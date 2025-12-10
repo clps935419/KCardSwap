@@ -1,0 +1,37 @@
+_format_version: "3.0"
+_transform: true
+
+services:
+  - name: backend
+    url: http://backend:8000
+    routes:
+      - name: api-v1
+        paths:
+          - /api/v1
+        strip_path: false
+
+plugins:
+  - name: cors
+    enabled: true
+    config:
+      origins:
+        - "*"
+      methods:
+        - GET
+        - POST
+        - PATCH
+        - DELETE
+      headers:
+        - Authorization
+        - Content-Type
+      exposed_headers:
+        - X-Request-Id
+      credentials: true
+      max_age: 3600
+  - name: request-size-limiting
+    config:
+      allowed_payload_size: 6  # MB, aligns to 5MB card + overhead
+  - name: rate-limiting
+    config:
+      minute: 120
+      policy: local
