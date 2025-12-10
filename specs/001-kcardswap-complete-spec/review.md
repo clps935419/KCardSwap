@@ -9,6 +9,7 @@
 ## Overview
 - 本次審查對象：產品規格（spec.md）、技術規劃（plan.md）、任務清單（tasks.md）。
 - 審查目標：需求明確、技術方案可行、任務可交付、測試可驗收、風險可緩解。
+ - 訂閱金流範圍：Android 僅用 Google Play Billing，後端僅驗證訂閱收據並同步 `subscriptions` 狀態；不直接處理金流或退款。iOS 後續採 Apple IAP，責任範圍相同（僅驗證收據）。
 
 ## Spec Findings
 - 規格內容齊全，含 User Stories、Functional Requirements、Key Entities、Success Criteria、Assumptions、Out of Scope。
@@ -58,6 +59,7 @@
 - [ ] 在 CARD 上限檢查中明確前端 UX 指引（錯誤提示文案統一）。
 - [ ] 在 API 標準章節加入 `409_CONFLICT` 的典型場景（交易狀態競態）。
 - [ ] 在 DB 任務補充必要索引清單與唯一性約束（如 friendship 唯一對）。
+ - [ ] 訂閱收據檢核細節：定義重試策略（次數、退避）、狀態回滾條件、監控指標（驗證失敗率、重試成功率）；退款由平台機制處理。
 
 ## Sign-off
 - Reviewer(s): PM / Tech Lead / Backend / Mobile / QA
