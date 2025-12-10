@@ -1,0 +1,256 @@
+# KCardSwap - Card Exchange Platform
+
+A card trading platform built with FastAPI, Kong API Gateway, and PostgreSQL.
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Docker & Docker Compose
+- Make (optional, for convenience commands)
+
+### Setup
+
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd KCardSwap
+   ```
+
+2. Copy environment variables:
+   ```bash
+   cp .env.example .env
+   # Edit .env with your configuration
+   ```
+
+3. Start all services:
+   ```bash
+   make setup
+   # or
+   docker compose up -d
+   ```
+
+4. Verify services are running:
+   ```bash
+   make health
+   ```
+
+Access points:
+- Backend API: http://localhost:8000
+- API Documentation: http://localhost:8000/api/v1/docs
+- Kong Gateway: http://localhost:8080
+- Kong Admin: http://localhost:8001
+- PostgreSQL: localhost:5432
+
+## 📁 Project Structure
+
+```
+KCardSwap/
+├── apps/
+│   └── backend/          # FastAPI backend application
+│       ├── app/
+│       │   ├── main.py   # Application entry point
+│       │   ├── routers/  # API route handlers
+│       │   ├── services/ # Business logic
+│       │   ├── models/   # Data models
+│       │   └── db/       # Database utilities
+│       ├── tests/        # Test files
+│       └── requirements.txt
+├── gateway/
+│   └── kong/             # Kong API Gateway configuration
+│       └── kong.yaml     # Declarative config
+├── infra/
+│   └── db/               # Database scripts
+│       └── init.sql      # Schema initialization
+├── specs/                # Feature specifications
+├── .github/
+│   └── workflows/        # CI/CD workflows
+├── docker-compose.yml    # Container orchestration
+├── Makefile             # Development commands
+└── SECRETS.md           # Secrets management guide
+```
+
+## 🛠️ Development
+
+### Available Commands
+
+```bash
+make help           # Show all available commands
+make dev            # Start development environment
+make down           # Stop all services
+make logs           # View logs from all services
+make test           # Run tests
+make lint           # Run linter
+make clean          # Stop services and remove volumes
+make health         # Check service health
+```
+
+### Backend Development
+
+```bash
+# View backend logs
+make logs-backend
+
+# Run tests
+cd apps/backend
+pytest -v
+
+# Run linter
+cd apps/backend
+flake8 .
+
+# Access backend shell
+make shell-backend
+```
+
+### Database
+
+```bash
+# Access PostgreSQL
+make shell-db
+
+# Re-initialize database
+make init-db
+```
+
+## 🧪 Testing
+
+Run all tests:
+```bash
+cd apps/backend
+pytest -v --cov=app
+```
+
+Run specific test file:
+```bash
+cd apps/backend
+pytest tests/test_main.py -v
+```
+
+## 📝 API Documentation
+
+Once the services are running, access the interactive API documentation:
+
+- Swagger UI: http://localhost:8000/api/v1/docs
+- ReDoc: http://localhost:8000/api/v1/redoc
+
+### API Routes
+
+All API endpoints are prefixed with `/api/v1/` and routed through Kong Gateway:
+
+```
+GET  /health              # Health check (direct)
+GET  /api/v1/health       # Health check (via Kong)
+GET  /api/v1/docs         # API documentation
+```
+
+### Example Request via Kong
+
+```bash
+# Direct to backend
+curl http://localhost:8000/api/v1/health
+
+# Via Kong Gateway (with rate limiting, CORS, etc.)
+curl http://localhost:8080/api/v1/health
+```
+
+## 🔐 Security & Secrets
+
+See [SECRETS.md](SECRETS.md) for detailed secrets management strategy.
+
+**Important:**
+- Never commit `.env` file
+- Rotate secrets regularly
+- Use different secrets for each environment
+
+## 🚢 Deployment
+
+### Phase 0 Status (Current)
+
+- [x] Mono-repo structure
+- [x] Docker Compose setup
+- [x] Kong API Gateway configuration
+- [x] Backend basic structure
+- [x] Database initialization
+- [x] CI/CD workflows
+- [x] Secrets management documentation
+
+### Next Phases
+
+See [specs/001-kcardswap-complete-spec/tasks.md](specs/001-kcardswap-complete-spec/tasks.md) for complete roadmap.
+
+## 📊 Tech Stack
+
+- **Backend**: Python 3.11, FastAPI, Uvicorn
+- **Database**: PostgreSQL 15
+- **API Gateway**: Kong 3.7
+- **Container**: Docker & Docker Compose
+- **CI/CD**: GitHub Actions
+- **Testing**: pytest, httpx
+
+## 🤝 Contributing
+
+1. Create a feature branch
+2. Make your changes
+3. Run tests and linter
+4. Submit a pull request
+
+CI will automatically run:
+- Code linting (flake8, black, isort)
+- Unit tests
+- Build verification
+- PR validation checks
+
+## 📚 Documentation
+
+- [Specification](specs/001-kcardswap-complete-spec/spec.md) - Complete feature specification
+- [Technical Plan](specs/001-kcardswap-complete-spec/plan.md) - Architecture and technical design
+- [Tasks](specs/001-kcardswap-complete-spec/tasks.md) - Implementation roadmap
+- [Secrets Management](SECRETS.md) - Security and secrets guide
+- [Backend README](apps/backend/README.md) - Backend-specific documentation
+
+## 🐛 Troubleshooting
+
+### Services won't start
+
+```bash
+# Check service status
+docker compose ps
+
+# View logs
+docker compose logs
+
+# Restart services
+docker compose restart
+```
+
+### Database connection issues
+
+```bash
+# Verify database is running
+docker compose ps db
+
+# Check database logs
+make logs-db
+
+# Test connection
+docker compose exec db pg_isready -U kcardswap
+```
+
+### Kong routing issues
+
+```bash
+# Verify Kong configuration
+docker compose exec kong kong config parse /kong/declarative/kong.yaml
+
+# Check Kong logs
+make logs-kong
+```
+
+## 📄 License
+
+[Add license information]
+
+## 👥 Team
+
+[Add team/contact information]
