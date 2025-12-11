@@ -60,7 +60,6 @@ poetry run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 | 查看依賴樹 | `poetry show --tree` |
 | 啟動虛擬環境 | `poetry shell` |
 | 執行命令 | `poetry run <command>` |
-| 導出 requirements.txt | `poetry export -f requirements.txt -o requirements.txt --without-hashes` |
 
 ## 本地開發伺服器啟動
 
@@ -95,7 +94,6 @@ apps/backend/
   tests/
   pyproject.toml      # Poetry 配置檔案
   poetry.lock         # Poetry 鎖定檔案（必須納入版本控制）
-  requirements.txt    # 向下相容用（由 Poetry 自動生成）
 ```
 
 ## 測試
@@ -110,12 +108,6 @@ poetry run pytest --cov=app --cov-report=term-missing
 
 # 執行特定測試檔案
 poetry run pytest tests/test_main.py -v
-```
-
-**傳統方式（僅供參考）:**
-```bash
-pip install -r requirements-dev.txt
-pytest -q
 ```
 
 ## Linting 與格式化
@@ -136,26 +128,13 @@ poetry run ruff check --fix .
 - 開發/生產依賴分離
 - 簡化的依賴操作
 
-### requirements.txt 的角色
-
-為了向下相容和 CI/CD 整合，我們保留 `requirements.txt` 和 `requirements-dev.txt`。這些檔案由 Poetry 自動生成：
-
-```bash
-# 生成生產依賴
-poetry export -f requirements.txt --output requirements.txt --without-hashes --without dev
-
-# 生成開發依賴
-poetry export -f requirements.txt --output requirements-dev.txt --with dev --without-hashes
-```
-
-**注意**: 請勿手動編輯 requirements.txt，所有依賴變更應透過 `poetry add/remove` 命令進行。
+所有依賴變更應透過 `poetry add/remove` 命令進行。
 
 ## 注意事項
 - 與 Kong 連接路徑統一為 `/api/v1/*`
 - 錯誤回應格式 `{ data: null, error: { code, message } }`
 - 超限錯誤碼：`422_LIMIT_EXCEEDED`；未授權：`401_UNAUTHORIZED`
 - `poetry.lock` 必須納入版本控制，確保團隊環境一致性
-- 依賴變更後，記得更新 requirements.txt（執行 poetry export）
 
 ## 故障排除
 

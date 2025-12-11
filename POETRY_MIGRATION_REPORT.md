@@ -52,9 +52,8 @@
   - README.md 包含 Poetry 設置說明
   - 常用 Poetry 命令參考表
   - 本地開發伺服器啟動指南
-  - 生成向後相容的 requirements.txt
-  - 生成 requirements-dev.txt
-  - 記錄 requirements.txt 生成流程
+  - 移除舊的 requirements.txt 和 requirements-dev.txt
+  - 完全採用 Poetry 依賴管理
 
 #### 階段 6：驗證（8/11 任務）✅
 - **T037-T039, T043-T044, T046-T047**：核心驗證完成
@@ -124,31 +123,19 @@ ruff = "^0.1.0"
 - **效能**：比傳統工具快 10-100 倍
 - **配置**：集中在 pyproject.toml
 
-### 6. 向後相容性
-```bash
-poetry export -f requirements.txt --output requirements.txt --without-hashes
-poetry export -f requirements.txt --output requirements-dev.txt --with dev --without-hashes
-```
-- **目的**：支援舊系統與手動 pip 安裝
-- **維護**：自動生成，請勿手動編輯
-
 ---
 
 ## 變更的檔案
 
-### 新增檔案（3 個）
+### 新增檔案（2 個）
 1. **apps/backend/poetry.lock**（157KB）
    - 包含精確版本的依賴鎖定檔
    - 必須提交至 Git
 
-2. **apps/backend/Dockerfile**（706 bytes）
-   - 多階段 Docker 構建配置
-   - 使用 Poetry 匯出的 requirements.txt
-
-3. **apps/backend/.dockerignore**（455 bytes）
+2. **apps/backend/.dockerignore**（455 bytes）
    - 從 Docker 上下文排除開發檔案
 
-### 修改檔案（7 個）
+### 修改檔案（3 個）
 1. **.github/workflows/backend-ci.yml**
    - 完全改寫以使用 Poetry
    - 新增快取策略
@@ -158,7 +145,8 @@ poetry export -f requirements.txt --output requirements-dev.txt --with dev --wit
    - 新增 Poetry 安裝指南
    - 新增常用命令參考
    - 新增故障排除章節
-   - 從 47 行擴展至 190 行
+   - 移除 requirements.txt 相關說明
+   - 完全採用 Poetry 工作流程
 
 3. **apps/backend/pyproject.toml**
    - 新增 [tool.poetry] 區段
@@ -168,21 +156,22 @@ poetry export -f requirements.txt --output requirements-dev.txt --with dev --wit
    - 新增 [tool.ruff] 配置
    - 從 16 行擴展至 55 行
 
-4. **apps/backend/requirements.txt**
-   - 從 Poetry 重新生成（僅生產依賴）
-   - 從 8 行增加至 48 行（包含子依賴）
+4. **apps/backend/Dockerfile**
+   - 改用 Poetry 直接安裝依賴
+   - 多階段構建最佳化
+   - 不再依賴 requirements.txt
 
-5. **apps/backend/requirements-dev.txt**
-   - 從 Poetry 重新生成（所有依賴）
-   - 從 4 行增加至 52 行（包含子依賴）
-
-6. **apps/backend/tests/test_main.py**
+5. **apps/backend/tests/test_main.py**
    - 次要：修正 import 順序（ruff 自動修復）
    - 移除未使用的 pytest import
 
-7. **specs/copilot/modify-requirements-backend/tasks.md**
+6. **specs/copilot/modify-requirements-backend/tasks.md**
    - 更新任務勾選框（52 個中完成 42 個）
    - 追蹤各階段進度
+
+### 移除檔案（2 個）
+1. **apps/backend/requirements.txt** - 已移除，不再需要向後兼容
+2. **apps/backend/requirements-dev.txt** - 已移除，不再需要向後兼容
 
 ---
 
@@ -312,7 +301,6 @@ poetry run ruff check .
 **緩解措施**：
 - Dockerfile 已正確實作
 - 在標準 Docker 環境中可正常運作
-- 預先生成的 requirements.txt 可作為備案
 
 **解決方案**：在具有適當 SSL 憑證的標準環境中測試 Docker 構建
 
@@ -382,8 +370,9 @@ git push origin copilot/modify-requirements-backend
 ```
 
 ### 步驟 2：恢復 pip 工作流程
-- Dockerfile 將自動使用 requirements.txt
+- 需要重新建立 requirements.txt 檔案
 - GitHub Actions 將使用 pip（如還原則不需變更）
+- Dockerfile 需要改回使用 pip
 - 團隊繼續使用 pip 工作流程
 
 ### 步驟 3：記錄問題
@@ -408,7 +397,7 @@ Poetry 遷移實作已**完成 80% 且功能已就緒**可部署。核心功能�
 - 自動化依賴解析
 - 使用 poetry.lock 進行版本鎖定
 - 具有快取的 CI/CD 管道
-- 透過 requirements.txt 的向後相容性
+- 完整採用 Poetry，無向後兼容包袱
 - 完整的文件
 - 所有現有測試通過
 
@@ -423,7 +412,7 @@ Poetry 遷移實作已**完成 80% 且功能已就緒**可部署。核心功能�
 3. **中期**：評估穩定性並迭代
 
 ### 風險評估
-**低風險** - 變更不具破壞性、可還原且保持向後相容性。遷移改善了程式碼品質與開發者體驗，且僅造成最小干擾。
+**低風險** - 變更可還原。完全採用 Poetry 提供更簡潔的依賴管理方式，改善了程式碼品質與開發者體驗。
 
 ---
 
