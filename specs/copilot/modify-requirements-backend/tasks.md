@@ -30,11 +30,11 @@
 
 **Prerequisites**: 無 - 可立即開始
 
-- [ ] T001 [DR-001] 在 apps/backend/ 目錄建立 pyproject.toml 並配置專案元資料（name, version, description, authors）
-- [ ] T002 [DR-002] 在 pyproject.toml 中定義生產依賴（fastapi, uvicorn, pydantic, pydantic-settings, python-jose, passlib, python-multipart, psycopg2-binary）
-- [ ] T003 [P] [DR-003] 在 pyproject.toml 中定義開發依賴（pytest, pytest-asyncio, pytest-cov, httpx, ruff）
-- [ ] T004 [P] [DR-002] 在 pyproject.toml 中配置 build-system 區段（poetry-core）
-- [ ] T005 [DR-002] 執行 `poetry lock` 生成 poetry.lock 檔案並驗證依賴解析成功
+- [X] T001 [DR-001] 在 apps/backend/ 目錄建立 pyproject.toml 並配置專案元資料（name, version, description, authors）
+- [X] T002 [DR-002] 在 pyproject.toml 中定義生產依賴（fastapi, uvicorn, pydantic, pydantic-settings, python-jose, passlib, python-multipart, psycopg2-binary）
+- [X] T003 [P] [DR-003] 在 pyproject.toml 中定義開發依賴（pytest, pytest-asyncio, pytest-cov, httpx, ruff）
+- [X] T004 [P] [DR-002] 在 pyproject.toml 中配置 build-system 區段（poetry-core）
+- [X] T005 [DR-002] 執行 `poetry lock` 生成 poetry.lock 檔案並驗證依賴解析成功
 
 **Checkpoint**: pyproject.toml 和 poetry.lock 已建立且可正常安裝
 
@@ -46,10 +46,10 @@
 
 **Prerequisites**: Phase 1 完成
 
-- [ ] T006 [P] [DR-001] 在 pyproject.toml 中整合 pytest 配置（testpaths, python_files, python_classes, python_functions, addopts）
-- [ ] T007 [P] [DR-001] 在 pyproject.toml 中整合 ruff 配置（line-length, target-version, select, ignore, per-file-ignores）
-- [ ] T008 [DR-001] 在本地環境執行 `poetry install` 驗證依賴安裝成功
-- [ ] T009 [DR-001] 在本地環境執行 `poetry run pytest` 驗證測試框架正常運作
+- [X] T006 [P] [DR-001] 在 pyproject.toml 中整合 pytest 配置（testpaths, python_files, python_classes, python_functions, addopts）
+- [X] T007 [P] [DR-001] 在 pyproject.toml 中整合 ruff 配置（line-length, target-version, select, ignore, per-file-ignores）
+- [X] T008 [DR-001] 在本地環境執行 `poetry install` 驗證依賴安裝成功
+- [X] T009 [DR-001] 在本地環境執行 `poetry run pytest` 驗證測試框架正常運作
 
 **Checkpoint**: 工具配置完成，可使用 Poetry 執行測試與 linting
 
@@ -63,18 +63,18 @@
 
 ### Docker 多階段構建設計
 
-- [ ] T010 [DR-004] 建立/更新 apps/backend/Dockerfile，實作 Stage 1: Builder（安裝 Poetry 並導出依賴）
-- [ ] T011 [DR-004] 在 Dockerfile Stage 1 中配置 Poetry 環境變數（POETRY_VERSION=1.7.1, POETRY_HOME, POETRY_NO_INTERACTION, POETRY_VIRTUALENVS_CREATE）
-- [ ] T012 [DR-004] 在 Dockerfile Stage 1 中使用官方安裝腳本安裝 Poetry 並設定 PATH
-- [ ] T013 [DR-004] 在 Dockerfile Stage 1 中複製 pyproject.toml 和 poetry.lock
-- [ ] T014 [DR-004] 在 Dockerfile Stage 1 中執行 `poetry export` 生成 requirements.txt（--without-hashes --without dev）
-- [ ] T015 [DR-004] 實作 Dockerfile Stage 2: Runtime（使用 python:3.11-slim 基礎映像）
-- [ ] T016 [DR-004] 在 Dockerfile Stage 2 中從 builder 複製 requirements.txt 並使用 pip 安裝
-- [ ] T017 [DR-004] 在 Dockerfile Stage 2 中複製應用程式碼並設定啟動命令
+- [X] T010 [DR-004] 建立/更新 apps/backend/Dockerfile，實作 Stage 1: Builder（安裝 Poetry 並導出依賴）
+- [X] T011 [DR-004] 在 Dockerfile Stage 1 中配置 Poetry 環境變數（POETRY_VERSION=1.7.1, POETRY_HOME, POETRY_NO_INTERACTION, POETRY_VIRTUALENVS_CREATE）
+- [X] T012 [DR-004] 在 Dockerfile Stage 1 中使用官方安裝腳本安裝 Poetry 並設定 PATH
+- [X] T013 [DR-004] 在 Dockerfile Stage 1 中複製 pyproject.toml 和 poetry.lock
+- [X] T014 [DR-004] 在 Dockerfile Stage 1 中執行 `poetry export` 生成 requirements.txt（--without-hashes --without dev）
+- [X] T015 [DR-004] 實作 Dockerfile Stage 2: Runtime（使用 python:3.11-slim 基礎映像）
+- [X] T016 [DR-004] 在 Dockerfile Stage 2 中從 builder 複製 requirements.txt 並使用 pip 安裝
+- [X] T017 [DR-004] 在 Dockerfile Stage 2 中複製應用程式碼並設定啟動命令
 
 ### Docker 驗證
 
-- [ ] T018 [DR-004] 建立/更新 apps/backend/.dockerignore（排除 __pycache__, *.pyc, .pytest_cache, .coverage, tests/）
+- [X] T018 [DR-004] 建立/更新 apps/backend/.dockerignore（排除 __pycache__, *.pyc, .pytest_cache, .coverage, tests/）
 - [ ] T019 [DR-004] 在本地執行 `docker build -t kcardswap-backend:local apps/backend` 驗證映像構建成功
 - [ ] T020 [DR-004] 在本地執行 Docker 容器並驗證應用程式可正常啟動（uvicorn 監聽 8000 port）
 
@@ -90,13 +90,13 @@
 
 ### GitHub Actions 配置
 
-- [ ] T021 [DR-005] 更新 .github/workflows/backend-ci.yml，在 test job 中使用 actions/setup-python@v5 設定 Python 3.11
-- [ ] T022 [DR-005] 在 backend-ci.yml 中使用 snok/install-poetry@v1 安裝 Poetry 1.7.1（配置 virtualenvs-create=true, virtualenvs-in-project=true）
-- [ ] T023 [DR-005] 在 backend-ci.yml 中配置 Poetry 虛擬環境快取（actions/cache@v3，路徑 apps/backend/.venv，key 基於 poetry.lock hash）
-- [ ] T024 [DR-005] 在 backend-ci.yml 中添加依賴安裝步驟（`poetry install --no-interaction --no-root`，僅在快取未命中時執行）
-- [ ] T025 [P] [DR-005] 在 backend-ci.yml 中更新 linting 步驟使用 `poetry run ruff check .`
-- [ ] T026 [P] [DR-005] 在 backend-ci.yml 中更新測試步驟使用 `poetry run pytest --cov=app --cov-report=xml`
-- [ ] T027 [P] [DR-005] 在 backend-ci.yml 中添加 poetry.lock 驗證步驟（`poetry check --lock`）
+- [X] T021 [DR-005] 更新 .github/workflows/backend-ci.yml，在 test job 中使用 actions/setup-python@v5 設定 Python 3.11
+- [X] T022 [DR-005] 在 backend-ci.yml 中使用 snok/install-poetry@v1 安裝 Poetry 1.7.1（配置 virtualenvs-create=true, virtualenvs-in-project=true）
+- [X] T023 [DR-005] 在 backend-ci.yml 中配置 Poetry 虛擬環境快取（actions/cache@v3，路徑 apps/backend/.venv，key 基於 poetry.lock hash）
+- [X] T024 [DR-005] 在 backend-ci.yml 中添加依賴安裝步驟（`poetry install --no-interaction --no-root`，僅在快取未命中時執行）
+- [X] T025 [P] [DR-005] 在 backend-ci.yml 中更新 linting 步驟使用 `poetry run ruff check .`
+- [X] T026 [P] [DR-005] 在 backend-ci.yml 中更新測試步驟使用 `poetry run pytest --cov=app --cov-report=xml`
+- [X] T027 [P] [DR-005] 在 backend-ci.yml 中添加 poetry.lock 驗證步驟（`poetry check --lock`）
 
 ### CI/CD 驗證
 
@@ -115,16 +115,16 @@
 
 ### 文件更新
 
-- [ ] T030 [P] [DR-001] 更新 apps/backend/README.md，新增「開發環境設置」章節（Poetry 安裝與使用說明）
-- [ ] T031 [P] [DR-001] 在 apps/backend/README.md 中新增「常用 Poetry 命令」參考表（add, remove, update, install, shell, run）
-- [ ] T032 [P] [DR-001] 在 apps/backend/README.md 中新增「本地開發伺服器啟動」說明（poetry run uvicorn app.main:app --reload）
-- [ ] T033 [P] [DR-001] 驗證 specs/copilot/modify-requirements-backend/quickstart.md 內容完整且正確
+- [X] T030 [P] [DR-001] 更新 apps/backend/README.md，新增「開發環境設置」章節（Poetry 安裝與使用說明）
+- [X] T031 [P] [DR-001] 在 apps/backend/README.md 中新增「常用 Poetry 命令」參考表（add, remove, update, install, shell, run）
+- [X] T032 [P] [DR-001] 在 apps/backend/README.md 中新增「本地開發伺服器啟動」說明（poetry run uvicorn app.main:app --reload）
+- [X] T033 [P] [DR-001] 驗證 specs/copilot/modify-requirements-backend/quickstart.md 內容完整且正確
 
 ### 向下相容性保障
 
-- [ ] T034 [DR-002] 在 apps/backend/ 中執行 `poetry export -f requirements.txt --output requirements.txt --without-hashes --without dev` 生成備援 requirements.txt
-- [ ] T035 [DR-003] 在 apps/backend/ 中執行 `poetry export -f requirements.txt --output requirements-dev.txt --with dev --without-hashes` 生成備援 requirements-dev.txt
-- [ ] T036 [DR-002] 在 apps/backend/README.md 中說明 requirements.txt 的用途（向下相容，由 Poetry 自動生成）
+- [X] T034 [DR-002] 在 apps/backend/ 中執行 `poetry export -f requirements.txt --output requirements.txt --without-hashes --without dev` 生成備援 requirements.txt
+- [X] T035 [DR-003] 在 apps/backend/ 中執行 `poetry export -f requirements.txt --output requirements-dev.txt --with dev --without-hashes` 生成備援 requirements-dev.txt
+- [X] T036 [DR-002] 在 apps/backend/README.md 中說明 requirements.txt 的用途（向下相容，由 Poetry 自動生成）
 
 **Checkpoint**: 文件更新完成，向下相容性已保障
 
@@ -138,23 +138,23 @@
 
 ### 端到端驗證
 
-- [ ] T037 在乾淨環境（新 clone 或刪除 .venv）執行 `poetry install` 並驗證所有依賴正確安裝
-- [ ] T038 執行 `poetry run pytest` 並驗證所有現有測試通過（測試覆蓋率與遷移前一致）
-- [ ] T039 執行 `poetry run ruff check .` 並驗證 linting 通過（無錯誤）
+- [X] T037 在乾淨環境（新 clone 或刪除 .venv）執行 `poetry install` 並驗證所有依賴正確安裝
+- [X] T038 執行 `poetry run pytest` 並驗證所有現有測試通過（測試覆蓋率與遷移前一致）
+- [X] T039 執行 `poetry run ruff check .` 並驗證 linting 通過（無錯誤）
 - [ ] T040 執行 `docker build -t kcardswap-backend:test apps/backend` 並驗證 Docker 映像大小合理（執行階段 < 250MB）
 - [ ] T041 啟動 Docker 容器並執行健康檢查（curl http://localhost:8000/health 或類似端點）
 - [ ] T042 驗證 CI/CD 管道在完整變更集下成功執行（所有 jobs 綠色）
 
 ### 文件驗證
 
-- [ ] T043 [P] 依照 apps/backend/README.md 中的 Poetry 設置步驟在測試環境驗證文件正確性
-- [ ] T044 [P] 依照 specs/copilot/modify-requirements-backend/quickstart.md 在測試環境驗證快速入門指南可用性
+- [X] T043 [P] 依照 apps/backend/README.md 中的 Poetry 設置步驟在測試環境驗證文件正確性
+- [X] T044 [P] 依照 specs/copilot/modify-requirements-backend/quickstart.md 在測試環境驗證快速入門指南可用性
 
 ### 清理與最佳化（可選）
 
 - [ ] T045 評估是否可移除舊的 requirements-dev.txt（若團隊已完全適應 Poetry）
-- [ ] T046 檢查 .gitignore 是否包含 Poetry 相關目錄（.venv/, poetry.toml - 若有本地配置）
-- [ ] T047 執行 `poetry check` 驗證 pyproject.toml 語法正確且依賴配置完整
+- [X] T046 檢查 .gitignore 是否包含 Poetry 相關目錄（.venv/, poetry.toml - 若有本地配置）
+- [X] T047 執行 `poetry check` 驗證 pyproject.toml 語法正確且依賴配置完整
 
 **Checkpoint**: 遷移完成，所有功能正常運作，文件齊全
 
