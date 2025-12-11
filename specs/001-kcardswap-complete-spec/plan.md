@@ -14,6 +14,16 @@
 
 ## 1. 架構與基礎設施
 - 專案目錄：`apps/mobile`, `apps/backend`, `gateway/kong`, `infra/db`, `infra/gcs`, `infra/ci`。
+- **後端依賴管理**（**已更新 2025-12-11**）：
+	- **工具**：Poetry（取代 pip + requirements.txt）
+	- **配置檔**：pyproject.toml（專案元資料 + 依賴定義 + 工具配置）
+	- **鎖定檔**：poetry.lock（確保版本一致性，必須納入版本控制）
+	- **依賴分離**：生產依賴 `[tool.poetry.dependencies]` vs 開發依賴 `[tool.poetry.group.dev.dependencies]`
+	- **優勢**：自動依賴解析、版本鎖定、現代化工具鏈、符合 PEP 518/517 標準
+	- **向下相容**：可導出 requirements.txt 作為備援（`poetry export`）
+	- **Docker 支援**：多階段構建，構建階段使用 Poetry，執行階段使用輕量 pip
+	- **CI/CD 整合**：GitHub Actions 使用 snok/install-poetry action，快取 .venv 目錄
+	- **詳細文件**：參見 `specs/copilot/modify-requirements-backend/`（plan.md, research.md, quickstart.md）
 - Kong Gateway（POC）：
 	- 插件：JWT auth、Rate Limiting（依會員等級）、CORS、Request Size Limiter。
 	- 路由前綴：`/api/v1/*` → upstream `apps/backend`。
