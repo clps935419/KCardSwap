@@ -1,0 +1,78 @@
+name: PR Checks
+
+on:
+  pull_request:
+    branches: [ main, master, develop ]
+
+jobs:
+  pr-checks:
+    name: Pull Request Validation
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Check PR title format
+      run: |
+        PR_TITLE="${{ github.event.pull_request.title }}"
+        echo "PR Title: $PR_TITLE"
+        # Add PR title validation if needed
+    
+    - name: Check for merge conflicts
+      run: |
+        git fetch origin ${{ github.base_ref }}
+        if git merge-tree $(git merge-base HEAD origin/${{ github.base_ref }}) HEAD origin/${{ github.base_ref }} | grep -q '<<<<<<<'; then
+          echo "Merge conflicts detected!"
+          exit 1
+        fi
+    
+    - name: Validate docker-compose
+      run: |
+        docker compose config > /dev/null
+    
+    - name: Check for secrets in code
+      run: |
+        # Basic check for common secret patterns
+        if grep -r -E "(password|secret|key|token).*=.*['\"][^'\"]{20,}['\"]" apps/ --exclude-dir=node_modules --exclude-dir=venv --exclude="*.md"; then
+          echo "⚠️ Warning: Potential hardcoded secrets detected"
+          exit 1
+        fi
+      continue-on-error: true
+    
+    - name: File size check
+      run: |
+        # Check for large files (> 5MB)
+        large_files=$(find . -type f -size +5M -not -path "./.git/*")
+        if [ -n "$large_files" ]; then
+          echo "Large files detected:"
+          echo "$large_files"
+          exit 1
+        fi
+
+  docker-build:
+    name: Docker Build Test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Test Docker Compose Build
+      run: |
+        docker compose build backend
+    
+    - name: Test Docker Compose Up
+      run: |
+        docker compose up -d
+        sleep 10
+        docker compose ps
+        
+        # Check if services are healthy
+        if ! docker compose ps | grep -q "Up"; then
+          echo "Services failed to start"
+          docker compose logs
+          exit 1
+        fi
+        
+        docker compose down

@@ -1,11 +1,11 @@
 # Tasks: 001 KCardSwap Complete Spec
 
 ## Phase 0: Setup
-- [ ] T001 初始化 mono-repo 目錄與工作流（apps/backend, gateway/kong, infra/db, specs, plans, tasks）
-- [ ] T002 建立 `.env` 與機密管理策略（本機 `.env`、CI/Prod 使用 Secret Manager）
-- [ ] T003 Docker Compose 一鍵啟動（Kong、Backend、Postgres、(可選)Nginx）路徑：`docker-compose.yml`
-- [ ] T004 Kong 宣告式設定與路由 `/api/v1/*` → backend 路徑：`gateway/kong/kong.yaml`
-- [ ] T005 CI/CD：lint/test/build、PR 檢查（GitHub Actions / GitLab CI）
+- [X] T001 初始化 mono-repo 目錄與工作流（apps/backend, gateway/kong, infra/db, specs, plans, tasks）
+- [X] T002 建立 `.env` 與機密管理策略（本機 `.env`、CI/Prod 使用 Secret Manager）
+- [X] T003 Docker Compose 一鍵啟動（Kong、Backend、Postgres、(可選)Nginx）路徑：`docker-compose.yml`
+- [X] T004 Kong 宣告式設定與路由 `/api/v1/*` → backend 路徑：`gateway/kong/kong.yaml`
+- [X] T005 CI/CD：lint/test/build、PR 檢查（GitHub Actions / GitLab CI）
 
 ## Phase 1: AUTH/PROFILE (P1)
 - [ ] T101 後端 Google OAuth 換 token 與使用者建立（`apps/backend/app/routers/auth.py`）

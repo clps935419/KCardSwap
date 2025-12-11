@@ -1,0 +1,118 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [ main, master, develop ]
+    paths:
+      - 'apps/backend/**'
+      - '.github/workflows/backend-ci.yml'
+  pull_request:
+    branches: [ main, master, develop ]
+    paths:
+      - 'apps/backend/**'
+      - '.github/workflows/backend-ci.yml'
+
+jobs:
+  lint:
+    name: Lint Python Code
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 black isort
+        cd apps/backend
+        pip install -r requirements.txt
+    
+    - name: Run black (formatter check)
+      run: |
+        cd apps/backend
+        black --check --diff .
+      continue-on-error: true
+    
+    - name: Run isort (import order check)
+      run: |
+        cd apps/backend
+        isort --check-only --diff .
+      continue-on-error: true
+    
+    - name: Run flake8 (linter)
+      run: |
+        cd apps/backend
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: kcardswap
+          POSTGRES_PASSWORD: kcardswap
+          POSTGRES_DB: kcardswap_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        cd apps/backend
+        pip install -r requirements.txt
+        pip install -r requirements-dev.txt
+    
+    - name: Run tests
+      env:
+        DATABASE_URL: postgresql://kcardswap:kcardswap@localhost:5432/kcardswap_test
+        JWT_SECRET: test-secret-key
+        GCS_BUCKET: test-bucket
+      run: |
+        cd apps/backend
+        pytest -v --cov=app --cov-report=term-missing
+
+  build:
+    name: Build Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        cd apps/backend
+        pip install -r requirements.txt
+    
+    - name: Check imports and syntax
+      run: |
+        cd apps/backend
+        python -m py_compile app/main.py
+        python -c "from app.main import app; print('FastAPI app loaded successfully')"
