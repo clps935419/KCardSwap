@@ -250,3 +250,24 @@
 - 全面性的金流整合與收費機制細節（目前僅定義會員等級與限制，不實作實際收款流程）。
 - 針對假卡的影像辨識與自動審核機制（此平台僅提供交友交換卡片功能不提供假卡辨識）。
 - 多語系完整支援（現階段以繁體中文為主，未完整支援英文或韓文介面）。
+
+---
+
+## Development Environment Requirements
+
+### Backend Dependency Management
+
+**[CHANGED: pip/requirements.txt → Poetry，原因：提升依賴管理的可靠性、可重現性與開發體驗]**
+
+- **DR-001**：後端專案必須使用 Poetry 作為依賴管理工具，取代傳統的 pip + requirements.txt 方式。
+- **DR-002**：所有 Python 依賴必須在 pyproject.toml 中明確定義，並透過 poetry.lock 鎖定版本以確保開發、測試、生產環境的一致性。
+- **DR-003**：開發依賴與生產依賴必須明確分離（Poetry 的 dev-dependencies 功能）。
+- **DR-004**：Docker 構建流程必須支援 Poetry，確保容器化環境可以正確安裝依賴。
+- **DR-005**：CI/CD 管道必須使用 Poetry 進行依賴安裝與測試執行。
+
+**變更理由**：
+1. **依賴解析**：Poetry 提供更智能的依賴解析機制，自動處理版本衝突
+2. **環境隔離**：內建虛擬環境管理，避免全局污染
+3. **版本鎖定**：poetry.lock 確保所有環境的依賴版本完全一致
+4. **開發體驗**：簡化的命令介面（poetry add/remove/update）
+5. **現代標準**：符合 PEP 517/518 標準，是 Python 社群推薦的現代化工具
