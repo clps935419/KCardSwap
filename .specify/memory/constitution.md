@@ -5,10 +5,7 @@
 
 ## 核心原則
 
-### I. 領域驅動設計架構（Domain-Driven Design）
-後端遵循 DDD 原則，明確分離領域層（domain）、應用層（application）和基礎設施層（infrastructure）。每個限界上下文（bounded context）維護自己的聚合（aggregates）、實體（entities）和值物件（value objects）。領域邏輯保持純淨，獨立於基礎設施關注點。
-
-### II. API 優先開發
+### I. API 優先開發
 所有功能透過 RESTful API 對外暴露，遵循 OpenAPI 規範。FastAPI 自動生成 Swagger 文件。輪詢端點針對高效訊息檢索和成本效益進行最佳化。
 
 ### III. 測試優先開發（不可妥協）
@@ -32,6 +29,98 @@
 - 靜態和傳輸中的敏感資料加密
 - Google Cloud Storage signed URLs 附帶過期時間策略
 - 定期安全稽核和依賴套件更新
+
+### VI. Domain-Driven Design Architecture（領域驅動設計架構）
+
+後端必須採用 Domain-Driven Design (DDD) 架構模式，確保業務邏輯與技術細節分離。
+
+#### 四層架構強制規定
+
+所有後端專案必須遵循以下四層架構，各層有明確的職責與依賴方向：
+
+```
+┌─────────────────────────────────────┐
+│   Presentation Layer (API/UI)      │  ← FastAPI Routers, Request/Response Models
+├─────────────────────────────────────┤
+│   Application Layer (Use Cases)    │  ← Application Services, DTOs, Command/Query Handlers
+├─────────────────────────────────────┤
+│   Domain Layer (Business Logic)    │  ← Entities, Value Objects, Domain Services, Domain Events
+├─────────────────────────────────────┤
+│   Infrastructure Layer (技術實作)   │  ← Database, External APIs, File Storage, Message Queue
+└─────────────────────────────────────┘
+```
+
+**依賴規則（Dependency Rule）**：
+- 外層可以依賴內層，內層不得依賴外層
+- Domain Layer 必須完全獨立，不依賴任何框架或基礎設施
+- 所有跨層通訊透過介面（Interface/Protocol）與依賴注入（Dependency Injection）
+
+#### 核心設計模式
+
+**Repository Pattern（倉儲模式）**
+- Domain Layer 定義 Repository 介面（Protocol），Infrastructure Layer 提供實作
+- Repository 負責聚合根（Aggregate Root）的持久化與查詢
+- 禁止在 Domain Layer 直接使用 ORM 或 SQL
+
+**Dependency Injection（依賴注入）**
+- 使用 FastAPI 的 `Depends` 機制進行依賴注入
+- 所有 Repository、Service、Use Case 透過建構函式注入
+- 配置統一管理於 `dependencies.py`
+
+**Use Case Pattern（用例模式）**
+- 每個業務用例封裝為獨立的 Use Case 類別
+- Use Case 協調 Domain Entities、Services、Repositories
+- Use Case 不含技術細節，僅處理業務流程
+
+**Domain Events（領域事件）**
+- 使用事件驅動架構處理跨聚合的業務邏輯
+- Domain Layer 定義事件，Infrastructure Layer 實作事件匯流排
+- 事件處理非同步執行（避免阻塞主流程）
+
+**CQRS Pattern（命令查詢職責分離）**
+- 寫操作（Command）與讀操作（Query）分離
+- Command 修改狀態並返回最少資訊
+- Query 優化讀取效能（可繞過 Domain Layer 直接查詢）
+
+**Value Objects（值物件）**
+- 不可變物件，通過值比較相等性
+- 封裝驗證邏輯（如 Email 格式、經緯度範圍）
+- 可在多個 Entity 間共用
+
+#### 測試策略
+
+**測試金字塔**
+```
+        ╱╲
+       ╱E2E╲         ← 少量端到端測試（完整流程）
+      ╱──────╲
+     ╱Integration╲   ← 適量整合測試（含 DB、外部服務）
+    ╱────────────╲
+   ╱   Unit Tests  ╲ ← 大量單元測試（Domain & Application）
+  ╱────────────────╲
+```
+
+- **單元測試**：測試 Domain Entities、Value Objects、Domain Services（不依賴 DB）
+- **整合測試**：測試 Repositories、Use Cases（使用測試資料庫）
+- **端到端測試**：測試完整 API 流程（從 HTTP Request 到 Response）
+
+**測試隔離**
+- Domain Layer 測試完全獨立，不啟動 FastAPI 應用
+- Repository 測試使用 Test Database（Docker PostgreSQL）
+- 外部服務使用 Mock（Google OAuth、GCS、FCM）
+
+#### 實作檢查清單
+
+開發時必須確保以下項目：
+- [ ] 所有 Domain Entities 不依賴 FastAPI、SQLAlchemy 或其他框架
+- [ ] Repository 介面定義在 Domain Layer，實作在 Infrastructure Layer
+- [ ] Use Cases 不包含 SQL 查詢或 HTTP 請求邏輯
+- [ ] Routers 僅負責請求驗證與回應格式化，業務邏輯委派給 Use Cases
+- [ ] ORM Models 與 Domain Entities 分離
+- [ ] 所有跨層依賴透過介面（Protocol）與依賴注入
+- [ ] Domain Events 用於處理跨聚合的副作用
+- [ ] Value Objects 封裝驗證邏輯且不可變
+- [ ] 單元測試覆蓋率達 80% 以上（Domain & Application Layer）
 
 ## 後端架構
 

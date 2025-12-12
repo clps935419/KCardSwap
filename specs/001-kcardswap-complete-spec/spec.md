@@ -235,39 +235,194 @@
 
 ---
 
-## Assumptions
+#### 目錄結構規範
 
-- 目前僅支援 Google 作為唯一第三方登入方式，未同時支援 Apple ID 或其他 OAuth 供應商。
-- POC 階段以台灣及韓國使用者為主要目標地區，地理位置與語系優先針對該區域優化。
-- 交換流程以面對面實體交換為主，不處理郵寄與金流相關流程（未來若要支援另行規劃）。
-- 使用者裝置大多為 Android 與 iOS 智慧型手機，螢幕尺寸與效能不極端老舊。
- - 訂閱金流：Android 採用「Google Play Billing」作為唯一訂閱支付方式；iOS 次階段採「Apple In‑App Purchase（IAP）」。後端僅進行訂閱收據驗證與狀態管理，不直接介入金流或退款。產品不支援卡片買賣或交易金流。
+**說明**：本專案的 DDD 原則請參考專案憲法（Constitution Article VI）。下列為本專案具體目錄與實體定義（專案專屬內容），保留於 Spec 中以利開發實作。
+
+```
+apps/backend/app/
+├── main.py                          # FastAPI 應用入口
+├── config.py                        # 配置管理（環境變數、設定）
+├── dependencies.py                  # 全局依賴注入設定
+|
+├── domain/                          # Domain Layer (核心業務邏輯)
+│   ├── __init__.py
+│   ├── entities/                    # 領域實體（Entities）
+
+#### 目錄結構規範
+
+```
+apps/backend/app/
+├── main.py                          # FastAPI 應用入口
+├── config.py                        # 配置管理（環境變數、設定）
+├── dependencies.py                  # 全局依賴注入設定
+|
+├── domain/                          # Domain Layer (核心業務邏輯)
+│   ├── __init__.py
+│   ├── entities/                    # 領域實體（Entities）
+│   │   ├── __init__.py
+│   │   ├── user.py                 # User Entity (含業務邏輯方法)
+│   │   ├── card.py                 # Card Entity
+│   │   ├── trade.py                # Trade Entity
+│   │   └── chat.py                 # Chat Entity
+│   ├── value_objects/              # 值物件（Value Objects）
+│   │   ├── __init__.py
+│   │   ├── email.py                # Email VO (不可變)
+│   │   ├── location.py             # Location VO (經緯度)
+│   │   └── rating.py               # Rating VO (1-5 星)
+│   ├── repositories/               # Repository 介面（不含實作）
+│   │   ├── __init__.py
+│   │   ├── user_repository.py      # IUserRepository (Protocol)
+│   │   ├── card_repository.py
+│   │   └── trade_repository.py
+│   ├── services/                   # Domain Services (複雜業務邏輯)
+│   │   ├── __init__.py
+│   │   ├── trade_matching_service.py
+│   │   └── nearby_search_service.py
+│   ├── events/                     # Domain Events
+│   │   ├── __init__.py
+│   │   ├── user_registered.py
+│   │   ├── trade_completed.py
+│   │   └── message_sent.py
+│   └── exceptions/                 # Domain 專用例外
+│       ├── __init__.py
+│       ├── business_rule_violation.py
+│       └── entity_not_found.py
+│
+├── application/                    # Application Layer (用例協調)
+│   ├── __init__.py
+│   ├── use_cases/                  # Use Cases (Application Services)
+│   │   ├── __init__.py
+│   │   ├── auth/
+│   │   │   ├── login_with_google.py
+│   │   │   └── refresh_token.py
+│   │   ├── cards/
+│   │   │   ├── create_card.py
+│   │   │   ├── update_card.py
+│   │   │   └── search_cards.py
+│   │   ├── trades/
+│   │   │   ├── create_trade_proposal.py
+│   │   │   ├── accept_trade.py
+│   │   │   └── complete_trade.py
+│   │   └── chats/
+│   │       ├── send_message.py
+│   │       └── get_chat_history.py
+│   ├── dtos/                       # Data Transfer Objects
+│   │   ├── __init__.py
+│   │   ├── user_dto.py
+│   │   ├── card_dto.py
+│   │   └── trade_dto.py
+│   ├── commands/                   # Command Objects (CQRS 模式)
+│   │   ├── __init__.py
+│   │   ├── create_card_command.py
+│   │   └── send_message_command.py
+│   ├── queries/                    # Query Objects (CQRS 模式)
+│   │   ├── __init__.py
+│   │   ├── get_nearby_users_query.py
+│   │   └── get_trade_history_query.py
+│   └── handlers/                   # Command/Query Handlers
+│       ├── __init__.py
+│       ├── command_handlers.py
+│       └── query_handlers.py
+│
+├── infrastructure/                 # Infrastructure Layer (技術實作)
+│   ├── __init__.py
+│   ├── database/
+│   │   ├── __init__.py
+│   │   ├── connection.py           # SQLAlchemy Engine/Session
+│   │   ├── models.py               # ORM Models (非 Domain Entities)
+│   │   └── migrations/             # Alembic migrations
+│   ├── repositories/               # Repository 實作
+│   │   ├── __init__.py
+│   │   ├── sqlalchemy_user_repository.py    # 實作 IUserRepository
+│   │   ├── sqlalchemy_card_repository.py
+│   │   └── sqlalchemy_trade_repository.py
+│   ├── external/                   # 外部服務整合
+│   │   ├── __init__.py
+│   │   ├── google_oauth_service.py
+│   │   ├── gcs_storage_service.py
+│   │   └── fcm_notification_service.py
+│   ├── messaging/                  # 事件發布/訂閱
+│   │   ├── __init__.py
+│   │   ├── event_bus.py
+│   │   └── event_handlers.py
+│   └── security/
+│       ├── __init__.py
+│       ├── jwt_service.py
+│       └── password_hasher.py
+│
+├── presentation/                   # Presentation Layer (API 層)
+│   ├── __init__.py
+│   ├── routers/                    # FastAPI Routers
+│   │   ├── __init__.py
+│   │   ├── auth_router.py          # /api/v1/auth/*
+│   │   ├── users_router.py         # /api/v1/users/*
+│   │   ├── cards_router.py         # /api/v1/cards/*
+│   │   ├── trades_router.py        # /api/v1/trades/*
+│   │   └── chats_router.py         # /api/v1/chats/*
+│   ├── schemas/                    # Pydantic Request/Response Models
+│   │   ├── __init__.py
+│   │   ├── auth_schemas.py
+│   │   ├── card_schemas.py
+│   │   └── trade_schemas.py
+│   ├── dependencies/               # Router-level Dependencies
+│   │   ├── __init__.py
+│   │   ├── auth_dependencies.py    # get_current_user, verify_token
+│   │   └── pagination_dependencies.py
+│   └── middleware/
+│       ├── __init__.py
+│       ├── error_handler.py
+│       └── logging_middleware.py
+│
+└── tests/                          # 測試目錄
+    ├── unit/                       # 單元測試（Domain & Application）
+    │   ├── domain/
+    │   └── application/
+    ├── integration/                # 整合測試（含 DB）
+    └── e2e/                        # 端到端測試
+```
 
 ---
 
-## Out of Scope
+#### 本專案核心 Entities
 
-- 全面性的金流整合與收費機制細節（目前僅定義會員等級與限制，不實作實際收款流程）。
-- 針對假卡的影像辨識與自動審核機制（此平台僅提供交友交換卡片功能不提供假卡辨識）。
-- 多語系完整支援（現階段以繁體中文為主，未完整支援英文或韓文介面）。
+**DA-003 領域實體定義**
+
+- **User**（使用者實體）：代表平台使用者帳號，包含登入識別、基本資料、會員等級
+- **Card**（小卡實體）：代表一張小卡，包含偶像、專輯、版本、稀有度、圖片連結
+- **Trade**（交換實體）：代表一次交換交易，記錄雙方參與者、狀態、時間
+- **Chat**（聊天實體）：一對一聊天室實體，關聯兩個 User，並提供訊息串
+- **Message**（訊息實體）：聊天室中的單則訊息，包含寄件者、內容、狀態
+- **Friendship**（好友實體）：好友關係紀錄，包含邀請方、接受方、狀態
+- **Rating**（評分實體）：交換後評分與文字回饋紀錄
+- **Report**（檢舉實體）：檢舉紀錄，包含檢舉人、被檢舉人、原因類別
+
+**DA-004 Repository 定義**
+
+本專案需實作以下 Repository 介面（定義於 Domain Layer，實作於 Infrastructure Layer）：
+- `IUserRepository`：使用者資料存取
+- `ICardRepository`：小卡資料存取
+- `ITradeRepository`：交換資料存取
+- `IChatRepository`：聊天室資料存取
+- `IMessageRepository`：訊息資料存取
+
+**DA-005 Domain Events**
+
+本專案需實作以下領域事件：
+- `UserRegisteredEvent`：使用者註冊完成 → 發送歡迎通知
+- `TradeCompletedEvent`：交換完成 → 更新信譽分數、發送完成通知
+- `MessageSentEvent`：訊息發送 → 推送 FCM 通知
+- `CardCreatedEvent`：小卡建立 → 通知附近使用者（付費功能）
 
 ---
 
-## Development Environment Requirements
+#### 實作檢查清單
 
-### Backend Dependency Management
+開發時必須確保以下項目（參考憲法 Article VI）：
 
-**[CHANGED: pip/requirements.txt → Poetry，原因：提升依賴管理的可靠性、可重現性與開發體驗]**
-
-- **DR-001**：後端專案必須使用 Poetry 作為依賴管理工具，取代傳統的 pip + requirements.txt 方式。
-- **DR-002**：所有 Python 依賴必須在 pyproject.toml 中明確定義，並透過 poetry.lock 鎖定版本以確保開發、測試、生產環境的一致性。
-- **DR-003**：開發依賴與生產依賴必須明確分離（Poetry 的 dev-dependencies 功能）。
-- **DR-004**：Docker 構建流程必須支援 Poetry，確保容器化環境可以正確安裝依賴。
-- **DR-005**：CI/CD 管道必須使用 Poetry 進行依賴安裝與測試執行。
-
-**變更理由**：
-1. **依賴解析**：Poetry 提供更智能的依賴解析機制，自動處理版本衝突
-2. **環境隔離**：內建虛擬環境管理，避免全局污染
-3. **版本鎖定**：poetry.lock 確保所有環境的依賴版本完全一致
-4. **開發體驗**：簡化的命令介面（poetry add/remove/update）
-5. **現代標準**：符合 PEP 517/518 標準，是 Python 社群推薦的現代化工具
+- [ ] 所有 Domain Entities 不依賴 FastAPI、SQLAlchemy 或其他框架
+- [ ] Repository 介面定義在 Domain Layer，實作在 Infrastructure Layer
+- [ ] Use Cases 不包含 SQL 查詢或 HTTP 請求邏輯
+- [ ] Routers 僅負責請求驗證與回應格式化，業務邏輯委派給 Use Cases
+- [ ] ORM Models 與 Domain Entities 分離
+- [ ] 單元測試覆蓋率達 80% 以上（Domain & Application Layer）

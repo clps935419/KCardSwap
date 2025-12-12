@@ -1,0 +1,25 @@
+{
+  "id": "biz.offer.list",
+  "title": "商務交換刊登",
+  "endpoint": "/api/biz/offers",
+  "method": "GET",
+  "request": {
+    "type": "object",
+    "properties": {
+      "owner_id": { "type": "string" },
+      "page": { "type": "integer" },
+      "per_page": { "type": "integer" }
+    },
+    "required": []
+  },
+  "response": {
+    "type": "object",
+    "properties": {
+      "items": { "type": "array" },
+      "total": { "type": "integer" }
+    },
+    "required": ["items"]
+  },
+  "implemented": false,
+  "notes": "Business listings contract."
+}

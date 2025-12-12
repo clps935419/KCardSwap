@@ -1,5 +1,9 @@
 # KCardSwap 技術規劃（Tech Plan）
 
+更新說明（2025-12-12）：本計畫已同步最新規格說明，DDD 架構原則改以專案憲法的 Article VI 作為唯一依據。此處僅保留與本專案實作直接相關的目錄結構與服務切分，避免重複規範。另新增契約與資料模型的集中維護，對應 Integration‑First Gate：
+1) 契約：specs/001-kcardswap-complete-spec/contracts/
+2) 資料模型綜覽：specs/001-kcardswap-complete-spec/data-model.md（與 infra/db/init.sql 對齊）
+
 本計劃對應 `specs/001-kcardswap-complete-spec/spec.md`，包含詳細的架構設計、API 規格、資料庫 Schema、前後端任務分解、限制與政策、測試策略、里程碑與風險控管。
 
 ## 0. 里程碑與時間線（POC → Beta）
@@ -14,6 +18,7 @@
 
 ## 1. 架構與基礎設施
 - 專案目錄：`apps/mobile`, `apps/backend`, `gateway/kong`, `infra/db`, `infra/gcs`, `infra/ci`。
+- 架構原則來源：Constitution v1.2.0 Article VI（四層架構 Domain/Application/Infrastructure/Presentation；Repository、CQRS、Domain Events、Value Objects）。
 - **後端依賴管理**（**已更新 2025-12-11**）：
 	- **工具**：Poetry（取代 pip + requirements.txt）
 	- **配置檔**：pyproject.toml（專案元資料 + 依賴定義 + 工具配置）
@@ -32,6 +37,9 @@
 - GCS：Bucket 結構：`kcardswap/cards/{user_id}/{card_id}.jpg`、`thumbs/{card_id}.jpg`。
 - Secrets 管理：本地 `.env` + CI/Prod 使用 Secret Manager。
 - CI/CD：GitHub Actions（lint/test/build，PR 檢查，main 部署）或 GitLab CI。
+
+一致性檢查（與憲法）：
+- Domain 不依賴 FastAPI/SQLAlchemy；Infrastructure 實作 Repository；Routers 僅含驗證與序列化；Use Cases 不含 SQL/HTTP。
 
 交付與驗收：
 - 提供 `docker-compose.yml` 一鍵啟動網關、後端、DB。
@@ -146,6 +154,11 @@
 - 端到端：關鍵 User Story 1–6；指標追蹤（SC-001..005）。
 - 性能測試：聊天延遲、附近搜尋查詢時間、圖片上傳吞吐。
 - 安全檢查：JWT 竄改、Rate Limit 避免濫用、檔案類型白名單。
+
+Phase -1 Gates（依憲法）
+- Simplicity Gate：專案數量 ≤3（mobile/backend/gateway）；避免過度設計，例外將記錄於本節。
+- Anti-Abstraction Gate：優先使用框架原生能力，禁止不必要抽象層。
+- Integration-First Gate：契約定義在 specs/001-kcardswap-complete-spec/contracts/；優先以真實 DB/Gateway 進行整合測試；路由實作需符合契約用例（成功/驗證失敗/未授權/衝突等）。
 
 ## 12. 風險與緩解
 - 位置隱私爭議 → 預設不顯示精確地址、僅行政區與距離。

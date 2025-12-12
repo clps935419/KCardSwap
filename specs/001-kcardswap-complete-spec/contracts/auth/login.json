@@ -1,0 +1,15 @@
+{
+  "name": "POST /auth/login",
+  "request": {
+    "method": "POST",
+    "path": "/auth/login",
+    "body": {"email": "string", "password": "string"}
+  },
+  "responses": [
+    {"status": 200, "body": {"data": {"token": "string", "expiresIn": 3600}, "error": null}},
+    {"status": 400, "body": {"data": null, "error": {"code": "VALIDATION_ERROR", "message": "invalid input"}}},
+    {"status": 401, "body": {"data": null, "error": {"code": "UNAUTHORIZED", "message": "invalid credentials"}}}
+  ]
+  ,
+  "implemented": false
+}

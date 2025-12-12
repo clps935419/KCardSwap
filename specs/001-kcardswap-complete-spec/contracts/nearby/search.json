@@ -1,0 +1,29 @@
+{
+  "id": "nearby.search",
+  "title": "搜尋附近 KCards",
+  "endpoint": "/api/nearby/search",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "properties": {
+      "lat": { "type": "number" },
+      "lng": { "type": "number" },
+      "radius": { "type": "integer" }
+    },
+    "required": ["lat", "lng"]
+  },
+  "response": {
+    "type": "array",
+    "items": {
+      "type": "object",
+      "properties": {
+        "card_id": { "type": "string" },
+        "distance_m": { "type": "number" },
+        "owner": { "type": "string" }
+      },
+      "required": ["card_id"]
+    }
+  },
+  "implemented": false,
+  "notes": "Contract for nearby search; tests should assert this contract exists (Red until implemented)."
+}

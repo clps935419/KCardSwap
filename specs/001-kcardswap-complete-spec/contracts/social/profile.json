@@ -1,0 +1,25 @@
+{
+  "id": "social.profile",
+  "title": "使用者社群資料",
+  "endpoint": "/api/social/profile/{user_id}",
+  "method": "GET",
+  "request": {
+    "type": "object",
+    "properties": {
+      "user_id": { "type": "string" }
+    },
+    "required": ["user_id"]
+  },
+  "response": {
+    "type": "object",
+    "properties": {
+      "user_id": { "type": "string" },
+      "display_name": { "type": "string" },
+      "bio": { "type": "string" },
+      "followers_count": { "type": "integer" }
+    },
+    "required": ["user_id", "display_name"]
+  },
+  "implemented": false,
+  "notes": "Social profile read contract."
+}

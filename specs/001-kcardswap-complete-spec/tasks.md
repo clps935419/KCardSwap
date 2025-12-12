@@ -6,6 +6,11 @@
 - [X] T003 Docker Compose 一鍵啟動（Kong、Backend、Postgres、(可選)Nginx）路徑：`docker-compose.yml`
 - [X] T004 Kong 宣告式設定與路由 `/api/v1/*` → backend 路徑：`gateway/kong/kong.yaml`
 - [X] T005 CI/CD：lint/test/build、PR 檢查（GitHub Actions / GitLab CI）
+- [X] T006 後端依賴管理遷移至 Poetry（pip → Poetry）
+  - 詳細任務：`specs/copilot/modify-requirements-backend/tasks.md`（52 個子任務）
+  - 實作計畫：`specs/copilot/modify-requirements-backend/plan.md`
+  - 狀態：✅ Phase 1-6 完成（技術實作就緒），Phase 7 待完成（團隊培訓）
+  - 影響範圍：開發環境、Docker、CI/CD、文件
 
 ## Phase 1: AUTH/PROFILE (P1)
 - [ ] T101 後端 Google OAuth 換 token 與使用者建立（`apps/backend/app/routers/auth.py`）
@@ -13,6 +18,7 @@
 - [ ] T103 Profile CRUD + 隱私設定（`apps/backend/app/routers/profile.py`）
 - [ ] T104 Kong 與後端 JWT 驗證串接（Kong jwt 插件預留、後端中介層）
 - [ ] T105 單元/整合測試：401/403/刷新流程、隱私旗標
+  - [ ] CT-Auth 契約測試：對齊 `contracts/auth/login.json`（成功/驗證失敗/未授權）
 
 ## Phase 2: CARD (P1)
 - [ ] T201 Signed URL 服務：副檔名/大小驗證（`apps/backend/app/routers/cards.py`）
@@ -21,6 +27,7 @@
 - [ ] T204 上限檢查（每日數量/總容量/單張大小），錯誤碼 `422_LIMIT_EXCEEDED`
 - [ ] T205 查詢與篩選（owner=me、filters、分頁）
 - [ ] T206 測試：大小驗證、上限達成時的訊息與行為
+  - [ ] CT-Cards 契約測試：對齊 `contracts/cards/create.json`（201/400/401）
 
 ## Phase 3: NEARBY (P1)
 - [ ] T301 位置來源：最近一次上傳座標或明確定位（資料欄位與更新）
@@ -48,6 +55,7 @@
 - [ ] T603 完成鎖定（兩邊確認後，小卡狀態改為已交換）
 - [ ] T604 交換歷史查詢與分頁
 - [ ] T605 測試：狀態流轉、雙向完成條件
+  - [ ] CT-Trade 契約測試：對齊 `contracts/trade/create.json`（201/409/401）
 
 ## Phase 7: BIZ (P2)
 - [ ] T701 會員權限檢查中介層（每日新增/貼文/搜尋/容量/大小）
@@ -69,6 +77,7 @@
 - [ ] T1001 建表與索引（users, profiles, cards, trades, trade_items, chats, messages, friendships, ratings, reports, subscriptions）
 - [ ] T1002 Seed 資料與遷移腳本
 - [ ] T1003 Query 優化與解說文件
+  - [ ] DM-001 整理 `specs/001-kcardswap-complete-spec/data-model.md`，與 `infra/db/init.sql` 對齊（含索引、外鍵、不變條件）
 
 ## Phase 11: 測試與品質
 - [ ] T1101 單元測試覆蓋（>70% 核心模組）
@@ -90,9 +99,16 @@
   - TRADE 依賴 CARD 與 SOCIAL 最低子集完成
   - BIZ 可在核心得分完成後並行
 
+## Phase -1 Gates Checklist
+- Simplicity Gate：保持 ≤3 個專案（mobile/backend/gateway）；若需例外，在 plan.md 記錄理由。
+- Anti-Abstraction Gate：遵循憲法 Article VI，禁止不必要抽象；Domain 不依賴框架；Repository 實作置於 Infrastructure。
+- Integration-First Gate：先定義 `specs/001-kcardswap-complete-spec/contracts/` 並使用真實 DB/Gateway 進行整合測試；契約測試必備；路由回應需與契約 JSON 對齊。
+
 ## Acceptance Criteria Examples
 - T204：超限時回傳 `422_LIMIT_EXCEEDED` 並包含哪一項超限訊息（每日/容量/大小）
 - T304：免費使用者第 6 次附近搜尋回傳 `429_RATE_LIMITED`（或同策略），付費不受限
 - T603：雙方都標記完成後，小卡狀態轉為已交換且不可再公開列表顯示
 
 > 來源：`specs/001-kcardswap-complete-spec/plan.md` 與 `specs/001-kcardswap-complete-spec/spec.md`。
+
+憲法參照：Constitution v1.2.0 Article VI（DDD 架構原則為唯一依據，避免在 Spec/Plan/Tasks 重複規範）。
