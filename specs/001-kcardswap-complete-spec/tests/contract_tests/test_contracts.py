@@ -17,4 +17,6 @@ def test_contract_marked_implemented(contract_path):
     These are expected to fail (Red) until the backend implements the contract.
     """
     data = json.loads(contract_path.read_text(encoding="utf-8"))
-    assert data.get("implemented", False), f"Contract {contract_path} is not implemented yet"
+    assert data.get(
+        "implemented", False
+    ), f"Contract {contract_path} is not implemented yet"
