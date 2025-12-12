@@ -8,14 +8,20 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
 
-from ...infrastructure.database.connection import get_db_session
-from ...infrastructure.repositories.sqlalchemy_user_repository import SQLAlchemyUserRepository
-from ...infrastructure.repositories.sqlalchemy_profile_repository import SQLAlchemyProfileRepository
+from ...domain.repositories.user_repository_interface import IUserRepository
+from ...domain.repositories.profile_repository_interface import IProfileRepository
 from ...infrastructure.external.google_oauth_service import GoogleOAuthService
 from ...infrastructure.security.jwt_service import JWTService
+from ...infrastructure.database.connection import get_db_session
 from ...application.use_cases.auth import LoginWithGoogleUseCase, RefreshTokenUseCase, LogoutUseCase
 from ..schemas import GoogleLoginRequest, TokenResponse, RefreshTokenRequest, APIResponse, ErrorDetail
 from ..dependencies import get_current_user_id
+from ..dependencies.ioc_dependencies import (
+    get_user_repository,
+    get_profile_repository,
+    get_google_oauth_service,
+    get_jwt_service
+)
 
 router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
 
@@ -23,7 +29,11 @@ router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
 @router.post("/google", response_model=APIResponse)
 async def login_with_google(
     request: GoogleLoginRequest,
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session),
+    user_repo: IUserRepository = Depends(get_user_repository),
+    profile_repo: IProfileRepository = Depends(get_profile_repository),
+    google_oauth: GoogleOAuthService = Depends(get_google_oauth_service),
+    jwt_service: JWTService = Depends(get_jwt_service)
 ):
     """
     Login with Google OAuth
@@ -31,13 +41,7 @@ async def login_with_google(
     Exchange Google ID token for JWT access and refresh tokens.
     Creates user and profile if they don't exist.
     """
-    # Initialize dependencies
-    user_repo = SQLAlchemyUserRepository(session)
-    profile_repo = SQLAlchemyProfileRepository(session)
-    google_oauth = GoogleOAuthService()
-    jwt_service = JWTService()
-    
-    # Execute use case
+    # Execute use case with injected dependencies
     use_case = LoginWithGoogleUseCase(
         user_repo=user_repo,
         profile_repo=profile_repo,
@@ -73,14 +77,14 @@ async def login_with_google(
 @router.post("/refresh", response_model=APIResponse)
 async def refresh_token(
     request: RefreshTokenRequest,
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session),
+    jwt_service: JWTService = Depends(get_jwt_service)
 ):
     """
     Refresh access token
     
     Exchange refresh token for new access and refresh tokens.
     """
-    jwt_service = JWTService()
     use_case = RefreshTokenUseCase(jwt_service=jwt_service, session=session)
     
     result = await use_case.execute(request.refresh_token)

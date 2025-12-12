@@ -10,8 +10,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ....domain.entities.user import User
 from ....domain.entities.profile import Profile
-from ....infrastructure.repositories.sqlalchemy_user_repository import SQLAlchemyUserRepository
-from ....infrastructure.repositories.sqlalchemy_profile_repository import SQLAlchemyProfileRepository
+from ....domain.repositories.user_repository_interface import IUserRepository
+from ....domain.repositories.profile_repository_interface import IProfileRepository
 from ....infrastructure.external.google_oauth_service import GoogleOAuthService
 from ....infrastructure.security.jwt_service import JWTService
 from ....infrastructure.database.models import RefreshTokenModel
@@ -25,8 +25,8 @@ class LoginWithGoogleUseCase:
     
     def __init__(
         self,
-        user_repo: SQLAlchemyUserRepository,
-        profile_repo: SQLAlchemyProfileRepository,
+        user_repo: IUserRepository,
+        profile_repo: IProfileRepository,
         google_oauth_service: GoogleOAuthService,
         jwt_service: JWTService,
         session: AsyncSession

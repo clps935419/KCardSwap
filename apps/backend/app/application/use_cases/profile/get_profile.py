@@ -5,13 +5,13 @@ from typing import Optional
 from uuid import UUID
 
 from ....domain.entities.profile import Profile
-from ....infrastructure.repositories.sqlalchemy_profile_repository import SQLAlchemyProfileRepository
+from ....domain.repositories.profile_repository_interface import IProfileRepository
 
 
 class GetProfileUseCase:
     """Use case for getting user profile"""
     
-    def __init__(self, profile_repo: SQLAlchemyProfileRepository):
+    def __init__(self, profile_repo: IProfileRepository):
         self.profile_repo = profile_repo
     
     async def execute(self, user_id: UUID) -> Optional[Profile]:

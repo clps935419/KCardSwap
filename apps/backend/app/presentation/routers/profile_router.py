@@ -7,11 +7,12 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
 
+from ...domain.repositories.profile_repository_interface import IProfileRepository
 from ...infrastructure.database.connection import get_db_session
-from ...infrastructure.repositories.sqlalchemy_profile_repository import SQLAlchemyProfileRepository
 from ...application.use_cases.profile import GetProfileUseCase, UpdateProfileUseCase
 from ..schemas import ProfileResponse, UpdateProfileRequest, APIResponse, ErrorDetail
 from ..dependencies import get_current_user_id
+from ..dependencies.ioc_dependencies import get_profile_repository
 
 router = APIRouter(prefix="/api/v1/profile", tags=["profile"])
 
@@ -19,14 +20,13 @@ router = APIRouter(prefix="/api/v1/profile", tags=["profile"])
 @router.get("/me", response_model=APIResponse)
 async def get_my_profile(
     user_id: UUID = Depends(get_current_user_id),
-    session: AsyncSession = Depends(get_db_session)
+    profile_repo: IProfileRepository = Depends(get_profile_repository)
 ):
     """
     Get current user's profile
     
     Requires authentication.
     """
-    profile_repo = SQLAlchemyProfileRepository(session)
     use_case = GetProfileUseCase(profile_repo=profile_repo)
     
     profile = await use_case.execute(user_id)
@@ -58,7 +58,7 @@ async def get_my_profile(
 async def update_my_profile(
     request: UpdateProfileRequest,
     user_id: UUID = Depends(get_current_user_id),
-    session: AsyncSession = Depends(get_db_session)
+    profile_repo: IProfileRepository = Depends(get_profile_repository)
 ):
     """
     Update current user's profile
@@ -66,7 +66,6 @@ async def update_my_profile(
     Requires authentication.
     Can update nickname, avatar, bio, region, preferences, and privacy settings.
     """
-    profile_repo = SQLAlchemyProfileRepository(session)
     use_case = UpdateProfileUseCase(profile_repo=profile_repo)
     
     profile = await use_case.execute(

@@ -8,6 +8,11 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .infrastructure.database import init_db
 from .presentation.routers import auth_router, profile_router
+from .container import Container
+
+
+# Initialize IoC Container
+container = Container()
 
 
 @asynccontextmanager
@@ -16,10 +21,21 @@ async def lifespan(app: FastAPI):
     Lifespan context manager for FastAPI
     Handles startup and shutdown events
     """
-    # Startup: Initialize database
+    # Startup: Initialize database and wire container
     await init_db()
+    
+    # Wire container for dependency injection
+    container.wire(modules=[
+        "app.presentation.routers.auth_router",
+        "app.presentation.routers.profile_router",
+        "app.presentation.dependencies.auth_dependencies",
+        "app.presentation.dependencies.ioc_dependencies"
+    ])
+    
     yield
-    # Shutdown: cleanup if needed
+    
+    # Shutdown: cleanup
+    container.unwire()
 
 
 app = FastAPI(
@@ -31,6 +47,9 @@ app = FastAPI(
     openapi_url="/api/v1/openapi.json",
     lifespan=lifespan
 )
+
+# Store container reference in app state for access in routes
+app.container = container
 
 # CORS middleware (Kong also handles CORS, but this provides fallback)
 app.add_middleware(

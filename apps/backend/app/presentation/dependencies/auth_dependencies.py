@@ -7,18 +7,18 @@ from uuid import UUID
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
+from ...domain.repositories.user_repository_interface import IUserRepository
 from ...infrastructure.security.jwt_service import JWTService
-from ...infrastructure.database.connection import get_db_session
-from ...infrastructure.repositories.sqlalchemy_user_repository import SQLAlchemyUserRepository
 from ...domain.entities.user import User
 from sqlalchemy.ext.asyncio import AsyncSession
+from .ioc_dependencies import get_jwt_service, get_user_repository
 
 security = HTTPBearer()
-jwt_service = JWTService()
 
 
 async def get_current_user_id(
-    credentials: HTTPAuthorizationCredentials = Depends(security)
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    jwt_service: JWTService = Depends(get_jwt_service)
 ) -> UUID:
     """
     Dependency to extract and validate current user ID from JWT token
@@ -51,12 +51,11 @@ async def get_current_user_id(
 
 async def get_current_user(
     user_id: UUID = Depends(get_current_user_id),
-    session: AsyncSession = Depends(get_db_session)
+    user_repo: IUserRepository = Depends(get_user_repository)
 ) -> User:
     """
     Dependency to get current authenticated user
     """
-    user_repo = SQLAlchemyUserRepository(session)
     user = await user_repo.get_by_id(user_id)
     
     if not user:
@@ -69,7 +68,8 @@ async def get_current_user(
 
 
 async def get_optional_current_user_id(
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(HTTPBearer(auto_error=False))
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(HTTPBearer(auto_error=False)),
+    jwt_service: JWTService = Depends(get_jwt_service)
 ) -> Optional[UUID]:
     """
     Dependency to optionally extract user ID from JWT token
