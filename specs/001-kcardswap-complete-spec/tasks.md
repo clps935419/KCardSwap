@@ -13,12 +13,12 @@
   - 影響範圍：開發環境、Docker、CI/CD、文件
 
 ## Phase 1: AUTH/PROFILE (P1)
-- [ ] T101 後端 Google OAuth 換 token 與使用者建立（`apps/backend/app/routers/auth.py`）
-- [ ] T102 JWT 生成/刷新/登出（access 15m, refresh 7d）（`apps/backend/app/services/auth.py`）
-- [ ] T103 Profile CRUD + 隱私設定（`apps/backend/app/routers/profile.py`）
-- [ ] T104 Kong 與後端 JWT 驗證串接（Kong jwt 插件預留、後端中介層）
-- [ ] T105 單元/整合測試：401/403/刷新流程、隱私旗標
-  - [ ] CT-Auth 契約測試：對齊 `contracts/auth/login.json`（成功/驗證失敗/未授權）
+- [X] T101 後端 Google OAuth 換 token 與使用者建立（`apps/backend/app/routers/auth.py`）
+- [X] T102 JWT 生成/刷新/登出（access 15m, refresh 7d）（`apps/backend/app/services/auth.py`）
+- [X] T103 Profile CRUD + 隱私設定（`apps/backend/app/routers/profile.py`）
+- [X] T104 Kong 與後端 JWT 驗證串接（Kong jwt 插件預留、後端中介層）
+- [X] T105 單元/整合測試：401/403/刷新流程、隱私旗標
+  - [X] CT-Auth 契約測試：對齊 `contracts/auth/login.json`（成功/驗證失敗/未授權）
 
 ## Phase 2: CARD (P1)
 - [ ] T201 Signed URL 服務：副檔名/大小驗證（`apps/backend/app/routers/cards.py`）

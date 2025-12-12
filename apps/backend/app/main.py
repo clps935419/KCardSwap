@@ -2,8 +2,25 @@
 KCardSwap Backend - FastAPI Application
 Main entry point for the backend service.
 """
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+from .infrastructure.database import init_db
+from .presentation.routers import auth_router, profile_router
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Lifespan context manager for FastAPI
+    Handles startup and shutdown events
+    """
+    # Startup: Initialize database
+    await init_db()
+    yield
+    # Shutdown: cleanup if needed
+
 
 app = FastAPI(
     title="KCardSwap API",
@@ -11,7 +28,8 @@ app = FastAPI(
     version="0.1.0",
     docs_url="/api/v1/docs",
     redoc_url="/api/v1/redoc",
-    openapi_url="/api/v1/openapi.json"
+    openapi_url="/api/v1/openapi.json",
+    lifespan=lifespan
 )
 
 # CORS middleware (Kong also handles CORS, but this provides fallback)
@@ -22,6 +40,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Register routers
+app.include_router(auth_router.router)
+app.include_router(profile_router.router)
 
 
 @app.get("/health")
