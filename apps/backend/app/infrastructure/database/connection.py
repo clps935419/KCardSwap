@@ -1,12 +1,11 @@
 """
 Database connection and session management
 """
+import os
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
-import os
 
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
-from sqlalchemy.orm import declarative_base
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from .models import Base
 

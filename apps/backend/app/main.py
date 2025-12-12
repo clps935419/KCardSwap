@@ -3,13 +3,13 @@ KCardSwap Backend - FastAPI Application
 Main entry point for the backend service.
 """
 from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from .container import Container
 from .infrastructure.database import init_db
 from .presentation.routers import auth_router, profile_router
-from .container import Container
-
 
 # Initialize IoC Container
 container = Container()
@@ -23,7 +23,7 @@ async def lifespan(app: FastAPI):
     """
     # Startup: Initialize database and wire container
     await init_db()
-    
+
     # Wire container for dependency injection
     container.wire(modules=[
         "app.presentation.routers.auth_router",
@@ -31,9 +31,9 @@ async def lifespan(app: FastAPI):
         "app.presentation.dependencies.auth_dependencies",
         "app.presentation.dependencies.ioc_dependencies"
     ])
-    
+
     yield
-    
+
     # Shutdown: cleanup
     container.unwire()
 

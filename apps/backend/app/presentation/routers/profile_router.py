@@ -3,16 +3,15 @@ Profile Router - Profile management endpoints
 GET /api/v1/profile/me - Get own profile
 PATCH /api/v1/profile/me - Update own profile
 """
-from fastapi import APIRouter, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
 
-from ...domain.repositories.profile_repository_interface import IProfileRepository
-from ...infrastructure.database.connection import get_db_session
+from fastapi import APIRouter, Depends
+
 from ...application.use_cases.profile import GetProfileUseCase, UpdateProfileUseCase
-from ..schemas import ProfileResponse, UpdateProfileRequest, APIResponse, ErrorDetail
+from ...domain.repositories.profile_repository_interface import IProfileRepository
 from ..dependencies import get_current_user_id
 from ..dependencies.ioc_dependencies import get_profile_repository
+from ..schemas import APIResponse, ErrorDetail, ProfileResponse, UpdateProfileRequest
 
 router = APIRouter(prefix="/api/v1/profile", tags=["profile"])
 
@@ -24,13 +23,13 @@ async def get_my_profile(
 ):
     """
     Get current user's profile
-    
+
     Requires authentication.
     """
     use_case = GetProfileUseCase(profile_repo=profile_repo)
-    
+
     profile = await use_case.execute(user_id)
-    
+
     if not profile:
         return APIResponse(
             data=None,
@@ -39,7 +38,7 @@ async def get_my_profile(
                 message="Profile not found"
             ).dict()
         )
-    
+
     return APIResponse(
         data=ProfileResponse(
             user_id=profile.user_id,
@@ -62,12 +61,12 @@ async def update_my_profile(
 ):
     """
     Update current user's profile
-    
+
     Requires authentication.
     Can update nickname, avatar, bio, region, preferences, and privacy settings.
     """
     use_case = UpdateProfileUseCase(profile_repo=profile_repo)
-    
+
     profile = await use_case.execute(
         user_id=user_id,
         nickname=request.nickname,
@@ -77,7 +76,7 @@ async def update_my_profile(
         preferences=request.preferences,
         privacy_flags=request.privacy_flags
     )
-    
+
     if not profile:
         return APIResponse(
             data=None,
@@ -86,7 +85,7 @@ async def update_my_profile(
                 message="Failed to update profile"
             ).dict()
         )
-    
+
     return APIResponse(
         data=ProfileResponse(
             user_id=profile.user_id,

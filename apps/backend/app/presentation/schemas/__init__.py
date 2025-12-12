@@ -1,8 +1,9 @@
 """
 Pydantic schemas for API requests and responses
 """
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
 from uuid import UUID
+
 from pydantic import BaseModel, EmailStr, Field
 
 
@@ -35,7 +36,7 @@ class ProfileResponse(BaseModel):
     region: Optional[str] = None
     preferences: Dict[str, Any] = {}
     privacy_flags: Dict[str, bool] = {}
-    
+
     class Config:
         from_attributes = True
 

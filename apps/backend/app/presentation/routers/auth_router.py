@@ -4,23 +4,34 @@ POST /api/v1/auth/google - Login with Google
 POST /api/v1/auth/refresh - Refresh access token
 POST /api/v1/auth/logout - Logout (revoke refresh token)
 """
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
 
-from ...domain.repositories.user_repository_interface import IUserRepository
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from ...application.use_cases.auth import (
+    LoginWithGoogleUseCase,
+    LogoutUseCase,
+    RefreshTokenUseCase,
+)
 from ...domain.repositories.profile_repository_interface import IProfileRepository
+from ...domain.repositories.user_repository_interface import IUserRepository
+from ...infrastructure.database.connection import get_db_session
 from ...infrastructure.external.google_oauth_service import GoogleOAuthService
 from ...infrastructure.security.jwt_service import JWTService
-from ...infrastructure.database.connection import get_db_session
-from ...application.use_cases.auth import LoginWithGoogleUseCase, RefreshTokenUseCase, LogoutUseCase
-from ..schemas import GoogleLoginRequest, TokenResponse, RefreshTokenRequest, APIResponse, ErrorDetail
 from ..dependencies import get_current_user_id
 from ..dependencies.ioc_dependencies import (
-    get_user_repository,
-    get_profile_repository,
     get_google_oauth_service,
-    get_jwt_service
+    get_jwt_service,
+    get_profile_repository,
+    get_user_repository,
+)
+from ..schemas import (
+    APIResponse,
+    ErrorDetail,
+    GoogleLoginRequest,
+    RefreshTokenRequest,
+    TokenResponse,
 )
 
 router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
@@ -37,7 +48,7 @@ async def login_with_google(
 ):
     """
     Login with Google OAuth
-    
+
     Exchange Google ID token for JWT access and refresh tokens.
     Creates user and profile if they don't exist.
     """
@@ -49,9 +60,9 @@ async def login_with_google(
         jwt_service=jwt_service,
         session=session
     )
-    
+
     result = await use_case.execute(request.google_token)
-    
+
     if not result:
         return APIResponse(
             data=None,
@@ -60,9 +71,9 @@ async def login_with_google(
                 message="Invalid Google token"
             ).dict()
         )
-    
+
     access_token, refresh_token, user = result
-    
+
     return APIResponse(
         data=TokenResponse(
             access_token=access_token,
@@ -82,13 +93,13 @@ async def refresh_token(
 ):
     """
     Refresh access token
-    
+
     Exchange refresh token for new access and refresh tokens.
     """
     use_case = RefreshTokenUseCase(jwt_service=jwt_service, session=session)
-    
+
     result = await use_case.execute(request.refresh_token)
-    
+
     if not result:
         return APIResponse(
             data=None,
@@ -97,9 +108,9 @@ async def refresh_token(
                 message="Invalid or expired refresh token"
             ).dict()
         )
-    
+
     new_access_token, new_refresh_token = result
-    
+
     return APIResponse(
         data=TokenResponse(
             access_token=new_access_token,
@@ -119,13 +130,13 @@ async def logout(
 ):
     """
     Logout user
-    
+
     Revoke refresh token to logout user.
     Requires valid access token.
     """
     use_case = LogoutUseCase(session=session)
     success = await use_case.execute(user_id, request.refresh_token)
-    
+
     if not success:
         return APIResponse(
             data=None,
@@ -134,7 +145,7 @@ async def logout(
                 message="Invalid refresh token"
             ).dict()
         )
-    
+
     return APIResponse(
         data={"message": "Logged out successfully"},
         error=None

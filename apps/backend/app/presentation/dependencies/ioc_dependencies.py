@@ -3,16 +3,17 @@ Dependency Providers for FastAPI Routes
 Uses IoC container to inject dependencies following DIP
 """
 from typing import AsyncGenerator
+
+from dependency_injector.wiring import inject
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from dependency_injector.wiring import Provide, inject
 
-from ..container import Container
-from ...domain.repositories.user_repository_interface import IUserRepository
 from ...domain.repositories.profile_repository_interface import IProfileRepository
+from ...domain.repositories.user_repository_interface import IUserRepository
+from ...infrastructure.database.connection import get_db_session
 from ...infrastructure.external.google_oauth_service import GoogleOAuthService
 from ...infrastructure.security.jwt_service import JWTService
-from ...infrastructure.database.connection import get_db_session
+from ...container import Container
 
 
 # Database session provider
@@ -32,7 +33,9 @@ def get_user_repository(
     Get user repository instance
     Depends on database session and returns interface, not concrete implementation
     """
-    from ...infrastructure.repositories.sqlalchemy_user_repository import SQLAlchemyUserRepository
+    from ...infrastructure.repositories.sqlalchemy_user_repository import (
+        SQLAlchemyUserRepository,
+    )
     return SQLAlchemyUserRepository(session)
 
 
@@ -45,7 +48,9 @@ def get_profile_repository(
     Get profile repository instance
     Depends on database session and returns interface, not concrete implementation
     """
-    from ...infrastructure.repositories.sqlalchemy_profile_repository import SQLAlchemyProfileRepository
+    from ...infrastructure.repositories.sqlalchemy_profile_repository import (
+        SQLAlchemyProfileRepository,
+    )
     return SQLAlchemyProfileRepository(session)
 
 

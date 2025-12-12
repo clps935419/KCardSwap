@@ -1,5 +1,5 @@
 """Domain entities __init__"""
-from .user import User
 from .profile import Profile
+from .user import User
 
 __all__ = ["User", "Profile"]

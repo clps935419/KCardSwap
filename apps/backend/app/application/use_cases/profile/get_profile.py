@@ -10,17 +10,17 @@ from ....domain.repositories.profile_repository_interface import IProfileReposit
 
 class GetProfileUseCase:
     """Use case for getting user profile"""
-    
+
     def __init__(self, profile_repo: IProfileRepository):
         self.profile_repo = profile_repo
-    
+
     async def execute(self, user_id: UUID) -> Optional[Profile]:
         """
         Get user profile
-        
+
         Args:
             user_id: User ID
-        
+
         Returns:
             Profile or None if not found
         """

@@ -14,10 +14,10 @@ from ..database.models import ProfileModel
 
 class SQLAlchemyProfileRepository(IProfileRepository):
     """SQLAlchemy implementation of Profile repository"""
-    
+
     def __init__(self, session: AsyncSession):
         self.session = session
-    
+
     async def get_by_user_id(self, user_id: UUID) -> Optional[Profile]:
         """Get profile by user ID"""
         result = await self.session.execute(
@@ -25,7 +25,7 @@ class SQLAlchemyProfileRepository(IProfileRepository):
         )
         model = result.scalar_one_or_none()
         return self._to_entity(model) if model else None
-    
+
     async def save(self, profile: Profile) -> Profile:
         """Save or update profile"""
         # Check if profile exists
@@ -33,7 +33,7 @@ class SQLAlchemyProfileRepository(IProfileRepository):
             select(ProfileModel).where(ProfileModel.user_id == profile.user_id)
         )
         existing = result.scalar_one_or_none()
-        
+
         if existing:
             # Update existing
             existing.nickname = profile.nickname
@@ -58,23 +58,23 @@ class SQLAlchemyProfileRepository(IProfileRepository):
                 updated_at=profile.updated_at
             )
             self.session.add(model)
-        
+
         await self.session.flush()
         return self._to_entity(model)
-    
+
     async def delete(self, user_id: UUID) -> bool:
         """Delete profile"""
         result = await self.session.execute(
             select(ProfileModel).where(ProfileModel.user_id == user_id)
         )
         model = result.scalar_one_or_none()
-        
+
         if model:
             await self.session.delete(model)
             await self.session.flush()
             return True
         return False
-    
+
     @staticmethod
     def _to_entity(model: ProfileModel) -> Profile:
         """Convert ORM model to domain entity"""
