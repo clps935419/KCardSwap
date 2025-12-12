@@ -9,7 +9,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...domain.entities.user import User
-from ...domain.repositories.user_repository import IUserRepository
+from ...domain.repositories.user_repository_interface import IUserRepository
 from ..database.models import UserModel
 
 

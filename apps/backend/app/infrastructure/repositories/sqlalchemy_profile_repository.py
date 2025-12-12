@@ -8,7 +8,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...domain.entities.profile import Profile
-from ...domain.repositories.profile_repository import IProfileRepository
+from ...domain.repositories.profile_repository_interface import IProfileRepository
 from ..database.models import ProfileModel
 
 
