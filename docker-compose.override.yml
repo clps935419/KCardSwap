@@ -1,14 +1,15 @@
 # Docker Compose Override for Development
-# This file is automatically applied when running `docker compose up`
-# It provides development-specific configurations like hot-reload
+# Development helpers: mount source, persist site-packages, and auto-install deps on first start
 
 services:
   backend:
-    # Override the CMD to enable hot-reload for development
-    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
-    # Mount source code for hot-reload
     volumes:
-      - ./apps/backend/app:/app/app:ro
-    environment:
-      # Enable SQL query logging for development
-      SQL_ECHO: "true"
+      - ./apps/backend/app:/app/app
+      - ./apps/backend/pyproject.toml:/app/pyproject.toml:ro
+      - ./apps/backend/poetry.lock:/app/poetry.lock:ro
+      - backend-site-packages:/usr/local/lib/python3.11/site-packages
+    # On container start, ensure production deps are present (first-run installs), then run start script
+    command: ["bash", "-lc", "poetry install --no-root --only main || true && /app/start.sh"]
+
+volumes:
+  backend-site-packages:
