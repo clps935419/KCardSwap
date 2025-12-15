@@ -100,6 +100,35 @@ jobs:
       if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
       run: poetry install --no-interaction --no-root
     
+    - name: Create PostgreSQL extensions
+      env:
+        PGPASSWORD: kcardswap
+      run: |
+        psql -h localhost -U kcardswap -d kcardswap_test -c "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";"
+    
+    - name: Verify migrations can upgrade
+      env:
+        DATABASE_URL: postgresql://kcardswap:kcardswap@localhost:5432/kcardswap_test
+      run: |
+        echo "Running Alembic upgrade to head..."
+        poetry run alembic upgrade head
+        echo "✓ Migrations upgraded successfully"
+    
+    - name: Verify migrations can downgrade
+      env:
+        DATABASE_URL: postgresql://kcardswap:kcardswap@localhost:5432/kcardswap_test
+      run: |
+        echo "Running Alembic downgrade to base..."
+        poetry run alembic downgrade base
+        echo "✓ Migrations downgraded successfully"
+    
+    - name: Re-upgrade for tests
+      env:
+        DATABASE_URL: postgresql://kcardswap:kcardswap@localhost:5432/kcardswap_test
+      run: |
+        echo "Re-running migrations for tests..."
+        poetry run alembic upgrade head
+    
     - name: Run tests with coverage
       env:
         DATABASE_URL: postgresql://kcardswap:kcardswap@localhost:5432/kcardswap_test
