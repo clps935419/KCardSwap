@@ -67,8 +67,10 @@ async def get_current_user(
 
 
 async def get_optional_current_user_id(
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(HTTPBearer(auto_error=False)),
-    jwt_service: JWTService = Depends(get_jwt_service)
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(
+        HTTPBearer(auto_error=False)
+    ),
+    jwt_service: JWTService = Depends(get_jwt_service),
 ) -> Optional[UUID]:
     """
     Dependency to optionally extract user ID from JWT token
