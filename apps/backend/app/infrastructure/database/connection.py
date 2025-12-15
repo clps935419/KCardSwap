@@ -34,12 +34,6 @@ AsyncSessionLocal = async_sessionmaker(
 )
 
 
-async def init_db():
-    """Initialize database tables"""
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-
-
 async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
     """
     Dependency for getting database session in FastAPI

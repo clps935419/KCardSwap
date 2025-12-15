@@ -1,7 +1,7 @@
 # KCardSwap Backend (FastAPI)
 
 ## 環境變數
-- `DATABASE_URL`: 例如 `postgresql://kcardswap:kcardswap@db:5432/kcardswap`
+- `DATABASE_URL`: 例如 `postgresql+asyncpg://kcardswap:kcardswap@db:5432/kcardswap`（使用 asyncpg 驅動）
 - `GCS_BUCKET`: 例如 `kcardswap-dev`
 - `JWT_SECRET`: 用於簽發 JWT 的密鑰（開發可暫用）
 

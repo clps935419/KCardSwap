@@ -46,13 +46,17 @@ class JWTService:
         token = jwt.encode(to_encode, self.secret_key, algorithm=self.algorithm)
         return token, expire
 
-    def verify_token(self, token: str, token_type: str = "access") -> Optional[Dict[str, Any]]:
+    def verify_token(
+        self, token: str, token_type: str = "access"
+    ) -> Optional[Dict[str, Any]]:
         """
         Verify JWT token and return payload
         Returns None if token is invalid or expired
         """
         try:
-            payload = jwt.decode(token, self.secret_key, algorithms=[self.algorithm])
+            payload = jwt.decode(
+                token, self.secret_key, algorithms=[self.algorithm]
+            )
 
             # Verify token type
             if payload.get("type") != token_type:
@@ -70,6 +74,11 @@ class JWTService:
     def decode_token(self, token: str) -> Optional[Dict[str, Any]]:
         """Decode token without verification (for debugging)"""
         try:
-            return jwt.decode(token, self.secret_key, algorithms=[self.algorithm], options={"verify_signature": False})
+            return jwt.decode(
+                token,
+                self.secret_key,
+                algorithms=[self.algorithm],
+                options={"verify_signature": False},
+            )
         except JWTError:
             return None

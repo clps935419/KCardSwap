@@ -31,7 +31,11 @@ class GoogleOAuthService:
             )
 
             # Verify issuer
-            if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
+            valid_issuers = [
+                'accounts.google.com',
+                'https://accounts.google.com',
+            ]
+            if idinfo['iss'] not in valid_issuers:
                 return None
 
             return {

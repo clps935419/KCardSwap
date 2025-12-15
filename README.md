@@ -25,10 +25,17 @@ A card trading platform built with FastAPI, Kong API Gateway, and PostgreSQL.
 
 3. Start all services:
    ```bash
-   make setup
-   # or
+   # Build and start all services (first time or after Dockerfile changes)
+   docker compose up --build -d
+   
+   # Or for subsequent runs
    docker compose up -d
    ```
+   
+   **Note**: The backend now uses Poetry for dependency management and includes:
+   - Automatic database migrations via Alembic on startup
+   - Hot-reload for development (via docker-compose.override.yml)
+   - Multi-stage Docker build for optimized images
 
 4. Verify services are running:
    ```bash
@@ -52,20 +59,23 @@ KCardSwap/
 │       │   ├── main.py   # Application entry point
 │       │   ├── routers/  # API route handlers
 │       │   ├── services/ # Business logic
-│       │   ├── models/   # Data models
-│       │   └── db/       # Database utilities
+│       │   └── domain/   # Domain entities (DDD)
+│       ├── alembic/      # Database migrations
 │       ├── tests/        # Test files
-│       └── requirements.txt
+│       ├── pyproject.toml # Poetry dependencies
+│       ├── poetry.lock   # Locked dependencies
+│       └── Dockerfile    # Multi-stage build
 ├── gateway/
 │   └── kong/             # Kong API Gateway configuration
 │       └── kong.yaml     # Declarative config
 ├── infra/
 │   └── db/               # Database scripts
-│       └── init.sql      # Schema initialization
+│       └── init.sql      # Database-level setup only
 ├── specs/                # Feature specifications
 ├── .github/
 │   └── workflows/        # CI/CD workflows
 ├── docker-compose.yml    # Container orchestration
+├── docker-compose.override.yml  # Development overrides
 ├── Makefile             # Development commands
 └── SECRETS.md           # Secrets management guide
 ```

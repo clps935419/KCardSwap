@@ -8,7 +8,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .container import Container
-from .infrastructure.database import init_db
 from .presentation.routers import auth_router, profile_router
 
 # Initialize IoC Container
@@ -20,10 +19,11 @@ async def lifespan(app: FastAPI):
     """
     Lifespan context manager for FastAPI
     Handles startup and shutdown events
+    
+    Note: Database tables are created by Alembic migrations.
+    - In Docker: Migrations run automatically via Dockerfile entrypoint
+    - In local dev: Run `poetry run alembic upgrade head` before starting the app
     """
-    # Startup: Initialize database and wire container
-    await init_db()
-
     # Wire container for dependency injection
     container.wire(modules=[
         "app.presentation.routers.auth_router",

@@ -1,0 +1,15 @@
+# Docker Compose Override for Development
+# Development helpers: mount source, persist site-packages, and auto-install deps on first start
+
+services:
+  backend:
+    volumes:
+      - ./apps/backend/app:/app/app
+      - ./apps/backend/pyproject.toml:/app/pyproject.toml:ro
+      - ./apps/backend/poetry.lock:/app/poetry.lock:ro
+      - backend-site-packages:/usr/local/lib/python3.11/site-packages
+    # On container start, ensure production deps are present (first-run installs), then run start script
+    command: ["bash", "-lc", "poetry install --no-root --only main || true && /app/start.sh"]
+
+volumes:
+  backend-site-packages:
