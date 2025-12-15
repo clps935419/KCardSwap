@@ -1,0 +1,14 @@
+# Docker Compose Override for Development
+# This file is automatically applied when running `docker compose up`
+# It provides development-specific configurations like hot-reload
+
+services:
+  backend:
+    # Override the CMD to enable hot-reload for development
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    # Mount source code for hot-reload
+    volumes:
+      - ./apps/backend/app:/app/app:ro
+    environment:
+      # Enable SQL query logging for development
+      SQL_ECHO: "true"

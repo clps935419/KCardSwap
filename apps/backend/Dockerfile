@@ -21,6 +21,9 @@ RUN poetry install --only main --no-root && rm -rf $POETRY_CACHE_DIR
 # Stage 2: Runtime - 執行階段輕量映像
 FROM python:3.11-slim
 
+# 安裝 curl（用於 healthcheck）
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+
 # 設定工作目錄
 WORKDIR /app
 

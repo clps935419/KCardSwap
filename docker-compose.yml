@@ -18,12 +18,10 @@ services:
       retries: 5
 
   backend:
-    image: python:3.11-slim
+    build:
+      context: ./apps/backend
+      dockerfile: Dockerfile
     container_name: kcardswap-backend
-    working_dir: /app
-    command: ["bash", "-lc", "apt-get update && apt-get install -y curl && pip install -r requirements.txt && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"]
-    volumes:
-      - ./apps/backend:/app
     environment:
       DATABASE_URL: postgresql://kcardswap:kcardswap@db:5432/kcardswap
       GCS_BUCKET: kcardswap-dev
