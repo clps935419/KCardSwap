@@ -21,7 +21,10 @@ async def lifespan(app: FastAPI):
     Lifespan context manager for FastAPI
     Handles startup and shutdown events
     """
-    # Startup: Initialize database and wire container
+    # Startup: Initialize database connection pool
+    # Note: Tables are created by Alembic migrations, not by init_db()
+    # Migrations run automatically in Docker via Dockerfile entrypoint
+    # For local development, run: poetry run alembic upgrade head
     await init_db()
 
     # Wire container for dependency injection

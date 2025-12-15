@@ -35,9 +35,15 @@ AsyncSessionLocal = async_sessionmaker(
 
 
 async def init_db():
-    """Initialize database tables"""
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    """
+    Initialize database connection (deprecated - use Alembic migrations instead)
+    
+    Note: This function no longer creates tables. All schema changes must be
+    managed through Alembic migrations. See docs/database-migrations.md
+    """
+    # Connection pooling is already handled by the engine
+    # This function is kept for backward compatibility but does nothing
+    pass
 
 
 async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
