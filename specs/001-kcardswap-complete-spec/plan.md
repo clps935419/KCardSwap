@@ -29,6 +29,26 @@
 	- **Docker 支援**：多階段構建，構建階段使用 Poetry，執行階段使用輕量 pip
 	- **CI/CD 整合**：GitHub Actions 使用 snok/install-poetry action，快取 .venv 目錄
 	- **詳細文件**：參見 `specs/copilot/modify-requirements-backend/`（plan.md, research.md, quickstart.md）
+- **資料庫遷移管理**（**已更新 2025-12-15，對應 FR-DB-004**）：
+	- **策略**：「遷移為王」—— 所有 schema 變更必須透過 Alembic migration 管理
+	- **工具**：Alembic（已配置於 `apps/backend/`）
+	- **配置檔**：`alembic.ini`、`alembic/env.py`、`alembic/versions/`
+	- **init.sql 責任調整**：僅保留資料庫級設定（CREATE DATABASE、CREATE EXTENSION、CREATE USER/ROLE、GRANT 權限），所有 CREATE TABLE、ALTER TABLE、CREATE INDEX 移除
+	- **初始化流程**：
+		1. Docker 容器啟動時執行 `init.sql`（建立資料庫、擴展、用戶、權限）
+		2. 後端應用啟動前執行 `alembic upgrade head`（建立所有表結構）
+	- **開發流程**：
+		- 新增/修改資料表：`alembic revision -m "描述"` → 編輯 migration script → `alembic upgrade head`
+		- 回滾變更：`alembic downgrade -1` 或 `alembic downgrade <revision>`
+		- 查看歷史：`alembic history`、`alembic current`
+	- **版本控制**：所有 migration scripts 納入 Git，確保團隊同步
+	- **測試環境**：testcontainers 自動執行 Alembic migrations
+	- **CI/CD 檢查**：GitHub Actions 檢查 migration scripts 是否可正常升級/降級
+	- **優勢**：
+		- 消除 init.sql 與 ORM models 雙重維護的同步問題
+		- Schema 版本可控、可追溯、可回滾
+		- 開發/測試/生產環境 schema 一致性保證
+		- 支援複雜 DDL 變更（如資料遷移、欄位重命名）
 - Kong Gateway（POC）：
 	- 插件：JWT auth、Rate Limiting（依會員等級）、CORS、Request Size Limiter。
 	- 路由前綴：`/api/v1/*` → upstream `apps/backend`。
@@ -212,9 +232,16 @@ Phase -1 Gates（依憲法）
 - [ ] 會員升級（方案頁、提示、權限變更）
 
 ## D. 資料庫與遷移
-- [ ] 建立所有表與索引
-- [ ] 撰寫 Seed 資料與遷移腳本
+- [ ] **[UPDATED: 2025-12-15]** 配置 Alembic 環境（alembic.ini、env.py）
+- [ ] **[UPDATED: 2025-12-15]** 建立初始 migration：從現有 init.sql 轉換所有 CREATE TABLE、CREATE INDEX 至 Alembic migration script
+- [ ] **[UPDATED: 2025-12-15]** 精簡 init.sql：僅保留 CREATE DATABASE、CREATE EXTENSION、CREATE USER、GRANT 等資料庫級設定
+- [ ] **[UPDATED: 2025-12-15]** 驗證 migration 升級/降級流程：`alembic upgrade head` 和 `alembic downgrade base`
+- [ ] **[UPDATED: 2025-12-15]** 更新 Docker 初始化流程：init.sql → alembic upgrade head
+- [ ] **[UPDATED: 2025-12-15]** 更新 testcontainers 整合測試：自動執行 Alembic migrations
+- [ ] **[UPDATED: 2025-12-15]** CI/CD 檢查：驗證 migration scripts 可正常執行
+- [ ] 撰寫 Seed 資料腳本（測試/開發環境用）
 - [ ] Query 優化與解說文件
+- [ ] **[ADDED: 2025-12-15]** 撰寫 migration 開發指南文件（如何建立、測試、回滾 migration）
 
 ## E. 測試與品質
 - [ ] 單元/整合測試用例覆蓋（>70% 核心模組）

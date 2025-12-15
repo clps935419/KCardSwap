@@ -73,11 +73,20 @@
 - [ ] T902 限制提示 UX（指出超限類型與下一步：隔日/升級/刪舊卡）
 - [ ] T903 二次確認（送出交換、完成交換、送出檢舉）
 
-## Phase 10: 資料庫與遷移
-- [ ] T1001 建表與索引（users, profiles, cards, trades, trade_items, chats, messages, friendships, ratings, reports, subscriptions）
-- [ ] T1002 Seed 資料與遷移腳本
-- [ ] T1003 Query 優化與解說文件
-  - [ ] DM-001 整理 `specs/001-kcardswap-complete-spec/data-model.md`，與 `infra/db/init.sql` 對齊（含索引、外鍵、不變條件）
+## Phase 10: 資料庫與遷移 [UPDATED: 2025-12-15, 對應 FR-DB-004]
+- [ ] T1001 [P] 配置 Alembic 環境 `apps/backend/alembic.ini` 和 `apps/backend/alembic/env.py`
+- [ ] T1002 [P] 建立初始 migration：從 `infra/db/init.sql` 轉換所有 CREATE TABLE 至 `apps/backend/alembic/versions/001_initial_schema.py`
+- [ ] T1003 [P] 建立索引 migration：從 `infra/db/init.sql` 轉換所有 CREATE INDEX 至 `apps/backend/alembic/versions/002_add_indexes.py`
+- [ ] T1004 精簡 `infra/db/init.sql`：僅保留 CREATE DATABASE、CREATE EXTENSION、CREATE USER、GRANT 等資料庫級設定，移除所有 CREATE TABLE 和 CREATE INDEX
+- [ ] T1005 驗證 migration 升級流程：執行 `alembic upgrade head` 確認所有表結構正確建立
+- [ ] T1006 驗證 migration 降級流程：執行 `alembic downgrade base` 確認可完全回滾
+- [ ] T1007 更新 Docker 初始化腳本 `apps/backend/Dockerfile` 或 `docker-compose.yml`：在應用啟動前執行 `alembic upgrade head`
+- [ ] T1008 更新 testcontainers 整合測試設定：自動執行 Alembic migrations 在測試環境
+- [ ] T1009 更新 CI/CD workflow `.github/workflows/test.yml`：新增 migration 升級/降級驗證步驟
+- [ ] T1010 [P] 撰寫 migration 開發指南文件 `apps/backend/docs/database-migrations.md`：包含如何建立、測試、回滾 migration
+- [ ] T1011 [P] Seed 資料腳本 `apps/backend/scripts/seed.py`：測試/開發環境用
+- [ ] T1012 Query 優化與解說文件 `apps/backend/docs/query-optimization.md`
+  - [ ] DM-001 整理 `specs/001-kcardswap-complete-spec/data-model.md`，與 Alembic migrations 對齊（含索引、外鍵、不變條件）
 
 ## Phase 11: 測試與品質
 - [ ] T1101 單元測試覆蓋（>70% 核心模組）

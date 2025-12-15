@@ -197,6 +197,7 @@
 - **FR-DB-001**：資料庫必須至少包含 users、profiles、cards、trades、trade_items、chats、messages、friendships、ratings、reports、subscriptions 等主要資料表。
 - **FR-DB-002**：所有外鍵關聯必須明確定義並採用適當的刪除/更新策略（例如交易歷史不可因使用者刪除而消失）。
 - **FR-DB-003**：常用查詢條件（例如依 user_id 查 cards、依 chat_id 查 messages、依地理區域查 users）必須建立適當索引以確保效能。
+- **[ADDED: 2025-12-15] FR-DB-004**：所有資料庫 schema 變更（CREATE TABLE、ALTER TABLE、CREATE INDEX 等）必須透過 Alembic migration 管理，init.sql 僅保留資料庫級設定（擴展、函數、權限），確保 schema 版本可控且可回滾。**Why**: 採用「遷移為王」策略，確保開發/測試/生產環境 schema 一致性，避免 init.sql 與 ORM models 雙重維護造成的同步問題。**Acceptance Scenarios**: (1) 當需要新增或修改資料表結構時，開發者建立 Alembic migration script，執行 `alembic upgrade head` 後 schema 變更生效，且可透過 `alembic downgrade` 回滾。(2) 當 Docker 環境首次啟動時，執行 init.sql 與 Alembic migrations 後，init.sql 僅建立資料庫/用戶/擴展，所有表結構由 migration 產生。
 
 #### 10. UI/UX 設計指南（畫面流程、元件規格、互動設計）
 
