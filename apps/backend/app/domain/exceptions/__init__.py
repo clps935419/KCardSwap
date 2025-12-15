@@ -1,12 +1,12 @@
 """Domain exceptions"""
 
 
-class DomainException(Exception):
+class DomainError(Exception):
     """Base domain exception"""
     pass
 
 
-class EntityNotFoundError(DomainException):
+class EntityNotFoundError(DomainError):
     """Entity not found error"""
     def __init__(self, entity_type: str, entity_id: str):
         self.entity_type = entity_type
@@ -14,16 +14,16 @@ class EntityNotFoundError(DomainException):
         super().__init__(f"{entity_type} with id {entity_id} not found")
 
 
-class BusinessRuleViolationError(DomainException):
+class BusinessRuleViolationError(DomainError):
     """Business rule violation error"""
     pass
 
 
-class InvalidCredentialsError(DomainException):
+class InvalidCredentialsError(DomainError):
     """Invalid credentials error"""
     pass
 
 
-class UnauthorizedError(DomainException):
+class UnauthorizedError(DomainError):
     """Unauthorized access error"""
     pass

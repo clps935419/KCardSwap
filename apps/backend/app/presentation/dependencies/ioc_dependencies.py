@@ -8,12 +8,12 @@ from dependency_injector.wiring import inject
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from ...container import Container
 from ...domain.repositories.profile_repository_interface import IProfileRepository
 from ...domain.repositories.user_repository_interface import IUserRepository
 from ...infrastructure.database.connection import get_db_session
 from ...infrastructure.external.google_oauth_service import GoogleOAuthService
 from ...infrastructure.security.jwt_service import JWTService
-from ...container import Container
 
 
 # Database session provider
