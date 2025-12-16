@@ -240,150 +240,187 @@
 
 **說明**：本專案的 DDD 原則請參考專案憲法（Constitution Article VI）。下列為本專案具體目錄與實體定義（專案專屬內容），保留於 Spec 中以利開發實作。
 
-```
-apps/backend/app/
-├── main.py                          # FastAPI 應用入口
-├── config.py                        # 配置管理（環境變數、設定）
-├── dependencies.py                  # 全局依賴注入設定
-|
-├── domain/                          # Domain Layer (核心業務邏輯)
-│   ├── __init__.py
-│   ├── entities/                    # 領域實體（Entities）
+#### 目錄結構規範（**已更新 2025-12-15，採用 Modular DDD**）
 
-#### 目錄結構規範
+[CHANGED: 分層架構 → 模組化架構，原因：提升業務內聚性，符合 DDD Bounded Context 原則]
 
 ```
 apps/backend/app/
-├── main.py                          # FastAPI 應用入口
-├── config.py                        # 配置管理（環境變數、設定）
-├── dependencies.py                  # 全局依賴注入設定
-|
-├── domain/                          # Domain Layer (核心業務邏輯)
-│   ├── __init__.py
-│   ├── entities/                    # 領域實體（Entities）
-│   │   ├── __init__.py
-│   │   ├── user.py                 # User Entity (含業務邏輯方法)
-│   │   ├── card.py                 # Card Entity
-│   │   ├── trade.py                # Trade Entity
-│   │   └── chat.py                 # Chat Entity
-│   ├── value_objects/              # 值物件（Value Objects）
-│   │   ├── __init__.py
-│   │   ├── email.py                # Email VO (不可變)
-│   │   ├── location.py             # Location VO (經緯度)
-│   │   └── rating.py               # Rating VO (1-5 星)
-│   ├── repositories/               # Repository 介面（不含實作）
-│   │   ├── __init__.py
-│   │   ├── user_repository.py      # IUserRepository (Protocol)
-│   │   ├── card_repository.py
-│   │   └── trade_repository.py
-│   ├── services/                   # Domain Services (複雜業務邏輯)
-│   │   ├── __init__.py
-│   │   ├── trade_matching_service.py
-│   │   └── nearby_search_service.py
-│   ├── events/                     # Domain Events
-│   │   ├── __init__.py
-│   │   ├── user_registered.py
-│   │   ├── trade_completed.py
-│   │   └── message_sent.py
-│   └── exceptions/                 # Domain 專用例外
-│       ├── __init__.py
-│       ├── business_rule_violation.py
-│       └── entity_not_found.py
+├── main.py                 # 應用程式入口與路由聚合
+├── config.py              # 全域配置管理
+├── container.py           # 全域依賴注入容器
 │
-├── application/                    # Application Layer (用例協調)
-│   ├── __init__.py
-│   ├── use_cases/                  # Use Cases (Application Services)
+├── modules/               # 業務模組核心（取代原有的分層結構）
+│   ├── identity/          # [Module] 認證與使用者管理（Auth + User）
 │   │   ├── __init__.py
-│   │   ├── auth/
-│   │   │   ├── login_with_google.py
-│   │   │   └── refresh_token.py
-│   │   ├── cards/
-│   │   │   ├── create_card.py
-│   │   │   ├── update_card.py
-│   │   │   └── search_cards.py
-│   │   ├── trades/
-│   │   │   ├── create_trade_proposal.py
-│   │   │   ├── accept_trade.py
-│   │   │   └── complete_trade.py
-│   │   └── chats/
-│   │       ├── send_message.py
-│   │       └── get_chat_history.py
-│   ├── dtos/                       # Data Transfer Objects
-│   │   ├── __init__.py
-│   │   ├── user_dto.py
-│   │   ├── card_dto.py
-│   │   └── trade_dto.py
-│   ├── commands/                   # Command Objects (CQRS 模式)
-│   │   ├── __init__.py
-│   │   ├── create_card_command.py
-│   │   └── send_message_command.py
-│   ├── queries/                    # Query Objects (CQRS 模式)
-│   │   ├── __init__.py
-│   │   ├── get_nearby_users_query.py
-│   │   └── get_trade_history_query.py
-│   └── handlers/                   # Command/Query Handlers
+│   │   ├── domain/        # 領域層（Entities, Value Objects, Repository Interfaces）
+│   │   │   ├── __init__.py
+│   │   │   ├── entities/
+│   │   │   │   ├── __init__.py
+│   │   │   │   └── user.py              # User Entity
+│   │   │   ├── value_objects/
+│   │   │   │   ├── __init__.py
+│   │   │   │   └── user_id.py           # UserId VO
+│   │   │   ├── repositories/
+│   │   │   │   ├── __init__.py
+│   │   │   │   └── user_repository_interface.py  # IUserRepository
+│   │   │   └── exceptions/
+│   │   │       ├── __init__.py
+│   │   │       └── user_exceptions.py
+│   │   │
+│   │   ├── application/   # 應用層（Use Cases, DTOs）
+│   │   │   ├── __init__.py
+│   │   │   ├── use_cases/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── login_with_google.py
+│   │   │   │   ├── refresh_token.py
+│   │   │   │   └── logout.py
+│   │   │   └── dtos/
+│   │   │       ├── __init__.py
+│   │   │       └── user_dto.py
+│   │   │
+│   │   ├── infrastructure/ # 基礎設施層（Repository 實作、外部服務）
+│   │   │   ├── __init__.py
+│   │   │   ├── repositories/
+│   │   │   │   ├── __init__.py
+│   │   │   │   └── sqlalchemy_user_repository.py
+│   │   │   └── external/
+│   │   │       ├── __init__.py
+│   │   │       └── google_oauth_service.py
+│   │   │
+│   │   └── presentation/  # 表現層（Routers, Schemas, Dependencies）
+│   │       ├── __init__.py
+│   │       ├── routers/
+│   │       │   ├── __init__.py
+│   │       │   └── auth_router.py       # /api/v1/auth/*
+│   │       ├── schemas/
+│   │       │   ├── __init__.py
+│   │       │   └── auth_schemas.py
+│   │       └── dependencies/
+│   │           ├── __init__.py
+│   │           └── auth_dependencies.py
+│   │
+│   └── social/            # [Module] 個人檔案與社交功能（Profile + Friends + Chat）
 │       ├── __init__.py
-│       ├── command_handlers.py
-│       └── query_handlers.py
+│       ├── domain/
+│       │   ├── __init__.py
+│       │   ├── entities/
+│       │   │   ├── __init__.py
+│       │   │   ├── profile.py           # Profile Entity
+│       │   │   ├── friendship.py        # Friendship Entity
+│       │   │   ├── chat.py              # Chat Entity
+│       │   │   └── message.py           # Message Entity
+│       │   ├── value_objects/
+│       │   │   ├── __init__.py
+│       │   │   ├── location.py          # Location VO
+│       │   │   └── rating.py            # Rating VO
+│       │   ├── repositories/
+│       │   │   ├── __init__.py
+│       │   │   ├── profile_repository_interface.py
+│       │   │   ├── chat_repository_interface.py
+│       │   │   └── friendship_repository_interface.py
+│       │   ├── events/
+│       │   │   ├── __init__.py
+│       │   │   └── message_sent_event.py
+│       │   └── exceptions/
+│       │       ├── __init__.py
+│       │       └── social_exceptions.py
+│       │
+│       ├── application/
+│       │   ├── __init__.py
+│       │   ├── use_cases/
+│       │   │   ├── __init__.py
+│       │   │   ├── profile/
+│       │   │   │   ├── get_profile.py
+│       │   │   │   └── update_profile.py
+│       │   │   ├── friends/
+│       │   │   │   ├── send_friend_request.py
+│       │   │   │   └── accept_friend_request.py
+│       │   │   └── chat/
+│       │   │       ├── send_message.py
+│       │   │       └── get_chat_history.py
+│       │   └── dtos/
+│       │       ├── __init__.py
+│       │       ├── profile_dto.py
+│       │       └── message_dto.py
+│       │
+│       ├── infrastructure/
+│       │   ├── __init__.py
+│       │   ├── repositories/
+│       │   │   ├── __init__.py
+│       │   │   ├── sqlalchemy_profile_repository.py
+│       │   │   ├── sqlalchemy_chat_repository.py
+│       │   │   └── sqlalchemy_friendship_repository.py
+│       │   └── external/
+│       │       ├── __init__.py
+│       │       └── fcm_notification_service.py
+│       │
+│       └── presentation/
+│           ├── __init__.py
+│           ├── routers/
+│           │   ├── __init__.py
+│           │   ├── profile_router.py    # /api/v1/profile/*
+│           │   ├── friends_router.py    # /api/v1/friends/*
+│           │   └── chat_router.py       # /api/v1/chats/*
+│           ├── schemas/
+│           │   ├── __init__.py
+│           │   ├── profile_schemas.py
+│           │   └── chat_schemas.py
+│           └── dependencies/
+│               ├── __init__.py
+│               └── social_dependencies.py
 │
-├── infrastructure/                 # Infrastructure Layer (技術實作)
-│   ├── __init__.py
-│   ├── database/
-│   │   ├── __init__.py
-│   │   ├── connection.py           # SQLAlchemy Engine/Session
-│   │   ├── models.py               # ORM Models (非 Domain Entities)
-│   │   └── migrations/             # Alembic migrations
-│   ├── repositories/               # Repository 實作
-│   │   ├── __init__.py
-│   │   ├── sqlalchemy_user_repository.py    # 實作 IUserRepository
-│   │   ├── sqlalchemy_card_repository.py
-│   │   └── sqlalchemy_trade_repository.py
-│   ├── external/                   # 外部服務整合
-│   │   ├── __init__.py
-│   │   ├── google_oauth_service.py
-│   │   ├── gcs_storage_service.py
-│   │   └── fcm_notification_service.py
-│   ├── messaging/                  # 事件發布/訂閱
-│   │   ├── __init__.py
-│   │   ├── event_bus.py
-│   │   └── event_handlers.py
-│   └── security/
-│       ├── __init__.py
-│       ├── jwt_service.py
-│       └── password_hasher.py
-│
-├── presentation/                   # Presentation Layer (API 層)
-│   ├── __init__.py
-│   ├── routers/                    # FastAPI Routers
-│   │   ├── __init__.py
-│   │   ├── auth_router.py          # /api/v1/auth/*
-│   │   ├── users_router.py         # /api/v1/users/*
-│   │   ├── cards_router.py         # /api/v1/cards/*
-│   │   ├── trades_router.py        # /api/v1/trades/*
-│   │   └── chats_router.py         # /api/v1/chats/*
-│   ├── schemas/                    # Pydantic Request/Response Models
-│   │   ├── __init__.py
-│   │   ├── auth_schemas.py
-│   │   ├── card_schemas.py
-│   │   └── trade_schemas.py
-│   ├── dependencies/               # Router-level Dependencies
-│   │   ├── __init__.py
-│   │   ├── auth_dependencies.py    # get_current_user, verify_token
-│   │   └── pagination_dependencies.py
-│   └── middleware/
-│       ├── __init__.py
-│       ├── error_handler.py
-│       └── logging_middleware.py
-│
-└── tests/                          # 測試目錄
-    ├── unit/                       # 單元測試（Domain & Application）
-    │   ├── domain/
-    │   └── application/
-    ├── integration/                # 整合測試（含 DB）
-    └── e2e/                        # 端到端測試
+└── shared/                # 共用核心（Shared Kernel）
+    ├── __init__.py
+    ├── domain/            # 共用 Value Objects
+    │   ├── __init__.py
+    │   ├── email.py       # Email VO
+    │   └── base_entity.py # Entity 基類
+    │
+    ├── infrastructure/    # 共用基礎設施
+    │   ├── __init__.py
+    │   ├── database/
+    │   │   ├── __init__.py
+    │   │   ├── connection.py          # SQLAlchemy Engine/Session
+    │   │   └── base_repository.py     # Repository 基類
+    │   ├── security/
+    │   │   ├── __init__.py
+    │   │   ├── jwt_service.py
+    │   │   └── password_hasher.py
+    │   └── external/
+    │       ├── __init__.py
+    │       └── gcs_storage_service.py
+    │
+    └── presentation/      # 共用表現層組件
+        ├── __init__.py
+        ├── middleware/
+        │   ├── __init__.py
+        │   ├── error_handler.py
+        │   └── logging_middleware.py
+        └── exceptions/
+            ├── __init__.py
+            └── api_exceptions.py
 ```
 
 ---
+
+#### 系統架構與設計約束
+
+**DA-002A 架構模式約束**（**已更新 2025-12-15**）
+
+- **架構模式**：[CHANGED: 分層架構 → 模組化架構 (Modular DDD)，原因：提升業務內聚性，符合 DDD Bounded Context 原則]
+- **目錄組織原則**：採用「依功能分包 (Package by Feature)」的模組化設計
+  - 系統必須按領域邊界（如 Identity、Social）劃分為獨立模組
+  - 每個模組包含完整的 Domain、Application、Infrastructure、Presentation 層
+  - 禁止使用傳統的依技術分層（如 routers/、services/ 散落在根目錄）
+- **模組邊界定義**：
+  - `identity` 模組：認證與使用者管理（Auth + User）
+  - `social` 模組：個人檔案與社交功能（Profile）
+  - `shared` 核心：共用基礎設施（資料庫、安全性、Value Objects）
+- **驗收標準**：
+  - 修改單一業務功能時，變更應限制在對應的單一模組目錄內
+  - 模組間不得出現循環依賴（Circular Dependencies）
+  - 共用邏輯必須放置於 `shared/` 目錄
 
 #### 本專案核心 Entities
 

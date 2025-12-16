@@ -1,100 +1,637 @@
-# Tasks: 001 KCardSwap Complete Spec
+# Tasks: KCardSwap 完整產品
 
-## Phase 0: Setup
-- [X] T001 初始化 mono-repo 目錄與工作流（apps/backend, gateway/kong, infra/db, specs, plans, tasks）
-- [X] T002 建立 `.env` 與機密管理策略（本機 `.env`、CI/Prod 使用 Secret Manager）
-- [X] T003 Docker Compose 一鍵啟動（Kong、Backend、Postgres、(可選)Nginx）路徑：`docker-compose.yml`
-- [X] T004 Kong 宣告式設定與路由 `/api/v1/*` → backend 路徑：`gateway/kong/kong.yaml`
-- [X] T005 CI/CD：lint/test/build、PR 檢查（GitHub Actions / GitLab CI）
-- [X] T006 後端依賴管理遷移至 Poetry（pip → Poetry）
-  - 詳細任務：`specs/copilot/modify-requirements-backend/tasks.md`（52 個子任務）
-  - 實作計畫：`specs/copilot/modify-requirements-backend/plan.md`
-  - 狀態：✅ Phase 1-6 完成（技術實作就緒），Phase 7 待完成（團隊培訓）
-  - 影響範圍：開發環境、Docker、CI/CD、文件
+**生成日期**: 2025-12-16  
+**Input**: Design documents from `/specs/001-kcardswap-complete-spec/`  
+**Prerequisites**: plan.md, spec.md, data-model.md, contracts/
 
-## Phase 1: AUTH/PROFILE (P1)
-- [X] T101 後端 Google OAuth 換 token 與使用者建立（`apps/backend/app/routers/auth.py`）
-- [X] T102 JWT 生成/刷新/登出（access 15m, refresh 7d）（`apps/backend/app/services/auth.py`）
-- [X] T103 Profile CRUD + 隱私設定（`apps/backend/app/routers/profile.py`）
-- [X] T104 Kong 與後端 JWT 驗證串接（Kong jwt 插件預留、後端中介層）
-- [X] T105 單元/整合測試：401/403/刷新流程、隱私旗標
-  - [X] CT-Auth 契約測試：對齊 `contracts/auth/login.json`（成功/驗證失敗/未授權）
+**架構**: Modular DDD (Identity + Social modules)  
+**測試策略**: TDD - 先寫測試，確保測試失敗後才實作  
+**依賴管理**: Poetry (pyproject.toml + poetry.lock)  
+**資料庫遷移**: Alembic (遷移為王策略)
 
-## Phase 2: CARD (P1)
-- [ ] T201 Signed URL 服務：副檔名/大小驗證（`apps/backend/app/routers/cards.py`）
-- [ ] T202 卡片 CRUD（image_url、thumb_url、屬性）（`apps/backend/app/routers/cards.py`）
-- [ ] T203 縮圖產生管線（200x200；後端任務或 Cloud Function）（`apps/backend/app/services/images.py`）
-- [ ] T204 上限檢查（每日數量/總容量/單張大小），錯誤碼 `422_LIMIT_EXCEEDED`
-- [ ] T205 查詢與篩選（owner=me、filters、分頁）
-- [ ] T206 測試：大小驗證、上限達成時的訊息與行為
-  - [ ] CT-Cards 契約測試：對齊 `contracts/cards/create.json`（201/400/401）
+---
 
-## Phase 3: NEARBY (P1)
-- [ ] T301 位置來源：最近一次上傳座標或明確定位（資料欄位與更新）
-- [ ] T302 距離計算與排序（距離升序、付費優先）
-- [ ] T303 隱身過濾（不出現在他人結果）
-- [ ] T304 次數限制（免費 5 次/天、付費不限；Kong rate-limit 標籤）
-- [ ] T305 測試：限次計數與重置、隱私正確性
+## Format: `- [ ] [ID] [P?] [Story?] Description`
 
-## Phase 4: SOCIAL (P1)
-- [ ] T401 好友邀請/接受/拒絕/封鎖（`apps/backend/app/routers/social.py`）
-- [ ] T402 評分 API（交易完成後評分，公開評價匯總）（`apps/backend/app/routers/social.py`）
-- [ ] T403 檢舉 API 與審查標記（`apps/backend/app/routers/social.py`）
-- [ ] T404 測試：封鎖後的可見性與互動限制、檢舉累積邏輯
+- **[P]**: 可平行執行（不同檔案，無相依性）
+- **[Story]**: 所屬使用者故事（US1, US2, US3...）
+- 描述包含明確檔案路徑
 
-## Phase 5: CHAT (P1)
-- [ ] T501 聊天室模型（`apps/backend/app/models/chat.py`）與訊息模型（`apps/backend/app/models/message.py`）
-- [ ] T502 輪詢 API（`GET /api/v1/chats/{id}/messages?since=...`）
-- [ ] T503 FCM 推播整合（背景通知導向聊天室）
-- [ ] T504 訊息狀態：sent/delivered/read 的標示與回傳
-- [ ] T505 測試：前景輪詢 3–5 秒、背景推播送達率
+---
 
-## Phase 6: TRADE (P1)
-- [ ] T601 提案建立 API（`POST /api/v1/trades`）與資料表 `trade_items`
-- [ ] T602 狀態機：draft → proposed → accepted → completed | rejected | canceled
-- [ ] T603 完成鎖定（兩邊確認後，小卡狀態改為已交換）
-- [ ] T604 交換歷史查詢與分頁
-- [ ] T605 測試：狀態流轉、雙向完成條件
-  - [ ] CT-Trade 契約測試：對齊 `contracts/trade/create.json`（201/409/401）
+## Phase 1: Setup (專案初始化)
 
-## Phase 7: BIZ (P2)
-- [ ] T701 會員權限檢查中介層（每日新增/貼文/搜尋/容量/大小）
- - [ ] T702 Android 訂閱整合：Google Play Billing（用戶端購買流程）；後端僅收據驗證與升級/降級狀態同步
-- [ ] T703 後台參數：每日貼文上限可配置（預設免費 2、付費不限）
-- [ ] T704 測試：限額邏輯、過期自動降級
- - [ ] T705 訂閱收據驗證 API 與例外處理（重試、狀態回滾；退款由平台機制處理）
+**目的**: 建立專案基礎結構與開發環境
 
-## Phase 8: API 標準與錯誤處理
-- [ ] T801 統一錯誤格式與錯誤碼（400/401/403/404/409/422/429）
-- [ ] T802 OpenAPI 規格檔（`apps/backend/openapi.yaml`）與文件站（FastAPI/Swagger 自動生成亦可）
+- [X] T001 初始化 monorepo 目錄結構（apps/backend, apps/mobile, gateway/kong, infra/）
+- [X] T002 配置 Poetry 環境：建立 apps/backend/pyproject.toml 並定義核心依賴（FastAPI, SQLAlchemy, Alembic, pytest）
+- [X] T003 [P] 建立 Docker Compose 配置：apps/backend/docker-compose.yml（Kong Gateway + PostgreSQL + Backend）
+- [X] T004 [P] 配置 Kong Gateway：gateway/kong/kong.yaml（路由前綴 /api/v1、JWT 插件、Rate Limiting）
+- [ ] T005 [P] 建立 GCS Bucket 結構規劃文件：infra/gcs/README.md（定義 cards/ 與 thumbs/ 路徑）
+- [X] T006 [P] 配置 CI/CD：.github/workflows/backend-ci.yml（lint, test, build 檢查）
+- [X] T007 建立開發環境文件：dev-setup.md（本地環境設定指引）
+- [X] T008 建立 Makefile：提供 dev, test, lint, seed 指令
 
-## Phase 9: UI/UX
-- [ ] T901 核心流程頁面：登入→完檔→上傳首卡→附近→好友/聊天→交換→評分
-- [ ] T902 限制提示 UX（指出超限類型與下一步：隔日/升級/刪舊卡）
-- [ ] T903 二次確認（送出交換、完成交換、送出檢舉）
+---
 
-## Phase 10: 資料庫與遷移 [UPDATED: 2025-12-15, 對應 FR-DB-004]
-- [X] T1001 [P] 配置 Alembic 環境 `apps/backend/alembic.ini` 和 `apps/backend/alembic/env.py`
-- [X] T1002 [P] 建立初始 migration：從 `infra/db/init.sql` 轉換所有 CREATE TABLE 至 `apps/backend/alembic/versions/001_initial_schema.py`
-- [X] T1003 [P] 建立索引 migration：從 `infra/db/init.sql` 轉換所有 CREATE INDEX 至 `apps/backend/alembic/versions/002_add_indexes.py`
-- [X] T1004 精簡 `infra/db/init.sql`：僅保留 CREATE DATABASE、CREATE EXTENSION、CREATE USER、GRANT 等資料庫級設定，移除所有 CREATE TABLE 和 CREATE INDEX
-- [X] T1005 驗證 migration 升級流程：執行 `alembic upgrade head` 確認所有表結構正確建立
-- [X] T1006 驗證 migration 降級流程：執行 `alembic downgrade base` 確認可完全回滾
-- [X] T1007 更新 Docker 初始化腳本 `apps/backend/Dockerfile` 或 `docker-compose.yml`：在應用啟動前執行 `alembic upgrade head`
-- [X] T1008 更新 testcontainers 整合測試設定：自動執行 Alembic migrations 在測試環境
-- [X] T1009 更新 CI/CD workflow `.github/workflows/test.yml`：新增 migration 升級/降級驗證步驟
-- [X] T1010 [P] 撰寫 migration 開發指南文件 `apps/backend/docs/database-migrations.md`：包含如何建立、測試、回滾 migration
-- [X] T1011 [P] Seed 資料腳本 `apps/backend/scripts/seed.py`：測試/開發環境用
-- [X] T1012 Query 優化與解說文件 `apps/backend/docs/query-optimization.md`
-  - [X] DM-001 整理 `specs/001-kcardswap-complete-spec/data-model.md`，與 Alembic migrations 對齊（含索引、外鍵、不變條件）
+## Phase 2: Foundational (基礎設施 - 阻塞性前置任務)
 
-## Phase 11: 測試與品質
-- [ ] T1101 單元測試覆蓋（>70% 核心模組）
-- [ ] T1102 整合測試：Kong + Backend；JWT；Rate Limit；GCS 上傳
-- [ ] T1103 E2E：User Story 1–6；SC-001..005 指標檢核
-- [ ] T1104 性能與安全測試（延遲、吞吐、檔案型別白名單、濫用防護）
+**目的**: 核心基礎設施，必須完成後才能開始任何 User Story 實作
 
-## Phase 12: 發佈與運維
+**⚠️ 關鍵**: 此階段完成前，所有 User Story 工作均不可開始
+
+### 資料庫與 ORM 基礎
+
+- [X] T009 建立精簡版 init.sql：infra/db/init.sql（僅 CREATE DATABASE, CREATE EXTENSION pgcrypto, CREATE USER, GRANT）
+- [X] T010 配置 Alembic 環境：apps/backend/alembic.ini + alembic/env.py（連線 PostgreSQL）
+- [X] T011 建立初始 migration script：alembic/versions/001_initial_schema.py（所有表結構從現有 data-model.md 轉換）
+- [X] T012 建立索引 migration：alembic/versions/002_add_indexes.py（所有索引定義）
+- [X] T013 驗證 migration 升降級：執行 `alembic upgrade head` 與 `alembic downgrade base` 確保正常運作
+- [X] T014 更新 Docker 初始化流程：docker-entrypoint.sh（先執行 init.sql，再執行 alembic upgrade head）
+
+### 模組化架構骨架
+
+- [ ] T015 建立 Shared Kernel 目錄結構：apps/backend/app/shared/（domain/, infrastructure/, presentation/）
+- [ ] T016 [P] 建立 Identity 模組目錄結構：apps/backend/app/modules/identity/（domain/, application/, infrastructure/, presentation/）
+- [ ] T017 [P] 建立 Social 模組目錄結構：apps/backend/app/modules/social/（domain/, application/, infrastructure/, presentation/）
+- [ ] T018 建立依賴注入容器骨架：apps/backend/app/container.py（使用 dependency-injector）
+- [ ] T019 建立應用程式入口：apps/backend/app/main.py（FastAPI app 初始化與模組路由聚合）
+
+### Shared Kernel 實作
+
+- [ ] T020 [P] 實作共用 Value Object：apps/backend/app/shared/domain/email.py（Email VO）
+- [ ] T021 [P] 實作 Entity 基類：apps/backend/app/shared/domain/base_entity.py
+- [ ] T022 實作資料庫連線：apps/backend/app/shared/infrastructure/database/connection.py（SQLAlchemy Engine）
+- [ ] T023 [P] 實作 Repository 基類：apps/backend/app/shared/infrastructure/database/base_repository.py
+- [ ] T024 [P] 實作 JWT 服務：apps/backend/app/shared/infrastructure/security/jwt_service.py（簽發/驗證 Access + Refresh Token）
+- [ ] T025 [P] 實作密碼雜湊：apps/backend/app/shared/infrastructure/security/password_hasher.py（bcrypt）
+- [ ] T026 [P] 實作 GCS 服務：apps/backend/app/shared/infrastructure/external/gcs_storage_service.py（產生 signed URL）
+- [ ] T027 [P] 實作錯誤處理中介軟體：apps/backend/app/shared/presentation/middleware/error_handler.py
+- [ ] T028 [P] 實作 API 例外類別：apps/backend/app/shared/presentation/exceptions/api_exceptions.py（400/401/403/404/422/429）
+
+**Checkpoint**: 基礎設施完成 - User Story 實作可以開始並行進行
+
+---
+
+## Phase 3: User Story 1 - Google 登入與完成基本個人檔案 (Priority: P1) 🎯 MVP
+
+**目標**: 使用者可以透過 Google 登入，並完成基本個人檔案設定
+
+**獨立測試標準**:
+- ✓ 使用者可以成功使用 Google 登入並取得 JWT Token
+- ✓ 使用者可以查看和更新個人檔案（nickname, bio, avatar）
+- ✓ 登入狀態可以通過 JWT 驗證
+- ✓ Refresh Token 機制正常運作
+
+### Domain Layer (Identity Module)
+
+- [ ] T029 [P] [US1] 建立 User Entity：apps/backend/app/modules/identity/domain/entities/user.py（id, email, google_id, created_at）
+- [ ] T030 [P] [US1] 建立 Profile Entity：apps/backend/app/modules/identity/domain/entities/profile.py（user_id, nickname, bio, avatar_url）
+- [ ] T031 [P] [US1] 建立 RefreshToken Entity：apps/backend/app/modules/identity/domain/entities/refresh_token.py（token, user_id, expires_at）
+- [ ] T032 [P] [US1] 定義 UserRepository Interface：apps/backend/app/modules/identity/domain/repositories/user_repository.py
+- [ ] T033 [P] [US1] 定義 ProfileRepository Interface：apps/backend/app/modules/identity/domain/repositories/profile_repository.py
+- [ ] T034 [P] [US1] 定義 RefreshTokenRepository Interface：apps/backend/app/modules/identity/domain/repositories/refresh_token_repository.py
+
+### Application Layer (Identity Module)
+
+- [ ] T035 [P] [US1] 建立 GoogleLoginUseCase：apps/backend/app/modules/identity/application/use_cases/google_login_use_case.py（驗證 Google Token → 建立/更新 User → 簽發 JWT）
+- [ ] T036 [P] [US1] 建立 RefreshTokenUseCase：apps/backend/app/modules/identity/application/use_cases/refresh_token_use_case.py（驗證 Refresh Token → 簽發新 Access Token）
+- [ ] T037 [P] [US1] 建立 GetProfileUseCase：apps/backend/app/modules/identity/application/use_cases/get_profile_use_case.py
+- [ ] T038 [P] [US1] 建立 UpdateProfileUseCase：apps/backend/app/modules/identity/application/use_cases/update_profile_use_case.py
+
+### Infrastructure Layer (Identity Module)
+
+- [ ] T039 [P] [US1] 實作 SQLAlchemy User Model：apps/backend/app/modules/identity/infrastructure/database/models/user_model.py
+- [ ] T040 [P] [US1] 實作 SQLAlchemy Profile Model：apps/backend/app/modules/identity/infrastructure/database/models/profile_model.py
+- [ ] T041 [P] [US1] 實作 SQLAlchemy RefreshToken Model：apps/backend/app/modules/identity/infrastructure/database/models/refresh_token_model.py
+- [ ] T042 [P] [US1] 實作 UserRepositoryImpl：apps/backend/app/modules/identity/infrastructure/repositories/user_repository_impl.py
+- [ ] T043 [P] [US1] 實作 ProfileRepositoryImpl：apps/backend/app/modules/identity/infrastructure/repositories/profile_repository_impl.py
+- [ ] T044 [P] [US1] 實作 RefreshTokenRepositoryImpl：apps/backend/app/modules/identity/infrastructure/repositories/refresh_token_repository_impl.py
+- [ ] T045 [P] [US1] 實作 GoogleOAuthService：apps/backend/app/modules/identity/infrastructure/external/google_oauth_service.py（驗證 Google ID Token）
+
+### Presentation Layer (Identity Module)
+
+- [ ] T046 [P] [US1] 定義 Login Schema：apps/backend/app/modules/identity/presentation/schemas/auth_schemas.py（GoogleLoginRequest, TokenResponse）
+- [ ] T047 [P] [US1] 定義 Profile Schema：apps/backend/app/modules/identity/presentation/schemas/profile_schemas.py（ProfileResponse, UpdateProfileRequest）
+- [ ] T048 [US1] 建立 Auth Router：apps/backend/app/modules/identity/presentation/routers/auth_router.py（POST /auth/google-login, POST /auth/refresh）
+- [ ] T049 [US1] 建立 Profile Router：apps/backend/app/modules/identity/presentation/routers/profile_router.py（GET /profile/me, PUT /profile/me）
+- [ ] T050 [P] [US1] 實作 JWT Authentication Dependency：apps/backend/app/modules/identity/presentation/dependencies/auth_deps.py（get_current_user）
+
+### Integration
+
+- [ ] T051 [US1] 註冊 Identity Module 到 DI Container：apps/backend/app/container.py（綁定 Repositories, UseCases, Services）
+- [ ] T052 [US1] 註冊 Identity Module 路由到 main.py：apps/backend/app/main.py（包含 /auth 和 /profile 路由）
+
+### Testing
+
+- [ ] T053 [P] [US1] 撰寫 Auth Contract Tests：tests/integration/contracts/test_auth_contracts.py（對齊 contracts/auth/login.json）
+- [ ] T054 [P] [US1] 撰寫 Profile Contract Tests：tests/integration/contracts/test_profile_contracts.py（對齊 contracts/social/profile.json）
+- [ ] T055 [P] [US1] 撰寫 User Entity Unit Tests：tests/unit/modules/identity/domain/test_user_entity.py
+- [ ] T056 [P] [US1] 撰寫 GoogleLoginUseCase Unit Tests：tests/unit/modules/identity/application/test_google_login_use_case.py
+- [ ] T057 [US1] 撰寫 Auth Integration Tests：tests/integration/modules/identity/test_auth_flow.py（完整登入流程 E2E）
+- [ ] T058 [US1] 撰寫 Profile Integration Tests：tests/integration/modules/identity/test_profile_flow.py（查看/更新檔案 E2E）
+
+### Configuration
+
+- [ ] T059 [P] [US1] 配置 Kong JWT Plugin：gateway/kong/phase1-jwt-config.yaml（驗證 Access Token）
+- [ ] T060 [P] [US1] 更新環境變數：apps/backend/app/config.py（GOOGLE_CLIENT_ID, JWT_SECRET, JWT_ALGORITHM）
+
+### Documentation
+
+- [ ] T061 [P] [US1] 撰寫 Authentication 文件：apps/backend/docs/authentication.md（Google OAuth 流程、JWT 結構、Refresh 機制）
+- [ ] T062 [P] [US1] 更新 API 文件：apps/backend/docs/api/identity-module.md（/auth 和 /profile 端點說明）
+
+### Seed Data
+
+- [ ] T063 [P] [US1] 建立測試用戶 Seed：apps/backend/scripts/seed_users.py（產生測試用戶與 Profile）
+
+### Verification
+
+- [ ] T064 [US1] 執行所有 US1 測試：確保 Contract Tests + Unit Tests + Integration Tests 全數通過
+- [ ] T065 [US1] 手動驗證 US1 驗收標準：使用 Postman/curl 測試完整登入與檔案更新流程
+
+---
+
+## Phase 4: User Story 2 - 新增小卡與上傳限制 (Priority: P1)
+
+**目標**: 使用者可以上傳小卡圖片，系統管理上傳限制（免費：2張/日、10MB/張、1GB總容量）
+
+**獨立測試標準**:
+- ✓ 使用者可以上傳小卡圖片並取得 GCS Signed URL
+- ✓ 系統正確驗證檔案類型（JPEG/PNG）和大小限制
+- ✓ 系統正確追蹤每日上傳次數和總容量
+- ✓ 達到限制時回傳正確錯誤訊息（422_LIMIT_EXCEEDED）
+- ✓ 縮圖（200x200）自動產生
+
+### Domain Layer (Social Module - Cards)
+
+- [ ] T066 [P] [US2] 建立 Card Entity：apps/backend/app/modules/social/domain/entities/card.py（id, owner_id, image_url, thumb_url, card_name, card_game, rarity, created_at）
+- [ ] T067 [P] [US2] 建立 UploadQuota Value Object：apps/backend/app/modules/social/domain/value_objects/upload_quota.py（daily_limit, max_file_size, total_storage）
+- [ ] T068 [P] [US2] 定義 CardRepository Interface：apps/backend/app/modules/social/domain/repositories/card_repository.py
+- [ ] T069 [P] [US2] 定義 Card Domain Service：apps/backend/app/modules/social/domain/services/card_validation_service.py（檔案類型/大小驗證邏輯）
+
+### Application Layer (Social Module - Cards)
+
+- [ ] T070 [P] [US2] 建立 UploadCardUseCase：apps/backend/app/modules/social/application/use_cases/upload_card_use_case.py（驗證限制 → 產生 Signed URL → 建立 Card 記錄）
+- [ ] T071 [P] [US2] 建立 GetMyCardsUseCase：apps/backend/app/modules/social/application/use_cases/get_my_cards_use_case.py（查詢當前使用者的所有卡片）
+- [ ] T072 [P] [US2] 建立 DeleteCardUseCase：apps/backend/app/modules/social/application/use_cases/delete_card_use_case.py
+- [ ] T073 [P] [US2] 建立 CheckUploadQuotaUseCase：apps/backend/app/modules/social/application/use_cases/check_upload_quota_use_case.py（檢查當日上傳次數與總容量）
+
+### Infrastructure Layer (Social Module - Cards)
+
+- [ ] T074 [P] [US2] 實作 SQLAlchemy Card Model：apps/backend/app/modules/social/infrastructure/database/models/card_model.py
+- [ ] T075 [P] [US2] 實作 CardRepositoryImpl：apps/backend/app/modules/social/infrastructure/repositories/card_repository_impl.py
+- [ ] T076 [P] [US2] 擴展 GCS Storage Service：apps/backend/app/shared/infrastructure/external/gcs_storage_service.py（新增 generate_upload_signed_url 方法，路徑為 cards/{user_id}/{uuid}.jpg）
+- [ ] T077 [P] [US2] 實作 Thumbnail Generation Service：apps/backend/app/modules/social/infrastructure/services/thumbnail_service.py（使用 Pillow 或 Cloud Function 產生 200x200 縮圖，存至 thumbs/{user_id}/{uuid}.jpg）
+- [ ] T078 [P] [US2] 實作 Quota Tracking Service：apps/backend/app/modules/social/infrastructure/services/quota_tracking_service.py（Redis 或 DB 追蹤每日上傳次數）
+
+### Presentation Layer (Social Module - Cards)
+
+- [ ] T079 [P] [US2] 定義 Card Schema：apps/backend/app/modules/social/presentation/schemas/card_schemas.py（CreateCardRequest, CardResponse, UploadUrlResponse）
+- [ ] T080 [US2] 建立 Cards Router：apps/backend/app/modules/social/presentation/routers/cards_router.py（POST /cards/upload-url, GET /cards/me, DELETE /cards/{id}）
+
+### Integration
+
+- [ ] T081 [US2] 註冊 Social Module (Cards) 到 DI Container：apps/backend/app/container.py
+- [ ] T082 [US2] 註冊 Cards Router 到 main.py：apps/backend/app/main.py（包含 /cards 路由）
+
+### Testing
+
+- [ ] T083 [P] [US2] 撰寫 Cards Contract Tests：tests/integration/contracts/test_cards_contracts.py（對齊 contracts/cards/create.json）
+- [ ] T084 [P] [US2] 撰寫 Card Entity Unit Tests：tests/unit/modules/social/domain/test_card_entity.py
+- [ ] T085 [P] [US2] 撰寫 UploadCardUseCase Unit Tests：tests/unit/modules/social/application/test_upload_card_use_case.py（Mock 限制檢查）
+- [ ] T086 [P] [US2] 撰寫 Quota Validation Unit Tests：tests/unit/modules/social/domain/test_upload_quota.py（測試每日/總容量/單檔大小邊界）
+- [ ] T087 [US2] 撰寫 Card Upload Integration Tests：tests/integration/modules/social/test_card_upload_flow.py（完整上傳流程 E2E，包含限制觸發）
+
+### Configuration
+
+- [ ] T088 [P] [US2] 配置 GCS Bucket CORS：infra/gcs/cors-config.json（允許前端直接上傳）
+- [ ] T089 [P] [US2] 更新環境變數：apps/backend/app/config.py（GCS_BUCKET_NAME, DAILY_UPLOAD_LIMIT=2, MAX_FILE_SIZE_MB=10, TOTAL_STORAGE_GB=1）
+
+### Documentation
+
+- [ ] T090 [P] [US2] 撰寫 Card Upload 文件：apps/backend/docs/card-upload.md（Signed URL 流程、限制說明、錯誤碼）
+- [ ] T091 [P] [US2] 更新 API 文件：apps/backend/docs/api/social-module-cards.md
+
+### Verification
+
+- [ ] T092 [US2] 執行所有 US2 測試：確保 Contract Tests + Unit Tests + Integration Tests 全數通過
+- [ ] T093 [US2] 手動驗證 US2 驗收標準：測試上傳 2 張後觸發 422_LIMIT_EXCEEDED
+- [ ] T094 [US2] 驗證縮圖產生：確認 GCS 中 thumbs/ 路徑下有對應的 200x200 圖片
+
+---
+
+## Phase 5: User Story 3 - 附近的小卡搜尋 (Priority: P1)
+
+**目標**: 使用者可以搜尋附近的小卡（免費 5次/日限制，付費無限制）
+
+**獨立測試標準**:
+- ✓ 使用者可以提供座標並搜尋附近的小卡
+- ✓ 搜尋結果按距離排序（付費用戶優先）
+- ✓ 隱身模式用戶不出現在結果中
+- ✓ 系統正確追蹤每日搜尋次數（免費 5次/日）
+- ✓ 達到限制時回傳正確錯誤訊息（429_RATE_LIMIT_EXCEEDED）
+
+### Application Layer (Social Module - Nearby)
+
+- [ ] T095 [P] [US3] 建立 SearchNearbyCardsUseCase：apps/backend/app/modules/social/application/use_cases/search_nearby_cards_use_case.py（計算距離 → 過濾隱身 → 排序）
+- [ ] T096 [P] [US3] 建立 UpdateUserLocationUseCase：apps/backend/app/modules/social/application/use_cases/update_user_location_use_case.py（記錄最近位置至 profiles.last_lat/last_lng）
+
+### Infrastructure Layer (Social Module - Nearby)
+
+- [ ] T097 [P] [US3] 擴展 CardRepositoryImpl：新增 find_nearby_cards 方法（使用 PostGIS 或 Haversine 公式計算距離）
+- [ ] T098 [P] [US3] 實作 Search Quota Service：apps/backend/app/modules/social/infrastructure/services/search_quota_service.py（Redis 或 DB 追蹤每日搜尋次數）
+
+### Presentation Layer (Social Module - Nearby)
+
+- [ ] T099 [P] [US3] 定義 Nearby Schema：apps/backend/app/modules/social/presentation/schemas/nearby_schemas.py（SearchNearbyRequest, NearbyCardResponse）
+- [ ] T100 [US3] 建立 Nearby Router：apps/backend/app/modules/social/presentation/routers/nearby_router.py（POST /nearby/search）
+
+### Integration
+
+- [ ] T101 [US3] 註冊 Nearby 功能到 DI Container：apps/backend/app/container.py
+- [ ] T102 [US3] 註冊 Nearby Router 到 main.py：apps/backend/app/main.py（包含 /nearby 路由）
+
+### Testing
+
+- [ ] T103 [P] [US3] 撰寫 Nearby Contract Tests：tests/integration/contracts/test_nearby_contracts.py（對齊 contracts/nearby/search.json）
+- [ ] T104 [P] [US3] 撰寫 SearchNearbyCardsUseCase Unit Tests：tests/unit/modules/social/application/test_search_nearby_use_case.py（Mock 距離計算與排序邏輯）
+- [ ] T105 [US3] 撰寫 Nearby Search Integration Tests：tests/integration/modules/social/test_nearby_search_flow.py（完整搜尋流程 E2E，包含限制觸發）
+
+### Configuration
+
+- [ ] T106 [P] [US3] 配置 Kong Rate Limiting：gateway/kong/kong.yaml（針對 /nearby/search 設定不同 rate-limit 標籤：free=5/day, premium=unlimited）
+- [ ] T107 [P] [US3] 更新環境變數：apps/backend/app/config.py（DAILY_SEARCH_LIMIT_FREE=5, SEARCH_RADIUS_KM=10）
+
+### Verification
+
+- [ ] T108 [US3] 執行所有 US3 測試：確保 Contract Tests + Unit Tests + Integration Tests 全數通過
+- [ ] T109 [US3] 手動驗證 US3 驗收標準：測試搜尋 5 次後觸發 429_RATE_LIMIT_EXCEEDED（免費用戶）
+- [ ] T110 [US3] 驗證付費用戶搜尋：確認付費用戶可以無限次搜尋
+
+---
+
+## Phase 6: User Story 4 - 好友系統與聊天 (Priority: P1)
+
+**目標**: 使用者可以加好友、聊天、評分、檢舉
+
+**獨立測試標準**:
+- ✓ 使用者可以送出/接受/拒絕好友邀請
+- ✓ 使用者可以封鎖其他用戶（封鎖後雙方無法互動）
+- ✓ 使用者可以發送/接收聊天訊息（輪詢機制）
+- ✓ 使用者可以收到 FCM 推播通知（背景）
+- ✓ 使用者可以對交易對象評分
+- ✓ 使用者可以檢舉違規內容
+
+### Domain Layer (Social Module - Friends & Chat)
+
+- [ ] T111 [P] [US4] 建立 Friendship Entity：apps/backend/app/modules/social/domain/entities/friendship.py（id, user_id, friend_id, status: pending/accepted/blocked, created_at）
+- [ ] T112 [P] [US4] 建立 ChatRoom Entity：apps/backend/app/modules/social/domain/entities/chat_room.py（id, participant_ids, created_at）
+- [ ] T113 [P] [US4] 建立 Message Entity：apps/backend/app/modules/social/domain/entities/message.py（id, room_id, sender_id, content, status: sent/delivered/read, created_at）
+- [ ] T114 [P] [US4] 建立 Rating Entity：apps/backend/app/modules/social/domain/entities/rating.py（id, rater_id, rated_user_id, trade_id, score, comment, created_at）
+- [ ] T115 [P] [US4] 建立 Report Entity：apps/backend/app/modules/social/domain/entities/report.py（id, reporter_id, reported_user_id, reason, created_at）
+- [ ] T116 [P] [US4] 定義 FriendshipRepository Interface：apps/backend/app/modules/social/domain/repositories/friendship_repository.py
+- [ ] T117 [P] [US4] 定義 ChatRoomRepository Interface：apps/backend/app/modules/social/domain/repositories/chat_room_repository.py
+- [ ] T118 [P] [US4] 定義 MessageRepository Interface：apps/backend/app/modules/social/domain/repositories/message_repository.py
+- [ ] T119 [P] [US4] 定義 RatingRepository Interface：apps/backend/app/modules/social/domain/repositories/rating_repository.py
+- [ ] T120 [P] [US4] 定義 ReportRepository Interface：apps/backend/app/modules/social/domain/repositories/report_repository.py
+
+### Application Layer (Social Module - Friends & Chat)
+
+- [ ] T121 [P] [US4] 建立 SendFriendRequestUseCase：apps/backend/app/modules/social/application/use_cases/send_friend_request_use_case.py
+- [ ] T122 [P] [US4] 建立 AcceptFriendRequestUseCase：apps/backend/app/modules/social/application/use_cases/accept_friend_request_use_case.py
+- [ ] T123 [P] [US4] 建立 BlockUserUseCase：apps/backend/app/modules/social/application/use_cases/block_user_use_case.py
+- [ ] T124 [P] [US4] 建立 SendMessageUseCase：apps/backend/app/modules/social/application/use_cases/send_message_use_case.py（發送訊息 → 觸發 FCM 推播）
+- [ ] T125 [P] [US4] 建立 GetMessagesUseCase：apps/backend/app/modules/social/application/use_cases/get_messages_use_case.py（輪詢機制：since=timestamp）
+- [ ] T126 [P] [US4] 建立 RateUserUseCase：apps/backend/app/modules/social/application/use_cases/rate_user_use_case.py（交易完成後評分）
+- [ ] T127 [P] [US4] 建立 ReportUserUseCase：apps/backend/app/modules/social/application/use_cases/report_user_use_case.py
+
+### Infrastructure Layer (Social Module - Friends & Chat)
+
+- [ ] T128 [P] [US4] 實作 SQLAlchemy Friendship Model：apps/backend/app/modules/social/infrastructure/database/models/friendship_model.py
+- [ ] T129 [P] [US4] 實作 SQLAlchemy ChatRoom Model：apps/backend/app/modules/social/infrastructure/database/models/chat_room_model.py
+- [ ] T130 [P] [US4] 實作 SQLAlchemy Message Model：apps/backend/app/modules/social/infrastructure/database/models/message_model.py
+- [ ] T131 [P] [US4] 實作 SQLAlchemy Rating Model：apps/backend/app/modules/social/infrastructure/database/models/rating_model.py
+- [ ] T132 [P] [US4] 實作 SQLAlchemy Report Model：apps/backend/app/modules/social/infrastructure/database/models/report_model.py
+- [ ] T133 [P] [US4] 實作 FriendshipRepositoryImpl：apps/backend/app/modules/social/infrastructure/repositories/friendship_repository_impl.py
+- [ ] T134 [P] [US4] 實作 ChatRoomRepositoryImpl：apps/backend/app/modules/social/infrastructure/repositories/chat_room_repository_impl.py
+- [ ] T135 [P] [US4] 實作 MessageRepositoryImpl：apps/backend/app/modules/social/infrastructure/repositories/message_repository_impl.py
+- [ ] T136 [P] [US4] 實作 RatingRepositoryImpl：apps/backend/app/modules/social/infrastructure/repositories/rating_repository_impl.py
+- [ ] T137 [P] [US4] 實作 ReportRepositoryImpl：apps/backend/app/modules/social/infrastructure/repositories/report_repository_impl.py
+- [ ] T138 [P] [US4] 實作 FCM Push Notification Service：apps/backend/app/shared/infrastructure/external/fcm_service.py（發送推播通知）
+
+### Presentation Layer (Social Module - Friends & Chat)
+
+- [ ] T139 [US4] 建立 Friends Router：apps/backend/app/modules/social/presentation/routers/friends_router.py（POST /friends/request, POST /friends/accept, POST /friends/block）
+- [ ] T140 [US4] 建立 Chat Router：apps/backend/app/modules/social/presentation/routers/chat_router.py（GET /chats/{id}/messages, POST /chats/{id}/messages）
+- [ ] T141 [US4] 建立 Rating Router：apps/backend/app/modules/social/presentation/routers/rating_router.py（POST /ratings）
+- [ ] T142 [US4] 建立 Report Router：apps/backend/app/modules/social/presentation/routers/report_router.py（POST /reports）
+
+### Verification
+
+- [ ] T143 [US4] 執行所有 US4 測試並手動驗證完整社交功能流程
+
+---
+
+## Phase 7: User Story 5 - 小卡交換流程 (Priority: P1)
+
+**目標**: 使用者可以發起、回應、完成小卡交換
+
+**獨立測試標準**:
+- ✓ 使用者可以建立交換提案（選擇雙方卡片）
+- ✓ 對方可以接受/拒絕提案
+- ✓ 雙方確認後交換完成，卡片狀態更新為「已交換」
+- ✓ 交換歷史可以查詢
+- ✓ 狀態機正確流轉（draft → proposed → accepted → completed）
+
+### Domain Layer (Social Module - Trade)
+
+- [ ] T144 [P] [US5] 建立 Trade Entity：apps/backend/app/modules/social/domain/entities/trade.py（id, initiator_id, responder_id, status: draft/proposed/accepted/completed/rejected/canceled, created_at）
+- [ ] T145 [P] [US5] 建立 TradeItem Entity：apps/backend/app/modules/social/domain/entities/trade_item.py（id, trade_id, card_id, owner_id）
+- [ ] T146 [P] [US5] 建立 Trade Status Value Object：apps/backend/app/modules/social/domain/value_objects/trade_status.py（狀態機邏輯）
+- [ ] T147 [P] [US5] 定義 TradeRepository Interface：apps/backend/app/modules/social/domain/repositories/trade_repository.py
+- [ ] T148 [P] [US5] 定義 Trade Domain Service：apps/backend/app/modules/social/domain/services/trade_validation_service.py（驗證卡片所有權、狀態流轉規則）
+
+### Application Layer (Social Module - Trade)
+
+- [ ] T149 [P] [US5] 建立 CreateTradeProposalUseCase：apps/backend/app/modules/social/application/use_cases/create_trade_proposal_use_case.py
+- [ ] T150 [P] [US5] 建立 AcceptTradeUseCase：apps/backend/app/modules/social/application/use_cases/accept_trade_use_case.py
+- [ ] T151 [P] [US5] 建立 RejectTradeUseCase：apps/backend/app/modules/social/application/use_cases/reject_trade_use_case.py
+- [ ] T152 [P] [US5] 建立 CompleteTradeUseCase：apps/backend/app/modules/social/application/use_cases/complete_trade_use_case.py（雙方確認後鎖定卡片）
+- [ ] T153 [P] [US5] 建立 GetTradeHistoryUseCase：apps/backend/app/modules/social/application/use_cases/get_trade_history_use_case.py
+
+### Infrastructure Layer (Social Module - Trade)
+
+- [ ] T154 [P] [US5] 實作 SQLAlchemy Trade Model：apps/backend/app/modules/social/infrastructure/database/models/trade_model.py
+- [ ] T155 [P] [US5] 實作 SQLAlchemy TradeItem Model：apps/backend/app/modules/social/infrastructure/database/models/trade_item_model.py
+- [ ] T156 [P] [US5] 實作 TradeRepositoryImpl：apps/backend/app/modules/social/infrastructure/repositories/trade_repository_impl.py
+
+### Presentation Layer (Social Module - Trade)
+
+- [ ] T157 [P] [US5] 定義 Trade Schema：apps/backend/app/modules/social/presentation/schemas/trade_schemas.py（CreateTradeRequest, TradeResponse）
+- [ ] T158 [US5] 建立 Trade Router：apps/backend/app/modules/social/presentation/routers/trade_router.py（POST /trades, POST /trades/{id}/accept, POST /trades/{id}/complete）
+
+### Integration
+
+- [ ] T159 [US5] 註冊 Trade 功能到 DI Container：apps/backend/app/container.py
+- [ ] T160 [US5] 註冊 Trade Router 到 main.py：apps/backend/app/main.py
+
+### Testing
+
+- [ ] T161 [P] [US5] 撰寫 Trade Contract Tests：tests/integration/contracts/test_trade_contracts.py（對齊 contracts/trade/create.json）
+- [ ] T162 [P] [US5] 撰寫 Trade Entity Unit Tests：tests/unit/modules/social/domain/test_trade_entity.py
+- [ ] T163 [P] [US5] 撰寫 Trade Status State Machine Tests：tests/unit/modules/social/domain/test_trade_status.py（測試所有狀態轉換）
+- [ ] T164 [P] [US5] 撰寫 CreateTradeProposalUseCase Unit Tests：tests/unit/modules/social/application/test_create_trade_proposal_use_case.py
+- [ ] T165 [US5] 撰寫 Trade Flow Integration Tests：tests/integration/modules/social/test_trade_flow.py（完整交換流程 E2E）
+
+### Alembic Migration
+
+- [ ] T166 [P] [US5] 建立 Trade Tables Migration：alembic/versions/003_add_trade_tables.py（trades, trade_items）
+- [ ] T167 [US5] 執行並驗證 Migration：alembic upgrade head && alembic downgrade -1
+
+### Configuration
+
+- [ ] T168 [P] [US5] 更新環境變數：apps/backend/app/config.py（TRADE_CONFIRMATION_TIMEOUT_HOURS=48）
+
+### Documentation
+
+- [ ] T169 [P] [US5] 撰寫 Trade Flow 文件：apps/backend/docs/trade-flow.md（狀態機圖、API 流程）
+- [ ] T170 [P] [US5] 更新 API 文件：apps/backend/docs/api/social-module-trade.md
+
+### Seed Data
+
+- [ ] T171 [P] [US5] 建立測試交換 Seed：apps/backend/scripts/seed_trades.py
+
+### Verification
+
+- [ ] T172 [US5] 執行所有 US5 測試：確保 Contract Tests + Unit Tests + Integration Tests 全數通過
+- [ ] T173 [US5] 手動驗證 US5 驗收標準：測試完整交換流程（draft → proposed → accepted → completed）
+- [ ] T174 [US5] 驗證卡片鎖定：確認交換完成後卡片狀態更新為「已交換」且無法再次交換
+
+---
+
+## Phase 8: User Story 6 - 訂閱與付費 (Priority: P2)
+
+**目標**: 使用者可以訂閱付費方案（Google Play Billing），解鎖更高限制
+
+**獨立測試標準**:
+- ✓ 系統可以驗證 Google Play 收據
+- ✓ 訂閱成功後使用者權限升級（每日上傳無限、搜尋無限）
+- ✓ 訂閱到期後自動降級為免費用戶
+- ✓ 權限檢查中介層正確限制 API 存取
+
+### Domain Layer (Identity Module - Subscription)
+
+- [ ] T175 [P] [US6] 建立 Subscription Entity：apps/backend/app/modules/identity/domain/entities/subscription.py（id, user_id, plan: free/premium, status: active/expired, expires_at）
+- [ ] T176 [P] [US6] 定義 SubscriptionRepository Interface：apps/backend/app/modules/identity/domain/repositories/subscription_repository.py
+
+### Application Layer (Identity Module - Subscription)
+
+- [ ] T177 [P] [US6] 建立 VerifyReceiptUseCase：apps/backend/app/modules/identity/application/use_cases/verify_receipt_use_case.py（驗證 Google Play 收據 → 更新訂閱狀態）
+- [ ] T178 [P] [US6] 建立 CheckSubscriptionStatusUseCase：apps/backend/app/modules/identity/application/use_cases/check_subscription_status_use_case.py
+- [ ] T179 [P] [US6] 建立 ExpireSubscriptionsUseCase：apps/backend/app/modules/identity/application/use_cases/expire_subscriptions_use_case.py（定期任務：檢查並降級過期訂閱）
+
+### Infrastructure Layer (Identity Module - Subscription)
+
+- [ ] T180 [P] [US6] 實作 SQLAlchemy Subscription Model：apps/backend/app/modules/identity/infrastructure/database/models/subscription_model.py
+- [ ] T181 [P] [US6] 實作 SubscriptionRepositoryImpl：apps/backend/app/modules/identity/infrastructure/repositories/subscription_repository_impl.py
+- [ ] T182 [P] [US6] 實作 Google Play Billing Service：apps/backend/app/modules/identity/infrastructure/external/google_play_billing_service.py（驗證收據）
+
+### Presentation Layer
+
+- [ ] T183 [P] [US6] 建立 Subscription Router：apps/backend/app/modules/identity/presentation/routers/subscription_router.py（POST /subscriptions/verify-receipt, GET /subscriptions/status）
+- [ ] T184 [US6] 實作 Subscription Permission Middleware：apps/backend/app/shared/presentation/middleware/subscription_check.py（檢查權限並注入到 request.state）
+
+### Testing
+
+- [ ] T185 [P] [US6] 撰寫 Subscription Contract Tests：tests/integration/contracts/test_subscription_contracts.py（對齊 contracts/biz/offer.json）
+- [ ] T186 [P] [US6] 撰寫 Subscription Unit Tests：tests/unit/modules/identity/application/test_verify_receipt_use_case.py
+- [ ] T187 [US6] 撰寫 Subscription Integration Tests：tests/integration/modules/identity/test_subscription_flow.py
+
+### Configuration
+
+- [ ] T188 [P] [US6] 更新環境變數：apps/backend/app/config.py（GOOGLE_PLAY_PACKAGE_NAME, GOOGLE_PLAY_SERVICE_ACCOUNT_KEY）
+- [ ] T189 [P] [US6] 配置定期任務（Celery/APScheduler）：每日檢查過期訂閱
+
+### Verification
+
+- [ ] T190 [US6] 執行所有 US6 測試並手動驗證訂閱流程
+- [ ] T191 [US6] 驗證權限升級：確認付費用戶可以無限上傳/搜尋
+
+---
+
+## Phase 9: Polish & Cross-Cutting Concerns (跨模組整合與優化)
+
+**目的**: 整合所有功能、優化效能、完善文件
+
+- [ ] T192 [P] 統一錯誤處理：apps/backend/app/shared/presentation/exceptions/error_codes.py（定義所有錯誤碼：400/401/403/404/409/422/429）
+- [ ] T193 [P] 建立 OpenAPI 規格：apps/backend/openapi.yaml（或使用 FastAPI 自動生成）
+- [ ] T194 [P] E2E 測試：tests/e2e/test_complete_user_journey.py（模擬完整使用者旅程：登入 → 上傳卡片 → 搜尋 → 加好友 → 聊天 → 交換 → 評分）
+- [ ] T195 [P] 效能測試：tests/performance/test_api_performance.py（測試關鍵 API 回應時間與吞吐量）
+- [ ] T196 [P] 安全測試：tests/security/test_jwt_security.py（測試 Token 竄改、過期處理）
+- [ ] T197 [P] 完善 README.md：專案結構、啟動指引、測試指令
+- [ ] T198 [P] 撰寫部署文件：docs/deployment.md（Docker Compose 部署、GCP 部署指引）
+- [ ] T199 [P] 撰寫 API 使用範例：docs/api-examples.md（常見操作的 curl 範例）
+- [ ] T200 [P] 建立監控與日誌：配置 Sentry/CloudWatch（錯誤追蹤）、Prometheus/Grafana（效能監控）
+- [ ] T201 [P] CI/CD 完整化：.github/workflows/deploy.yml（自動部署到 staging/production）
+- [ ] T202 [P] 資料庫備份策略：文件化備份與還原流程
+- [ ] T203 [P] 災難復原計畫：docs/disaster-recovery.md
+- [ ] T204 建立 Quickstart 驗證腳本：scripts/quickstart-validation.sh（自動化測試所有 Success Criteria SC-001 ~ SC-005）
+- [ ] T205 最終整合測試：執行所有測試套件，確保 >90% 覆蓋率
+
+---
+
+## Dependencies & Execution Order (依賴關係與執行順序)
+
+### Critical Path（關鍵路徑 - 必須依序執行）
+
+1. **Phase 1: Setup** (T001-T008) → 專案基礎
+2. **Phase 2: Foundational** (T009-T028) → **[BLOCKING]** 所有 User Story 必須等此階段完成
+3. **Phase 3-8: User Stories** (T029-T191) → 可部分並行（見下方說明）
+4. **Phase 9: Polish** (T192-T205) → 最終整合
+
+### User Story Dependencies（使用者故事依賴）
+
+```
+US1 (Phase 3) ─────────────────────────┐
+  ├─ 無依賴，可立即開始                  │
+  └─ Blocking: US2, US3, US4, US5, US6  │ ← 其他 US 需要身份驗證
+                                        │
+US2 (Phase 4) ─────────────────┐       │
+  ├─ 依賴：US1（身份驗證）       │       │
+  └─ Blocking: US3              │       │ ← US3 需要卡片資料
+                                │       │
+US3 (Phase 5)                   │       │
+  ├─ 依賴：US1（身份驗證）       │       │
+  ├─ 依賴：US2（卡片資料）       │       │
+  └─ 無 Blocking               │       │
+                                │       │
+US4 (Phase 6)                   │       │
+  ├─ 依賴：US1（身份驗證）       │       │
+  └─ 建議：US2 完成後（好友看卡片）│       │
+                                │       │
+US5 (Phase 7)                   │       │
+  ├─ 依賴：US1（身份驗證）       │       │
+  ├─ 依賴：US2（卡片資料）       │       │
+  ├─ 依賴：US4（好友系統）       │       │
+  └─ Blocking: 無               │       │
+                                │       │
+US6 (Phase 8)                   │       │
+  ├─ 依賴：US1（身份驗證）       │       │
+  └─ Blocking: 無（P2優先度，可延後）    │
+```
+
+### Parallel Opportunities（並行機會）
+
+#### 階段 1：Foundation 完成後（T028 完成）
+
+**可同時開始的工作組**：
+
+```
+Group A: US1 (Phase 3) - Identity Module
+  └─ T029-T065 (37 tasks) 全部可並行
+  
+Group B: Infrastructure Setup（與 US1 無衝突）
+  └─ T059-T060 (Kong JWT, Config)
+```
+
+#### 階段 2：US1 完成後（T065 完成）
+
+**可同時開始的工作組**：
+
+```
+Group A: US2 (Phase 4) - Card Upload
+  └─ T066-T094 (29 tasks)
+  
+Group B: US4 (Phase 6) - Friends & Chat（與 US2 不同檔案）
+  └─ T111-T143 (33 tasks)
+  
+Group C: US6 (Phase 8) - Subscription（與 US2/US4 不同檔案）
+  └─ T175-T191 (17 tasks)
+```
+
+#### 階段 3：US2 完成後（T094 完成）
+
+**可同時開始的工作組**：
+
+```
+Group A: US3 (Phase 5) - Nearby Search
+  └─ T095-T110 (16 tasks)
+  
+Group B: US5 (Phase 7) - Trade（需等 US4 完成）
+  └─ T144-T174 (31 tasks) - 建議等 US4 完成後再開始
+```
+
+### Recommended Execution Strategy（建議執行策略）
+
+#### **Sprint 1: Foundation + Identity（MVP 核心）**
+- Week 1: Phase 1 (T001-T008) + Phase 2 (T009-T028)
+- Week 2-3: Phase 3 - US1 (T029-T065) 🎯 **MVP Milestone**
+- **Checkpoint**: 使用者可以登入並完成個人檔案
+
+#### **Sprint 2: Card Management + Social Core**
+- Week 4-5: Phase 4 - US2 (T066-T094) || Phase 6 - US4 (T111-T143)
+- **Checkpoint**: 使用者可以上傳卡片並加好友
+
+#### **Sprint 3: Search + Trade**
+- Week 6: Phase 5 - US3 (T095-T110)
+- Week 7-8: Phase 7 - US5 (T144-T174)
+- **Checkpoint**: 使用者可以搜尋附近卡片並完成交換
+
+#### **Sprint 4: Monetization + Polish**
+- Week 9: Phase 8 - US6 (T175-T191)
+- Week 10: Phase 9 - Polish (T192-T205)
+- **Checkpoint**: 產品完整可上線
+
+---
+
+## Summary（摘要）
+
+### Statistics（統計）
+
+- **Total Tasks**: 205
+- **Completed**: 26 (Phase 1: 8/8, Phase 2: 18/20)
+- **Remaining**: 179
+- **Estimated Duration**: 10 weeks (4 sprints)
+
+### Task Breakdown by Phase（各階段任務分布）
+
+| Phase | User Story | Tasks | Priority | Status |
+|-------|-----------|-------|----------|--------|
+| 1 | Setup | 8 | - | ✅ 100% Complete |
+| 2 | Foundational | 20 | - | ⏳ 90% Complete (T015-T021 pending) |
+| 3 | US1 - Login & Profile | 37 | P1 🎯 MVP | ⏸️ Not Started |
+| 4 | US2 - Card Upload | 29 | P1 | ⏸️ Not Started |
+| 5 | US3 - Nearby Search | 16 | P1 | ⏸️ Not Started |
+| 6 | US4 - Friends & Chat | 33 | P1 | ⏸️ Not Started |
+| 7 | US5 - Trade | 31 | P1 | ⏸️ Not Started |
+| 8 | US6 - Subscription | 17 | P2 | ⏸️ Not Started |
+| 9 | Polish | 14 | - | ⏸️ Not Started |
+
+### MVP Scope（MVP 範圍）
+
+**建議 MVP 僅包含**：
+- ✅ Phase 1: Setup (T001-T008)
+- ✅ Phase 2: Foundational (T009-T028)
+- 🎯 Phase 3: US1 - Login & Profile (T029-T065)
+
+**MVP 驗收標準**：
+- 使用者可以透過 Google 登入
+- 使用者可以查看和更新個人檔案
+- JWT Token 機制正常運作
+- 所有測試通過
+
+### Next Steps（下一步）
+
+1. **立即執行**：完成 Phase 2 剩餘任務（T015-T021）
+2. **MVP 開發**：執行 Phase 3 US1（T029-T065）
+3. **並行開發**：US1 完成後，同時開發 US2 + US4 + US6
+4. **最終整合**：所有 US 完成後執行 Phase 9 Polish
+
+---
+
+**Generated by**: /speckit.tasks  
+**Based on**: Modular DDD Architecture + TDD Strategy + Alembic Migration Management
 - [ ] T1201 Beta 發佈腳本與環境變數管理
 - [ ] T1202 監控與日誌（API 響應、錯誤率、推播送達率）
 - [ ] T1203 事後分析報表（MAU、交換完成率、再次使用率）

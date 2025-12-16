@@ -29,10 +29,11 @@
 
 **工作方式**：
 - 直接在主專案目錄工作（如 `specs/001-xxx/`）
-- 編輯 `spec.md` 並標記 `[CHANGED: 舊 → 新，原因...]`
-- 執行 `/speckit.plan` 重新生成計畫
-- 執行 `/speckit.tasks` 重新生成任務
-- **不創建子目錄或分支**
+- 手動編輯 `spec.md` 並標記 `[CHANGED: 舊 → 新，原因...]`
+- 手動編輯 `plan.md` 並標記 `[UPDATED: 日期]`
+- 執行 `/speckit.tasks` 更新任務清單
+- ⚠️ **絕不執行 `/speckit.plan`** - 它會建立新資料夾！
+- **從頭到尾維護一份文件**
 
 #### **策略二：子功能分支（僅大型變更）**
 **適用情境**：
@@ -85,10 +86,10 @@
 3. 確保只在主專案 specs/[XXX]/ 工作
 
 操作步驟：
-1. 在 specs/[XXX]/ 修改 spec.md（使用 [CHANGED] 標記）
-2. 執行 /speckit.plan 重新生成計畫
-3. 驗證 Phase -1 Gates
-4. 執行 /speckit.tasks 重新生成任務
+1. 在 specs/[XXX]/ 手動修改 spec.md（使用 [CHANGED] 標記）
+2. 在 specs/[XXX]/ 手動修改 plan.md（使用 [UPDATED] 標記）
+3. 驗證 Phase -1 Gates（手動檢查 plan.md）
+4. 執行 /speckit.tasks 更新任務清單
 
 ⚠️ 若涉及大型架構變更（新增子系統、API 重構），請改用策略二（子功能分支）
 
@@ -101,17 +102,17 @@
 
 ✅ **應該做的事：**
 1. 引導開發者完成「變更影響分析」
-2. 引導開發者修改 spec.md（如需要）
-3. 引導開發者執行 `/speckit.plan` 和 `/speckit.tasks`
-4. 審核生成的 plan.md 是否符合 Phase -1 Gates
+2. 引導開發者手動修改 spec.md 和 plan.md
+3. 引導開發者執行 `/speckit.tasks` 更新任務
+4. 審核 plan.md 是否符合 Phase -1 Gates
 5. 引導測試優先流程
 6. 監督整個 SDD 流程的完整性
 
 ❌ **不應該做的事：**
 1. **不要**直接給出「Plan: 實施 XX 策略」並列出實作步驟（Steps 1-6）
-2. **不要**在 spec.md 更新前就討論實作細節（如「修改 docker-compose.yml」「調整 models.py」）
-3. **不要**跳過 spec.md 修改直接進入技術方案討論
-4. **不要**替代 `/speckit.plan` 的角色去生成實作計畫
+2. **不要**在 spec.md 和 plan.md 更新前就討論實作細節
+3. **不要**跳過手動編輯文件直接執行指令
+4. **不要**建議執行 `/speckit.plan`（它會建立新資料夾）
 
 **錯誤示範：**
 ```
@@ -131,19 +132,22 @@ Steps:
 影響範圍：
 - 功能編號：001
 - 變更類型：基礎設施優化
-- 建議策略：輕量修改
 
-📝 第一步：請先修改 spec.md
+📝 步驟一：請手動修改 spec.md
 建議在 FR-DB-003 之後新增 FR-DB-004...
 
-完成後回覆「規格已更新」，我將引導你執行 /speckit.plan
+📝 步驟二：請手動修改 plan.md
+建議在「架構與基礎設施」區段新增資料庫遷移管理...
+
+完成後回覆「文件已更新」，我將引導你執行 /speckit.tasks
 ```
 
 **為什麼要這樣做？**
-- spec.md 是「唯一真實來源」（核心原則 #1）
-- 技術決策應該由 `/speckit.plan` 根據更新後的 spec.md 自動生成
-- 你的角色是「流程引導者」，不是「技術方案設計者」
-- 這確保了「規格 → 計畫 → 任務 → 實作」的正確順序
+- spec.md 和 plan.md 是「唯一真實來源」（核心原則 #1）
+- 所有修改都通過手動編輯維護，確保「從頭到尾維護一份文件」
+- `/speckit.plan` 會建立新資料夾，不適合修改現有規格
+- 你的角色是「流程引導者」，引導手動編輯而非自動生成
+- 這確保了「手動編輯 spec.md + plan.md → /speckit.tasks → 實作」的正確順序
 
 ---
 
@@ -187,79 +191,20 @@ Steps:
 完成後回覆「規格已更新」繼續下一步。
 ```
 
-### 第三步：重新生成實作計畫
-規格修改完成後，選擇更新方式：
+### 第三步：手動更新實作計畫
+規格修改完成後，**唯一正確方式：手動編輯 plan.md**
 
-#### **選項 A：執行 /speckit.plan（推薦用於複雜變更）**
+⚠️ **重要提醒：絕不執行 `/speckit.plan`**
+- `/speckit.plan` 是用於「首次建立」新功能規格時使用
+- 執行 `/speckit.plan` 會建立新的資料夾和文件結構
+- 修改現有規格時，必須手動編輯維護，確保「從頭到尾維護一份文件」
 
-**適用情境：**
-- 變更影響多個模組
-- 新增跨系統功能
-- 不確定完整影響範圍
-- 需要 AI 分析關聯變更
+#### **唯一正確方式：手動更新 plan.md**
 
-```markdown
-## 執行 /speckit.plan
-
-### 輸入檢查
-- [ ] spec.md 已更新且無 [NEEDS CLARIFICATION] 標記
-- [ ] 變更已在分支中提交（建議先 commit）
-
-### 執行命令
-/speckit.plan
-
-### 預期輸出
-- plan.md（更新或重新生成）
-- research.md（技術調研）
-- data-model.md（若資料結構變更）
-- contracts/（若 API 變更）
-- implementation-details/（若有複雜演算法）
-
-### Phase -1 Gates 檢查
-必須通過以下憲章檢查點：
-
-#### Simplicity Gate (Article VII)
-- [ ] 是否使用 ≤3 個專案？
-- [ ] 是否避免未來預設（future-proofing）？
-- [ ] 若未通過，是否在「複雜度追蹤」區段記錄正當理由？
-
-#### Anti-Abstraction Gate (Article VIII)
-- [ ] 是否直接使用框架功能？
-- [ ] 是否使用單一模型表示？
-- [ ] 是否避免不必要的包裝層？
-
-#### Integration-First Gate (Article IX)
-- [ ] 是否已定義契約（Contracts）？
-- [ ] 是否優先使用真實環境測試？
-- [ ] 是否撰寫契約測試？
-```
-
-**輸出給開發者：**
-```
-🔄 重新生成實作計畫...
-
-執行：/speckit.plan
-
-✅ 已生成：
-- plan.md（已更新技術決策）
-- research.md（調研結果）
-- [其他相關檔案]
-
-⚠️ Phase -1 Gates 檢查結果：
-- Simplicity Gate: [✓ 通過 / ⚠️ 例外已記錄]
-- Anti-Abstraction Gate: [✓ 通過 / ⚠️ 例外已記錄]
-- Integration-First Gate: [✓ 通過 / ⚠️ 例外已記錄]
-
-若所有 gates 通過，繼續下一步；否則請審核例外理由。
-```
-
-#### **選項 B：手動更新 plan.md（適用於單一明確變更）**
-
-**適用情境：**
-- 變更範圍明確且單一（如新增一個 FR）
-- 不影響其他模組
-- 只需新增/調整 plan.md 中的特定區段
-- 變更不涉及複雜的關聯分析
+**適用情境：所有修改**
+- ✅ 不管是輕量修改或大型變更
+- ✅ 所有對現有規格的修改
+- ✅ 從頭到尾維護一份文件
 
 **執行步驟：**
 1. 直接編輯 `specs/[XXX]/plan.md`
@@ -286,30 +231,34 @@ Steps:
 - § 1. 架構與基礎設施 → 新增資料庫遷移管理
 - § D. 資料庫與遷移 → 更新任務清單
 
-變更已標記：[UPDATED: 2025-12-15]
+變更已標記：[UPDATED: 2025-12-16]
+
+### Phase -1 Gates 手動檢查
+請確認以下憲章檢查點：
+
+#### Simplicity Gate (Article VII)
+- [ ] 是否使用 ≤3 個專案？
+- [ ] 是否避免未來預設（future-proofing）？
+
+#### Anti-Abstraction Gate (Article VIII)
+- [ ] 是否直接使用框架功能？
+- [ ] 是否使用單一模型表示？
+
+#### Integration-First Gate (Article IX)
+- [ ] 是否已定義契約（Contracts）？
+- [ ] 是否優先使用真實環境測試？
 
 ⚠️ 提醒：手動更新後，請確保：
-- 新增區段與 spec.md 的 FR-DB-004 對應
+- 新增區段與 spec.md 的需求對應
 - 任務分解區段已同步更新
 - 無遺漏的關聯變更
+- Phase -1 Gates 檢查通過
 
-繼續下一步：執行 /speckit.tasks 重新生成任務清單
+繼續下一步：執行 /speckit.tasks 更新任務清單
 ```
 
-#### **決策指引**
-
-選擇選項 A 當：
-- ⚠️ 你不確定變更的完整影響
-- ⚠️ 變更可能影響多個技術決策
-- ⚠️ 需要 AI 協助分析關聯性
-
-選擇選項 B 當：
-- ✅ 變更範圍明確（如「新增 Alembic 配置」）
-- ✅ 只影響單一區域
-- ✅ 你清楚知道需要更新哪些區段
-
-### 第四步：重新生成任務清單
-計畫確認後，生成可執行任務：
+### 第四步：更新任務清單
+plan.md 手動更新並檢查通過後，執行 `/speckit.tasks` 更新任務：
 
 ```markdown
 ## 執行 /speckit.tasks
@@ -870,9 +819,9 @@ SDD 循環完成！🎉
 ## 完整流程快速參考
 
 ```
-修改需求 → 建分支 → 更新 spec.md → /speckit.plan → 審核 Gates
+修改需求 → 手動編輯 spec.md → 手動編輯 plan.md → 檢查 Gates
     ↓
-生成 tasks.md ← /speckit.tasks ← 確認 plan.md
+更新 tasks.md ← /speckit.tasks
     ↓
 撰寫測試 → 驗證 Red → /speckit.implement --dry-run → 審核
     ↓
@@ -881,6 +830,11 @@ SDD 循環完成！🎉
 測試通過 → 提交 PR → CI 成功 → Code Review → 合併
     ↓
 部署 → 監控指標 → 回饋到 specs/ → 觸發下一輪（若需要）
+
+⚠️ 關鍵提醒：
+- 絕不執行 /speckit.plan（會建立新資料夾）
+- 所有修改都手動編輯維護
+- 從頭到尾維護一份文件
 ```
 
 ## 關鍵提醒

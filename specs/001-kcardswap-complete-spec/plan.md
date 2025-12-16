@@ -17,8 +17,40 @@
 - M7（Week 10）：E2E 測試與 Beta 封測（100–200 MAU）。
 
 ## 1. 架構與基礎設施
-- 專案目錄：`apps/mobile`, `apps/backend`, `gateway/kong`, `infra/db`, `infra/gcs`, `infra/ci`。
+- **專案目錄結構**（**已更新 2025-12-15，採用 Modular DDD**）：
+  - 頂層目錄：`apps/mobile`, `apps/backend`, `gateway/kong`, `infra/db`, `infra/gcs`, `infra/ci`
+  - **後端模組化結構** (`apps/backend/app/`)：
+    ```
+    app/
+    ├── main.py                 # 應用程式入口與路由聚合
+    ├── container.py            # 全域依賴注入容器
+    ├── modules/                # 業務模組核心（取代原有的 routers/services/ 分層）
+    │   ├── identity/           # [Module] 認證與使用者管理（Auth + User）
+    │   │   ├── domain/         # Entity, Value Objects, Repository Interfaces
+    │   │   ├── application/    # Use Cases, DTOs
+    │   │   ├── infrastructure/ # Repository Implementations, External Services
+    │   │   ├── presentation/   # Routers, Schemas, Dependencies
+    │   │   └── __init__.py
+    │   │
+    │   └── social/             # [Module] 個人檔案與社交功能（Profile）
+    │       ├── domain/
+    │       ├── application/
+    │       ├── infrastructure/
+    │       ├── presentation/
+    │       └── __init__.py
+    │
+    └── shared/                 # 共用核心（Shared Kernel）
+        ├── domain/             # 共用 Value Objects (e.g., Email, UserId)
+        ├── infrastructure/     # 資料庫連線、安全性工具、通用 Repository 基類
+        ├── presentation/       # 通用中介軟體、例外處理器
+        └── __init__.py
+    ```
 - 架構原則來源：Constitution v1.2.0 Article VI（四層架構 Domain/Application/Infrastructure/Presentation；Repository、CQRS、Domain Events、Value Objects）。
+- **模組化設計原則**：
+  - 每個業務模組（`identity`, `social`）包含完整的 DDD 四層架構
+  - 模組間透過定義良好的介面（Use Cases / Domain Events）通訊
+  - 禁止模組直接存取其他模組的 Infrastructure 或 Domain 層
+  - 共用邏輯（如資料庫連線、JWT 處理）集中於 `shared/` 目錄
 - **後端依賴管理**（**已更新 2025-12-11**）：
 	- **工具**：Poetry（取代 pip + requirements.txt）
 	- **配置檔**：pyproject.toml（專案元資料 + 依賴定義 + 工具配置）

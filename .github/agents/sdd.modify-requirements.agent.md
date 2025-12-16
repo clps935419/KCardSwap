@@ -2,13 +2,9 @@
 ---
 description: 引導開發者完成 SDD 修改需求的完整工作流程，確保規格、計畫與實作保持同步
 handoffs:
-  - label: 重新生成計畫
-    agent: speckit.plan
-    prompt: 規格已更新，請重新生成實作計畫
-    send: true
-  - label: 重新生成任務
+  - label: 更新任務清單
     agent: speckit.tasks
-    prompt: 計畫已確認，請生成任務清單
+    prompt: spec.md 和 plan.md 已手動更新，請生成任務清單
     send: true
   - label: 預覽實作
     agent: speckit.implement
@@ -56,11 +52,13 @@ handoffs:
 
 **接下來的步驟**：
 1. 建立變更分支
-2. 修改規格說明（我會提供指引）
-3. 重新生成計畫（自動觸發 /speckit.plan）
-4. 重新生成任務（自動觸發 /speckit.tasks）
+2. 手動修改 spec.md（我會提供指引）
+3. 手動修改 plan.md（我會提供指引）
+4. 更新任務清單（執行 /speckit.tasks）
 5. 測試優先實作
 6. 提交 PR
+
+⚠️ **重要**：所有修改都手動維護，不執行 /speckit.plan
 
 是否要我協助建立分支？[Y/n]
 ```
@@ -98,76 +96,92 @@ git checkout -b specs/[XXX]-update-[feature-name]
 完成修改後，回覆「規格已更新」，我會協助你進入下一步。
 ```
 
-### 步驟 3：重新生成實作計畫
+### 步驟 3：手動更新實作計畫
 
-規格更新後，自動準備計畫生成：
-
-```markdown
-🔄 準備重新生成實作計畫
-
-規格已更新，現在需要重新生成或更新實作計畫。
-
-**執行前檢查**：
-- [ ] `spec.md` 無 [NEEDS CLARIFICATION] 標記
-- [ ] 變更已在分支中（建議先 git commit）
-
-**我將執行**：`/speckit.plan`
-
-這會生成/更新：
-- `plan.md` - 技術實作計畫
-- `research.md` - 技術調研
-- `data-model.md` - 資料模型（若變更）
-- `contracts/` - API 契約（若變更）
-
-**Phase -1 Gates 檢查**（憲章強制執行）：
-執行後我會檢查是否通過：
-- Simplicity Gate (Article VII) - 專案數量 ≤3
-- Anti-Abstraction Gate (Article VIII) - 直接使用框架
-- Integration-First Gate (Article IX) - 契約測試優先
-
-準備好了嗎？[Y/n]
-```
-
-若用戶同意，執行 handoff 到 `speckit.plan`。
-
-### 步驟 4：審核 Gates 與計畫
-
-計畫生成後，檢查 Phase -1 Gates：
+規格更新後，引導手動編輯 plan.md：
 
 ```markdown
-✅ 實作計畫已生成
+📝 手動更新實作計畫
 
-**生成的檔案**：
-- `plan.md` - 技術決策與實作計畫
-- [其他相關檔案]
+spec.md 已更新，現在需要手動編輯 plan.md 以對應變更。
 
-**Phase -1 Gates 檢查結果**：
+⚠️ **重要提醒**：
+- **絕不執行 `/speckit.plan`** - 它會建立新資料夾
+- 所有修改都手動維護，確保「從頭到尾維護一份文件」
+
+**請開啟並修改 `specs/[XXX]/plan.md`**
+
+**必須更新的區段**：
+- [ ] **技術決策** - 對應 spec.md 的變更
+- [ ] **架構與基礎設施** - 若有新增功能
+- [ ] **實作細節** - 更新受影響的區段
+- [ ] **任務分解** - 同步更新任務相關說明
+
+**標記變更**（重要！）：
+- `[UPDATED: 2025-12-16]` - 標記更新日期
+- `[ADDED: ...]` - 標記新增內容
+- `[MODIFIED: ...]` - 標記修改內容
+
+**範例**：
+```markdown
+## 1. 架構與基礎設施
+
+### 資料庫管理 [UPDATED: 2025-12-16]
+
+- **策略**：遷移為王（對應 FR-DB-004）
+- **工具**：Alembic
+- **優勢**：
+  - 版本控制
+  - 團隊協作
+  ...
 ```
-[從 plan.md 讀取 Phase -1 section]
+
+**Phase -1 Gates 手動檢查**（憲章強制執行）：
+更新時請確認：
+- [ ] Simplicity Gate (Article VII) - 專案數量 ≤3
+- [ ] Anti-Abstraction Gate (Article VIII) - 直接使用框架
+- [ ] Integration-First Gate (Article IX) - 契約測試優先
+
+完成修改後，回覆「plan.md 已更新」繼續下一步。
 ```
 
-**結果評估**：
-- Simplicity Gate: [✓ 通過 / ⚠️ 例外已記錄 / ❌ 未通過]
-- Anti-Abstraction Gate: [✓ 通過 / ⚠️ 例外已記錄 / ❌ 未通過]
-- Integration-First Gate: [✓ 通過 / ⚠️ 例外已記錄 / ❌ 未通過]
+### 步驟 4：確認手動更新完成
 
-**若所有 gates 通過或例外已合理記錄**：
-✅ 可以繼續下一步
-
-**若有 gates 未通過且無合理例外**：
-⚠️ 需要修改 plan.md 或回到 spec.md 簡化需求
-
-是否繼續生成任務清單？[Y/n]
-```
-
-### 步驟 5：重新生成任務清單
-
-Gates 通過後，生成任務：
+plan.md 更新後，確認變更完整性：
 
 ```markdown
-📋 準備生成任務清單
+✅ 確認 plan.md 更新完成
 
-實作計畫已確認，現在生成可執行的任務清單。
+**請確認以下檢查清單**：
+
+**更新完整性**：
+- [ ] spec.md 的變更已反映在 plan.md 中
+- [ ] 所有新增需求都有對應的技術決策
+- [ ] 變更已標記日期（[UPDATED: ...]）
+- [ ] 任務分解區段已同步更新
+
+**Phase -1 Gates 檢查**：
+- [ ] Simplicity Gate (Article VII) - 專案數量 ≤3
+- [ ] Anti-Abstraction Gate (Article VIII) - 直接使用框架
+- [ ] Integration-First Gate (Article IX) - 契約測試優先
+
+**若所有檢查通過**：
+✅ 可以繼續更新任務清單
+
+**若有項目未完成**：
+⚠️ 請繼續編輯 plan.md 或回到 spec.md 調整需求
+
+確認完成後，回覆「已確認」繼續下一步。
+```
+
+### 步驟 5：更新任務清單
+
+手動更新確認後，執行 /speckit.tasks：
+
+```markdown
+📋 準備更新任務清單
+
+spec.md 和 plan.md 已手動更新完成，現在更新任務清單。
 
 **我將執行**：`/speckit.tasks`
 
@@ -526,14 +540,16 @@ PR 合併後：
 
 **Agent 自動執行**：
 - 檢測變更意圖
-- 提供步驟指引
-- 自動 handoff 到 speckit.plan / speckit.tasks / speckit.implement
-- 檢查憲章 gates
+- 提供步驟指引（手動編輯 spec.md 和 plan.md）
+- 自動 handoff 到 speckit.tasks / speckit.implement
+- 引導 Phase -1 Gates 檢查
 - 提供 PR 範本
 - 監控運維回饋
 
 **關鍵原則**：
-- 規格是唯一真實來源
+- 規格和計畫是唯一真實來源
+- 所有修改都手動維護，從頭到尾維護一份文件
+- 絕不執行 /speckit.plan（會建立新資料夾）
 - 測試優先不可妥協
 - 小步快跑，保持可回滾
 - 憲章是守護者
