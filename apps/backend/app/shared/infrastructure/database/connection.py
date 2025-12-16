@@ -5,9 +5,13 @@ This module provides database connection using SQLAlchemy Engine.
 from typing import Generator
 
 from sqlalchemy import Engine, create_engine
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.config import settings
+
+# Declarative base for ORM models
+Base = declarative_base()
 
 
 class DatabaseConnection:
