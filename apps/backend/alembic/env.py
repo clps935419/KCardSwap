@@ -1,7 +1,6 @@
 import os
 import sys
 from logging.config import fileConfig
-import importlib.util
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
@@ -11,16 +10,17 @@ from alembic import context
 # Add parent directory to path to import app modules
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-# Import Base directly from models module without triggering __init__.py
-# This avoids loading connection.py which creates async engine
-models_path = os.path.join(
-    os.path.dirname(os.path.dirname(__file__)),
-    "app", "infrastructure", "database", "models.py"
+# Import Base from shared database connection
+# This is the declarative base that all ORM models inherit from
+from app.shared.infrastructure.database.connection import Base
+
+# Import all models to ensure they're registered with Base.metadata
+# This is required for Alembic autogenerate to work properly
+from app.modules.identity.infrastructure.database.models import (
+    UserModel,
+    ProfileModel,
+    RefreshTokenModel
 )
-spec = importlib.util.spec_from_file_location("models", models_path)
-models = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(models)
-Base = models.Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

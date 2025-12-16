@@ -1,98 +1,107 @@
-"""
-KCardSwap Backend - FastAPI Application
-Main entry point for the backend service.
+"""KCardSwap Backend - FastAPI Application.
+
+Main entry point for the backend service following modular DDD architecture.
 """
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .container import Container
-from .presentation.routers import auth_router, profile_router
-
-# Initialize IoC Container
-container = Container()
+from .config import settings
+from .container import container
+from .shared.presentation.middleware.error_handler import register_exception_handlers
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """
-    Lifespan context manager for FastAPI
-    Handles startup and shutdown events
-    
+    """Lifespan context manager for FastAPI.
+
+    Handles startup and shutdown events.
+
     Note: Database tables are created by Alembic migrations.
     - In Docker: Migrations run automatically via Dockerfile entrypoint
     - In local dev: Run `poetry run alembic upgrade head` before starting the app
     """
-    # Wire container for dependency injection
-    container.wire(modules=[
-        "app.presentation.routers.auth_router",
-        "app.presentation.routers.profile_router",
-        "app.presentation.dependencies.auth_dependencies",
-        "app.presentation.dependencies.ioc_dependencies"
-    ])
+    # Initialize container wiring (will be expanded when modules add routers)
+    # container.wire() is called automatically via wiring_config in container
 
     yield
 
-    # Shutdown: cleanup
+    # Shutdown: cleanup resources
     container.unwire()
+    container.shared().db_connection_provider().close()
 
 
-app = FastAPI(
-    title="KCardSwap API",
-    description="Backend API for KCardSwap - Card Exchange Platform",
-    version="0.1.0",
-    docs_url="/api/v1/docs",
-    redoc_url="/api/v1/redoc",
-    openapi_url="/api/v1/openapi.json",
-    lifespan=lifespan
-)
+def create_application() -> FastAPI:
+    """Create and configure the FastAPI application.
 
-# Store container reference in app state for access in routes
-app.container = container
+    Returns:
+        Configured FastAPI application instance
+    """
+    app = FastAPI(
+        title="KCardSwap API",
+        description="Backend API for KCardSwap - Card Exchange Platform",
+        version="0.1.0",
+        docs_url=f"{settings.API_PREFIX}/docs",
+        redoc_url=f"{settings.API_PREFIX}/redoc",
+        openapi_url=f"{settings.API_PREFIX}/openapi.json",
+        lifespan=lifespan
+    )
 
-# CORS middleware (Kong also handles CORS, but this provides fallback)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+    # Store container reference in app state
+    app.container = container
 
-# Register routers
-app.include_router(auth_router.router)
-app.include_router(profile_router.router)
+    # Register exception handlers
+    register_exception_handlers(app)
 
+    # CORS middleware (Kong also handles CORS, but this provides fallback)
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.CORS_ORIGINS,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
-@app.get("/health")
-async def health_check():
-    """Health check endpoint for container orchestration"""
-    return {
-        "status": "healthy",
-        "service": "kcardswap-backend",
-        "version": "0.1.0"
-    }
-
-
-@app.get("/api/v1/health")
-async def api_health_check():
-    """API health check endpoint"""
-    return {
-        "data": {
+    # Health check endpoints
+    @app.get("/health")
+    async def health_check():
+        """Health check endpoint for container orchestration."""
+        return {
             "status": "healthy",
             "service": "kcardswap-backend",
             "version": "0.1.0"
-        },
-        "error": None
-    }
+        }
+
+    @app.get(f"{settings.API_PREFIX}/health")
+    async def api_health_check():
+        """API health check endpoint."""
+        return {
+            "data": {
+                "status": "healthy",
+                "service": "kcardswap-backend",
+                "version": "0.1.0"
+            },
+            "error": None
+        }
+
+    @app.get("/")
+    async def root():
+        """Root endpoint."""
+        return {
+            "message": "KCardSwap API",
+            "version": "0.1.0",
+            "docs": f"{settings.API_PREFIX}/docs"
+        }
+
+    # Module routers will be registered here in Phase 3+
+    # from .modules.identity.presentation import identity_router
+    # from .modules.social.presentation import social_router
+    # app.include_router(identity_router, prefix=settings.API_PREFIX)
+    # app.include_router(social_router, prefix=settings.API_PREFIX)
+
+    return app
 
 
-@app.get("/")
-async def root():
-    """Root endpoint"""
-    return {
-        "message": "KCardSwap API",
-        "version": "0.1.0",
-        "docs": "/api/v1/docs"
-    }
+# Create application instance
+app = create_application()
