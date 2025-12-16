@@ -51,23 +51,23 @@
 
 ### 模組化架構骨架
 
-- [ ] T015 建立 Shared Kernel 目錄結構：apps/backend/app/shared/（domain/, infrastructure/, presentation/）
-- [ ] T016 [P] 建立 Identity 模組目錄結構：apps/backend/app/modules/identity/（domain/, application/, infrastructure/, presentation/）
-- [ ] T017 [P] 建立 Social 模組目錄結構：apps/backend/app/modules/social/（domain/, application/, infrastructure/, presentation/）
-- [ ] T018 建立依賴注入容器骨架：apps/backend/app/container.py（使用 dependency-injector）
-- [ ] T019 建立應用程式入口：apps/backend/app/main.py（FastAPI app 初始化與模組路由聚合）
+- [X] T015 建立 Shared Kernel 目錄結構：apps/backend/app/shared/（domain/, infrastructure/, presentation/）
+- [X] T016 [P] 建立 Identity 模組目錄結構：apps/backend/app/modules/identity/（domain/, application/, infrastructure/, presentation/）
+- [X] T017 [P] 建立 Social 模組目錄結構：apps/backend/app/modules/social/（domain/, application/, infrastructure/, presentation/）
+- [X] T018 建立依賴注入容器骨架：apps/backend/app/container.py（使用 dependency-injector）
+- [X] T019 建立應用程式入口：apps/backend/app/main.py（FastAPI app 初始化與模組路由聚合）
 
 ### Shared Kernel 實作
 
-- [ ] T020 [P] 實作共用 Value Object：apps/backend/app/shared/domain/email.py（Email VO）
-- [ ] T021 [P] 實作 Entity 基類：apps/backend/app/shared/domain/base_entity.py
-- [ ] T022 實作資料庫連線：apps/backend/app/shared/infrastructure/database/connection.py（SQLAlchemy Engine）
-- [ ] T023 [P] 實作 Repository 基類：apps/backend/app/shared/infrastructure/database/base_repository.py
-- [ ] T024 [P] 實作 JWT 服務：apps/backend/app/shared/infrastructure/security/jwt_service.py（簽發/驗證 Access + Refresh Token）
-- [ ] T025 [P] 實作密碼雜湊：apps/backend/app/shared/infrastructure/security/password_hasher.py（bcrypt）
-- [ ] T026 [P] 實作 GCS 服務：apps/backend/app/shared/infrastructure/external/gcs_storage_service.py（產生 signed URL）
-- [ ] T027 [P] 實作錯誤處理中介軟體：apps/backend/app/shared/presentation/middleware/error_handler.py
-- [ ] T028 [P] 實作 API 例外類別：apps/backend/app/shared/presentation/exceptions/api_exceptions.py（400/401/403/404/422/429）
+- [X] T020 [P] 實作共用 Value Object：apps/backend/app/shared/domain/email.py（Email VO）
+- [X] T021 [P] 實作 Entity 基類：apps/backend/app/shared/domain/base_entity.py
+- [X] T022 實作資料庫連線：apps/backend/app/shared/infrastructure/database/connection.py（SQLAlchemy Engine）
+- [X] T023 [P] 實作 Repository 基類：apps/backend/app/shared/infrastructure/database/base_repository.py
+- [X] T024 [P] 實作 JWT 服務：apps/backend/app/shared/infrastructure/security/jwt_service.py（簽發/驗證 Access + Refresh Token）
+- [X] T025 [P] 實作密碼雜湊：apps/backend/app/shared/infrastructure/security/password_hasher.py（bcrypt）
+- [X] T026 [P] 實作 GCS 服務：apps/backend/app/shared/infrastructure/external/gcs_storage_service.py（產生 signed URL）
+- [X] T027 [P] 實作錯誤處理中介軟體：apps/backend/app/shared/presentation/middleware/error_handler.py
+- [X] T028 [P] 實作 API 例外類別：apps/backend/app/shared/presentation/exceptions/api_exceptions.py（400/401/403/404/422/429）
 
 **Checkpoint**: 基礎設施完成 - User Story 實作可以開始並行進行
 
