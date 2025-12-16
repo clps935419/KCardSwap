@@ -22,10 +22,8 @@ services:
       context: ./apps/backend
       dockerfile: Dockerfile
     container_name: kcardswap-backend
-    environment:
-      DATABASE_URL: postgresql+asyncpg://kcardswap:kcardswap@db:5432/kcardswap
-      GCS_BUCKET: kcardswap-dev
-      JWT_SECRET: change-me
+    env_file:
+      - .env
     depends_on:
       db:
         condition: service_healthy
