@@ -141,9 +141,9 @@
 
 #### Testing
 
-- [ ] T053A [P] [US1] （Expo/PKCE）新增 Auth Contract：specs/001-kcardswap-complete-spec/contracts/auth/google_callback.json（定義 request/response）
-- [ ] T053B [P] [US1] （Expo/PKCE）撰寫 Google Callback Contract Tests：specs/001-kcardswap-complete-spec/tests/contract_tests/test_contracts.py（新增 google_callback contract 驗證）
-- [ ] T057A [P] [US1] （Expo/PKCE）Auth Integration Tests：tests/integration/modules/identity/test_auth_flow.py（mock Google token endpoint，覆蓋 code+pkce 流程）
+- [X] T053A [P] [US1] （Expo/PKCE）新增 Auth Contract：specs/001-kcardswap-complete-spec/contracts/auth/google_callback.json（定義 request/response）
+- [X] T053B [P] [US1] （Expo/PKCE）撰寫 Google Callback Contract Tests：specs/001-kcardswap-complete-spec/tests/contract_tests/test_contracts.py（新增 google_callback contract 驗證）
+- [X] T057A [P] [US1] （Expo/PKCE）Auth Integration Tests：tests/integration/modules/identity/test_auth_flow.py（mock Google token endpoint，覆蓋 code+pkce 流程）
 
 #### Documentation
 
