@@ -15,8 +15,10 @@ class User:
 
     def __init__(
         self,
-        google_id: str,
         email: str,
+        google_id: Optional[str] = None,
+        password_hash: Optional[str] = None,
+        role: str = "user",
         id: Optional[UUID] = None,
         created_at: Optional[datetime] = None,
         updated_at: Optional[datetime] = None
@@ -24,6 +26,8 @@ class User:
         self._id = id or uuid4()
         self._google_id = google_id
         self._email = email.lower()  # Normalize email
+        self._password_hash = password_hash
+        self._role = role
         self._created_at = created_at or datetime.utcnow()
         self._updated_at = updated_at or datetime.utcnow()
 
@@ -31,10 +35,14 @@ class User:
 
     def _validate(self):
         """Validate user data"""
-        if not self._google_id or len(self._google_id) == 0:
-            raise ValueError("google_id cannot be empty")
         if not self._email or "@" not in self._email:
             raise ValueError("Invalid email format")
+        # Either google_id or password_hash must be set
+        if not self._google_id and not self._password_hash:
+            raise ValueError("Either google_id or password_hash must be provided")
+        # Role validation
+        if self._role not in ["user", "admin", "super_admin"]:
+            raise ValueError("Invalid role. Must be 'user', 'admin', or 'super_admin'")
 
     @property
     def id(self) -> UUID:
@@ -55,6 +63,18 @@ class User:
     @property
     def updated_at(self) -> datetime:
         return self._updated_at
+
+    @property
+    def password_hash(self) -> Optional[str]:
+        return self._password_hash
+
+    @property
+    def role(self) -> str:
+        return self._role
+
+    def is_admin(self) -> bool:
+        """Check if user is an admin"""
+        return self._role in ["admin", "super_admin"]
 
     def update_email(self, new_email: str):
         """Update user email"""

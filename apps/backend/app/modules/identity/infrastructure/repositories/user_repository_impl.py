@@ -55,6 +55,8 @@ class SQLAlchemyUserRepository(IUserRepository):
             # Update existing
             existing.google_id = user.google_id
             existing.email = user.email
+            existing.password_hash = user.password_hash
+            existing.role = user.role
             existing.updated_at = user.updated_at
             model = existing
         else:
@@ -63,6 +65,8 @@ class SQLAlchemyUserRepository(IUserRepository):
                 id=user.id,
                 google_id=user.google_id,
                 email=user.email,
+                password_hash=user.password_hash,
+                role=user.role,
                 created_at=user.created_at,
                 updated_at=user.updated_at
             )
@@ -91,6 +95,8 @@ class SQLAlchemyUserRepository(IUserRepository):
             id=model.id,
             google_id=model.google_id,
             email=model.email,
+            password_hash=model.password_hash,
+            role=model.role,
             created_at=model.created_at,
             updated_at=model.updated_at
         )

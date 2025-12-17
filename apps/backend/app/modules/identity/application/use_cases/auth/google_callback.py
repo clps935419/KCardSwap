@@ -94,8 +94,8 @@ class GoogleCallbackUseCase:
         if not user:
             # Create new user entity
             user = User(
-                google_id=google_id,
-                email=email
+                email=email,
+                google_id=google_id
             )
             user = await self._user_repo.save(user)
 

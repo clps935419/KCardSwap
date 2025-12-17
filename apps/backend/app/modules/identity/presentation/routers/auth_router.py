@@ -8,6 +8,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
+from app.modules.identity.application.use_cases.auth.admin_login import (
+    AdminLoginUseCase,
+)
 from app.modules.identity.application.use_cases.auth.google_callback import (
     GoogleCallbackUseCase,
 )
@@ -37,6 +40,7 @@ from app.modules.identity.infrastructure.repositories.user_repository_impl impor
     UserRepositoryImpl,
 )
 from app.modules.identity.presentation.schemas.auth_schemas import (
+    AdminLoginRequest,
     ErrorWrapper,
     GoogleCallbackRequest,
     GoogleLoginRequest,
@@ -44,11 +48,85 @@ from app.modules.identity.presentation.schemas.auth_schemas import (
     RefreshTokenRequest,
     TokenResponse,
 )
+from app.modules.identity.infrastructure.security.password_service import (
+    PasswordService,
+)
 from app.shared.infrastructure.database.connection import get_db_session
 from app.shared.infrastructure.security.jwt_service import JWTService
 
 # Create router
 router = APIRouter(prefix="/auth", tags=["Authentication"])
+
+
+@router.post(
+    "/admin-login",
+    response_model=LoginResponse,
+    status_code=status.HTTP_200_OK,
+    responses={
+        200: {"description": "Successfully authenticated as admin"},
+        400: {"model": ErrorWrapper, "description": "Validation error"},
+        401: {"model": ErrorWrapper, "description": "Invalid credentials or not an admin"},
+    },
+    tags=["Admin"],
+    summary="Admin login with email/password",
+    description="Authenticate admin user with email and password. Only users with admin or super_admin role can login."
+)
+async def admin_login(
+    request: AdminLoginRequest,
+    session: Annotated[AsyncSession, Depends(get_db_session)]
+) -> LoginResponse:
+    """
+    Admin login with email/password.
+
+    - Verifies email and password
+    - Checks if user has admin role (admin or super_admin)
+    - Returns JWT access and refresh tokens
+
+    This endpoint is only for admin users with password-based authentication.
+    Regular users should use Google OAuth login.
+    """
+    # Initialize dependencies
+    user_repo: IUserRepository = UserRepositoryImpl(session)
+    refresh_token_repo: RefreshTokenRepository = RefreshTokenRepositoryImpl(session)
+    password_service = PasswordService()
+    jwt_service = JWTService()
+
+    # Create and execute use case
+    use_case = AdminLoginUseCase(
+        user_repo=user_repo,
+        refresh_token_repo=refresh_token_repo,
+        password_service=password_service,
+        jwt_service=jwt_service
+    )
+
+    result = await use_case.execute(request.email, request.password)
+
+    if result is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail={
+                "code": "UNAUTHORIZED",
+                "message": "Invalid credentials or not an admin user"
+            }
+        )
+
+    access_token, refresh_token, user = result
+
+    # Commit transaction
+    await session.commit()
+
+    # Build response
+    token_response = TokenResponse(
+        access_token=access_token,
+        refresh_token=refresh_token,
+        token_type="bearer",
+        expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,  # Convert to seconds
+        user_id=user.id,
+        email=user.email,
+        role=user.role
+    )
+
+    return LoginResponse(data=token_response, error=None)
 
 
 @router.post(

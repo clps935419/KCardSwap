@@ -8,6 +8,19 @@ from uuid import UUID
 from pydantic import BaseModel, EmailStr, Field
 
 
+class AdminLoginRequest(BaseModel):
+    """Request schema for admin login with email/password"""
+    email: EmailStr = Field(
+        ...,
+        description="Admin email address"
+    )
+    password: str = Field(
+        ...,
+        description="Admin password",
+        min_length=8
+    )
+
+
 class GoogleLoginRequest(BaseModel):
     """Request schema for Google login"""
     google_token: str = Field(
@@ -44,6 +57,7 @@ class TokenResponse(BaseModel):
     expires_in: int = Field(..., description="Access token expiration in seconds")
     user_id: UUID = Field(..., description="User ID")
     email: EmailStr = Field(..., description="User email")
+    role: Optional[str] = Field(None, description="User role (only for admin users)")
 
     class Config:
         json_schema_extra = {
@@ -53,7 +67,8 @@ class TokenResponse(BaseModel):
                 "token_type": "bearer",
                 "expires_in": 900,
                 "user_id": "123e4567-e89b-12d3-a456-426614174000",
-                "email": "user@example.com"
+                "email": "user@example.com",
+                "role": "admin"
             }
         }
 
