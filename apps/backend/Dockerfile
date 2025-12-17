@@ -39,14 +39,9 @@ COPY ./alembic.ini ./alembic.ini
 # 暴露服務端口
 EXPOSE 8000
 
-# 建立啟動腳本以先執行 migrations 再啟動應用
-RUN echo '#!/bin/bash\n\
-set -e\n\
-echo "Running database migrations..."\n\
-alembic upgrade head\n\
-echo "Starting application..."\n\
-exec uvicorn app.main:app --host 0.0.0.0 --port 8000' > /app/start.sh \
-    && chmod +x /app/start.sh
+# 拷貝啟動腳本並設為可執行
+COPY start.sh /app/start.sh
+RUN chmod +x /app/start.sh
 
 # 啟動命令：先執行 migrations，然後啟動應用
 CMD ["/app/start.sh"]
