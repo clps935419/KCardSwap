@@ -16,6 +16,7 @@
 - **[P]**: 可平行執行（不同檔案，無相依性）
 - **[Story]**: 所屬使用者故事（US1, US2, US3...）
 - 描述包含明確檔案路徑
+- **ID 命名建議**: 後端維持 `T###`，前端 Expo 維持 `M###`（同一份 tasks.md 但不混用編號）
 
 ---
 
@@ -31,6 +32,25 @@
 - [X] T006 [P] 配置 CI/CD：.github/workflows/backend-ci.yml（lint, test, build 檢查）
 - [X] T007 建立開發環境文件：dev-setup.md（本地環境設定指引）
 - [X] T008 建立 Makefile：提供 dev, test, lint, seed 指令
+
+---
+
+## Phase 1M: Mobile Setup (Expo 基礎架構)
+
+**目的**: 建立 Expo app 與共用前端基礎，供所有 User Story 的 Mobile 任務共用（不放進各 US）
+
+- [ ] M001 初始化 Expo app 專案：建立 apps/mobile（TypeScript）
+- [ ] M002 建立路由與導航骨架：apps/mobile/src/navigation（Auth Stack + Main Tabs）
+- [ ] M003 建立 API Client：apps/mobile/src/shared/api/client.ts（baseURL + /api/v1、timeout、錯誤解析）
+- [ ] M004 建立 Token 儲存與 Session 管理：apps/mobile/src/shared/auth/session.ts（expo-secure-store 儲存 access/refresh、啟動時 refresh）
+- [ ] M005 建立 Auth 狀態管理：apps/mobile/src/shared/state/authStore.ts（登入/登出/refresh、401 自動導回登入）
+- [ ] M006 建立錯誤碼與訊息映射：apps/mobile/src/shared/api/errorMapper.ts（對齊後端 400/401/403/404/422/429）
+- [ ] M007 建立環境設定範本：apps/mobile/.env.example（BACKEND_BASE_URL、GOOGLE_CLIENT_ID 等）
+- [ ] M008 建立基礎測試與 lint：apps/mobile（eslint/prettier + jest）
+- [ ] M009 更新開發文件：dev-setup.md（補上 mobile 啟動、環境變數、Android 模擬器/實機）
+- [ ] M010 [P] 建立 Mobile CI：.github/workflows/mobile-ci.yml（lint/test；EAS build 可後續加）
+
+**Checkpoint**: Mobile 基礎架構完成 - 各 US 的 Mobile 任務可開始並行
 
 ---
 
@@ -205,6 +225,13 @@
 - [ ] T064 [US1] 執行所有 US1 測試：確保 Contract Tests + Unit Tests + Integration Tests 全數通過
 - [ ] T065 [US1] 手動驗證 US1 驗收標準：使用 Postman/curl 測試完整登入與檔案更新流程
 
+### Mobile (Expo)
+
+- [ ] M101 [P] [US1] 實作 Google 登入畫面與 PKCE Flow：apps/mobile/src/features/auth（使用 AuthSession 取得 code + code_verifier → 呼叫 /auth/google-callback；Contract: specs/001-kcardswap-complete-spec/contracts/auth/google_callback.json）
+- [ ] M102 [P] [US1] 串接 TokenResponse 並寫入 Session：apps/mobile/src/shared/auth/session.ts（使用 /auth/refresh 續期；Contract: specs/001-kcardswap-complete-spec/contracts/auth/login.json）
+- [ ] M103 [P] [US1] 建立個人檔案頁（讀取/更新）：apps/mobile/src/features/profile（GET/PUT /profile/me；Contract: specs/001-kcardswap-complete-spec/contracts/social/profile.json）
+- [ ] M104 [US1] 手動驗證登入與更新檔案：Android 實機/模擬器（確認冷啟動 refresh 與 401 重新登入）
+
 ---
 
 ## Phase 4: User Story 2 - 新增小卡與上傳限制 (Priority: P1)
@@ -274,6 +301,15 @@
 - [ ] T093 [US2] 手動驗證 US2 驗收標準：測試上傳 2 張後觸發 422_LIMIT_EXCEEDED
 - [ ] T094 [US2] 驗證縮圖產生：確認 GCS 中 thumbs/ 路徑下有對應的 200x200 圖片
 
+### Mobile (Expo)
+
+- [ ] M201 [P] [US2] 圖片選取與壓縮：apps/mobile/src/features/cards（expo-image-picker + expo-image-manipulator；控制大小 ≤10MB）
+- [ ] M202 [P] [US2] 取得上傳 Signed URL：apps/mobile/src/features/cards/api（呼叫 POST /cards/upload-url；Contract: specs/001-kcardswap-complete-spec/contracts/cards/create.json）
+- [ ] M203 [P] [US2] 直接上傳到 Signed URL：apps/mobile/src/features/cards/services/uploadToSignedUrl.ts（PUT/POST 上傳、錯誤處理與重試）
+- [ ] M204 [P] [US2] 我的卡冊列表：apps/mobile/src/features/cards/screens/MyCardsScreen.tsx（GET /cards/me）
+- [ ] M205 [P] [US2] 刪除卡片：apps/mobile/src/features/cards/api（DELETE /cards/{id}）
+- [ ] M206 [US2] 手動驗證上傳限制：免費用戶上傳 2 張後提示 422_LIMIT_EXCEEDED
+
 ---
 
 ## Phase 5: User Story 3 - 附近的小卡搜尋 (Priority: P1)
@@ -323,6 +359,12 @@
 - [ ] T108 [US3] 執行所有 US3 測試：確保 Contract Tests + Unit Tests + Integration Tests 全數通過
 - [ ] T109 [US3] 手動驗證 US3 驗收標準：測試搜尋 5 次後觸發 429_RATE_LIMIT_EXCEEDED（免費用戶）
 - [ ] T110 [US3] 驗證付費用戶搜尋：確認付費用戶可以無限次搜尋
+
+### Mobile (Expo)
+
+- [ ] M301 [P] [US3] 定位權限與取得座標：apps/mobile/src/features/nearby（expo-location；處理拒絕權限）
+- [ ] M302 [P] [US3] 附近搜尋頁：apps/mobile/src/features/nearby/screens/NearbySearchScreen.tsx（POST /nearby/search；Contract: specs/001-kcardswap-complete-spec/contracts/nearby/search.json）
+- [ ] M303 [US3] 限次錯誤處理：免費用戶第 6 次提示 429_RATE_LIMIT_EXCEEDED（並提供升級入口）
 
 ---
 
@@ -385,6 +427,13 @@
 ### Verification
 
 - [ ] T143 [US4] 執行所有 US4 測試並手動驗證完整社交功能流程
+
+### Mobile (Expo)
+
+- [ ] M401 [P] [US4] 好友邀請/接受/封鎖頁：apps/mobile/src/features/friends（對齊 /friends/* 端點；Contracts: 待補或沿用後端 OpenAPI）
+- [ ] M402 [P] [US4] 聊天室 UI 與輪詢：apps/mobile/src/features/chat（GET /chats/{id}/messages, POST /chats/{id}/messages；Contract: specs/001-kcardswap-complete-spec/contracts/chat/message.json）
+- [ ] M403 [P] [US4] 前景輪詢策略：apps/mobile/src/features/chat/services/polling.ts（since=timestamp、退避避免過度打 API）
+- [ ] M404 [P] [US4] 推播接收與導頁：apps/mobile/src/features/notifications（expo-notifications；點擊通知導向聊天室）
 
 ---
 
@@ -463,6 +512,12 @@
 - [ ] T173 [US5] 手動驗證 US5 驗收標準：測試完整交換流程（draft → proposed → accepted → completed）
 - [ ] T174 [US5] 驗證卡片鎖定：確認交換完成後卡片狀態更新為「已交換」且無法再次交換
 
+### Mobile (Expo)
+
+- [ ] M501 [P] [US5] 發起交換提案頁：apps/mobile/src/features/trade（選擇卡片並呼叫 POST /trades；Contract: specs/001-kcardswap-complete-spec/contracts/trade/create.json）
+- [ ] M502 [P] [US5] 提案詳情與狀態更新 UI：apps/mobile/src/features/trade/screens/TradeDetailScreen.tsx（接受/完成等動作）
+- [ ] M503 [US5] 交換歷史列表：apps/mobile/src/features/trade/screens/TradeHistoryScreen.tsx（依後端查詢端點）
+
 ---
 
 ## Phase 8: User Story 6 - 訂閱與付費 (Priority: P2)
@@ -513,6 +568,13 @@
 - [ ] T190 [US6] 執行所有 US6 測試並手動驗證訂閱流程
 - [ ] T191 [US6] 驗證權限升級：確認付費用戶可以無限上傳/搜尋
 
+### Mobile (Expo)
+
+- [ ] M601 [P] [US6] 方案/付費牆頁：apps/mobile/src/features/subscription（顯示 free/premium 差異與升級入口）
+- [ ] M602 [P] [US6] Android Google Play Billing 整合：apps/mobile/src/features/subscription/billing（購買/續訂/恢復購買）
+- [ ] M603 [P] [US6] 收據驗證串接：apps/mobile/src/features/subscription/api（POST /subscriptions/verify-receipt；Contract: specs/001-kcardswap-complete-spec/contracts/biz/offer.json）
+- [ ] M604 [US6] 訂閱狀態顯示與降級提示：apps/mobile/src/features/subscription/screens/SubscriptionStatusScreen.tsx
+
 ---
 
 ## Phase 9: Polish & Cross-Cutting Concerns (跨模組整合與優化)
@@ -541,9 +603,10 @@
 ### Critical Path（關鍵路徑 - 必須依序執行）
 
 1. **Phase 1: Setup** (T001-T008) → 專案基礎
-2. **Phase 2: Foundational** (T009-T028) → **[BLOCKING]** 所有 User Story 必須等此階段完成
-3. **Phase 3-8: User Stories** (T029-T191) → 可部分並行（見下方說明）
-4. **Phase 9: Polish** (T192-T205) → 最終整合
+2. **Phase 1M: Mobile Setup** (M001-M010) → Expo app 基礎（可與 Phase 2 並行進行）
+3. **Phase 2: Foundational** (T009-T028) → **[BLOCKING]** 所有後端 User Story 必須等此階段完成
+4. **Phase 3-8: User Stories** (T029-T191 + M101-M604) → 後端與 Mobile 可依契約並行（見下方說明）
+5. **Phase 9: Polish** (T192-T205) → 最終整合
 
 ### User Story Dependencies（使用者故事依賴）
 
@@ -578,6 +641,15 @@ US6 (Phase 8)                   │       │
 
 ### Parallel Opportunities（並行機會）
 
+#### 階段 0：可立即開始（與 Foundation 並行）
+
+**可同時開始的工作組**：
+
+```
+Group M0: Mobile Setup (Phase 1M) - Expo Foundation
+  └─ M001-M010（app skeleton / API client / session / CI）
+```
+
 #### 階段 1：Foundation 完成後（T028 完成）
 
 **可同時開始的工作組**：
@@ -588,6 +660,10 @@ Group A: US1 (Phase 3) - Identity Module
   
 Group B: Infrastructure Setup（與 US1 無衝突）
   └─ T059-T060 (Kong JWT, Config)
+
+Group M1: US1 Mobile (Expo) - Auth + Profile
+  ├─ 先決條件：M001-M006
+  └─ M101-M104（可先用 contract/mock 並行；待後端端點可用後做整合）
 ```
 
 #### 階段 2：US1 完成後（T065 完成）
@@ -603,6 +679,18 @@ Group B: US4 (Phase 6) - Friends & Chat（與 US2 不同檔案）
   
 Group C: US6 (Phase 8) - Subscription（與 US2/US4 不同檔案）
   └─ T175-T191 (17 tasks)
+
+Group M2: US2 Mobile (Expo) - Card Upload
+  ├─ 先決條件：M001-M006 + US1 Mobile 已可取得有效 access token
+  └─ M201-M206（Signed URL 上傳可先做 UI/流程，待 /cards/* 端點可用後整合）
+
+Group M4: US4 Mobile (Expo) - Friends & Chat
+  ├─ 先決條件：M001-M006 + US1 Mobile（登入狀態）
+  └─ M401-M404（可先做 UI/輪詢骨架；待 /friends/*、/chats/* 端點與推播配置後整合）
+
+Group M6: US6 Mobile (Expo) - Subscription
+  ├─ 先決條件：M001-M006 + US1 Mobile（登入狀態）
+  └─ M601-M604（可先做 paywall/UI；Billing 與 /subscriptions/* 後續整合）
 ```
 
 #### 階段 3：US2 完成後（T094 完成）
@@ -615,6 +703,14 @@ Group A: US3 (Phase 5) - Nearby Search
   
 Group B: US5 (Phase 7) - Trade（需等 US4 完成）
   └─ T144-T174 (31 tasks) - 建議等 US4 完成後再開始
+
+Group M3: US3 Mobile (Expo) - Nearby Search
+  ├─ 先決條件：M001-M006 + US1 Mobile（登入狀態）
+  └─ M301-M303（定位與搜尋頁可先做；待 /nearby/search 端點可用後整合）
+
+Group M5: US5 Mobile (Expo) - Trade
+  ├─ 先決條件：M001-M006 + US1 Mobile（登入狀態）+ US2（卡片資料）+ US4（好友）
+  └─ M501-M503（可先做 UI，待 /trades/* 與狀態流轉端點可用後整合）
 ```
 
 ### Recommended Execution Strategy（建議執行策略）
@@ -645,6 +741,7 @@ Group B: US5 (Phase 7) - Trade（需等 US4 完成）
 ### Statistics（統計）
 
 - **Total Tasks**: 205
+- **Total Tasks**: 205（不含 Mobile 的 M### 任務）
 - **Completed**: 26 (Phase 1: 8/8, Phase 2: 18/20)
 - **Remaining**: 179
 - **Estimated Duration**: 10 weeks (4 sprints)
