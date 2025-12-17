@@ -73,6 +73,28 @@
 
 ---
 
+## Phase 2.5: Admin System (管理員系統 - 僅供後台管理)
+
+**目的**: 提供管理員帳密登入功能，不對移動端用戶開放
+
+**使用場景**: 管理員透過 Swagger UI、Postman 或 curl 進行帳密登入，獲取 JWT Token 進行後台管理操作
+
+- [ ] T029 [Admin-Auth] 擴展 User Entity：添加 password_hash 和 role 屬性（apps/backend/app/modules/identity/domain/entities/user.py）
+- [ ] T030 [Admin-Auth] 創建 Alembic migration：alembic/versions/003_add_admin_fields.py（添加 password_hash VARCHAR(255) NULLABLE, role VARCHAR(20) DEFAULT 'user'，修改 google_id 為 NULLABLE）
+- [ ] T031 [Admin-Auth] 更新 ORM 模型：apps/backend/app/modules/identity/infrastructure/database/models.py（同步 password_hash 與 role 欄位）
+- [ ] T032 [Admin-Auth] 實現密碼服務：apps/backend/app/modules/identity/infrastructure/security/password_service.py（hash_password, verify_password 使用 bcrypt）
+- [ ] T033 [Admin-Auth] 實現 AdminLoginUseCase：apps/backend/app/modules/identity/application/use_cases/auth/admin_login.py（驗證 email+password，檢查 role 是否為 admin/super_admin）
+- [ ] T034 [Admin-Auth] 添加 Admin Login Endpoint：POST /api/v1/auth/admin-login（apps/backend/app/modules/identity/presentation/routers/auth_router.py，標記 tags=["Admin"]）
+- [ ] T035 [Admin-Auth] 創建管理員工具腳本：apps/backend/scripts/create_admin.py（接受 --email, --password, --role 參數，生成 bcrypt hash 並插入資料庫）
+- [ ] T036 [Admin-Auth] 更新 API Contract：specs/001-kcardswap-complete-spec/contracts/auth/admin_login.json（定義請求/回應結構）
+- [ ] T037 [Admin-Auth] 更新資料模型文件：specs/001-kcardswap-complete-spec/data-model.md（更新 users 表定義與不變條件）
+- [ ] T038 [Admin-Auth] 撰寫單元測試：tests/unit/application/use_cases/test_admin_login.py（測試正確密碼、錯誤密碼、非管理員帳號）
+- [ ] T039 [Admin-Auth] 添加 pyproject.toml 依賴：bcrypt = "^4.1.0"
+
+**Checkpoint**: Admin 登入系統完成，管理員可透過帳密登入獲取 JWT Token
+
+---
+
 ## Phase 3: User Story 1 - Google 登入與完成基本個人檔案 (Priority: P1) 🎯 MVP
 
 **目標**: 使用者可以透過 Google 登入，並完成基本個人檔案設定
@@ -85,9 +107,9 @@
 
 ### Domain Layer (Identity Module)
 
-- [X] T029 [P] [US1] 建立 User Entity：apps/backend/app/modules/identity/domain/entities/user.py（id, email, google_id, created_at）
-- [X] T030 [P] [US1] 建立 Profile Entity：apps/backend/app/modules/identity/domain/entities/profile.py（user_id, nickname, bio, avatar_url）
-- [X] T031 [P] [US1] 建立 RefreshToken Entity：apps/backend/app/modules/identity/domain/entities/refresh_token.py（token, user_id, expires_at）
+- [X] T040 [P] [US1] 建立 User Entity：apps/backend/app/modules/identity/domain/entities/user.py（id, email, google_id, created_at）
+- [X] T041 [P] [US1] 建立 Profile Entity：apps/backend/app/modules/identity/domain/entities/profile.py（user_id, nickname, bio, avatar_url）
+- [X] T042 [P] [US1] 建立 RefreshToken Entity：apps/backend/app/modules/identity/domain/entities/refresh_token.py（token, user_id, expires_at）
 - [X] T032 [P] [US1] 定義 UserRepository Interface：apps/backend/app/modules/identity/domain/repositories/user_repository.py
 - [X] T033 [P] [US1] 定義 ProfileRepository Interface：apps/backend/app/modules/identity/domain/repositories/profile_repository.py
 - [X] T034 [P] [US1] 定義 RefreshTokenRepository Interface：apps/backend/app/modules/identity/domain/repositories/refresh_token_repository.py

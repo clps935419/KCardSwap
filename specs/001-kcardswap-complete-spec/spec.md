@@ -117,14 +117,16 @@
 
 以下以 10 個核心主題分組定義功能需求，每一條皆應可被測試驗證。
 
-#### 1. 使用者認證與個人檔案（Google OAuth、JWT、隱私設定）
+#### 1. 使用者認證與個人檔案（Google OAuth、管理員登入、JWT、隱私設定）
 
 - **FR-AUTH-001**：系統必須支援使用者透過 Google OAuth 完成首次登入與帳號建立。
+- **[ADDED: 2025-12-17] FR-AUTH-001-ADMIN**：系統必須支援管理員透過帳號密碼登入（僅供後台管理使用，不對移動端開放）。管理員帳號需包含 email、password_hash（bcrypt 加密）與 role（admin/super_admin），登入成功後返回與 Google OAuth 相同格式的 JWT tokens。**Why**: 管理員需要獨立的認證方式以進行後台管理操作，不依賴第三方 OAuth 服務。**Acceptance Scenarios**: (1) 管理員可透過 POST /api/v1/auth/admin-login 使用 email + password 登入，返回 access_token、refresh_token 與 role 資訊。(2) 非管理員角色（role='user'）無法透過此 endpoint 登入，返回 401 錯誤。
 - **FR-AUTH-002**：系統必須在成功登入後簽發存活時間 15 分鐘的 Access Token 與 7 天的 Refresh Token，並於 API Gateway（Kong）與後端共同驗證。
 - **FR-AUTH-003**：行動 App 必須將 JWT 資訊安全儲存在安全儲存區（例如 expo-secure-store），不得以明文存在一般 AsyncStorage。
 - **FR-AUTH-004**：使用者必須能在個人檔案頁面檢視與編輯暱稱、頭像、偏好偶像、簡介與所在區域（不顯示精確地址）。
 - **FR-AUTH-005**：系統必須提供「隱私設定」讓使用者可控制：是否可被附近搜尋找到、是否顯示線上狀態、是否允許陌生人發起聊天。
 - **FR-AUTH-006**：使用者必須能在任何時間登出，登出後本機 JWT 必須被清除且之後的 API 呼叫一律當作未登入處理。
+- **[ADDED: 2025-12-17] FR-AUTH-007**：系統必須支援三種使用者角色（user、admin、super_admin），並在 JWT payload 中包含 role 資訊。需保護的 API endpoint 應根據 role 進行權限檢查。**Why**: 提供最小權限原則與管理職責分離，確保敏感操作僅限特定角色存取。**Acceptance Scenarios**: (1) 一般用戶（role='user'）無法存取管理員專用 API。(2) admin 可管理內容與用戶，但無法管理其他 admin。(3) super_admin 擁有最高權限，可管理所有 admin 與系統設定。
 
 #### 2. 小卡管理功能（資料模型、上傳流程、驗證、篩選）
 

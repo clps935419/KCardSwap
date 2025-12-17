@@ -1,0 +1,171 @@
+{
+  "endpoint": "POST /api/v1/auth/admin-login",
+  "description": "管理員帳密登入（僅供後台使用，不對移動端開放）",
+  "tags": ["Admin"],
+  "authentication": "None (public endpoint for admin login)",
+  "rate_limit": "10 requests per minute per IP",
+  "request": {
+    "content_type": "application/json",
+    "schema": {
+      "email": {
+        "type": "string",
+        "format": "email",
+        "required": true,
+        "example": "admin@kcardswap.com",
+        "description": "管理員電子郵件"
+      },
+      "password": {
+        "type": "string",
+        "required": true,
+        "min_length": 8,
+        "example": "SecureAdminPassword123!",
+        "description": "管理員密碼"
+      }
+    },
+    "example": {
+      "email": "admin@kcardswap.com",
+      "password": "SecureAdminPassword123!"
+    }
+  },
+  "responses": {
+    "200": {
+      "description": "登入成功，返回 JWT tokens",
+      "content_type": "application/json",
+      "schema": {
+        "data": {
+          "access_token": {
+            "type": "string",
+            "description": "JWT access token (15 minutes)"
+          },
+          "refresh_token": {
+            "type": "string",
+            "description": "JWT refresh token (7 days)"
+          },
+          "token_type": {
+            "type": "string",
+            "value": "bearer"
+          },
+          "expires_in": {
+            "type": "integer",
+            "description": "Access token 有效秒數",
+            "value": 900
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "使用者 ID"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "電子郵件"
+          },
+          "role": {
+            "type": "string",
+            "enum": ["admin", "super_admin"],
+            "description": "管理員角色"
+          }
+        },
+        "error": null
+      },
+      "example": {
+        "data": {
+          "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyNDhjODFmYi1hZmZiLTRhN2UtOWYxNC0xOTg2NGY2NDc2YmMiLCJlbWFpbCI6ImFkbWluQGtjYXJkc3dhcC5jb20iLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MDMxMjM0NTZ9.abc123...",
+          "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyNDhjODFmYi1hZmZiLTRhN2UtOWYxNC0xOTg2NGY2NDc2YmMiLCJ0eXBlIjoicmVmcmVzaCIsImV4cCI6MTcwMzcyMzQ1Nn0.def456...",
+          "token_type": "bearer",
+          "expires_in": 900,
+          "user_id": "248c81fb-affb-4a7e-9f14-19864f6476bc",
+          "email": "admin@kcardswap.com",
+          "role": "admin"
+        },
+        "error": null
+      }
+    },
+    "401": {
+      "description": "認證失敗：密碼錯誤或帳號不存在",
+      "content_type": "application/json",
+      "schema": {
+        "data": null,
+        "error": {
+          "code": {
+            "type": "string",
+            "value": "401_UNAUTHORIZED"
+          },
+          "message": {
+            "type": "string",
+            "description": "錯誤訊息"
+          },
+          "details": {
+            "type": "object",
+            "description": "額外錯誤資訊（可選）"
+          }
+        }
+      },
+      "examples": {
+        "invalid_credentials": {
+          "data": null,
+          "error": {
+            "code": "401_UNAUTHORIZED",
+            "message": "Invalid email or password",
+            "details": {}
+          }
+        },
+        "not_admin": {
+          "data": null,
+          "error": {
+            "code": "401_UNAUTHORIZED",
+            "message": "This account does not have admin privileges",
+            "details": {
+              "role": "user"
+            }
+          }
+        }
+      }
+    },
+    "422": {
+      "description": "請求參數驗證失敗",
+      "content_type": "application/json",
+      "example": {
+        "data": null,
+        "error": {
+          "code": "422_VALIDATION_ERROR",
+          "message": "Request validation failed",
+          "details": {
+            "email": ["Invalid email format"],
+            "password": ["Password must be at least 8 characters"]
+          }
+        }
+      }
+    },
+    "429": {
+      "description": "請求頻率超過限制",
+      "content_type": "application/json",
+      "example": {
+        "data": null,
+        "error": {
+          "code": "429_RATE_LIMIT_EXCEEDED",
+          "message": "Too many login attempts. Please try again later.",
+          "details": {
+            "retry_after": 60
+          }
+        }
+      }
+    }
+  },
+  "notes": [
+    "此 endpoint 僅供管理員使用，不應在移動端 UI 中顯示",
+    "管理員應通過 Swagger UI、Postman 或 curl 進行登入",
+    "返回的 JWT token 與 Google OAuth 登入的 token 格式相同",
+    "token 可在 Swagger UI 右上角 Authorize 按鈕中使用",
+    "建議在生產環境中限制 IP 白名單或使用 VPN",
+    "password_hash 使用 bcrypt 加密，成本因子 12",
+    "role 必須為 'admin' 或 'super_admin'，'user' 角色無法通過此 endpoint 登入"
+  ],
+  "security_considerations": [
+    "實現登入失敗次數限制（例如：5 次失敗後鎖定 15 分鐘）",
+    "記錄所有管理員登入嘗試（成功與失敗）到審計日誌",
+    "考慮使用 2FA（Two-Factor Authentication）增強安全性",
+    "定期輪換管理員密碼（例如：每 90 天）",
+    "在生產環境中使用 HTTPS 確保密碼傳輸安全"
+  ]
+}

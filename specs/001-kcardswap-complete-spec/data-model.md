@@ -24,14 +24,17 @@
 | 欄位 | 型別 | 約束 | 說明 |
 |------|------|------|------|
 | id | UUID | PK, DEFAULT uuid_generate_v4() | 使用者唯一識別碼 |
-| google_id | VARCHAR(255) | UNIQUE, NOT NULL | Google OAuth ID |
+| google_id | VARCHAR(255) | UNIQUE, NULLABLE | Google OAuth ID（管理員可為 NULL）|
 | email | VARCHAR(255) | UNIQUE, NOT NULL | 電子郵件 |
+| password_hash | VARCHAR(255) | NULLABLE | 密碼雜湊（僅管理員使用，bcrypt）|
+| role | VARCHAR(20) | NOT NULL, DEFAULT 'user' | 角色：'user', 'admin', 'super_admin' |
 | created_at | TIMESTAMP WITH TIME ZONE | DEFAULT CURRENT_TIMESTAMP | 建立時間 |
 | updated_at | TIMESTAMP WITH TIME ZONE | DEFAULT CURRENT_TIMESTAMP | 更新時間 |
 
 **索引**:
 - `idx_users_google_id` ON (google_id)
 - `idx_users_email` ON (email)
+- `idx_users_role` ON (role)
 
 **關聯**:
 - → profiles (1:1)
@@ -41,7 +44,10 @@
 
 **不變條件**:
 - email 必須正規化且小寫唯一
-- google_id 由 Google OAuth 提供，必須唯一
+- 一般用戶：google_id NOT NULL, password_hash NULL, role='user'
+- 管理員：password_hash NOT NULL, google_id 可為 NULL, role IN ('admin', 'super_admin')
+- password_hash 必須使用 bcrypt 加密（成本因子 12 以上）
+- role 必須為有效值之一：'user', 'admin', 'super_admin'
 
 **Trigger**:
 - `update_users_updated_at`: 自動更新 updated_at

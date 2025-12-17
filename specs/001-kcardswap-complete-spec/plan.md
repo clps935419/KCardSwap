@@ -100,11 +100,15 @@
 ## 2. 使用者認證與個人檔案（AUTH + PROFILE）
 - API 規格：
 	- `POST /api/v1/auth/google`：交換 auth code → 建立/登入 → 發 JWT。
+	- **[ADDED: 2025-12-17]** `POST /api/v1/auth/admin-login`：管理員帳密登入（僅供後台，不對移動端開放）→ 發 JWT（包含 role）。
 	- `POST /api/v1/auth/refresh`：刷新 Access Token。
 	- `POST /api/v1/auth/logout`：使 Refresh 失效。
 	- `GET /api/v1/profile/me` / `PATCH /api/v1/profile/me`：檢視/更新個人檔案與隱私設定。
 - 資料表：
-	- `users(id, google_id, email, created_at)`
+	- `users(id, google_id, email, password_hash, role, created_at, updated_at)`
+		- **[UPDATED: 2025-12-17]** 新增 `password_hash VARCHAR(255) NULLABLE`（管理員使用 bcrypt）
+		- **[UPDATED: 2025-12-17]** 新增 `role VARCHAR(20) DEFAULT 'user'`（'user', 'admin', 'super_admin'）
+		- **[UPDATED: 2025-12-17]** `google_id` 改為 NULLABLE（允許純帳密管理員）
 	- `profiles(user_id, nickname, avatar_url, bio, region, preferences, privacy_flags)`
 	- `subscriptions(user_id, plan, started_at, expires_at, status)`
 - 權限與驗證：
