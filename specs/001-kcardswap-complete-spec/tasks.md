@@ -95,6 +95,7 @@
 ### Application Layer (Identity Module)
 
 - [ ] T035 [P] [US1] 建立 GoogleLoginUseCase：apps/backend/app/modules/identity/application/use_cases/google_login_use_case.py（驗證 Google Token → 建立/更新 User → 簽發 JWT）
+- [ ] T035A [P] [US1] （Expo/PKCE）建立 GoogleCallbackUseCase：apps/backend/app/modules/identity/application/use_cases/google_callback_use_case.py（接收 authorization code + code_verifier → 後端交換 tokens → 驗證 id_token → 建立/更新 User → 簽發 JWT）
 - [ ] T036 [P] [US1] 建立 RefreshTokenUseCase：apps/backend/app/modules/identity/application/use_cases/refresh_token_use_case.py（驗證 Refresh Token → 簽發新 Access Token）
 - [ ] T037 [P] [US1] 建立 GetProfileUseCase：apps/backend/app/modules/identity/application/use_cases/get_profile_use_case.py
 - [ ] T038 [P] [US1] 建立 UpdateProfileUseCase：apps/backend/app/modules/identity/application/use_cases/update_profile_use_case.py
@@ -108,14 +109,46 @@
 - [ ] T043 [P] [US1] 實作 ProfileRepositoryImpl：apps/backend/app/modules/identity/infrastructure/repositories/profile_repository_impl.py
 - [ ] T044 [P] [US1] 實作 RefreshTokenRepositoryImpl：apps/backend/app/modules/identity/infrastructure/repositories/refresh_token_repository_impl.py
 - [ ] T045 [P] [US1] 實作 GoogleOAuthService：apps/backend/app/modules/identity/infrastructure/external/google_oauth_service.py（驗證 Google ID Token）
+- [ ] T045A [P] [US1] （Expo/PKCE）擴展 GoogleOAuthService：apps/backend/app/modules/identity/infrastructure/external/google_oauth_service.py（新增 exchange_code_with_pkce：用 code + code_verifier 向 Google token endpoint 交換 tokens，取得並回傳 id_token）
 
 ### Presentation Layer (Identity Module)
 
 - [ ] T046 [P] [US1] 定義 Login Schema：apps/backend/app/modules/identity/presentation/schemas/auth_schemas.py（GoogleLoginRequest, TokenResponse）
 - [ ] T047 [P] [US1] 定義 Profile Schema：apps/backend/app/modules/identity/presentation/schemas/profile_schemas.py（ProfileResponse, UpdateProfileRequest）
 - [ ] T048 [US1] 建立 Auth Router：apps/backend/app/modules/identity/presentation/routers/auth_router.py（POST /auth/google-login, POST /auth/refresh）
+- [ ] T048A [US1] （Expo/PKCE）擴展 Auth Router：apps/backend/app/modules/identity/presentation/routers/auth_router.py（新增 POST /auth/google-callback：接收 { code, code_verifier, redirect_uri? }，回傳 TokenResponse）
 - [ ] T049 [US1] 建立 Profile Router：apps/backend/app/modules/identity/presentation/routers/profile_router.py（GET /profile/me, PUT /profile/me）
 - [ ] T050 [P] [US1] 實作 JWT Authentication Dependency：apps/backend/app/modules/identity/presentation/dependencies/auth_deps.py（get_current_user）
+
+### Phase 3.1: Google OAuth Callback with PKCE（Expo 標準做法）
+
+**目的**: 支援 Expo AuthSession 的 Authorization Code Flow with PKCE。Mobile 端取得 `code` 後，交由後端交換 tokens（避免在前端保存任何 secret）。
+
+**端點**:
+- `POST /api/v1/auth/google-callback`（Kong 前綴後實際為 `/auth/google-callback`）
+
+**保留既有端點**:
+- `POST /api/v1/auth/google-login`：維持接收 `id_token`（Web 或其他情境），但不作為 Expo 推薦路徑
+
+#### Schemas
+
+- [ ] T046A [P] [US1] （Expo/PKCE）擴展 Login Schema：apps/backend/app/modules/identity/presentation/schemas/auth_schemas.py（GoogleCallbackRequest: code, code_verifier, redirect_uri?）
+
+#### Use Case / Service 行為
+
+- [ ] T035B [P] [US1] （Expo/PKCE）GoogleCallbackUseCase：強制驗證 `redirect_uri` 與配置一致（若採用），並處理錯誤映射（Google token endpoint 失敗 → 401/422）
+- [ ] T045B [P] [US1] （Expo/PKCE）Google token exchange：HTTP client timeout/retry 策略（最小實作：timeout + 清楚錯誤訊息）
+
+#### Testing
+
+- [ ] T053A [P] [US1] （Expo/PKCE）新增 Auth Contract：specs/001-kcardswap-complete-spec/contracts/auth/google_callback.json（定義 request/response）
+- [ ] T053B [P] [US1] （Expo/PKCE）撰寫 Google Callback Contract Tests：specs/001-kcardswap-complete-spec/tests/contract_tests/test_contracts.py（新增 google_callback contract 驗證）
+- [ ] T057A [P] [US1] （Expo/PKCE）Auth Integration Tests：tests/integration/modules/identity/test_auth_flow.py（mock Google token endpoint，覆蓋 code+pkce 流程）
+
+#### Documentation
+
+- [ ] T061A [P] [US1] （Expo/PKCE）更新 Authentication 文件：apps/backend/docs/authentication.md（補上 PKCE code flow 與兩條登入路徑差異）
+- [ ] T062A [P] [US1] （Expo/PKCE）更新 API 文件：apps/backend/docs/api/identity-module.md（新增 /auth/google-callback）
 
 ### Integration
 
