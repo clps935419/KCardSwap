@@ -94,10 +94,16 @@ def create_application() -> FastAPI:
             "docs": f"{settings.API_PREFIX}/docs"
         }
 
-    # Module routers will be registered here in Phase 3+
-    # from .modules.identity.presentation import identity_router
+    # Register module routers
+    # Phase 3: Identity module (Authentication and Profile)
+    from .modules.identity.presentation.routers.auth_router import router as auth_router
+    from .modules.identity.presentation.routers.profile_router import router as profile_router
+    
+    app.include_router(auth_router, prefix=settings.API_PREFIX)
+    app.include_router(profile_router, prefix=settings.API_PREFIX)
+    
+    # Future module routers (Phase 4+)
     # from .modules.social.presentation import social_router
-    # app.include_router(identity_router, prefix=settings.API_PREFIX)
     # app.include_router(social_router, prefix=settings.API_PREFIX)
 
     return app
