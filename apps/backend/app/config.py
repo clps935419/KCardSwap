@@ -47,6 +47,7 @@ class Config:
     ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
     DEBUG: bool = os.getenv("DEBUG", "false").lower() == "true"
     SQL_ECHO: bool = os.getenv("SQL_ECHO", "false").lower() == "true"
+    LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")  # DEBUG, INFO, WARNING, ERROR, CRITICAL
 
     # Security
     CORS_ORIGINS: list[str] = os.getenv("CORS_ORIGINS", "*").split(",")

@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google OAuth PKCE 測試 - KCardSwap</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+            width: 100%;
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title .step {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            margin-right: 10px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        pre {
+            background: #2d3748;
+            color: #48bb78;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.6;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .success {
+            color: #48bb78;
+            font-weight: 600;
+        }
+        
+        .error {
+            color: #f56565;
+            font-weight: 600;
+        }
+        
+        .info {
+            color: #4299e1;
+            font-weight: 600;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #667eea;
+            color: white;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 Google OAuth PKCE 測試工具</h1>
+            <p>模擬 Expo AuthSession 的 PKCE 流程 | KCardSwap Backend API</p>
+        </div>
+        
+        <div class="content">
+            <!-- Step 1 -->
+            <div class="section">
+                <div class="section-title">
+                    <span class="step">1</span>
+                    開始 OAuth 授權流程
+                </div>
+                <button id="startBtn" onclick="startOAuth()">
+                    🚀 開始 Google 登入 (PKCE)
+                </button>
+            </div>
+            
+            <!-- Step 2 -->
+            <div class="section">
+                <div class="section-title">
+                    <span class="step">2</span>
+                    PKCE 參數
+                    <span id="pkce-badge" class="badge hidden">已生成</span>
+                </div>
+                <pre id="pkce-info">等待生成 PKCE 參數...</pre>
+            </div>
+            
+            <!-- Step 3 -->
+            <div class="section">
+                <div class="section-title">
+                    <span class="step">3</span>
+                    授權結果
+                </div>
+                <pre id="callback-info">等待授權回調...</pre>
+            </div>
+            
+            <!-- Step 4 -->
+            <div class="section">
+                <div class="section-title">
+                    <span class="step">4</span>
+                    Token Exchange 結果
+                </div>
+                <pre id="token-info">等待 Token Exchange...</pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Google OAuth 配置
+        const GOOGLE_CLIENT_ID = '385748301604-mmrios984991bh8ho7j473rl2k9anjdq.apps.googleusercontent.com';
+        const BACKEND_API = 'http://localhost:8000/api/v1/auth/google-callback';
+        const SCOPES = ['openid', 'email', 'profile'];
+
+        // 生成隨機字串 (用於 PKCE code_verifier)
+        function generateRandomString(length) {
+            const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
+            const values = crypto.getRandomValues(new Uint8Array(length));
+            return Array.from(values)
+                .map(x => possible[x % possible.length])
+                .join('');
+        }
+
+        // Base64URL 編碼 (移除 padding =)
+        function base64URLEncode(buffer) {
+            return btoa(String.fromCharCode(...new Uint8Array(buffer)))
+                .replace(/\+/g, '-')
+                .replace(/\//g, '_')
+                .replace(/=/g, '');
+        }
+
+        // SHA256 哈希
+        async function sha256(plain) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(plain);
+            return await crypto.subtle.digest('SHA-256', data);
+        }
+
+        // 開始 OAuth 流程
+        async function startOAuth() {
+            const startBtn = document.getElementById('startBtn');
+            startBtn.disabled = true;
+            startBtn.innerHTML = '正在生成 PKCE...<span class="loading"></span>';
+            
+            try {
+                // 1. 生成 code_verifier (43-128 字元)
+                const code_verifier = generateRandomString(64);
+                
+                // 2. 生成 code_challenge
+                const hashed = await sha256(code_verifier);
+                const code_challenge = base64URLEncode(hashed);
+                
+                // 3. 保存 code_verifier 到 sessionStorage
+                sessionStorage.setItem('code_verifier', code_verifier);
+                sessionStorage.setItem('code_challenge', code_challenge);
+                
+                // 4. 顯示 PKCE 資訊
+                document.getElementById('pkce-info').innerHTML = 
+                    `<span class="info">✓ PKCE 參數生成成功</span>\n\n` +
+                    `<span style="color: #cbd5e0;">code_verifier (${code_verifier.length} 字元):</span>\n${code_verifier}\n\n` +
+                    `<span style="color: #cbd5e0;">code_challenge (S256):</span>\n${code_challenge}\n\n` +
+                    `<span style="color: #ffd700;">→ 即將跳轉到 Google 授權頁面...</span>`;
+                
+                document.getElementById('pkce-badge').classList.remove('hidden');
+                
+                // 5. 構建授權 URL
+                // 固定使用 localhost:3000 避免 redirect_uri 不一致
+                const redirect_uri = 'http://localhost:3000/test-google-oauth.html';
+                
+                // 保存 redirect_uri 到 sessionStorage
+                sessionStorage.setItem('redirect_uri', redirect_uri);
+                
+                const params = new URLSearchParams({
+                    client_id: GOOGLE_CLIENT_ID,
+                    redirect_uri: redirect_uri,
+                    response_type: 'code',
+                    scope: SCOPES.join(' '),
+                    code_challenge: code_challenge,
+                    code_challenge_method: 'S256',
+                    state: Math.random().toString(36).substring(7),
+                    access_type: 'offline',
+                    prompt: 'consent'
+                });
+                
+                // 6. 延遲 1 秒後跳轉 (讓用戶看到資訊)
+                setTimeout(() => {
+                    window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
+                }, 1000);
+                
+            } catch (error) {
+                document.getElementById('pkce-info').innerHTML = 
+                    `<span class="error">✗ 錯誤: ${error.message}</span>`;
+                startBtn.disabled = false;
+                startBtn.innerHTML = '🚀 開始 Google 登入 (PKCE)';
+            }
+        }
+
+        // Exchange 授權碼
+        async function exchangeToken(code, code_verifier, redirect_uri) {
+            const tokenInfoEl = document.getElementById('token-info');
+            tokenInfoEl.innerHTML = '<span class="info">正在執行 Token Exchange...</span><span class="loading"></span>';
+            
+            try {
+                const response = await fetch(BACKEND_API, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        code: code,
+                        code_verifier: code_verifier,
+                        redirect_uri: redirect_uri
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // 成功
+                    const tokenData = data.data || data;
+                    tokenInfoEl.innerHTML = 
+                        `<span class="success">✓ Token Exchange 成功！</span>\n\n` +
+                        `<span style="color: #cbd5e0;">HTTP Status:</span> <span class="success">${response.status} OK</span>\n\n` +
+                        `<span style="color: #cbd5e0;">Response:</span>\n${JSON.stringify(data, null, 2)}\n\n` +
+                        `<span style="color: #cbd5e0;">Access Token (前 50 字元):</span>\n${(tokenData.access_token || 'N/A').substring(0, 50)}...\n\n` +
+                        `<span style="color: #cbd5e0;">User ID:</span> ${tokenData.user_id || 'N/A'}\n` +
+                        `<span style="color: #cbd5e0;">Email:</span> ${tokenData.email || 'N/A'}`;
+                } else {
+                    // 失敗
+                    tokenInfoEl.innerHTML = 
+                        `<span class="error">✗ Token Exchange 失敗 (${response.status})</span>\n\n` +
+                        `<span style="color: #cbd5e0;">Error Response:</span>\n${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                tokenInfoEl.innerHTML = 
+                    `<span class="error">✗ 網路錯誤: ${error.message}</span>\n\n` +
+                    `請確認後端服務是否正在運行：\n` +
+                    `docker ps | grep kcardswap-backend`;
+            }
+        }
+
+        // 頁面載入時檢查是否有回調參數
+        window.addEventListener('load', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            const error = urlParams.get('error');
+            const state = urlParams.get('state');
+            
+            const callbackInfoEl = document.getElementById('callback-info');
+            
+            // 處理錯誤
+            if (error) {
+                callbackInfoEl.innerHTML = 
+                    `<span class="error">✗ 授權失敗</span>\n\n` +
+                    `<span style="color: #cbd5e0;">Error:</span> ${error}\n` +
+                    `<span style="color: #cbd5e0;">Description:</span> ${urlParams.get('error_description') || 'N/A'}`;
+                return;
+            }
+            
+            // 處理成功回調
+            if (code) {
+                const code_verifier = sessionStorage.getItem('code_verifier');
+                const code_challenge = sessionStorage.getItem('code_challenge');
+                
+                if (!code_verifier) {
+                    callbackInfoEl.innerHTML = 
+                        `<span class="error">✗ 錯誤: 找不到 code_verifier</span>\n\n` +
+                        `SessionStorage 中沒有保存的 code_verifier。\n` +
+                        `這可能是因為頁面重新載入或使用了不同的瀏覽器標籤。`;
+                    return;
+                }
+                
+                // 顯示回調資訊
+                callbackInfoEl.innerHTML = 
+                    `<span class="success">✓ 授權成功，已收到 Authorization Code</span>\n\n` +
+                    `<span style="color: #cbd5e0;">Authorization Code (前 50 字元):</span>\n${code.substring(0, 50)}...\n\n` +
+                    `<span style="color: #cbd5e0;">State:</span> ${state || 'N/A'}\n\n` +
+                    `<span style="color: #cbd5e0;">使用的 code_verifier:</span>\n${code_verifier}\n\n` +
+                    `<span style="color: #ffd700;">→ 準備執行 Token Exchange...</span>`;
+                
+                // 從 sessionStorage 獲取與授權請求時相同的 redirect_uri
+                const redirect_uri = sessionStorage.getItem('redirect_uri') || 'http://localhost:3000/test-google-oauth.html';
+                
+                // 延遲 1 秒後執行 token exchange
+                setTimeout(() => {
+                    exchangeToken(code, code_verifier, redirect_uri);
+                }, 1000);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -2,6 +2,8 @@
 
 Main entry point for the backend service following modular DDD architecture.
 """
+import logging
+import sys
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -10,6 +12,17 @@ from fastapi.middleware.cors import CORSMiddleware
 from .config import settings
 from .container import container
 from .shared.presentation.middleware.error_handler import register_exception_handlers
+
+# Configure logging
+logging.basicConfig(
+    level=getattr(logging, settings.LOG_LEVEL.upper(), logging.INFO),
+    format='%(levelname)s:%(name)s:%(message)s',
+    stream=sys.stdout,
+    force=True  # Override any existing configuration
+)
+
+# Get logger for this module
+logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager

@@ -1,12 +1,16 @@
 """
 Google OAuth Service - Handle Google OAuth authentication
 """
+import logging
 import os
 from typing import Any, Dict, Optional
 
 import httpx
 from google.auth.transport import requests
 from google.oauth2 import id_token
+
+# Get logger for this module
+logger = logging.getLogger(__name__)
 
 
 class GoogleOAuthService:
@@ -106,6 +110,12 @@ class GoogleOAuthService:
             "grant_type": "authorization_code"
         }
 
+        # Log request details (without sensitive data)
+        logger.info(f"Google PKCE token exchange request:")
+        logger.info(f"  - redirect_uri: {uri}")
+        logger.info(f"  - code_verifier length: {len(code_verifier)}")
+        logger.info(f"  - code length: {len(code)}")
+
         try:
             async with httpx.AsyncClient(timeout=10.0) as client:
                 response = await client.post(token_url, data=data)
@@ -113,10 +123,15 @@ class GoogleOAuthService:
                 if response.status_code == 200:
                     tokens = response.json()
                     return tokens.get("id_token")
+                else:
+                    # Log error response from Google
+                    logger.error(f"Google token exchange failed: status={response.status_code}, body={response.text}")
                 return None
         except httpx.TimeoutException:
             # Timeout occurred
+            logger.error("Google token exchange timeout")
             return None
-        except Exception:
+        except Exception as e:
             # Other exceptions
+            logger.error(f"Google token exchange error: {e}")
             return None
