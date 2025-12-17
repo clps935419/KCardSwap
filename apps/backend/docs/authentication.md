@@ -133,7 +133,10 @@ Mobile app uses Expo AuthSession to start OAuth flow:
 
 #### Backend Processing:
 1. Receive authorization code + code_verifier from client
-2. Exchange code + verifier with Google token endpoint
+2. Exchange code + verifier + client_secret with Google token endpoint
+   - **Important**: Backend still uses client_secret when exchanging with Google
+   - PKCE protects the mobile app (no secret stored there)
+   - Backend-to-Google communication uses both PKCE and client_secret for maximum security
 3. Receive ID token from Google
 4. Verify ID token with Google's servers
 5. Extract user information (google_id, email, name, picture)
@@ -148,10 +151,16 @@ Mobile app uses Expo AuthSession to start OAuth flow:
 10. Return tokens to client
 
 **Security Benefits:**
-- No client secret required on mobile device
+- No client secret required on mobile device (stored only on backend)
 - Code verifier prevents authorization code interception
+- Backend still uses client_secret for Google API communication
 - More secure than implicit flow
 - Recommended by OAuth 2.0 best practices
+
+**PKCE + Client Secret:**
+- Mobile app: Uses PKCE (code_verifier) - no secret exposure
+- Backend: Uses both PKCE (code_verifier) AND client_secret
+- This provides defense-in-depth security
 
 ---
 
