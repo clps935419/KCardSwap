@@ -1,6 +1,7 @@
 """
 Profile ORM model for Identity module
 """
+
 from datetime import datetime
 
 from sqlalchemy import JSON, Column, DateTime, ForeignKey, String, Text
@@ -12,6 +13,7 @@ from app.shared.infrastructure.database.connection import Base
 
 class ProfileModel(Base):
     """Profile ORM model"""
+
     __tablename__ = "profiles"
 
     user_id = Column(
@@ -29,8 +31,8 @@ class ProfileModel(Base):
         default={
             "nearby_visible": True,
             "show_online": True,
-            "allow_stranger_chat": True
-        }
+            "allow_stranger_chat": True,
+        },
     )
     created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
     updated_at = Column(

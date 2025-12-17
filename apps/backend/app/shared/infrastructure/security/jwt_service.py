@@ -2,6 +2,7 @@
 
 This module provides JWT token generation and verification for access and refresh tokens.
 """
+
 from datetime import datetime, timedelta
 from typing import Any, Dict, Optional
 
@@ -21,7 +22,7 @@ class JWTService:
         secret_key: str = settings.JWT_SECRET_KEY,
         algorithm: str = settings.JWT_ALGORITHM,
         access_token_expire_minutes: int = settings.ACCESS_TOKEN_EXPIRE_MINUTES,
-        refresh_token_expire_days: int = settings.REFRESH_TOKEN_EXPIRE_DAYS
+        refresh_token_expire_days: int = settings.REFRESH_TOKEN_EXPIRE_DAYS,
     ) -> None:
         """Initialize JWT service.
 
@@ -36,7 +37,9 @@ class JWTService:
         self._access_token_expire_minutes = access_token_expire_minutes
         self._refresh_token_expire_days = refresh_token_expire_days
 
-    def create_access_token(self, subject: str, additional_claims: Dict[str, Any] | None = None) -> str:
+    def create_access_token(
+        self, subject: str, additional_claims: Dict[str, Any] | None = None
+    ) -> str:
         """Create an access token.
 
         Args:
@@ -46,13 +49,15 @@ class JWTService:
         Returns:
             Encoded JWT access token
         """
-        expire = datetime.utcnow() + timedelta(minutes=self._access_token_expire_minutes)
+        expire = datetime.utcnow() + timedelta(
+            minutes=self._access_token_expire_minutes
+        )
 
         to_encode = {
             "sub": subject,
             "exp": expire,
             "iat": datetime.utcnow(),
-            "type": "access"
+            "type": "access",
         }
 
         if additional_claims:
@@ -60,7 +65,9 @@ class JWTService:
 
         return jwt.encode(to_encode, self._secret_key, algorithm=self._algorithm)
 
-    def create_refresh_token(self, subject: str, additional_claims: Dict[str, Any] | None = None) -> str:
+    def create_refresh_token(
+        self, subject: str, additional_claims: Dict[str, Any] | None = None
+    ) -> str:
         """Create a refresh token.
 
         Args:
@@ -76,7 +83,7 @@ class JWTService:
             "sub": subject,
             "exp": expire,
             "iat": datetime.utcnow(),
-            "type": "refresh"
+            "type": "refresh",
         }
 
         if additional_claims:
@@ -104,7 +111,9 @@ class JWTService:
             # Verify token type
             token_type = payload.get("type")
             if token_type != expected_type:
-                raise ValueError(f"Invalid token type. Expected '{expected_type}', got '{token_type}'")
+                raise ValueError(
+                    f"Invalid token type. Expected '{expected_type}', got '{token_type}'"
+                )
 
             return payload
 
@@ -125,7 +134,7 @@ class JWTService:
                 token,
                 self._secret_key,
                 algorithms=[self._algorithm],
-                options={"verify_exp": False}
+                options={"verify_exp": False},
             )
             return payload.get("sub")
         except JWTError:

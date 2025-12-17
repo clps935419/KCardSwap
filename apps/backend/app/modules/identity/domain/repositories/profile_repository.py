@@ -1,6 +1,7 @@
 """
 Profile Repository Interface
 """
+
 from typing import Optional, Protocol
 from uuid import UUID
 

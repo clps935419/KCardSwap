@@ -1,6 +1,7 @@
 """
 User Repository Interface - Repository pattern for User aggregate
 """
+
 from typing import Optional, Protocol
 from uuid import UUID
 

@@ -2,6 +2,7 @@
 
 This module provides the base repository interface following DDD principles.
 """
+
 from abc import ABC, abstractmethod
 from typing import Generic, List, Optional, TypeVar
 from uuid import UUID
@@ -10,7 +11,7 @@ from sqlalchemy.orm import Session
 
 from app.shared.domain.base_entity import BaseEntity
 
-EntityType = TypeVar('EntityType', bound=BaseEntity)
+EntityType = TypeVar("EntityType", bound=BaseEntity)
 
 
 class BaseRepository(ABC, Generic[EntityType]):

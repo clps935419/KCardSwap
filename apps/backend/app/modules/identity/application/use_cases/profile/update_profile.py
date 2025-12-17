@@ -1,6 +1,7 @@
 """
 Update Profile Use Case
 """
+
 from typing import Any, Dict, Optional
 from uuid import UUID
 
@@ -24,7 +25,7 @@ class UpdateProfileUseCase:
         bio: Optional[str] = None,
         region: Optional[str] = None,
         preferences: Optional[Dict[str, Any]] = None,
-        privacy_flags: Optional[Dict[str, bool]] = None
+        privacy_flags: Optional[Dict[str, bool]] = None,
     ) -> Optional[Profile]:
         """
         Update user profile
@@ -49,14 +50,21 @@ class UpdateProfileUseCase:
             profile = Profile(user_id=user_id)
 
         # Update profile fields
-        if any([nickname is not None, avatar_url is not None, bio is not None,
-                region is not None, preferences is not None]):
+        if any(
+            [
+                nickname is not None,
+                avatar_url is not None,
+                bio is not None,
+                region is not None,
+                preferences is not None,
+            ]
+        ):
             profile.update_profile(
                 nickname=nickname,
                 avatar_url=avatar_url,
                 bio=bio,
                 region=region,
-                preferences=preferences
+                preferences=preferences,
             )
 
         # Update privacy settings separately

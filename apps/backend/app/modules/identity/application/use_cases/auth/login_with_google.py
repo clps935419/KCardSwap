@@ -3,16 +3,23 @@ Login with Google Use Case - GoogleLoginUseCase
 Application layer - coordinates domain logic
 Follows DDD: Uses domain entities and repository interfaces
 """
+
 from datetime import datetime, timedelta
 from typing import Optional, Tuple
 
 from app.modules.identity.domain.entities.profile import Profile
 from app.modules.identity.domain.entities.refresh_token import RefreshToken
 from app.modules.identity.domain.entities.user import User
-from app.modules.identity.domain.repositories.profile_repository import IProfileRepository
-from app.modules.identity.domain.repositories.refresh_token_repository import RefreshTokenRepository
+from app.modules.identity.domain.repositories.profile_repository import (
+    IProfileRepository,
+)
+from app.modules.identity.domain.repositories.refresh_token_repository import (
+    RefreshTokenRepository,
+)
 from app.modules.identity.domain.repositories.user_repository import IUserRepository
-from app.modules.identity.infrastructure.external.google_oauth_service import GoogleOAuthService
+from app.modules.identity.infrastructure.external.google_oauth_service import (
+    GoogleOAuthService,
+)
 from app.shared.infrastructure.security.jwt_service import JWTService
 
 
@@ -32,7 +39,7 @@ class GoogleLoginUseCase:
         profile_repo: IProfileRepository,
         refresh_token_repo: RefreshTokenRepository,
         google_oauth_service: GoogleOAuthService,
-        jwt_service: JWTService
+        jwt_service: JWTService,
     ):
         self._user_repo = user_repo
         self._profile_repo = profile_repo
@@ -66,28 +73,20 @@ class GoogleLoginUseCase:
 
         if not user:
             # Create new user entity
-            user = User(
-                google_id=google_id,
-                email=email
-            )
+            user = User(email=email, google_id=google_id)
             user = await self._user_repo.save(user)
 
             # Create default profile for new user
-            profile = Profile(
-                user_id=user.id,
-                avatar_url=user_info.get("picture")
-            )
+            profile = Profile(user_id=user.id, avatar_url=user_info.get("picture"))
             await self._profile_repo.save(profile)
 
         # Step 3: Generate JWT tokens
         access_token = self._jwt_service.create_access_token(
-            subject=str(user.id),
-            additional_claims={"email": user.email}
+            subject=str(user.id), additional_claims={"email": user.email}
         )
-        
+
         refresh_token_string = self._jwt_service.create_refresh_token(
-            subject=str(user.id),
-            additional_claims={"email": user.email}
+            subject=str(user.id), additional_claims={"email": user.email}
         )
 
         # Step 4: Create and save refresh token entity
@@ -96,7 +95,7 @@ class GoogleLoginUseCase:
             user_id=user.id,
             token=refresh_token_string,
             expires_at=expires_at,
-            revoked=False
+            revoked=False,
         )
         await self._refresh_token_repo.create(refresh_token)
 

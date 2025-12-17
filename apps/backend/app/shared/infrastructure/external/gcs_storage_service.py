@@ -2,6 +2,7 @@
 
 This module provides GCS integration for generating signed URLs for file uploads.
 """
+
 from datetime import timedelta
 from typing import Optional
 
@@ -21,7 +22,7 @@ class GCSStorageService:
     def __init__(
         self,
         bucket_name: str = settings.GCS_BUCKET_NAME,
-        credentials_path: Optional[str] = settings.GCS_CREDENTIALS_PATH
+        credentials_path: Optional[str] = settings.GCS_CREDENTIALS_PATH,
     ) -> None:
         """Initialize GCS storage service (lazy initialization).
 
@@ -54,7 +55,7 @@ class GCSStorageService:
         self,
         blob_name: str,
         content_type: str = "image/jpeg",
-        expiration_minutes: int = 15
+        expiration_minutes: int = 15,
     ) -> str:
         """Generate a signed URL for uploading a file.
 
@@ -73,15 +74,13 @@ class GCSStorageService:
             version="v4",
             expiration=timedelta(minutes=expiration_minutes),
             method="PUT",
-            content_type=content_type
+            content_type=content_type,
         )
 
         return url
 
     def generate_download_signed_url(
-        self,
-        blob_name: str,
-        expiration_minutes: int = 60
+        self, blob_name: str, expiration_minutes: int = 60
     ) -> str:
         """Generate a signed URL for downloading a file.
 
@@ -96,9 +95,7 @@ class GCSStorageService:
         blob = self._bucket.blob(blob_name)
 
         url = blob.generate_signed_url(
-            version="v4",
-            expiration=timedelta(minutes=expiration_minutes),
-            method="GET"
+            version="v4", expiration=timedelta(minutes=expiration_minutes), method="GET"
         )
 
         return url
@@ -156,7 +153,7 @@ class GCSStorageService:
             "size": blob.size,
             "content_type": blob.content_type,
             "created": blob.time_created,
-            "updated": blob.updated
+            "updated": blob.updated,
         }
 
 

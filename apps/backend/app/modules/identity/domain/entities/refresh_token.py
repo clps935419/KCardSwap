@@ -2,7 +2,8 @@
 RefreshToken Entity - JWT refresh token management
 Following DDD principles: No framework dependencies, pure business logic
 """
-from datetime import datetime, timedelta
+
+from datetime import datetime
 from typing import Optional
 from uuid import UUID, uuid4
 
@@ -21,7 +22,7 @@ class RefreshToken:
         id: Optional[UUID] = None,
         revoked: bool = False,
         created_at: Optional[datetime] = None,
-        updated_at: Optional[datetime] = None
+        updated_at: Optional[datetime] = None,
     ):
         self._id = id or uuid4()
         self._user_id = user_id
@@ -37,10 +38,10 @@ class RefreshToken:
         """Validate refresh token data."""
         if not self._token:
             raise ValueError("Token cannot be empty")
-        
+
         if not self._user_id:
             raise ValueError("User ID is required")
-        
+
         if self._expires_at <= self._created_at:
             raise ValueError("Expiration time must be after creation time")
 
@@ -93,7 +94,7 @@ class RefreshToken:
         """Revoke the token."""
         if self._revoked:
             raise ValueError("Token is already revoked")
-        
+
         self._revoked = True
         self._updated_at = datetime.utcnow()
 

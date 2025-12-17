@@ -1,6 +1,7 @@
 """
 SQLAlchemy Profile Repository Implementation
 """
+
 from typing import Optional
 from uuid import UUID
 
@@ -57,7 +58,7 @@ class SQLAlchemyProfileRepository(IProfileRepository):
                 preferences=profile.preferences,
                 privacy_flags=profile.privacy_flags,
                 created_at=profile.created_at,
-                updated_at=profile.updated_at
+                updated_at=profile.updated_at,
             )
             self.session.add(model)
 
@@ -87,13 +88,14 @@ class SQLAlchemyProfileRepository(IProfileRepository):
             bio=model.bio,
             region=model.region,
             preferences=model.preferences or {},
-            privacy_flags=model.privacy_flags or {
+            privacy_flags=model.privacy_flags
+            or {
                 "nearby_visible": True,
                 "show_online": True,
-                "allow_stranger_chat": True
+                "allow_stranger_chat": True,
             },
             created_at=model.created_at,
-            updated_at=model.updated_at
+            updated_at=model.updated_at,
         )
 
 

@@ -64,6 +64,15 @@ health: ## Check health of all services
 seed: ## Seed database with test data (Phase 10)
 	@echo "Seed functionality not yet implemented (Phase 10)"
 
+init-admin: ## Initialize default admin user (idempotent)
+	cd apps/backend && python scripts/init_admin.py
+
+init-admin-docker: ## Initialize default admin in Docker container
+	docker compose exec backend python scripts/init_admin.py
+
+create-admin: ## Create a new admin user (interactive)
+	cd apps/backend && python scripts/create_admin.py
+
 setup: ## Initial setup - copy env and start services
 	@if [ ! -f .env ]; then cp .env.example .env; echo "Created .env file - please update with your values"; fi
 	@make dev

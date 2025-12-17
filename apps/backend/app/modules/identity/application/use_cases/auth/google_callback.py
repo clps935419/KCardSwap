@@ -4,6 +4,7 @@ Application layer - coordinates domain logic for PKCE flow
 Follows DDD: Uses domain entities and repository interfaces
 Supports Expo AuthSession with Authorization Code Flow + PKCE
 """
+
 from datetime import datetime, timedelta
 from typing import Optional, Tuple
 
@@ -42,7 +43,7 @@ class GoogleCallbackUseCase:
         profile_repo: IProfileRepository,
         refresh_token_repo: RefreshTokenRepository,
         google_oauth_service: GoogleOAuthService,
-        jwt_service: JWTService
+        jwt_service: JWTService,
     ):
         self._user_repo = user_repo
         self._profile_repo = profile_repo
@@ -51,10 +52,7 @@ class GoogleCallbackUseCase:
         self._jwt_service = jwt_service
 
     async def execute(
-        self,
-        code: str,
-        code_verifier: str,
-        redirect_uri: Optional[str] = None
+        self, code: str, code_verifier: str, redirect_uri: Optional[str] = None
     ) -> Optional[Tuple[str, str, User]]:
         """
         Execute Google OAuth callback flow with PKCE
@@ -69,9 +67,7 @@ class GoogleCallbackUseCase:
         """
         # Step 1: Exchange authorization code for ID token using PKCE
         id_token = await self._google_oauth.exchange_code_with_pkce(
-            code=code,
-            code_verifier=code_verifier,
-            redirect_uri=redirect_uri
+            code=code, code_verifier=code_verifier, redirect_uri=redirect_uri
         )
 
         if not id_token:
@@ -93,28 +89,20 @@ class GoogleCallbackUseCase:
 
         if not user:
             # Create new user entity
-            user = User(
-                google_id=google_id,
-                email=email
-            )
+            user = User(email=email, google_id=google_id)
             user = await self._user_repo.save(user)
 
             # Create default profile for new user
-            profile = Profile(
-                user_id=user.id,
-                avatar_url=user_info.get("picture")
-            )
+            profile = Profile(user_id=user.id, avatar_url=user_info.get("picture"))
             await self._profile_repo.save(profile)
 
         # Step 4: Generate JWT tokens
         access_token = self._jwt_service.create_access_token(
-            subject=str(user.id),
-            additional_claims={"email": user.email}
+            subject=str(user.id), additional_claims={"email": user.email}
         )
 
         refresh_token_string = self._jwt_service.create_refresh_token(
-            subject=str(user.id),
-            additional_claims={"email": user.email}
+            subject=str(user.id), additional_claims={"email": user.email}
         )
 
         # Step 5: Create and save refresh token entity
@@ -123,7 +111,7 @@ class GoogleCallbackUseCase:
             user_id=user.id,
             token=refresh_token_string,
             expires_at=expires_at,
-            revoked=False
+            revoked=False,
         )
         await self._refresh_token_repo.create(refresh_token)
 
