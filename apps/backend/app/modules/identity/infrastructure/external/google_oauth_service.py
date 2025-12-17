@@ -74,3 +74,48 @@ class GoogleOAuthService:
                 return None
         except Exception:
             return None
+
+    async def exchange_code_with_pkce(
+        self,
+        code: str,
+        code_verifier: str,
+        redirect_uri: Optional[str] = None
+    ) -> Optional[str]:
+        """
+        Exchange authorization code for ID token using PKCE flow (Expo AuthSession)
+        
+        Args:
+            code: Authorization code from Google OAuth
+            code_verifier: PKCE code verifier (43-128 characters)
+            redirect_uri: Optional redirect URI (must match the one used in auth request)
+        
+        Returns:
+            ID token or None if exchange fails
+        """
+        token_url = "https://oauth2.googleapis.com/token"
+        
+        # Use provided redirect_uri or fallback to configured one
+        uri = redirect_uri or self.redirect_uri
+
+        data = {
+            "code": code,
+            "client_id": self.client_id,
+            "code_verifier": code_verifier,
+            "redirect_uri": uri,
+            "grant_type": "authorization_code"
+        }
+
+        try:
+            async with httpx.AsyncClient(timeout=10.0) as client:
+                response = await client.post(token_url, data=data)
+
+                if response.status_code == 200:
+                    tokens = response.json()
+                    return tokens.get("id_token")
+                return None
+        except httpx.TimeoutException:
+            # Timeout occurred
+            return None
+        except Exception:
+            # Other exceptions
+            return None

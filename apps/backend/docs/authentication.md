@@ -1,12 +1,18 @@
 # Authentication Flow Documentation
 
-**Version**: 1.0  
-**Phase**: Phase 3 - User Story 1 (Google Login and Basic Profile)  
-**Last Updated**: 2025-12-16
+**Version**: 1.1  
+**Phase**: Phase 3.1 - Google OAuth with PKCE Support  
+**Last Updated**: 2025-12-17
 
 ## Overview
 
-The KCardSwap authentication system uses Google OAuth 2.0 for user authentication and JSON Web Tokens (JWT) for session management. This document describes the authentication flow, token structure, and security considerations.
+The KCardSwap authentication system uses Google OAuth 2.0 for user authentication and JSON Web Tokens (JWT) for session management. 
+
+**Two OAuth flows are supported:**
+1. **Authorization Code Flow with PKCE** (Recommended for Expo/Mobile apps)
+2. **Implicit Flow with ID Token** (Legacy/Web support)
+
+This document describes both authentication flows, token structure, and security considerations.
 
 ## Architecture
 
@@ -39,9 +45,150 @@ The KCardSwap authentication system uses Google OAuth 2.0 for user authenticatio
        │   Access + Refresh    │                        │                       │
 ```
 
-## Authentication Flow
+## Authentication Flows
 
-### 1. Google OAuth Login
+### Flow 1: Authorization Code Flow with PKCE (Recommended for Expo/Mobile)
+
+This is the **recommended and most secure** flow for Expo AuthSession and mobile applications.
+
+#### Architecture
+
+```
+┌─────────────┐         ┌──────────────┐         ┌─────────────┐         ┌──────────────┐
+│   Client    │         │     Kong     │         │   Backend   │         │    Google    │
+│ (Expo App)  │         │   Gateway    │         │     API     │         │    OAuth     │
+└──────┬──────┘         └──────┬───────┘         └──────┬──────┘         └──────┬───────┘
+       │                       │                        │                       │
+       │ 1. Start Auth (PKCE)  │                        │                       │
+       ├──────────────────────────────────────────────────────────────────────>│
+       │   code_challenge      │                        │                       │
+       │                       │                        │                       │
+       │<─────────────────────────────────────────────────────────────────────┤
+       │                       │   Authorization Code   │                       │
+       │                       │                        │                       │
+       │ 2. Send code + verifier│                       │                       │
+       ├──────────────────────>│                        │                       │
+       │                       │ 3. Forward Request     │                       │
+       │                       ├───────────────────────>│                       │
+       │                       │                        │ 4. Exchange Code      │
+       │                       │                        │    + code_verifier    │
+       │                       │                        ├──────────────────────>│
+       │                       │                        │<──────────────────────┤
+       │                       │                        │   ID Token            │
+       │                       │                        │                       │
+       │                       │                        │ 5. Verify ID Token    │
+       │                       │                        │    Create/Get User    │
+       │                       │                        │    Generate JWT       │
+       │                       │                        │                       │
+       │                       │ 6. Return Tokens       │                       │
+       │<──────────────────────┤<───────────────────────┤                       │
+       │   Access + Refresh    │                        │                       │
+```
+
+#### Step 1: Client Starts OAuth with PKCE (Client-Side)
+
+Mobile app uses Expo AuthSession to start OAuth flow:
+- Generates `code_verifier` (random 43-128 character string)
+- Generates `code_challenge` from verifier
+- Redirects user to Google with challenge
+
+#### Step 2: Exchange Authorization Code for JWT
+
+**Endpoint**: `POST /api/v1/auth/google-callback`
+
+**Request**:
+```json
+{
+  "code": "4/0AY0e-g7...",
+  "code_verifier": "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk",
+  "redirect_uri": "exp://192.168.1.1:19000" 
+}
+```
+
+**Response** (Success - 200):
+```json
+{
+  "data": {
+    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "token_type": "bearer",
+    "expires_in": 900,
+    "user_id": "123e4567-e89b-12d3-a456-426614174000",
+    "email": "user@example.com"
+  },
+  "error": null
+}
+```
+
+**Response** (Error - 401):
+```json
+{
+  "data": null,
+  "error": {
+    "code": "UNAUTHORIZED",
+    "message": "Invalid authorization code or code_verifier. Token exchange failed."
+  }
+}
+```
+
+#### Backend Processing:
+1. Receive authorization code + code_verifier from client
+2. Exchange code + verifier with Google token endpoint
+3. Receive ID token from Google
+4. Verify ID token with Google's servers
+5. Extract user information (google_id, email, name, picture)
+6. Check if user exists in database by google_id
+7. If new user:
+   - Create User entity
+   - Create default Profile entity
+8. Generate JWT tokens:
+   - Access Token (15 minutes expiry)
+   - Refresh Token (7 days expiry)
+9. Store refresh token in database
+10. Return tokens to client
+
+**Security Benefits:**
+- No client secret required on mobile device
+- Code verifier prevents authorization code interception
+- More secure than implicit flow
+- Recommended by OAuth 2.0 best practices
+
+---
+
+### Flow 2: Implicit Flow with ID Token (Legacy/Web Support)
+
+This flow is **maintained for backward compatibility** and web applications. For new mobile implementations, use Flow 1 (PKCE) instead.
+
+#### Architecture
+
+```
+┌─────────────┐         ┌──────────────┐         ┌─────────────┐         ┌──────────────┐
+│   Client    │         │     Kong     │         │   Backend   │         │    Google    │
+│  (Mobile)   │         │   Gateway    │         │     API     │         │    OAuth     │
+└──────┬──────┘         └──────┬───────┘         └──────┬──────┘         └──────┬───────┘
+       │                       │                        │                       │
+       │ 1. Get Google Token   │                        │                       │
+       ├──────────────────────────────────────────────────────────────────────>│
+       │                       │                        │                       │
+       │<─────────────────────────────────────────────────────────────────────┤
+       │                       │       Google ID Token   │                       │
+       │                       │                        │                       │
+       │ 2. Login with Google  │                        │                       │
+       ├──────────────────────>│                        │                       │
+       │   (Google ID Token)   │ 3. Forward Request     │                       │
+       │                       ├───────────────────────>│                       │
+       │                       │                        │ 4. Verify Google Token│
+       │                       │                        ├──────────────────────>│
+       │                       │                        │<──────────────────────┤
+       │                       │                        │   Valid User Info     │
+       │                       │                        │                       │
+       │                       │                        │ 5. Create/Get User    │
+       │                       │                        │    Generate JWT       │
+       │                       │                        │                       │
+       │                       │ 6. Return Tokens       │                       │
+       │<──────────────────────┤<───────────────────────┤                       │
+       │   Access + Refresh    │                        │                       │
+```
 
 #### Step 1: Client Gets Google ID Token
 - User initiates login via Google OAuth
@@ -96,6 +243,10 @@ The KCardSwap authentication system uses Google OAuth 2.0 for user authenticatio
    - Refresh Token (7 days expiry)
 6. Store refresh token in database
 7. Return tokens to client
+
+**Note:** This flow is less secure than PKCE as the ID token is exposed client-side. Use PKCE flow (Flow 1) for mobile apps.
+
+---
 
 ### 2. Token Refresh
 
