@@ -2,6 +2,7 @@
 
 This module provides global error handling for the FastAPI application.
 """
+
 from typing import Any
 
 from fastapi import Request, status
@@ -28,13 +29,15 @@ async def api_exception_handler(request: Request, exc: APIException) -> JSONResp
             "error": {
                 "code": exc.error_code,
                 "message": exc.message,
-                "details": exc.details
+                "details": exc.details,
             }
-        }
+        },
     )
 
 
-async def http_exception_handler(request: Request, exc: StarletteHTTPException) -> JSONResponse:
+async def http_exception_handler(
+    request: Request, exc: StarletteHTTPException
+) -> JSONResponse:
     """Handle Starlette HTTP exceptions.
 
     Args:
@@ -50,13 +53,15 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException) 
             "error": {
                 "code": f"{exc.status_code}_HTTP_ERROR",
                 "message": exc.detail,
-                "details": {}
+                "details": {},
             }
-        }
+        },
     )
 
 
-async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
+async def validation_exception_handler(
+    request: Request, exc: RequestValidationError
+) -> JSONResponse:
     """Handle request validation errors.
 
     Args:
@@ -68,11 +73,13 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     """
     errors = []
     for error in exc.errors():
-        errors.append({
-            "field": ".".join(str(loc) for loc in error["loc"]),
-            "message": error["msg"],
-            "type": error["type"]
-        })
+        errors.append(
+            {
+                "field": ".".join(str(loc) for loc in error["loc"]),
+                "message": error["msg"],
+                "type": error["type"],
+            }
+        )
 
     return JSONResponse(
         status_code=status.HTTP_400_BAD_REQUEST,
@@ -80,9 +87,9 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
             "error": {
                 "code": "400_VALIDATION_FAILED",
                 "message": "Request validation failed",
-                "details": {"errors": errors}
+                "details": {"errors": errors},
             }
-        }
+        },
     )
 
 
@@ -103,9 +110,9 @@ async def general_exception_handler(request: Request, exc: Exception) -> JSONRes
             "error": {
                 "code": "500_INTERNAL_ERROR",
                 "message": "An unexpected error occurred",
-                "details": {}
+                "details": {},
             }
-        }
+        },
     )
 
 

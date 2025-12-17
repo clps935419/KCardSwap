@@ -2,12 +2,13 @@
 
 This service provides password hashing and verification for admin users.
 """
+
 from app.shared.infrastructure.security.password_hasher import password_hasher
 
 
 class PasswordService:
     """Service for password hashing and verification.
-    
+
     Uses the shared PasswordHasher for consistent password handling.
     """
 

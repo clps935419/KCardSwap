@@ -2,6 +2,7 @@
 
 This module provides secure password hashing and verification.
 """
+
 from passlib.context import CryptContext
 
 

@@ -2,6 +2,7 @@
 Profile Entity - User profile information
 Following DDD principles: No framework dependencies
 """
+
 from datetime import datetime
 from typing import Any, Dict, Optional
 from uuid import UUID
@@ -22,7 +23,7 @@ class Profile:
         preferences: Optional[Dict[str, Any]] = None,
         privacy_flags: Optional[Dict[str, bool]] = None,
         created_at: Optional[datetime] = None,
-        updated_at: Optional[datetime] = None
+        updated_at: Optional[datetime] = None,
     ):
         self._user_id = user_id
         self._nickname = nickname
@@ -33,7 +34,7 @@ class Profile:
         self._privacy_flags = privacy_flags or {
             "nearby_visible": True,
             "show_online": True,
-            "allow_stranger_chat": True
+            "allow_stranger_chat": True,
         }
         self._created_at = created_at or datetime.utcnow()
         self._updated_at = updated_at or datetime.utcnow()
@@ -89,7 +90,7 @@ class Profile:
         avatar_url: Optional[str] = None,
         bio: Optional[str] = None,
         region: Optional[str] = None,
-        preferences: Optional[Dict[str, Any]] = None
+        preferences: Optional[Dict[str, Any]] = None,
     ):
         """Update profile fields"""
         if nickname is not None:

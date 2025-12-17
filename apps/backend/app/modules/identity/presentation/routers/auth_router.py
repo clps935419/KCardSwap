@@ -2,6 +2,7 @@
 Authentication Router for Identity Module
 Handles Google login, token refresh, and logout
 """
+
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -39,6 +40,9 @@ from app.modules.identity.infrastructure.repositories.refresh_token_repository_i
 from app.modules.identity.infrastructure.repositories.user_repository_impl import (
     UserRepositoryImpl,
 )
+from app.modules.identity.infrastructure.security.password_service import (
+    PasswordService,
+)
 from app.modules.identity.presentation.schemas.auth_schemas import (
     AdminLoginRequest,
     ErrorWrapper,
@@ -47,9 +51,6 @@ from app.modules.identity.presentation.schemas.auth_schemas import (
     LoginResponse,
     RefreshTokenRequest,
     TokenResponse,
-)
-from app.modules.identity.infrastructure.security.password_service import (
-    PasswordService,
 )
 from app.shared.infrastructure.database.connection import get_db_session
 from app.shared.infrastructure.security.jwt_service import JWTService
@@ -65,15 +66,18 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
     responses={
         200: {"description": "Successfully authenticated as admin"},
         400: {"model": ErrorWrapper, "description": "Validation error"},
-        401: {"model": ErrorWrapper, "description": "Invalid credentials or not an admin"},
+        401: {
+            "model": ErrorWrapper,
+            "description": "Invalid credentials or not an admin",
+        },
     },
     tags=["Admin"],
     summary="Admin login with email/password",
-    description="Authenticate admin user with email and password. Only users with admin or super_admin role can login."
+    description="Authenticate admin user with email and password. Only users with admin or super_admin role can login.",
 )
 async def admin_login(
     request: AdminLoginRequest,
-    session: Annotated[AsyncSession, Depends(get_db_session)]
+    session: Annotated[AsyncSession, Depends(get_db_session)],
 ) -> LoginResponse:
     """
     Admin login with email/password.
@@ -96,7 +100,7 @@ async def admin_login(
         user_repo=user_repo,
         refresh_token_repo=refresh_token_repo,
         password_service=password_service,
-        jwt_service=jwt_service
+        jwt_service=jwt_service,
     )
 
     result = await use_case.execute(request.email, request.password)
@@ -106,8 +110,8 @@ async def admin_login(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail={
                 "code": "UNAUTHORIZED",
-                "message": "Invalid credentials or not an admin user"
-            }
+                "message": "Invalid credentials or not an admin user",
+            },
         )
 
     access_token, refresh_token, user = result
@@ -123,7 +127,7 @@ async def admin_login(
         expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,  # Convert to seconds
         user_id=user.id,
         email=user.email,
-        role=user.role
+        role=user.role,
     )
 
     return LoginResponse(data=token_response, error=None)
@@ -139,11 +143,11 @@ async def admin_login(
         401: {"model": ErrorWrapper, "description": "Invalid Google token"},
     },
     summary="Login with Google",
-    description="Authenticate user with Google OAuth token and receive JWT tokens"
+    description="Authenticate user with Google OAuth token and receive JWT tokens",
 )
 async def google_login(
     request: GoogleLoginRequest,
-    session: Annotated[AsyncSession, Depends(get_db_session)]
+    session: Annotated[AsyncSession, Depends(get_db_session)],
 ) -> LoginResponse:
     """
     Login with Google OAuth.
@@ -165,7 +169,7 @@ async def google_login(
         profile_repo=profile_repo,
         refresh_token_repo=refresh_token_repo,
         google_oauth_service=google_oauth_service,
-        jwt_service=jwt_service
+        jwt_service=jwt_service,
     )
 
     result = await use_case.execute(request.google_token)
@@ -173,10 +177,7 @@ async def google_login(
     if result is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail={
-                "code": "UNAUTHORIZED",
-                "message": "Invalid Google token"
-            }
+            detail={"code": "UNAUTHORIZED", "message": "Invalid Google token"},
         )
 
     access_token, refresh_token, user = result
@@ -191,7 +192,7 @@ async def google_login(
         token_type="bearer",
         expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,  # Convert to seconds
         user_id=user.id,
-        email=user.email
+        email=user.email,
     )
 
     return LoginResponse(data=token_response, error=None)
@@ -204,15 +205,18 @@ async def google_login(
     responses={
         200: {"description": "Successfully authenticated"},
         400: {"model": ErrorWrapper, "description": "Validation error"},
-        401: {"model": ErrorWrapper, "description": "Invalid authorization code or code_verifier"},
+        401: {
+            "model": ErrorWrapper,
+            "description": "Invalid authorization code or code_verifier",
+        },
         422: {"model": ErrorWrapper, "description": "Token exchange failed"},
     },
     summary="Google OAuth Callback with PKCE",
-    description="Authenticate user with Google OAuth authorization code and PKCE code_verifier (Expo AuthSession)"
+    description="Authenticate user with Google OAuth authorization code and PKCE code_verifier (Expo AuthSession)",
 )
 async def google_callback(
     request: GoogleCallbackRequest,
-    session: Annotated[AsyncSession, Depends(get_db_session)]
+    session: Annotated[AsyncSession, Depends(get_db_session)],
 ) -> LoginResponse:
     """
     Google OAuth callback with PKCE (Recommended for Expo AuthSession).
@@ -238,13 +242,13 @@ async def google_callback(
         profile_repo=profile_repo,
         refresh_token_repo=refresh_token_repo,
         google_oauth_service=google_oauth_service,
-        jwt_service=jwt_service
+        jwt_service=jwt_service,
     )
 
     result = await use_case.execute(
         code=request.code,
         code_verifier=request.code_verifier,
-        redirect_uri=request.redirect_uri
+        redirect_uri=request.redirect_uri,
     )
 
     if result is None:
@@ -252,8 +256,8 @@ async def google_callback(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail={
                 "code": "UNAUTHORIZED",
-                "message": "Invalid authorization code or code_verifier. Token exchange failed."
-            }
+                "message": "Invalid authorization code or code_verifier. Token exchange failed.",
+            },
         )
 
     access_token, refresh_token, user = result
@@ -268,7 +272,7 @@ async def google_callback(
         token_type="bearer",
         expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,  # Convert to seconds
         user_id=user.id,
-        email=user.email
+        email=user.email,
     )
 
     return LoginResponse(data=token_response, error=None)
@@ -283,11 +287,11 @@ async def google_callback(
         401: {"model": ErrorWrapper, "description": "Invalid or expired refresh token"},
     },
     summary="Refresh access token",
-    description="Use refresh token to obtain new access and refresh tokens"
+    description="Use refresh token to obtain new access and refresh tokens",
 )
 async def refresh_token(
     request: RefreshTokenRequest,
-    session: Annotated[AsyncSession, Depends(get_db_session)]
+    session: Annotated[AsyncSession, Depends(get_db_session)],
 ) -> LoginResponse:
     """
     Refresh access token using refresh token.
@@ -302,8 +306,7 @@ async def refresh_token(
 
     # Create and execute use case
     use_case = RefreshTokenUseCase(
-        refresh_token_repo=refresh_token_repo,
-        jwt_service=jwt_service
+        refresh_token_repo=refresh_token_repo, jwt_service=jwt_service
     )
 
     result = await use_case.execute(request.refresh_token)
@@ -313,8 +316,8 @@ async def refresh_token(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail={
                 "code": "UNAUTHORIZED",
-                "message": "Invalid or expired refresh token"
-            }
+                "message": "Invalid or expired refresh token",
+            },
         )
 
     new_access_token, new_refresh_token = result
@@ -330,10 +333,7 @@ async def refresh_token(
     except Exception:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={
-                "code": "INTERNAL_ERROR",
-                "message": "Failed to generate tokens"
-            }
+            detail={"code": "INTERNAL_ERROR", "message": "Failed to generate tokens"},
         )
 
     # Build response
@@ -343,7 +343,7 @@ async def refresh_token(
         token_type="bearer",
         expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
         user_id=user_id,
-        email=email
+        email=email,
     )
 
     return LoginResponse(data=token_response, error=None)

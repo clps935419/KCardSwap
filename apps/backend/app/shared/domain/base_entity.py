@@ -2,6 +2,7 @@
 
 This module provides the base class for all domain entities following DDD principles.
 """
+
 from datetime import datetime
 from typing import Any
 from uuid import UUID, uuid4
@@ -18,7 +19,7 @@ class BaseEntity:
         self,
         id: UUID | None = None,
         created_at: datetime | None = None,
-        updated_at: datetime | None = None
+        updated_at: datetime | None = None,
     ) -> None:
         """Initialize base entity.
 

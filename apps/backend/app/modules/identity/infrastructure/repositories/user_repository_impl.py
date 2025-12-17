@@ -2,6 +2,7 @@
 SQLAlchemy User Repository Implementation
 Implements IUserRepository from domain layer
 """
+
 from typing import Optional
 from uuid import UUID
 
@@ -68,7 +69,7 @@ class SQLAlchemyUserRepository(IUserRepository):
                 password_hash=user.password_hash,
                 role=user.role,
                 created_at=user.created_at,
-                updated_at=user.updated_at
+                updated_at=user.updated_at,
             )
             self.session.add(model)
 
@@ -98,7 +99,7 @@ class SQLAlchemyUserRepository(IUserRepository):
             password_hash=model.password_hash,
             role=model.role,
             created_at=model.created_at,
-            updated_at=model.updated_at
+            updated_at=model.updated_at,
         )
 
 

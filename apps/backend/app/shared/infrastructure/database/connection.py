@@ -2,6 +2,7 @@
 
 This module provides database connection using SQLAlchemy Engine (both sync and async).
 """
+
 from typing import AsyncGenerator, Generator
 
 from sqlalchemy import Engine, create_engine
@@ -38,7 +39,7 @@ class DatabaseConnection:
                 pool_pre_ping=True,
                 pool_size=10,
                 max_overflow=20,
-                echo=settings.DEBUG
+                echo=settings.DEBUG,
             )
         return self._engine
 
@@ -51,13 +52,15 @@ class DatabaseConnection:
         """
         if self._async_engine is None:
             # Convert postgresql:// to postgresql+asyncpg://
-            async_url = settings.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://")
+            async_url = settings.DATABASE_URL.replace(
+                "postgresql://", "postgresql+asyncpg://"
+            )
             self._async_engine = create_async_engine(
                 async_url,
                 pool_pre_ping=True,
                 pool_size=10,
                 max_overflow=20,
-                echo=settings.DEBUG
+                echo=settings.DEBUG,
             )
         return self._async_engine
 
@@ -70,9 +73,7 @@ class DatabaseConnection:
         """
         if self._session_factory is None:
             self._session_factory = sessionmaker(
-                bind=self.engine,
-                autocommit=False,
-                autoflush=False
+                bind=self.engine, autocommit=False, autoflush=False
             )
         return self._session_factory
 
@@ -89,7 +90,7 @@ class DatabaseConnection:
                 class_=AsyncSession,
                 autocommit=False,
                 autoflush=False,
-                expire_on_commit=False
+                expire_on_commit=False,
             )
         return self._async_session_factory
 

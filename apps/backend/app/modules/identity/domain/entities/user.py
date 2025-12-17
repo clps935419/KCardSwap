@@ -2,6 +2,7 @@
 User Entity - Core domain model for users
 Following DDD principles: No framework dependencies, pure business logic
 """
+
 from datetime import datetime
 from typing import Optional
 from uuid import UUID, uuid4
@@ -21,7 +22,7 @@ class User:
         role: str = "user",
         id: Optional[UUID] = None,
         created_at: Optional[datetime] = None,
-        updated_at: Optional[datetime] = None
+        updated_at: Optional[datetime] = None,
     ):
         self._id = id or uuid4()
         self._google_id = google_id

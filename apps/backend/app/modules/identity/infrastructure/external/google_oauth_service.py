@@ -107,7 +107,7 @@ class GoogleOAuthService:
         }
 
         # Log request details (without sensitive data)
-        logger.info(f"Google PKCE token exchange request:")
+        logger.info("Google PKCE token exchange request:")
         logger.info(f"  - redirect_uri: {uri}")
         logger.info(f"  - code_verifier length: {len(code_verifier)}")
         logger.info(f"  - code length: {len(code)}")

@@ -1,6 +1,7 @@
 """
 User ORM model for Identity module
 """
+
 import uuid
 from datetime import datetime
 
@@ -13,6 +14,7 @@ from app.shared.infrastructure.database.connection import Base
 
 class UserModel(Base):
     """User ORM model"""
+
     __tablename__ = "users"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)

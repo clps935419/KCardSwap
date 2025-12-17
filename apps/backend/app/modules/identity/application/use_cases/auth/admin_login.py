@@ -2,14 +2,19 @@
 Admin Login Use Case - AdminLoginUseCase
 Application layer for admin authentication using email/password
 """
+
 from datetime import datetime, timedelta
 from typing import Optional, Tuple
 
 from app.modules.identity.domain.entities.refresh_token import RefreshToken
 from app.modules.identity.domain.entities.user import User
-from app.modules.identity.domain.repositories.refresh_token_repository import RefreshTokenRepository
+from app.modules.identity.domain.repositories.refresh_token_repository import (
+    RefreshTokenRepository,
+)
 from app.modules.identity.domain.repositories.user_repository import IUserRepository
-from app.modules.identity.infrastructure.security.password_service import PasswordService
+from app.modules.identity.infrastructure.security.password_service import (
+    PasswordService,
+)
 from app.shared.infrastructure.security.jwt_service import JWTService
 
 
@@ -27,14 +32,16 @@ class AdminLoginUseCase:
         user_repo: IUserRepository,
         refresh_token_repo: RefreshTokenRepository,
         password_service: PasswordService,
-        jwt_service: JWTService
+        jwt_service: JWTService,
     ):
         self._user_repo = user_repo
         self._refresh_token_repo = refresh_token_repo
         self._password_service = password_service
         self._jwt_service = jwt_service
 
-    async def execute(self, email: str, password: str) -> Optional[Tuple[str, str, User]]:
+    async def execute(
+        self, email: str, password: str
+    ) -> Optional[Tuple[str, str, User]]:
         """
         Execute admin login flow
 
@@ -65,12 +72,12 @@ class AdminLoginUseCase:
         # Step 5: Generate JWT tokens
         access_token = self._jwt_service.create_access_token(
             subject=str(user.id),
-            additional_claims={"email": user.email, "role": user.role}
+            additional_claims={"email": user.email, "role": user.role},
         )
-        
+
         refresh_token_string = self._jwt_service.create_refresh_token(
             subject=str(user.id),
-            additional_claims={"email": user.email, "role": user.role}
+            additional_claims={"email": user.email, "role": user.role},
         )
 
         # Step 6: Create and save refresh token entity
@@ -79,7 +86,7 @@ class AdminLoginUseCase:
             user_id=user.id,
             token=refresh_token_string,
             expires_at=expires_at,
-            revoked=False
+            revoked=False,
         )
         await self._refresh_token_repo.create(refresh_token)
 

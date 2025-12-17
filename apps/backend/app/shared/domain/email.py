@@ -2,6 +2,7 @@
 
 This module provides a value object for email addresses with validation.
 """
+
 import re
 from typing import Any
 
@@ -12,9 +13,7 @@ class Email:
     Ensures email addresses are properly formatted and normalized.
     """
 
-    EMAIL_REGEX = re.compile(
-        r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-    )
+    EMAIL_REGEX = re.compile(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
 
     def __init__(self, value: str) -> None:
         """Initialize email value object.

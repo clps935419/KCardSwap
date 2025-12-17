@@ -1,6 +1,7 @@
 """
 Get Profile Use Case
 """
+
 from typing import Optional
 from uuid import UUID
 

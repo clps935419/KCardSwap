@@ -3,6 +3,7 @@
 IoC container for managing application dependencies using dependency-injector.
 Follows modular DDD architecture with separate containers for each module.
 """
+
 from dependency_injector import containers, providers
 
 from .config import settings
@@ -76,26 +77,16 @@ class ApplicationContainer(containers.DeclarativeContainer):
 
     # Wire configuration - modules that need dependency injection
     wiring_config = containers.WiringConfiguration(
-        packages=[
-            "app.modules.identity",
-            "app.modules.social",
-            "app.shared"
-        ]
+        packages=["app.modules.identity", "app.modules.social", "app.shared"]
     )
 
     # Shared Kernel
     shared = providers.Container(SharedContainer)
 
     # Module Containers
-    identity = providers.Container(
-        IdentityModuleContainer,
-        shared=shared
-    )
+    identity = providers.Container(IdentityModuleContainer, shared=shared)
 
-    social = providers.Container(
-        SocialModuleContainer,
-        shared=shared
-    )
+    social = providers.Container(SocialModuleContainer, shared=shared)
 
 
 # Global container instance

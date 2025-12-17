@@ -1,7 +1,7 @@
 # Data Model（資料模型綜覽）
 
-**更新日期**: 2025-12-15  
-**對應版本**: Alembic migration 002 (add indexes)
+**更新日期**: 2025-12-17  
+**對應版本**: Alembic migration 003 (add admin fields)
 
 ## 目的
 
@@ -12,6 +12,7 @@
 - **Schema 定義來源**: `apps/backend/alembic/versions/` 中的 migration scripts
   - `001_initial_schema.py`: 所有表結構
   - `002_add_indexes.py`: 所有索引
+  - `003_add_admin_fields.py`: 管理員認證欄位 (password_hash, role)
 - **ORM 模型**: `apps/backend/app/infrastructure/database/models.py`
 - **初始化腳本**: `infra/db/init.sql`（僅保留資料庫級設定：extensions, users, grants）
 

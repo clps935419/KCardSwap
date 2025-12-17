@@ -1,6 +1,7 @@
 """
 Logout Use Case - Revoke refresh token
 """
+
 from uuid import UUID
 
 from sqlalchemy import select
@@ -31,7 +32,7 @@ class LogoutUseCase:
             select(RefreshTokenModel).where(
                 RefreshTokenModel.token == refresh_token,
                 RefreshTokenModel.user_id == user_id,
-                RefreshTokenModel.revoked is False
+                RefreshTokenModel.revoked is False,
             )
         )
         token_model = result.scalar_one_or_none()
