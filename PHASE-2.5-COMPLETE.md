@@ -55,7 +55,8 @@ Phase 2.5 已成功實作完成，提供管理員帳密登入功能，僅供後�
   - 指令：`python scripts/init_admin.py` 或透過環境變數設定
   - **Idempotent 設計**：可重複執行，不會重複建立
   - 支援自動密碼生成
-  - 整合至 Docker 啟動流程
+  - 整合至 Docker 啟動流程（`start.sh`）
+  - **遵循業界最佳實務**：資料初始化與 schema migration 分離
 
 ### 文件與測試 (Documentation & Testing)
 

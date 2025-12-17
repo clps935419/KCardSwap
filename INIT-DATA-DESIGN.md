@@ -2,10 +2,13 @@
 
 ## 概述
 
-此專案實作了 **idempotent init data** 模式，確保資料庫遷移後能自動或手動初始化預設管理員帳號。
+此專案實作了 **idempotent init data** 模式，遵循業界最佳實務：**schema 用 migration、資料初始化用 seed/bootstrapping script**。
 
-### 特點
+預設管理員等環境敏感資料透過 `scripts/init_admin.py` 在應用啟動時初始化，而非在 Alembic migration 中處理。
 
+### 設計原則
+
+- ✅ **分離關注點**：Schema 變更（migrations）與資料初始化（scripts）分開
 - ✅ **Idempotent（冪等性）**：可重複執行，不會重複建立資料
 - ✅ **彈性配置**：支援環境變數或命令列參數
 - ✅ **自動化友善**：可整合至 CI/CD 和 Docker 啟動流程
@@ -45,7 +48,7 @@ export DEFAULT_ADMIN_ROLE="admin"
 python scripts/init_admin.py
 ```
 
-### 方法 3: Docker 啟動時自動初始化
+### 方法 3: Docker 啟動時自動初始化（推薦用於生產）
 
 在 `docker-compose.yml` 或 `.env` 中設定：
 
@@ -69,26 +72,14 @@ DEFAULT_ADMIN_ROLE=admin
 ```
 
 Docker 容器啟動時會自動：
-1. 執行 `alembic upgrade head`
-2. 執行 `python scripts/init_admin.py`（如果 `INIT_DEFAULT_ADMIN=true`）
-
-### 方法 4: 在 Alembic Migration 中初始化
-
-```bash
-cd apps/backend
-
-# 設定環境變數後執行 migration
-INIT_DEFAULT_ADMIN=true \
-DEFAULT_ADMIN_EMAIL=admin@example.com \
-DEFAULT_ADMIN_PASSWORD=SecurePass123 \
-alembic upgrade head
-```
+1. 執行 `alembic upgrade head`（schema migration）
+2. 執行 `python scripts/init_admin.py`（資料初始化，如果 `INIT_DEFAULT_ADMIN=true`）
 
 ## 環境變數說明
 
 | 變數名稱 | 說明 | 預設值 | 必填 |
 |---------|------|--------|------|
-| `INIT_DEFAULT_ADMIN` | 是否自動初始化（Docker/Migration） | `false` | 否 |
+| `INIT_DEFAULT_ADMIN` | 是否自動初始化（Docker/Entrypoint） | `false` | 否 |
 | `DEFAULT_ADMIN_EMAIL` | 管理員 email | `admin@kcardswap.local` | 否 |
 | `DEFAULT_ADMIN_PASSWORD` | 管理員密碼 | 隨機生成 | **建議** |
 | `DEFAULT_ADMIN_ROLE` | 管理員角色 (`admin`/`super_admin`) | `admin` | 否 |
@@ -249,10 +240,9 @@ aws secretsmanager create-secret \
 apps/backend/
 ├── alembic/
 │   └── versions/
-│       ├── 001_initial_schema.py
-│       ├── 002_add_indexes.py
-│       ├── 003_add_admin_fields.py
-│       └── 004_init_default_admin.py      # 可選的資料 migration
+│       ├── 001_initial_schema.py          # Schema: 建立所有表
+│       ├── 002_add_indexes.py             # Schema: 添加索引
+│       └── 003_add_admin_fields.py        # Schema: 添加 admin 欄位
 ├── scripts/
 │   ├── create_admin.py                     # 手動建立管理員（任意 email）
 │   ├── init_admin.py                       # 初始化預設管理員（idempotent）★
@@ -260,17 +250,42 @@ apps/backend/
 └── start.sh                                # Docker 啟動腳本（整合 init_admin）
 ```
 
-## Migration vs Script 比較
+## 設計哲學：為何不用 Migration 處理資料初始化？
 
-| 功能 | Migration 004 | init_admin.py Script |
-|------|---------------|----------------------|
-| 執行時機 | `alembic upgrade head` | 手動或 Docker 啟動 |
-| 需要環境變數 | `INIT_DEFAULT_ADMIN=true` | 無（但建議設定密碼） |
-| 密碼處理 | 必須提供 | 可自動生成 |
-| 適用場景 | 自動化 pipeline | 開發/運維手動操作 |
-| 推薦用途 | ❌ 較複雜 | ✅ **推薦使用** |
+### 業界最佳實務
 
-**建議：優先使用 `init_admin.py` script**，更靈活且容易除錯。
+根據業界標準做法：
+
+- ✅ **Schema 變更** → Alembic Migrations
+  - 建立/修改/刪除表結構
+  - 添加/移除欄位
+  - 建立索引和約束
+  - 版本控制、可回滾
+
+- ✅ **資料初始化** → Seed/Bootstrapping Scripts
+  - 預設管理員帳號
+  - 初始設定資料
+  - 測試資料
+  - 環境敏感資料
+
+### 為什麼分離？
+
+| 考量點 | Migration 處理資料 ❌ | Script 處理資料 ✅ |
+|--------|---------------------|-------------------|
+| 環境敏感性 | 所有環境共用同一個 migration | 可根據環境調整（dev/staging/prod） |
+| 密碼管理 | 難以安全處理密碼 | 支援環境變數、Secrets Manager |
+| 冪等性 | Migration 只跑一次 | Script 可重複執行 |
+| 除錯 | 需要 downgrade/upgrade | 直接執行 script |
+| 版本控制 | Migration 號碼固定 | Script 可靈活調整 |
+| 回滾風險 | Data migration 回滾可能破壞資料 | Script 不影響 migration 歷史 |
+
+### 參考資料
+
+- [Django Best Practices](https://docs.djangoproject.com/en/stable/howto/initial-data/): "Use fixtures or custom management commands for initial data"
+- [Rails Guides](https://guides.rubyonrails.org/active_record_migrations.html#migrations-and-seed-data): "Seeds are for data, migrations are for schema"
+- [Alembic Documentation](https://alembic.sqlalchemy.org/): "Migrations should focus on schema changes"
+
+**本專案採用的方案**：`init_admin.py` script + Docker entrypoint，符合業界最佳實務。
 
 ## 常見問題 (FAQ)
 
