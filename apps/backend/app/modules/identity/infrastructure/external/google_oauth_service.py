@@ -1,6 +1,7 @@
 """
 Google OAuth Service - Handle Google OAuth authentication
 """
+
 import logging
 import os
 from typing import Any, Dict, Optional
@@ -29,25 +30,23 @@ class GoogleOAuthService:
         try:
             # Verify the token
             idinfo = id_token.verify_oauth2_token(
-                token,
-                requests.Request(),
-                self.client_id
+                token, requests.Request(), self.client_id
             )
 
             # Verify issuer
             valid_issuers = [
-                'accounts.google.com',
-                'https://accounts.google.com',
+                "accounts.google.com",
+                "https://accounts.google.com",
             ]
-            if idinfo['iss'] not in valid_issuers:
+            if idinfo["iss"] not in valid_issuers:
                 return None
 
             return {
-                "google_id": idinfo['sub'],
-                "email": idinfo.get('email'),
-                "name": idinfo.get('name'),
-                "picture": idinfo.get('picture'),
-                "email_verified": idinfo.get('email_verified', False)
+                "google_id": idinfo["sub"],
+                "email": idinfo.get("email"),
+                "name": idinfo.get("name"),
+                "picture": idinfo.get("picture"),
+                "email_verified": idinfo.get("email_verified", False),
             }
         except ValueError:
             # Invalid token
@@ -65,7 +64,7 @@ class GoogleOAuthService:
             "client_id": self.client_id,
             "client_secret": self.client_secret,
             "redirect_uri": self.redirect_uri,
-            "grant_type": "authorization_code"
+            "grant_type": "authorization_code",
         }
 
         try:
@@ -80,10 +79,7 @@ class GoogleOAuthService:
             return None
 
     async def exchange_code_with_pkce(
-        self,
-        code: str,
-        code_verifier: str,
-        redirect_uri: Optional[str] = None
+        self, code: str, code_verifier: str, redirect_uri: Optional[str] = None
     ) -> Optional[str]:
         """
         Exchange authorization code for ID token using PKCE flow (Expo AuthSession)
@@ -107,7 +103,7 @@ class GoogleOAuthService:
             "client_secret": self.client_secret,
             "code_verifier": code_verifier,
             "redirect_uri": uri,
-            "grant_type": "authorization_code"
+            "grant_type": "authorization_code",
         }
 
         # Log request details (without sensitive data)
@@ -125,7 +121,9 @@ class GoogleOAuthService:
                     return tokens.get("id_token")
                 else:
                     # Log error response from Google
-                    logger.error(f"Google token exchange failed: status={response.status_code}, body={response.text}")
+                    logger.error(
+                        f"Google token exchange failed: status={response.status_code}, body={response.text}"
+                    )
                 return None
         except httpx.TimeoutException:
             # Timeout occurred

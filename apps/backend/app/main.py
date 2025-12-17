@@ -2,6 +2,7 @@
 
 Main entry point for the backend service following modular DDD architecture.
 """
+
 import logging
 import sys
 from contextlib import asynccontextmanager
@@ -16,9 +17,9 @@ from .shared.presentation.middleware.error_handler import register_exception_han
 # Configure logging
 logging.basicConfig(
     level=getattr(logging, settings.LOG_LEVEL.upper(), logging.INFO),
-    format='%(levelname)s:%(name)s:%(message)s',
+    format="%(levelname)s:%(name)s:%(message)s",
     stream=sys.stdout,
-    force=True  # Override any existing configuration
+    force=True,  # Override any existing configuration
 )
 
 # Get logger for this module
@@ -58,7 +59,7 @@ def create_application() -> FastAPI:
         docs_url=f"{settings.API_PREFIX}/docs",
         redoc_url=f"{settings.API_PREFIX}/redoc",
         openapi_url=f"{settings.API_PREFIX}/openapi.json",
-        lifespan=lifespan
+        lifespan=lifespan,
     )
 
     # Store container reference in app state
@@ -80,11 +81,7 @@ def create_application() -> FastAPI:
     @app.get("/health")
     async def health_check():
         """Health check endpoint for container orchestration."""
-        return {
-            "status": "healthy",
-            "service": "kcardswap-backend",
-            "version": "0.1.0"
-        }
+        return {"status": "healthy", "service": "kcardswap-backend", "version": "0.1.0"}
 
     @app.get(f"{settings.API_PREFIX}/health")
     async def api_health_check():
@@ -93,9 +90,9 @@ def create_application() -> FastAPI:
             "data": {
                 "status": "healthy",
                 "service": "kcardswap-backend",
-                "version": "0.1.0"
+                "version": "0.1.0",
             },
-            "error": None
+            "error": None,
         }
 
     @app.get("/")
@@ -104,17 +101,19 @@ def create_application() -> FastAPI:
         return {
             "message": "KCardSwap API",
             "version": "0.1.0",
-            "docs": f"{settings.API_PREFIX}/docs"
+            "docs": f"{settings.API_PREFIX}/docs",
         }
 
     # Register module routers
     # Phase 3: Identity module (Authentication and Profile)
     from .modules.identity.presentation.routers.auth_router import router as auth_router
-    from .modules.identity.presentation.routers.profile_router import router as profile_router
-    
+    from .modules.identity.presentation.routers.profile_router import (
+        router as profile_router,
+    )
+
     app.include_router(auth_router, prefix=settings.API_PREFIX)
     app.include_router(profile_router, prefix=settings.API_PREFIX)
-    
+
     # Future module routers (Phase 4+)
     # from .modules.social.presentation import social_router
     # app.include_router(social_router, prefix=settings.API_PREFIX)
