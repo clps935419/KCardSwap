@@ -2,7 +2,6 @@
 Authentication Schemas for Identity Module
 Presentation layer - Request/Response schemas
 """
-from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
@@ -15,6 +14,25 @@ class GoogleLoginRequest(BaseModel):
         ...,
         description="Google ID token received from Google OAuth",
         min_length=1
+    )
+
+
+class GoogleCallbackRequest(BaseModel):
+    """Request schema for Google OAuth callback with PKCE (Expo AuthSession)"""
+    code: str = Field(
+        ...,
+        description="Authorization code from Google OAuth",
+        min_length=1
+    )
+    code_verifier: str = Field(
+        ...,
+        description="PKCE code verifier used during authorization request",
+        min_length=43,
+        max_length=128
+    )
+    redirect_uri: Optional[str] = Field(
+        None,
+        description="Redirect URI used during authorization (must match the one used in auth request)"
     )
 
 

@@ -6,7 +6,8 @@ services:
     volumes:
       - ./apps/backend/app:/app/app
       - ./apps/backend/alembic:/app/alembic
-      - ./apps/backend/start.sh:/app/start.sh:ro
+      # Note: do not bind-mount start.sh to avoid exec format / permission issues on Windows
+      # - ./apps/backend/start.sh:/app/start.sh:ro
       - ./apps/backend/pyproject.toml:/app/pyproject.toml:ro
       - ./apps/backend/poetry.lock:/app/poetry.lock:ro
       - backend-site-packages:/usr/local/lib/python3.11/site-packages

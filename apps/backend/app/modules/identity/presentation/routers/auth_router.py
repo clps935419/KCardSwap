@@ -8,17 +8,37 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
-from app.modules.identity.application.use_cases.auth.login_with_google import GoogleLoginUseCase
-from app.modules.identity.application.use_cases.auth.refresh_token import RefreshTokenUseCase
-from app.modules.identity.domain.repositories.profile_repository import IProfileRepository
-from app.modules.identity.domain.repositories.refresh_token_repository import RefreshTokenRepository
+from app.modules.identity.application.use_cases.auth.google_callback import (
+    GoogleCallbackUseCase,
+)
+from app.modules.identity.application.use_cases.auth.login_with_google import (
+    GoogleLoginUseCase,
+)
+from app.modules.identity.application.use_cases.auth.refresh_token import (
+    RefreshTokenUseCase,
+)
+from app.modules.identity.domain.repositories.profile_repository import (
+    IProfileRepository,
+)
+from app.modules.identity.domain.repositories.refresh_token_repository import (
+    RefreshTokenRepository,
+)
 from app.modules.identity.domain.repositories.user_repository import IUserRepository
-from app.modules.identity.infrastructure.external.google_oauth_service import GoogleOAuthService
-from app.modules.identity.infrastructure.repositories.profile_repository_impl import ProfileRepositoryImpl
-from app.modules.identity.infrastructure.repositories.refresh_token_repository_impl import RefreshTokenRepositoryImpl
-from app.modules.identity.infrastructure.repositories.user_repository_impl import UserRepositoryImpl
+from app.modules.identity.infrastructure.external.google_oauth_service import (
+    GoogleOAuthService,
+)
+from app.modules.identity.infrastructure.repositories.profile_repository_impl import (
+    ProfileRepositoryImpl,
+)
+from app.modules.identity.infrastructure.repositories.refresh_token_repository_impl import (
+    RefreshTokenRepositoryImpl,
+)
+from app.modules.identity.infrastructure.repositories.user_repository_impl import (
+    UserRepositoryImpl,
+)
 from app.modules.identity.presentation.schemas.auth_schemas import (
     ErrorWrapper,
+    GoogleCallbackRequest,
     GoogleLoginRequest,
     LoginResponse,
     RefreshTokenRequest,
@@ -49,7 +69,7 @@ async def google_login(
 ) -> LoginResponse:
     """
     Login with Google OAuth.
-    
+
     - Verifies Google ID token
     - Creates user and profile if new user
     - Returns JWT access and refresh tokens
@@ -60,7 +80,7 @@ async def google_login(
     refresh_token_repo: RefreshTokenRepository = RefreshTokenRepositoryImpl(session)
     google_oauth_service = GoogleOAuthService()
     jwt_service = JWTService()
-    
+
     # Create and execute use case
     use_case = GoogleLoginUseCase(
         user_repo=user_repo,
@@ -69,9 +89,9 @@ async def google_login(
         google_oauth_service=google_oauth_service,
         jwt_service=jwt_service
     )
-    
+
     result = await use_case.execute(request.google_token)
-    
+
     if result is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -80,12 +100,12 @@ async def google_login(
                 "message": "Invalid Google token"
             }
         )
-    
+
     access_token, refresh_token, user = result
-    
+
     # Commit transaction
     await session.commit()
-    
+
     # Build response
     token_response = TokenResponse(
         access_token=access_token,
@@ -95,7 +115,84 @@ async def google_login(
         user_id=user.id,
         email=user.email
     )
-    
+
+    return LoginResponse(data=token_response, error=None)
+
+
+@router.post(
+    "/google-callback",
+    response_model=LoginResponse,
+    status_code=status.HTTP_200_OK,
+    responses={
+        200: {"description": "Successfully authenticated"},
+        400: {"model": ErrorWrapper, "description": "Validation error"},
+        401: {"model": ErrorWrapper, "description": "Invalid authorization code or code_verifier"},
+        422: {"model": ErrorWrapper, "description": "Token exchange failed"},
+    },
+    summary="Google OAuth Callback with PKCE",
+    description="Authenticate user with Google OAuth authorization code and PKCE code_verifier (Expo AuthSession)"
+)
+async def google_callback(
+    request: GoogleCallbackRequest,
+    session: Annotated[AsyncSession, Depends(get_db_session)]
+) -> LoginResponse:
+    """
+    Google OAuth callback with PKCE (Recommended for Expo AuthSession).
+
+    - Exchanges authorization code + code_verifier for ID token
+    - Verifies Google ID token
+    - Creates user and profile if new user
+    - Returns JWT access and refresh tokens
+
+    This endpoint implements Authorization Code Flow with PKCE,
+    which is the recommended OAuth flow for mobile applications.
+    """
+    # Initialize dependencies
+    user_repo: IUserRepository = UserRepositoryImpl(session)
+    profile_repo: IProfileRepository = ProfileRepositoryImpl(session)
+    refresh_token_repo: RefreshTokenRepository = RefreshTokenRepositoryImpl(session)
+    google_oauth_service = GoogleOAuthService()
+    jwt_service = JWTService()
+
+    # Create and execute use case
+    use_case = GoogleCallbackUseCase(
+        user_repo=user_repo,
+        profile_repo=profile_repo,
+        refresh_token_repo=refresh_token_repo,
+        google_oauth_service=google_oauth_service,
+        jwt_service=jwt_service
+    )
+
+    result = await use_case.execute(
+        code=request.code,
+        code_verifier=request.code_verifier,
+        redirect_uri=request.redirect_uri
+    )
+
+    if result is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail={
+                "code": "UNAUTHORIZED",
+                "message": "Invalid authorization code or code_verifier. Token exchange failed."
+            }
+        )
+
+    access_token, refresh_token, user = result
+
+    # Commit transaction
+    await session.commit()
+
+    # Build response
+    token_response = TokenResponse(
+        access_token=access_token,
+        refresh_token=refresh_token,
+        token_type="bearer",
+        expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,  # Convert to seconds
+        user_id=user.id,
+        email=user.email
+    )
+
     return LoginResponse(data=token_response, error=None)
 
 
@@ -116,7 +213,7 @@ async def refresh_token(
 ) -> LoginResponse:
     """
     Refresh access token using refresh token.
-    
+
     - Validates refresh token
     - Revokes old refresh token
     - Issues new access and refresh tokens
@@ -124,15 +221,15 @@ async def refresh_token(
     # Initialize dependencies
     refresh_token_repo: RefreshTokenRepository = RefreshTokenRepositoryImpl(session)
     jwt_service = JWTService()
-    
+
     # Create and execute use case
     use_case = RefreshTokenUseCase(
         refresh_token_repo=refresh_token_repo,
         jwt_service=jwt_service
     )
-    
+
     result = await use_case.execute(request.refresh_token)
-    
+
     if result is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -141,12 +238,12 @@ async def refresh_token(
                 "message": "Invalid or expired refresh token"
             }
         )
-    
+
     new_access_token, new_refresh_token = result
-    
+
     # Commit transaction
     await session.commit()
-    
+
     # Extract user info from new access token for response
     try:
         payload = jwt_service.verify_token(new_access_token, expected_type="access")
@@ -160,7 +257,7 @@ async def refresh_token(
                 "message": "Failed to generate tokens"
             }
         )
-    
+
     # Build response
     token_response = TokenResponse(
         access_token=new_access_token,
@@ -170,5 +267,5 @@ async def refresh_token(
         user_id=user_id,
         email=email
     )
-    
+
     return LoginResponse(data=token_response, error=None)

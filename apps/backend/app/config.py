@@ -2,6 +2,7 @@
 
 This module provides centralized configuration management using environment variables.
 """
+
 import os
 
 
@@ -13,8 +14,7 @@ class Config:
 
     # Database
     DATABASE_URL: str = os.getenv(
-        "DATABASE_URL",
-        "postgresql://postgres:postgres@localhost:5432/kcardswap"
+        "DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/kcardswap"
     )
 
     # JWT
@@ -22,7 +22,9 @@ class Config:
         "JWT_SECRET_KEY", "your-secret-key-change-in-production"
     )
     JWT_ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "15"))
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = int(
+        os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "15")
+    )
     REFRESH_TOKEN_EXPIRE_DAYS: int = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", "7"))
 
     # Google OAuth
@@ -47,6 +49,9 @@ class Config:
     ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
     DEBUG: bool = os.getenv("DEBUG", "false").lower() == "true"
     SQL_ECHO: bool = os.getenv("SQL_ECHO", "false").lower() == "true"
+    LOG_LEVEL: str = os.getenv(
+        "LOG_LEVEL", "INFO"
+    )  # DEBUG, INFO, WARNING, ERROR, CRITICAL
 
     # Security
     CORS_ORIGINS: list[str] = os.getenv("CORS_ORIGINS", "*").split(",")
