@@ -10,10 +10,16 @@ from typing import Optional, Tuple
 from app.modules.identity.domain.entities.profile import Profile
 from app.modules.identity.domain.entities.refresh_token import RefreshToken
 from app.modules.identity.domain.entities.user import User
-from app.modules.identity.domain.repositories.profile_repository import IProfileRepository
-from app.modules.identity.domain.repositories.refresh_token_repository import RefreshTokenRepository
+from app.modules.identity.domain.repositories.profile_repository import (
+    IProfileRepository,
+)
+from app.modules.identity.domain.repositories.refresh_token_repository import (
+    RefreshTokenRepository,
+)
 from app.modules.identity.domain.repositories.user_repository import IUserRepository
-from app.modules.identity.infrastructure.external.google_oauth_service import GoogleOAuthService
+from app.modules.identity.infrastructure.external.google_oauth_service import (
+    GoogleOAuthService,
+)
 from app.shared.infrastructure.security.jwt_service import JWTService
 
 
@@ -26,7 +32,7 @@ class GoogleCallbackUseCase:
     - Creates profile if new user
     - Generates JWT tokens (access + refresh)
     - Saves refresh token to database
-    
+
     This is the recommended flow for Expo AuthSession (mobile apps)
     """
 
@@ -67,7 +73,7 @@ class GoogleCallbackUseCase:
             code_verifier=code_verifier,
             redirect_uri=redirect_uri
         )
-        
+
         if not id_token:
             return None
 
@@ -105,7 +111,7 @@ class GoogleCallbackUseCase:
             subject=str(user.id),
             additional_claims={"email": user.email}
         )
-        
+
         refresh_token_string = self._jwt_service.create_refresh_token(
             subject=str(user.id),
             additional_claims={"email": user.email}

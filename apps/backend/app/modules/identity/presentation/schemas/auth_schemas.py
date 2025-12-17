@@ -2,7 +2,6 @@
 Authentication Schemas for Identity Module
 Presentation layer - Request/Response schemas
 """
-from datetime import datetime
 from typing import Optional
 from uuid import UUID
 

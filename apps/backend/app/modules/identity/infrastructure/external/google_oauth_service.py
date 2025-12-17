@@ -83,17 +83,17 @@ class GoogleOAuthService:
     ) -> Optional[str]:
         """
         Exchange authorization code for ID token using PKCE flow (Expo AuthSession)
-        
+
         Args:
             code: Authorization code from Google OAuth
             code_verifier: PKCE code verifier (43-128 characters)
             redirect_uri: Optional redirect URI (must match the one used in auth request)
-        
+
         Returns:
             ID token or None if exchange fails
         """
         token_url = "https://oauth2.googleapis.com/token"
-        
+
         # Use provided redirect_uri or fallback to configured one
         uri = redirect_uri or self.redirect_uri
 
