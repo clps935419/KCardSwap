@@ -50,6 +50,13 @@ Phase 2.5 已成功實作完成，提供管理員帳密登入功能，僅供後�
   - 自動檢查 email 是否已存在
   - 使用 bcrypt 加密密碼
 
+- ✅ **T035+** - 建立自動化初始資料腳本（新增）
+  - 檔案：`apps/backend/scripts/init_admin.py`
+  - 指令：`python scripts/init_admin.py` 或透過環境變數設定
+  - **Idempotent 設計**：可重複執行，不會重複建立
+  - 支援自動密碼生成
+  - 整合至 Docker 啟動流程
+
 ### 文件與測試 (Documentation & Testing)
 
 - ✅ **T036** - API Contract（已存在）
@@ -95,6 +102,33 @@ poetry run alembic upgrade head
 
 ### 2. 建立管理員帳號
 
+有三種方式建立管理員帳號：
+
+#### 方式 A: 自動初始化（推薦，idempotent）
+
+```bash
+cd apps/backend
+
+# 使用預設值（會生成隨機密碼）
+python scripts/init_admin.py
+
+# 自訂 email 和密碼
+python scripts/init_admin.py --email admin@kcardswap.com --password SecurePassword123
+
+# 或透過環境變數
+DEFAULT_ADMIN_EMAIL=admin@kcardswap.com DEFAULT_ADMIN_PASSWORD=SecurePassword123 python scripts/init_admin.py
+
+# 在 Docker 環境中
+make init-admin-docker
+```
+
+**特點**：
+- ✅ Idempotent（可重複執行）
+- ✅ 如果管理員已存在會跳過
+- ✅ 適合整合到自動化部署流程
+
+#### 方式 B: 手動建立（可建立多個管理員）
+
 ```bash
 cd apps/backend
 python scripts/create_admin.py --email admin@kcardswap.com --password SecurePassword123 --role admin
@@ -105,6 +139,25 @@ python scripts/create_admin.py --email admin@kcardswap.com --password SecurePass
 ```bash
 python scripts/create_admin.py --email superadmin@kcardswap.com --password SecurePassword123 --role super_admin
 ```
+
+**特點**：
+- ✅ 可建立多個不同 email 的管理員
+- ⚠️ Email 重複會報錯
+
+#### 方式 C: Docker 自動啟動時初始化
+
+在 `.env` 檔案中設定：
+
+```bash
+INIT_DEFAULT_ADMIN=true
+DEFAULT_ADMIN_EMAIL=admin@kcardswap.com
+DEFAULT_ADMIN_PASSWORD=SecurePassword123
+DEFAULT_ADMIN_ROLE=admin
+```
+
+Docker 容器啟動時會自動建立管理員。
+
+📖 **詳細說明請參考**: `INIT-DATA-DESIGN.md`
 
 ### 3. 管理員登入
 

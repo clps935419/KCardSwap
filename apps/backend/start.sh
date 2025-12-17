@@ -10,6 +10,12 @@ poetry install --no-root --only main
 echo "Running database migrations..."
 alembic upgrade head
 
+# Initialize default admin user if configured
+if [ "${INIT_DEFAULT_ADMIN:-}" = "true" ]; then
+  echo "Initializing default admin user..."
+  python scripts/init_admin.py --quiet || echo "Warning: Failed to initialize admin (may already exist)"
+fi
+
 echo "Starting application..."
 if [ "${ENVIRONMENT:-}" = "development" ] || [ "${DEBUG:-}" = "true" ]; then
   echo "Starting application (development mode) with reload..."
