@@ -99,19 +99,27 @@
 
 **使用場景**: 管理員透過 Swagger UI、Postman 或 curl 進行帳密登入，獲取 JWT Token 進行後台管理操作
 
-- [ ] T029 [Admin-Auth] 擴展 User Entity：添加 password_hash 和 role 屬性（apps/backend/app/modules/identity/domain/entities/user.py）
-- [ ] T030 [Admin-Auth] 創建 Alembic migration：alembic/versions/003_add_admin_fields.py（添加 password_hash VARCHAR(255) NULLABLE, role VARCHAR(20) DEFAULT 'user'，修改 google_id 為 NULLABLE）
-- [ ] T031 [Admin-Auth] 更新 ORM 模型：apps/backend/app/modules/identity/infrastructure/database/models.py（同步 password_hash 與 role 欄位）
-- [ ] T032 [Admin-Auth] 實現密碼服務：apps/backend/app/modules/identity/infrastructure/security/password_service.py（hash_password, verify_password 使用 bcrypt）
-- [ ] T033 [Admin-Auth] 實現 AdminLoginUseCase：apps/backend/app/modules/identity/application/use_cases/auth/admin_login.py（驗證 email+password，檢查 role 是否為 admin/super_admin）
-- [ ] T034 [Admin-Auth] 添加 Admin Login Endpoint：POST /api/v1/auth/admin-login（apps/backend/app/modules/identity/presentation/routers/auth_router.py，標記 tags=["Admin"]）
-- [ ] T035 [Admin-Auth] 創建管理員工具腳本：apps/backend/scripts/create_admin.py（接受 --email, --password, --role 參數，生成 bcrypt hash 並插入資料庫）
-- [ ] T036 [Admin-Auth] 更新 API Contract：specs/001-kcardswap-complete-spec/contracts/auth/admin_login.json（定義請求/回應結構）
-- [ ] T037 [Admin-Auth] 更新資料模型文件：specs/001-kcardswap-complete-spec/data-model.md（更新 users 表定義與不變條件）
-- [ ] T038 [Admin-Auth] 撰寫單元測試：tests/unit/application/use_cases/test_admin_login.py（測試正確密碼、錯誤密碼、非管理員帳號）
-- [ ] T039 [Admin-Auth] 添加 pyproject.toml 依賴：bcrypt = "^4.1.0"
+- [X] T029 [Admin-Auth] 擴展 User Entity：添加 password_hash 和 role 屬性（apps/backend/app/modules/identity/domain/entities/user.py）
+- [X] T030 [Admin-Auth] 創建 Alembic migration：alembic/versions/003_add_admin_fields.py（添加 password_hash VARCHAR(255) NULLABLE, role VARCHAR(20) DEFAULT 'user'，修改 google_id 為 NULLABLE）
+- [X] T031 [Admin-Auth] 更新 ORM 模型：apps/backend/app/modules/identity/infrastructure/database/models.py（同步 password_hash 與 role 欄位）
+- [X] T032 [Admin-Auth] 實現密碼服務：apps/backend/app/modules/identity/infrastructure/security/password_service.py（hash_password, verify_password 使用 bcrypt）
+- [X] T033 [Admin-Auth] 實現 AdminLoginUseCase：apps/backend/app/modules/identity/application/use_cases/auth/admin_login.py（驗證 email+password，檢查 role 是否為 admin/super_admin）
+- [X] T034 [Admin-Auth] 添加 Admin Login Endpoint：POST /api/v1/auth/admin-login（apps/backend/app/modules/identity/presentation/routers/auth_router.py，標記 tags=["Admin"]）
+- [X] T035 [Admin-Auth] 創建管理員工具腳本（手動）：apps/backend/scripts/create_admin.py（接受 --email, --password, --role 參數，生成 bcrypt hash 並插入資料庫；用於手動建立額外管理員，email 重複會報錯）
+- [X] T035A [Admin-Auth] 創建自動初始化腳本（idempotent）：apps/backend/scripts/init_admin.py（支援環境變數、預設值、隨機密碼生成；idempotent 設計可重複執行；整合至 Docker 啟動流程 start.sh；用於自動化部署）
+- [X] T036 [Admin-Auth] 更新 API Contract：specs/001-kcardswap-complete-spec/contracts/auth/admin_login.json（定義請求/回應結構）
+- [X] T037 [Admin-Auth] 更新資料模型文件：specs/001-kcardswap-complete-spec/data-model.md（更新 users 表定義與不變條件）
+- [X] T038 [Admin-Auth] 撰寫單元測試：tests/unit/application/use_cases/test_admin_login.py（測試正確密碼、錯誤密碼、非管理員帳號）
+- [X] T039 [Admin-Auth] 添加 pyproject.toml 依賴：bcrypt = "^4.1.0"
 
 **Checkpoint**: Admin 登入系統完成，管理員可透過帳密登入獲取 JWT Token
+
+**📝 重要說明**：
+- **兩個腳本的用途不同，都需要保留**：
+  - `create_admin.py` (T035)：手動建立額外管理員（會在 email 重複時報錯，確保不會意外覆蓋）
+  - `init_admin.py` (T035A)：自動化初始化預設管理員（idempotent，可安全重複執行，用於 Docker/CI/CD）
+- **遵循業界最佳實務**：Schema migration（Alembic）與資料初始化（init scripts）分離
+- **參考文件**：詳見 `INIT-DATA-DESIGN.md`
 
 ---
 
