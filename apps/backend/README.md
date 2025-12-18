@@ -1,15 +1,40 @@
-# KCardSwap Backend (FastAPI)
+# KCardSwap Backend Documentation
 
-## 環境變數
-- `DATABASE_URL`: 例如 `postgresql+asyncpg://kcardswap:kcardswap@db:5432/kcardswap`（使用 asyncpg 驅動）
-- `GCS_BUCKET`: 例如 `kcardswap-dev`
-- `JWT_SECRET`: 用於簽發 JWT 的密鑰（開發可暫用）
+FastAPI + PostgreSQL + Alembic + Poetry
+
+## 📚 文件索引
+
+### 🚀 快速開始
+- [開發環境設置](#開發環境設置) - 如何啟動本地開發環境
+- [環境變數配置](#環境變數) - 必要的環境變數說明
+- [Docker 開發流程](docs/setup/docker-dev-workflow.md) - Docker 開發最佳實務
+
+### 🏗️ 架構設計
+- [IoC 容器實作](docs/architecture/ioc-implementation.md) - 依賴注入容器設計
+- [資料庫架構](docs/database-architecture.md) - 資料庫設計與關係
+- [認證系統](docs/authentication.md) - Google OAuth 與 JWT 認證
+- [資料庫遷移](docs/database-migrations.md) - Alembic 遷移管理
+- [查詢優化](docs/query-optimization.md) - 資料庫查詢最佳化
+
+### 📖 API 文件
+- [Identity Module API](docs/api/identity-module.md) - 身份驗證與個人檔案 API
+
+### 🔧 開發指南
+- [初始化資料設計](docs/setup/init-data-design.md) - Init data 與 seed 策略
+- [Google OAuth 設定](docs/setup/google-oauth-setup.md) - OAuth 配置步驟
+- [密鑰管理](docs/setup/secrets.md) - 敏感資料處理指南
+
+---
 
 ## 開發環境設置
 
-### 安裝 Poetry
+### 前置需求
+- Python 3.11+
+- Poetry 1.7+
+- PostgreSQL 15+
+- Docker & Docker Compose (optional)
 
-Poetry 是本專案的依賴管理工具。請依據您的作業系統安裝：
+### 安裝 Poetry
 
 **macOS / Linux:**
 ```bash
@@ -21,134 +46,120 @@ curl -sSL https://install.python-poetry.org | python3 -
 (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | py -
 ```
 
-驗證安裝：
-```bash
-poetry --version
-```
-
-### 首次設置專案
+### 首次設置
 
 ```bash
-# 1. Clone 專案並進入 backend 目錄
+# 1. 進入 backend 目錄
 cd apps/backend
 
-# 2. 安裝所有依賴（生產 + 開發）
+# 2. 安裝依賴
 poetry install
 
-# 3. 啟動虛擬環境 shell
-poetry shell
+# 3. 執行資料庫遷移
+poetry run alembic upgrade head
 
-# 4. 啟動開發伺服器（支援熱重載）
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
+# 4. 初始化管理員（可選）
+poetry run python scripts/init_admin.py
 
-或者不進入 shell，直接使用 `poetry run`：
-```bash
+# 5. 啟動開發伺服器
 poetry run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-## 常用 Poetry 命令
+### 使用 Docker（推薦）
 
-| 操作 | 命令 |
-|------|------|
-| 安裝所有依賴 | `poetry install` |
-| 新增生產依賴 | `poetry add package-name` |
-| 新增開發依賴 | `poetry add --group dev package-name` |
-| 移除依賴 | `poetry remove package-name` |
-| 更新依賴 | `poetry update` |
-| 查看已安裝套件 | `poetry show` |
-| 查看依賴樹 | `poetry show --tree` |
-| 啟動虛擬環境 | `poetry shell` |
-| 執行命令 | `poetry run <command>` |
-
-## 本地開發伺服器啟動
-
-**使用 Poetry（推薦）:**
 ```bash
-poetry run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
-
-**使用 Docker Compose:**
-```bash
-# 從專案根目錄啟動整套環境
+# 從專案根目錄啟動
 docker compose up -d
+
+# 查看日誌
+docker compose logs -f backend
 ```
 
-## 結構建議
-```
-apps/backend/
-  app/
-    main.py
-    routers/
-      auth.py
-      profile.py
-      cards.py
-      nearby.py
-      social.py
-      chat.py
-      trade.py
-      biz.py
-    services/
-    models/
-    db/
-  tests/
-  pyproject.toml      # Poetry 配置檔案
-  poetry.lock         # Poetry 鎖定檔案（必須納入版本控制）
-```
+## 環境變數
 
-## 測試
-
-**使用 Poetry 執行測試:**
 ```bash
-# 執行所有測試
+# 資料庫
+DATABASE_URL=postgresql+asyncpg://kcardswap:kcardswap@localhost:5432/kcardswap
+
+# JWT
+JWT_SECRET=your-secret-key
+JWT_ALGORITHM=HS256
+
+# Google OAuth
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+
+# 管理員初始化
+INIT_DEFAULT_ADMIN=true
+DEFAULT_ADMIN_EMAIL=admin@kcardswap.local
+DEFAULT_ADMIN_PASSWORD=your-password
+```
+
+## 常用命令
+
+### Poetry
+```bash
+poetry install              # 安裝依賴
+poetry add package-name     # 新增依賴
+poetry run <command>        # 執行命令
+```
+
+### 資料庫遷移
+```bash
+poetry run alembic upgrade head              # 執行遷移
+poetry run alembic revision --autogenerate   # 建立遷移
+```
+
+### 管理員
+```bash
+# Idempotent（可重複執行）
+poetry run python scripts/init_admin.py
+
+# Fail-fast（重複會報錯）
+poetry run python scripts/create_admin.py --email admin@example.com --password pass123
+```
+
+### 測試
+```bash
 poetry run pytest
-
-# 執行測試並顯示覆蓋率
-poetry run pytest --cov=app --cov-report=term-missing
-
-# 執行特定測試檔案
-poetry run pytest tests/test_main.py -v
+poetry run pytest --cov=app
 ```
 
-## Linting 與格式化
-
+### Linting
 ```bash
-# 執行 Ruff linting
 poetry run ruff check .
-
-# 自動修正可修正的問題
 poetry run ruff check --fix .
 ```
 
-## 依賴管理說明
+## API 文件
 
-本專案使用 **Poetry** 進行依賴管理，提供以下優勢：
-- 自動解決依賴衝突
-- 精確的版本鎖定（poetry.lock）
-- 開發/生產依賴分離
-- 簡化的依賴操作
+- **Swagger UI**: http://localhost:8000/docs
+- **ReDoc**: http://localhost:8000/redoc
+- **Kong Gateway**: http://localhost:8080/api/v1
 
-所有依賴變更應透過 `poetry add/remove` 命令進行。
+## 架構原則
 
-## 注意事項
-- 與 Kong 連接路徑統一為 `/api/v1/*`
-- 錯誤回應格式 `{ data: null, error: { code, message } }`
-- 超限錯誤碼：`422_LIMIT_EXCEEDED`；未授權：`401_UNAUTHORIZED`
-- `poetry.lock` 必須納入版本控制，確保團隊環境一致性
+### DDD (Domain-Driven Design)
+- 模組化的 DDD 架構
+- 清楚分離 Domain, Application, Infrastructure, Presentation 層
 
-## 故障排除
+### 依賴注入
+- 使用 IoC 容器管理依賴
+- 透過介面定義服務
 
-### Poetry 找不到
-確保 Poetry 已加入 PATH。通常在：
-- macOS/Linux: `$HOME/.local/bin`
-- Windows: `%APPDATA%\Python\Scripts`
+### 資料庫遷移
+- Alembic 管理 schema 變更
+- 初始化資料透過獨立 scripts
 
-### 依賴衝突
-```bash
-# 清除快取並重新安裝
-poetry cache clear pypi --all
-poetry install
-```
+詳見 [IoC 容器實作](docs/architecture/ioc-implementation.md) 和 [初始化資料設計](docs/setup/init-data-design.md)。
 
-### 更多協助
-詳見 `/specs/copilot/modify-requirements-backend/quickstart.md`
+## 相關資源
+
+- [FastAPI 官方文件](https://fastapi.tiangolo.com/)
+- [Poetry 官方文件](https://python-poetry.org/docs/)
+- [Alembic 官方文件](https://alembic.sqlalchemy.org/)
+
+---
+
+**最後更新**: 2025-12-18  
+**維護者**: KCardSwap Team

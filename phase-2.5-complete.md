@@ -7,6 +7,60 @@
 
 Phase 2.5 已成功實作完成，提供管理員帳密登入功能，僅供後台管理使用。
 
+## ⚠️ 重要說明：為什麼有兩個 Admin 建立腳本？
+
+**問題**：為什麼 init data 會有兩個產生 admin 資料的程式？
+
+**答案**：這是 **刻意設計**，兩個腳本服務於不同場景，遵循業界最佳實務：
+
+### 1. `create_admin.py` (T035) - 手動建立工具
+- **用途**：手動建立**額外**的管理員帳號
+- **行為**：Email 重複時會**報錯**，防止意外覆蓋
+- **適用場景**：
+  - 需要建立多個不同 email 的管理員
+  - 手動維護管理員清單
+  - 確保不會意外覆蓋現有管理員
+- **範例**：
+  ```bash
+  python scripts/create_admin.py --email admin2@example.com --password pass123
+  python scripts/create_admin.py --email admin3@example.com --password pass456
+  ```
+
+### 2. `init_admin.py` (T035A) - 自動初始化工具
+- **用途**：自動化初始化**預設**管理員（適用於 Docker/CI/CD）
+- **行為**：**Idempotent**（冪等性）- 如果管理員已存在會跳過，不會報錯
+- **特點**：
+  - 支援環境變數配置
+  - 可自動生成隨機密碼
+  - 整合至 Docker 啟動流程（`start.sh`）
+  - 可安全重複執行
+- **適用場景**：
+  - Docker 容器啟動時自動建立預設管理員
+  - CI/CD 部署流程
+  - 開發環境快速設置
+- **範例**：
+  ```bash
+  # 自動生成密碼（會顯示在輸出）
+  python scripts/init_admin.py
+  
+  # 使用環境變數
+  DEFAULT_ADMIN_EMAIL=admin@example.com DEFAULT_ADMIN_PASSWORD=pass123 python scripts/init_admin.py
+  
+  # Docker 啟動時自動執行（在 .env 設定 INIT_DEFAULT_ADMIN=true）
+  ```
+
+### 設計理念
+
+這種設計遵循 **關注點分離** 原則：
+
+1. **Schema Management（結構管理）**：使用 Alembic migrations
+2. **Default Data Initialization（預設資料初始化）**：使用 `init_admin.py`（idempotent）
+3. **Manual Data Management（手動資料管理）**：使用 `create_admin.py`（explicit）
+
+詳細說明請參考：`INIT-DATA-DESIGN.md`
+
+---
+
 ## 已完成的任務
 
 ### 核心功能 (Core Components)
