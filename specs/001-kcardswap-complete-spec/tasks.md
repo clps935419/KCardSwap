@@ -246,14 +246,14 @@
 
 ### Verification
 
-- [ ] T064 [US1] 執行所有 US1 測試：確保 Unit Tests + Integration Tests 全數通過（已移除獨立 contract 測試流程）
-- [ ] T065 [US1] 手動驗證 US1 驗收標準：使用 Postman/curl 測試完整登入與檔案更新流程
+- [X] T064 [US1] 執行所有 US1 測試：確保 Unit Tests + Integration Tests 全數通過（已移除獨立 contract 測試流程）
+- [X] T065 [US1] 手動驗證 US1 驗收標準：使用 Postman/curl 測試完整登入與檔案更新流程
 
 ### Mobile (Expo)
 
-- [ ] M101 [P] [US1] 實作 Google 登入畫面與 PKCE Flow：apps/mobile/src/features/auth（使用 AuthSession 取得 code + code_verifier → 呼叫 /auth/google-callback；Contract: specs/001-kcardswap-complete-spec/contracts/auth/google_callback.json）
-- [ ] M102 [P] [US1] 串接 TokenResponse 並寫入 Session：apps/mobile/src/shared/auth/session.ts（使用 /auth/refresh 續期；Contract: specs/001-kcardswap-complete-spec/contracts/auth/login.json）
-- [ ] M103 [P] [US1] 建立個人檔案頁（讀取/更新）：apps/mobile/src/features/profile（GET/PUT /profile/me；Contract: specs/001-kcardswap-complete-spec/contracts/social/profile.json）
+- [X] M101 [P] [US1] 實作 Google 登入畫面與 PKCE Flow：apps/mobile/src/features/auth（使用 AuthSession 取得 code + code_verifier → 呼叫 /auth/google-callback；Contract: specs/001-kcardswap-complete-spec/contracts/auth/google_callback.json）
+- [X] M102 [P] [US1] 串接 TokenResponse 並寫入 Session：apps/mobile/src/shared/auth/session.ts（使用 /auth/refresh 續期；Contract: specs/001-kcardswap-complete-spec/contracts/auth/login.json）
+- [X] M103 [P] [US1] 建立個人檔案頁（讀取/更新）：apps/mobile/src/features/profile（GET/PUT /profile/me；Contract: specs/001-kcardswap-complete-spec/contracts/social/profile.json）
 - [ ] M104 [US1] 手動驗證登入與更新檔案：Android 實機/模擬器（確認冷啟動 refresh 與 401 重新登入）
 
 ---
@@ -832,10 +832,10 @@ Group M5: US5 Mobile (Expo) - Trade
 
 ### Statistics（統計）
 
-- **Total Tasks**: 228 (Backend) + 13 (Mobile Phase 1M) = 241
-- **Completed**: 26 (Backend: Phase 1: 8/8, Phase 2: 18/20) + 13 (Mobile: Phase 1M: 13/13) = 39
-- **Remaining**: 202 (Backend) + Mobile US tasks (M101-M704)
-- **Estimated Duration**: 10 weeks (4 sprints)
+- **Total Tasks**: 228 (Backend) + 13 (Mobile Phase 1M) + Mobile US tasks = 241+
+- **Completed**: 63 (Backend: Phase 1: 8/8, Phase 2: 20/20, Phase 3: 35/37) + 13 (Mobile: Phase 1M: 13/13) + 3 (Mobile: Phase 3: 3/4) = 79
+- **Remaining**: 165 (Backend) + Mobile US tasks (M104, M201-M704)
+- **Estimated Duration**: 8 weeks (remaining sprints)
 
 ### Task Breakdown by Phase（各階段任務分布）
 
@@ -843,8 +843,10 @@ Group M5: US5 Mobile (Expo) - Trade
 |-------|-----------|-------|----------|--------|
 | 1 | Setup (Backend) | 8 | - | ✅ 100% Complete |
 | 1M | Mobile Setup | 13 | - | ✅ 100% Complete |
-| 2 | Foundational | 20 | - | ⏳ 90% Complete (T015-T021 pending) |
-| 3 | US1 - Login & Profile | 37 | P1 🎯 MVP | ⏸️ Not Started |
+| 2 | Foundational | 20 | - | ✅ 100% Complete |
+| 3 | US1 - Login & Profile (Backend) | 37 | P1 🎯 MVP | ✅ 95% Complete (35/37) |
+| 3.1 | US1 - PKCE Implementation | 7 | P1 🎯 MVP | ✅ 100% Complete (7/7) |
+| 3 | US1 - Mobile | 4 | P1 🎯 MVP | ⏳ 75% Complete (3/4, M104 pending) |
 | 4 | US2 - Card Upload | 29 | P1 | ⏸️ Not Started |
 | 5 | US3 - Nearby Search | 16 | P1 | ⏸️ Not Started |
 | 6 | US4 - Friends & Chat | 33 | P1 | ⏸️ Not Started |
@@ -859,21 +861,29 @@ Group M5: US5 Mobile (Expo) - Trade
 - ✅ Phase 1: Setup (T001-T008)
 - ✅ Phase 1M: Mobile Setup (M001-M013)
 - ✅ Phase 2: Foundational (T009-T028)
-- 🎯 Phase 3: US1 - Login & Profile (T029-T065)
+- ✅ Phase 3: US1 - Login & Profile Backend (T029-T063) 
+- ✅ Phase 3.1: US1 - PKCE Implementation (T046A, T035B, T045B, T053A, T057A, T061A, T062A)
+- ✅ Phase 3: US1 - Mobile Implementation (M101-M103)
+- ⏳ Phase 3: US1 - Verification (T064-T065 完成, M104 pending)
 
 **MVP 驗收標準**：
-- 使用者可以透過 Google 登入
-- 使用者可以查看和更新個人檔案
-- JWT Token 機制正常運作
-- 所有測試通過
+- ✅ 使用者可以透過 Google 登入 (PKCE + Implicit flows)
+- ✅ 使用者可以查看和更新個人檔案
+- ✅ JWT Token 機制正常運作
+- ✅ 所有測試通過
+- ⏳ 手動驗證待完成 (M104 - 需要實際環境)
 
 ### Next Steps（下一步）
 
 1. **✅ 已完成**：Phase 1M Mobile Setup (M001-M013) - Mobile 基礎架構完成
-2. **立即執行**：完成 Phase 2 剩餘任務（T015-T021）
-3. **MVP 開發**：執行 Phase 3 US1（T029-T065 Backend + M101-M104 Mobile）
-4. **並行開發**：US1 完成後，同時開發 US2 + US4 + US6（Backend + Mobile 各自並行）
-5. **最終整合**：所有 US 完成後執行 Phase 9 Polish
+2. **✅ 已完成**：Phase 2 Foundational (T009-T028) - 基礎設施完成
+3. **✅ 已完成**：Phase 3 US1 Backend (T029-T063) - Google 登入與個人檔案後端完成
+4. **✅ 已完成**：Phase 3.1 PKCE Implementation - Expo 標準 OAuth 流程完成
+5. **✅ 已完成**：Phase 3 US1 Mobile (M101-M103) - Mobile 端登入與個人檔案完成
+6. **⏳ 進行中**：Phase 3 US1 Verification (M104) - 待實際環境手動驗證
+7. **下一階段**：Phase 4 US2 (Card Upload) - 小卡上傳功能開發
+8. **並行開發**：US1 完成後，同時開發 US2 + US4 + US6（Backend + Mobile 各自並行）
+9. **最終整合**：所有 US 完成後執行 Phase 9 Polish
 
 ---
 
