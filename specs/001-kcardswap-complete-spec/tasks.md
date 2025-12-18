@@ -35,20 +35,37 @@
 
 ---
 
-## Phase 1M: Mobile Setup (Expo 基礎架構)
+## Phase 1M: Mobile Setup (Expo 基礎架構) ✅
 
 **目的**: 建立 Expo app 與共用前端基礎，供所有 User Story 的 Mobile 任務共用（不放進各 US）
 
-- [ ] M001 初始化 Expo app 專案：建立 apps/mobile（TypeScript）
-- [ ] M002 建立路由與導航骨架：apps/mobile/src/navigation（Auth Stack + Main Tabs）
-- [ ] M003 建立 API Client：apps/mobile/src/shared/api/client.ts（baseURL + /api/v1、timeout、錯誤解析）
-- [ ] M004 建立 Token 儲存與 Session 管理：apps/mobile/src/shared/auth/session.ts（expo-secure-store 儲存 access/refresh、啟動時 refresh）
-- [ ] M005 建立 Auth 狀態管理：apps/mobile/src/shared/state/authStore.ts（登入/登出/refresh、401 自動導回登入）
-- [ ] M006 建立錯誤碼與訊息映射：apps/mobile/src/shared/api/errorMapper.ts（對齊後端 400/401/403/404/422/429）
-- [ ] M007 建立環境設定範本：apps/mobile/.env.example（BACKEND_BASE_URL、GOOGLE_CLIENT_ID 等）
-- [ ] M008 建立基礎測試與 lint：apps/mobile（eslint/prettier + jest）
-- [ ] M009 更新開發文件：dev-setup.md（補上 mobile 啟動、環境變數、Android 模擬器/實機）
-- [ ] M010 [P] 建立 Mobile CI：.github/workflows/mobile-ci.yml（lint/test；EAS build 可後續加）
+- [x] M001 初始化 Expo app 專案：建立 apps/mobile（TypeScript）
+- [x] M002 建立路由與導航骨架：apps/mobile/app（Expo Router - Auth Stack + Main Tabs）
+- [x] M003 建立 API Client：apps/mobile/src/shared/api/client.ts（baseURL + /api/v1、timeout、錯誤解析、自動 token refresh）
+- [x] M004 建立 Token 儲存與 Session 管理：apps/mobile/src/shared/auth/session.ts（expo-secure-store 儲存 access/refresh、啟動時 refresh）
+- [x] M005 建立 Auth 狀態管理：apps/mobile/src/shared/state/authStore.ts（登入/登出/refresh、401 自動導回登入）
+- [x] M006 建立錯誤碼與訊息映射：apps/mobile/src/shared/api/errorMapper.ts（對齊後端 400/401/403/404/422/429）
+- [x] M007 建立環境設定範本：apps/mobile/.env.example（BACKEND_BASE_URL、GOOGLE_CLIENT_ID 等）
+- [x] M008 建立基礎測試與 lint：apps/mobile（eslint/prettier + jest）
+- [x] M009 更新開發文件：dev-setup.md（補上 mobile 啟動、環境變數、Android 模擬器/實機）
+- [x] M010 [P] 建立 Mobile CI：.github/workflows/mobile-ci.yml（lint/test；EAS build 可後續加）
+- [x] M011 安裝 User Stories 所需 Expo 套件（expo-auth-session, expo-image-picker, expo-image-manipulator, expo-location, expo-notifications 等）
+- [x] M012 建立前端技術文件：apps/mobile/TECH_STACK.md（完整技術棧說明、套件使用範例、最佳實踐）
+- [x] M013 配置程式碼格式化工具：Prettier + ESLint with Expo config（npm run format, npm run precommit）
+
+**Checkpoint**: Mobile 基礎架構完成 ✅ - 各 US 的 Mobile 任務可開始並行
+
+**已完成項目:**
+- ✅ Expo SDK 54 + React Native 0.81 + TypeScript
+- ✅ Expo Router 檔案式路由（app/ 目錄結構）
+- ✅ NativeWind (Tailwind CSS) 樣式系統
+- ✅ Zustand 狀態管理 + TanStack Query API 管理
+- ✅ Axios API Client with 自動 Token Refresh
+- ✅ 完整錯誤處理與映射
+- ✅ 所有 User Stories 所需 Expo 套件已安裝
+- ✅ 完整技術文件 (TECH_STACK.md)
+- ✅ ESLint + Prettier 程式碼品質工具
+- ✅ Mobile CI/CD workflow
 
 **Checkpoint**: Mobile 基礎架構完成 - 各 US 的 Mobile 任務可開始並行
 
@@ -740,17 +757,17 @@ Group M5: US5 Mobile (Expo) - Trade
 
 ### Statistics（統計）
 
-- **Total Tasks**: 205
-- **Total Tasks**: 205（不含 Mobile 的 M### 任務）
-- **Completed**: 26 (Phase 1: 8/8, Phase 2: 18/20)
-- **Remaining**: 179
+- **Total Tasks**: 205 (Backend) + 13 (Mobile Phase 1M) = 218
+- **Completed**: 26 (Backend: Phase 1: 8/8, Phase 2: 18/20) + 13 (Mobile: Phase 1M: 13/13) = 39
+- **Remaining**: 179 (Backend) + Mobile US tasks (M101-M604)
 - **Estimated Duration**: 10 weeks (4 sprints)
 
 ### Task Breakdown by Phase（各階段任務分布）
 
 | Phase | User Story | Tasks | Priority | Status |
 |-------|-----------|-------|----------|--------|
-| 1 | Setup | 8 | - | ✅ 100% Complete |
+| 1 | Setup (Backend) | 8 | - | ✅ 100% Complete |
+| 1M | Mobile Setup | 13 | - | ✅ 100% Complete |
 | 2 | Foundational | 20 | - | ⏳ 90% Complete (T015-T021 pending) |
 | 3 | US1 - Login & Profile | 37 | P1 🎯 MVP | ⏸️ Not Started |
 | 4 | US2 - Card Upload | 29 | P1 | ⏸️ Not Started |
@@ -764,6 +781,7 @@ Group M5: US5 Mobile (Expo) - Trade
 
 **建議 MVP 僅包含**：
 - ✅ Phase 1: Setup (T001-T008)
+- ✅ Phase 1M: Mobile Setup (M001-M013)
 - ✅ Phase 2: Foundational (T009-T028)
 - 🎯 Phase 3: US1 - Login & Profile (T029-T065)
 
@@ -775,10 +793,11 @@ Group M5: US5 Mobile (Expo) - Trade
 
 ### Next Steps（下一步）
 
-1. **立即執行**：完成 Phase 2 剩餘任務（T015-T021）
-2. **MVP 開發**：執行 Phase 3 US1（T029-T065）
-3. **並行開發**：US1 完成後，同時開發 US2 + US4 + US6
-4. **最終整合**：所有 US 完成後執行 Phase 9 Polish
+1. **✅ 已完成**：Phase 1M Mobile Setup (M001-M013) - Mobile 基礎架構完成
+2. **立即執行**：完成 Phase 2 剩餘任務（T015-T021）
+3. **MVP 開發**：執行 Phase 3 US1（T029-T065 Backend + M101-M104 Mobile）
+4. **並行開發**：US1 完成後，同時開發 US2 + US4 + US6（Backend + Mobile 各自並行）
+5. **最終整合**：所有 US 完成後執行 Phase 9 Polish
 
 ---
 
