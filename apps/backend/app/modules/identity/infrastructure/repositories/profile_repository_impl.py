@@ -48,9 +48,8 @@ class SQLAlchemyProfileRepository(IProfileRepository):
             existing.updated_at = profile.updated_at
             model = existing
         else:
-            # Create new
+            # Create new - let database generate ID
             model = ProfileModel(
-                id=profile.id,
                 user_id=profile.user_id,
                 nickname=profile.nickname,
                 avatar_url=profile.avatar_url,

@@ -25,7 +25,7 @@ def upgrade() -> None:
     """Add id column to profiles table and make user_id unique."""
     
     # Step 1: Drop the existing primary key constraint on user_id
-    op.execute('ALTER TABLE profiles DROP CONSTRAINT profiles_pkey')
+    op.drop_constraint('profiles_pkey', 'profiles', type_='primary')
     
     # Step 2: Add the new id column with UUID type and default value
     op.add_column('profiles', sa.Column('id', postgresql.UUID(as_uuid=True), nullable=False, server_default=sa.text('uuid_generate_v4()')))
