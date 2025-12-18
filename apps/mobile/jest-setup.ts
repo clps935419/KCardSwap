@@ -1,5 +1,5 @@
 // Jest setup file
-import '@testing-library/react-native/extend-expect';
+// Note: @testing-library/react-native v12.4+ has built-in matchers
 
 // Mock expo modules
 jest.mock('expo-secure-store', () => ({

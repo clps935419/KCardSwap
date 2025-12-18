@@ -14,7 +14,7 @@ export default function ProfileScreen() {
         <View className="w-24 h-24 rounded-full bg-gray-300 items-center justify-center mb-4">
           <Text className="text-3xl">👤</Text>
         </View>
-        
+
         {user && (
           <>
             <Text className="text-xl font-bold text-gray-800">{user.nickname || 'User'}</Text>

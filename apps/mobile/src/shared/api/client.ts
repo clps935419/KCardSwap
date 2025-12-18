@@ -19,7 +19,7 @@ export const createApiClient = (): AxiosInstance => {
   client.interceptors.request.use(
     async (requestConfig: InternalAxiosRequestConfig) => {
       const token = await getAccessToken();
-      
+
       if (token && requestConfig.headers) {
         requestConfig.headers.Authorization = `Bearer ${token}`;
       }
@@ -43,7 +43,7 @@ export const createApiClient = (): AxiosInstance => {
 
         try {
           const refreshToken = await getRefreshToken();
-          
+
           if (!refreshToken) {
             // No refresh token, user needs to login again
             throw mapApiError(error);
@@ -57,7 +57,7 @@ export const createApiClient = (): AxiosInstance => {
           );
 
           const { accessToken, refreshToken: newRefreshToken, expiresIn } = response.data;
-          
+
           // Save new tokens
           await saveTokens({
             accessToken,
@@ -69,7 +69,7 @@ export const createApiClient = (): AxiosInstance => {
           if (originalRequest.headers) {
             originalRequest.headers.Authorization = `Bearer ${accessToken}`;
           }
-          
+
           return client(originalRequest);
         } catch (refreshError) {
           // Refresh failed, user needs to login again
@@ -94,10 +94,10 @@ export const apiClient = createApiClient();
  */
 export async function ensureValidToken(): Promise<void> {
   const expired = await isTokenExpired();
-  
+
   if (expired) {
     const refreshToken = await getRefreshToken();
-    
+
     if (!refreshToken) {
       throw new Error('No refresh token available');
     }
@@ -110,7 +110,7 @@ export async function ensureValidToken(): Promise<void> {
       );
 
       const { accessToken, refreshToken: newRefreshToken, expiresIn } = response.data;
-      
+
       await saveTokens({
         accessToken,
         refreshToken: newRefreshToken,

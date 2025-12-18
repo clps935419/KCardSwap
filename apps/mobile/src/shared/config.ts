@@ -6,7 +6,7 @@ export const config = {
   appName: process.env.EXPO_PUBLIC_APP_NAME || 'KCardSwap',
   appVersion: process.env.EXPO_PUBLIC_APP_VERSION || '1.0.0',
   env: process.env.EXPO_PUBLIC_ENV || 'development',
-  
+
   // API timeouts (in milliseconds)
   apiTimeout: 30000, // 30 seconds
   apiRetries: 3,

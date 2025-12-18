@@ -30,7 +30,8 @@ export const ERROR_MESSAGES: Record<string, string> = {
 
   // Rate limiting (429)
   '429_RATE_LIMIT_EXCEEDED': 'Too many requests. Please try again later.',
-  '429_DAILY_SEARCH_LIMIT': 'Daily search limit reached. Upgrade to premium for unlimited searches.',
+  '429_DAILY_SEARCH_LIMIT':
+    'Daily search limit reached. Upgrade to premium for unlimited searches.',
 
   // Server errors (500)
   '500_INTERNAL_ERROR': 'An unexpected error occurred. Please try again.',

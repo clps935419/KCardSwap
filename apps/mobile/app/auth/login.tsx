@@ -1,9 +1,6 @@
 import { View, Text, TouchableOpacity } from 'react-native';
-import { useRouter } from 'expo-router';
 
 export default function LoginScreen() {
-  const router = useRouter();
-
   const handleGoogleLogin = async () => {
     // TODO: Implement Google OAuth with PKCE flow
     // This will be implemented in US1 Mobile tasks (M101)
