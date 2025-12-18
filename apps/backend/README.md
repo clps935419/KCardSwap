@@ -24,25 +24,6 @@ FastAPI + PostgreSQL + Alembic + Poetry
 - [Google OAuth 設定](docs/setup/google-oauth-setup.md) - OAuth 配置步驟
 - [密鑰管理](docs/setup/secrets.md) - 敏感資料處理指南
 
-### 📋 Phase 完成報告
-- [Phase 0 完成報告](docs/phases/phase-0-complete.md) - 專案初始化
-- [Phase 1 完成報告](docs/phases/phase-1-complete.md) - 認證與個人檔案
-- [Phase 2.5 完成報告](docs/phases/phase-2.5-complete.md) - 管理員系統
-- [Phase 3 & 3.1 總結](docs/phases/phase-3-and-3.1-summary.md) - Google OAuth PKCE
-- [Phase 3.1 完成報告](docs/phases/phase-3.1-complete.md) - OAuth 整合
-
-### 📝 實作報告
-- [Phase 1 實作報告](docs/phases/phase-1-implementation-report.md)
-- [Phase 2.5 管理員腳本說明](docs/phases/phase-2.5-admin-scripts-clarification.md)
-- [Phase 2.5 驗證指南](docs/phases/phase-2.5-verification-guide.md)
-- [Phase 2.5 最終總結](docs/phases/phase-2.5-final-summary.md)
-- [Phase 3 執行報告](docs/phases/phase-3-execution-report.md)
-- [Phase 3.1 測試指南](docs/phases/phase-3.1-testing-guide.md)
-
-### 🎉 里程碑
-- [完成報告](docs/completion-report.md) - 專案完成總覽
-- [Poetry 遷移報告](docs/poetry-migration-report.md) - 依賴管理工具遷移
-
 ---
 
 ## 開發環境設置
