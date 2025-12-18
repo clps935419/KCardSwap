@@ -15,11 +15,13 @@
 
 ## 解決方案實施
 
-### 階段 1: 修復 init_admin.py ✅
+### 階段 1: 修復 init_admin.py 和 create_admin.py ✅
 
-**變更檔案**: `apps/backend/scripts/init_admin.py`
+**變更檔案**: 
+- `apps/backend/scripts/init_admin.py`
+- `apps/backend/scripts/create_admin.py`
 
-新增了 ProfileModel 建立邏輯，在建立管理員使用者後立即建立對應的 Profile：
+兩個腳本都新增了 ProfileModel 建立邏輯，在建立管理員使用者後立即建立對應的 Profile：
 
 ```python
 # Create default profile for admin user
@@ -196,7 +198,17 @@ model = ProfileModel(
 - 讓 SQLAlchemy 的 default 邏輯正常運作
 - 簡化程式碼，減少潛在錯誤
 
-### 3. 管理員 Profile 預設值
+### 3. 管理員腳本一致性
+**決策**: `init_admin.py` 和 `create_admin.py` 使用相同的 Profile 建立邏輯
+
+**理由**:
+- 確保所有管理員帳號都有 Profile，避免 404 錯誤
+- 兩個腳本用途不同但都需要建立完整的管理員帳號
+  - `init_admin.py`: 用於初始化預設管理員（可設定環境變數）
+  - `create_admin.py`: 用於手動建立額外的管理員（必須提供參數）
+- 統一的預設值確保所有管理員的隱私設定一致
+
+### 4. 管理員 Profile 預設值
 **決策**: Privacy flags 全部設為 False
 
 **理由**:
@@ -206,12 +218,14 @@ model = ProfileModel(
 
 ## 檔案變更統計
 
-**新增檔案**: 2
+**新增檔案**: 3
 - `alembic/versions/004_add_profile_id.py`
 - `phase-2.5-profile-fix-guide.md`
+- `phase-2.5-completion-summary.md`
 
-**修改檔案**: 9
+**修改檔案**: 10
 - `scripts/init_admin.py`
+- `scripts/create_admin.py` ⭐ 補充修正
 - `app/modules/identity/infrastructure/database/models/profile_model.py`
 - `app/modules/identity/domain/entities/profile.py`
 - `app/modules/identity/infrastructure/repositories/profile_repository_impl.py`

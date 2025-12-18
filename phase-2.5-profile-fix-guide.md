@@ -32,6 +32,19 @@ admin_profile = ProfileModel(
 )
 ```
 
+#### `apps/backend/scripts/create_admin.py`
+- **變更**: 新增 ProfileModel 建立邏輯（與 init_admin.py 相同）
+- **影響**: 管理員建立腳本現在會同時建立 User 和 Profile
+```python
+# 新增的程式碼片段（與 init_admin.py 相同邏輯）
+admin_profile = ProfileModel(
+    user_id=admin_user.id,
+    nickname=f"Admin ({email.split('@')[0]})",
+    bio="System Administrator",
+    privacy_flags={"nearby_visible": False, "show_online": False, "allow_stranger_chat": False},
+)
+```
+
 #### `apps/backend/app/modules/identity/infrastructure/database/models/profile_model.py`
 - **變更**: 添加 `id` 欄位作為主鍵，`user_id` 改為 unique foreign key
 ```python
