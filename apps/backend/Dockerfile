@@ -39,9 +39,9 @@ COPY ./alembic.ini ./alembic.ini
 # 暴露服務端口
 EXPOSE 8000
 
-# 拷貝啟動腳本並設為可執行
-COPY start.sh /app/start.sh
-RUN chmod +x /app/start.sh
+# 拷貝啟動腳本（強制定權限）並移除可能的 CRLF
+COPY --chmod=755 start.sh /app/start.sh
+RUN sed -i 's/\r$//' /app/start.sh
 
 # 啟動命令：先執行 migrations，然後啟動應用
 CMD ["/app/start.sh"]
