@@ -3,6 +3,7 @@ export const config = {
   apiBaseUrl: process.env.EXPO_PUBLIC_API_BASE_URL || 'http://localhost:8080/api/v1',
   googleClientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID || '',
   googleRedirectUri: process.env.EXPO_PUBLIC_GOOGLE_REDIRECT_URI || 'kcardswap://',
+  appScheme: process.env.EXPO_PUBLIC_APP_SCHEME || 'kcardswap',
   appName: process.env.EXPO_PUBLIC_APP_NAME || 'KCardSwap',
   appVersion: process.env.EXPO_PUBLIC_APP_VERSION || '1.0.0',
   env: process.env.EXPO_PUBLIC_ENV || 'development',
