@@ -58,12 +58,10 @@ Phase 3.1 (Google OAuth Callback with PKCE) has been **successfully implemented*
 ✅ Same JWT token response as existing google-login endpoint  
 ✅ Documentation clearly explains both OAuth flows  
 
-## ⏳ Remaining Tasks (3 tasks - 33%)
+## ⏳ Remaining Tasks (1 task)
 
-### Testing Suite (T053A, T053B, T057A)
+### Testing Suite
 Code is implemented and ready to be tested:
-- [ ] T053A: Create google_callback.json contract
-- [ ] T053B: Write contract tests for PKCE flow
 - [ ] T057A: Integration tests with mocked Google endpoint
 
 ## 🚀 Ready to Use!

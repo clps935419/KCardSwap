@@ -60,9 +60,7 @@
 
 #### ⏳ 待完成項目 / Remaining Tasks (Optional Testing)
 
-**Testing (6 tasks)**
-- T053: Auth Contract Tests
-- T054: Profile Contract Tests
+**Testing (4 tasks)**
 - T055: User Entity Unit Tests
 - T056: GoogleLoginUseCase Unit Tests
 - T057: Auth Integration Tests
@@ -98,9 +96,7 @@
 
 #### ⏳ 待完成項目 / Remaining Tasks (Optional Testing)
 
-**Testing (3 tasks)**
-- T053A: Create google_callback.json contract
-- T053B: Write Google Callback Contract Tests
+**Testing (1 task)**
 - T057A: Auth Integration Tests with PKCE flow
 
 **Note**: All core functionality implemented and working. Testing tasks are optional.
@@ -248,7 +244,7 @@ Mobile App
 ### 立即可做 / Immediate Actions (Optional)
 
 1. **寫測試** / Write Tests
-   - Contract tests for PKCE flow
+  - Integration tests for PKCE flow
    - Integration tests with mocked Google
    - Unit tests for GoogleCallbackUseCase
 

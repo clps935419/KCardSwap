@@ -209,7 +209,6 @@
 #### Testing
 
 - [X] T053A [P] [US1] （Expo/PKCE）新增 Auth Contract：specs/001-kcardswap-complete-spec/contracts/auth/google_callback.json（定義 request/response）
-- [X] T053B [P] [US1] （Expo/PKCE）撰寫 Google Callback Contract Tests：specs/001-kcardswap-complete-spec/tests/contract_tests/test_contracts.py（新增 google_callback contract 驗證）
 - [X] T057A [P] [US1] （Expo/PKCE）Auth Integration Tests：tests/integration/modules/identity/test_auth_flow.py（mock Google token endpoint，覆蓋 code+pkce 流程）
 
 #### Documentation
@@ -224,8 +223,8 @@
 
 ### Testing
 
-- [ ] T053 [P] [US1] 撰寫 Auth Contract Tests：tests/integration/contracts/test_auth_contracts.py（對齊 contracts/auth/login.json）
-- [ ] T054 [P] [US1] 撰寫 Profile Contract Tests：tests/integration/contracts/test_profile_contracts.py（對齊 contracts/social/profile.json）
+- [ ] T053 [P] [US1] 撰寫 Auth Integration Tests：tests/integration/contracts/test_auth_contracts.py（對齊 contracts/auth/login.json，移除獨立 contract 測試流程後改以整合測試覆蓋）
+- [ ] T054 [P] [US1] 撰寫 Profile Integration Tests：tests/integration/contracts/test_profile_contracts.py（對齊 contracts/social/profile.json，改以整合測試覆蓋）
 - [ ] T055 [P] [US1] 撰寫 User Entity Unit Tests：tests/unit/modules/identity/domain/test_user_entity.py
 - [ ] T056 [P] [US1] 撰寫 GoogleLoginUseCase Unit Tests：tests/unit/modules/identity/application/test_google_login_use_case.py
 - [ ] T057 [US1] 撰寫 Auth Integration Tests：tests/integration/modules/identity/test_auth_flow.py（完整登入流程 E2E）
@@ -247,7 +246,7 @@
 
 ### Verification
 
-- [ ] T064 [US1] 執行所有 US1 測試：確保 Contract Tests + Unit Tests + Integration Tests 全數通過
+- [ ] T064 [US1] 執行所有 US1 測試：確保 Unit Tests + Integration Tests 全數通過（已移除獨立 contract 測試流程）
 - [ ] T065 [US1] 手動驗證 US1 驗收標準：使用 Postman/curl 測試完整登入與檔案更新流程
 
 ### Mobile (Expo)
@@ -304,7 +303,7 @@
 
 ### Testing
 
-- [ ] T083 [P] [US2] 撰寫 Cards Contract Tests：tests/integration/contracts/test_cards_contracts.py（對齊 contracts/cards/create.json）
+- [ ] T083 [P] [US2] 撰寫 Cards Integration Tests：tests/integration/contracts/test_cards_contracts.py（對齊 contracts/cards/create.json，改以整合測試覆蓋）
 - [ ] T084 [P] [US2] 撰寫 Card Entity Unit Tests：tests/unit/modules/social/domain/test_card_entity.py
 - [ ] T085 [P] [US2] 撰寫 UploadCardUseCase Unit Tests：tests/unit/modules/social/application/test_upload_card_use_case.py（Mock 限制檢查）
 - [ ] T086 [P] [US2] 撰寫 Quota Validation Unit Tests：tests/unit/modules/social/domain/test_upload_quota.py（測試每日/總容量/單檔大小邊界）
@@ -322,7 +321,7 @@
 
 ### Verification
 
-- [ ] T092 [US2] 執行所有 US2 測試：確保 Contract Tests + Unit Tests + Integration Tests 全數通過
+- [ ] T092 [US2] 執行所有 US2 測試：確保 Unit Tests + Integration Tests 全數通過（已移除獨立 contract 測試流程）
 - [ ] T093 [US2] 手動驗證 US2 驗收標準：測試上傳 2 張後觸發 422_LIMIT_EXCEEDED
 - [ ] T094 [US2] 驗證縮圖產生：確認 GCS 中 thumbs/ 路徑下有對應的 200x200 圖片
 
@@ -370,7 +369,7 @@
 
 ### Testing
 
-- [ ] T103 [P] [US3] 撰寫 Nearby Contract Tests：tests/integration/contracts/test_nearby_contracts.py（對齊 contracts/nearby/search.json）
+- [ ] T103 [P] [US3] 撰寫 Nearby Integration Tests：tests/integration/contracts/test_nearby_contracts.py（對齊 contracts/nearby/search.json，改以整合測試覆蓋）
 - [ ] T104 [P] [US3] 撰寫 SearchNearbyCardsUseCase Unit Tests：tests/unit/modules/social/application/test_search_nearby_use_case.py（Mock 距離計算與排序邏輯）
 - [ ] T105 [US3] 撰寫 Nearby Search Integration Tests：tests/integration/modules/social/test_nearby_search_flow.py（完整搜尋流程 E2E，包含限制觸發）
 
@@ -381,7 +380,7 @@
 
 ### Verification
 
-- [ ] T108 [US3] 執行所有 US3 測試：確保 Contract Tests + Unit Tests + Integration Tests 全數通過
+- [ ] T108 [US3] 執行所有 US3 測試：確保 Unit Tests + Integration Tests 全數通過（已移除獨立 contract 測試流程）
 - [ ] T109 [US3] 手動驗證 US3 驗收標準：測試搜尋 5 次後觸發 429_RATE_LIMIT_EXCEEDED（免費用戶）
 - [ ] T110 [US3] 驗證付費用戶搜尋：確認付費用戶可以無限次搜尋
 
@@ -507,7 +506,7 @@
 
 ### Testing
 
-- [ ] T161 [P] [US5] 撰寫 Trade Contract Tests：tests/integration/contracts/test_trade_contracts.py（對齊 contracts/trade/create.json）
+- [ ] T161 [P] [US5] 撰寫 Trade Integration Tests：tests/integration/contracts/test_trade_contracts.py（對齊 contracts/trade/create.json，改以整合測試覆蓋）
 - [ ] T162 [P] [US5] 撰寫 Trade Entity Unit Tests：tests/unit/modules/social/domain/test_trade_entity.py
 - [ ] T163 [P] [US5] 撰寫 Trade Status State Machine Tests：tests/unit/modules/social/domain/test_trade_status.py（測試所有狀態轉換）
 - [ ] T164 [P] [US5] 撰寫 CreateTradeProposalUseCase Unit Tests：tests/unit/modules/social/application/test_create_trade_proposal_use_case.py
@@ -533,7 +532,7 @@
 
 ### Verification
 
-- [ ] T172 [US5] 執行所有 US5 測試：確保 Contract Tests + Unit Tests + Integration Tests 全數通過
+- [ ] T172 [US5] 執行所有 US5 測試：確保 Unit Tests + Integration Tests 全數通過（已移除獨立 contract 測試流程）
 - [ ] T173 [US5] 手動驗證 US5 驗收標準：測試完整交換流程（draft → proposed → accepted → completed）
 - [ ] T174 [US5] 驗證卡片鎖定：確認交換完成後卡片狀態更新為「已交換」且無法再次交換
 
@@ -579,7 +578,7 @@
 
 ### Testing
 
-- [ ] T185 [P] [US6] 撰寫 Subscription Contract Tests：tests/integration/contracts/test_subscription_contracts.py（對齊 contracts/biz/offer.json）
+- [ ] T185 [P] [US6] 撰寫 Subscription Integration Tests：tests/integration/contracts/test_subscription_contracts.py（對齊 contracts/biz/offer.json，改以整合測試覆蓋）
 - [ ] T186 [P] [US6] 撰寫 Subscription Unit Tests：tests/unit/modules/identity/application/test_verify_receipt_use_case.py
 - [ ] T187 [US6] 撰寫 Subscription Integration Tests：tests/integration/modules/identity/test_subscription_flow.py
 

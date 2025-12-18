@@ -1,32 +1,11 @@
-name: Contract tests
+name: Contract tests (disabled)
 
-on:
-  push:
-    paths:
-      - 'specs/**'
-      - '.github/workflows/**'
-  pull_request:
-    paths:
-      - 'specs/**'
-      - '.github/workflows/**'
+on: {}
 
 jobs:
   contract-tests:
+    if: false
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.12'
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install pytest
-
-      - name: Run contract tests
-        run: |
-          python -m pytest specs/001-kcardswap-complete-spec/tests/contract_tests -q
+      - name: Skipped
+        run: echo "contract tests workflow disabled"

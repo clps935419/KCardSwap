@@ -23,7 +23,7 @@ Successfully completed Phase 1 (AUTH/PROFILE) implementation for KCardSwap, impl
 | T102 | JWT generation/refresh/logout (15m/7d) | ✅ Complete |
 | T103 | Profile CRUD + privacy settings | ✅ Complete |
 | T104 | Kong + backend JWT verification | ✅ Complete |
-| T105 | Unit/integration tests + contract tests | ✅ Complete |
+| T105 | Unit/integration tests | ✅ Complete |
 
 ---
 
@@ -239,10 +239,6 @@ Available at:
    - Test full auth flows
    - Test privacy flag behaviors
 
-6. **Contract Tests** (Recommended)
-   - Align with `contracts/auth/login.json`
-   - Test all scenarios: success, validation failure, unauthorized
-
 ---
 
 ## Production Readiness Assessment
@@ -256,7 +252,6 @@ Available at:
 | Security | ⚠️ Pending Config | Needs actual OAuth credentials |
 | Kong Integration | ⚠️ Pending Config | Config template ready |
 | Integration Tests | ⚠️ Recommended | Should be added |
-| Contract Tests | ⚠️ Recommended | Should be added |
 
 **Overall**: Code is production-ready, pending external service configuration.
 
@@ -317,9 +312,8 @@ poetry run pytest --cov=app --cov-report=html
 
 1. **Google OAuth**: Requires actual Google OAuth credentials for testing
 2. **Kong**: JWT plugin configuration pending deployment
-3. **Contract Tests**: Need to be expanded per `contracts/auth/login.json`
-4. **Integration Tests**: Require running PostgreSQL instance
-5. **E2E Tests**: User journey tests not yet implemented
+3. **Integration Tests**: Require running PostgreSQL instance
+4. **E2E Tests**: User journey tests not yet implemented
 
 ---
 

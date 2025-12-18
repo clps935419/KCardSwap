@@ -115,7 +115,7 @@ Every task MUST strictly follow this format:
 
 2. **From Contracts**:
    - Map each contract/endpoint → to the user story it serves
-   - If tests requested: Each contract → contract test task [P] before implementation in that story's phase
+   - 若需測試：以對應的整合測試（非獨立 contract 測試）涵蓋該端點
 
 3. **From Data Model**:
    - Map each entity to the user story(ies) that need it

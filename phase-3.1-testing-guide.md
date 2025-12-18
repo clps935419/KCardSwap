@@ -12,92 +12,20 @@ This document explains how to test the Phase 3.1 Google OAuth PKCE authenticatio
 
 ### 測試類型 / Test Types
 
-Phase 3.1 包含三種測試：
+Phase 3.1 包含兩種測試：
 
-1. **Contract Tests** (契約測試)
-   - 驗證 API 端點符合定義的契約
-   - 位置: `specs/001-kcardswap-complete-spec/contracts/auth/google_callback.json`
-   - 測試檔: `specs/001-kcardswap-complete-spec/tests/contract_tests/test_contracts.py`
+1. **Integration Tests** (整合測試)
+  - 測試完整的 PKCE 認證流程
+  - 位置: `apps/backend/tests/integration/modules/identity/test_auth_flow.py`
+  - 使用 mock 模擬 Google OAuth 服務
 
-2. **Integration Tests** (整合測試)
-   - 測試完整的 PKCE 認證流程
-   - 位置: `apps/backend/tests/integration/modules/identity/test_auth_flow.py`
-   - 使用 mock 模擬 Google OAuth 服務
-
-3. **Manual Testing** (手動測試)
-   - 使用真實的 Google OAuth 憑證測試
-   - 使用 curl 或 Postman
+2. **Manual Testing** (手動測試)
+  - 使用真實的 Google OAuth 憑證測試
+  - 使用 curl 或 Postman
 
 ---
 
-## 1. Contract Tests (契約測試)
-
-### 什麼是 Contract Tests?
-
-Contract tests 驗證 API 端點的請求和回應格式符合預定義的契約。這確保：
-- API 結構一致性
-- 前後端通訊協定一致
-- Breaking changes 可以被檢測到
-
-### 執行 Contract Tests
-
-```bash
-cd /home/runner/work/KCardSwap/KCardSwap/apps/backend
-
-# 執行所有契約測試
-pytest specs/001-kcardswap-complete-spec/tests/contract_tests/test_contracts.py -v
-
-# 只測試 google_callback 契約
-pytest specs/001-kcardswap-complete-spec/tests/contract_tests/test_contracts.py -v -k google_callback
-```
-
-### Contract 定義
-
-Contract 位於 `specs/001-kcardswap-complete-spec/contracts/auth/google_callback.json`:
-
-```json
-{
-  "name": "POST /auth/google-callback",
-  "request": {
-    "method": "POST",
-    "path": "/auth/google-callback",
-    "body": {
-      "code": "string (required)",
-      "code_verifier": "string (required, 43-128 chars)",
-      "redirect_uri": "string (optional)"
-    }
-  },
-  "responses": [
-    {
-      "status": 200,
-      "body": {
-        "data": {
-          "access_token": "string",
-          "refresh_token": "string",
-          "token_type": "bearer",
-          "expires_in": 900,
-          "user_id": "uuid",
-          "email": "string"
-        },
-        "error": null
-      }
-    }
-  ],
-  "implemented": true
-}
-```
-
-### 驗證項目
-
-Contract tests 自動驗證：
-- ✅ API 端點已實現 (`implemented: true`)
-- ✅ 請求格式正確
-- ✅ 回應格式符合契約
-- ✅ 錯誤處理正確
-
----
-
-## 2. Integration Tests (整合測試)
+## 1. Integration Tests (整合測試)
 
 ### 測試場景
 
@@ -210,7 +138,7 @@ assert data["data"]["access_token"] is not None
 
 ---
 
-## 3. Manual Testing (手動測試)
+## 2. Manual Testing (手動測試)
 
 ### 3.1 使用 curl 測試
 
@@ -509,11 +437,6 @@ jobs:
           pip install -r requirements.txt
           pip install pytest pytest-asyncio
       
-      - name: Run Contract Tests
-        run: |
-          cd apps/backend
-          pytest specs/001-kcardswap-complete-spec/tests/contract_tests/ -v
-      
       - name: Run Integration Tests
         run: |
           cd apps/backend
@@ -562,11 +485,6 @@ sqlalchemy.exc.OperationalError: could not connect to server
 
 完成 Phase 3.1 測試的檢查清單：
 
-### Contract Tests
-- [X] google_callback.json contract 已創建
-- [X] Contract 標記為 implemented: true
-- [ ] 執行契約測試並通過
-
 ### Integration Tests
 - [X] test_auth_flow.py 已創建
 - [X] 成功場景測試已實現
@@ -592,7 +510,6 @@ sqlalchemy.exc.OperationalError: could not connect to server
 
 Phase 3.1 的測試涵蓋：
 
-✅ **Contract Tests** - 驗證 API 契約
 ✅ **Integration Tests** - 測試完整 PKCE 流程
 ✅ **Manual Testing Guide** - 提供手動測試方法
 ✅ **Documentation** - 完整的測試說明

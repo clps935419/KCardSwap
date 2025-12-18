@@ -65,12 +65,10 @@ Phase 3 (User Story 1 - Google Login and Basic Profile) has been **successfully 
 ✅ JWT authentication works correctly  
 ✅ Refresh token mechanism functions properly (single-use, 7-day expiry)  
 
-## ⏳ Remaining Tasks (6 tasks - 16%)
+## ⏳ Remaining Tasks (4 tasks)
 
-### Testing Suite (T053-T058)
+### Testing Suite (T055-T058)
 All code is in place and ready to be tested:
-- [ ] T053: Auth Contract Tests
-- [ ] T054: Profile Contract Tests
 - [ ] T055: User Entity Unit Tests
 - [ ] T056: GoogleLoginUseCase Unit Tests
 - [ ] T057: Auth Integration Tests

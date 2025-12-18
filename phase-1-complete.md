@@ -391,11 +391,7 @@ To complete the full Phase 1 implementation:
    - Profile CRUD tests with database
    - Privacy flag behavior tests
 
-3. **Contract Tests**:
-   - Align with `contracts/auth/login.json`
-   - Test success/validation failure/unauthorized scenarios
-
-4. **E2E Tests**:
+3. **E2E Tests**:
    - Full user journey from login to profile update
    - Token refresh and logout flows
 
@@ -403,8 +399,7 @@ To complete the full Phase 1 implementation:
 
 1. Google OAuth configuration requires actual Google OAuth credentials
 2. Kong JWT plugin configuration is pending (backend is ready)
-3. Contract tests need to be expanded
-4. Integration tests require running PostgreSQL instance
+3. Integration tests require running PostgreSQL instance
 
 ## Files Modified/Created
 

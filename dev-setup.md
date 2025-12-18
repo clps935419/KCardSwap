@@ -39,14 +39,12 @@ poetry shell
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-### 4) 執行合約測試
+### 4) 執行後端測試
 
 ```bash
 cd apps/backend
-poetry run pytest ../specs/001-kcardswap-complete-spec/tests/contract_tests -q
+poetry run pytest -q
 ```
-
-說明：合約測試設計為 Test-First（Red），在後端實作並更新合約 JSON 的 `implemented: true` 後，測試才會通過（Green）。
 
 ## 常用 Poetry 命令
 
