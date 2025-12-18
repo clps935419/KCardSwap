@@ -5,7 +5,7 @@ import pytest
 from datetime import datetime
 from uuid import uuid4
 
-from app.domain.entities.user import User
+from app.modules.identity.domain.entities.user import User
 
 
 def test_user_creation():
@@ -30,7 +30,7 @@ def test_user_email_normalization():
 
 def test_user_validation_empty_google_id():
     """Test validation fails for empty google_id"""
-    with pytest.raises(ValueError, match="google_id cannot be empty"):
+    with pytest.raises(ValueError, match="Either google_id or password_hash must be provided"):
         User(google_id="", email="test@example.com")
 
 
