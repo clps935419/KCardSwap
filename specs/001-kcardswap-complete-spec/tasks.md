@@ -223,12 +223,12 @@
 
 ### Testing
 
-- [ ] T053 [P] [US1] 撰寫 Auth Integration Tests：tests/integration/contracts/test_auth_contracts.py（對齊 contracts/auth/login.json，移除獨立 contract 測試流程後改以整合測試覆蓋）
-- [ ] T054 [P] [US1] 撰寫 Profile Integration Tests：tests/integration/contracts/test_profile_contracts.py（對齊 contracts/social/profile.json，改以整合測試覆蓋）
-- [ ] T055 [P] [US1] 撰寫 User Entity Unit Tests：tests/unit/modules/identity/domain/test_user_entity.py
-- [ ] T056 [P] [US1] 撰寫 GoogleLoginUseCase Unit Tests：tests/unit/modules/identity/application/test_google_login_use_case.py
-- [ ] T057 [US1] 撰寫 Auth Integration Tests：tests/integration/modules/identity/test_auth_flow.py（完整登入流程 E2E）
-- [ ] T058 [US1] 撰寫 Profile Integration Tests：tests/integration/modules/identity/test_profile_flow.py（查看/更新檔案 E2E）
+- [X] T053 [P] [US1] 撰寫 Auth Integration Tests：tests/integration/contracts/test_auth_contracts.py（對齊 contracts/auth/login.json，移除獨立 contract 測試流程後改以整合測試覆蓋 - 已由 T057/T057A 整合測試覆蓋）
+- [X] T054 [P] [US1] 撰寫 Profile Integration Tests：tests/integration/contracts/test_profile_contracts.py（對齊 contracts/social/profile.json，改以整合測試覆蓋 - 已由 T058 整合測試覆蓋）
+- [X] T055 [P] [US1] 撰寫 User Entity Unit Tests：tests/unit/modules/identity/domain/test_user_entity.py
+- [X] T056 [P] [US1] 撰寫 GoogleLoginUseCase Unit Tests：tests/unit/modules/identity/application/test_google_login_use_case.py
+- [X] T057 [US1] 撰寫 Auth Integration Tests：tests/integration/modules/identity/test_auth_flow.py（完整登入流程 E2E）
+- [X] T058 [US1] 撰寫 Profile Integration Tests：tests/integration/modules/identity/test_profile_flow.py（查看/更新檔案 E2E）
 
 ### Configuration
 

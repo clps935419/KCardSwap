@@ -17,7 +17,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sess
 from alembic.config import Config
 from alembic import command
 
-from app.infrastructure.database.models import Base
+from app.shared.infrastructure.database.connection import Base
 
 
 @pytest.fixture(scope="session")
