@@ -48,7 +48,7 @@ class SQLAlchemyProfileRepository(IProfileRepository):
             existing.updated_at = profile.updated_at
             model = existing
         else:
-            # Create new
+            # Create new - let database generate ID
             model = ProfileModel(
                 user_id=profile.user_id,
                 nickname=profile.nickname,
@@ -82,6 +82,7 @@ class SQLAlchemyProfileRepository(IProfileRepository):
     def _to_entity(model: ProfileModel) -> Profile:
         """Convert ORM model to domain entity"""
         return Profile(
+            id=model.id,
             user_id=model.user_id,
             nickname=model.nickname,
             avatar_url=model.avatar_url,

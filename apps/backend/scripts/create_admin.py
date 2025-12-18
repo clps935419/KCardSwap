@@ -21,6 +21,7 @@ from sqlalchemy.orm import sessionmaker
 
 from app.config import settings
 from app.modules.identity.infrastructure.database.models.user_model import UserModel
+from app.modules.identity.infrastructure.database.models.profile_model import ProfileModel
 from app.shared.infrastructure.security.password_hasher import password_hasher
 
 
@@ -71,10 +72,28 @@ async def create_admin_user(email: str, password: str, role: str):
             await session.commit()
             await session.refresh(admin_user)
 
+            # Create default profile for admin user
+            admin_profile = ProfileModel(
+                user_id=admin_user.id,
+                nickname=f"Admin ({email.split('@')[0]})",
+                avatar_url=None,
+                bio="System Administrator",
+                region=None,
+                preferences={},
+                privacy_flags={
+                    "nearby_visible": False,
+                    "show_online": False,
+                    "allow_stranger_chat": False,
+                },
+            )
+            session.add(admin_profile)
+            await session.commit()
+
             print(f"\n✅ Admin user created successfully!")
             print(f"   Email: {admin_user.email}")
             print(f"   Role: {admin_user.role}")
             print(f"   User ID: {admin_user.id}")
+            print(f"   Profile created: {admin_profile.nickname}")
             print(f"\nYou can now login at POST /api/v1/auth/admin-login with:")
             print(f"   {{\n     \"email\": \"{email}\",\n     \"password\": \"[your-password]\"\n   }}")
 

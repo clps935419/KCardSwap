@@ -3,6 +3,7 @@ Profile Entity - User profile information
 Following DDD principles: No framework dependencies
 """
 
+import uuid
 from datetime import datetime
 from typing import Any, Dict, Optional
 from uuid import UUID
@@ -16,6 +17,7 @@ class Profile:
     def __init__(
         self,
         user_id: UUID,
+        id: Optional[UUID] = None,
         nickname: Optional[str] = None,
         avatar_url: Optional[str] = None,
         bio: Optional[str] = None,
@@ -25,6 +27,7 @@ class Profile:
         created_at: Optional[datetime] = None,
         updated_at: Optional[datetime] = None,
     ):
+        self._id = id or uuid.uuid4()
         self._user_id = user_id
         self._nickname = nickname
         self._avatar_url = avatar_url
@@ -47,6 +50,10 @@ class Profile:
             raise ValueError("Nickname must be 100 characters or less")
         if self._bio and len(self._bio) > 1000:
             raise ValueError("Bio must be 1000 characters or less")
+
+    @property
+    def id(self) -> UUID:
+        return self._id
 
     @property
     def user_id(self) -> UUID:

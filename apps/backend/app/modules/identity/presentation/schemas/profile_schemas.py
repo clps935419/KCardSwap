@@ -13,6 +13,7 @@ from pydantic import BaseModel, Field
 class ProfileResponse(BaseModel):
     """Response schema for user profile"""
 
+    id: UUID = Field(..., description="Profile ID")
     user_id: UUID = Field(..., description="User ID")
     nickname: Optional[str] = Field(None, description="User nickname", max_length=100)
     avatar_url: Optional[str] = Field(None, description="Avatar image URL")
@@ -36,6 +37,7 @@ class ProfileResponse(BaseModel):
         from_attributes = True
         json_schema_extra = {
             "example": {
+                "id": "987e6543-e21b-12d3-a456-426614174000",
                 "user_id": "123e4567-e89b-12d3-a456-426614174000",
                 "nickname": "CardCollector",
                 "avatar_url": "https://example.com/avatar.jpg",
