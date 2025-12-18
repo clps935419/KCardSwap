@@ -35,6 +35,7 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 COPY ./app ./app
 COPY ./alembic ./alembic
 COPY ./alembic.ini ./alembic.ini
+COPY ./scripts ./scripts
 
 # 暴露服務端口
 EXPOSE 8000
