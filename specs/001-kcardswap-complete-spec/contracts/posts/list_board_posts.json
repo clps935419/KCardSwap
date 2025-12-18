@@ -1,0 +1,42 @@
+{
+  "name": "GET /posts (board list)",
+  "request": {
+    "method": "GET",
+    "path": "/posts?cityCode=TPE&districtCode=DAAN",
+    "headers": {"Authorization": "Bearer <token>"}
+  },
+  "responses": [
+    {
+      "status": 200,
+      "body": {
+        "data": {
+          "items": [
+            {
+              "id": "uuid",
+              "ownerId": "uuid",
+              "cityCode": "TPE",
+              "districtCode": "DAAN",
+              "title": "string",
+              "content": "string",
+              "idol": "string",
+              "idolGroup": "string",
+              "status": "active",
+              "expiresAt": "2025-12-25T00:00:00Z",
+              "createdAt": "2025-12-18T00:00:00Z"
+            }
+          ]
+        },
+        "error": null
+      }
+    },
+    {
+      "status": 400,
+      "body": {"data": null, "error": {"code": "VALIDATION_ERROR", "message": "cityCode is required"}}
+    },
+    {
+      "status": 401,
+      "body": {"data": null, "error": {"code": "UNAUTHORIZED"}}
+    }
+  ],
+  "implemented": false
+}

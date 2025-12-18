@@ -5,13 +5,22 @@
 結構：
 - auth/
 - cards/
+- posts/
 - nearby/
 - social/
 - chat/
 - trade/
 - biz/
 
+posts/（城市/行政區佈告欄貼文）建議契約：
+- create_post.json
+- list_board_posts.json
+- express_interest.json
+- accept_interest.json
+- reject_interest.json
+- close_post.json
+
 約定：
 - 每模組至少 3–5 個契約用例，覆蓋成功、驗證失敗、權限不足/限流。
 - 回應格式遵循 `{ data, error }` 規範與標準錯誤碼。
-- 若契約更新，須同步更新對應測試與 `specs/001-.../plan.md`。
+- 若契約更新，須同步更新對應測試與 `specs/001-kcardswap-complete-spec/plan.md`。

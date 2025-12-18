@@ -1,7 +1,7 @@
 # Data Model（資料模型綜覽）
 
-**更新日期**: 2025-12-17  
-**對應版本**: Alembic migration 003 (add admin fields)
+**更新日期**: 2025-12-18  
+**對應版本**: Alembic migration 003 (add admin fields) + 後續擴展（見「未來擴展」）
 
 ## 目的
 
@@ -273,6 +273,61 @@ poetry run alembic history
 - **messages**: 訊息記錄
 - **notifications**: 推播通知記錄
 - **card_upload_stats**: 上傳統計（用於限制檢查）
+- **posts**: 城市/行政區佈告欄貼文（看板發文）
+- **post_interests**: 對貼文表達「有興趣」的請求（作者接受後導流聊天/好友）
+
+---
+
+### posts（佈告欄貼文）— Schema 草案（US7 / 待實作）
+
+| 欄位 | 型別 | 約束 | 說明 |
+|------|------|------|------|
+| id | UUID | PK, DEFAULT uuid_generate_v4() | 貼文唯一識別碼 |
+| owner_id | UUID | NOT NULL, FK(users.id) ON DELETE CASCADE | 作者 |
+| city_code | VARCHAR(20) | NOT NULL | 城市代碼（例如 TPE） |
+| district_code | VARCHAR(20) | NULLABLE | 行政區代碼（例如 Daan） |
+| title | VARCHAR(120) | NOT NULL | 標題 |
+| content | TEXT | NOT NULL | 內容（禁止精確地址/聯絡方式等個資） |
+| idol | VARCHAR(100) | NULLABLE | 偶像名稱（篩選用） |
+| idol_group | VARCHAR(100) | NULLABLE | 團體/團名（篩選用） |
+| status | VARCHAR(20) | NOT NULL, DEFAULT 'open' | 狀態：open/closed/expired/deleted |
+| expires_at | TIMESTAMP WITH TIME ZONE | NOT NULL | 到期時間（預設 created_at + 14d） |
+| created_at | TIMESTAMP WITH TIME ZONE | DEFAULT CURRENT_TIMESTAMP | 建立時間 |
+| updated_at | TIMESTAMP WITH TIME ZONE | DEFAULT CURRENT_TIMESTAMP | 更新時間 |
+
+**索引（建議）**:
+- `idx_posts_board_status_created_at` ON (city_code, district_code, status, created_at DESC)
+- `idx_posts_owner_id` ON (owner_id)
+- `idx_posts_idol` ON (idol)
+- `idx_posts_idol_group` ON (idol_group)
+- `idx_posts_expires_at` ON (expires_at)
+
+**不變條件（應用層 + DB 層）**:
+- status ∈ {open, closed, expired, deleted}
+- expires_at > created_at
+- city_code 必填；district_code 可選
+
+---
+
+### post_interests（貼文興趣請求）— Schema 草案（US7 / 待實作）
+
+| 欄位 | 型別 | 約束 | 說明 |
+|------|------|------|------|
+| id | UUID | PK, DEFAULT uuid_generate_v4() | 興趣請求唯一識別碼 |
+| post_id | UUID | NOT NULL, FK(posts.id) ON DELETE CASCADE | 對應貼文 |
+| user_id | UUID | NOT NULL, FK(users.id) ON DELETE CASCADE | 送出者 |
+| status | VARCHAR(20) | NOT NULL, DEFAULT 'pending' | 狀態：pending/accepted/rejected |
+| created_at | TIMESTAMP WITH TIME ZONE | DEFAULT CURRENT_TIMESTAMP | 建立時間 |
+| updated_at | TIMESTAMP WITH TIME ZONE | DEFAULT CURRENT_TIMESTAMP | 更新時間 |
+
+**索引/約束（建議）**:
+- UNIQUE(post_id, user_id)（避免同一使用者重複送出）
+- `idx_post_interests_post_id_created_at` ON (post_id, created_at DESC)
+- `idx_post_interests_user_id_created_at` ON (user_id, created_at DESC)
+
+**不變條件（應用層）**:
+- 只有貼文作者可將 pending 變更為 accepted/rejected
+- accepted 時需導流建立好友與聊天室（或若已存在則重用）
 
 ---
 

@@ -1,0 +1,44 @@
+{
+  "name": "POST /posts/{postId}/interests/{interestId}/accept",
+  "request": {
+    "method": "POST",
+    "path": "/posts/<postId>/interests/<interestId>/accept",
+    "headers": {"Authorization": "Bearer <token>"},
+    "body": {}
+  },
+  "responses": [
+    {
+      "status": 200,
+      "body": {
+        "data": {
+          "interest": {
+            "id": "uuid",
+            "postId": "uuid",
+            "userId": "uuid",
+            "status": "accepted"
+          },
+          "friendship": {"id": "uuid", "userId": "uuid", "friendId": "uuid"},
+          "chat": {"id": "uuid"}
+        },
+        "error": null
+      }
+    },
+    {
+      "status": 401,
+      "body": {"data": null, "error": {"code": "UNAUTHORIZED"}}
+    },
+    {
+      "status": 403,
+      "body": {"data": null, "error": {"code": "FORBIDDEN", "message": "only post owner can accept"}}
+    },
+    {
+      "status": 404,
+      "body": {"data": null, "error": {"code": "NOT_FOUND", "message": "interest not found"}}
+    },
+    {
+      "status": 409,
+      "body": {"data": null, "error": {"code": "CONFLICT", "message": "interest already processed"}}
+    }
+  ],
+  "implemented": false
+}

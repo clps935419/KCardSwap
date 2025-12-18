@@ -11,6 +11,7 @@
 - M1（Week 1-2）：AUTH + PROFILE 完成（Google OAuth、JWT、個人檔案）。
 - M2（Week 3-4）：CARD 上傳與管理完成（含上限檢查與縮圖）。
 - M3（Week 5）：NEARBY 附近搜尋（距離計算、隱私、排序、次數限制）。
+- M3.5（Week 5-6）：POSTS 城市/行政區佈告欄（發文、看板列表、興趣請求、接受後導流聊天、到期/關閉）。
 - M4（Week 6-7）：SOCIAL + CHAT（好友、評分、檢舉、輪詢 + 推播）。
 - M5（Week 8）：TRADE（提案、狀態機、歷史）。
 - M6（Week 9）：BIZ（免費/付費權限、容量與大小限制、升級/降級）。
@@ -32,12 +33,19 @@
     │   │   ├── presentation/   # Routers, Schemas, Dependencies
     │   │   └── __init__.py
     │   │
-    │   └── social/             # [Module] 個人檔案與社交功能（Profile）
+	│   ├── social/             # [Module] 個人檔案與社交功能（Profile）
     │       ├── domain/
     │       ├── application/
     │       ├── infrastructure/
     │       ├── presentation/
     │       └── __init__.py
+	│
+	│   └── posts/              # [Module] 城市/行政區佈告欄貼文（Posts / Bulletin Board）
+	│       ├── domain/
+	│       ├── application/
+	│       ├── infrastructure/
+	│       ├── presentation/
+	│       └── __init__.py
     │
     └── shared/                 # 共用核心（Shared Kernel）
         ├── domain/             # 共用 Value Objects (e.g., Email, UserId)
@@ -245,6 +253,10 @@ Phase -1 Gates（依憲法）
 - NEARBY
 	- [ ] 距離計算與排序、隱身過濾
 	- [ ] 次數限制與重置機制
+- POSTS
+	- [ ] 城市/行政區佈告欄貼文 CRUD（建立/列表/詳情/關閉/刪除）
+	- [ ] 興趣請求流程（送出/清單/接受→建立好友+聊天室/拒絕）
+	- [ ] 到期策略與下架（expired）
 - SOCIAL
 	- [ ] 好友邀請/接受/拒絕/封鎖
 	- [ ] 評分/檢舉 API 與審查標記
@@ -262,6 +274,7 @@ Phase -1 Gates（依憲法）
 - [ ] 登入/註冊/隱私設定頁
 - [ ] 我的小卡（上傳、列表、編輯、刪除、過濾）
 - [ ] 附近的人（權限、篩選、排序、次數提示）
+- [ ] 城市/行政區佈告欄（列表、發文、詳情、我有興趣/作者接受導流聊天）
 - [ ] 好友列表與個人頁
 - [ ] 聊天列表與聊天室（輪詢、推播導覽）
 - [ ] 交換流程（提案、確認、歷史）

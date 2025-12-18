@@ -601,6 +601,69 @@
 
 ---
 
+## Phase 8.5: User Story 7 - 城市/行政區佈告欄貼文 (Priority: P2)
+
+**目標**: 使用者可以在指定城市/行政區看板發起交換貼文，其他使用者可表達「有興趣」，作者接受後導流建立好友 + 一對一聊天室協商交換。
+
+**獨立測試標準**:
+- ✓ A 能在「台北市/大安區」建立貼文並出現在看板列表
+- ✓ B 能在該城市看板找到貼文並送出「有興趣」
+- ✓ A 接受後，系統建立好友關係並建立/導向聊天室
+- ✓ 貼文可手動關閉或到期自動下架
+
+### Domain Layer (Posts Module)
+
+- [ ] T206 [P] [US7] 建立 Posts 模組目錄結構：apps/backend/app/modules/posts/（domain/, application/, infrastructure/, presentation/）
+- [ ] T207 [P] [US7] 建立 Post Entity：apps/backend/app/modules/posts/domain/entities/post.py（owner_id, city_code, district_code, title, content, idol, idol_group, status, expires_at）
+- [ ] T208 [P] [US7] 建立 PostInterest Entity：apps/backend/app/modules/posts/domain/entities/post_interest.py（post_id, user_id, status）
+- [ ] T209 [P] [US7] 定義 PostRepository Interface：apps/backend/app/modules/posts/domain/repositories/post_repository.py
+- [ ] T210 [P] [US7] 定義 PostInterestRepository Interface：apps/backend/app/modules/posts/domain/repositories/post_interest_repository.py
+
+### Application Layer (Posts Module)
+
+- [ ] T211 [P] [US7] 建立 CreatePostUseCase：apps/backend/app/modules/posts/application/use_cases/create_post_use_case.py（含每日發文限制檢查：free=2/day）
+- [ ] T212 [P] [US7] 建立 ListBoardPostsUseCase：apps/backend/app/modules/posts/application/use_cases/list_board_posts_use_case.py（city_code 必填，district_code 選填，支援 idol/idol_group 篩選）
+- [ ] T213 [P] [US7] 建立 ExpressInterestUseCase：apps/backend/app/modules/posts/application/use_cases/express_interest_use_case.py（建立 PostInterest，避免重複）
+- [ ] T214 [P] [US7] 建立 AcceptInterestUseCase：apps/backend/app/modules/posts/application/use_cases/accept_interest_use_case.py（接受後建立好友關係 + 建立/重用聊天室）
+- [ ] T215 [P] [US7] 建立 RejectInterestUseCase：apps/backend/app/modules/posts/application/use_cases/reject_interest_use_case.py
+- [ ] T216 [P] [US7] 建立 ClosePostUseCase：apps/backend/app/modules/posts/application/use_cases/close_post_use_case.py
+
+### Infrastructure Layer (Posts Module)
+
+- [ ] T217 [P] [US7] 實作 SQLAlchemy Post Model：apps/backend/app/modules/posts/infrastructure/database/models/post_model.py
+- [ ] T218 [P] [US7] 實作 SQLAlchemy PostInterest Model：apps/backend/app/modules/posts/infrastructure/database/models/post_interest_model.py
+- [ ] T219 [P] [US7] 實作 PostRepositoryImpl：apps/backend/app/modules/posts/infrastructure/repositories/post_repository_impl.py
+- [ ] T220 [P] [US7] 實作 PostInterestRepositoryImpl：apps/backend/app/modules/posts/infrastructure/repositories/post_interest_repository_impl.py
+
+### Presentation Layer (Posts Module)
+
+- [ ] T221 [P] [US7] 定義 Posts Schemas：apps/backend/app/modules/posts/presentation/schemas/post_schemas.py
+- [ ] T222 [US7] 建立 Posts Router：apps/backend/app/modules/posts/presentation/routers/posts_router.py（POST /posts, GET /posts, POST /posts/{id}/interest, POST /posts/{id}/interests/{interest_id}/accept, POST /posts/{id}/interests/{interest_id}/reject, POST /posts/{id}/close）
+
+### Integration
+
+- [ ] T223 [US7] 註冊 Posts Module 到 DI Container：apps/backend/app/container.py
+- [ ] T224 [US7] 註冊 Posts Router 到 main.py：apps/backend/app/main.py
+
+### Alembic Migration
+
+- [ ] T225 [P] [US7] 建立 Posts Tables Migration：apps/backend/alembic/versions/005_add_posts_tables.py（posts, post_interests + indexes）
+- [ ] T226 [US7] 驗證 Migration：alembic upgrade head && alembic downgrade -1
+
+### Contracts & Testing
+
+- [ ] T227 [P] [US7] 新增 Posts Contracts：specs/001-kcardswap-complete-spec/contracts/posts/*.json（create/list/interest/accept/reject/close）
+- [ ] T228 [P] [US7] 撰寫 Posts Integration Tests：tests/integration/contracts/test_posts_contracts.py（對齊 contracts/posts/*.json，改以整合測試覆蓋）
+
+### Mobile (Expo)
+
+- [ ] M701 [P] [US7] 城市/行政區佈告欄列表：apps/mobile/src/features/posts/screens/BoardPostsScreen.tsx（GET /posts?city_code=...）
+- [ ] M702 [P] [US7] 建立貼文頁：apps/mobile/src/features/posts/screens/CreatePostScreen.tsx（POST /posts；city_code/district_code + 內容）
+- [ ] M703 [P] [US7] 貼文詳情與「有興趣」：apps/mobile/src/features/posts/screens/PostDetailScreen.tsx（POST /posts/{id}/interest）
+- [ ] M704 [US7] 作者端興趣清單與接受導流聊天：apps/mobile/src/features/posts/screens/MyPostInterestsScreen.tsx（accept/reject；導向 chat）
+
+---
+
 ## Phase 9: Polish & Cross-Cutting Concerns (跨模組整合與優化)
 
 **目的**: 整合所有功能、優化效能、完善文件
@@ -629,7 +692,7 @@
 1. **Phase 1: Setup** (T001-T008) → 專案基礎
 2. **Phase 1M: Mobile Setup** (M001-M010) → Expo app 基礎（可與 Phase 2 並行進行）
 3. **Phase 2: Foundational** (T009-T028) → **[BLOCKING]** 所有後端 User Story 必須等此階段完成
-4. **Phase 3-8: User Stories** (T029-T191 + M101-M604) → 後端與 Mobile 可依契約並行（見下方說明）
+4. **Phase 3-8.5: User Stories** (T029-T228 + M101-M704) → 後端與 Mobile 可依契約並行（見下方說明）
 5. **Phase 9: Polish** (T192-T205) → 最終整合
 
 ### User Story Dependencies（使用者故事依賴）
@@ -661,6 +724,11 @@ US5 (Phase 7)                   │       │
 US6 (Phase 8)                   │       │
   ├─ 依賴：US1（身份驗證）       │       │
   └─ Blocking: 無（P2優先度，可延後）    │
+
+US7 (Phase 8.5)                 │       │
+  ├─ 依賴：US1（身份驗證）       │       │
+  ├─ 依賴：US4（好友+聊天，用於接受後導流）│       │
+  └─ 建議：US3（附近頁可導到城市看板）   │
 ```
 
 ### Parallel Opportunities（並行機會）
@@ -764,9 +832,9 @@ Group M5: US5 Mobile (Expo) - Trade
 
 ### Statistics（統計）
 
-- **Total Tasks**: 205 (Backend) + 13 (Mobile Phase 1M) = 218
+- **Total Tasks**: 228 (Backend) + 13 (Mobile Phase 1M) = 241
 - **Completed**: 26 (Backend: Phase 1: 8/8, Phase 2: 18/20) + 13 (Mobile: Phase 1M: 13/13) = 39
-- **Remaining**: 179 (Backend) + Mobile US tasks (M101-M604)
+- **Remaining**: 202 (Backend) + Mobile US tasks (M101-M704)
 - **Estimated Duration**: 10 weeks (4 sprints)
 
 ### Task Breakdown by Phase（各階段任務分布）
@@ -782,6 +850,7 @@ Group M5: US5 Mobile (Expo) - Trade
 | 6 | US4 - Friends & Chat | 33 | P1 | ⏸️ Not Started |
 | 7 | US5 - Trade | 31 | P1 | ⏸️ Not Started |
 | 8 | US6 - Subscription | 17 | P2 | ⏸️ Not Started |
+| 8.5 | US7 - Board Posts | 23 | P2 | ⏸️ Not Started |
 | 9 | Polish | 14 | - | ⏸️ Not Started |
 
 ### MVP Scope（MVP 範圍）
