@@ -4,7 +4,7 @@ Unit tests for Profile entity
 import pytest
 from uuid import uuid4
 
-from app.domain.entities.profile import Profile
+from app.modules.identity.domain.entities.profile import Profile
 
 
 def test_profile_creation():
@@ -12,6 +12,7 @@ def test_profile_creation():
     user_id = uuid4()
     profile = Profile(user_id=user_id)
     
+    assert profile.id is not None
     assert profile.user_id == user_id
     assert profile.nickname is None
     assert profile.privacy_flags["nearby_visible"] == True
@@ -29,6 +30,7 @@ def test_profile_with_data():
         region="Seoul"
     )
     
+    assert profile.id is not None
     assert profile.nickname == "TestUser"
     assert profile.bio == "Test bio"
     assert profile.region == "Seoul"
