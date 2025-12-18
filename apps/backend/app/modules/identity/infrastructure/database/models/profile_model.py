@@ -2,6 +2,7 @@
 Profile ORM model for Identity module
 """
 
+import uuid
 from datetime import datetime
 
 from sqlalchemy import JSON, Column, DateTime, ForeignKey, String, Text
@@ -16,10 +17,13 @@ class ProfileModel(Base):
 
     __tablename__ = "profiles"
 
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = Column(
         UUID(as_uuid=True),
         ForeignKey("users.id", ondelete="CASCADE"),
-        primary_key=True,
+        unique=True,
+        nullable=False,
+        index=True,
     )
     nickname = Column(String(100))
     avatar_url = Column(Text)

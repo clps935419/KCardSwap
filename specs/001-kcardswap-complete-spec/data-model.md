@@ -61,7 +61,8 @@
 
 | 欄位 | 型別 | 約束 | 說明 |
 |------|------|------|------|
-| user_id | UUID | PK, FK(users.id) ON DELETE CASCADE | 使用者 ID |
+| id | UUID | PK, DEFAULT uuid_generate_v4() | Profile 唯一識別碼 |
+| user_id | UUID | UNIQUE, NOT NULL, FK(users.id) ON DELETE CASCADE | 使用者 ID |
 | nickname | VARCHAR(100) | NULLABLE | 暱稱 |
 | avatar_url | TEXT | NULLABLE | 頭像 URL |
 | bio | TEXT | NULLABLE | 個人簡介 |
@@ -80,11 +81,14 @@ privacy_flags: {
 }
 ```
 
+**索引**:
+- `idx_profiles_user_id` ON (user_id)
+
 **關聯**:
 - users.id ← user_id (1:1)
 
 **不變條件**:
-- user_id 必須存在於 users 表中
+- user_id 必須存在於 users 表中且唯一
 - privacy_flags 必須包含三個布林鍵值
 
 **Trigger**:
@@ -229,6 +233,8 @@ $$ language 'plpgsql';
 
 - **001_initial_schema.py**: 建立所有表結構與觸發器
 - **002_add_indexes.py**: 建立所有索引
+- **003_add_admin_fields.py**: 管理員認證欄位 (password_hash, role)
+- **004_add_profile_id.py**: 為 profiles 表添加獨立的 id 主鍵欄位
 
 ### Schema 變更流程
 

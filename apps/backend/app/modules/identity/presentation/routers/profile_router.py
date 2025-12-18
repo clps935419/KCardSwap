@@ -70,6 +70,7 @@ async def get_my_profile(
 
     # Build response
     profile_response = ProfileResponse(
+        id=profile.id,
         user_id=profile.user_id,
         nickname=profile.nickname,
         avatar_url=profile.avatar_url,
@@ -134,6 +135,7 @@ async def update_my_profile(
 
     # Build response
     profile_response = ProfileResponse(
+        id=profile.id,
         user_id=profile.user_id,
         nickname=profile.nickname,
         avatar_url=profile.avatar_url,

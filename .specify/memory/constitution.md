@@ -109,6 +109,29 @@
 - Repository 測試使用 Test Database（Docker PostgreSQL）
 - 外部服務使用 Mock（Google OAuth、GCS、FCM）
 
+#### 資料庫設計原則
+
+所有資料表必須遵循以下設計原則：
+
+1. **主鍵規範**：
+   - 所有資料表必須有獨立的 `id` 欄位作為主鍵
+   - `id` 欄位使用 UUID 型別，預設值為 `uuid_generate_v4()`
+   - 即使是一對一關聯的表，也必須有獨立的 `id` 欄位，外鍵欄位應設為 UNIQUE 而非 PRIMARY KEY
+
+2. **外鍵約束**：
+   - 外鍵欄位應設定 `ON DELETE CASCADE` 或 `ON DELETE SET NULL`
+   - 外鍵欄位應建立索引以提升查詢效能
+
+3. **時間戳記**：
+   - 所有資料表應包含 `created_at` 和 `updated_at` 欄位
+   - 使用 `TIMESTAMP WITH TIME ZONE` 型別
+   - `updated_at` 應設定觸發器自動更新
+
+4. **欄位命名**：
+   - 使用 snake_case 命名法
+   - 布林欄位使用 `is_` 或 `has_` 前綴
+   - 外鍵欄位使用 `_id` 後綴
+
 #### 實作檢查清單
 
 開發時必須確保以下項目：
@@ -121,6 +144,7 @@
 - [ ] Domain Events 用於處理跨聚合的副作用
 - [ ] Value Objects 封裝驗證邏輯且不可變
 - [ ] 單元測試覆蓋率達 80% 以上（Domain & Application Layer）
+- [ ] 所有資料表都有獨立的 `id` 欄位作為主鍵（UUID 型別）
 
 ## 後端架構
 
