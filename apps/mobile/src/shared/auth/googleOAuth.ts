@@ -16,8 +16,8 @@
 import * as AuthSession from 'expo-auth-session';
 import * as Crypto from 'expo-crypto';
 import { Platform } from 'react-native';
-import { config } from '../config';
-import { apiClient } from '../api/client';
+import { config } from '@/src/shared/config';
+import { apiClient } from '@/src/shared/api/client';
 
 // Google OAuth configuration
 const GOOGLE_OAUTH_CONFIG = {

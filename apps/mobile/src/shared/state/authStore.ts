@@ -6,8 +6,8 @@ import {
   getUserData,
   clearAuthData,
   TokenData,
-} from '../auth/session';
-import { ensureValidToken } from '../api/client';
+} from '@/src/shared/auth/session';
+import { ensureValidToken } from '@/src/shared/api/client';
 
 export interface AuthState {
   user: UserData | null;

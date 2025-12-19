@@ -1,10 +1,10 @@
-import { View, Text } from 'react-native';
+import { Box, Text, Heading } from '@/src/shared/ui/components';
 
 export default function NearbyScreen() {
   return (
-    <View className="flex-1 items-center justify-center bg-white">
-      <Text className="text-xl font-bold text-gray-800">Nearby Cards</Text>
-      <Text className="text-sm text-gray-500 mt-2">To be implemented in US3</Text>
-    </View>
+    <Box className="flex-1 items-center justify-center bg-white">
+      <Heading size="xl" className="text-gray-800">Nearby Cards</Heading>
+      <Text size="sm" className="text-gray-500 mt-2">To be implemented in US3</Text>
+    </Box>
   );
 }

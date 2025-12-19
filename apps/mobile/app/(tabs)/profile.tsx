@@ -1,22 +1,24 @@
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  ScrollView,
-  ActivityIndicator,
-  Alert,
-  Switch,
-} from 'react-native';
+import { ScrollView, Alert } from 'react-native';
 import { useState, useEffect } from 'react';
-import { useAuthStore } from '../../src/shared/state/authStore';
+import { useAuthStore } from '@/src/shared/state/authStore';
 import {
   getMyProfile,
   updateMyProfile,
   validateNickname,
   validateBio,
   Profile,
-} from '../../src/features/profile/api/profileApi';
+} from '@/src/features/profile/api/profileApi';
+import {
+  Box,
+  Text,
+  Heading,
+  Button,
+  ButtonText,
+  Input,
+  InputField,
+  Spinner,
+  Switch,
+} from '@/src/shared/ui/components';
 
 export default function ProfileScreen() {
   const { user, logout } = useAuthStore();
@@ -77,7 +79,7 @@ export default function ProfileScreen() {
       // Update profile
       const updated = await updateMyProfile({
         nickname: nickname.trim(),
-        bio: bio.trim() || null,
+        bio: bio.trim() || undefined,
         privacy_flags: {
           nearby_visible: nearbyVisible,
           show_online: showOnline,
@@ -127,157 +129,161 @@ export default function ProfileScreen() {
 
   if (isLoading) {
     return (
-      <View className="flex-1 bg-white items-center justify-center">
-        <ActivityIndicator size="large" color="#3B82F6" />
+      <Box className="flex-1 bg-white items-center justify-center">
+        <Spinner size="large" />
         <Text className="mt-4 text-gray-600">Loading profile...</Text>
-      </View>
+      </Box>
     );
   }
 
   return (
     <ScrollView className="flex-1 bg-white">
-      <View className="p-4">
+      <Box className="p-4">
         {/* Header */}
-        <View className="items-center mt-4 mb-6">
-          <View className="w-24 h-24 rounded-full bg-gray-300 items-center justify-center mb-4">
-            <Text className="text-3xl">
+        <Box className="items-center mt-4 mb-6">
+          <Box className="w-24 h-24 rounded-full bg-gray-300 items-center justify-center mb-4">
+            <Text size="3xl">
               {profile?.avatar_url ? '🖼️' : '👤'}
             </Text>
-          </View>
+          </Box>
 
           {user && (
-            <Text className="text-sm text-gray-600">{user.email}</Text>
+            <Text size="sm" className="text-gray-600">{user.email}</Text>
           )}
-        </View>
+        </Box>
 
         {/* Profile Form */}
-        <View className="mb-6">
+        <Box className="mb-6">
           {/* Nickname */}
-          <View className="mb-4">
-            <Text className="text-sm font-semibold text-gray-700 mb-2">
+          <Box className="mb-4">
+            <Text size="sm" className="font-semibold text-gray-700 mb-2">
               Nickname
             </Text>
-            <TextInput
-              className="border border-gray-300 rounded-lg px-4 py-3 text-base"
-              value={nickname}
-              onChangeText={setNickname}
-              placeholder="Enter your nickname"
-              editable={isEditing}
-              maxLength={50}
-            />
-            <Text className="text-xs text-gray-500 mt-1">
+            <Input isDisabled={!isEditing}>
+              <InputField
+                value={nickname}
+                onChangeText={setNickname}
+                placeholder="Enter your nickname"
+                maxLength={50}
+              />
+            </Input>
+            <Text size="xs" className="text-gray-500 mt-1">
               {nickname.length}/50 characters
             </Text>
-          </View>
+          </Box>
 
           {/* Bio */}
-          <View className="mb-4">
-            <Text className="text-sm font-semibold text-gray-700 mb-2">
+          <Box className="mb-4">
+            <Text size="sm" className="font-semibold text-gray-700 mb-2">
               Bio
             </Text>
-            <TextInput
-              className="border border-gray-300 rounded-lg px-4 py-3 text-base"
-              value={bio}
-              onChangeText={setBio}
-              placeholder="Tell us about yourself..."
-              editable={isEditing}
-              multiline
-              numberOfLines={4}
-              textAlignVertical="top"
-              maxLength={500}
-            />
-            <Text className="text-xs text-gray-500 mt-1">
+            <Input isDisabled={!isEditing}>
+              <InputField
+                value={bio}
+                onChangeText={setBio}
+                placeholder="Tell us about yourself..."
+                multiline
+                numberOfLines={4}
+                textAlignVertical="top"
+                maxLength={500}
+              />
+            </Input>
+            <Text size="xs" className="text-gray-500 mt-1">
               {bio.length}/500 characters
             </Text>
-          </View>
+          </Box>
 
           {/* Privacy Settings */}
-          <View className="mb-4">
-            <Text className="text-sm font-semibold text-gray-700 mb-3">
+          <Box className="mb-4">
+            <Text size="sm" className="font-semibold text-gray-700 mb-3">
               Privacy Settings
             </Text>
 
-            <View className="flex-row justify-between items-center mb-3">
-              <Text className="text-base text-gray-700">Visible in Nearby Search</Text>
+            <Box className="flex-row justify-between items-center mb-3">
+              <Text size="md" className="text-gray-700">Visible in Nearby Search</Text>
               <Switch
                 value={nearbyVisible}
                 onValueChange={setNearbyVisible}
-                disabled={!isEditing}
+                isDisabled={!isEditing}
               />
-            </View>
+            </Box>
 
-            <View className="flex-row justify-between items-center mb-3">
-              <Text className="text-base text-gray-700">Show Online Status</Text>
+            <Box className="flex-row justify-between items-center mb-3">
+              <Text size="md" className="text-gray-700">Show Online Status</Text>
               <Switch
                 value={showOnline}
                 onValueChange={setShowOnline}
-                disabled={!isEditing}
+                isDisabled={!isEditing}
               />
-            </View>
+            </Box>
 
-            <View className="flex-row justify-between items-center">
-              <Text className="text-base text-gray-700">Allow Stranger Chat</Text>
+            <Box className="flex-row justify-between items-center">
+              <Text size="md" className="text-gray-700">Allow Stranger Chat</Text>
               <Switch
                 value={allowStrangerChat}
                 onValueChange={setAllowStrangerChat}
-                disabled={!isEditing}
+                isDisabled={!isEditing}
               />
-            </View>
-          </View>
-        </View>
+            </Box>
+          </Box>
+        </Box>
 
         {/* Action Buttons */}
         {isEditing ? (
-          <View className="flex-row gap-3 mb-4">
-            <TouchableOpacity
+          <Box className="flex-row gap-3 mb-4">
+            <Button
               onPress={handleCancel}
-              disabled={isSaving}
-              className="flex-1 bg-gray-500 px-6 py-3 rounded-lg active:bg-gray-600"
+              isDisabled={isSaving}
+              variant="outline"
+              className="flex-1"
             >
-              <Text className="text-white font-semibold text-center">Cancel</Text>
-            </TouchableOpacity>
+              <ButtonText>Cancel</ButtonText>
+            </Button>
 
-            <TouchableOpacity
+            <Button
               onPress={handleSave}
-              disabled={isSaving}
-              className="flex-1 bg-blue-500 px-6 py-3 rounded-lg active:bg-blue-600"
+              isDisabled={isSaving}
+              variant="solid"
+              className="flex-1 bg-blue-500"
             >
               {isSaving ? (
-                <ActivityIndicator color="white" />
+                <Spinner color="white" size="small" />
               ) : (
-                <Text className="text-white font-semibold text-center">Save</Text>
+                <ButtonText>Save</ButtonText>
               )}
-            </TouchableOpacity>
-          </View>
+            </Button>
+          </Box>
         ) : (
-          <TouchableOpacity
+          <Button
             onPress={() => setIsEditing(true)}
-            className="bg-blue-500 px-6 py-3 rounded-lg active:bg-blue-600 mb-4"
+            variant="solid"
+            className="bg-blue-500 mb-4"
           >
-            <Text className="text-white font-semibold text-center">Edit Profile</Text>
-          </TouchableOpacity>
+            <ButtonText>Edit Profile</ButtonText>
+          </Button>
         )}
 
         {/* Logout Button */}
-        <TouchableOpacity
+        <Button
           onPress={handleLogout}
-          className="bg-red-500 px-6 py-3 rounded-lg active:bg-red-600"
+          variant="solid"
+          className="bg-red-500"
         >
-          <Text className="text-white font-semibold text-center">Logout</Text>
-        </TouchableOpacity>
+          <ButtonText>Logout</ButtonText>
+        </Button>
 
         {/* Profile Info */}
         {profile && (
-          <View className="mt-6 p-4 bg-gray-50 rounded-lg">
-            <Text className="text-xs text-gray-500 mb-1">
+          <Box className="mt-6 p-4 bg-gray-50 rounded-lg">
+            <Text size="xs" className="text-gray-500 mb-1">
               Profile ID: {profile.id.substring(0, 8)}...
             </Text>
-            <Text className="text-xs text-gray-500">
+            <Text size="xs" className="text-gray-500">
               Last updated: {new Date(profile.updated_at).toLocaleDateString()}
             </Text>
-          </View>
+          </Box>
         )}
-      </View>
+      </Box>
     </ScrollView>
   );
 }
