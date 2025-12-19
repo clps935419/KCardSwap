@@ -6,10 +6,6 @@ and validate that it enforces the correct path patterns.
 
 import pytest
 
-from app.shared.infrastructure.external.mock_gcs_storage_service import (
-    MockGCSStorageService,
-)
-
 
 class TestMockGCSStorageService:
     """Test cases for mock GCS storage service."""
@@ -89,24 +85,34 @@ class TestMockGCSStorageService:
         assert "updated" in metadata
 
     def test_content_type_parameter_in_url(self, mock_gcs_service):
-        """Test that content_type parameter is used in URL generation."""
+        """Test that content_type parameter is accepted by the service.
+
+        Note: The mock service doesn't encode content_type in the URL
+        but validates that it accepts the parameter without errors.
+        """
         blob_name = "cards/user123/card456.jpg"
         url = mock_gcs_service.generate_upload_signed_url(
             blob_name, content_type="image/png"
         )
 
         assert url is not None
-        # Mock URL doesn't actually encode content type but should still generate
+        # Mock URL structure validation
+        assert "storage.googleapis.com" in url
 
     def test_expiration_parameter_in_url(self, mock_gcs_service):
-        """Test that expiration parameter is reflected in URL."""
+        """Test that expiration parameter is reflected in URL.
+
+        The mock implementation appends '00' to expiration_minutes to simulate
+        the X-Goog-Expires parameter (e.g., 30 minutes becomes '3000').
+        """
         blob_name = "cards/user123/card456.jpg"
         url = mock_gcs_service.generate_upload_signed_url(
             blob_name, expiration_minutes=30
         )
 
         assert url is not None
-        assert "X-Goog-Expires=3000" in url  # 30 minutes * 100 in mock
+        # Verify expiration is encoded: 30 minutes * 100 = 3000
+        assert "X-Goog-Expires=3000" in url
 
 
 @pytest.mark.gcs_smoke

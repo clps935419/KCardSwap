@@ -64,6 +64,8 @@ class MockGCSStorageService:
 
         # Return a mock URL that looks realistic but won't actually work
         base_url = f"https://storage.googleapis.com/{self._bucket_name}/{blob_name}"
+        # Mock signature format: expiration_minutes is multiplied by 100 for the Expires parameter
+        # This mimics GCS URL format where Expires is in seconds (e.g., 15 min * 60 sec/min = 900, then * 100 for mock)
         mock_signature = "X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=mock&X-Goog-Date=mock&X-Goog-Expires={expiration_minutes}00&X-Goog-SignedHeaders=content-type%3Bhost&X-Goog-Signature=mock_signature"
 
         return f"{base_url}?{mock_signature}"
@@ -129,18 +131,18 @@ class MockGCSStorageService:
         # Return mock metadata
         return {
             "name": blob_name,
-            "size": 1024 * 100,  # Mock 100KB file
+            "size": 100 * 1024,  # 100 KB default mock file size
             "content_type": "image/jpeg",
             "created": datetime.utcnow(),
             "updated": datetime.utcnow(),
         }
 
-    def _add_mock_blob(self, blob_name: str, size: int = 1024 * 100) -> None:
+    def _add_mock_blob(self, blob_name: str, size: int = 100 * 1024) -> None:
         """Helper method to add a mock blob to storage (for testing).
 
         Args:
             blob_name: Name/path of the blob
-            size: Size of the blob in bytes
+            size: Size of the blob in bytes (default: 100 KB)
         """
         self._mock_storage[blob_name] = {
             "name": blob_name,
