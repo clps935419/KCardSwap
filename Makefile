@@ -81,7 +81,7 @@ setup: ## Initial setup - copy env and start services
 	@make health
 
 generate-openapi: ## Generate OpenAPI spec from backend code
-	cd apps/backend && python scripts/generate_openapi.py
+	cd apps/backend && poetry run python scripts/generate_openapi.py
 
 generate-openapi-docker: ## Generate OpenAPI spec using Docker container
 	docker compose exec backend python scripts/generate_openapi.py
