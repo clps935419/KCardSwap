@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
-import { config } from '../config';
-import { getAccessToken, getRefreshToken, saveTokens, isTokenExpired } from '../auth/session';
+import { config } from '@/src/shared/config';
+import { getAccessToken, getRefreshToken, saveTokens, isTokenExpired } from '@/src/shared/auth/session';
 import { mapApiError } from './errorMapper';
 
 /**

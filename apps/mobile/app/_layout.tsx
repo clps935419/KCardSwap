@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
 import { Slot, useRouter, useSegments } from 'expo-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useAuthStore } from '../src/shared/state/authStore';
+import { useAuthStore } from '@/src/shared/state/authStore';
 import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider';
-import '../global.css';
+import '@/global.css';
 
 // Create a client
 const queryClient = new QueryClient({

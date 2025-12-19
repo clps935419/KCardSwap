@@ -1,8 +1,16 @@
-import { View, Text, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import { Alert } from 'react-native';
 import { useState } from 'react';
 import { router } from 'expo-router';
-import { useAuthStore } from '../../src/shared/state/authStore';
-import { googleLoginWithPKCE, isGoogleOAuthConfigured } from '../../src/shared/auth/googleOAuth';
+import { useAuthStore } from '@/src/shared/state/authStore';
+import { googleLoginWithPKCE, isGoogleOAuthConfigured } from '@/src/shared/auth/googleOAuth';
+import {
+  Box,
+  Text,
+  Heading,
+  Button,
+  ButtonText,
+  Spinner,
+} from '@/src/shared/ui/components';
 
 export default function LoginScreen() {
   const [isLoading, setIsLoading] = useState(false);
@@ -66,36 +74,41 @@ export default function LoginScreen() {
   };
 
   return (
-    <View className="flex-1 items-center justify-center bg-white p-4">
-      <Text className="text-3xl font-bold mb-2 text-gray-800">Welcome to KCardSwap</Text>
-      <Text className="text-base mb-8 text-gray-600 text-center">
+    <Box className="flex-1 items-center justify-center bg-white p-4">
+      <Heading size="3xl" className="mb-2 text-gray-800">
+        Welcome to KCardSwap
+      </Heading>
+      <Text size="md" className="mb-8 text-gray-600 text-center">
         Sign in to start trading your cards
       </Text>
 
-      <TouchableOpacity
+      <Button
         onPress={handleGoogleLogin}
-        disabled={isLoading}
+        isDisabled={isLoading}
+        size="lg"
         className={`px-8 py-4 rounded-lg shadow-md ${
-          isLoading ? 'bg-blue-300' : 'bg-blue-500 active:bg-blue-600'
+          isLoading ? 'bg-blue-300' : 'bg-blue-500'
         }`}
       >
         {isLoading ? (
-          <ActivityIndicator color="white" />
+          <Spinner color="white" />
         ) : (
-          <Text className="text-white text-lg font-semibold">Sign in with Google</Text>
+          <ButtonText size="lg" className="font-semibold">
+            Sign in with Google
+          </ButtonText>
         )}
-      </TouchableOpacity>
+      </Button>
 
       {isLoading && (
-        <Text className="mt-4 text-sm text-gray-500">
+        <Text size="sm" className="mt-4 text-gray-500">
           Redirecting to Google...
         </Text>
       )}
 
-      <Text className="mt-8 text-sm text-gray-500 text-center">
+      <Text size="sm" className="mt-8 text-gray-500 text-center">
         Phase 3 (US1): Google OAuth with PKCE{'\n'}
         Secure mobile authentication
       </Text>
-    </View>
+    </Box>
   );
 }

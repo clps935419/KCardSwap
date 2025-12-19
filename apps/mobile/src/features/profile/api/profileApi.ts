@@ -6,7 +6,7 @@
  * - PUT /profile/me - Update current user's profile
  */
 
-import { apiClient } from '../../../shared/api/client';
+import { apiClient } from '@/src/shared/api/client';
 
 /**
  * Profile data structure matching backend contract
