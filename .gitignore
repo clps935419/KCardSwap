@@ -56,6 +56,3 @@ htmlcov/
 # Build artifacts
 dist/
 build/
-
-# Mobile app generated SDK (regenerate with npm run sdk:generate)
-apps/mobile/src/shared/api/generated/
