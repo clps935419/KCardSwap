@@ -5,6 +5,44 @@
 - Mobile（或其他前端）在本機/CI/雲端 agent 進行 codegen
 - 避免 codegen 依賴 `localhost` 或內網可達性
 
+---
+
+## ⚠️ 重要：開發工作流程
+
+### 當您修改後端 API 時，請務必遵循以下順序：
+
+```bash
+# 步驟 1：修改後端程式碼（例如新增或修改 API 端點）
+# 在 apps/backend/app/modules/... 修改您的 router
+
+# 步驟 2：生成新的 OpenAPI 規格
+make generate-openapi
+# 或使用 Docker: make generate-openapi-docker
+
+# 步驟 3：重新生成前端 SDK（在修改前端前必須執行）
+cd apps/mobile
+npm run sdk:clean
+npm run sdk:generate
+
+# 步驟 4：驗證型別
+npm run type-check
+
+# 步驟 5：現在可以開始修改前端程式碼，使用新的 SDK
+
+# 步驟 6：提交變更
+git add ../../openapi/openapi.json  # 只 commit openapi.json
+# generated/ 目錄不要 commit（已在 .gitignore）
+git commit -m "feat: Add new API endpoint and regenerate SDK"
+```
+
+### 為什麼這個順序很重要？
+
+1. **型別安全**：前端 TypeScript 會自動知道新的 API 端點和型別
+2. **避免錯誤**：在修改前端前生成 SDK，避免使用過期的 API 定義
+3. **開發效率**：IDE 會提供自動完成和型別檢查
+
+---
+
 ## 快照檔案約定
 
 請在本目錄維護一份快照檔（檔名可依團隊偏好統一）：

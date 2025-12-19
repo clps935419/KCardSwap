@@ -262,6 +262,41 @@ Generated from `openapi/openapi.json`:
 
 ## Development Workflow
 
+### ⚠️ Critical: When Backend API Changes
+
+**Always follow this order to maintain type safety:**
+
+```bash
+# 1. Backend developer adds/modifies endpoint
+# Edit: apps/backend/app/modules/.../routers/*.py
+
+# 2. Generate new OpenAPI spec (MUST DO FIRST)
+make generate-openapi
+# or: make generate-openapi-docker
+
+# 3. Regenerate Mobile SDK (BEFORE editing frontend)
+cd apps/mobile
+npm run sdk:clean
+npm run sdk:generate
+
+# 4. Verify types
+npm run type-check
+
+# 5. Now frontend developer can use new SDK
+# Import from @/src/shared/api/sdk and get full type safety
+
+# 6. Commit changes
+git add ../../openapi/openapi.json
+# Note: Don't commit generated/ - it's in .gitignore
+```
+
+### Why This Order Matters
+
+1. **Type Safety**: Frontend TypeScript will know about new endpoints immediately
+2. **Prevent Errors**: Regenerating SDK before frontend changes avoids using outdated API definitions
+3. **Developer Experience**: IDE autocomplete and type checking work correctly
+4. **Team Collaboration**: Backend and frontend stay in sync
+
 ### Adding a New Endpoint
 
 1. **Backend**: Add new endpoint to FastAPI
