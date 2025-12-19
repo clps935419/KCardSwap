@@ -1,8 +1,14 @@
 /**
  * Theme Tokens
  * 
- * Centralized theme configuration extracted from Gluestack UI provider.
- * These tokens define the design system's colors, spacing, typography, etc.
+ * Centralized theme configuration for KCardSwap mobile app.
+ * Color palette inspired by Korean minimalist girl aesthetic:
+ * - Soft lavender (primary)
+ * - Blush pink (secondary)
+ * - Dreamy mint (tertiary)
+ * - Gentle pastels for feedback colors
+ * 
+ * Keywords: 韓系 (Korean style), 女孩 (girl), 卡片 (card), 簡約 (minimalist)
  * 
  * @see components/ui/gluestack-ui-provider/config.ts for full configuration
  */
@@ -12,105 +18,117 @@
  * 
  * RGB format: 'R G B' (space-separated values)
  * Usage in Tailwind: text-[rgb(var(--color-primary-500))]
+ * 
+ * Design Philosophy:
+ * - Primary: Soft lavender (#B984DF area) - Main brand color, feminine and calming
+ * - Secondary: Blush pink (#FEC5E5, #FFB7C5) - Cherry blossom inspired, romantic
+ * - Tertiary: Dreamy mint (#B8E4DC, #E4F1CB) - Fresh and clean, Korean aesthetic
  */
 export const colors = {
   primary: {
-    0: '179 179 179',
-    50: '153 153 153',
-    100: '128 128 128',
-    200: '115 115 115',
-    300: '102 102 102',
-    400: '82 82 82',
-    500: '51 51 51',
-    600: '41 41 41',
-    700: '31 31 31',
-    800: '13 13 13',
-    900: '10 10 10',
-    950: '8 8 8',
+    // Soft Lavender - Korean aesthetic inspired
+    0: '252 248 255',      // Very light lavender
+    50: '245 239 254',     // Ultra soft lavender
+    100: '237 229 252',    // Light lavender
+    200: '220 208 247',    // Soft lavender
+    300: '201 185 240',    // Medium lavender
+    400: '185 164 228',    // Floral lavender (#B984DF)
+    500: '169 142 216',    // Main lavender
+    600: '149 119 193',    // Deep lavender
+    700: '128 95 169',     // Darker lavender
+    800: '102 76 135',     // Very dark lavender
+    900: '76 57 101',      // Deepest lavender
+    950: '51 38 68',       // Almost black lavender
   },
   secondary: {
-    0: '253 253 253',
-    50: '251 251 251',
-    100: '246 246 246',
-    200: '242 242 242',
-    300: '237 237 237',
-    400: '230 230 231',
-    500: '217 217 219',
-    600: '198 199 199',
-    700: '189 189 189',
-    800: '177 177 177',
-    900: '165 164 164',
-    950: '157 157 157',
+    // Blush Pink - Cherry blossom inspired
+    0: '255 251 252',      // Almost white pink
+    50: '255 247 249',     // Very light pink
+    100: '255 237 242',    // Light blush (#FCEDF2)
+    200: '255 220 230',    // Soft blush
+    300: '255 197 213',    // Cherry blossom (#FFB7C5)
+    400: '254 181 202',    // Medium blush
+    500: '254 197 229',    // Blush pink (#FEC5E5)
+    600: '255 156 184',    // Deep blush
+    700: '240 131 161',    // Darker pink
+    800: '214 106 136',    // Very dark pink
+    900: '171 85 109',     // Deepest pink
+    950: '114 57 73',      // Almost black pink
   },
   tertiary: {
-    0: '255 250 245',
-    50: '255 242 229',
-    100: '255 233 213',
-    200: '254 209 170',
-    300: '253 180 116',
-    400: '251 157 75',
-    500: '231 129 40',
-    600: '215 117 31',
-    700: '180 98 26',
-    800: '130 73 23',
-    900: '108 61 19',
-    950: '84 49 18',
+    // Soft Mint - Fresh and clean Korean aesthetic
+    0: '247 254 252',      // Almost white mint
+    50: '236 252 247',     // Very light mint
+    100: '224 249 241',    // Light mint (#E4F1CB)
+    200: '201 241 228',    // Soft mint
+    300: '184 228 220',    // Dreamy mint (#B8E4DC)
+    400: '156 217 204',    // Medium mint
+    500: '140 207 193',    // Main mint
+    600: '115 186 172',    // Deep mint
+    700: '92 158 146',     // Darker mint
+    800: '74 131 121',     // Very dark mint
+    900: '56 99 92',       // Deepest mint
+    950: '37 66 61',       // Almost black mint
   },
   error: {
-    0: '254 233 233',
-    50: '254 226 226',
-    100: '254 202 202',
-    200: '252 165 165',
-    300: '248 113 113',
-    400: '239 68 68',
-    500: '220 38 38',
-    600: '185 28 28',
-    700: '153 27 27',
-    800: '127 29 29',
-    900: '69 10 10',
-    950: '69 10 10',
+    // Soft Coral - Gentle error feedback
+    0: '255 246 245',
+    50: '255 237 235',
+    100: '255 220 215',
+    200: '255 194 186',
+    300: '255 162 149',
+    400: '251 134 119',
+    500: '242 106 91',
+    600: '224 84 73',
+    700: '197 66 58',
+    800: '165 54 48',
+    900: '128 45 41',
+    950: '85 30 27',
   },
   success: {
-    0: '220 252 231',
-    50: '187 247 208',
-    100: '134 239 172',
-    200: '74 222 128',
-    300: '34 197 94',
-    400: '22 163 74',
-    500: '21 128 61',
-    600: '22 101 52',
-    700: '20 83 45',
-    800: '19 56 35',
-    900: '5 46 22',
-    950: '5 46 22',
+    // Soft Sage Green - Gentle success feedback
+    0: '244 251 246',
+    50: '233 247 237',
+    100: '214 240 221',
+    200: '186 229 198',
+    300: '149 213 168',
+    400: '116 196 141',
+    500: '92 184 121',
+    600: '72 161 102',
+    700: '57 135 84',
+    800: '46 109 69',
+    900: '38 86 56',
+    950: '25 57 37',
   },
   warning: {
-    0: '254 252 232',
-    50: '254 249 195',
-    100: '254 240 138',
-    200: '253 224 71',
-    300: '250 204 21',
-    400: '234 179 8',
-    500: '202 138 4',
-    600: '161 98 7',
-    700: '133 77 14',
-    800: '113 63 18',
-    900: '66 32 6',
-    950: '66 32 6',
+    // Soft Peach - Gentle warning feedback
+    0: '255 251 247',
+    50: '255 246 237',
+    100: '255 238 222',
+    200: '255 221 189',
+    300: '255 199 149',
+    400: '255 176 112',
+    500: '255 158 88',
+    600: '242 135 63',
+    700: '217 112 44',
+    800: '179 91 36',
+    900: '140 72 30',
+    950: '92 47 20',
   },
   info: {
-    0: '224 242 254',
-    50: '186 230 253',
-    100: '125 211 252',
-    200: '56 189 248',
-    300: '14 165 233',
-    400: '2 132 199',
-    500: '3 105 161',
-    600: '7 89 133',
-    700: '12 74 110',
-    800: '30 58 138',
-    900: '23 37 84',
-    950: '23 37 84',
+    // Soft Sky Blue - Gentle info feedback
+    0: '245 251 255',
+    50: '235 247 255',
+    100: '220 241 255',
+    200: '194 231 255',
+    300: '156 217 252',
+    400: '115 200 246',
+    500: '82 186 240',
+    600: '56 167 225',
+    700: '41 141 196',
+    800: '35 116 161',
+    900: '33 92 126',
+    950: '22 61 84',
   },
 } as const;
 
