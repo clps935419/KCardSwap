@@ -7,19 +7,13 @@
  * - 支援狀態篩選
  * - 支援刪除卡片
  * - 顯示配額狀態
+ * 
+ * 使用 Gluestack UI 元件
  */
 
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  ActivityIndicator,
-  StyleSheet,
-  RefreshControl,
-  Alert,
-} from 'react-native';
+import { FlatList, RefreshControl, Alert } from 'react-native';
+import { Box, Text, Pressable, Spinner, Button, ButtonText } from '@/src/shared/ui/components';
 import { useMyCards, useDeleteCard, useQuotaStatus } from '../hooks/useCards';
 import { CardItem } from '../components/CardItem';
 import type { Card, CardStatus } from '../types';
@@ -63,50 +57,55 @@ export function MyCardsScreen() {
   };
 
   const renderHeader = () => (
-    <View style={styles.header}>
+    <Box>
       {/* 配額狀態 */}
       {quota && (
-        <View style={styles.quotaContainer}>
-          <Text style={styles.quotaTitle}>今日上傳限制</Text>
-          <View style={styles.quotaRow}>
-            <Text style={styles.quotaText}>
+        <Box className="p-4 bg-gray-50 border-b border-gray-200">
+          <Text className="text-sm font-bold text-gray-900 mb-2">今日上傳限制</Text>
+          <Box className="flex-row justify-between mb-1">
+            <Text className="text-xs text-gray-700">
               已上傳：{quota.daily_uploads.used} / {quota.daily_uploads.limit}
             </Text>
             <Text
-              style={[
-                styles.quotaRemaining,
-                quota.daily_uploads.remaining === 0 && styles.quotaExceeded,
-              ]}
+              className={`text-xs font-semibold ${
+                quota.daily_uploads.remaining === 0 ? 'text-red-500' : 'text-green-500'
+              }`}
             >
               剩餘：{quota.daily_uploads.remaining}
             </Text>
-          </View>
-          <View style={styles.quotaRow}>
-            <Text style={styles.quotaText}>
+          </Box>
+          <Box className="flex-row justify-between">
+            <Text className="text-xs text-gray-700">
               容量：{(quota.storage.used_bytes / 1024 / 1024).toFixed(2)} MB /{' '}
               {(quota.storage.limit_bytes / 1024 / 1024 / 1024).toFixed(2)} GB
             </Text>
-          </View>
-        </View>
+          </Box>
+        </Box>
       )}
 
       {/* 狀態篩選 */}
-      <View style={styles.filterContainer}>
+      <Box className="flex-row px-4 pt-4 pb-2 gap-2 bg-white">
         {STATUS_FILTERS.map((filter) => (
-          <TouchableOpacity
+          <Pressable
             key={filter.value}
-            style={[styles.filterButton, selectedStatus === filter.value && styles.filterButtonActive]}
+            className={`px-4 py-2 rounded-full ${
+              selectedStatus === filter.value ? 'bg-blue-500' : 'bg-gray-200'
+            }`}
             onPress={() => setSelectedStatus(filter.value)}
           >
             <Text
-              style={[styles.filterText, selectedStatus === filter.value && styles.filterTextActive]}
+              className={`text-sm ${
+                selectedStatus === filter.value
+                  ? 'text-white font-semibold'
+                  : 'text-gray-700'
+              }`}
             >
               {filter.label}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         ))}
-      </View>
-    </View>
+      </Box>
+    </Box>
   );
 
   const renderEmpty = () => {
@@ -115,31 +114,35 @@ export function MyCardsScreen() {
     }
 
     return (
-      <View style={styles.emptyContainer}>
-        <Text style={styles.emptyIcon}>📦</Text>
-        <Text style={styles.emptyTitle}>尚無卡片</Text>
-        <Text style={styles.emptyText}>上傳您的第一張小卡開始收藏吧！</Text>
-      </View>
+      <Box className="flex-1 justify-center items-center py-16">
+        <Text className="text-6xl mb-4">📦</Text>
+        <Text className="text-lg font-bold text-gray-900 mb-2">尚無卡片</Text>
+        <Text className="text-sm text-gray-500 text-center">
+          上傳您的第一張小卡開始收藏吧！
+        </Text>
+      </Box>
     );
   };
 
   const renderError = () => (
-    <View style={styles.errorContainer}>
-      <Text style={styles.errorIcon}>⚠️</Text>
-      <Text style={styles.errorTitle}>載入失敗</Text>
-      <Text style={styles.errorText}>{(error as Error)?.message || '請稍後再試'}</Text>
-      <TouchableOpacity style={styles.retryButton} onPress={() => refetch()}>
-        <Text style={styles.retryButtonText}>重試</Text>
-      </TouchableOpacity>
-    </View>
+    <Box className="flex-1 justify-center items-center p-8">
+      <Text className="text-6xl mb-4">⚠️</Text>
+      <Text className="text-lg font-bold text-gray-900 mb-2">載入失敗</Text>
+      <Text className="text-sm text-gray-500 text-center mb-6">
+        {(error as Error)?.message || '請稍後再試'}
+      </Text>
+      <Button onPress={() => refetch()} className="bg-blue-500">
+        <ButtonText>重試</ButtonText>
+      </Button>
+    </Box>
   );
 
   if (error && !cards) {
-    return <View style={styles.container}>{renderError()}</View>;
+    return <Box className="flex-1 bg-gray-50">{renderError()}</Box>;
   }
 
   return (
-    <View style={styles.container}>
+    <Box className="flex-1 bg-gray-50">
       <FlatList
         data={cards || []}
         keyExtractor={(item) => item.id}
@@ -151,157 +154,24 @@ export function MyCardsScreen() {
         refreshControl={
           <RefreshControl refreshing={isRefetching} onRefresh={refetch} />
         }
-        contentContainerStyle={cards?.length === 0 ? styles.emptyList : undefined}
+        contentContainerStyle={cards?.length === 0 ? { flexGrow: 1 } : undefined}
       />
 
       {/* 載入中遮罩 */}
       {isLoading && (
-        <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="large" color="#007AFF" />
-          <Text style={styles.loadingText}>載入中...</Text>
-        </View>
+        <Box className="absolute inset-0 bg-black/30 justify-center items-center">
+          <Spinner size="large" />
+          <Text className="mt-3 text-base text-white font-semibold">載入中...</Text>
+        </Box>
       )}
 
       {/* 刪除中遮罩 */}
       {deleteCardMutation.isPending && (
-        <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="large" color="#FF5252" />
-          <Text style={styles.loadingText}>刪除中...</Text>
-        </View>
+        <Box className="absolute inset-0 bg-black/30 justify-center items-center">
+          <Spinner size="large" color="$red500" />
+          <Text className="mt-3 text-base text-white font-semibold">刪除中...</Text>
+        </Box>
       )}
-    </View>
+    </Box>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  header: {
-    backgroundColor: '#fff',
-    paddingBottom: 16,
-    marginBottom: 8,
-  },
-  quotaContainer: {
-    padding: 16,
-    backgroundColor: '#f9f9f9',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  quotaTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
-  },
-  quotaRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 4,
-  },
-  quotaText: {
-    fontSize: 12,
-    color: '#666',
-  },
-  quotaRemaining: {
-    fontSize: 12,
-    color: '#4CAF50',
-    fontWeight: '600',
-  },
-  quotaExceeded: {
-    color: '#FF5252',
-  },
-  filterContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    gap: 8,
-  },
-  filterButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: '#f0f0f0',
-  },
-  filterButtonActive: {
-    backgroundColor: '#007AFF',
-  },
-  filterText: {
-    fontSize: 14,
-    color: '#666',
-  },
-  filterTextActive: {
-    color: '#fff',
-    fontWeight: '600',
-  },
-  emptyList: {
-    flexGrow: 1,
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 60,
-  },
-  emptyIcon: {
-    fontSize: 64,
-    marginBottom: 16,
-  },
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
-  },
-  emptyText: {
-    fontSize: 14,
-    color: '#999',
-    textAlign: 'center',
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 32,
-  },
-  errorIcon: {
-    fontSize: 64,
-    marginBottom: 16,
-  },
-  errorTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
-  },
-  errorText: {
-    fontSize: 14,
-    color: '#999',
-    textAlign: 'center',
-    marginBottom: 24,
-  },
-  retryButton: {
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
-    backgroundColor: '#007AFF',
-  },
-  retryButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#fff',
-  },
-  loadingOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    marginTop: 12,
-    fontSize: 16,
-    color: '#fff',
-    fontWeight: '600',
-  },
-});

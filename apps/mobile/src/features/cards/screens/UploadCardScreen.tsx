@@ -7,20 +7,23 @@
  * - 填寫卡片資訊
  * - 顯示上傳進度
  * - 錯誤處理（配額、檔案大小、網路等）
+ * 
+ * 使用 Gluestack UI 元件
  */
 
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-  ScrollView,
-  ActivityIndicator,
-} from 'react-native';
+import { ScrollView, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
+import {
+  Box,
+  Text,
+  Input,
+  Pressable,
+  Spinner,
+  Button,
+  ButtonText,
+  Heading,
+} from '@/src/shared/ui/components';
 import { useUploadCard } from '../hooks/useUploadCard';
 import type { CardRarity, LimitExceededError } from '../types';
 
@@ -124,271 +127,157 @@ export function UploadCardScreen() {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>上傳小卡</Text>
+    <ScrollView className="flex-1 bg-gray-50">
+      <Box className="p-4">
+        <Heading size="xl" className="text-gray-900 mb-6">
+          上傳小卡
+        </Heading>
 
-      {/* 卡片資訊表單 */}
-      <View style={styles.form}>
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>偶像名稱</Text>
-          <TextInput
-            style={styles.input}
-            value={idol}
-            onChangeText={setIdol}
-            placeholder="例：IU"
-            editable={!isUploading}
-          />
-        </View>
+        {/* 卡片資訊表單 */}
+        <Box className="bg-white rounded-xl p-4 mb-4">
+          <Box className="mb-4">
+            <Text className="text-sm font-semibold text-gray-900 mb-2">偶像名稱</Text>
+            <Input
+              value={idol}
+              onChangeText={setIdol}
+              placeholder="例：IU"
+              isDisabled={isUploading}
+              className="bg-white"
+            />
+          </Box>
 
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>團體/公司（選填）</Text>
-          <TextInput
-            style={styles.input}
-            value={idolGroup}
-            onChangeText={setIdolGroup}
-            placeholder="例：EDAM Entertainment"
-            editable={!isUploading}
-          />
-        </View>
+          <Box className="mb-4">
+            <Text className="text-sm font-semibold text-gray-900 mb-2">
+              團體/公司（選填）
+            </Text>
+            <Input
+              value={idolGroup}
+              onChangeText={setIdolGroup}
+              placeholder="例：EDAM Entertainment"
+              isDisabled={isUploading}
+              className="bg-white"
+            />
+          </Box>
 
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>專輯名稱（選填）</Text>
-          <TextInput
-            style={styles.input}
-            value={album}
-            onChangeText={setAlbum}
-            placeholder="例：Love Poem"
-            editable={!isUploading}
-          />
-        </View>
+          <Box className="mb-4">
+            <Text className="text-sm font-semibold text-gray-900 mb-2">
+              專輯名稱（選填）
+            </Text>
+            <Input
+              value={album}
+              onChangeText={setAlbum}
+              placeholder="例：Love Poem"
+              isDisabled={isUploading}
+              className="bg-white"
+            />
+          </Box>
 
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>版本（選填）</Text>
-          <TextInput
-            style={styles.input}
-            value={version}
-            onChangeText={setVersion}
-            placeholder="例：限定版"
-            editable={!isUploading}
-          />
-        </View>
+          <Box className="mb-4">
+            <Text className="text-sm font-semibold text-gray-900 mb-2">版本（選填）</Text>
+            <Input
+              value={version}
+              onChangeText={setVersion}
+              placeholder="例：限定版"
+              isDisabled={isUploading}
+              className="bg-white"
+            />
+          </Box>
 
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>稀有度</Text>
-          <View style={styles.rarityContainer}>
-            {RARITY_OPTIONS.map((option) => (
-              <TouchableOpacity
-                key={option.value}
-                style={[styles.rarityButton, rarity === option.value && styles.rarityButtonActive]}
-                onPress={() => setRarity(option.value)}
-                disabled={isUploading}
-              >
-                <Text
-                  style={[styles.rarityText, rarity === option.value && styles.rarityTextActive]}
+          <Box>
+            <Text className="text-sm font-semibold text-gray-900 mb-2">稀有度</Text>
+            <Box className="flex-row gap-2">
+              {RARITY_OPTIONS.map((option) => (
+                <Pressable
+                  key={option.value}
+                  className={`flex-1 py-3 rounded-lg items-center ${
+                    rarity === option.value ? 'bg-blue-500' : 'bg-gray-100'
+                  }`}
+                  onPress={() => setRarity(option.value)}
+                  isDisabled={isUploading}
                 >
-                  {option.label}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-      </View>
+                  <Text
+                    className={`text-sm ${
+                      rarity === option.value
+                        ? 'text-white font-semibold'
+                        : 'text-gray-700'
+                    }`}
+                  >
+                    {option.label}
+                  </Text>
+                </Pressable>
+              ))}
+            </Box>
+          </Box>
+        </Box>
 
-      {/* 上傳進度 */}
-      {isUploading && (
-        <View style={styles.progressContainer}>
-          <ActivityIndicator size="large" color="#007AFF" />
-          <Text style={styles.progressMessage}>{uploadProgress.message}</Text>
-          <View style={styles.progressBar}>
-            <View style={[styles.progressFill, { width: `${uploadProgress.progress}%` }]} />
-          </View>
-          <Text style={styles.progressPercent}>{uploadProgress.progress.toFixed(0)}%</Text>
-        </View>
-      )}
+        {/* 上傳進度 */}
+        {isUploading && (
+          <Box className="bg-white rounded-xl p-6 mb-4 items-center">
+            <Spinner size="large" />
+            <Text className="text-base text-gray-900 mt-4 mb-3">
+              {uploadProgress.message}
+            </Text>
+            <Box className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+              <Box
+                className="h-full bg-blue-500"
+                style={{ width: `${uploadProgress.progress}%` }}
+              />
+            </Box>
+            <Text className="text-sm text-gray-600 mt-2">
+              {uploadProgress.progress.toFixed(0)}%
+            </Text>
+          </Box>
+        )}
 
-      {/* 錯誤訊息 */}
-      {error && !isUploading && (
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>❌ {(error as Error).message}</Text>
-        </View>
-      )}
+        {/* 錯誤訊息 */}
+        {error && !isUploading && (
+          <Box className="bg-red-50 rounded-lg p-4 mb-4">
+            <Text className="text-sm text-red-700">
+              ❌ {(error as Error).message}
+            </Text>
+          </Box>
+        )}
 
-      {/* 上傳按鈕 */}
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={[styles.button, styles.cameraButton, isUploading && styles.buttonDisabled]}
-          onPress={() => handleUpload('camera')}
-          disabled={isUploading}
-        >
-          <Text style={styles.buttonIcon}>📷</Text>
-          <Text style={styles.buttonText}>拍照上傳</Text>
-        </TouchableOpacity>
+        {/* 上傳按鈕 */}
+        <Box className="flex-row gap-3 mb-4">
+          <Button
+            onPress={() => handleUpload('camera')}
+            isDisabled={isUploading}
+            className="flex-1 bg-green-500"
+          >
+            <Text className="text-3xl mb-2">📷</Text>
+            <ButtonText>拍照上傳</ButtonText>
+          </Button>
 
-        <TouchableOpacity
-          style={[styles.button, styles.galleryButton, isUploading && styles.buttonDisabled]}
-          onPress={() => handleUpload('gallery')}
-          disabled={isUploading}
-        >
-          <Text style={styles.buttonIcon}>🖼️</Text>
-          <Text style={styles.buttonText}>相簿選取</Text>
-        </TouchableOpacity>
-      </View>
+          <Button
+            onPress={() => handleUpload('gallery')}
+            isDisabled={isUploading}
+            className="flex-1 bg-blue-500"
+          >
+            <Text className="text-3xl mb-2">🖼️</Text>
+            <ButtonText>相簿選取</ButtonText>
+          </Button>
+        </Box>
 
-      {/* 使用說明 */}
-      <View style={styles.infoContainer}>
-        <Text style={styles.infoTitle}>📌 上傳說明</Text>
-        <Text style={styles.infoText}>• 支援 JPEG 和 PNG 格式</Text>
-        <Text style={styles.infoText}>• 單檔最大 10MB</Text>
-        <Text style={styles.infoText}>• 免費用戶：每日 2 張，總容量 1GB</Text>
-        <Text style={styles.infoText}>• 建議比例：3:4（標準卡片比例）</Text>
-      </View>
+        {/* 使用說明 */}
+        <Box className="bg-amber-50 rounded-xl p-4">
+          <Text className="text-base font-bold text-amber-900 mb-3">
+            📌 上傳說明
+          </Text>
+          <Text className="text-sm text-amber-900 mb-1">
+            • 支援 JPEG 和 PNG 格式
+          </Text>
+          <Text className="text-sm text-amber-900 mb-1">
+            • 單檔最大 10MB
+          </Text>
+          <Text className="text-sm text-amber-900 mb-1">
+            • 免費用戶：每日 2 張，總容量 1GB
+          </Text>
+          <Text className="text-sm text-amber-900">
+            • 建議比例：3:4（標準卡片比例）
+          </Text>
+        </Box>
+      </Box>
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  content: {
-    padding: 16,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 24,
-  },
-  form: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-  },
-  formGroup: {
-    marginBottom: 16,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    color: '#333',
-    backgroundColor: '#fff',
-  },
-  rarityContainer: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  rarityButton: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 8,
-    backgroundColor: '#f0f0f0',
-    alignItems: 'center',
-  },
-  rarityButtonActive: {
-    backgroundColor: '#007AFF',
-  },
-  rarityText: {
-    fontSize: 14,
-    color: '#666',
-  },
-  rarityTextActive: {
-    color: '#fff',
-    fontWeight: '600',
-  },
-  progressContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 24,
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  progressMessage: {
-    fontSize: 16,
-    color: '#333',
-    marginTop: 16,
-    marginBottom: 12,
-  },
-  progressBar: {
-    width: '100%',
-    height: 8,
-    backgroundColor: '#e0e0e0',
-    borderRadius: 4,
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: '100%',
-    backgroundColor: '#007AFF',
-  },
-  progressPercent: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 8,
-  },
-  errorContainer: {
-    backgroundColor: '#FFEBEE',
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 16,
-  },
-  errorText: {
-    fontSize: 14,
-    color: '#C62828',
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 16,
-  },
-  button: {
-    flex: 1,
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    flexDirection: 'column',
-  },
-  cameraButton: {
-    backgroundColor: '#4CAF50',
-  },
-  galleryButton: {
-    backgroundColor: '#2196F3',
-  },
-  buttonDisabled: {
-    opacity: 0.5,
-  },
-  buttonIcon: {
-    fontSize: 32,
-    marginBottom: 8,
-  },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#fff',
-  },
-  infoContainer: {
-    backgroundColor: '#FFF3E0',
-    borderRadius: 12,
-    padding: 16,
-  },
-  infoTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#E65100',
-    marginBottom: 12,
-  },
-  infoText: {
-    fontSize: 14,
-    color: '#E65100',
-    marginBottom: 4,
-  },
-});

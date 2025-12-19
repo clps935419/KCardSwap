@@ -2,17 +2,20 @@
  * Card Item Component
  * 卡片列表項目元件
  * M204: 列表顯示，優先使用本機縮圖
+ * 
+ * 使用 Gluestack UI 元件
  */
 
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native';
+import { Image } from 'react-native';
+import { Box, Text, Pressable, Spinner, Card } from '@/src/shared/ui/components';
 import { getThumbnailFromCache } from '../services/thumbnailService';
-import type { Card } from '../types';
+import type { Card as CardType } from '../types';
 
 interface CardItemProps {
-  card: Card;
-  onPress?: (card: Card) => void;
-  onDelete?: (card: Card) => void;
+  card: CardType;
+  onPress?: (card: CardType) => void;
+  onDelete?: (card: CardType) => void;
 }
 
 export function CardItem({ card, onPress, onDelete }: CardItemProps) {
@@ -62,200 +65,116 @@ export function CardItem({ card, onPress, onDelete }: CardItemProps) {
     setError(false);
   };
 
+  const getRarityColor = (rarity: string) => {
+    const colors: Record<string, string> = {
+      common: '$gray200',
+      rare: '$blue400',
+      epic: '$purple500',
+      legendary: '$amber500',
+    };
+    return colors[rarity] || '$gray200';
+  };
+
+  const getStatusColor = (status: string) => {
+    const colors: Record<string, string> = {
+      available: '$green500',
+      trading: '$orange500',
+      traded: '$gray500',
+    };
+    return colors[status] || '$gray500';
+  };
+
+  const getStatusLabel = (status: string) => {
+    const labels: Record<string, string> = {
+      available: '可交換',
+      trading: '交易中',
+      traded: '已交換',
+    };
+    return labels[status] || status;
+  };
+
   return (
-    <TouchableOpacity
-      style={styles.container}
-      onPress={() => onPress?.(card)}
-      activeOpacity={0.7}
-    >
-      <View style={styles.imageContainer}>
-        {loading ? (
-          <View style={styles.placeholder}>
-            <ActivityIndicator size="small" color="#666" />
-          </View>
-        ) : error ? (
-          <TouchableOpacity style={styles.placeholder} onPress={handleRetry}>
-            <Text style={styles.errorText}>載入失敗</Text>
-            <Text style={styles.retryText}>點擊重試</Text>
-          </TouchableOpacity>
-        ) : (
-          <Image
-            source={{ uri: imageUri || undefined }}
-            style={styles.image}
-            resizeMode="cover"
-            onError={() => setError(true)}
-          />
-        )}
-      </View>
+    <Pressable onPress={() => onPress?.(card)}>
+      <Card
+        variant="elevated"
+        className="flex-row p-3 mx-4 my-2"
+      >
+        {/* 圖片容器 */}
+        <Box className="w-20 h-24 rounded-lg overflow-hidden bg-gray-100">
+          {loading ? (
+            <Box className="w-full h-full justify-center items-center">
+              <Spinner size="small" />
+            </Box>
+          ) : error ? (
+            <Pressable
+              className="w-full h-full justify-center items-center"
+              onPress={handleRetry}
+            >
+              <Text className="text-xs text-gray-600 text-center">載入失敗</Text>
+              <Text className="text-xs text-blue-500 mt-1">點擊重試</Text>
+            </Pressable>
+          ) : (
+            <Image
+              source={{ uri: imageUri || undefined }}
+              style={{ width: '100%', height: '100%' }}
+              resizeMode="cover"
+              onError={() => setError(true)}
+            />
+          )}
+        </Box>
 
-      <View style={styles.infoContainer}>
-        <Text style={styles.idol} numberOfLines={1}>
-          {card.idol}
-        </Text>
-        {card.idol_group && (
-          <Text style={styles.group} numberOfLines={1}>
-            {card.idol_group}
-          </Text>
-        )}
-        {card.album && (
-          <Text style={styles.album} numberOfLines={1}>
-            {card.album}
-          </Text>
-        )}
-        <View style={styles.footer}>
-          <View style={[styles.rarityBadge, styles[`rarity_${card.rarity}`]]}>
-            <Text style={styles.rarityText}>{card.rarity}</Text>
-          </View>
-          <View style={[styles.statusBadge, styles[`status_${card.status}`]]}>
-            <Text style={styles.statusText}>{getStatusLabel(card.status)}</Text>
-          </View>
-        </View>
-      </View>
+        {/* 資訊容器 */}
+        <Box className="flex-1 ml-3 justify-between">
+          <Box>
+            <Text className="text-base font-bold text-gray-900" numberOfLines={1}>
+              {card.idol}
+            </Text>
+            {card.idol_group && (
+              <Text className="text-sm text-gray-600 mt-0.5" numberOfLines={1}>
+                {card.idol_group}
+              </Text>
+            )}
+            {card.album && (
+              <Text className="text-xs text-gray-400 mt-0.5" numberOfLines={1}>
+                {card.album}
+              </Text>
+            )}
+          </Box>
 
-      {onDelete && card.status === 'available' && (
-        <TouchableOpacity
-          style={styles.deleteButton}
-          onPress={(e) => {
-            e.stopPropagation();
-            onDelete(card);
-          }}
-        >
-          <Text style={styles.deleteText}>✕</Text>
-        </TouchableOpacity>
-      )}
-    </TouchableOpacity>
+          {/* 標籤 */}
+          <Box className="flex-row gap-2 mt-2">
+            <Box
+              className="px-2 py-1 rounded"
+              style={{ backgroundColor: getRarityColor(card.rarity) }}
+            >
+              <Text className="text-xs font-bold text-white uppercase">
+                {card.rarity}
+              </Text>
+            </Box>
+            <Box
+              className="px-2 py-1 rounded"
+              style={{ backgroundColor: getStatusColor(card.status) }}
+            >
+              <Text className="text-xs font-semibold text-white">
+                {getStatusLabel(card.status)}
+              </Text>
+            </Box>
+          </Box>
+        </Box>
+
+        {/* 刪除按鈕 */}
+        {onDelete && card.status === 'available' && (
+          <Pressable
+            className="w-8 h-8 rounded-full bg-red-500 justify-center items-center self-start"
+            onPress={(e) => {
+              e.stopPropagation();
+              onDelete(card);
+            }}
+          >
+            <Text className="text-lg text-white font-bold">✕</Text>
+          </Pressable>
+        )}
+      </Card>
+    </Pressable>
   );
 }
-
-function getStatusLabel(status: string): string {
-  const labels: Record<string, string> = {
-    available: '可交換',
-    trading: '交易中',
-    traded: '已交換',
-  };
-  return labels[status] || status;
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 12,
-    marginHorizontal: 16,
-    marginVertical: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  imageContainer: {
-    width: 80,
-    height: 100,
-    borderRadius: 8,
-    overflow: 'hidden',
-    backgroundColor: '#f0f0f0',
-  },
-  image: {
-    width: '100%',
-    height: '100%',
-  },
-  placeholder: {
-    width: '100%',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f0f0f0',
-  },
-  errorText: {
-    fontSize: 12,
-    color: '#666',
-    marginBottom: 4,
-  },
-  retryText: {
-    fontSize: 10,
-    color: '#007AFF',
-  },
-  infoContainer: {
-    flex: 1,
-    marginLeft: 12,
-    justifyContent: 'space-between',
-  },
-  idol: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  group: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 2,
-  },
-  album: {
-    fontSize: 12,
-    color: '#999',
-    marginTop: 2,
-  },
-  footer: {
-    flexDirection: 'row',
-    gap: 8,
-    marginTop: 8,
-  },
-  rarityBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-  },
-  rarity_common: {
-    backgroundColor: '#e0e0e0',
-  },
-  rarity_rare: {
-    backgroundColor: '#64B5F6',
-  },
-  rarity_epic: {
-    backgroundColor: '#AB47BC',
-  },
-  rarity_legendary: {
-    backgroundColor: '#FFB74D',
-  },
-  rarityText: {
-    fontSize: 10,
-    fontWeight: 'bold',
-    color: '#fff',
-    textTransform: 'uppercase',
-  },
-  statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-  },
-  status_available: {
-    backgroundColor: '#4CAF50',
-  },
-  status_trading: {
-    backgroundColor: '#FF9800',
-  },
-  status_traded: {
-    backgroundColor: '#9E9E9E',
-  },
-  statusText: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: '#fff',
-  },
-  deleteButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#FF5252',
-    justifyContent: 'center',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-  },
-  deleteText: {
-    fontSize: 18,
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-});
