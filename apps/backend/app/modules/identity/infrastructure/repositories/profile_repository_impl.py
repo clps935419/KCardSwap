@@ -45,6 +45,9 @@ class SQLAlchemyProfileRepository(IProfileRepository):
             existing.region = profile.region
             existing.preferences = profile.preferences
             existing.privacy_flags = profile.privacy_flags
+            existing.last_lat = profile.last_lat
+            existing.last_lng = profile.last_lng
+            existing.stealth_mode = profile.stealth_mode
             existing.updated_at = profile.updated_at
             model = existing
         else:
@@ -57,6 +60,9 @@ class SQLAlchemyProfileRepository(IProfileRepository):
                 region=profile.region,
                 preferences=profile.preferences,
                 privacy_flags=profile.privacy_flags,
+                last_lat=profile.last_lat,
+                last_lng=profile.last_lng,
+                stealth_mode=profile.stealth_mode,
                 created_at=profile.created_at,
                 updated_at=profile.updated_at,
             )
@@ -95,6 +101,9 @@ class SQLAlchemyProfileRepository(IProfileRepository):
                 "show_online": True,
                 "allow_stranger_chat": True,
             },
+            last_lat=model.last_lat,
+            last_lng=model.last_lng,
+            stealth_mode=model.stealth_mode or False,
             created_at=model.created_at,
             updated_at=model.updated_at,
         )

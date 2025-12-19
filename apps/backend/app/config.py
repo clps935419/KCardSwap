@@ -45,6 +45,10 @@ class Config:
     DAILY_UPLOAD_LIMIT_FREE: int = int(os.getenv("DAILY_UPLOAD_LIMIT_FREE", "2"))
     TOTAL_STORAGE_GB_FREE: int = int(os.getenv("TOTAL_STORAGE_GB_FREE", "1"))
 
+    # Nearby Search Limits
+    DAILY_SEARCH_LIMIT_FREE: int = int(os.getenv("DAILY_SEARCH_LIMIT_FREE", "5"))
+    SEARCH_RADIUS_KM: float = float(os.getenv("SEARCH_RADIUS_KM", "10.0"))
+
     # API
     API_VERSION: str = "v1"
     API_PREFIX: str = f"/api/{API_VERSION}"
