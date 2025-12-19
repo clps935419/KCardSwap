@@ -44,6 +44,9 @@ python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 addopts = "-v --strict-markers --disable-warnings"
+markers = [
+    "gcs_smoke: GCS smoke tests that require real GCS connection (use RUN_GCS_SMOKE=1)",
+]
 
 [tool.ruff]
 line-length = 88

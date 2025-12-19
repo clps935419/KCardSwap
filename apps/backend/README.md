@@ -89,11 +89,35 @@ JWT_ALGORITHM=HS256
 GOOGLE_CLIENT_ID=your-google-client-id
 GOOGLE_CLIENT_SECRET=your-google-client-secret
 
+# GCS (Google Cloud Storage)
+GCS_BUCKET_NAME=kcardswap
+GCS_CREDENTIALS_PATH=/path/to/service-account-key.json
+# 開發/測試使用 Mock GCS (預設: true)
+USE_MOCK_GCS=true
+# 啟用 GCS Smoke 測試 (僅用於 Staging/Nightly CI)
+RUN_GCS_SMOKE=false
+
 # 管理員初始化
 INIT_DEFAULT_ADMIN=true
 DEFAULT_ADMIN_EMAIL=admin@kcardswap.local
 DEFAULT_ADMIN_PASSWORD=your-password
 ```
+
+### GCS 測試分層說明
+
+本專案採用 Mock GCS 策略，避免開發和測試環境直接連接真實 GCS：
+
+- **開發環境（預設）**：`USE_MOCK_GCS=true` - 使用 MockGCSStorageService
+- **Unit/Integration 測試**：永遠使用 Mock，不打真實 GCS
+- **Staging/Nightly Smoke 測試**：設定 `RUN_GCS_SMOKE=1` 執行真實 GCS 測試
+
+執行 GCS Smoke 測試：
+```bash
+# 僅執行標記為 gcs_smoke 的測試
+RUN_GCS_SMOKE=1 poetry run pytest -m gcs_smoke
+```
+
+詳細規範請參考 [infra/gcs/README.md](/infra/gcs/README.md)
 
 ## 常用命令
 

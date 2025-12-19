@@ -5,6 +5,7 @@ This module provides fixtures for:
 - PostgreSQL database container
 - Automatic Alembic migration execution
 - Database session management
+- GCS mock service for testing
 """
 import os
 import pytest
@@ -18,6 +19,31 @@ from alembic.config import Config
 from alembic import command
 
 from app.shared.infrastructure.database.connection import Base
+from app.shared.infrastructure.external.mock_gcs_storage_service import (
+    MockGCSStorageService,
+)
+
+
+def pytest_configure(config):
+    """Register custom markers for pytest."""
+    config.addinivalue_line(
+        "markers", "gcs_smoke: mark test as GCS smoke test (requires real GCS)"
+    )
+
+
+@pytest.fixture(scope="function")
+def mock_gcs_service():
+    """Provide a fresh mock GCS service for each test.
+    
+    This fixture should be used in unit and integration tests to avoid
+    hitting real GCS. The mock service provides the same interface as
+    the real GCS service but operates in-memory.
+    
+    Returns:
+        MockGCSStorageService: A fresh instance of the mock service
+    """
+    service = MockGCSStorageService(bucket_name="kcardswap-test")
+    return service
 
 
 @pytest.fixture(scope="session")
