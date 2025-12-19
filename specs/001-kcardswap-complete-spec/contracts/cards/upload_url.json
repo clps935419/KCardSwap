@@ -1,0 +1,59 @@
+{
+  "name": "POST /cards/upload-url",
+  "request": {
+    "method": "POST",
+    "path": "/cards/upload-url",
+    "headers": {
+      "Authorization": "Bearer <token>"
+    },
+    "body": {
+      "content_type": "image/jpeg",
+      "file_size_bytes": 1234567
+    }
+  },
+  "responses": [
+    {
+      "status": 200,
+      "body": {
+        "data": {
+          "upload_url": "https://storage.googleapis.com/<bucket>/<object>?X-Goog-Algorithm=...",
+          "method": "PUT",
+          "required_headers": {
+            "Content-Type": "image/jpeg"
+          },
+          "image_url": "https://storage.googleapis.com/<bucket>/<object>",
+          "expires_at": "2025-01-01T00:00:00Z"
+        },
+        "error": null
+      }
+    },
+    {
+      "status": 400,
+      "body": {
+        "data": null,
+        "error": {
+          "code": "VALIDATION_ERROR"
+        }
+      }
+    },
+    {
+      "status": 401,
+      "body": {
+        "data": null,
+        "error": {
+          "code": "UNAUTHORIZED"
+        }
+      }
+    },
+    {
+      "status": 422,
+      "body": {
+        "data": null,
+        "error": {
+          "code": "LIMIT_EXCEEDED"
+        }
+      }
+    }
+  ],
+  "implemented": false
+}

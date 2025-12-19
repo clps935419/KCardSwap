@@ -9,7 +9,8 @@ React Native mobile application for KCardSwap, built with Expo SDK 54.
 - **Framework**: Expo SDK 54 (React Native 0.81)
 - **Language**: TypeScript
 - **Navigation**: Expo Router (file-based routing)
-- **UI Framework**: NativeWind (Tailwind CSS for React Native)
+- **UI Framework**: Gluestack UI (primary UI component system)
+- **Styling Engine**: Tailwind CSS + NativeWind (used by Gluestack)
 - **State Management**:
   - Zustand (global state, auth)
   - TanStack Query (server state, API calls)
@@ -30,6 +31,10 @@ React Native mobile application for KCardSwap, built with Expo SDK 54.
 
 - expo-image-picker (Image selection)
 - expo-image-manipulator (Image compression)
+
+**UI Components:**
+
+- gluestack-ui (UI component system; initialized via `npx gluestack-ui init`)
 
 **Location:**
 
@@ -187,7 +192,7 @@ npm run test:coverage
 
 - [x] Expo SDK 54 setup with TypeScript
 - [x] Expo Router navigation structure
-- [x] NativeWind styling setup
+- [x] Gluestack UI setup (with Tailwind/NativeWind styling engine)
 - [x] API client with Axios (baseURL, timeout, error handling)
 - [x] Token storage with expo-secure-store
 - [x] Zustand auth store (login/logout/refresh)

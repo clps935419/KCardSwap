@@ -164,6 +164,36 @@ if (fileSize > 10 * 1024 * 1024) {
 }
 ```
 
+#### US2：Signed URL Upload（直傳 GCS）
+
+**目標:** 小卡上傳採「先向後端取 Signed URL → 前端直傳雲端」模式，後端只負責簽名與建立卡片記錄。
+
+**建議流程（最小可行）:**
+
+1. 選擇圖片（拍照/相簿）
+2. 本機壓縮/轉檔（JPEG/PNG，≤10MB）
+3. 呼叫 `POST /cards/upload-url` 取得：`upload_url` + `method` + `required_headers` + `image_url`（或等價欄位）
+4. 依回應指定的 `method` 與 `required_headers`，直接上傳到 `upload_url`
+5. 上傳成功後刷新「我的卡冊」列表（`GET /cards/me`）
+
+**重要注意:**
+
+- Signed URL 上傳請求不走 `src/shared/api/client.ts`（避免自動注入 Authorization header 或錯誤攔截器影響簽名）
+- 上傳錯誤需分流處理：
+  - 後端 API 錯誤（例如 422 配額/檔案過大）→ 走既有 `errorMapper`
+  - Signed URL 上傳錯誤（例如 403/過期、網路中斷、timeout、5xx）→ 以 status + 可重試條件顯示對應訊息
+
+#### US2：縮圖產生與本機快取（200x200）
+
+**需求:** 產生 200x200 縮圖供卡冊列表快速載入；縮圖不上傳、不進後端契約。
+
+**建議行為:**
+
+- 產生縮圖：固定 200x200；優先 WebP（若平台不支援，需定義 fallback 格式，例如 JPEG）
+- 快取 key：建議用 `card_id` 或 `image_url` 雜湊，避免同名覆蓋
+- 失效策略：刪卡時移除縮圖；若找不到縮圖則回退載入原圖（fallback）
+- 容量策略：需定義上限（張數或總大小），避免無限成長（可先用最小可行策略，後續再優化）
+
 ---
 
 ### 定位服務 (Location Services)
@@ -413,19 +443,22 @@ function UploadCard() {
 
 ## UI 與樣式 (UI & Styling)
 
-### NativeWind (v4.2.1) + Tailwind CSS (v4.1.18)
+### Gluestack UI（主要 UI 元件系統）
 
-**用途:** Utility-First CSS 框架  
-**特性:**
+**用途:** App 全域 UI 元件系統（Button、Card、Input、Toast、Overlay 等）  
+**原則:** 專案 UI 以 Gluestack 為主，不再導入其他 UI 框架（避免多套設計系統並存造成不一致）。
 
-- ✅ Tailwind 語法
-- ✅ 響應式設計
-- ✅ 黑暗模式支援
-- ✅ 自訂主題
+**安裝/初始化（CLI）:**
 
+- 在 `apps/mobile` 根目錄執行 `npx gluestack-ui init`，加入 `GluestackUIProvider` 與必要基礎元件（icon/overlay/toast 等）
+- 後續元件以 CLI 或手動加入（以 Gluestack 文件為準）
+
+### Styling Engine：Tailwind CSS + NativeWind（Gluestack 底層樣式引擎）
+
+**用途:** 提供 tokens/utility class 與跨平台樣式能力，供 Gluestack 元件與專案樣式使用。  
 **配置檔案:** `tailwind.config.js`, `global.css`
 
-**使用範例:**
+**使用範例（搭配 utility class）:**
 
 ```tsx
 import { View, Text } from 'react-native';
@@ -504,6 +537,14 @@ client.interceptors.response.use(
 - `500` - Internal Server Error
 - `NETWORK_ERROR` - 網路錯誤
 - `TIMEOUT_ERROR` - 請求超時
+
+### US2：Signed URL 上傳的錯誤處理（Non-API Request）
+
+Signed URL 上傳的目標通常不是後端網域，因此：
+
+- 不會有後端的統一錯誤格式（無 `code`/`message`），需用 HTTP status + 網路錯誤分類
+- 不會觸發 `401 refresh`，因此 403/400 多半代表簽名不匹配或 URL 過期 → 需重新取得 Signed URL
+- 建議只對「可恢復」錯誤做有限重試（網路錯誤、timeout、5xx）；對 4xx 不盲重試
 
 ---
 
@@ -803,7 +844,7 @@ cd ios && pod install && cd ..
 - [React Native Documentation](https://reactnative.dev/)
 - [TanStack Query](https://tanstack.com/query/latest)
 - [Zustand](https://github.com/pmndrs/zustand)
-- [NativeWind](https://www.nativewind.dev/)
+- [Gluestack UI](https://gluestack.io/ui/docs)
 
 ### 專案文檔
 

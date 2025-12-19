@@ -52,13 +52,22 @@
 - [x] M011 安裝 User Stories 所需 Expo 套件（expo-auth-session, expo-image-picker, expo-image-manipulator, expo-location, expo-notifications 等）
 - [x] M012 建立前端技術文件：apps/mobile/TECH_STACK.md（完整技術棧說明、套件使用範例、最佳實踐）
 - [x] M013 配置程式碼格式化工具：Prettier + ESLint with Expo config（npm run format, npm run precommit）
+ - [ ] M014 [P] [INFRA/US] Gluestack UI 導入與初始化：apps/mobile
+   - 在 `apps/mobile` 執行 `npx gluestack-ui init`，將 `GluestackUIProvider` 加入全域布局（`app/_layout.tsx`）
+   - 建立初始 theme tokens（colors/spacing/typography）並加入 `src/shared/ui/theme`
+   - 實作並替換 3 個共享基礎元件：`Button`, `Card`, `Input`（放在 `src/shared/ui/components/`），並提供最小的 story / snapshot 測試
+   - 更新 `apps/mobile/TECH_STACK.md` 與 `apps/mobile/README.md` 的安裝與啟動說明（包含 gluestack init 指令與 provider 範例）
+   - 驗收標準：
+     - App 能啟動且首頁可正確載入 Gluestack provider（dev build）
+     - `Button/Card/Input` 在至少一個 screen 中被替換並通過 snapshot 測試
+     - docs 已更新、且 Phase 1M checkpoint 維持 Gluestack-only 語句
 
 **Checkpoint**: Mobile 基礎架構完成 ✅ - 各 US 的 Mobile 任務可開始並行
 
 **已完成項目:**
 - ✅ Expo SDK 54 + React Native 0.81 + TypeScript
 - ✅ Expo Router 檔案式路由（app/ 目錄結構）
-- ✅ NativeWind (Tailwind CSS) 樣式系統
+- ✅ Gluestack UI 元件系統（Provider + 基礎元件）
 - ✅ Zustand 狀態管理 + TanStack Query API 管理
 - ✅ Axios API Client with 自動 Token Refresh
 - ✅ 完整錯誤處理與映射
@@ -327,12 +336,30 @@
 ### Mobile (Expo)
 
 - [ ] M201 [P] [US2] 圖片選取與壓縮：apps/mobile/src/features/cards（expo-image-picker + expo-image-manipulator；控制大小 ≤10MB）
-- [ ] M202 [P] [US2] 取得上傳 Signed URL：apps/mobile/src/features/cards/api（呼叫 POST /cards/upload-url；Contract: specs/001-kcardswap-complete-spec/contracts/cards/create.json）
+  - 支援「拍照」與「相簿選取」兩種來源（相機/相簿權限各自處理；權限拒絕需提供清楚提示與重新授權入口）
+  - 使用者取消選取/拍照不視為錯誤（不噴錯、不寫入狀態）
+  - 需取得實際檔案大小（bytes）做前置驗證；若壓縮後仍 >10MB，需再降解析度/品質直到 ≤10MB 或明確提示「檔案過大」並中止
+  - 輸出格式限制為 JPEG/PNG（與後端限制一致），並在 UI 顯示不支援格式的提示
+- [ ] M202 [P] [US2] 取得上傳 Signed URL：apps/mobile/src/features/cards/api（呼叫 POST /cards/upload-url；Contract: specs/001-kcardswap-complete-spec/contracts/cards/upload_url.json（需新增））
+  - 回應需包含：`upload_url`、`method`（PUT/POST）、`required_headers`（至少 Content-Type；由後端決定）、以及可對應列表的 `image_url`/object key（或等價欄位）
+  - 需明確規範 Signed URL 的有效期限（或 TTL 欄位），過期時前端需重新走 M202
 - [ ] M203 [P] [US2] 直接上傳到 Signed URL：apps/mobile/src/features/cards/services/uploadToSignedUrl.ts（PUT/POST 上傳、錯誤處理與重試）
+  - 上傳請求必須嚴格使用 M202 回傳的 `method` + `required_headers`（避免簽名不匹配導致 403）
+  - 上傳至 Signed URL 不走既有 API client（避免自動注入 Authorization 等 header）；用 fetch 或獨立 HTTP client
+  - Retry：僅針對網路錯誤/timeout/5xx 做有限次重試；對 4xx（含 403/400）不盲重試，需提示並必要時重新取得 Signed URL
+  - 錯誤 UX：需區分「後端 422（配額/檔案過大/格式不符）」與「Signed URL 上傳失敗（403/過期/網路）」並給出對應提示與重試入口
 - [ ] M203A [P] [US2] 產生 200x200 WebP 縮圖並本機快取：apps/mobile/src/features/cards（縮圖僅供列表快速載入，不上傳、不進後端契約）
+  - 縮圖快取需定義 key（建議以 card_id 或 image_url 雜湊），並提供失效策略：卡片刪除時移除縮圖；找不到縮圖時回退載入原圖
+  - 若 WebP 在特定平台不可用，需定義 fallback（例如 JPEG），但仍維持 200x200 尺寸
 - [ ] M204 [P] [US2] 我的卡冊列表：apps/mobile/src/features/cards/screens/MyCardsScreen.tsx（GET /cards/me）
+  - 列表圖片載入順序：本機縮圖 → 原圖（fallback）；原圖載入失敗需顯示可重試狀態
+  - UI 狀態：loading/空狀態/錯誤狀態（含重試）需可見且一致
 - [ ] M205 [P] [US2] 刪除卡片：apps/mobile/src/features/cards/api（DELETE /cards/{id}）
-- [ ] M206 [US2] 手動驗證上傳限制：免費用戶上傳 2 張後提示 422_LIMIT_EXCEEDED
+  - 刪除成功後需同步清除該卡片的縮圖快取，並刷新列表資料
+  - 刪除失敗需顯示原因與重試入口（401/403 需導回登入或提示無權限，遵循既有錯誤映射策略）
+- [ ] M206 [US2] 手動驗證上傳限制與錯誤 UX：Android 實機/模擬器
+  - 驗證免費用戶上傳第 3 張觸發 422_LIMIT_EXCEEDED
+  - 驗證相機/相簿權限拒絕、使用者取消、>10MB、非 JPEG/PNG、Signed URL 過期/403、網路中斷/timeout 時的提示與重試行為
 
 ---
 
