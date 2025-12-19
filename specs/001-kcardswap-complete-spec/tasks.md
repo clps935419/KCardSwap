@@ -334,52 +334,52 @@
 
 ### Domain Layer (Social Module - Cards)
 
-- [ ] T066 [P] [US2] 建立 Card Entity：apps/backend/app/modules/social/domain/entities/card.py（id, owner_id, idol, idol_group, album, version, rarity, status, image_url, size_bytes, created_at）
-- [ ] T067 [P] [US2] 建立 UploadQuota Value Object：apps/backend/app/modules/social/domain/value_objects/upload_quota.py（daily_limit, max_file_size, total_storage）
-- [ ] T068 [P] [US2] 定義 CardRepository Interface：apps/backend/app/modules/social/domain/repositories/card_repository.py
-- [ ] T069 [P] [US2] 定義 Card Domain Service：apps/backend/app/modules/social/domain/services/card_validation_service.py（檔案類型/大小驗證邏輯）
+- [x] T066 [P] [US2] 建立 Card Entity：apps/backend/app/modules/social/domain/entities/card.py（id, owner_id, idol, idol_group, album, version, rarity, status, image_url, size_bytes, created_at）
+- [x] T067 [P] [US2] 建立 UploadQuota Value Object：apps/backend/app/modules/social/domain/value_objects/upload_quota.py（daily_limit, max_file_size, total_storage）
+- [x] T068 [P] [US2] 定義 CardRepository Interface：apps/backend/app/modules/social/domain/repositories/card_repository.py
+- [x] T069 [P] [US2] 定義 Card Domain Service：apps/backend/app/modules/social/domain/services/card_validation_service.py（檔案類型/大小驗證邏輯）
 
 ### Application Layer (Social Module - Cards)
 
-- [ ] T070 [P] [US2] 建立 UploadCardUseCase：apps/backend/app/modules/social/application/use_cases/upload_card_use_case.py（驗證限制 → 產生 Signed URL → 建立 Card 記錄）
-- [ ] T071 [P] [US2] 建立 GetMyCardsUseCase：apps/backend/app/modules/social/application/use_cases/get_my_cards_use_case.py（查詢當前使用者的所有卡片）
-- [ ] T072 [P] [US2] 建立 DeleteCardUseCase：apps/backend/app/modules/social/application/use_cases/delete_card_use_case.py
-- [ ] T073 [P] [US2] 建立 CheckUploadQuotaUseCase：apps/backend/app/modules/social/application/use_cases/check_upload_quota_use_case.py（檢查當日上傳次數與總容量）
+- [x] T070 [P] [US2] 建立 UploadCardUseCase：apps/backend/app/modules/social/application/use_cases/upload_card_use_case.py（驗證限制 → 產生 Signed URL → 建立 Card 記錄）
+- [x] T071 [P] [US2] 建立 GetMyCardsUseCase：apps/backend/app/modules/social/application/use_cases/get_my_cards_use_case.py（查詢當前使用者的所有卡片）
+- [x] T072 [P] [US2] 建立 DeleteCardUseCase：apps/backend/app/modules/social/application/use_cases/delete_card_use_case.py
+- [x] T073 [P] [US2] 建立 CheckUploadQuotaUseCase：apps/backend/app/modules/social/application/use_cases/check_upload_quota_use_case.py（檢查當日上傳次數與總容量）
 
 ### Infrastructure Layer (Social Module - Cards)
 
-- [ ] T074 [P] [US2] 實作 SQLAlchemy Card Model：apps/backend/app/modules/social/infrastructure/database/models/card_model.py
-- [ ] T075 [P] [US2] 實作 CardRepositoryImpl：apps/backend/app/modules/social/infrastructure/repositories/card_repository_impl.py
-- [ ] T076 [P] [US2] 擴展 GCS Storage Service：apps/backend/app/shared/infrastructure/external/gcs_storage_service.py（新增 generate_upload_signed_url 方法，路徑為 cards/{user_id}/{uuid}.jpg）
-- [ ] T078 [P] [US2] 實作 Quota Tracking Service：apps/backend/app/modules/social/infrastructure/services/quota_tracking_service.py（Redis 或 DB 追蹤每日上傳次數）
+- [x] T074 [P] [US2] 實作 SQLAlchemy Card Model：apps/backend/app/modules/social/infrastructure/database/models/card_model.py
+- [x] T075 [P] [US2] 實作 CardRepositoryImpl：apps/backend/app/modules/social/infrastructure/repositories/card_repository_impl.py
+- [x] T076 [P] [US2] 擴展 GCS Storage Service：apps/backend/app/shared/infrastructure/external/gcs_storage_service.py（新增 generate_upload_signed_url 方法，路徑為 cards/{user_id}/{uuid}.jpg）
+- [x] T078 [P] [US2] 實作 Quota Tracking Service：apps/backend/app/modules/social/infrastructure/services/quota_tracking_service.py（Redis 或 DB 追蹤每日上傳次數）
 
 ### Presentation Layer (Social Module - Cards)
 
-- [ ] T079 [P] [US2] 定義 Card Schema：apps/backend/app/modules/social/presentation/schemas/card_schemas.py（CreateCardRequest, CardResponse, UploadUrlResponse）
-- [ ] T080 [US2] 建立 Cards Router：apps/backend/app/modules/social/presentation/routers/cards_router.py（POST /cards/upload-url, GET /cards/me, DELETE /cards/{id}）
+- [x] T079 [P] [US2] 定義 Card Schema：apps/backend/app/modules/social/presentation/schemas/card_schemas.py（CreateCardRequest, CardResponse, UploadUrlResponse）
+- [x] T080 [US2] 建立 Cards Router：apps/backend/app/modules/social/presentation/routers/cards_router.py（POST /cards/upload-url, GET /cards/me, DELETE /cards/{id}）
 
 ### Integration
 
-- [ ] T081 [US2] 註冊 Social Module (Cards) 到 DI Container：apps/backend/app/container.py
-- [ ] T082 [US2] 註冊 Cards Router 到 main.py：apps/backend/app/main.py（包含 /cards 路由）
+- [x] T081 [US2] 註冊 Social Module (Cards) 到 DI Container：apps/backend/app/container.py
+- [x] T082 [US2] 註冊 Cards Router 到 main.py：apps/backend/app/main.py（包含 /cards 路由）
 
 ### Testing
 
-- [ ] T083 [P] [US2] 撰寫 Cards Integration Tests：tests/integration/contracts/test_cards_contracts.py（對齊 contracts/cards/create.json，改以整合測試覆蓋）
-- [ ] T084 [P] [US2] 撰寫 Card Entity Unit Tests：tests/unit/modules/social/domain/test_card_entity.py
-- [ ] T085 [P] [US2] 撰寫 UploadCardUseCase Unit Tests：tests/unit/modules/social/application/test_upload_card_use_case.py（Mock 限制檢查）
-- [ ] T086 [P] [US2] 撰寫 Quota Validation Unit Tests：tests/unit/modules/social/domain/test_upload_quota.py（測試每日/總容量/單檔大小邊界）
-- [ ] T087 [US2] 撰寫 Card Upload Integration Tests：tests/integration/modules/social/test_card_upload_flow.py（完整上傳流程 E2E，包含限制觸發）
+- [x] T083 [P] [US2] 撰寫 Cards Integration Tests：tests/integration/contracts/test_cards_contracts.py（對齊 contracts/cards/create.json，改以整合測試覆蓋）
+- [x] T084 [P] [US2] 撰寫 Card Entity Unit Tests：tests/unit/modules/social/domain/test_card_entity.py
+- [x] T085 [P] [US2] 撰寫 UploadCardUseCase Unit Tests：tests/unit/modules/social/application/test_upload_card_use_case.py（Mock 限制檢查）
+- [x] T086 [P] [US2] 撰寫 Quota Validation Unit Tests：tests/unit/modules/social/domain/test_upload_quota.py（測試每日/總容量/單檔大小邊界）
+- [x] T087 [US2] 撰寫 Card Upload Integration Tests：tests/integration/modules/social/test_card_upload_flow.py（完整上傳流程 E2E，包含限制觸發）
 
 ### Configuration
 
-- [ ] T088 [P] [US2] 配置 GCS Bucket CORS：infra/gcs/cors-config.json（允許前端直接上傳）
-- [ ] T089 [P] [US2] 更新環境變數：apps/backend/app/config.py（GCS_BUCKET_NAME, DAILY_UPLOAD_LIMIT=2, MAX_FILE_SIZE_MB=10, TOTAL_STORAGE_GB=1）
+- [x] T088 [P] [US2] 配置 GCS Bucket CORS：infra/gcs/cors-config.json（允許前端直接上傳）
+- [x] T089 [P] [US2] 更新環境變數：apps/backend/app/config.py（GCS_BUCKET_NAME, DAILY_UPLOAD_LIMIT=2, MAX_FILE_SIZE_MB=10, TOTAL_STORAGE_GB=1）
 
 ### Documentation
 
-- [ ] T090 [P] [US2] 撰寫 Card Upload 文件：apps/backend/docs/card-upload.md（Signed URL 流程、限制說明、錯誤碼）
-- [ ] T091 [P] [US2] 更新 API 文件：apps/backend/docs/api/social-module-cards.md
+- [x] T090 [P] [US2] 撰寫 Card Upload 文件：apps/backend/docs/card-upload.md（Signed URL 流程、限制說明、錯誤碼）
+- [x] T091 [P] [US2] 更新 API 文件：apps/backend/docs/api/social-module-cards.md
 
 ### Verification
 

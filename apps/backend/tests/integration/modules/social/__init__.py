@@ -1,0 +1,1 @@
+"""Social module integration tests"""
