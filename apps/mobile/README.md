@@ -14,7 +14,9 @@ React Native mobile application for KCardSwap, built with Expo SDK 54.
 - **State Management**:
   - Zustand (global state, auth)
   - TanStack Query (server state, API calls)
-- **API Client**: hey-api/openapi-ts 生成 SDK（client + TanStack Query options/mutations）
+- **API Client**: hey-api/openapi-ts 生成 SDK（Axios client + TanStack Query options/mutations）
+  - **唯一 API 呼叫方式**：使用 TanStack Query options/mutations（禁止直接呼叫 SDK 函式或舊 client）
+  - **例外**：Signed URL 上傳必須使用獨立 `fetch()`
 - **Storage**: expo-secure-store (secure token storage)
 - **Testing**: Jest + React Native Testing Library
 - **Code Quality**: ESLint + Prettier
@@ -141,7 +143,13 @@ OpenAPI snapshot 說明請見：`/openapi/README.md`
 
 ### Signed URL Upload 仍是例外
 
-Signed URL 上傳的目標通常不是後端網域，因此不建議沿用同一套 auth/interceptor；請維持「上傳走獨立 request、API 走生成 client」的分流。
+Signed URL 上傳的目標通常不是後端網域，因此：
+
+- **取得 Signed URL**（`POST /cards/upload-url`）走 hey-api SDK 的 TanStack Query mutation
+- **上傳到 Signed URL**（PUT/POST 到 `upload_url`）必須使用獨立 `fetch()`
+  - 不可使用 SDK（避免自動注入 Authorization header）
+  - 必須完全依照後端回傳的 `method` 與 `required_headers`
+  - 詳見 `apps/mobile/TECH_STACK.md` 的錯誤處理分流規則
 
 ### 雲端 agent / CI 的獨立 tasks（文件版）
 

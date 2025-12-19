@@ -51,7 +51,11 @@ npm run sdk:generate
 npm run sdk:clean
 ```
 
-**Note**: 生成輸出會被提交進 repo（方便單人開發與 CI），但**禁止手動修改**；一律透過更新 `openapi/openapi.json` 後再 `sdk:generate` 來更新。
+**重要規則**：
+- 生成輸出（`src/shared/api/generated/`）會被提交進 repo（方便單人開發與 CI）
+- **嚴格禁止手動修改** generated 檔案
+- 任何變更必須透過更新 `openapi/openapi.json` 後再執行 `sdk:generate`
+- generated 檔案視為 dependency，如同 node_modules
 
 ### 2. Configuring the SDK (One-time setup)
 
@@ -74,20 +78,23 @@ export default function RootLayout() {
 
 ### 3. Using the SDK in Components
 
-#### Option A: TanStack Query Options (Recommended)
+**重要規範：僅使用 TanStack Query Options/Mutations**
+
+本專案**禁止**直接呼叫 SDK 函式（如 `getMyProfile()`），**必須**使用 TanStack Query options/mutations 搭配 `useQuery` / `useMutation`。
+
+#### ✅ 正確用法：TanStack Query Options (Required)
 
 ```typescript
 import { useMutation, useQuery } from '@tanstack/react-query';
-
-import { getMyProfileOptions, updateMyProfileMutation } from '@/src/shared/api/sdk';
+import { getGetProfileMeQueryOptions, useUpdateProfileMeMutation } from '@/src/shared/api/sdk';
 import { Box, Button, ButtonText, Spinner, Text } from '@/src/shared/ui/components';
 
 function ProfileScreen() {
-  // Automatic caching, refetching, loading states
-  const { data, isLoading, error } = useQuery(getMyProfileOptions());
+  // 使用 generated query options
+  const { data, isLoading, error } = useQuery(getGetProfileMeQueryOptions());
 
-  // Mutations with optimistic updates
-  const updateProfile = useMutation(updateMyProfileMutation());
+  // 使用 generated mutation hook
+  const updateProfile = useUpdateProfileMeMutation();
 
   const handleUpdate = async () => {
     await updateProfile.mutateAsync({
@@ -112,23 +119,33 @@ function ProfileScreen() {
 }
 ```
 
-#### Option B: Direct API Calls
+#### ❌ 錯誤用法：禁止直接呼叫 SDK 函式
 
 ```typescript
+// ❌ 禁止這樣使用
 import { getMyProfile, updateMyProfile } from '@/src/shared/api/sdk';
 
 async function fetchProfile() {
-  const response = await getMyProfile();
-  return response.data;
-}
-
-async function updateProfile(nickname: string) {
-  const response = await updateMyProfile({
-    body: { nickname },
-  });
+  const response = await getMyProfile(); // ❌ 不允許
   return response.data;
 }
 ```
+
+#### 例外：Signed URL 直傳（不經過後端 API）
+
+```typescript
+// ✅ Signed URL 上傳必須使用獨立 fetch()
+async function uploadToSignedUrl(url: string, file: Blob, headers: Record<string, string>) {
+  const response = await fetch(url, {
+    method: 'PUT',
+    headers, // 使用後端回傳的 required_headers
+    body: file,
+  });
+  
+  if (!response.ok) {
+    throw new Error(`Upload failed: ${response.status}`);
+  }
+}
 
 ### 4. Using TypeScript Types
 
@@ -339,18 +356,20 @@ function MyCardsScreen() {
 
 ### ✅ DO
 
+- **僅使用 TanStack Query options/mutations**（不直接呼叫 SDK 函式）
 - Always regenerate SDK after backend API changes
-- Use TanStack Query options/mutations for components
 - Configure SDK once at app startup
-- Commit generated files, but never edit them manually
+- Commit generated files, but **never edit them manually**
 - Use TypeScript types from the SDK
 - Handle loading and error states
+- Signed URL 上傳必須使用獨立 `fetch()` 並依照 `required_headers`
 
 ### ❌ DON'T
 
+- **禁止直接呼叫 SDK 函式**（如 `getMyProfile()`），必須用 options/mutations
+- **禁止 import 舊的 `@/src/shared/api/client`**（legacy，已廢除）
 - Modify generated files manually
-- Use direct `fetch()` calls for backend API (use SDK instead)
-- Exception: Signed URL upload PUT/POST to `upload_url` should use `fetch()` and follow `required_headers`
+- Use direct `fetch()` calls for backend API (except Signed URL upload)
 - Hardcode API URLs (use SDK configuration)
 - Ignore TypeScript errors from SDK
 
@@ -370,9 +389,10 @@ npm run sdk:generate
 ### Type Errors After Generation
 
 ```bash
-# Ensure you're importing from the SDK, not old client
+# Ensure you're using TanStack Query options, not direct SDK calls
+# ❌ import { getMyProfile } from '@/src/shared/api/sdk'
 # ❌ import { apiClient } from '@/src/shared/api/client'
-# ✅ import { getMyProfileOptions } from '@/src/shared/api/sdk'
+# ✅ import { getGetProfileMeQueryOptions } from '@/src/shared/api/sdk'
 
 # Run type check
 npm run type-check
