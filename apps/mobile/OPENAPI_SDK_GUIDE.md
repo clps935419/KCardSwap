@@ -182,7 +182,32 @@ TanStack Query provides additional error handling with retry logic and error bou
 
 When the backend API changes, update the snapshot:
 
-### Manual Update (Development)
+### Method 1: Generate from Backend Code (Recommended) ✅
+
+**No need to start the backend server**. Generate directly from FastAPI code:
+
+```bash
+# From repo root
+make generate-openapi
+
+# Or from backend directory
+cd apps/backend
+python scripts/generate_openapi.py
+
+# Using Docker (if you don't have Python locally)
+make generate-openapi-docker
+```
+
+**Advantages:**
+- ✅ No database required
+- ✅ No Kong gateway required
+- ✅ No environment variables or network setup needed
+- ✅ Extracts directly from code, guaranteed to match implementation
+- ✅ Can be automated in CI/CD pipeline
+
+### Method 2: Fetch from Running Backend
+
+If the backend is already running:
 
 ```bash
 # Start the backend first
@@ -201,15 +226,14 @@ npm run sdk:generate
 npm run type-check
 ```
 
-### Automated Update (Future CI/CD)
+### Automated Update (CI/CD)
 
 In CI/CD pipeline:
 
 ```yaml
 # .github/workflows/update-openapi.yml
-- name: Fetch OpenAPI from staging
-  run: |
-    curl -s https://staging.kcardswap.com/api/v1/openapi.json > openapi/openapi.json
+- name: Generate OpenAPI spec from code
+  run: make generate-openapi
 
 - name: Generate Mobile SDK
   run: |
@@ -241,8 +265,8 @@ Generated from `openapi/openapi.json`:
 ### Adding a New Endpoint
 
 1. **Backend**: Add new endpoint to FastAPI
-2. **Update OpenAPI**: Fetch new snapshot `curl http://localhost:8080/api/v1/openapi.json > openapi/openapi.json`
-3. **Regenerate SDK**: `npm run sdk:generate`
+2. **Update OpenAPI**: Generate from code: `make generate-openapi`
+3. **Regenerate SDK**: `cd apps/mobile && npm run sdk:generate`
 4. **Use in Mobile**: Import new hooks/functions from `@/src/shared/api/sdk`
 5. **Type Safety**: TypeScript will ensure correct usage
 
