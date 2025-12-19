@@ -335,7 +335,7 @@
 
 ### Mobile (Expo)
 
-- [ ] M201 [P] [US2] 圖片選取與壓縮：apps/mobile/src/features/cards（expo-image-picker + expo-image-manipulator；控制大小 ≤10MB）
+- [x] M201 [P] [US2] 圖片選取與壓縮：apps/mobile/src/features/cards（expo-image-picker + expo-image-manipulator；控制大小 ≤10MB）✅
   - 支援「拍照」與「相簿選取」兩種來源（相機/相簿權限各自處理；權限拒絕需提供清楚提示與重新授權入口）
   - 使用者取消選取/拍照不視為錯誤（不噴錯、不寫入狀態）
   - 需取得實際檔案大小（bytes）做前置驗證；若壓縮後仍 >10MB，需再降解析度/品質直到 ≤10MB 或明確提示「檔案過大」並中止
@@ -344,24 +344,24 @@
   - （POC/依框裁切）若要「依框線區域裁切成卡片圖」，需處理座標映射：框線是在 preview(View) 座標；拍照結果是照片像素座標。建議以相對比例保存框線區域（x/y/width/height 皆為 0..1），再換算為照片像素後用 `expo-image-manipulator` crop。
   - （避免映射歪斜）盡量讓 preview aspect ratio 與拍照輸出比例一致；若 preview 使用 cover/縮放，需把 letterbox/crop 的偏移納入換算，否則裁切會偏移。
   - 參考：apps/mobile/TECH_STACK.md 的「expo-camera（相機預覽 + 自訂 overlay，引導框 POC）」段落（含 POC 步驟與座標映射注意事項）
-- [ ] M202 [P] [US2] 取得上傳 Signed URL：apps/mobile/src/features/cards/api（呼叫 POST /cards/upload-url；Contract: specs/001-kcardswap-complete-spec/contracts/cards/upload_url.json（需新增））
+- [x] M202 [P] [US2] 取得上傳 Signed URL：apps/mobile/src/features/cards/api（呼叫 POST /cards/upload-url；Contract: specs/001-kcardswap-complete-spec/contracts/cards/upload_url.json（需新增））✅
   - 回應需包含：`upload_url`、`method`（PUT/POST）、`required_headers`（至少 Content-Type；由後端決定）、以及可對應列表的 `image_url`/object key（或等價欄位）
   - 需明確規範 Signed URL 的有效期限（或 TTL 欄位），過期時前端需重新走 M202
-- [ ] M203 [P] [US2] 直接上傳到 Signed URL：apps/mobile/src/features/cards/services/uploadToSignedUrl.ts（PUT/POST 上傳、錯誤處理與重試）
+- [x] M203 [P] [US2] 直接上傳到 Signed URL：apps/mobile/src/features/cards/services/uploadToSignedUrl.ts（PUT/POST 上傳、錯誤處理與重試）✅
   - 上傳請求必須嚴格使用 M202 回傳的 `method` + `required_headers`（避免簽名不匹配導致 403）
   - 上傳至 Signed URL 不走既有 API client（避免自動注入 Authorization 等 header）；用 fetch 或獨立 HTTP client
   - Retry：僅針對網路錯誤/timeout/5xx 做有限次重試；對 4xx（含 403/400）不盲重試，需提示並必要時重新取得 Signed URL
   - 錯誤 UX：需區分「後端 422（配額/檔案過大/格式不符）」與「Signed URL 上傳失敗（403/過期/網路）」並給出對應提示與重試入口
-- [ ] M203A [P] [US2] 產生 200x200 WebP 縮圖並本機快取：apps/mobile/src/features/cards（縮圖僅供列表快速載入，不上傳、不進後端契約）
+- [x] M203A [P] [US2] 產生 200x200 WebP 縮圖並本機快取：apps/mobile/src/features/cards（縮圖僅供列表快速載入，不上傳、不進後端契約）✅
   - 縮圖快取需定義 key（建議以 card_id 或 image_url 雜湊），並提供失效策略：卡片刪除時移除縮圖；找不到縮圖時回退載入原圖
   - 若 WebP 在特定平台不可用，需定義 fallback（例如 JPEG），但仍維持 200x200 尺寸
-- [ ] M204 [P] [US2] 我的卡冊列表：apps/mobile/src/features/cards/screens/MyCardsScreen.tsx（GET /cards/me）
+- [x] M204 [P] [US2] 我的卡冊列表：apps/mobile/src/features/cards/screens/MyCardsScreen.tsx（GET /cards/me）✅（已使用 Gluestack UI）
   - 列表圖片載入順序：本機縮圖 → 原圖（fallback）；原圖載入失敗需顯示可重試狀態
   - UI 狀態：loading/空狀態/錯誤狀態（含重試）需可見且一致
-- [ ] M205 [P] [US2] 刪除卡片：apps/mobile/src/features/cards/api（DELETE /cards/{id}）
+- [x] M205 [P] [US2] 刪除卡片：apps/mobile/src/features/cards/api（DELETE /cards/{id}）✅
   - 刪除成功後需同步清除該卡片的縮圖快取，並刷新列表資料
   - 刪除失敗需顯示原因與重試入口（401/403 需導回登入或提示無權限，遵循既有錯誤映射策略）
-- [ ] M206 [US2] 手動驗證上傳限制與錯誤 UX：Android 實機/模擬器
+- [ ] M206 [US2] 手動驗證上傳限制與錯誤 UX：Android 實機/模擬器 ⚠️（程式碼完成，待實機測試）
   - 驗證免費用戶上傳第 3 張觸發 422_LIMIT_EXCEEDED
   - 驗證相機/相簿權限拒絕、使用者取消、>10MB、非 JPEG/PNG、Signed URL 過期/403、網路中斷/timeout 時的提示與重試行為
 
