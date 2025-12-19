@@ -443,15 +443,73 @@ function UploadCard() {
 
 ## UI 與樣式 (UI & Styling)
 
-### Gluestack UI（主要 UI 元件系統）
+### Gluestack UI v3（主要 UI 元件系統）
 
 **用途:** App 全域 UI 元件系統（Button、Card、Input、Toast、Overlay 等）  
+**版本:** v3.0.11  
 **原則:** 專案 UI 以 Gluestack 為主，不再導入其他 UI 框架（避免多套設計系統並存造成不一致）。
 
 **安裝/初始化（CLI）:**
 
-- 在 `apps/mobile` 根目錄執行 `npx gluestack-ui init`，加入 `GluestackUIProvider` 與必要基礎元件（icon/overlay/toast 等）
-- 後續元件以 CLI 或手動加入（以 Gluestack 文件為準）
+```bash
+# 初始化 Gluestack UI（已完成）
+npx gluestack-ui@latest init
+
+# 新增元件
+npx gluestack-ui@latest add <component-name>
+
+# 例如：
+npx gluestack-ui@latest add avatar
+npx gluestack-ui@latest add modal
+npx gluestack-ui@latest add toast
+```
+
+**已導入元件：**
+- ✅ Button (Solid, Outline 等變體)
+- ✅ Card (內容容器)
+- ✅ Input (表單輸入)
+
+**Provider 配置：**
+```typescript
+// app/_layout.tsx
+import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider';
+
+<GluestackUIProvider mode="light">
+  {/* app content */}
+</GluestackUIProvider>
+```
+
+**使用範例：**
+```typescript
+import { Button, ButtonText } from '@/src/shared/ui/components/Button';
+import { Card } from '@/src/shared/ui/components/Card';
+import { Input, InputField } from '@/src/shared/ui/components/Input';
+
+function MyScreen() {
+  return (
+    <Card className="p-4">
+      <Input>
+        <InputField placeholder="Enter text..." />
+      </Input>
+      <Button variant="solid">
+        <ButtonText>Submit</ButtonText>
+      </Button>
+    </Card>
+  );
+}
+```
+
+**Theme Tokens:**
+主題代幣定義在 `src/shared/ui/theme/tokens.ts`：
+- Colors (Primary, Secondary, Tertiary, Error, Success, Warning, Info)
+- Spacing (0-64 scale based on 4px)
+- Typography (Font families, sizes, weights, line heights)
+- Border Radius
+- Opacity
+
+**文檔：**
+- [Official Docs](https://gluestack.io/ui/docs/home/overview/introduction)
+- [Components](https://gluestack.io/ui/docs/components/button/introduction)
 
 ### Styling Engine：Tailwind CSS + NativeWind（Gluestack 底層樣式引擎）
 

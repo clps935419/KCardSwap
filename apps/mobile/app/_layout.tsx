@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Slot, useRouter, useSegments } from 'expo-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAuthStore } from '../src/shared/state/authStore';
+import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider';
 import '../global.css';
 
 // Create a client
@@ -40,8 +41,10 @@ export default function RootLayout() {
   }, [isAuthenticated, isLoading, segments]);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <Slot />
-    </QueryClientProvider>
+    <GluestackUIProvider mode="light">
+      <QueryClientProvider client={queryClient}>
+        <Slot />
+      </QueryClientProvider>
+    </GluestackUIProvider>
   );
 }

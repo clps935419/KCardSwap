@@ -52,7 +52,7 @@
 - [x] M011 安裝 User Stories 所需 Expo 套件（expo-auth-session, expo-image-picker, expo-image-manipulator, expo-location, expo-notifications 等）
 - [x] M012 建立前端技術文件：apps/mobile/TECH_STACK.md（完整技術棧說明、套件使用範例、最佳實踐）
 - [x] M013 配置程式碼格式化工具：Prettier + ESLint with Expo config（npm run format, npm run precommit）
- - [ ] M014 [P] [INFRA/US] Gluestack UI 導入與初始化：apps/mobile
+ - [x] M014 [P] [INFRA/US] Gluestack UI 導入與初始化：apps/mobile
    - 在 `apps/mobile` 執行 `npx gluestack-ui init`，將 `GluestackUIProvider` 加入全域布局（`app/_layout.tsx`）
    - 建立初始 theme tokens（colors/spacing/typography）並加入 `src/shared/ui/theme`
    - 實作並替換 3 個共享基礎元件：`Button`, `Card`, `Input`（放在 `src/shared/ui/components/`），並提供最小的 story / snapshot 測試

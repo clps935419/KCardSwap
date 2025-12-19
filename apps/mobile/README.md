@@ -35,6 +35,9 @@ React Native mobile application for KCardSwap, built with Expo SDK 54.
 **UI Components:**
 
 - gluestack-ui (UI component system; initialized via `npx gluestack-ui init`)
+  - Provider configured in `app/_layout.tsx`
+  - Components: Button, Card, Input (with more available via CLI)
+  - Theme tokens in `src/shared/ui/theme/tokens.ts`
 
 **Location:**
 
@@ -63,6 +66,33 @@ React Native mobile application for KCardSwap, built with Expo SDK 54.
 ```bash
 cd apps/mobile
 npm install --legacy-peer-deps
+
+# Initialize Gluestack UI (already done, only needed once)
+# npx gluestack-ui init
+```
+
+### Gluestack UI Setup
+
+The project uses Gluestack UI v3 as the primary UI component system. The setup includes:
+
+1. **Provider Configuration**: `GluestackUIProvider` is configured in `app/_layout.tsx`
+2. **Components**: Available in `components/ui/` directory
+   - `button` - Button components with variants (solid, outline, etc.)
+   - `card` - Card component for content containers
+   - `input` - Input components for forms
+3. **Theme Tokens**: Centralized in `src/shared/ui/theme/tokens.ts`
+4. **Shared Components**: Re-exported in `src/shared/ui/components/` for easy imports
+
+**Adding More Components:**
+
+```bash
+# Add a specific component
+npx gluestack-ui@latest add <component-name>
+
+# Examples:
+npx gluestack-ui@latest add avatar
+npx gluestack-ui@latest add modal
+npx gluestack-ui@latest add toast
 ```
 
 ### Environment Setup
@@ -101,14 +131,23 @@ npm run web
 ```
 apps/mobile/
 ├── app/                      # Expo Router app directory (routes)
-│   ├── _layout.tsx          # Root layout with providers
+│   ├── _layout.tsx          # Root layout with providers (Gluestack + TanStack Query)
 │   ├── auth/                # Auth screens (login, etc.)
 │   └── (tabs)/              # Main app with tab navigation
+├── components/               # Gluestack UI components
+│   └── ui/                  # UI components added via CLI
+│       ├── button/          # Button component
+│       ├── card/            # Card component
+│       ├── input/           # Input component
+│       └── gluestack-ui-provider/ # Provider configuration
 ├── src/
 │   ├── shared/              # Shared utilities
 │   │   ├── api/            # API client and error handling
 │   │   ├── auth/           # Token storage and session management
 │   │   ├── state/          # Zustand stores
+│   │   ├── ui/             # UI components and theme
+│   │   │   ├── components/ # Shared UI component exports (Button, Card, Input)
+│   │   │   └── theme/      # Theme tokens (colors, spacing, typography)
 │   │   └── config.ts       # App configuration
 │   └── features/            # Feature modules (to be implemented)
 │       ├── auth/
@@ -192,7 +231,11 @@ npm run test:coverage
 
 - [x] Expo SDK 54 setup with TypeScript
 - [x] Expo Router navigation structure
-- [x] Gluestack UI setup (with Tailwind/NativeWind styling engine)
+- [x] **Gluestack UI v3 setup** (with Tailwind/NativeWind styling engine)
+  - [x] Provider configured in app/_layout.tsx
+  - [x] Button, Card, Input components added
+  - [x] Theme tokens in src/shared/ui/theme/
+  - [x] Snapshot tests for components
 - [x] API client with Axios (baseURL, timeout, error handling)
 - [x] Token storage with expo-secure-store
 - [x] Zustand auth store (login/logout/refresh)
