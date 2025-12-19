@@ -157,9 +157,14 @@ poetry run ruff check --fix .
 
 ## API 文件
 
-- **Swagger UI**: http://localhost:8000/docs
-- **ReDoc**: http://localhost:8000/redoc
+- **Swagger UI**: http://localhost:8000/api/v1/docs
+- **ReDoc**: http://localhost:8000/api/v1/redoc
+- **OpenAPI JSON**: http://localhost:8000/api/v1/openapi.json
 - **Kong Gateway**: http://localhost:8080/api/v1
+
+（可選）透過 Kong Proxy 存取 OpenAPI JSON：
+
+- http://localhost:8080/api/v1/openapi.json
 
 ## 架構原則
 

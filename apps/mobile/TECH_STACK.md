@@ -624,6 +624,18 @@ client.interceptors.response.use(
 - `NETWORK_ERROR` - 網路錯誤
 - `TIMEOUT_ERROR` - 請求超時
 
+### OpenAPI Codegen（hey-api / Axios client）
+
+**目的：** 由後端 OpenAPI 產生型別安全的 API client，並可額外產生 TanStack Query 的 query/mutation options。
+
+**策略：** 使用 repo 內的 OpenAPI snapshot（策略 B），以便在雲端 agent / CI 不依賴 `localhost` 或內網即可產出 SDK。
+
+**重要：baseURL 設定**
+
+後端 OpenAPI 的 endpoint paths 已包含 `/api/v1`，因此生成 client 的 `baseUrl` 應使用 host-only（例如 `http://localhost:8080`），避免 `/api/v1/api/v1`。
+
+OpenAPI snapshot 文件：`/openapi/README.md`
+
 ### US2：Signed URL 上傳的錯誤處理（Non-API Request）
 
 Signed URL 上傳的目標通常不是後端網域，因此：

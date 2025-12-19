@@ -45,9 +45,14 @@ A card trading platform built with FastAPI, Kong API Gateway, and PostgreSQL.
 Access points:
 - Backend API: http://localhost:8000
 - API Documentation: http://localhost:8000/api/v1/docs
+- OpenAPI JSON: http://localhost:8000/api/v1/openapi.json
 - Kong Gateway: http://localhost:8080
 - Kong Admin: http://localhost:8001
 - PostgreSQL: localhost:5432
+
+For deterministic client generation (cloud agent / CI), keep an OpenAPI snapshot in the repository:
+
+- `openapi/README.md`
 
 ## 📁 Project Structure
 

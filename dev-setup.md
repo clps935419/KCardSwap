@@ -99,6 +99,14 @@ EXPO_PUBLIC_API_BASE_URL=http://localhost:8080/api/v1
 EXPO_PUBLIC_GOOGLE_CLIENT_ID=your-google-client-id
 ```
 
+若切換為 hey-api 由 OpenAPI 生成的 client（Axios runtime），請將 `EXPO_PUBLIC_API_BASE_URL` 設為 host-only（因為 OpenAPI paths 已包含 `/api/v1`）：
+
+```env
+EXPO_PUBLIC_API_BASE_URL=http://localhost:8080
+```
+
+OpenAPI snapshot（策略 B）與雲端 agent 產 SDK 流程請見：`/openapi/README.md`。
+
 ### 4) 啟動開發伺服器
 
 ```bash

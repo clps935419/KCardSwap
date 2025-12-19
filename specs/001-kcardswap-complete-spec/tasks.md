@@ -80,6 +80,21 @@
 
 ---
 
+## Phase 1M.1: OpenAPI SDK Generation（hey-api / Axios client）
+
+**目的**: 由後端 OpenAPI 產生型別安全 SDK（含 TanStack Query options），並確保雲端 agent/CI 不依賴網路可達性（使用 repo 內 snapshot）。
+
+**重要規則**:
+- OpenAPI paths 已包含 `/api/v1`，生成 client 的 baseUrl 必須使用 host-only（例如 `http://localhost:8080`），避免 `/api/v1/api/v1`。
+- 生成輸出（generated）**不 commit**；每次需要時重新 generate。
+
+- [ ] M015 [P] [TOOLING] 新增/更新 OpenAPI snapshot：建立 `openapi/openapi.json`（來源：`http://localhost:8080/api/v1/openapi.json`）
+- [ ] M016 [P] [TOOLING] 建立 hey-api codegen config：`apps/mobile/openapi-ts.config.ts`（Axios client + `@tanstack/react-query` plugin；input 指向 `openapi/openapi.json`；output 至 `apps/mobile/src/shared/api/generated/`）
+- [ ] M017 [P] [TOOLING] 加入 codegen scripts：更新 `apps/mobile/package.json`（新增 `sdk:generate` / `sdk:clean`；確保可在乾淨環境執行）
+- [ ] M018 [P] [TOOLING] 排除生成輸出：更新 `.gitignore`（忽略 `apps/mobile/src/shared/api/generated/`，確保 generated 不被提交）
+- [ ] M019 [P] [TOOLING] 生成 client 的 runtime 設定入口：新增 `apps/mobile/src/shared/api/sdk.ts`（集中設定 baseUrl=host-only、Auth header、以及 refresh token 行為；使用 hey-api axios client）
+- [ ] M020 [P] [TOOLING] 最小驗證：在 `apps/mobile` 執行 `npm run sdk:generate` + `npm run type-check`（確保生成結果可被 TS 正確解析）
+
 ## Phase 2: Foundational (基礎設施 - 阻塞性前置任務)
 
 **目的**: 核心基礎設施，必須完成後才能開始任何 User Story 實作
@@ -721,10 +736,11 @@
 ### Critical Path（關鍵路徑 - 必須依序執行）
 
 1. **Phase 1: Setup** (T001-T008) → 專案基礎
-2. **Phase 1M: Mobile Setup** (M001-M010) → Expo app 基礎（可與 Phase 2 並行進行）
-3. **Phase 2: Foundational** (T009-T028) → **[BLOCKING]** 所有後端 User Story 必須等此階段完成
-4. **Phase 3-8.5: User Stories** (T029-T228 + M101-M704) → 後端與 Mobile 可依契約並行（見下方說明）
-5. **Phase 9: Polish** (T192-T205) → 最終整合
+2. **Phase 1M: Mobile Setup** (M001-M014) → Expo app 基礎（可與 Phase 2 並行進行）
+3. **Phase 1M.1: OpenAPI SDK Generation** (M015-M020) → 產 SDK（可與 Phase 2 並行進行）
+4. **Phase 2: Foundational** (T009-T028) → **[BLOCKING]** 所有後端 User Story 必須等此階段完成
+5. **Phase 3-8.5: User Stories** (T029-T228 + M101-M704) → 後端與 Mobile 可依契約並行（見下方說明）
+6. **Phase 9: Polish** (T192-T205) → 最終整合
 
 ### User Story Dependencies（使用者故事依賴）
 
@@ -863,7 +879,7 @@ Group M5: US5 Mobile (Expo) - Trade
 
 ### Statistics（統計）
 
-- **Total Tasks**: 228 (Backend) + 13 (Mobile Phase 1M) + Mobile US tasks = 241+
+- **Total Tasks**: 228 (Backend) + 13 (Mobile Phase 1M) + 6 (Mobile Tooling: Phase 1M.1) + Mobile US tasks = 247+
 - **Completed**: 63 (Backend: Phase 1: 8/8, Phase 2: 20/20, Phase 3: 35/37) + 13 (Mobile: Phase 1M: 13/13) + 3 (Mobile: Phase 3: 3/4) = 79
 - **Remaining**: 165 (Backend) + Mobile US tasks (M104, M201-M704)
 - **Estimated Duration**: 8 weeks (remaining sprints)
@@ -874,6 +890,7 @@ Group M5: US5 Mobile (Expo) - Trade
 |-------|-----------|-------|----------|--------|
 | 1 | Setup (Backend) | 8 | - | ✅ 100% Complete |
 | 1M | Mobile Setup | 13 | - | ✅ 100% Complete |
+| 1M.1 | OpenAPI SDK Generation (Tooling) | 6 | - | ⏸️ Not Started |
 | 2 | Foundational | 20 | - | ✅ 100% Complete |
 | 3 | US1 - Login & Profile (Backend) | 37 | P1 🎯 MVP | ✅ 95% Complete (35/37) |
 | 3.1 | US1 - PKCE Implementation | 7 | P1 🎯 MVP | ✅ 100% Complete (7/7) |
@@ -890,7 +907,7 @@ Group M5: US5 Mobile (Expo) - Trade
 
 **建議 MVP 僅包含**：
 - ✅ Phase 1: Setup (T001-T008)
-- ✅ Phase 1M: Mobile Setup (M001-M013)
+- ✅ Phase 1M: Mobile Setup (M001-M014)
 - ✅ Phase 2: Foundational (T009-T028)
 - ✅ Phase 3: US1 - Login & Profile Backend (T029-T063) 
 - ✅ Phase 3.1: US1 - PKCE Implementation (T046A, T035B, T045B, T053A, T057A, T061A, T062A)

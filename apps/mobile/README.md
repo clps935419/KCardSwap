@@ -107,8 +107,49 @@ cp .env.example .env
 
 ```
 EXPO_PUBLIC_API_BASE_URL=http://localhost:8080/api/v1
+# When switching to hey-api generated client (paths already include /api/v1), use host-only base URL:
+# EXPO_PUBLIC_API_BASE_URL=http://localhost:8080
 EXPO_PUBLIC_GOOGLE_CLIENT_ID=your-google-client-id
 ```
+
+## OpenAPI SDK 產生（hey-api / Axios client）
+
+本專案規劃使用 hey-api 由 OpenAPI 產生：
+
+- TypeScript API client（Axios runtime）
+- TanStack Query 相關的 query/mutation options（可搭配 React Native / Expo 使用）
+
+### 為什麼要用本地 snapshot（策略 B）
+
+雲端 agent 或 CI 在沒有可達的 `localhost`/內網環境時，仍能穩定產出 SDK；因此 OpenAPI 以「repo 內快照檔」作為 codegen 輸入來源。
+
+### OpenAPI 來源
+
+- Backend（直連）: http://localhost:8000/api/v1/openapi.json
+- Kong Proxy（建議與 App 同路徑）: http://localhost:8080/api/v1/openapi.json
+
+OpenAPI snapshot 說明請見：`/openapi/README.md`
+
+### 重要：baseURL 規則（避免 /api/v1/api/v1）
+
+目前後端 OpenAPI 的 endpoint paths 已包含 `/api/v1`（例如 `/api/v1/cards/me`）。
+
+- ✅ hey-api 生成 client 的 `baseUrl` 建議設定為「host-only」：`http://localhost:8080`
+- ❌ 不要把 `/api/v1` 再放進 `baseUrl`，否則會造成 `/api/v1/api/v1/...`
+
+這也意味著：當你從現有 `src/shared/api/client.ts`（legacy axios client）切換到 hey-api 生成 client 時，`.env` 的 `EXPO_PUBLIC_API_BASE_URL` 需要跟著調整。
+
+### Signed URL Upload 仍是例外
+
+Signed URL 上傳的目標通常不是後端網域，因此不建議沿用同一套 auth/interceptor；請維持「上傳走獨立 request、API 走生成 client」的分流。
+
+### 雲端 agent / CI 的獨立 tasks（文件版）
+
+1. 更新 OpenAPI snapshot（repo 內檔案）
+2. 在 `apps/mobile` 安裝 hey-api 相關依賴（含 Axios client + TanStack Query plugin）
+3. 以 snapshot 作為 input 產生 SDK（輸出目錄不 commit；每次 generate）
+4. 驗證：`npm run type-check`、相關單元測試（如有）
+
 
 ### Running the App
 
