@@ -18,7 +18,7 @@
     "validate": "npm run type-check && npm run lint && npm run format:check",
     "precommit": "npm run format && npm run lint:fix && npm run type-check",
     "sdk:generate": "openapi-ts -f openapi-ts.config.ts",
-    "sdk:clean": "rm -rf src/shared/api/generated"
+    "sdk:clean": "node -e \"require('fs').rmSync('src/shared/api/generated', { recursive: true, force: true })\""
   },
   "dependencies": {
     "@expo/html-elements": "^0.10.1",

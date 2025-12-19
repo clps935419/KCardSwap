@@ -113,6 +113,27 @@
 - `openapi/README.md` - OpenAPI 生成方法與完整工作流程
 - `apps/mobile/OPENAPI_SDK_GUIDE.md` - SDK 使用指南與最佳實踐
 
+---
+
+## Phase 1M.2: SDK Adoption & Standardization（hey-api TanStack SDK 全面接管）
+
+**目的**: 在不回改既有已完成項（Phase 1M / 1M.1）的前提下，補充/覆寫 Mobile 對 SDK 的最新規範：
+
+- **唯一允許的後端 API 呼叫方式**：使用 hey-api 生成的 TanStack Query **options/mutations**（`getXxxOptions()` / `xxxMutation()` / `getXxxQueryKey()`）搭配 `useQuery(...)` / `useMutation(...)`
+- **禁止**：再新增任何對 `apps/mobile/src/shared/api/client.ts` 的使用（視為 legacy）
+- **例外**：Signed URL 直傳（PUT/POST 到 `upload_url`）必須使用獨立 `fetch()`，並完全依照 `required_headers`（不得注入 Authorization / 其他非必要 header）
+- **生成輸出策略（單人開發取捨）**：允許 commit `apps/mobile/src/shared/api/generated/`，但它是 dependency，**禁止手改**；只能透過 `sdk:generate` 更新
+
+- [x] M021 [P] [DOCS] 更新 Mobile 文件：
+  - `apps/mobile/README.md`：移除「Axios client as standard」敘述，改成 SDK 為唯一 API 入口，保留 Signed URL 上傳例外
+  - `apps/mobile/OPENAPI_SDK_GUIDE.md`：改成 options/mutations 用法（非 hooks），並更新「generated 可 commit、禁手改」規則
+  - `apps/mobile/TECH_STACK.md`：Signed URL 直傳例外與錯誤分流規則更精準
+- [x] M022 [P] [TOOLING] 調整 `apps/mobile/package.json` 的 `sdk:clean` 為跨平台（Windows 可用，不依賴 `rm -rf`）
+- [ ] M023 [P] [REFACTOR] 全面移除 Mobile 對 legacy client 的依賴：搜尋並改寫所有 `@/src/shared/api/client` 的 import，改用 `@/src/shared/api/sdk` 的 options/mutations
+- [ ] M024 [P] [GUARDRAIL] 加入防呆規則：
+  - ESLint 規則或專案約定，禁止 import `@/src/shared/api/client`
+  - README/TECH_STACK 明確列出「禁止使用的 import」與替代寫法
+
 ## Phase 2: Foundational (基礎設施 - 阻塞性前置任務)
 
 **目的**: 核心基礎設施，必須完成後才能開始任何 User Story 實作

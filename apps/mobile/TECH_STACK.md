@@ -206,7 +206,8 @@ if (fileSize > 10 * 1024 * 1024) {
 
 **重要注意:**
 
-- Signed URL 上傳請求不走 `src/shared/api/client.ts`（避免自動注入 Authorization header 或錯誤攔截器影響簽名）
+- **取得 Signed URL**（`POST /cards/upload-url`）仍應走 hey-api 生成的 SDK（可享有 token / refresh / 型別安全）。
+- **直傳雲端的上傳請求**（對 `upload_url` 做 PUT/POST）不要走 SDK 的 interceptors / auth header：請用獨立的 `fetch()`（或等價 HTTP client），並且**完全依照後端回傳的 `method` 與 `required_headers`** 送出。
 - 上傳錯誤需分流處理：
   - 後端 API 錯誤（例如 422 配額/檔案過大）→ 走既有 `errorMapper`
   - Signed URL 上傳錯誤（例如 403/過期、網路中斷、timeout、5xx）→ 以 status + 可重試條件顯示對應訊息

@@ -5,7 +5,7 @@
 This project uses **hey-api/openapi-ts** to generate a type-safe TypeScript SDK from the backend's OpenAPI specification. The SDK includes:
 
 - **Axios client** for HTTP requests
-- **TanStack Query hooks** for React components
+- **TanStack Query query/mutation options** for React components
 - **Full TypeScript types** for all endpoints
 
 ## Architecture
@@ -19,9 +19,9 @@ This project uses **hey-api/openapi-ts** to generate a type-safe TypeScript SDK 
 │   ├── openapi-ts.config.ts           # hey-api configuration
 │   ├── src/shared/api/
 │   │   ├── sdk.ts                     # Runtime configuration & exports
-│   │   └── generated/                 # Generated SDK (not committed)
+│   │   └── generated/                 # Generated SDK (committed; treat as dependency)
 │   │       ├── @tanstack/
-│   │       │   └── react-query.gen.ts # TanStack Query hooks
+│   │       │   └── react-query.gen.ts # TanStack Query options/mutations
 │   │       ├── client/                # Client implementation
 │   │       ├── sdk.gen.ts             # API functions
 │   │       └── types.gen.ts           # TypeScript types
@@ -51,7 +51,7 @@ npm run sdk:generate
 npm run sdk:clean
 ```
 
-**Note**: Generated files are in `.gitignore` and should NOT be committed.
+**Note**: 生成輸出會被提交進 repo（方便單人開發與 CI），但**禁止手動修改**；一律透過更新 `openapi/openapi.json` 後再 `sdk:generate` 來更新。
 
 ### 2. Configuring the SDK (One-time setup)
 
@@ -74,17 +74,20 @@ export default function RootLayout() {
 
 ### 3. Using the SDK in Components
 
-#### Option A: TanStack Query Hooks (Recommended)
+#### Option A: TanStack Query Options (Recommended)
 
 ```typescript
-import { useGetMyProfileQuery, useUpdateMyProfileMutation } from '@/src/shared/api/sdk';
+import { useMutation, useQuery } from '@tanstack/react-query';
+
+import { getMyProfileOptions, updateMyProfileMutation } from '@/src/shared/api/sdk';
+import { Box, Button, ButtonText, Spinner, Text } from '@/src/shared/ui/components';
 
 function ProfileScreen() {
   // Automatic caching, refetching, loading states
-  const { data, isLoading, error } = useGetMyProfileQuery();
+  const { data, isLoading, error } = useQuery(getMyProfileOptions());
 
   // Mutations with optimistic updates
-  const updateProfile = useUpdateMyProfileMutation();
+  const updateProfile = useMutation(updateMyProfileMutation());
 
   const handleUpdate = async () => {
     await updateProfile.mutateAsync({
@@ -95,14 +98,16 @@ function ProfileScreen() {
     });
   };
 
-  if (isLoading) return <LoadingSpinner />;
-  if (error) return <ErrorMessage error={error} />;
+  if (isLoading) return <Spinner />;
+  if (error) return <Text>載入失敗</Text>;
 
   return (
-    <View>
+    <Box>
       <Text>{data?.data?.nickname}</Text>
-      <Button onPress={handleUpdate}>Update</Button>
-    </View>
+      <Button onPress={handleUpdate}>
+        <ButtonText>Update</ButtonText>
+      </Button>
+    </Box>
   );
 }
 ```
@@ -128,17 +133,19 @@ async function updateProfile(nickname: string) {
 ### 4. Using TypeScript Types
 
 ```typescript
-import type { ProfileResponse, UpdateProfileRequest } from '@/src/shared/api/sdk';
+import type { GetMyProfileResponse, UpdateMyProfileData } from '@/src/shared/api/sdk';
 
 // Type-safe function parameters
-function displayProfile(profile: ProfileResponse['data']) {
-  console.log(profile.nickname);
+function displayProfile(profile: GetMyProfileResponse['data']) {
+  console.log(profile?.nickname);
 }
 
-// Type-safe form data
-const formData: UpdateProfileRequest = {
-  nickname: 'John',
-  bio: 'Hello world',
+// Type-safe request payload (as Options<UpdateMyProfileData> variables)
+const updatePayload: UpdateMyProfileData = {
+  body: {
+    nickname: 'John',
+    bio: 'Hello world',
+  },
 };
 ```
 
@@ -287,7 +294,8 @@ npm run type-check
 
 # 6. Commit changes
 git add ../../openapi/openapi.json
-# Note: Don't commit generated/ - it's in .gitignore
+# Commit generated output too (but never edit generated files manually)
+git add src/shared/api/generated
 ```
 
 ### Why This Order Matters
@@ -302,32 +310,28 @@ git add ../../openapi/openapi.json
 1. **Backend**: Add new endpoint to FastAPI
 2. **Update OpenAPI**: Generate from code: `make generate-openapi`
 3. **Regenerate SDK**: `cd apps/mobile && npm run sdk:generate`
-4. **Use in Mobile**: Import new hooks/functions from `@/src/shared/api/sdk`
+4. **Use in Mobile**: Import new options/mutations from `@/src/shared/api/sdk`
 5. **Type Safety**: TypeScript will ensure correct usage
 
-### Example: Adding a Card Upload Endpoint
+### Example: Querying a New Endpoint
 
 ```typescript
-// After backend adds POST /cards/upload-url and you regenerate SDK:
+import { useQuery } from '@tanstack/react-query';
 
-import { useUploadCardMutation } from '@/src/shared/api/sdk';
+import { getMyCardsOptions } from '@/src/shared/api/sdk';
+import { Box, Spinner, Text } from '@/src/shared/ui/components';
 
-function UploadCardScreen() {
-  const uploadCard = useUploadCardMutation();
+function MyCardsScreen() {
+  const { data, isLoading, error } = useQuery(getMyCardsOptions());
 
-  const handleUpload = async (imageData: string) => {
-    const result = await uploadCard.mutateAsync({
-      body: {
-        idol: 'IU',
-        idol_group: 'Solo',
-        image_data: imageData,
-      },
-    });
+  if (isLoading) return <Spinner />;
+  if (error) return <Text>載入失敗</Text>;
 
-    console.log('Upload URL:', result.data?.upload_url);
-  };
-
-  return <Button onPress={handleUpload}>Upload</Button>;
+  return (
+    <Box>
+      <Text>共 {data?.data?.length ?? 0} 張</Text>
+    </Box>
+  );
 }
 ```
 
@@ -336,17 +340,17 @@ function UploadCardScreen() {
 ### ✅ DO
 
 - Always regenerate SDK after backend API changes
-- Use TanStack Query hooks for components
+- Use TanStack Query options/mutations for components
 - Configure SDK once at app startup
-- Keep generated files in `.gitignore`
+- Commit generated files, but never edit them manually
 - Use TypeScript types from the SDK
 - Handle loading and error states
 
 ### ❌ DON'T
 
-- Commit generated files to git
 - Modify generated files manually
-- Use direct `fetch()` calls (use SDK instead)
+- Use direct `fetch()` calls for backend API (use SDK instead)
+- Exception: Signed URL upload PUT/POST to `upload_url` should use `fetch()` and follow `required_headers`
 - Hardcode API URLs (use SDK configuration)
 - Ignore TypeScript errors from SDK
 
@@ -368,7 +372,7 @@ npm run sdk:generate
 ```bash
 # Ensure you're importing from the SDK, not old client
 # ❌ import { apiClient } from '@/src/shared/api/client'
-# ✅ import { useGetMyProfileQuery } from '@/src/shared/api/sdk'
+# ✅ import { getMyProfileOptions } from '@/src/shared/api/sdk'
 
 # Run type check
 npm run type-check

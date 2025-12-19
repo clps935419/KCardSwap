@@ -14,7 +14,7 @@ React Native mobile application for KCardSwap, built with Expo SDK 54.
 - **State Management**:
   - Zustand (global state, auth)
   - TanStack Query (server state, API calls)
-- **API Client**: Axios with interceptors
+- **API Client**: hey-api/openapi-ts 生成 SDK（client + TanStack Query options/mutations）
 - **Storage**: expo-secure-store (secure token storage)
 - **Testing**: Jest + React Native Testing Library
 - **Code Quality**: ESLint + Prettier
@@ -106,9 +106,9 @@ cp .env.example .env
 2. Update the variables in `.env`:
 
 ```
-EXPO_PUBLIC_API_BASE_URL=http://localhost:8080/api/v1
-# When switching to hey-api generated client (paths already include /api/v1), use host-only base URL:
-# EXPO_PUBLIC_API_BASE_URL=http://localhost:8080
+EXPO_PUBLIC_API_BASE_URL=http://localhost:8080
+# OpenAPI paths 已包含 /api/v1；baseUrl 請維持 host-only。
+#（若不小心填成 http://localhost:8080/api/v1，SDK 會自動移除 /api/v1）
 EXPO_PUBLIC_GOOGLE_CLIENT_ID=your-google-client-id
 ```
 
@@ -147,7 +147,7 @@ Signed URL 上傳的目標通常不是後端網域，因此不建議沿用同一
 
 1. 更新 OpenAPI snapshot（repo 內檔案）
 2. 在 `apps/mobile` 安裝 hey-api 相關依賴（含 Axios client + TanStack Query plugin）
-3. 以 snapshot 作為 input 產生 SDK（輸出目錄不 commit；每次 generate）
+3. 以 snapshot 作為 input 產生 SDK（生成輸出可 commit，但視為 dependency：禁止手改；修改 OpenAPI 後必須 regenerate）
 4. 驗證：`npm run type-check`、相關單元測試（如有）
 
 

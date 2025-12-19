@@ -124,13 +124,13 @@ export const configureSDK = () => {
 
 /**
  * Re-export the configured client for direct use
- * Most users should use the TanStack Query hooks instead
+ * Most users should use the TanStack Query options/mutations instead
  */
 export { client };
 
 /**
  * Re-export SDK functions for direct API calls
- * For React components, prefer using TanStack Query hooks from './generated/@tanstack/react-query.gen'
+ * For React components, prefer using TanStack Query options/mutations from './generated/@tanstack/react-query.gen'
  */
 export * from './generated/sdk.gen';
 
@@ -140,7 +140,7 @@ export * from './generated/sdk.gen';
 export type * from './generated/types.gen';
 
 /**
- * Re-export TanStack Query hooks
+ * Re-export TanStack Query option helpers
  * These are the recommended way to use the SDK in React components
  */
 export * from './generated/@tanstack/react-query.gen';
