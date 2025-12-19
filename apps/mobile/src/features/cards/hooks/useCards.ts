@@ -4,9 +4,9 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getMyCards, deleteCard, getQuotaStatus } from '../api/cardsApi';
-import { removeThumbnailFromCache } from '../services/thumbnailService';
-import type { Card, CardStatus, QuotaStatus } from '../types';
+import { getMyCards, deleteCard, getQuotaStatus } from '@/src/features/cards/api/cardsApi';
+import { removeThumbnailFromCache } from '@/src/features/cards/services/thumbnailService';
+import type { Card, CardStatus, QuotaStatus } from '@/src/features/cards/types';
 
 // Query keys
 export const cardsKeys = {

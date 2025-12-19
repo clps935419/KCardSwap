@@ -14,9 +14,9 @@
 import React, { useState } from 'react';
 import { FlatList, RefreshControl, Alert } from 'react-native';
 import { Box, Text, Pressable, Spinner, Button, ButtonText } from '@/src/shared/ui/components';
-import { useMyCards, useDeleteCard, useQuotaStatus } from '../hooks/useCards';
-import { CardItem } from '../components/CardItem';
-import type { Card, CardStatus } from '../types';
+import { useMyCards, useDeleteCard, useQuotaStatus } from '@/src/features/cards/hooks/useCards';
+import { CardItem } from '@/src/features/cards/components/CardItem';
+import type { Card, CardStatus } from '@/src/features/cards/types';
 
 const STATUS_FILTERS: { label: string; value: CardStatus | 'all' }[] = [
   { label: '全部', value: 'all' },

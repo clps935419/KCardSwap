@@ -10,7 +10,7 @@ import type {
   UploadUrlRequest,
   UploadUrlResponse,
   QuotaStatus,
-} from '../types';
+} from '@/src/features/cards/types';
 
 /**
  * 取得上傳 Signed URL

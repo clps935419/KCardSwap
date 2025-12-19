@@ -9,8 +9,8 @@
 import React, { useState, useEffect } from 'react';
 import { Image } from 'react-native';
 import { Box, Text, Pressable, Spinner, Card } from '@/src/shared/ui/components';
-import { getThumbnailFromCache } from '../services/thumbnailService';
-import type { Card as CardType } from '../types';
+import { getThumbnailFromCache } from '@/src/features/cards/services/thumbnailService';
+import type { Card as CardType } from '@/src/features/cards/types';
 
 interface CardItemProps {
   card: CardType;

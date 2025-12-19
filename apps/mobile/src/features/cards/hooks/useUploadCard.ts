@@ -9,16 +9,16 @@
 
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { getUploadUrl } from '../api/cardsApi';
+import { getUploadUrl } from '@/src/features/cards/api/cardsApi';
 import {
   pickImageFromCamera,
   pickImageFromGallery,
   validateImageSize,
-} from '../services/imagePickerService';
-import { uploadWithRetry, isSignedUrlExpired } from '../services/uploadService';
-import { generateThumbnail, saveThumbnailToCache } from '../services/thumbnailService';
-import type { ImagePickResult, CardRarity } from '../types';
-import { cardsKeys } from './useCards';
+} from '@/src/features/cards/services/imagePickerService';
+import { uploadWithRetry, isSignedUrlExpired } from '@/src/features/cards/services/uploadService';
+import { generateThumbnail, saveThumbnailToCache } from '@/src/features/cards/services/thumbnailService';
+import type { ImagePickResult, CardRarity } from '@/src/features/cards/types';
+import { cardsKeys } from '@/src/features/cards/hooks/useCards';
 
 /**
  * 上傳進度狀態

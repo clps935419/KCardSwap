@@ -24,8 +24,8 @@ import {
   ButtonText,
   Heading,
 } from '@/src/shared/ui/components';
-import { useUploadCard } from '../hooks/useUploadCard';
-import type { CardRarity, LimitExceededError } from '../types';
+import { useUploadCard } from '@/src/features/cards/hooks/useUploadCard';
+import type { CardRarity, LimitExceededError } from '@/src/features/cards/types';
 
 const RARITY_OPTIONS: { label: string; value: CardRarity }[] = [
   { label: '普通', value: 'common' },
