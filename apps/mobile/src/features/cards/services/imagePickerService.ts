@@ -35,10 +35,15 @@ async function requestMediaLibraryPermission(): Promise<boolean> {
 
 /**
  * 取得圖片檔案大小（估算）
+ * 
+ * 估算公式說明：
+ * JPEG 檔案大小 ≈ (寬 × 高 × 3 bytes RGB) × 品質 / 壓縮率
+ * 壓縮率約 10:1 是 JPEG 典型值
  */
+const JPEG_COMPRESSION_RATIO = 10;
+
 function estimateImageSize(width: number, height: number, quality: number = 0.8): number {
-  // 粗略估算 JPEG 檔案大小：width × height × 3(RGB) × quality / 壓縮率
-  return Math.ceil((width * height * 3 * quality) / 10);
+  return Math.ceil((width * height * 3 * quality) / JPEG_COMPRESSION_RATIO);
 }
 
 /**
@@ -61,11 +66,12 @@ async function compressImage(
     if (quality > 0.3) {
       // 先降低品質
       quality -= 0.15;
+      result = await ImageManipulator.manipulateAsync(result.uri, [], { compress: quality });
     } else {
       // 品質已經很低，開始縮小尺寸
       const scale = 0.8;
       result = await ImageManipulator.manipulateAsync(
-        uri,
+        result.uri,
         [
           {
             resize: {
@@ -77,8 +83,6 @@ async function compressImage(
         { compress: quality }
       );
     }
-
-    result = await ImageManipulator.manipulateAsync(uri, [], { compress: quality });
   }
 
   return result;

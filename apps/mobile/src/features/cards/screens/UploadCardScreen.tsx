@@ -41,8 +41,11 @@ export function UploadCardScreen() {
   const [album, setAlbum] = useState('');
   const [version, setVersion] = useState('');
   const [rarity, setRarity] = useState<CardRarity>('common');
+  const [lastUploadSource, setLastUploadSource] = useState<'camera' | 'gallery' | null>(null);
 
   const handleUpload = async (source: 'camera' | 'gallery') => {
+    setLastUploadSource(source);
+    
     try {
       const uploadFn = source === 'camera' ? uploadFromCamera : uploadFromGallery;
 
@@ -90,17 +93,17 @@ export function UploadCardScreen() {
 
     // 權限錯誤
     if (error.message?.includes('權限')) {
-      Alert.alert('權限不足', error.message, [
-        { text: '取消', style: 'cancel' },
-        { text: '前往設定', onPress: () => {/* TODO: 開啟設定頁面 */} },
-      ]);
+      Alert.alert('權限不足', error.message);
       return;
     }
 
     // Signed URL 相關錯誤
     if (error.message?.includes('過期') || error.statusCode === 403) {
       Alert.alert('上傳失敗', '上傳連結已過期，請重試', [
-        { text: '重試', onPress: () => handleUpload('gallery') },
+        { 
+          text: '重試', 
+          onPress: () => lastUploadSource && handleUpload(lastUploadSource)
+        },
       ]);
       return;
     }
@@ -108,7 +111,10 @@ export function UploadCardScreen() {
     // 網路錯誤
     if (error.message?.includes('網路')) {
       Alert.alert('網路錯誤', '請檢查網路連線後重試', [
-        { text: '重試', onPress: () => handleUpload('gallery') },
+        { 
+          text: '重試', 
+          onPress: () => lastUploadSource && handleUpload(lastUploadSource)
+        },
       ]);
       return;
     }

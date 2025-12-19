@@ -8,15 +8,31 @@
 import * as ImageManipulator from 'expo-image-manipulator';
 import * as FileSystem from 'expo-file-system';
 import * as Crypto from 'expo-crypto';
+import { Platform } from 'react-native';
 
 // 縮圖尺寸
 const THUMBNAIL_SIZE = 200;
 
-// 縮圖快取目錄（使用 documentDirectory 或 cacheDirectory）
+/**
+ * 取得縮圖快取目錄
+ * 根據平台和可用的 API 選擇適當的目錄
+ */
 function getThumbnailCacheDirectory(): string {
-  // 優先使用 documentDirectory，如果不存在則使用當前目錄
-  const baseDir = (FileSystem as any).documentDirectory || (FileSystem as any).cacheDirectory || '';
-  return `${baseDir}thumbnails/`;
+  // 嘗試使用 documentDirectory（較新版本的 expo-file-system）
+  if ('documentDirectory' in FileSystem && FileSystem.documentDirectory) {
+    return `${FileSystem.documentDirectory}thumbnails/`;
+  }
+  
+  // 嘗試使用 cacheDirectory（舊版本）
+  if ('cacheDirectory' in FileSystem && (FileSystem as any).cacheDirectory) {
+    return `${(FileSystem as any).cacheDirectory}thumbnails/`;
+  }
+  
+  // Fallback: 使用臨時目錄
+  console.warn('FileSystem directory constants not found, using fallback');
+  return Platform.OS === 'ios' 
+    ? 'file:///tmp/thumbnails/' 
+    : 'file:///data/local/tmp/thumbnails/';
 }
 
 const THUMBNAIL_CACHE_DIR = getThumbnailCacheDirectory();
