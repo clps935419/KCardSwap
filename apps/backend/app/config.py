@@ -35,6 +35,10 @@ class Config:
     # GCS (Google Cloud Storage)
     GCS_BUCKET_NAME: str = os.getenv("GCS_BUCKET_NAME", "kcardswap")
     GCS_CREDENTIALS_PATH: str | None = os.getenv("GCS_CREDENTIALS_PATH")
+    # Use mock GCS for development/testing (default: true for dev, false for production)
+    USE_MOCK_GCS: bool = os.getenv("USE_MOCK_GCS", "true").lower() == "true"
+    # Enable GCS smoke tests (only for staging/nightly, default: false)
+    RUN_GCS_SMOKE: bool = os.getenv("RUN_GCS_SMOKE", "false").lower() == "true"
 
     # File Upload Limits
     MAX_FILE_SIZE_MB: int = int(os.getenv("MAX_FILE_SIZE_MB", "10"))
