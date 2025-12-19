@@ -471,9 +471,9 @@
 
 ### Mobile (Expo)
 
-- [ ] M301 [P] [US3] 定位權限與取得座標：apps/mobile/src/features/nearby（expo-location；處理拒絕權限）
-- [ ] M302 [P] [US3] 附近搜尋頁：apps/mobile/src/features/nearby/screens/NearbySearchScreen.tsx（POST /nearby/search；Contract: specs/001-kcardswap-complete-spec/contracts/nearby/search.json）
-- [ ] M303 [US3] 限次錯誤處理：免費用戶第 6 次提示 429_RATE_LIMIT_EXCEEDED（並提供升級入口）
+- [X] M301 [P] [US3] 定位權限與取得座標：apps/mobile/src/features/nearby（expo-location；處理拒絕權限）
+- [X] M302 [P] [US3] 附近搜尋頁：apps/mobile/src/features/nearby/screens/NearbySearchScreen.tsx（POST /nearby/search；Contract: specs/001-kcardswap-complete-spec/contracts/nearby/search.json）
+- [X] M303 [US3] 限次錯誤處理：免費用戶第 6 次提示 429_RATE_LIMIT_EXCEEDED（並提供升級入口）
 
 ---
 
