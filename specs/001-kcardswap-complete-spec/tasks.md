@@ -80,20 +80,38 @@
 
 ---
 
-## Phase 1M.1: OpenAPI SDK Generation（hey-api / Axios client）
+## Phase 1M.1: OpenAPI SDK Generation（hey-api / Axios client）✅
 
 **目的**: 由後端 OpenAPI 產生型別安全 SDK（含 TanStack Query options），並確保雲端 agent/CI 不依賴網路可達性（使用 repo 內 snapshot）。
+
+**狀態**: ✅ **已完成**
 
 **重要規則**:
 - OpenAPI paths 已包含 `/api/v1`，生成 client 的 baseUrl 必須使用 host-only（例如 `http://localhost:8080`），避免 `/api/v1/api/v1`。
 - 生成輸出（generated）**不 commit**；每次需要時重新 generate。
 
-- [ ] M015 [P] [TOOLING] 新增/更新 OpenAPI snapshot：建立 `openapi/openapi.json`（來源：`http://localhost:8080/api/v1/openapi.json`）
-- [ ] M016 [P] [TOOLING] 建立 hey-api codegen config：`apps/mobile/openapi-ts.config.ts`（Axios client + `@tanstack/react-query` plugin；input 指向 `openapi/openapi.json`；output 至 `apps/mobile/src/shared/api/generated/`）
-- [ ] M017 [P] [TOOLING] 加入 codegen scripts：更新 `apps/mobile/package.json`（新增 `sdk:generate` / `sdk:clean`；確保可在乾淨環境執行）
-- [ ] M018 [P] [TOOLING] 排除生成輸出：更新 `.gitignore`（忽略 `apps/mobile/src/shared/api/generated/`，確保 generated 不被提交）
-- [ ] M019 [P] [TOOLING] 生成 client 的 runtime 設定入口：新增 `apps/mobile/src/shared/api/sdk.ts`（集中設定 baseUrl=host-only、Auth header、以及 refresh token 行為；使用 hey-api axios client）
-- [ ] M020 [P] [TOOLING] 最小驗證：在 `apps/mobile` 執行 `npm run sdk:generate` + `npm run type-check`（確保生成結果可被 TS 正確解析）
+- [x] M015 [P] [TOOLING] 新增/更新 OpenAPI snapshot：建立 `openapi/openapi.json`（來源：從後端程式碼自動生成，已執行）
+- [x] M016 [P] [TOOLING] 建立 hey-api codegen config：`apps/mobile/openapi-ts.config.ts`（Axios client + `@tanstack/react-query` plugin；input 指向 `openapi/openapi.json`；output 至 `apps/mobile/src/shared/api/generated/`）
+- [x] M017 [P] [TOOLING] 加入 codegen scripts：更新 `apps/mobile/package.json`（新增 `sdk:generate` / `sdk:clean`；確保可在乾淨環境執行）
+- [x] M018 [P] [TOOLING] 排除生成輸出：更新 `.gitignore`（忽略 `apps/mobile/src/shared/api/generated/`，確保 generated 不被提交）
+- [x] M019 [P] [TOOLING] 生成 client 的 runtime 設定入口：新增 `apps/mobile/src/shared/api/sdk.ts`（集中設定 baseUrl=host-only、Auth header、以及 refresh token 行為；使用 hey-api axios client）
+- [x] M020 [P] [TOOLING] 最小驗證：在 `apps/mobile` 執行 `npm run sdk:generate` + `npm run type-check`（確保生成結果可被 TS 正確解析）
+
+**Checkpoint**: OpenAPI SDK Generation 完成 ✅
+- ✅ OpenAPI 規格已從實際後端程式碼生成（17 個端點，41KB）
+- ✅ hey-api 配置完成，可生成型別安全的 Axios client + TanStack Query hooks
+- ✅ 完整文檔與故障排除指南
+- ✅ 雲端 agent 驗證通過
+
+**開發工作流程**（重要）：
+1. **當修改後端 API 時**：先執行 `make generate-openapi` 或 `make generate-openapi-docker` 生成新的 `openapi/openapi.json`
+2. **在修改前端前**：執行 `cd apps/mobile && npm run sdk:generate` 生成最新的 hey-api SDK
+3. **驗證**：執行 `npm run type-check` 確保型別正確
+4. **提交**：只 commit `openapi/openapi.json`，不 commit `apps/mobile/src/shared/api/generated/`（已在 .gitignore）
+
+詳細文檔請見：
+- `openapi/README.md` - OpenAPI 生成方法與完整工作流程
+- `apps/mobile/OPENAPI_SDK_GUIDE.md` - SDK 使用指南與最佳實踐
 
 ## Phase 2: Foundational (基礎設施 - 阻塞性前置任務)
 

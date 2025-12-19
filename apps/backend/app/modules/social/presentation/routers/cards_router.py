@@ -40,7 +40,7 @@ from app.modules.social.presentation.schemas.card_schemas import (
 )
 from app.shared.infrastructure.database.connection import get_db_session
 from app.shared.infrastructure.external.storage_service_factory import (
-    storage_service_factory,
+    get_storage_service,
 )
 
 # Create router
@@ -95,7 +95,7 @@ async def get_upload_url(
     # Initialize dependencies
     card_repo: CardRepository = CardRepositoryImpl(session)
     validation_service = CardValidationService()
-    gcs_service = storage_service_factory()
+    gcs_service = get_storage_service()
 
     # Create and execute use case
     use_case = UploadCardUseCase(
@@ -216,7 +216,7 @@ async def delete_card(
     """
     # Initialize dependencies
     card_repo: CardRepository = CardRepositoryImpl(session)
-    gcs_service = storage_service_factory()
+    gcs_service = get_storage_service()
 
     # Create and execute use case
     use_case = DeleteCardUseCase(card_repository=card_repo, gcs_service=gcs_service)
