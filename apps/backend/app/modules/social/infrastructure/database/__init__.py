@@ -1,0 +1,1 @@
+"""Social infrastructure database models"""
