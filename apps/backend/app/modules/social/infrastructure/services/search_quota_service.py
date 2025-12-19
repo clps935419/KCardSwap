@@ -40,6 +40,15 @@ class SearchQuotaService:
         """
         self.session = session
 
+    @staticmethod
+    def _get_today_utc() -> datetime.date:
+        """Get current date in UTC.
+        
+        Returns:
+            Current date in UTC timezone
+        """
+        return datetime.now(timezone.utc).date()
+
     async def get_today_count(self, user_id: UUID) -> int:
         """
         Get the number of searches performed by user today.
@@ -50,7 +59,7 @@ class SearchQuotaService:
         Returns:
             Number of searches performed today (0 if no record exists)
         """
-        today = datetime.now(timezone.utc).date()
+        today = self._get_today_utc()
 
         stmt = select(SearchQuotaModel.count).where(
             SearchQuotaModel.user_id == user_id, SearchQuotaModel.date == today
@@ -70,7 +79,7 @@ class SearchQuotaService:
         Returns:
             New count after increment
         """
-        today = datetime.now(timezone.utc).date()
+        today = self._get_today_utc()
 
         # Try to get existing record
         stmt = select(SearchQuotaModel).where(

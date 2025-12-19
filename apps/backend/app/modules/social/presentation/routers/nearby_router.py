@@ -128,7 +128,8 @@ async def search_nearby_cards(
         )
 
         # Execute search
-        # TODO: Check if user is premium (for now, assume all users are free)
+        # TODO(Phase 8): Check if user is premium from subscription status
+        # For now, assume all users are free (will be implemented in Phase 8: US6)
         is_premium = False
 
         dto_request = SearchRequestDTO(

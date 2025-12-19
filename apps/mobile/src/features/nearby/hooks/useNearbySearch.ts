@@ -10,6 +10,7 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/src/shared/api/client';
+import { SEARCH_LIMITS } from '@/src/shared/config/constants';
 import type { LocationCoords } from './useLocation';
 
 // Types based on nearby search API contract
@@ -83,8 +84,8 @@ export function useNearbySearch(request: SearchNearbyRequest | null, enabled = f
         if (error.response?.status === 429) {
           const rateLimitError: RateLimitError = {
             is_rate_limit: true,
-            current_count: 5, // Default, can be parsed from error message
-            limit: 5,
+            current_count: SEARCH_LIMITS.FREE_USER_DAILY_LIMIT,
+            limit: SEARCH_LIMITS.FREE_USER_DAILY_LIMIT,
             message: error.response?.data?.detail || '每日搜尋次數已達上限',
           };
 
