@@ -4,6 +4,7 @@
  * 
  * 功能：
  * - 選擇圖片來源（相機/相簿）
+ * - POC: 自訂相機 + 框線 + 提示文字
  * - 填寫卡片資訊
  * - 顯示上傳進度
  * - 錯誤處理（配額、檔案大小、網路等）
@@ -24,6 +25,7 @@ import {
   ButtonText,
   Heading,
 } from '@/src/shared/ui/components';
+import { CameraWithOverlay } from '@/src/features/cards/components';
 import { useUploadCard } from '@/src/features/cards/hooks/useUploadCard';
 import type { CardRarity, LimitExceededError } from '@/src/features/cards/types';
 
@@ -45,6 +47,27 @@ export function UploadCardScreen() {
   const [version, setVersion] = useState('');
   const [rarity, setRarity] = useState<CardRarity>('common');
   const [lastUploadSource, setLastUploadSource] = useState<'camera' | 'gallery' | null>(null);
+  const [showCustomCamera, setShowCustomCamera] = useState(false);
+
+  // POC: 自訂相機模式
+  if (showCustomCamera) {
+    return (
+      <CameraWithOverlay
+        onCapture={async (uri) => {
+          setShowCustomCamera(false);
+          // 使用拍攝的圖片繼續上傳流程
+          await handleCameraCapture(uri);
+        }}
+        onCancel={() => setShowCustomCamera(false)}
+      />
+    );
+  }
+
+  const handleCameraCapture = async (uri: string) => {
+    // POC: 使用拍攝的圖片（CameraWithOverlay 已處理裁切和壓縮）
+    // TODO: 整合到完整上傳流程
+    Alert.alert('POC 完成', `已拍攝照片: ${uri.substring(0, 50)}...`);
+  };
 
   const handleUpload = async (source: 'camera' | 'gallery') => {
     setLastUploadSource(source);
@@ -239,14 +262,25 @@ export function UploadCardScreen() {
         )}
 
         {/* 上傳按鈕 */}
-        <Box className="flex-row gap-3 mb-4">
+        <Box className="gap-3 mb-4">
+          {/* POC: 自訂相機 + 框線 */}
           <Button
-            onPress={() => handleUpload('camera')}
+            onPress={() => setShowCustomCamera(true)}
             isDisabled={isUploading}
-            className="flex-1 bg-green-500"
+            className="bg-purple-500 mb-2"
           >
-            <Text className="text-3xl mb-2">📷</Text>
-            <ButtonText>拍照上傳</ButtonText>
+            <Text className="text-3xl mb-2">🎯</Text>
+            <ButtonText>POC: 框線拍照</ButtonText>
+          </Button>
+
+          <Box className="flex-row gap-3">
+            <Button
+              onPress={() => handleUpload('camera')}
+              isDisabled={isUploading}
+              className="flex-1 bg-green-500"
+            >
+              <Text className="text-3xl mb-2">📷</Text>
+              <ButtonText>拍照上傳</ButtonText>
           </Button>
 
           <Button
@@ -257,12 +291,16 @@ export function UploadCardScreen() {
             <Text className="text-3xl mb-2">🖼️</Text>
             <ButtonText>相簿選取</ButtonText>
           </Button>
+          </Box>
         </Box>
 
         {/* 使用說明 */}
         <Box className="bg-amber-50 rounded-xl p-4">
           <Text className="text-base font-bold text-amber-900 mb-3">
             📌 上傳說明
+          </Text>
+          <Text className="text-sm text-amber-900 mb-1">
+            • POC 框線拍照：自訂相機畫面，對齊框線後拍攝
           </Text>
           <Text className="text-sm text-amber-900 mb-1">
             • 支援 JPEG 和 PNG 格式

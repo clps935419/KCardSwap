@@ -3,3 +3,4 @@
  */
 
 export * from './CardItem';
+export * from './CameraWithOverlay';

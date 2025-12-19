@@ -55,7 +55,7 @@ export function useDeleteCard() {
 /**
  * Hook: 查詢配額狀態
  */
-export function useQuotaStatus() {
+export function useQuotaStatus(): ReturnType<typeof useQuery<QuotaStatus>> {
   return useQuery({
     queryKey: cardsKeys.quota(),
     queryFn: getQuotaStatus,

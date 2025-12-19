@@ -18,14 +18,17 @@ const THUMBNAIL_SIZE = 200;
  * 根據平台和可用的 API 選擇適當的目錄
  */
 function getThumbnailCacheDirectory(): string {
-  // 嘗試使用 documentDirectory（較新版本的 expo-file-system）
-  if ('documentDirectory' in FileSystem && FileSystem.documentDirectory) {
-    return `${FileSystem.documentDirectory}thumbnails/`;
+  // 使用 any 來繞過 TypeScript 檢查，因為不同版本的 expo-file-system API 不同
+  const fs = FileSystem as any;
+  
+  // 嘗試使用 documentDirectory（較新版本）
+  if (fs.documentDirectory) {
+    return `${fs.documentDirectory}thumbnails/`;
   }
   
   // 嘗試使用 cacheDirectory（舊版本）
-  if ('cacheDirectory' in FileSystem && (FileSystem as any).cacheDirectory) {
-    return `${(FileSystem as any).cacheDirectory}thumbnails/`;
+  if (fs.cacheDirectory) {
+    return `${fs.cacheDirectory}thumbnails/`;
   }
   
   // Fallback: 使用臨時目錄

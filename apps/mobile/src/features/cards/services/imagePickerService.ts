@@ -5,6 +5,8 @@
  * 支援「拍照」與「相簿選取」兩種來源
  * 自動壓縮至 ≤10MB
  * 支援 JPEG/PNG 格式
+ * 
+ * POC Enhancement: 支援自訂相機畫面（框線 + 提示文字）
  */
 
 import * as ImagePicker from 'expo-image-picker';
@@ -182,3 +184,33 @@ export function validateImageSize(fileSize: number): { valid: boolean; error?: s
   }
   return { valid: true };
 }
+
+/**
+ * POC: 使用自訂相機 + 框線拍照
+ * 
+ * 此函式需要在 React 元件內使用，因為它會呼叫 CameraWithOverlay 元件
+ * 建議在 UploadCardScreen 中整合使用
+ * 
+ * @returns Promise with image URI or null if cancelled
+ * 
+ * @example
+ * ```tsx
+ * // In UploadCardScreen.tsx
+ * import { CameraWithOverlay } from '@/src/features/cards/components';
+ * 
+ * const [showCustomCamera, setShowCustomCamera] = useState(false);
+ * 
+ * if (showCustomCamera) {
+ *   return (
+ *     <CameraWithOverlay
+ *       onCapture={(uri) => {
+ *         // Process captured image
+ *         setShowCustomCamera(false);
+ *       }}
+ *       onCancel={() => setShowCustomCamera(false)}
+ *     />
+ *   );
+ * }
+ * ```
+ */
+export const POC_CAMERA_WITH_FRAME_AVAILABLE = true;
