@@ -1,49 +1,243 @@
 /**
  * Cards API Client
- * 卡片相關的 API 請求
+ * 
+ * Uses hey-api generated TanStack Query options/mutations for card operations.
+ * 
+ * **Standard Usage**:
+ * ```typescript
+ * import { useQuery, useMutation } from '@tanstack/react-query';
+ * import { getMyCardsOptions, uploadToSignedUrl } from './cardsApi';
+ * 
+ * function MyCardsScreen() {
+ *   const { data, isLoading } = useQuery(getMyCardsOptions());
+ *   // ... render cards
+ * }
+ * ```
  */
 
-import { apiClient } from '@/src/shared/api/client';
 import type {
-  Card,
-  CardStatus,
-  UploadUrlRequest,
-  UploadUrlResponse,
-  QuotaStatus,
-} from '@/src/features/cards/types';
+  GetMyCardsResponse,
+  GetMyCardsData,
+} from '@/src/shared/api/sdk';
+
+// Re-export SDK TanStack Query options
+export {
+  getMyCardsOptions,
+  getMyCardsQueryKey,
+} from '@/src/shared/api/sdk';
+
+// Re-export types
+export type { GetMyCardsResponse, GetMyCardsData };
 
 /**
- * 取得上傳 Signed URL
- * M202: 呼叫後端 API 取得 GCS Signed URL
+ * Card data structure
  */
-export async function getUploadUrl(request: UploadUrlRequest): Promise<UploadUrlResponse> {
-  const response = await apiClient.post<{ data: UploadUrlResponse }>('/cards/upload-url', request);
-  return response.data.data;
+export type CardsData = NonNullable<GetMyCardsResponse['data']>;
+export type Card = NonNullable<CardsData['items']>[number];
+
+/**
+ * Card status enum
+ */
+export type CardStatus = 'available' | 'in_trade' | 'traded';
+
+/**
+ * Upload URL request
+ * 
+ * **Note**: This type will be replaced by SDK-generated type once the endpoint is added to OpenAPI spec.
+ * TODO: Use SDK type when available: `GetUploadUrlData`
+ */
+export interface UploadUrlRequest {
+  file_name: string;
+  file_size: number;
+  content_type: 'image/jpeg' | 'image/png';
 }
 
 /**
- * 查詢我的卡片列表
- * M204: 取得使用者的所有卡片
+ * Upload URL response
+ * 
+ * **Note**: This type will be replaced by SDK-generated type once the endpoint is added to OpenAPI spec.
+ * TODO: Use SDK type when available: `GetUploadUrlResponse`
  */
-export async function getMyCards(status?: CardStatus): Promise<Card[]> {
-  const params = status ? { status } : {};
-  const response = await apiClient.get<{ data: { items: Card[] } }>('/cards/me', { params });
-  return response.data.data.items;
+export interface UploadUrlResponse {
+  upload_url: string;
+  method: 'PUT' | 'POST';
+  required_headers: Record<string, string>;
+  image_url: string;
+  expires_at: string;
 }
 
 /**
- * 刪除卡片
- * M205: 刪除指定的卡片（包含 GCS 清理）
+ * Quota status
+ * 
+ * **Note**: This type will be replaced by SDK-generated type once the endpoint is added to OpenAPI spec.
  */
-export async function deleteCard(cardId: string): Promise<void> {
-  await apiClient.delete(`/cards/${cardId}`);
+export interface QuotaStatus {
+  daily_uploads_used: number;
+  daily_uploads_limit: number;
+  total_storage_used: number;
+  total_storage_limit: number;
 }
 
 /**
- * 檢查配額狀態
- * 查詢當前上傳配額使用情況
+ * TODO M202: Once `/cards/upload-url` is added to OpenAPI spec:
+ * 1. Regenerate SDK: `npm run sdk:generate`
+ * 2. Replace this comment with:
+ *    ```
+ *    export { getUploadUrlMutation, getUploadUrlMutationKey } from '@/src/shared/api/sdk';
+ *    ```
+ * 3. Update UploadUrlRequest and UploadUrlResponse types to use SDK types
+ * 4. Remove the temporary implementation below
  */
-export async function getQuotaStatus(): Promise<QuotaStatus> {
-  const response = await apiClient.get<{ data: QuotaStatus }>('/cards/quota/status');
-  return response.data.data;
+
+/**
+ * TODO M205: Once `/cards/{id}` DELETE is added to OpenAPI spec:
+ * 1. Regenerate SDK: `npm run sdk:generate`
+ * 2. Replace this comment with:
+ *    ```
+ *    export { deleteCardMutation, deleteCardMutationKey } from '@/src/shared/api/sdk';
+ *    ```
+ */
+
+/**
+ * Upload file to Signed URL (M203)
+ * 
+ * **Important**: This must use independent `fetch()`, NOT the SDK client.
+ * - Do not inject Authorization headers
+ * - Must follow `required_headers` from backend exactly
+ * - Handle errors separately from backend API errors
+ * 
+ * @param uploadUrl - The signed URL from backend
+ * @param file - The file Blob to upload
+ * @param method - HTTP method (PUT or POST)
+ * @param requiredHeaders - Headers from backend response
+ * @returns Promise<void>
+ * @throws Error with status code and message
+ */
+export async function uploadToSignedUrl(
+  uploadUrl: string,
+  file: Blob,
+  method: 'PUT' | 'POST',
+  requiredHeaders: Record<string, string>
+): Promise<void> {
+  try {
+    const response = await fetch(uploadUrl, {
+      method,
+      headers: requiredHeaders,
+      body: file,
+    });
+
+    if (!response.ok) {
+      // Handle Signed URL upload errors (not backend API errors)
+      if (response.status === 403) {
+        throw new Error('Upload URL expired or invalid. Please get a new upload URL.');
+      } else if (response.status >= 400 && response.status < 500) {
+        throw new Error(`Upload failed: ${response.status}. Please check the file and try again.`);
+      } else if (response.status >= 500) {
+        throw new Error('Cloud storage error. Please try again later.');
+      }
+      
+      throw new Error(`Upload failed with status: ${response.status}`);
+    }
+  } catch (error: any) {
+    // Handle network errors
+    if (error.message?.includes('network') || error.message?.includes('timeout')) {
+      throw new Error('Network error. Please check your connection and try again.');
+    }
+    
+    // Re-throw with context
+    throw error;
+  }
 }
+
+/**
+ * Retry configuration for signed URL upload
+ */
+export const UPLOAD_RETRY_CONFIG = {
+  maxRetries: 3,
+  retryableStatuses: [408, 429, 500, 502, 503, 504], // Timeout, rate limit, server errors
+  nonRetryableStatuses: [400, 403, 404], // Bad request, forbidden, not found
+  retryDelay: (attemptNumber: number) => Math.min(1000 * Math.pow(2, attemptNumber), 10000), // Exponential backoff
+};
+
+/**
+ * Upload to signed URL with retry logic
+ * 
+ * @param uploadUrl - The signed URL from backend
+ * @param file - The file Blob to upload
+ * @param method - HTTP method (PUT or POST)
+ * @param requiredHeaders - Headers from backend response
+ * @param retryConfig - Optional retry configuration
+ * @returns Promise<void>
+ */
+export async function uploadToSignedUrlWithRetry(
+  uploadUrl: string,
+  file: Blob,
+  method: 'PUT' | 'POST',
+  requiredHeaders: Record<string, string>,
+  retryConfig = UPLOAD_RETRY_CONFIG
+): Promise<void> {
+  let lastError: Error | null = null;
+  
+  for (let attempt = 0; attempt <= retryConfig.maxRetries; attempt++) {
+    try {
+      await uploadToSignedUrl(uploadUrl, file, method, requiredHeaders);
+      return; // Success
+    } catch (error: any) {
+      lastError = error;
+      
+      // Check if error is retryable
+      const isNetworkError = error.message?.includes('network') || error.message?.includes('timeout');
+      const isRetryableStatus = error.status && retryConfig.retryableStatuses.includes(error.status);
+      
+      if (!isNetworkError && !isRetryableStatus) {
+        // Non-retryable error, throw immediately
+        throw error;
+      }
+      
+      // Last attempt, throw error
+      if (attempt === retryConfig.maxRetries) {
+        break;
+      }
+      
+      // Wait before retry
+      const delay = retryConfig.retryDelay(attempt);
+      console.log(`Upload failed (attempt ${attempt + 1}/${retryConfig.maxRetries + 1}), retrying in ${delay}ms...`);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+  
+  throw lastError || new Error('Upload failed after retries');
+}
+
+/**
+ * Example usage:
+ * 
+ * ```typescript
+ * import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+ * import { getMyCardsOptions, getMyCardsQueryKey, uploadToSignedUrlWithRetry } from './cardsApi';
+ * 
+ * function UploadCardScreen() {
+ *   const queryClient = useQueryClient();
+ *   
+ *   // 1. Get my cards
+ *   const { data: cards } = useQuery(getMyCardsOptions());
+ *   
+ *   // 2. Upload process (TODO: Replace with SDK mutation when available)
+ *   const handleUpload = async (file: Blob) => {
+ *     // Step 1: Get signed URL from backend (TODO: Use SDK mutation)
+ *     const uploadUrlResponse = await getUploadUrl(file);
+ *     
+ *     // Step 2: Upload to signed URL (independent fetch)
+ *     await uploadToSignedUrlWithRetry(
+ *       uploadUrlResponse.upload_url,
+ *       file,
+ *       uploadUrlResponse.method,
+ *       uploadUrlResponse.required_headers
+ *     );
+ *     
+ *     // Step 3: Refresh card list
+ *     queryClient.invalidateQueries({ queryKey: getMyCardsQueryKey() });
+ *   };
+ * }
+ * ```
+ */

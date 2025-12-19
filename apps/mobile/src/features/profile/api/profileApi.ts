@@ -1,32 +1,45 @@
 /**
  * Profile API Service (M103)
  * 
- * API calls for profile management:
- * - GET /profile/me - Get current user's profile
- * - PUT /profile/me - Update current user's profile
+ * Uses hey-api generated TanStack Query options/mutations for profile operations.
+ * This file re-exports SDK functions and provides helper utilities.
+ * 
+ * **Standard Usage**:
+ * ```typescript
+ * import { useQuery, useMutation } from '@tanstack/react-query';
+ * import { getMyProfileOptions, updateMyProfileMutation } from './profileApi';
+ * 
+ * function ProfileScreen() {
+ *   const { data, isLoading } = useQuery(getMyProfileOptions());
+ *   const updateProfile = useMutation(updateMyProfileMutation());
+ *   
+ *   const handleUpdate = async () => {
+ *     await updateProfile.mutateAsync({ body: { nickname: 'New Name' } });
+ *   };
+ * }
+ * ```
  */
 
-import { apiClient } from '@/src/shared/api/client';
+import type {
+  GetMyProfileResponse,
+  UpdateMyProfileData,
+  UpdateMyProfileResponse,
+} from '@/src/shared/api/sdk';
+
+// Re-export SDK TanStack Query options and mutations
+export {
+  getMyProfileOptions,
+  getMyProfileQueryKey,
+  updateMyProfileMutation,
+} from '@/src/shared/api/sdk';
+
+// Re-export types for convenience
+export type { GetMyProfileResponse, UpdateMyProfileData, UpdateMyProfileResponse };
 
 /**
- * Profile data structure matching backend contract
+ * Profile data structure (extracted from response type)
  */
-export interface Profile {
-  id: string;
-  user_id: string;
-  nickname: string | null;
-  avatar_url: string | null;
-  bio: string | null;
-  region: string | null;
-  preferences: Record<string, any>;
-  privacy_flags: {
-    nearby_visible: boolean;
-    show_online: boolean;
-    allow_stranger_chat: boolean;
-  };
-  created_at: string;
-  updated_at: string;
-}
+export type Profile = NonNullable<GetMyProfileResponse['data']>;
 
 /**
  * Profile update request (all fields optional)
@@ -42,91 +55,6 @@ export interface ProfileUpdateRequest {
     show_online?: boolean;
     allow_stranger_chat?: boolean;
   };
-}
-
-/**
- * API response wrapper
- */
-interface ApiResponse<T> {
-  data: T | null;
-  error: {
-    code: string;
-    message: string;
-  } | null;
-}
-
-/**
- * Get current user's profile
- * 
- * @returns Promise<Profile>
- * @throws Error if request fails
- */
-export async function getMyProfile(): Promise<Profile> {
-  try {
-    const response = await apiClient.get<ApiResponse<Profile>>('/profile/me');
-
-    if (!response.data || !response.data.data) {
-      throw new Error('Invalid response from server');
-    }
-
-    if (response.data.error) {
-      throw new Error(response.data.error.message);
-    }
-
-    return response.data.data;
-  } catch (error: any) {
-    console.error('Get profile error:', error);
-
-    if (error.response?.status === 404) {
-      throw new Error('Profile not found');
-    } else if (error.response?.status === 401) {
-      throw new Error('Please login again');
-    }
-
-    throw new Error(error.message || 'Failed to load profile');
-  }
-}
-
-/**
- * Update current user's profile
- * 
- * @param updates - Partial profile data to update
- * @returns Promise<Profile> - Updated profile
- * @throws Error if request fails
- */
-export async function updateMyProfile(updates: ProfileUpdateRequest): Promise<Profile> {
-  try {
-    console.log('Updating profile with:', updates);
-
-    const response = await apiClient.put<ApiResponse<Profile>>('/profile/me', updates);
-
-    if (!response.data || !response.data.data) {
-      throw new Error('Invalid response from server');
-    }
-
-    if (response.data.error) {
-      throw new Error(response.data.error.message);
-    }
-
-    return response.data.data;
-  } catch (error: any) {
-    console.error('Update profile error:', error);
-
-    if (error.response?.status === 400 || error.response?.status === 422) {
-      // Validation error
-      const errorDetail = error.response?.data?.detail;
-      if (errorDetail && typeof errorDetail === 'object') {
-        // Extract validation errors
-        const messages = errorDetail.map((err: any) => err.msg || err.message).join(', ');
-        throw new Error(`Validation error: ${messages}`);
-      }
-      throw new Error('Invalid profile data');
-    } else if (error.response?.status === 401) {
-      throw new Error('Please login again');
-    }
-
-    throw new Error(error.message || 'Failed to update profile');
-  }
 }
 
 /**
@@ -154,3 +82,46 @@ export function validateBio(bio: string): string | null {
 
   return null;
 }
+
+/**
+ * Example usage in a component:
+ * 
+ * ```typescript
+ * import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+ * import { 
+ *   getMyProfileOptions,
+ *   getMyProfileQueryKey, 
+ *   updateMyProfileMutation,
+ *   validateNickname 
+ * } from './profileApi';
+ * 
+ * function EditProfileScreen() {
+ *   const queryClient = useQueryClient();
+ *   const { data, isLoading } = useQuery(getMyProfileOptions());
+ *   const updateProfile = useMutation({
+ *     ...updateMyProfileMutation(),
+ *     onSuccess: () => {
+ *       // Invalidate profile query to refetch
+ *       queryClient.invalidateQueries({ queryKey: getMyProfileQueryKey() });
+ *     },
+ *   });
+ *   
+ *   const handleSubmit = async (nickname: string, bio: string) => {
+ *     const nicknameError = validateNickname(nickname);
+ *     if (nicknameError) {
+ *       alert(nicknameError);
+ *       return;
+ *     }
+ *     
+ *     await updateProfile.mutateAsync({
+ *       body: { nickname, bio },
+ *     });
+ *   };
+ *   
+ *   if (isLoading) return <Spinner />;
+ *   
+ *   const profile = data?.data;
+ *   return <EditForm initialValues={profile} onSubmit={handleSubmit} />;
+ * }
+ * ```
+ */

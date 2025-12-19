@@ -9,15 +9,17 @@
  * 2. Start OAuth flow with Google
  * 3. User authorizes in browser
  * 4. Receive authorization code
- * 5. Send code + code_verifier to backend
+ * 5. Send code + code_verifier to backend using SDK
  * 6. Backend exchanges with Google and returns JWT tokens
+ * 
+ * **SDK Usage**: Uses hey-api generated TanStack Query mutation for /auth/google-callback
  */
 
 import * as AuthSession from 'expo-auth-session';
 import * as Crypto from 'expo-crypto';
-import { Platform } from 'react-native';
 import { config } from '@/src/shared/config';
-import { apiClient } from '@/src/shared/api/client';
+import { client } from '@/src/shared/api/sdk';
+import type { GoogleCallbackResponse, GoogleCallbackRequest } from '@/src/shared/api/sdk';
 
 // Google OAuth configuration
 const GOOGLE_OAUTH_CONFIG = {
@@ -74,16 +76,9 @@ function base64UrlEncode(input: string | Uint8Array): string {
 }
 
 /**
- * Google OAuth Response from backend
+ * Google OAuth Response from backend (matches SDK type)
  */
-export interface GoogleOAuthResponse {
-  access_token: string;
-  refresh_token: string;
-  token_type: string;
-  expires_in: number;
-  user_id: string;
-  email: string;
-}
+export type GoogleOAuthResponse = GoogleCallbackResponse;
 
 /**
  * Start Google OAuth flow with PKCE
@@ -130,7 +125,7 @@ export async function startGoogleOAuthFlow(): Promise<AuthSession.AuthSessionRes
 }
 
 /**
- * Exchange authorization code for tokens via backend
+ * Exchange authorization code for tokens via backend using SDK
  * 
  * @param code - Authorization code from Google
  * @param codeVerifier - Code verifier used in PKCE challenge
@@ -143,27 +138,30 @@ export async function exchangeCodeForTokens(
   try {
     console.log('Exchanging authorization code for tokens...');
 
-    const response = await apiClient.post<{ data: GoogleOAuthResponse; error: null }>(
-      '/auth/google-callback',
-      {
-        code,
-        code_verifier: codeVerifier,
-        redirect_uri: GOOGLE_OAUTH_CONFIG.redirectUri,
-      }
-    );
+    // Use SDK client directly (not through TanStack Query since this is imperative)
+    const requestBody: GoogleCallbackRequest = {
+      code,
+      code_verifier: codeVerifier,
+      redirect_uri: GOOGLE_OAUTH_CONFIG.redirectUri,
+    };
 
-    if (!response.data || !response.data.data) {
+    const response = await client.post<GoogleCallbackResponse>({
+      url: '/api/v1/auth/google-callback',
+      body: requestBody,
+    });
+
+    if (!response.data) {
       throw new Error('Invalid response from server');
     }
 
-    return response.data.data;
+    return response.data;
   } catch (error: any) {
     console.error('Token exchange error:', error);
 
     // Handle specific error cases
-    if (error.response?.status === 401) {
+    if (error.status === 401) {
       throw new Error('Invalid authorization code. Please try again.');
-    } else if (error.response?.status === 422) {
+    } else if (error.status === 422) {
       throw new Error('Invalid request. Please check your configuration.');
     } else if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
       throw new Error('Server timeout. Please try again.');

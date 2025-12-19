@@ -6,8 +6,11 @@ import {
   getUserData,
   clearAuthData,
   TokenData,
+  getRefreshToken,
+  isTokenExpired,
 } from '@/src/shared/auth/session';
-import { ensureValidToken } from '@/src/shared/api/client';
+import { client } from '@/src/shared/api/sdk';
+import type { RefreshTokenRequest, RefreshTokenResponse } from '@/src/shared/api/sdk';
 
 export interface AuthState {
   user: UserData | null;
@@ -23,6 +26,61 @@ export interface AuthState {
   refreshSession: () => Promise<void>;
   clearError: () => void;
   initialize: () => Promise<void>;
+}
+
+/**
+ * Refresh access token using SDK
+ * 
+ * @returns New access token or null if refresh fails
+ */
+async function refreshAccessToken(): Promise<TokenData | null> {
+  try {
+    const refreshToken = await getRefreshToken();
+    if (!refreshToken) {
+      return null;
+    }
+
+    // Use SDK client directly for token refresh
+    const requestBody: RefreshTokenRequest = {
+      refresh_token: refreshToken,
+    };
+
+    const response = await client.post<RefreshTokenResponse>({
+      url: '/api/v1/auth/refresh',
+      body: requestBody,
+    });
+
+    if (!response.data?.data) {
+      return null;
+    }
+
+    const tokenData: TokenData = {
+      accessToken: response.data.data.access_token,
+      refreshToken: response.data.data.refresh_token,
+      expiresAt: Date.now() + response.data.data.expires_in * 1000,
+    };
+
+    await saveTokens(tokenData);
+    return tokenData;
+  } catch (error) {
+    console.error('Failed to refresh token:', error);
+    return null;
+  }
+}
+
+/**
+ * Ensure valid token - check expiration and refresh if needed
+ */
+async function ensureValidToken(): Promise<void> {
+  const expired = await isTokenExpired();
+
+  if (expired) {
+    const tokens = await refreshAccessToken();
+    
+    if (!tokens) {
+      throw new Error('Failed to refresh token');
+    }
+  }
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
