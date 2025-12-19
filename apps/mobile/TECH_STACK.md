@@ -134,6 +134,34 @@ if (!result.canceled) {
 }
 ```
 
+#### expo-camera（相機預覽 + 自訂 overlay，引導框 POC）
+
+**用途:** 自建相機畫面（Camera Preview），支援在拍照畫面上疊加「框線/角標/提示文字」等引導 UI。
+
+**為什麼需要它（US2 拍照引導框）**
+
+- `expo-image-picker` 的 `launchCameraAsync()` 走系統相機 UI，無法在「拍照當下」自訂疊加框線與提示。
+- 若需求是「相機畫面出現框，使用者把卡片對齊框再拍照」，需使用 `expo-camera` 的 `CameraView` + React Native overlay（絕對定位）。
+
+**POC 建議（固定提示 + 依框裁切，不做自動偵測）**
+
+1. `CameraView` 全螢幕預覽
+2. 用 `position: 'absolute'` 疊一個半透明 overlay，包含：框線、四角標記、提示文案（固定）
+3. 按快門呼叫 `takePictureAsync()` 取得照片（uri + width/height）
+4. 依框線區域裁切：用 `expo-image-manipulator` crop 出卡片圖
+
+**關鍵技術點：座標映射（一定要寫清楚避免裁切歪）**
+
+- 框線座標屬於「preview view 座標系」；照片裁切需要「照片像素座標系」。
+- 建議將框線區域用相對比例保存（x/y/width/height 皆為 0..1，相對於 preview 內容區），再換算：
+  - `cropX = x * photoWidth`
+  - `cropY = y * photoHeight`
+  - `cropW = width * photoWidth`
+  - `cropH = height * photoHeight`
+- **避免映射偏移**：盡量讓 preview 顯示比例與拍照輸出比例一致（例如固定 4:3 或 16:9），並避免 preview 使用 cover 造成畫面裁切；若 unavoidable，需要把 cover 的裁切偏移量納入換算。
+
+> 目標是先做出「能引導對齊、裁切大致準」的 POC；後續若要做到自動偵測卡片邊緣/透視矯正，會需要更進階的 CV（例如 document scanner / VisionCamera + frame processor）。
+
 #### expo-image-manipulator (v14.0.8)
 
 **用途:** 圖片處理與壓縮  

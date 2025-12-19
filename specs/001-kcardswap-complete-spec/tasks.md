@@ -340,6 +340,10 @@
   - 使用者取消選取/拍照不視為錯誤（不噴錯、不寫入狀態）
   - 需取得實際檔案大小（bytes）做前置驗證；若壓縮後仍 >10MB，需再降解析度/品質直到 ≤10MB 或明確提示「檔案過大」並中止
   - 輸出格式限制為 JPEG/PNG（與後端限制一致），並在 UI 顯示不支援格式的提示
+  - （POC/引導框）若需要「拍照時相機畫面顯示框線 + 固定提示文案」，不要使用 `expo-image-picker` 的內建相機 UI（無法自訂 overlay）。需改用 `expo-camera` 自建 CameraView，並以絕對定位疊加 overlay（框線/角標/提示文字）。
+  - （POC/依框裁切）若要「依框線區域裁切成卡片圖」，需處理座標映射：框線是在 preview(View) 座標；拍照結果是照片像素座標。建議以相對比例保存框線區域（x/y/width/height 皆為 0..1），再換算為照片像素後用 `expo-image-manipulator` crop。
+  - （避免映射歪斜）盡量讓 preview aspect ratio 與拍照輸出比例一致；若 preview 使用 cover/縮放，需把 letterbox/crop 的偏移納入換算，否則裁切會偏移。
+  - 參考：apps/mobile/TECH_STACK.md 的「expo-camera（相機預覽 + 自訂 overlay，引導框 POC）」段落（含 POC 步驟與座標映射注意事項）
 - [ ] M202 [P] [US2] 取得上傳 Signed URL：apps/mobile/src/features/cards/api（呼叫 POST /cards/upload-url；Contract: specs/001-kcardswap-complete-spec/contracts/cards/upload_url.json（需新增））
   - 回應需包含：`upload_url`、`method`（PUT/POST）、`required_headers`（至少 Content-Type；由後端決定）、以及可對應列表的 `image_url`/object key（或等價欄位）
   - 需明確規範 Signed URL 的有效期限（或 TTL 欄位），過期時前端需重新走 M202
