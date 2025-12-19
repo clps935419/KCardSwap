@@ -1,12 +1,14 @@
 import { ScrollView, Alert } from 'react-native';
 import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '@/src/shared/state/authStore';
 import {
-  getMyProfile,
-  updateMyProfile,
+  getMyProfileOptions,
+  getMyProfileQueryKey,
+  updateMyProfileMutation,
   validateNickname,
   validateBio,
-  Profile,
+  type Profile,
 } from '@/src/features/profile/api/profileApi';
 import {
   Box,
@@ -21,11 +23,29 @@ import {
 } from '@/src/shared/ui/components';
 
 export default function ProfileScreen() {
+  const queryClient = useQueryClient();
   const { user, logout } = useAuthStore();
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  
+  // Use TanStack Query for fetching profile
+  const { data: profileData, isLoading, error } = useQuery(getMyProfileOptions());
+  const profile = profileData?.data;
+  
+  // Use TanStack Query mutation for updating profile
+  const updateProfile = useMutation({
+    ...updateMyProfileMutation(),
+    onSuccess: () => {
+      // Invalidate and refetch profile data
+      queryClient.invalidateQueries({ queryKey: getMyProfileQueryKey() });
+      setIsEditing(false);
+      Alert.alert('Success', 'Profile updated successfully!');
+    },
+    onError: (error: any) => {
+      console.error('Failed to update profile:', error);
+      Alert.alert('Error', error.message || 'Failed to update profile');
+    },
+  });
+
   const [isEditing, setIsEditing] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
 
   // Form fields
   const [nickname, setNickname] = useState('');
@@ -34,30 +54,16 @@ export default function ProfileScreen() {
   const [showOnline, setShowOnline] = useState(true);
   const [allowStrangerChat, setAllowStrangerChat] = useState(true);
 
-  // Load profile on mount
+  // Initialize form fields when profile loads
   useEffect(() => {
-    loadProfile();
-  }, []);
-
-  const loadProfile = async () => {
-    try {
-      setIsLoading(true);
-      const data = await getMyProfile();
-      setProfile(data);
-      
-      // Initialize form fields
-      setNickname(data.nickname || '');
-      setBio(data.bio || '');
-      setNearbyVisible(data.privacy_flags.nearby_visible);
-      setShowOnline(data.privacy_flags.show_online);
-      setAllowStrangerChat(data.privacy_flags.allow_stranger_chat);
-    } catch (error: any) {
-      console.error('Failed to load profile:', error);
-      Alert.alert('Error', error.message || 'Failed to load profile');
-    } finally {
-      setIsLoading(false);
+    if (profile) {
+      setNickname(profile.nickname || '');
+      setBio(profile.bio || '');
+      setNearbyVisible(profile.privacy_flags.nearby_visible);
+      setShowOnline(profile.privacy_flags.show_online);
+      setAllowStrangerChat(profile.privacy_flags.allow_stranger_chat);
     }
-  };
+  }, [profile]);
 
   const handleSave = async () => {
     try {
@@ -74,27 +80,20 @@ export default function ProfileScreen() {
         return;
       }
 
-      setIsSaving(true);
-
-      // Update profile
-      const updated = await updateMyProfile({
-        nickname: nickname.trim(),
-        bio: bio.trim() || undefined,
-        privacy_flags: {
-          nearby_visible: nearbyVisible,
-          show_online: showOnline,
-          allow_stranger_chat: allowStrangerChat,
+      // Update profile using mutation
+      await updateProfile.mutateAsync({
+        body: {
+          nickname: nickname.trim(),
+          bio: bio.trim() || undefined,
+          privacy_flags: {
+            nearby_visible: nearbyVisible,
+            show_online: showOnline,
+            allow_stranger_chat: allowStrangerChat,
+          },
         },
       });
-
-      setProfile(updated);
-      setIsEditing(false);
-      Alert.alert('Success', 'Profile updated successfully!');
-    } catch (error: any) {
-      console.error('Failed to update profile:', error);
-      Alert.alert('Error', error.message || 'Failed to update profile');
-    } finally {
-      setIsSaving(false);
+    } catch (error) {
+      // Error handling is done in mutation onError
     }
   };
 
@@ -127,11 +126,26 @@ export default function ProfileScreen() {
     );
   };
 
+  // Show loading spinner
   if (isLoading) {
     return (
       <Box className="flex-1 bg-white items-center justify-center">
         <Spinner size="large" />
         <Text className="mt-4 text-gray-600">Loading profile...</Text>
+      </Box>
+    );
+  }
+
+  // Show error message
+  if (error) {
+    return (
+      <Box className="flex-1 bg-white items-center justify-center p-4">
+        <Text className="text-red-500 text-center mb-4">
+          Failed to load profile
+        </Text>
+        <Button onPress={() => queryClient.invalidateQueries({ queryKey: getMyProfileQueryKey() })}>
+          <ButtonText>Retry</ButtonText>
+        </Button>
       </Box>
     );
   }
@@ -233,7 +247,7 @@ export default function ProfileScreen() {
           <Box className="flex-row gap-3 mb-4">
             <Button
               onPress={handleCancel}
-              isDisabled={isSaving}
+              isDisabled={updateProfile.isPending}
               variant="outline"
               className="flex-1"
             >
@@ -242,11 +256,11 @@ export default function ProfileScreen() {
 
             <Button
               onPress={handleSave}
-              isDisabled={isSaving}
+              isDisabled={updateProfile.isPending}
               variant="solid"
               className="flex-1 bg-blue-500"
             >
-              {isSaving ? (
+              {updateProfile.isPending ? (
                 <Spinner color="white" size="small" />
               ) : (
                 <ButtonText>Save</ButtonText>

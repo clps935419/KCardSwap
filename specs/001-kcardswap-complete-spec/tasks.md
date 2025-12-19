@@ -129,8 +129,8 @@
   - `apps/mobile/OPENAPI_SDK_GUIDE.md`：改成 options/mutations 用法（非 hooks），並更新「generated 可 commit、禁手改」規則
   - `apps/mobile/TECH_STACK.md`：Signed URL 直傳例外與錯誤分流規則更精準
 - [x] M022 [P] [TOOLING] 調整 `apps/mobile/package.json` 的 `sdk:clean` 為跨平台（Windows 可用，不依賴 `rm -rf`）
-- [ ] M023 [P] [REFACTOR] 全面移除 Mobile 對 legacy client 的依賴：搜尋並改寫所有 `@/src/shared/api/client` 的 import，改用 `@/src/shared/api/sdk` 的 options/mutations
-- [ ] M024 [P] [GUARDRAIL] 加入防呆規則：
+- [x] M023 [P] [REFACTOR] 全面移除 Mobile 對 legacy client 的依賴：搜尋並改寫所有 `@/src/shared/api/client` 的 import，改用 `@/src/shared/api/sdk` 的 options/mutations
+- [x] M024 [P] [GUARDRAIL] 加入防呆規則：
   - ESLint 規則或專案約定，禁止 import `@/src/shared/api/client`
   - README/TECH_STACK 明確列出「禁止使用的 import」與替代寫法
 

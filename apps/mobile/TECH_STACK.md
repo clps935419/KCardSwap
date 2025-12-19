@@ -200,14 +200,17 @@ if (fileSize > 10 * 1024 * 1024) {
 
 1. 選擇圖片（拍照/相簿）
 2. 本機壓縮/轉檔（JPEG/PNG，≤10MB）
-3. 呼叫 `POST /cards/upload-url` 取得：`upload_url` + `method` + `required_headers` + `image_url`（或等價欄位）
-4. 依回應指定的 `method` 與 `required_headers`，直接上傳到 `upload_url`
-5. 上傳成功後刷新「我的卡冊」列表（`GET /cards/me`）
+3. 呼叫 `POST /cards/upload-url` 取得：`upload_url` + `method` + `required_headers` + `image_url`（使用 hey-api 的 TanStack Query mutation）
+4. 依回應指定的 `method` 與 `required_headers`，使用獨立 `fetch()` 直接上傳到 `upload_url`
+5. 上傳成功後刷新「我的卡冊」列表（`GET /cards/me`，使用 TanStack Query）
 
 **重要注意:**
 
-- **取得 Signed URL**（`POST /cards/upload-url`）仍應走 hey-api 生成的 SDK（可享有 token / refresh / 型別安全）。
-- **直傳雲端的上傳請求**（對 `upload_url` 做 PUT/POST）不要走 SDK 的 interceptors / auth header：請用獨立的 `fetch()`（或等價 HTTP client），並且**完全依照後端回傳的 `method` 與 `required_headers`** 送出。
+- **取得 Signed URL**（`POST /cards/upload-url`）**必須**走 hey-api 生成的 TanStack Query mutation（可享有 token / refresh / 型別安全）
+- **直傳雲端的上傳請求**（對 `upload_url` 做 PUT/POST）**不可**走 SDK：
+  - 使用獨立的 `fetch()`（或等價 HTTP client）
+  - **完全依照後端回傳的 `method` 與 `required_headers`** 送出
+  - 不可自動注入 Authorization 或其他非必要 header
 - 上傳錯誤需分流處理：
   - 後端 API 錯誤（例如 422 配額/檔案過大）→ 走既有 `errorMapper`
   - Signed URL 上傳錯誤（例如 403/過期、網路中斷、timeout、5xx）→ 以 status + 可重試條件顯示對應訊息
@@ -625,9 +628,14 @@ client.interceptors.response.use(
 - `NETWORK_ERROR` - 網路錯誤
 - `TIMEOUT_ERROR` - 請求超時
 
-### OpenAPI Codegen（hey-api / Axios client）
+### OpenAPI Codegen（hey-api / TanStack Query SDK）
 
-**目的：** 由後端 OpenAPI 產生型別安全的 API client，並可額外產生 TanStack Query 的 query/mutation options。
+**目的：** 由後端 OpenAPI 產生型別安全的 API client + TanStack Query options/mutations。
+
+**唯一允許的 API 呼叫方式：**
+- ✅ 使用 hey-api 生成的 **TanStack Query options/mutations**（`getXxxQueryOptions()` / `useXxxMutation()`）
+- ❌ **禁止**直接呼叫 SDK 函式（如 `getMyProfile()`）
+- ❌ **禁止**使用舊的 `@/src/shared/api/client`（legacy，已廢除）
 
 **策略：** 使用 repo 內的 OpenAPI snapshot（策略 B），以便在雲端 agent / CI 不依賴 `localhost` 或內網即可產出 SDK。
 
@@ -635,7 +643,8 @@ client.interceptors.response.use(
 
 後端 OpenAPI 的 endpoint paths 已包含 `/api/v1`，因此生成 client 的 `baseUrl` 應使用 host-only（例如 `http://localhost:8080`），避免 `/api/v1/api/v1`。
 
-OpenAPI snapshot 文件：`/openapi/README.md`
+OpenAPI snapshot 文件：`/openapi/README.md`  
+SDK 使用指南：`apps/mobile/OPENAPI_SDK_GUIDE.md`
 
 ### US2：Signed URL 上傳的錯誤處理（Non-API Request）
 
