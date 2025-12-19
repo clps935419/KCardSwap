@@ -434,34 +434,34 @@
 
 ### Application Layer (Social Module - Nearby)
 
-- [ ] T095 [P] [US3] 建立 SearchNearbyCardsUseCase：apps/backend/app/modules/social/application/use_cases/search_nearby_cards_use_case.py（計算距離 → 過濾隱身 → 排序）
-- [ ] T096 [P] [US3] 建立 UpdateUserLocationUseCase：apps/backend/app/modules/social/application/use_cases/update_user_location_use_case.py（記錄最近位置至 profiles.last_lat/last_lng）
+- [X] T095 [P] [US3] 建立 SearchNearbyCardsUseCase：apps/backend/app/modules/social/application/use_cases/search_nearby_cards_use_case.py（計算距離 → 過濾隱身 → 排序）
+- [X] T096 [P] [US3] 建立 UpdateUserLocationUseCase：apps/backend/app/modules/social/application/use_cases/update_user_location_use_case.py（記錄最近位置至 profiles.last_lat/last_lng）
 
 ### Infrastructure Layer (Social Module - Nearby)
 
-- [ ] T097 [P] [US3] 擴展 CardRepositoryImpl：新增 find_nearby_cards 方法（使用 PostGIS 或 Haversine 公式計算距離）
-- [ ] T098 [P] [US3] 實作 Search Quota Service：apps/backend/app/modules/social/infrastructure/services/search_quota_service.py（Redis 或 DB 追蹤每日搜尋次數）
+- [X] T097 [P] [US3] 擴展 CardRepositoryImpl：新增 find_nearby_cards 方法（使用 PostGIS 或 Haversine 公式計算距離）
+- [X] T098 [P] [US3] 實作 Search Quota Service：apps/backend/app/modules/social/infrastructure/services/search_quota_service.py（Redis 或 DB 追蹤每日搜尋次數）
 
 ### Presentation Layer (Social Module - Nearby)
 
-- [ ] T099 [P] [US3] 定義 Nearby Schema：apps/backend/app/modules/social/presentation/schemas/nearby_schemas.py（SearchNearbyRequest, NearbyCardResponse）
-- [ ] T100 [US3] 建立 Nearby Router：apps/backend/app/modules/social/presentation/routers/nearby_router.py（POST /nearby/search）
+- [X] T099 [P] [US3] 定義 Nearby Schema：apps/backend/app/modules/social/presentation/schemas/nearby_schemas.py（SearchNearbyRequest, NearbyCardResponse）
+- [X] T100 [US3] 建立 Nearby Router：apps/backend/app/modules/social/presentation/routers/nearby_router.py（POST /nearby/search）
 
 ### Integration
 
-- [ ] T101 [US3] 註冊 Nearby 功能到 DI Container：apps/backend/app/container.py
-- [ ] T102 [US3] 註冊 Nearby Router 到 main.py：apps/backend/app/main.py（包含 /nearby 路由）
+- [X] T101 [US3] 註冊 Nearby 功能到 DI Container：apps/backend/app/container.py
+- [X] T102 [US3] 註冊 Nearby Router 到 main.py：apps/backend/app/main.py（包含 /nearby 路由）
 
 ### Testing
 
-- [ ] T103 [P] [US3] 撰寫 Nearby Integration Tests：tests/integration/contracts/test_nearby_contracts.py（對齊 contracts/nearby/search.json，改以整合測試覆蓋）
-- [ ] T104 [P] [US3] 撰寫 SearchNearbyCardsUseCase Unit Tests：tests/unit/modules/social/application/test_search_nearby_use_case.py（Mock 距離計算與排序邏輯）
-- [ ] T105 [US3] 撰寫 Nearby Search Integration Tests：tests/integration/modules/social/test_nearby_search_flow.py（完整搜尋流程 E2E，包含限制觸發）
+- [X] T103 [P] [US3] 撰寫 Nearby Integration Tests：tests/integration/contracts/test_nearby_contracts.py（對齊 contracts/nearby/search.json，改以整合測試覆蓋）
+- [X] T104 [P] [US3] 撰寫 SearchNearbyCardsUseCase Unit Tests：tests/unit/modules/social/application/test_search_nearby_use_case.py（Mock 距離計算與排序邏輯）
+- [X] T105 [US3] 撰寫 Nearby Search Integration Tests：tests/integration/modules/social/test_nearby_search_flow.py（完整搜尋流程 E2E，包含限制觸發）
 
 ### Configuration
 
 - [ ] T106 [P] [US3] 配置 Kong Rate Limiting：gateway/kong/kong.yaml（針對 /nearby/search 設定不同 rate-limit 標籤：free=5/day, premium=unlimited）
-- [ ] T107 [P] [US3] 更新環境變數：apps/backend/app/config.py（DAILY_SEARCH_LIMIT_FREE=5, SEARCH_RADIUS_KM=10）
+- [X] T107 [P] [US3] 更新環境變數：apps/backend/app/config.py（DAILY_SEARCH_LIMIT_FREE=5, SEARCH_RADIUS_KM=10）
 
 ### Verification
 
