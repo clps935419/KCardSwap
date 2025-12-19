@@ -9,7 +9,7 @@
 ## 0. 里程碑與時間線（POC → Beta）
 - M0（Week 0）：專案初始化、基礎架構就緒（Kong、DB、GCS、CI）。
 - M1（Week 1-2）：AUTH + PROFILE 完成（Google OAuth、JWT、個人檔案）。
-- M2（Week 3-4）：CARD 上傳與管理完成（含上限檢查與縮圖）。
+- M2（Week 3-4）：CARD 上傳與管理完成（含上限檢查與 Mobile-only 縮圖快取）。
 - M3（Week 5）：NEARBY 附近搜尋（距離計算、隱私、排序、次數限制）。
 - M3.5（Week 5-6）：POSTS 城市/行政區佈告欄（發文、看板列表、興趣請求、接受後導流聊天、到期/關閉）。
 - M4（Week 6-7）：SOCIAL + CHAT（好友、評分、檢舉、輪詢 + 推播）。
@@ -94,7 +94,7 @@
 	- 路由前綴：`/api/v1/*` → upstream `apps/backend`。
 - Nginx：作為前端資源與反向代理（如需）。
 - PostgreSQL：部署與連線管理，使用 `pgcrypto`（如需 UUID/加密）。
-- GCS：Bucket 結構：`kcardswap/cards/{user_id}/{card_id}.jpg`、`thumbs/{card_id}.jpg`。
+- GCS：Bucket 結構：`kcardswap/cards/{user_id}/{uuid}.jpg`（僅原圖；不建立 thumbs/；縮圖為 mobile 本機衍生快取）。
 - Secrets 管理：本地 `.env` + CI/Prod 使用 Secret Manager。
 - CI/CD：GitHub Actions（lint/test/build，PR 檢查，main 部署）或 GitLab CI。
 
@@ -133,15 +133,16 @@
 	- `GET /api/v1/cards?owner=me&filters=...`：查詢+分頁。
 	- `PATCH /api/v1/cards/{id}` / `DELETE /api/v1/cards/{id}`。
 - 上限與政策：
-	- 免費：每日新增 3、單張 ≤2MB、總容量 ≤100MB。
-	- 付費：每日新增不限（受總容量 ≤1GB）、單張 ≤5MB。
+	- 免費：每日新增 2、單張 ≤10MB、總容量 ≤1GB。
+	- 付費：每日新增不限（其他限制由應用層配置與驗證；以環境變數為準）。
 	- 失敗訊息：明確指出是「當日數量」或「總容量」超限。
 - 資料表：
-	- `cards(id, owner_id, idol, group, album, version, rarity, status, image_url, thumb_url, size_bytes, created_at, updated_at)`
+	- `cards(id, owner_id, idol, group, album, version, rarity, status, image_url, size_bytes, created_at, updated_at)`
 	- `card_upload_stats(user_id, date, created_count)`
-- 縮圖服務：後端任務或 Cloud Function 產生 `200x200`。
+- 縮圖策略：Mobile 端本機產生 `200x200` WebP 並快取（後端不產生/不儲存/不回傳縮圖）。
 - 測試：
 	- 上傳前大小驗證；達上限時的錯誤碼（`422_LIMIT_EXCEEDED`）。
+	- 第三方整合測試分層：Unit/Integration 不打真實 GCS；僅 Staging/Nightly 以環境變數啟用少量真實 GCS Smoke（CORS/IAM/PUT 可用性）。
 
 ## 4. 附近搜尋（NEARBY）
 - API 規格：
@@ -248,7 +249,7 @@ Phase -1 Gates（依憲法）
 	- [ ] Profile CRUD + 隱私設定
 - CARD
 	- [ ] Signed URL 服務 + 檔案型別/大小驗證
-	- [ ] 卡片 CRUD + 縮圖產生管線
+	- [ ] 卡片 CRUD（縮圖為 Mobile 端本機產生與快取；後端不產生/不儲存/不回傳縮圖）
 	- [ ] 上限檢查（每日數量/總容量/單張大小）
 - NEARBY
 	- [ ] 距離計算與排序、隱身過濾

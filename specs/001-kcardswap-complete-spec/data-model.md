@@ -173,7 +173,6 @@ privacy_flags: {
 | rarity | VARCHAR(50) | NULLABLE | 稀有度 |
 | status | VARCHAR(50) | NOT NULL, DEFAULT 'available' | 狀態 |
 | image_url | TEXT | NULLABLE | 圖片 URL |
-| thumb_url | TEXT | NULLABLE | 縮圖 URL |
 | size_bytes | INTEGER | NULLABLE | 圖片大小（bytes）|
 | created_at | TIMESTAMP WITH TIME ZONE | DEFAULT CURRENT_TIMESTAMP | 建立時間 |
 | updated_at | TIMESTAMP WITH TIME ZONE | DEFAULT CURRENT_TIMESTAMP | 更新時間 |
@@ -188,8 +187,8 @@ privacy_flags: {
 **不變條件**:
 - rarity ∈ {common, rare, epic, legendary} (應用層驗證)
 - status ∈ {available, trading, traded} (應用層驗證)
-- size_bytes ≤ 5MB (5242880 bytes) for premium users
-- size_bytes ≤ 2MB (2097152 bytes) for free users
+- **縮圖為 Mobile 端本機衍生快取**：後端不產生/不儲存/不回傳任何 `thumb_*` / `thumbnail_*` 欄位
+- size_bytes 與上傳限制由應用層依環境變數驗證（參見 `apps/backend/app/config.py`：`MAX_FILE_SIZE_MB`, `DAILY_UPLOAD_LIMIT_FREE`, `TOTAL_STORAGE_GB_FREE`）
 
 **Trigger**:
 - `update_cards_updated_at`: 自動更新 updated_at

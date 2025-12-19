@@ -28,7 +28,7 @@
 - [X] T002 配置 Poetry 環境：建立 apps/backend/pyproject.toml 並定義核心依賴（FastAPI, SQLAlchemy, Alembic, pytest）
 - [X] T003 [P] 建立 Docker Compose 配置：apps/backend/docker-compose.yml（Kong Gateway + PostgreSQL + Backend）
 - [X] T004 [P] 配置 Kong Gateway：gateway/kong/kong.yaml（路由前綴 /api/v1、JWT 插件、Rate Limiting）
-- [ ] T005 [P] 建立 GCS Bucket 結構規劃文件：infra/gcs/README.md（定義 cards/ 與 thumbs/ 路徑）
+- [ ] T005 [P] 建立 GCS Bucket 與測試分層規劃文件：infra/gcs/README.md（僅定義 cards/；禁止 thumbs/；並明確規範 mock→真實 GCS 切換：Unit/Integration 不打真實 GCS，僅 Staging/Nightly 以環境變數啟用少量 Smoke 測試）
 - [X] T006 [P] 配置 CI/CD：.github/workflows/backend-ci.yml（lint, test, build 檢查）
 - [X] T007 建立開發環境文件：dev-setup.md（本地環境設定指引）
 - [X] T008 建立 Makefile：提供 dev, test, lint, seed 指令
@@ -267,11 +267,11 @@
 - ✓ 系統正確驗證檔案類型（JPEG/PNG）和大小限制
 - ✓ 系統正確追蹤每日上傳次數和總容量
 - ✓ 達到限制時回傳正確錯誤訊息（422_LIMIT_EXCEEDED）
-- ✓ 縮圖（200x200）自動產生
+- ✓ Mobile 端本機產生 200x200 WebP 縮圖並快取（不回傳/不儲存/不上傳縮圖；列表優先使用本機縮圖，必要時回退載入原圖）
 
 ### Domain Layer (Social Module - Cards)
 
-- [ ] T066 [P] [US2] 建立 Card Entity：apps/backend/app/modules/social/domain/entities/card.py（id, owner_id, image_url, thumb_url, card_name, card_game, rarity, created_at）
+- [ ] T066 [P] [US2] 建立 Card Entity：apps/backend/app/modules/social/domain/entities/card.py（id, owner_id, idol, idol_group, album, version, rarity, status, image_url, size_bytes, created_at）
 - [ ] T067 [P] [US2] 建立 UploadQuota Value Object：apps/backend/app/modules/social/domain/value_objects/upload_quota.py（daily_limit, max_file_size, total_storage）
 - [ ] T068 [P] [US2] 定義 CardRepository Interface：apps/backend/app/modules/social/domain/repositories/card_repository.py
 - [ ] T069 [P] [US2] 定義 Card Domain Service：apps/backend/app/modules/social/domain/services/card_validation_service.py（檔案類型/大小驗證邏輯）
@@ -288,7 +288,6 @@
 - [ ] T074 [P] [US2] 實作 SQLAlchemy Card Model：apps/backend/app/modules/social/infrastructure/database/models/card_model.py
 - [ ] T075 [P] [US2] 實作 CardRepositoryImpl：apps/backend/app/modules/social/infrastructure/repositories/card_repository_impl.py
 - [ ] T076 [P] [US2] 擴展 GCS Storage Service：apps/backend/app/shared/infrastructure/external/gcs_storage_service.py（新增 generate_upload_signed_url 方法，路徑為 cards/{user_id}/{uuid}.jpg）
-- [ ] T077 [P] [US2] 實作 Thumbnail Generation Service：apps/backend/app/modules/social/infrastructure/services/thumbnail_service.py（使用 Pillow 或 Cloud Function 產生 200x200 縮圖，存至 thumbs/{user_id}/{uuid}.jpg）
 - [ ] T078 [P] [US2] 實作 Quota Tracking Service：apps/backend/app/modules/social/infrastructure/services/quota_tracking_service.py（Redis 或 DB 追蹤每日上傳次數）
 
 ### Presentation Layer (Social Module - Cards)
@@ -323,13 +322,14 @@
 
 - [ ] T092 [US2] 執行所有 US2 測試：確保 Unit Tests + Integration Tests 全數通過（已移除獨立 contract 測試流程）
 - [ ] T093 [US2] 手動驗證 US2 驗收標準：測試上傳 2 張後觸發 422_LIMIT_EXCEEDED
-- [ ] T094 [US2] 驗證縮圖產生：確認 GCS 中 thumbs/ 路徑下有對應的 200x200 圖片
+- [ ] T094 [US2] 驗證縮圖行為（Mobile-only）：確認 App 本機產生 200x200 WebP 縮圖並快取；卡冊列表優先顯示本機縮圖（無縮圖時回退載入原圖）
 
 ### Mobile (Expo)
 
 - [ ] M201 [P] [US2] 圖片選取與壓縮：apps/mobile/src/features/cards（expo-image-picker + expo-image-manipulator；控制大小 ≤10MB）
 - [ ] M202 [P] [US2] 取得上傳 Signed URL：apps/mobile/src/features/cards/api（呼叫 POST /cards/upload-url；Contract: specs/001-kcardswap-complete-spec/contracts/cards/create.json）
 - [ ] M203 [P] [US2] 直接上傳到 Signed URL：apps/mobile/src/features/cards/services/uploadToSignedUrl.ts（PUT/POST 上傳、錯誤處理與重試）
+- [ ] M203A [P] [US2] 產生 200x200 WebP 縮圖並本機快取：apps/mobile/src/features/cards（縮圖僅供列表快速載入，不上傳、不進後端契約）
 - [ ] M204 [P] [US2] 我的卡冊列表：apps/mobile/src/features/cards/screens/MyCardsScreen.tsx（GET /cards/me）
 - [ ] M205 [P] [US2] 刪除卡片：apps/mobile/src/features/cards/api（DELETE /cards/{id}）
 - [ ] M206 [US2] 手動驗證上傳限制：免費用戶上傳 2 張後提示 422_LIMIT_EXCEEDED
