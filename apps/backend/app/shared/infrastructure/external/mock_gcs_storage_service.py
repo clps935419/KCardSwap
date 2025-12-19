@@ -4,8 +4,8 @@ This module provides a mock implementation of GCS for local development
 and testing environments, avoiding the need to connect to real GCS.
 """
 
-from typing import Optional
 from datetime import datetime
+from typing import Optional
 
 
 class MockGCSStorageService:
@@ -16,7 +16,7 @@ class MockGCSStorageService:
     - Local development (when USE_MOCK_GCS=true)
     - Unit tests (always mocked)
     - Integration tests (always mocked)
-    
+
     Real GCS is only used for Staging/Nightly smoke tests when RUN_GCS_SMOKE=1.
     """
 
@@ -58,14 +58,14 @@ class MockGCSStorageService:
         # Validate blob_name follows the correct pattern
         if not blob_name.startswith("cards/"):
             raise ValueError(f"Invalid blob path: {blob_name}. Must start with 'cards/'")
-        
+
         if "thumbs" in blob_name.lower():
             raise ValueError(f"Invalid blob path: {blob_name}. 'thumbs/' is not allowed")
 
         # Return a mock URL that looks realistic but won't actually work
         base_url = f"https://storage.googleapis.com/{self._bucket_name}/{blob_name}"
         mock_signature = "X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=mock&X-Goog-Date=mock&X-Goog-Expires={expiration_minutes}00&X-Goog-SignedHeaders=content-type%3Bhost&X-Goog-Signature=mock_signature"
-        
+
         return f"{base_url}?{mock_signature}"
 
     def generate_download_signed_url(
@@ -86,7 +86,7 @@ class MockGCSStorageService:
 
         base_url = f"https://storage.googleapis.com/{self._bucket_name}/{blob_name}"
         mock_signature = f"X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=mock&X-Goog-Date=mock&X-Goog-Expires={expiration_minutes}00&X-Goog-SignedHeaders=host&X-Goog-Signature=mock_signature"
-        
+
         return f"{base_url}?{mock_signature}"
 
     def delete_blob(self, blob_name: str) -> bool:

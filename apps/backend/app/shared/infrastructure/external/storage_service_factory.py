@@ -4,16 +4,20 @@ This module provides a factory to get the appropriate storage service
 (real or mock) based on the application configuration.
 """
 
-from typing import Union
+from typing import TYPE_CHECKING, Union
+
+if TYPE_CHECKING:
+    from app.shared.infrastructure.external.gcs_storage_service import (
+        GCSStorageService,
+    )
 
 from app.config import settings
-from app.shared.infrastructure.external.gcs_storage_service import GCSStorageService
 from app.shared.infrastructure.external.mock_gcs_storage_service import (
     MockGCSStorageService,
 )
 
 
-def get_storage_service() -> Union[GCSStorageService, MockGCSStorageService]:
+def get_storage_service() -> Union["GCSStorageService", MockGCSStorageService]:
     """Get the appropriate storage service based on configuration.
 
     Returns:
@@ -30,6 +34,11 @@ def get_storage_service() -> Union[GCSStorageService, MockGCSStorageService]:
             credentials_path=settings.GCS_CREDENTIALS_PATH,
         )
     else:
+        # Import only when needed to avoid dependency issues in development
+        from app.shared.infrastructure.external.gcs_storage_service import (
+            GCSStorageService,
+        )
+
         return GCSStorageService(
             bucket_name=settings.GCS_BUCKET_NAME,
             credentials_path=settings.GCS_CREDENTIALS_PATH,

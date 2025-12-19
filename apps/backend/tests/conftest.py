@@ -7,18 +7,14 @@ This module provides fixtures for:
 - Database session management
 - GCS mock service for testing
 """
-import os
+from typing import AsyncGenerator
+
 import pytest
-from typing import AsyncGenerator, Generator
 
 # Uncomment when testcontainers-postgres is installed
 # from testcontainers.postgres import PostgresContainer
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
-from alembic.config import Config
-from alembic import command
-
-from app.shared.infrastructure.database.connection import Base
 from app.shared.infrastructure.external.mock_gcs_storage_service import (
     MockGCSStorageService,
 )
@@ -34,11 +30,11 @@ def pytest_configure(config):
 @pytest.fixture(scope="function")
 def mock_gcs_service():
     """Provide a fresh mock GCS service for each test.
-    
+
     This fixture should be used in unit and integration tests to avoid
     hitting real GCS. The mock service provides the same interface as
     the real GCS service but operates in-memory.
-    
+
     Returns:
         MockGCSStorageService: A fresh instance of the mock service
     """
@@ -50,7 +46,7 @@ def mock_gcs_service():
 def postgres_container():
     """
     Start a PostgreSQL container for testing.
-    
+
     To use this fixture, install testcontainers:
     poetry add --group dev testcontainers[postgres]
     """
@@ -59,14 +55,14 @@ def postgres_container():
     #     # Set environment variable for Alembic
     #     database_url = postgres.get_connection_url()
     #     os.environ["DATABASE_URL"] = database_url
-    #     
+    #
     #     # Run Alembic migrations
     #     alembic_cfg = Config("alembic.ini")
     #     alembic_cfg.set_main_option("sqlalchemy.url", database_url)
     #     command.upgrade(alembic_cfg, "head")
-    #     
+    #
     #     yield postgres
-    
+
     # Temporary: Skip testcontainers for now
     pytest.skip("Testcontainers not yet configured")
 
@@ -101,7 +97,7 @@ async def test_session_factory(test_engine) -> async_sessionmaker:
 async def db_session(test_session_factory) -> AsyncGenerator[AsyncSession, None]:
     """
     Provide a transactional database session for each test.
-    
+
     Each test gets a clean database state through transaction rollback.
     """
     async with test_session_factory() as session:
