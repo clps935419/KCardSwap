@@ -5,6 +5,7 @@ Tests complete upload flow end-to-end including quota limits
 Note: These tests use TestClient and mock the database and GCS.
 For full E2E tests with real database, use pytest with testcontainers (see conftest.py).
 """
+
 import pytest
 from fastapi.testclient import TestClient
 from unittest.mock import AsyncMock, Mock, patch
@@ -23,10 +24,10 @@ class TestCardUploadIntegration:
     def mock_auth_dependency(self):
         """Mock authentication to return a test user ID"""
         test_user_id = uuid4()
-        
+
         async def mock_get_current_user_id():
             return test_user_id
-        
+
         with patch(
             "app.modules.social.presentation.routers.cards_router.get_current_user_id",
             return_value=test_user_id,
@@ -81,7 +82,7 @@ class TestCardUploadIntegration:
     ):
         """
         Test successful upload URL generation (T087.1)
-        
+
         Scenario:
         - User has not uploaded any cards today
         - File size is within limits (5MB < 10MB limit)
@@ -120,7 +121,7 @@ class TestCardUploadIntegration:
     def test_post_upload_url_invalid_content_type(self, mock_auth_dependency):
         """
         Test upload URL request with invalid content type (T087.2)
-        
+
         Expected: 400 Bad Request
         """
         request_data = {
@@ -136,7 +137,7 @@ class TestCardUploadIntegration:
     def test_post_upload_url_file_too_large(self, mock_auth_dependency):
         """
         Test upload URL request with oversized file (T087.3)
-        
+
         Expected: 400 Bad Request
         """
         request_data = {
@@ -170,11 +171,11 @@ class TestCardUploadIntegration:
     ):
         """
         Test upload URL request when daily limit is exceeded (T087.4)
-        
+
         Scenario:
         - Free user has already uploaded 2 cards today (daily limit = 2)
         - Attempting to upload 3rd card
-        
+
         Expected: 422 Unprocessable Entity with LIMIT_EXCEEDED code
         """
         request_data = {
@@ -218,11 +219,11 @@ class TestCardUploadIntegration:
     ):
         """
         Test upload URL request when storage limit is exceeded (T087.5)
-        
+
         Scenario:
         - Free user has used 950MB of 1GB storage
         - Attempting to upload 100MB file (would exceed 1GB total)
-        
+
         Expected: 422 Unprocessable Entity with LIMIT_EXCEEDED code
         """
         request_data = {
@@ -246,14 +247,14 @@ class TestCardUploadIntegration:
     def test_get_my_cards(self, mock_auth_dependency):
         """
         Test retrieving user's cards (T087.6)
-        
+
         Expected: 200 OK with list of cards (may be empty)
         """
         response = client.get("/api/v1/cards/me")
 
         # Should succeed or fail with DB issue
         assert response.status_code in [200, 500]
-        
+
         if response.status_code == 200:
             data = response.json()
             assert "data" in data
@@ -262,7 +263,7 @@ class TestCardUploadIntegration:
     def test_get_my_cards_with_status_filter(self, mock_auth_dependency):
         """
         Test retrieving user's cards with status filter (T087.7)
-        
+
         Expected: 200 OK with filtered list
         """
         response = client.get("/api/v1/cards/me?status=available")
@@ -273,7 +274,7 @@ class TestCardUploadIntegration:
     def test_delete_card(self, mock_auth_dependency, mock_db_session):
         """
         Test deleting a card (T087.8)
-        
+
         Expected: 204 No Content or 404 Not Found
         """
         # Mock repository for delete operation
@@ -283,13 +284,13 @@ class TestCardUploadIntegration:
             repo_instance = Mock()
             repo_instance.find_by_id = AsyncMock(return_value=None)  # Card not found
             mock_repo_class.return_value = repo_instance
-            
+
             # Mock GCS service
             with patch(
                 "app.shared.infrastructure.external.storage_service_factory.get_storage_service"
             ) as mock_gcs:
                 mock_gcs.return_value = Mock()
-                
+
                 card_id = uuid4()
                 response = client.delete(f"/api/v1/cards/{card_id}")
 
@@ -301,7 +302,7 @@ class TestCardUploadIntegration:
     ):
         """
         Test checking quota status (T087.9)
-        
+
         Expected: 200 OK with quota information
         """
         response = client.get("/api/v1/cards/quota/status")
@@ -325,7 +326,7 @@ class TestCardUploadAuthorizationIntegration:
     def test_upload_url_requires_authentication(self):
         """
         Test that upload URL endpoint requires authentication (T087.10)
-        
+
         Expected: 401 Unauthorized
         """
         request_data = {
@@ -341,7 +342,7 @@ class TestCardUploadAuthorizationIntegration:
     def test_get_my_cards_requires_authentication(self):
         """
         Test that get cards endpoint requires authentication (T087.11)
-        
+
         Expected: 401 Unauthorized
         """
         response = client.get("/api/v1/cards/me")
@@ -352,7 +353,7 @@ class TestCardUploadAuthorizationIntegration:
     def test_delete_card_requires_authentication(self):
         """
         Test that delete endpoint requires authentication (T087.12)
-        
+
         Expected: 401 Unauthorized
         """
         card_id = uuid4()
@@ -369,24 +370,29 @@ class TestCardUploadContractCompliance:
     def mock_successful_upload(self):
         """Mock all dependencies for successful upload"""
         test_user_id = uuid4()
-        
-        with patch(
-            "app.modules.social.presentation.routers.cards_router.get_current_user_id",
-            return_value=test_user_id,
-        ), patch(
-            "app.modules.social.presentation.routers.cards_router.get_db_session"
-        ), patch(
-            "app.modules.social.infrastructure.repositories.card_repository_impl.CardRepositoryImpl"
-        ) as mock_repo_class, patch(
-            "app.shared.infrastructure.external.storage_service_factory.get_storage_service"
-        ) as mock_gcs:
+
+        with (
+            patch(
+                "app.modules.social.presentation.routers.cards_router.get_current_user_id",
+                return_value=test_user_id,
+            ),
+            patch(
+                "app.modules.social.presentation.routers.cards_router.get_db_session"
+            ),
+            patch(
+                "app.modules.social.infrastructure.repositories.card_repository_impl.CardRepositoryImpl"
+            ) as mock_repo_class,
+            patch(
+                "app.shared.infrastructure.external.storage_service_factory.get_storage_service"
+            ) as mock_gcs,
+        ):
             # Setup repository mock
             repo_instance = Mock()
             repo_instance.count_uploads_today = AsyncMock(return_value=0)
             repo_instance.get_total_storage_used = AsyncMock(return_value=0)
             repo_instance.save = AsyncMock(side_effect=lambda card: card)
             mock_repo_class.return_value = repo_instance
-            
+
             # Setup GCS mock
             gcs_service = Mock()
             gcs_service._bucket_name = "kcardswap-test"
@@ -394,13 +400,13 @@ class TestCardUploadContractCompliance:
                 return_value="https://storage.googleapis.com/upload"
             )
             mock_gcs.return_value = gcs_service
-            
+
             yield
 
     def test_upload_url_response_structure(self, mock_successful_upload):
         """
         Test that upload URL response matches contract (T087.13)
-        
+
         Spec: OpenAPI/Swagger (openapi/openapi.json)
         """
         request_data = {
@@ -413,11 +419,11 @@ class TestCardUploadContractCompliance:
         # Check response structure matches contract
         if response.status_code == 200:
             data = response.json()
-            
+
             # Verify standard envelope
             assert "data" in data
             assert "error" in data or data.get("error") is None
-            
+
             # Verify upload URL response fields
             upload_data = data["data"]
             assert "upload_url" in upload_data
@@ -426,7 +432,7 @@ class TestCardUploadContractCompliance:
             assert "image_url" in upload_data
             assert "expires_at" in upload_data
             assert "card_id" in upload_data
-            
+
             # Verify types
             assert isinstance(upload_data["upload_url"], str)
             assert isinstance(upload_data["method"], str)
