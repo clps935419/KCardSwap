@@ -213,13 +213,6 @@ When the backend API changes, update the snapshot:
 ```bash
 # From repo root
 make generate-openapi
-
-# Or from backend directory
-cd apps/backend
-python scripts/generate_openapi.py
-
-# Using Docker (if you don't have Python locally)
-make generate-openapi-docker
 ```
 
 **Advantages:**
@@ -228,27 +221,6 @@ make generate-openapi-docker
 - ✅ No environment variables or network setup needed
 - ✅ Extracts directly from code, guaranteed to match implementation
 - ✅ Can be automated in CI/CD pipeline
-
-### Method 2: Fetch from Running Backend
-
-If the backend is already running:
-
-```bash
-# Start the backend first
-cd apps/backend
-docker compose up -d
-
-# Wait for backend to be ready, then fetch OpenAPI
-curl -s http://localhost:8080/api/v1/openapi.json > ../../openapi/openapi.json
-
-# Regenerate SDK
-cd ../mobile
-npm run sdk:clean
-npm run sdk:generate
-
-# Verify types
-npm run type-check
-```
 
 ### Automated Update (CI/CD)
 
@@ -296,7 +268,6 @@ Generated from `openapi/openapi.json`:
 
 # 2. Generate new OpenAPI spec (MUST DO FIRST)
 make generate-openapi
-# or: make generate-openapi-docker
 
 # 3. Regenerate Mobile SDK (BEFORE editing frontend)
 cd apps/mobile

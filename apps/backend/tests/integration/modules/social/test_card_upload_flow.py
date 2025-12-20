@@ -363,7 +363,7 @@ class TestCardUploadAuthorizationIntegration:
 
 
 class TestCardUploadContractCompliance:
-    """Test that responses match API contract (specs/contracts/cards/)"""
+    """Test that responses match OpenAPI/Swagger (openapi/openapi.json)"""
 
     @pytest.fixture
     def mock_successful_upload(self):
@@ -401,7 +401,7 @@ class TestCardUploadContractCompliance:
         """
         Test that upload URL response matches contract (T087.13)
         
-        Contract: specs/001-kcardswap-complete-spec/contracts/cards/upload_url.json
+        Spec: OpenAPI/Swagger (openapi/openapi.json)
         """
         request_data = {
             "content_type": "image/jpeg",

@@ -1,4 +1,4 @@
-# OpenAPI Snapshot（策略 B）
+# OpenAPI Snapshot
 
 本目錄用來保存 **後端 OpenAPI 規格的 repo 內快照**，提供給：
 
@@ -17,7 +17,6 @@
 
 # 步驟 2：生成新的 OpenAPI 規格
 make generate-openapi
-# 或使用 Docker: make generate-openapi-docker
 
 # 步驟 3：重新生成前端 SDK（在修改前端前必須執行）
 cd apps/mobile
@@ -67,35 +66,6 @@ poetry install  # 首次執行需要安裝依賴
 poetry run python scripts/generate_openapi.py
 ```
 
-#### 選項 B：使用 Docker（最簡單，無需本機安裝任何工具）
-
-```bash
-# 在 repo 根目錄
-# 1. 確保後端容器正在運行
-docker compose up -d backend
-
-# 2. 在容器內執行生成腳本
-make generate-openapi-docker
-```
-
-#### 選項 C：直接使用 Python（需要手動安裝依賴）
-
-```bash
-# 進入 backend 目錄
-cd apps/backend
-
-# 安裝依賴（使用 pip）
-pip install fastapi pydantic sqlalchemy psycopg2-binary python-dotenv dependency-injector
-
-# 執行腳本
-python scripts/generate_openapi.py
-```
-
-**推薦順序**：
-1. **Docker 方法**（最簡單）- 如果您已經在使用 Docker
-2. **Poetry 方法**（最佳實踐）- 如果您在本機開發
-3. **直接 Python**（最後選擇）- 只在無法使用上述方法時
-
 **優點**：
 - ✅ 不需要啟動 database
 - ✅ 不需要啟動 Kong gateway
@@ -103,53 +73,9 @@ python scripts/generate_openapi.py
 - ✅ 直接從程式碼提取，保證與實作一致
 - ✅ 可在 CI/CD pipeline 中自動化
 
-### 方法 2：從運行中的後端取得
-
-如果後端已經在運行，可以直接從端點取得：
-
-#### 來源端點
-- Backend（直連）: http://localhost:8000/api/v1/openapi.json
-- Kong Proxy（與 App 路徑一致）: http://localhost:8080/api/v1/openapi.json
-
-> 建議以 Kong Proxy 取得，以更貼近 App 實際走的 gateway 路徑。
-
-#### macOS / Linux
-
-```bash
-curl -s http://localhost:8080/api/v1/openapi.json > openapi/openapi.json
-```
-
-#### Windows PowerShell
-
-```powershell
-Invoke-WebRequest http://localhost:8080/api/v1/openapi.json -OutFile openapi/openapi.json
-```
-
 ## 完整工作流程
 
 ### 當後端 API 有變更時：
-
-#### 使用 Docker 方法（推薦給 Windows 用戶）
-
-```bash
-# 1. 確保後端容器正在運行
-docker compose up -d backend
-
-# 2. 生成 OpenAPI snapshot
-make generate-openapi-docker
-
-# 3. 重新生成 Mobile SDK
-cd apps/mobile
-npm run sdk:clean
-npm run sdk:generate
-
-# 4. 驗證 TypeScript 型別
-npm run type-check
-
-# 5. 提交變更（只提交 openapi.json，不提交 generated/）
-git add ../../openapi/openapi.json
-git commit -m "chore: Update OpenAPI spec"
-```
 
 #### 使用 Poetry 方法（本機開發）
 
@@ -186,35 +112,12 @@ git commit -m "chore: Update OpenAPI spec"
 
 **解決方案（依優先順序）**：
 
-1. **使用 Docker 方法（推薦）**：
-   ```bash
-   docker compose up -d backend
-   make generate-openapi-docker
-   ```
-
-2. **使用 Poetry**：
+1. **使用 Poetry**：
    ```bash
    cd apps/backend
    poetry install
    poetry run python scripts/generate_openapi.py
    ```
-
-3. **使用 pip 手動安裝**：
-   ```bash
-   cd apps/backend
-   pip install fastapi pydantic sqlalchemy psycopg2-binary python-dotenv dependency-injector
-   python scripts/generate_openapi.py
-   ```
-
-### 錯誤：`docker compose exec backend: container not running`
-
-**解決方案**：先啟動後端容器
-```bash
-docker compose up -d backend
-# 等待幾秒讓容器啟動
-docker compose ps  # 確認 backend 容器狀態為 "Up"
-make generate-openapi-docker
-```
 
 ### 在 Windows 上執行
 

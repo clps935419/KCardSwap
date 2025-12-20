@@ -104,8 +104,8 @@
 **Infrastructure Layer**:
 - `apps/backend/app/modules/identity/infrastructure/external/google_oauth_service.py` (exchange_code_with_pkce) ✅
 
-**Contracts**:
-- `specs/001-kcardswap-complete-spec/contracts/auth/google_callback.json` ✅
+**OpenAPI/Swagger**:
+- `openapi/openapi.json` ✅
 
 **Tests**:
 - `apps/backend/tests/unit/modules/identity/application/test_google_login_use_case.py` ✅

@@ -183,7 +183,7 @@ CREATE INDEX idx_cards_created_at ON cards(created_at);
 ### What Didn't Change
 - ✅ Database schema remains the same
 - ✅ Application code unchanged
-- ✅ API contracts unchanged
+- ✅ OpenAPI/Swagger specification unchanged
 - ✅ Test code unchanged
 
 ### Risk Level

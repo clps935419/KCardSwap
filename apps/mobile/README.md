@@ -121,16 +121,15 @@ EXPO_PUBLIC_GOOGLE_CLIENT_ID=your-google-client-id
 - TypeScript API client（Axios runtime）
 - TanStack Query 相關的 query/mutation options（可搭配 React Native / Expo 使用）
 
-### 為什麼要用本地 snapshot（策略 B）
+### 為什麼要用本地 snapshot
 
 雲端 agent 或 CI 在沒有可達的 `localhost`/內網環境時，仍能穩定產出 SDK；因此 OpenAPI 以「repo 內快照檔」作為 codegen 輸入來源。
 
 ### OpenAPI 來源
 
-- Backend（直連）: http://localhost:8000/api/v1/openapi.json
-- Kong Proxy（建議與 App 同路徑）: http://localhost:8080/api/v1/openapi.json
+- Repo snapshot：`openapi/openapi.json`（由後端程式碼直接生成）
 
-OpenAPI snapshot 說明請見：`/openapi/README.md`
+OpenAPI snapshot 生成/更新請見：`/openapi/README.md`
 
 ### 重要：baseURL 規則（避免 /api/v1/api/v1）
 

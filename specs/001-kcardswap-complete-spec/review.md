@@ -41,7 +41,7 @@
 - 錯誤碼策略：統一格式 `{ data, error }`；錯誤碼集合固定，利於前後端協作。
  - 金流範圍：訂閱支付在 Android 僅用「Google Play Billing」，未來 iOS 用「Apple IAP」。後端僅負責訂閱收據驗證與狀態管理，不直接介入金流或退款。產品不提供卡片買賣或交易金流。
 
-## Interfaces & Contracts
+## Interfaces & OpenAPI/Swagger
 - Kong 宣告式路由至 `backend:8000`；CORS、rate-limit、size-limiting 已配置。
 - 後端 FastAPI：建議維護 `apps/backend/openapi.yaml`（即使 FastAPI 自生 Swagger，也可導出）。
 - 資料模型：cards/trades/trade_items/chats/messages/friendships/ratings/reports/subscriptions 已在 plan 中列舉；任務需同步建表與索引（T1001）。

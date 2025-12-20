@@ -114,9 +114,9 @@ Phase 2.5 已成功實作完成，提供管理員帳密登入功能，僅供後�
 
 ### 文件與測試 (Documentation & Testing)
 
-- ✅ **T036** - API Contract（已存在）
-  - 檔案：`specs/001-kcardswap-complete-spec/contracts/auth/admin_login.json`
-  - 定義完整的請求/回應結構
+- ✅ **T036** - OpenAPI/Swagger（已存在）
+  - 檔案：`openapi/openapi.json`
+  - 定義 API 請求/回應結構
 
 - ✅ **T037** - 更新資料模型文件
   - 檔案：`specs/001-kcardswap-complete-spec/data-model.md`
