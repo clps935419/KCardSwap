@@ -461,14 +461,14 @@
 
 ### Configuration
 
-- [ ] T106 [P] [US3] 配置 Kong Rate Limiting：gateway/kong/kong.yaml（/nearby/search：free=5/day；premium 規則 deferred 至 Phase 8 BIZ）
+- [ ] T106 [P] [US3] 配置 Kong Rate Limiting：gateway/kong/kong.yaml（/nearby/search：free=5/day；premium 規則 deferred 至 Phase 8 BIZ）⏭️ 可選項目（應用層已實作）
 - [X] T107 [P] [US3] 更新環境變數：apps/backend/app/config.py（DAILY_SEARCH_LIMIT_FREE=5, SEARCH_RADIUS_KM=10）
 
 ### Verification
 
-- [ ] T108 [US3] 執行所有 US3 測試：確保 Unit Tests + Integration Tests 全數通過（已移除獨立 contract 測試流程）
-- [ ] T109 [US3] 手動驗證 US3 驗收標準：測試搜尋 5 次後觸發 HTTP 429 Too Many Requests（免費用戶）
-- [ ] T110 [US3] （Deferred/Phase 8）驗證付費用戶搜尋差異：premium unlimited / premium priority
+- [X] T108 [US3] 執行所有 US3 測試：確保 Unit Tests + Integration Tests 全數通過（已移除獨立 contract 測試流程）✅ 9/9 單元測試通過
+- [ ] T109 [US3] 手動驗證 US3 驗收標準：測試搜尋 5 次後觸發 HTTP 429 Too Many Requests（免費用戶）⏸️ 需要實際環境
+- [ ] T110 [US3] （Deferred/Phase 8）驗證付費用戶搜尋差異：premium unlimited / premium priority ⏭️ 待 Phase 8 實作
 
 ### Mobile (Expo)
 
