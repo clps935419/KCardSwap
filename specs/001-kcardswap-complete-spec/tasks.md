@@ -510,9 +510,11 @@
 - [ ] T122 [P] [US4] 建立 AcceptFriendRequestUseCase：apps/backend/app/modules/social/application/use_cases/accept_friend_request_use_case.py
 - [ ] T123 [P] [US4] 建立 BlockUserUseCase：apps/backend/app/modules/social/application/use_cases/block_user_use_case.py
 - [ ] T124 [P] [US4] 建立 SendMessageUseCase：apps/backend/app/modules/social/application/use_cases/send_message_use_case.py（發送訊息 → 觸發 FCM 推播）
-- [ ] T125 [P] [US4] 建立 GetMessagesUseCase：apps/backend/app/modules/social/application/use_cases/get_messages_use_case.py（輪詢機制：since=timestamp）
+- [ ] T125 [P] [US4] 建立 GetMessagesUseCase：apps/backend/app/modules/social/application/use_cases/get_messages_use_case.py（輪詢機制：after_message_id）
 - [ ] T126 [P] [US4] 建立 RateUserUseCase：apps/backend/app/modules/social/application/use_cases/rate_user_use_case.py（交易完成後評分）
 - [ ] T127 [P] [US4] 建立 ReportUserUseCase：apps/backend/app/modules/social/application/use_cases/report_user_use_case.py
+
+- [ ] T125A [DEFERRED] [US4] 訊息保留政策：伺服器端保留 30 天；清理/清除 job（例如每日排程）清除超過 30 天的 messages（先在文件/規格中定義，實作延後）
 
 ### Infrastructure Layer (Social Module - Friends & Chat)
 
@@ -543,7 +545,7 @@
 
 - [ ] M401 [P] [US4] 好友邀請/接受/封鎖頁：apps/mobile/src/features/friends（對齊 /friends/* 端點；以 OpenAPI/Swagger 為準）
 - [ ] M402 [P] [US4] 聊天室 UI 與輪詢：apps/mobile/src/features/chat（GET /chats/{id}/messages, POST /chats/{id}/messages；以 OpenAPI/Swagger 為準）
-- [ ] M403 [P] [US4] 前景輪詢策略：apps/mobile/src/features/chat/services/polling.ts（since=timestamp、退避避免過度打 API）
+- [ ] M403 [P] [US4] 前景輪詢策略：apps/mobile/src/features/chat/services/polling.ts（after_message_id、退避避免過度打 API）
 - [ ] M404 [P] [US4] 推播接收與導頁：apps/mobile/src/features/notifications（expo-notifications；點擊通知導向聊天室）
 
 ---

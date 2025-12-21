@@ -183,12 +183,15 @@
 
 ## 6. 聊天與訊息（CHAT）
 - API 規格：
-	- `GET /api/v1/chats`、`GET /api/v1/chats/{id}/messages?since=...`（輪詢）。
+	- `GET /api/v1/chats`、`GET /api/v1/chats/{id}/messages?after_message_id=...`（輪詢；以 message_id 游標增量拉取）。
 	- 推播：FCM 通知，背景喚醒導向聊天室。
 - 資料表：
 	- `chats(id, user_a, user_b, created_at)`
 	- `messages(id, chat_id, sender_id, content, status, created_at)`
 - 訊息狀態：sent/delivered/read；前端標示。
+- 訊息保留：
+	- **保留 30 天**；超過 30 天的訊息可由後端清除。
+	- 清除排程/清理 job：**deferred**（先在規格與任務中定義政策）。
 - 測試：
 	- 前景輪詢 3–5 秒、背景推播到達率。
 
