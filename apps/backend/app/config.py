@@ -40,6 +40,9 @@ class Config:
     # Enable GCS smoke tests (only for staging/nightly, default: false)
     RUN_GCS_SMOKE: bool = os.getenv("RUN_GCS_SMOKE", "false").lower() == "true"
 
+    # FCM (Firebase Cloud Messaging)
+    FCM_CREDENTIALS_PATH: str | None = os.getenv("FCM_CREDENTIALS_PATH")
+
     # File Upload Limits
     MAX_FILE_SIZE_MB: int = int(os.getenv("MAX_FILE_SIZE_MB", "10"))
     DAILY_UPLOAD_LIMIT_FREE: int = int(os.getenv("DAILY_UPLOAD_LIMIT_FREE", "2"))
