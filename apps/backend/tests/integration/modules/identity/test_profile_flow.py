@@ -11,6 +11,7 @@ Tests the complete profile management flow:
 These tests use a real database and test the complete integration
 from HTTP request through application layer to database.
 """
+
 import pytest
 from fastapi.testclient import TestClient
 from unittest.mock import patch
@@ -26,15 +27,17 @@ class TestProfileRetrievalFlow:
     def test_get_profile_requires_authentication(self):
         """Test that getting profile requires authentication"""
         response = client.get("/api/v1/profile/me")
-        
+
         # Should return 401 or 403 (depending on middleware configuration)
         assert response.status_code in [401, 403]
 
-    @pytest.mark.skip(reason="Requires database setup - test ready for when DB is configured")
+    @pytest.mark.skip(
+        reason="Requires database setup - test ready for when DB is configured"
+    )
     def test_get_profile_success_with_valid_token(self):
         """
         Test successful profile retrieval with valid authentication
-        
+
         This test requires:
         - Database to be configured
         - User to exist
@@ -43,7 +46,7 @@ class TestProfileRetrievalFlow:
         # This would be the test implementation:
         # headers = {"Authorization": "Bearer valid_jwt_token"}
         # response = client.get("/api/v1/profile/me", headers=headers)
-        # 
+        #
         # assert response.status_code == 200
         # data = response.json()
         # assert "data" in data
@@ -64,12 +67,12 @@ class TestProfileRetrievalFlow:
     def test_get_profile_not_found(self):
         """
         Test profile retrieval when profile doesn't exist
-        
+
         Expected: 404 NOT_FOUND
         """
         # headers = {"Authorization": "Bearer valid_token_but_no_profile"}
         # response = client.get("/api/v1/profile/me", headers=headers)
-        # 
+        #
         # assert response.status_code == 404
         # data = response.json()
         # assert data["detail"]["code"] == "NOT_FOUND"
@@ -81,13 +84,10 @@ class TestProfileUpdateFlow:
 
     def test_update_profile_requires_authentication(self):
         """Test that updating profile requires authentication"""
-        update_data = {
-            "nickname": "NewNickname",
-            "bio": "New bio"
-        }
-        
+        update_data = {"nickname": "NewNickname", "bio": "New bio"}
+
         response = client.put("/api/v1/profile/me", json=update_data)
-        
+
         # Should return 401 or 403
         assert response.status_code in [401, 403]
 
@@ -95,7 +95,7 @@ class TestProfileUpdateFlow:
     def test_update_profile_success_full_update(self):
         """
         Test successful full profile update
-        
+
         Updates all fields at once
         """
         # headers = {"Authorization": "Bearer valid_jwt_token"}
@@ -111,9 +111,9 @@ class TestProfileUpdateFlow:
         #         "allow_stranger_chat": False
         #     }
         # }
-        # 
+        #
         # response = client.put("/api/v1/profile/me", json=update_data, headers=headers)
-        # 
+        #
         # assert response.status_code == 200
         # data = response.json()
         # assert data["data"]["nickname"] == "UpdatedNick"
@@ -129,22 +129,22 @@ class TestProfileUpdateFlow:
     def test_update_profile_success_partial_update(self):
         """
         Test successful partial profile update
-        
+
         Only updates nickname and bio, leaves other fields unchanged
         """
         # headers = {"Authorization": "Bearer valid_jwt_token"}
-        # 
+        #
         # # Get original profile
         # original = client.get("/api/v1/profile/me", headers=headers).json()
-        # 
+        #
         # # Update only nickname and bio
         # update_data = {
         #     "nickname": "NewNickname",
         #     "bio": "New bio text"
         # }
-        # 
+        #
         # response = client.put("/api/v1/profile/me", json=update_data, headers=headers)
-        # 
+        #
         # assert response.status_code == 200
         # data = response.json()
         # assert data["data"]["nickname"] == "NewNickname"
@@ -159,9 +159,9 @@ class TestProfileUpdateFlow:
         """Test updating only nickname"""
         # headers = {"Authorization": "Bearer valid_jwt_token"}
         # update_data = {"nickname": "CoolNickname"}
-        # 
+        #
         # response = client.put("/api/v1/profile/me", json=update_data, headers=headers)
-        # 
+        #
         # assert response.status_code == 200
         # data = response.json()
         # assert data["data"]["nickname"] == "CoolNickname"
@@ -178,9 +178,9 @@ class TestProfileUpdateFlow:
         #         "allow_stranger_chat": False
         #     }
         # }
-        # 
+        #
         # response = client.put("/api/v1/profile/me", json=update_data, headers=headers)
-        # 
+        #
         # assert response.status_code == 200
         # data = response.json()
         # assert data["data"]["privacy_flags"]["nearby_visible"] is False
@@ -195,7 +195,7 @@ class TestProfileFlowValidation:
     def test_update_profile_empty_request(self):
         """
         Test update with empty request body
-        
+
         Should accept empty body (no updates) or return validation error
         """
         # This depends on whether optional fields are truly optional
@@ -209,9 +209,9 @@ class TestProfileFlowValidation:
         # update_data = {
         #     "avatar_url": "not-a-valid-url"
         # }
-        # 
+        #
         # response = client.put("/api/v1/profile/me", json=update_data, headers=headers)
-        # 
+        #
         # # Should return 422 validation error or accept any string
         # # (depends on schema validation rules)
         pass
@@ -236,13 +236,13 @@ class TestProfileCompleteFlow:
         # assert login_response.status_code == 200
         # tokens = login_response.json()["data"]
         # headers = {"Authorization": f"Bearer {tokens['access_token']}"}
-        # 
+        #
         # # Step 2: Get initial profile
         # get_response = client.get("/api/v1/profile/me", headers=headers)
         # assert get_response.status_code == 200
         # initial_profile = get_response.json()["data"]
         # assert initial_profile["nickname"] is None or initial_profile["nickname"] == ""
-        # 
+        #
         # # Step 3: Update profile
         # update_data = {
         #     "nickname": "MyNickname",
@@ -251,7 +251,7 @@ class TestProfileCompleteFlow:
         # }
         # update_response = client.put("/api/v1/profile/me", json=update_data, headers=headers)
         # assert update_response.status_code == 200
-        # 
+        #
         # # Step 4: Verify updates persisted
         # verify_response = client.get("/api/v1/profile/me", headers=headers)
         # assert verify_response.status_code == 200
@@ -270,7 +270,7 @@ class TestProfileResponseFormat:
     def test_profile_response_structure(self):
         """
         Test that profile response matches the expected schema structure
-        
+
         Expected structure:
         {
             "data": {
@@ -290,15 +290,15 @@ class TestProfileResponseFormat:
         """
         # headers = {"Authorization": "Bearer valid_jwt_token"}
         # response = client.get("/api/v1/profile/me", headers=headers)
-        # 
+        #
         # assert response.status_code == 200
         # data = response.json()
-        # 
+        #
         # # Check wrapper structure
         # assert "data" in data
         # assert "error" in data
         # assert data["error"] is None
-        # 
+        #
         # # Check profile data structure
         # profile = data["data"]
         # required_fields = [
@@ -308,7 +308,7 @@ class TestProfileResponseFormat:
         # ]
         # for field in required_fields:
         #     assert field in profile, f"Missing required field: {field}"
-        # 
+        #
         # # Check types
         # assert isinstance(profile["preferences"], dict)
         # assert isinstance(profile["privacy_flags"], dict)
@@ -324,7 +324,7 @@ class TestProfileErrorHandling:
         response = client.get("/api/v1/profile/me")
         # Should not return 404 (endpoint exists)
         assert response.status_code != 404
-        
+
         # Test PUT endpoint exists
         response = client.put("/api/v1/profile/me", json={})
         # Should not return 404 (endpoint exists)
