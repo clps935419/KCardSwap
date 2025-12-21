@@ -85,7 +85,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 2. **Align API specification** from functional requirements:
    - For each user action → endpoint
    - Use standard REST patterns
-   - OpenAPI/Swagger is the single source of truth (repo snapshot: `openapi/openapi.json`)
+   - Keep `openapi/openapi.json` updated as a generated snapshot of the implemented API (useful for validation/SDK generation; not a pre-dev contract)
 
 3. **Agent context update**:
    - Run `.specify/scripts/powershell/update-agent-context.ps1 -AgentType copilot`

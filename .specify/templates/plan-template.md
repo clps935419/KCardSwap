@@ -64,7 +64,6 @@ src/
 └── lib/
 
 tests/
-├── contract/
 ├── integration/
 └── unit/
 

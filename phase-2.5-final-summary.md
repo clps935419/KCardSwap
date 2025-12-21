@@ -141,7 +141,7 @@ python scripts/init_admin.py --email admin@example.com --password pass123
 - [X] **T034**: Admin Login Endpoint（POST /api/v1/auth/admin-login）
 - [X] **T035**: create_admin.py（手動建立工具）
 - [X] **T035A**: init_admin.py（自動初始化工具）⭐ **新增到 tasks.md**
-- [X] **T036**: API Contract 更新
+- [X] **T036**: OpenAPI snapshot 更新
 - [X] **T037**: 資料模型文件更新
 - [X] **T038**: 單元測試（8 個測試案例）
 - [X] **T039**: bcrypt 依賴添加
@@ -194,7 +194,7 @@ python scripts/init_admin.py --email admin@example.com --password pass123
 ✅ T034: Admin Login Endpoint added to auth_router.py
 ✅ T035: create_admin.py script exists
 ✅ T035A: init_admin.py script exists
-✅ T036: API Contract exists
+✅ T036: OpenAPI snapshot exists
 ✅ T037: Data Model documentation updated
 ✅ T038: Unit tests for admin_login exist
 ✅ T039: bcrypt dependency in pyproject.toml

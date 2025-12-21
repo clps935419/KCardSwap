@@ -45,7 +45,7 @@ Phase 3 (User Story 1 - Google 登入與個人檔案) 的 Mobile 實作已全面
    exchangeCodeForTokens(code, codeVerifier): Promise<GoogleOAuthResponse>
    ```
    - ✅ POST /auth/google-callback
-   - ✅ 符合後端 contract 定義
+   - ✅ 符合已實作 API 回應格式（並可由 OpenAPI snapshot 檢視/對齊）
    - ✅ 完整錯誤處理（401, 422, timeout）
    - ✅ 回應格式驗證
 

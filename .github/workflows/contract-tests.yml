@@ -1,11 +1,11 @@
-name: Contract tests (disabled)
+name: Schema alignment tests (disabled)
 
 on: {}
 
 jobs:
-  contract-tests:
+  schema-alignment-tests:
     if: false
     runs-on: ubuntu-latest
     steps:
       - name: Skipped
-        run: echo "contract tests workflow disabled"
+        run: echo "schema alignment tests workflow disabled"

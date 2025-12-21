@@ -149,7 +149,7 @@ Manual Data Management (create_admin.py) ← Explicit, Fail-fast
 ✅ T034: Admin Login Endpoint added to auth_router.py
 ✅ T035: create_admin.py script exists
 ✅ T035A: init_admin.py script exists
-✅ T036: API Contract exists
+✅ T036: OpenAPI snapshot exists
 ✅ T037: Data Model documentation updated
 ✅ T038: Unit tests for admin_login exist
 ✅ T039: bcrypt dependency in pyproject.toml

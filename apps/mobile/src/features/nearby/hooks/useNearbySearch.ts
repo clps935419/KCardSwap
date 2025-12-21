@@ -13,7 +13,7 @@ import { apiClient } from '@/src/shared/api/client';
 import { SEARCH_LIMITS } from '@/src/shared/config/constants';
 import type { LocationCoords } from './useLocation';
 
-// Types based on nearby search API contract
+// Types based on nearby search API schema (OpenAPI snapshot)
 export interface NearbyCard {
   card_id: string;
   owner_id: string;

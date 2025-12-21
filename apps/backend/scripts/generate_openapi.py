@@ -5,7 +5,7 @@ This script extracts the OpenAPI schema from the FastAPI app without
 running the server. The generated openapi.json can be used for:
 - SDK generation (mobile app, frontend clients)
 - API documentation
-- Contract testing
+- Schema alignment testing (verify implemented responses match the snapshot)
 
 Usage:
     poetry run python scripts/generate_openapi.py

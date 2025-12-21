@@ -304,7 +304,7 @@ Phase 2.5 所有功能驗證：
 - [ ] ✅ T034: POST /api/v1/auth/admin-login 端點可用
 - [ ] ✅ T035: create_admin.py 可手動建立管理員
 - [ ] ✅ T035A: init_admin.py 可自動初始化管理員（idempotent）
-- [ ] ✅ T036: API Contract 定義完整
+- [ ] ✅ T036: OpenAPI snapshot 可用
 - [ ] ✅ T037: 資料模型文件已更新
 - [ ] ✅ T038: 單元測試全部通過
 - [ ] ✅ T039: bcrypt 依賴已添加

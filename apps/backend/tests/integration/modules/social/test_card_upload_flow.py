@@ -405,7 +405,7 @@ class TestCardUploadContractCompliance:
 
     def test_upload_url_response_structure(self, mock_successful_upload):
         """
-        Test that upload URL response matches contract (T087.13)
+        Test that upload URL response matches expected schema (T087.13)
 
         Spec: OpenAPI/Swagger (openapi/openapi.json)
         """
@@ -416,7 +416,7 @@ class TestCardUploadContractCompliance:
 
         response = client.post("/api/v1/cards/upload-url", json=request_data)
 
-        # Check response structure matches contract
+        # Check response structure matches expected schema
         if response.status_code == 200:
             data = response.json()
 

@@ -39,7 +39,7 @@ Phase 3 (User Story 1 - Google 登入與個人檔案) 的測試實作已完成�
 - ✅ 隱私設定 (privacy_flags) 更新
 - ✅ 偏好設定 (preferences) 更新
 - ✅ 完整用戶生命週期（登入 → 查詢 → 更新 → 驗證）
-- ✅ Response 格式符合 contract 定義
+- ✅ Response 格式符合 OpenAPI schema（由程式碼生成的 snapshot）
 
 **測試統計**:
 - 6 個測試類別
@@ -52,9 +52,9 @@ Phase 3 (User Story 1 - Google 登入與個人檔案) 的測試實作已完成�
 - ✅ T057: Auth Integration Tests for PKCE (Phase 3.1)
 - ✅ User profile entity tests (已存在)
 
-### 4. Contract 測試整合
-- ✅ T053: Auth contract 測試已整合至 T057/T057A
-- ✅ T054: Profile contract 測試已整合至 T058
+### 4. OpenAPI 對齊（由整合測試覆蓋）
+- ✅ T053: Auth 的 OpenAPI 對齊由 T057/T057A 整合測試覆蓋
+- ✅ T054: Profile 的 OpenAPI 對齊由 T058 整合測試覆蓋
 
 ## 測試架構設計
 

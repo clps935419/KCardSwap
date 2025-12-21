@@ -112,7 +112,7 @@ $docs = @()
 if (Test-Path $paths.RESEARCH) { $docs += 'research.md' }
 if (Test-Path $paths.DATA_MODEL) { $docs += 'data-model.md' }
 
-# OpenAPI snapshot (repo-level single source of truth)
+# OpenAPI snapshot (repo-level generated snapshot; used for SDK/tests/docs)
 if (Test-Path $paths.OPENAPI_SNAPSHOT) { $docs += 'openapi/openapi.json' }
 
 if (Test-Path $paths.QUICKSTART) { $docs += 'quickstart.md' }

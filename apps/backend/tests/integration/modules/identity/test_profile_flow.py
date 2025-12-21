@@ -264,12 +264,12 @@ class TestProfileCompleteFlow:
 
 
 class TestProfileResponseFormat:
-    """Test profile response format matches contract"""
+    """Test profile response format matches expected schema"""
 
     @pytest.mark.skip(reason="Requires database setup")
     def test_profile_response_structure(self):
         """
-        Test that profile response matches the expected contract structure
+        Test that profile response matches the expected schema structure
         
         Expected structure:
         {

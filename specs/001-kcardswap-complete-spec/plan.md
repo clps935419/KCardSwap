@@ -2,8 +2,8 @@
 
 更新說明（2025-12-12）：本計畫已同步最新規格說明，DDD 架構原則改以專案憲法的 Article VI 作為唯一依據。此處僅保留與本專案實作直接相關的目錄結構與服務切分，避免重複規範。
 
-**API 單一真相來源（Single Source of Truth）**：本專案以 Swagger/OpenAPI 為唯一權威來源。
-1) OpenAPI snapshot：openapi/openapi.json（由後端 FastAPI 自動生成後提交到 repo）
+**API 描述（OpenAPI snapshot）**：本專案會把後端「已實作 API」的 OpenAPI 規格以 snapshot 形式提交到 repo，供檢視、SDK 生成與測試對齊使用；它是開發後產物，**不是開發前的合約**。
+1) OpenAPI snapshot：openapi/openapi.json（由後端 FastAPI 自動生成後提交到 repo；用於檢視/SDK/驗證）
 2) 資料模型綜覽：specs/001-kcardswap-complete-spec/data-model.md（與 infra/db/init.sql 對齊）
 
 本計劃對應 `specs/001-kcardswap-complete-spec/spec.md`，包含詳細的架構設計、API 規格、資料庫 Schema、前後端任務分解、限制與政策、測試策略、里程碑與風險控管。
@@ -218,7 +218,7 @@
 	- `409_CONFLICT`
 	- `422_LIMIT_EXCEEDED`
 	- `429_RATE_LIMITED`
-- OpenAPI 規格：由後端 FastAPI 自動生成（Swagger/OpenAPI），並提交 snapshot 至 openapi/openapi.json 作為唯一權威來源。
+- OpenAPI 規格：由後端 FastAPI 自動生成（Swagger/OpenAPI），並提交 snapshot 至 openapi/openapi.json 作為「已實作 API」的權威描述（用於檢視/SDK/測試對齊；非開發前契約）。
 
 ## 10. UI/UX 詳細規劃
 - Flow：登入 → 完檔 → 上傳首卡 → 附近 → 好友/聊天 → 交換 → 評分。
@@ -237,7 +237,7 @@
 Phase -1 Gates（依憲法）
 - Simplicity Gate：專案數量 ≤3（mobile/backend/gateway）；避免過度設計，例外將記錄於本節。
 - Anti-Abstraction Gate：優先使用框架原生能力，禁止不必要抽象層。
-- Integration-First Gate：以 Swagger/OpenAPI（openapi/openapi.json）作為唯一契約；優先以真實 DB/Gateway 進行整合測試；路由實作需符合 OpenAPI 定義（成功/驗證失敗/未授權/衝突等）。
+- Integration-First Gate：以 Swagger/OpenAPI（openapi/openapi.json）作為「已實作 API」的對齊基準；優先以真實 DB/Gateway 進行整合測試；路由實作與回應需與 OpenAPI 定義一致（成功/驗證失敗/未授權/衝突等）。
 
 ## 12. 風險與緩解
 - 位置隱私爭議 → 預設不顯示精確地址、僅行政區與距離。

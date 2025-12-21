@@ -14,7 +14,7 @@ This project uses **hey-api/openapi-ts** to generate a type-safe TypeScript SDK 
 
 ```
 ├── openapi/
-│   └── openapi.json                    # OpenAPI snapshot (source of truth)
+│   └── openapi.json                    # OpenAPI snapshot (generated from backend code; not a pre-dev contract)
 ├── apps/mobile/
 │   ├── openapi-ts.config.ts           # hey-api configuration
 │   ├── src/shared/api/
@@ -27,15 +27,17 @@ This project uses **hey-api/openapi-ts** to generate a type-safe TypeScript SDK 
 │   │       └── types.gen.ts           # TypeScript types
 ```
 
-### Why Strategy B (OpenAPI Snapshot in Repo)?
+### Why OpenAPI Snapshot in Repo?
 
-We use **Strategy B** (repo-internal snapshot) instead of Strategy A (direct network access) because:
+We commit an **OpenAPI snapshot** generated from backend code because:
 
-1. **CI/CD Reliability**: No dependency on backend being available during mobile builds
-2. **Cloud Agent Compatible**: Agents can generate SDK without network access to backend
-3. **Version Control**: Changes to API schema are visible in git diffs
+1. **CI/CD Reliability**: No dependency on a running backend during mobile builds
+2. **Cloud Agent Compatible**: Agents can generate SDK without network access
+3. **Version Control**: API schema changes are visible in git diffs
 4. **Offline Development**: Developers can work without running backend locally
 5. **Faster Builds**: No need to wait for backend startup
+
+> Note: This snapshot reflects the **implemented API** at the time it was generated. Product requirements still come from the User Stories / spec / plan / tasks.
 
 ## Usage
 

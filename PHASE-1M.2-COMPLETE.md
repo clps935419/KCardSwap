@@ -214,7 +214,7 @@ import { apiClient } from '@/src/shared/api/client';  // ❌ ESLint Error!
 - Refactoring safety with TypeScript
 
 ### 5. **Maintainability**
-- Single source of truth (OpenAPI spec)
+- SDK generation input (OpenAPI snapshot generated from backend code)
 - Backend changes automatically reflected in SDK
 - ESLint prevents regression
 

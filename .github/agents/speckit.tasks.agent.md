@@ -114,8 +114,8 @@ Every task MUST strictly follow this format:
    - Mark story dependencies (most stories should be independent)
 
 2. **From OpenAPI/Swagger**:
-   - Map each endpoint → to the user story it serves (source of truth: openapi/openapi.json)
-   - 若需測試：以對應的整合測試涵蓋該端點（避免獨立契約 JSON 測試流程）
+   - Map each endpoint → to the user story it serves (reference: generated snapshot `openapi/openapi.json`)
+   - 若需測試：以對應的整合測試涵蓋該端點（避免獨立 OpenAPI JSON 測試流程）
 
 3. **From Data Model**:
    - Map each entity to the user story(ies) that need it

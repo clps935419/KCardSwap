@@ -6,7 +6,7 @@
 
 - **後端只處理「原圖」**：後端僅負責產生 Signed URL（PUT 上傳）與上傳配額/限制檢查。
 - **禁止任何縮圖後端業務**：後端不得產生/儲存/回傳縮圖相關欄位；Bucket/物件路徑不得出現 `thumbs/`。
-- **縮圖為 Mobile-only**：Mobile 端本機產生 `200x200` WebP 縮圖並本機快取（不上傳、不入 DB、不入契約）。
+- **縮圖為 Mobile-only**：Mobile 端本機產生 `200x200` WebP 縮圖並本機快取（不上傳、不入 DB、不進後端 API 定義）。
 
 ## Bucket 與物件命名（Object Key）
 

@@ -286,8 +286,8 @@
 
 ### Testing
 
-- [X] T053 [P] [US1] 撰寫 Auth Integration Tests（以 OpenAPI/Swagger 為唯一來源；已由 T057/T057A 整合測試覆蓋）
-- [X] T054 [P] [US1] 撰寫 Profile Integration Tests（以 OpenAPI/Swagger 為唯一來源；已由 T058 整合測試覆蓋）
+- [X] T053 [P] [US1] 撰寫 Auth Integration Tests（以 OpenAPI/Swagger（由程式碼生成的 snapshot）作為回應/路由對齊驗證；已由 T057/T057A 整合測試覆蓋）
+- [X] T054 [P] [US1] 撰寫 Profile Integration Tests（以 OpenAPI/Swagger（由程式碼生成的 snapshot）作為回應/路由對齊驗證；已由 T058 整合測試覆蓋）
 - [X] T055 [P] [US1] 撰寫 User Entity Unit Tests：tests/unit/modules/identity/domain/test_user_entity.py
 - [X] T056 [P] [US1] 撰寫 GoogleLoginUseCase Unit Tests：tests/unit/modules/identity/application/test_google_login_use_case.py
 - [X] T057 [US1] 撰寫 Auth Integration Tests：tests/integration/modules/identity/test_auth_flow.py（完整登入流程 E2E）
@@ -309,7 +309,7 @@
 
 ### Verification
 
-- [X] T064 [US1] 執行所有 US1 測試：確保 Unit Tests + Integration Tests 全數通過（已移除獨立 contract 測試流程）
+- [X] T064 [US1] 執行所有 US1 測試：確保 Unit Tests + Integration Tests 全數通過（已移除獨立 OpenAPI JSON 驗證流程）
 - [X] T065 [US1] 手動驗證 US1 驗收標準：使用 Postman/curl 測試完整登入與檔案更新流程
 
 ### Mobile (Expo)
@@ -365,7 +365,7 @@
 
 ### Testing
 
-- [x] T083 [P] [US2] 撰寫 Cards Integration Tests（以 OpenAPI/Swagger 為唯一來源；改以整合測試覆蓋）
+- [x] T083 [P] [US2] 撰寫 Cards Integration Tests（以 OpenAPI/Swagger（由程式碼生成的 snapshot）作為回應/路由對齊驗證；改以整合測試覆蓋）
 - [x] T084 [P] [US2] 撰寫 Card Entity Unit Tests：tests/unit/modules/social/domain/test_card_entity.py
 - [x] T085 [P] [US2] 撰寫 UploadCardUseCase Unit Tests：tests/unit/modules/social/application/test_upload_card_use_case.py（Mock 限制檢查）
 - [x] T086 [P] [US2] 撰寫 Quota Validation Unit Tests：tests/unit/modules/social/domain/test_upload_quota.py（測試每日/總容量/單檔大小邊界）
@@ -383,7 +383,7 @@
 
 ### Verification
 
-- [ ] T092 [US2] 執行所有 US2 測試：確保 Unit Tests + Integration Tests 全數通過（已移除獨立 contract 測試流程）
+- [ ] T092 [US2] 執行所有 US2 測試：確保 Unit Tests + Integration Tests 全數通過（已移除獨立 OpenAPI JSON 驗證流程）
 - [ ] T093 [US2] 手動驗證 US2 驗收標準：測試上傳 2 張後觸發 422_LIMIT_EXCEEDED
 - [ ] T094 [US2] 驗證縮圖行為（Mobile-only）：確認 App 本機產生 200x200 WebP 縮圖並快取；卡冊列表優先顯示本機縮圖（無縮圖時回退載入原圖）
 
@@ -406,7 +406,7 @@
   - 上傳至 Signed URL 不走既有 API client（避免自動注入 Authorization 等 header）；用 fetch 或獨立 HTTP client
   - Retry：僅針對網路錯誤/timeout/5xx 做有限次重試；對 4xx（含 403/400）不盲重試，需提示並必要時重新取得 Signed URL
   - 錯誤 UX：需區分「後端 422（配額/檔案過大/格式不符）」與「Signed URL 上傳失敗（403/過期/網路）」並給出對應提示與重試入口
-- [x] M203A [P] [US2] 產生 200x200 WebP 縮圖並本機快取：apps/mobile/src/features/cards（縮圖僅供列表快速載入，不上傳、不進後端契約）✅
+- [x] M203A [P] [US2] 產生 200x200 WebP 縮圖並本機快取：apps/mobile/src/features/cards（縮圖僅供列表快速載入，不上傳、不進後端 API 定義）✅
   - 縮圖快取需定義 key（建議以 card_id 或 image_url 雜湊），並提供失效策略：卡片刪除時移除縮圖；找不到縮圖時回退載入原圖
   - 若 WebP 在特定平台不可用，需定義 fallback（例如 JPEG），但仍維持 200x200 尺寸
 - [x] M204 [P] [US2] 我的卡冊列表：apps/mobile/src/features/cards/screens/MyCardsScreen.tsx（GET /cards/me）✅（已使用 Gluestack UI）
@@ -455,7 +455,7 @@
 
 ### Testing
 
-- [X] T103 [P] [US3] 撰寫 Nearby Integration Tests（以 OpenAPI/Swagger 為唯一來源）
+- [X] T103 [P] [US3] 撰寫 Nearby Integration Tests（以 OpenAPI/Swagger（由程式碼生成的 snapshot）作為回應/路由對齊驗證）
 - [X] T104 [P] [US3] 撰寫 SearchNearbyCardsUseCase Unit Tests：tests/unit/modules/social/application/test_search_nearby_use_case.py（Mock 距離計算與排序邏輯）
 - [X] T105 [US3] 撰寫 Nearby Search Integration Tests：tests/integration/modules/social/test_nearby_search_flow.py（完整搜尋流程 E2E，包含限制觸發）
 
@@ -466,7 +466,7 @@
 
 ### Verification
 
-- [X] T108 [US3] 執行所有 US3 測試：確保 Unit Tests + Integration Tests 全數通過（已移除獨立 contract 測試流程）✅ 9/9 單元測試通過
+- [X] T108 [US3] 執行所有 US3 測試：確保 Unit Tests + Integration Tests 全數通過（已移除獨立 OpenAPI JSON 驗證流程）✅ 9/9 單元測試通過
 - [ ] T109 [US3] 手動驗證 US3 驗收標準：測試搜尋 5 次後觸發 HTTP 429 Too Many Requests（免費用戶）⏸️ 需要實際環境
 - [ ] T110 [US3] （Deferred/Phase 8）驗證付費用戶搜尋差異：premium unlimited / premium priority ⏭️ 待 Phase 8 實作
 
@@ -593,7 +593,7 @@
 
 ### Testing
 
-- [ ] T161 [P] [US5] 撰寫 Trade Integration Tests（以 OpenAPI/Swagger 為唯一來源；改以整合測試覆蓋）
+- [ ] T161 [P] [US5] 撰寫 Trade Integration Tests（以 OpenAPI/Swagger（由程式碼生成的 snapshot）作為回應/路由對齊驗證；改以整合測試覆蓋）
 - [ ] T162 [P] [US5] 撰寫 Trade Entity Unit Tests：tests/unit/modules/social/domain/test_trade_entity.py
 - [ ] T163 [P] [US5] 撰寫 Trade Status State Machine Tests：tests/unit/modules/social/domain/test_trade_status.py（測試所有狀態轉換）
 - [ ] T164 [P] [US5] 撰寫 CreateTradeProposalUseCase Unit Tests：tests/unit/modules/social/application/test_create_trade_proposal_use_case.py
@@ -619,7 +619,7 @@
 
 ### Verification
 
-- [ ] T172 [US5] 執行所有 US5 測試：確保 Unit Tests + Integration Tests 全數通過（已移除獨立 contract 測試流程）
+- [ ] T172 [US5] 執行所有 US5 測試：確保 Unit Tests + Integration Tests 全數通過（已移除獨立 OpenAPI JSON 驗證流程）
 - [ ] T173 [US5] 手動驗證 US5 驗收標準：測試完整交換流程（draft → proposed → accepted → completed）
 - [ ] T174 [US5] 驗證卡片鎖定：確認交換完成後卡片狀態更新為「已交換」且無法再次交換
 
@@ -665,7 +665,7 @@
 
 ### Testing
 
-- [ ] T185 [P] [US6] 撰寫 Subscription Integration Tests（以 OpenAPI/Swagger 為唯一來源；改以整合測試覆蓋）
+- [ ] T185 [P] [US6] 撰寫 Subscription Integration Tests（以 OpenAPI/Swagger（由程式碼生成的 snapshot）作為回應/路由對齊驗證；改以整合測試覆蓋）
 - [ ] T186 [P] [US6] 撰寫 Subscription Unit Tests：tests/unit/modules/identity/application/test_verify_receipt_use_case.py
 - [ ] T187 [US6] 撰寫 Subscription Integration Tests：tests/integration/modules/identity/test_subscription_flow.py
 
@@ -740,7 +740,7 @@
 ### OpenAPI/Swagger & Testing
 
 - [ ] T227 [P] [US7] 對齊 OpenAPI/Swagger：Posts 相關 endpoints（以 openapi/openapi.json 為準）
-- [ ] T228 [P] [US7] 撰寫 Posts Integration Tests（以 OpenAPI/Swagger 為唯一來源；改以整合測試覆蓋）
+- [ ] T228 [P] [US7] 撰寫 Posts Integration Tests（以 OpenAPI/Swagger（由程式碼生成的 snapshot）作為回應/路由對齊驗證；改以整合測試覆蓋）
 
 ### Mobile (Expo)
 
@@ -756,7 +756,7 @@
 **目的**: 整合所有功能、優化效能、完善文件
 
 - [ ] T192 [P] 統一錯誤處理：apps/backend/app/shared/presentation/exceptions/error_codes.py（定義所有錯誤碼：400/401/403/404/409/422/429）
-- [ ] T193 [P] 更新 OpenAPI snapshot（唯一來源）：openapi/openapi.json（由後端 FastAPI 自動生成；供 Swagger 與 SDK codegen 使用）
+- [ ] T193 [P] 更新 OpenAPI snapshot（開發後產物）：openapi/openapi.json（由後端 FastAPI 自動生成；供 Swagger 檢視、測試對齊與 SDK codegen 使用；非開發前契約）
 - [ ] T194 [P] E2E 測試：tests/e2e/test_complete_user_journey.py（模擬完整使用者旅程：登入 → 上傳卡片 → 搜尋 → 加好友 → 聊天 → 交換 → 評分）
 - [ ] T195 [P] 效能測試：tests/performance/test_api_performance.py（測試關鍵 API 回應時間與吞吐量）
 - [ ] T196 [P] 安全測試：tests/security/test_jwt_security.py（測試 Token 竄改、過期處理）
@@ -780,7 +780,7 @@
 2. **Phase 1M: Mobile Setup** (M001-M014) → Expo app 基礎（可與 Phase 2 並行進行）
 3. **Phase 1M.1: OpenAPI SDK Generation** (M015-M020) → 產 SDK（可與 Phase 2 並行進行）
 4. **Phase 2: Foundational** (T009-T028) → **[BLOCKING]** 所有後端 User Story 必須等此階段完成
-5. **Phase 3-8.5: User Stories** (T029-T228 + M101-M704) → 後端與 Mobile 可依契約並行（見下方說明）
+5. **Phase 3-8.5: User Stories** (T029-T228 + M101-M704) → 後端與 Mobile 可依 US/Plan/Tasks 並行（必要時先以 mock/先行 UI；端點完成後再用 OpenAPI snapshot 與整合測試對齊）
 6. **Phase 9: Polish** (T192-T205) → 最終整合
 
 ### User Story Dependencies（使用者故事依賴）
@@ -843,7 +843,7 @@ Group B: Infrastructure Setup（與 US1 無衝突）
 
 Group M1: US1 Mobile (Expo) - Auth + Profile
   ├─ 先決條件：M001-M006
-  └─ M101-M104（可先用 contract/mock 並行；待後端端點可用後做整合）
+  └─ M101-M104（可先用 mock/stub 並行；待後端端點可用後做整合）
 ```
 
 #### 階段 2：US1 完成後（T065 完成）
@@ -994,7 +994,7 @@ Group M5: US5 Mobile (Expo) - Trade
 ## Phase -1 Gates Checklist
 - Simplicity Gate：保持 ≤3 個專案（mobile/backend/gateway）；若需例外，在 plan.md 記錄理由。
 - Anti-Abstraction Gate：遵循憲法 Article VI，禁止不必要抽象；Domain 不依賴框架；Repository 實作置於 Infrastructure。
-- Integration-First Gate：以 OpenAPI/Swagger 為唯一契約來源；端到端整合測試需覆蓋主要路由與錯誤情境，回應需與 OpenAPI 定義一致。
+- Integration-First Gate：以 OpenAPI/Swagger（由程式碼生成的 snapshot）作為對齊基準；端到端整合測試需覆蓋主要路由與錯誤情境，回應需與 OpenAPI 定義一致（非開發前契約）。
 
 ## Acceptance Criteria Examples
 - T204：超限時回傳 `422_LIMIT_EXCEEDED` 並包含哪一項超限訊息（每日/容量/大小）
