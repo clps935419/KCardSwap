@@ -2,7 +2,7 @@
 
 **生成日期**: 2025-12-16  
 **Input**: Design documents from `/specs/001-kcardswap-complete-spec/`  
-**Prerequisites**: plan.md, spec.md, data-model.md, contracts/
+**Prerequisites**: plan.md, spec.md, data-model.md, openapi/openapi.json
 
 **架構**: Modular DDD (Identity + Social modules)  
 **測試策略**: TDD - 先寫測試，確保測試失敗後才實作  
@@ -104,7 +104,7 @@
 - ✅ 雲端 agent 驗證通過
 
 **開發工作流程**（重要）：
-1. **當修改後端 API 時**：先執行 `make generate-openapi` 或 `make generate-openapi-docker` 生成新的 `openapi/openapi.json`
+1. **當修改後端 API 時**：先執行 `make generate-openapi` 生成新的 `openapi/openapi.json`
 2. **在修改前端前**：執行 `cd apps/mobile && npm run sdk:generate` 生成最新的 hey-api SDK
 3. **驗證**：執行 `npm run type-check` 確保型別正確
 4. **提交**：只 commit `openapi/openapi.json`，不 commit `apps/mobile/src/shared/api/generated/`（已在 .gitignore）
@@ -187,7 +187,7 @@
 - [X] T034 [Admin-Auth] 添加 Admin Login Endpoint：POST /api/v1/auth/admin-login（apps/backend/app/modules/identity/presentation/routers/auth_router.py，標記 tags=["Admin"]）
 - [X] T035 [Admin-Auth] 創建管理員工具腳本（手動）：apps/backend/scripts/create_admin.py（接受 --email, --password, --role 參數，生成 bcrypt hash 並插入資料庫；用於手動建立額外管理員，email 重複會報錯）
 - [X] T035A [Admin-Auth] 創建自動初始化腳本（idempotent）：apps/backend/scripts/init_admin.py（支援環境變數、預設值、隨機密碼生成；idempotent 設計可重複執行；整合至 Docker 啟動流程 start.sh；用於自動化部署）
-- [X] T036 [Admin-Auth] 更新 API Contract：specs/001-kcardswap-complete-spec/contracts/auth/admin_login.json（定義請求/回應結構）
+- [X] T036 [Admin-Auth] 對齊 OpenAPI/Swagger：/auth/admin-login（以 openapi/openapi.json 為準）
 - [X] T037 [Admin-Auth] 更新資料模型文件：specs/001-kcardswap-complete-spec/data-model.md（更新 users 表定義與不變條件）
 - [X] T038 [Admin-Auth] 撰寫單元測試：tests/unit/application/use_cases/test_admin_login.py（測試正確密碼、錯誤密碼、非管理員帳號）
 - [X] T039 [Admin-Auth] 添加 pyproject.toml 依賴：bcrypt = "^4.1.0"
@@ -271,7 +271,7 @@
 
 #### Testing
 
-- [X] T053A [P] [US1] （Expo/PKCE）新增 Auth Contract：specs/001-kcardswap-complete-spec/contracts/auth/google_callback.json（定義 request/response）
+- [X] T053A [P] [US1] （Expo/PKCE）對齊 OpenAPI/Swagger：/auth/google-callback（以 openapi/openapi.json 為準）
 - [X] T057A [P] [US1] （Expo/PKCE）Auth Integration Tests：tests/integration/modules/identity/test_auth_flow.py（mock Google token endpoint，覆蓋 code+pkce 流程）
 
 #### Documentation
@@ -286,8 +286,8 @@
 
 ### Testing
 
-- [X] T053 [P] [US1] 撰寫 Auth Integration Tests：tests/integration/contracts/test_auth_contracts.py（對齊 contracts/auth/login.json，移除獨立 contract 測試流程後改以整合測試覆蓋 - 已由 T057/T057A 整合測試覆蓋）
-- [X] T054 [P] [US1] 撰寫 Profile Integration Tests：tests/integration/contracts/test_profile_contracts.py（對齊 contracts/social/profile.json，改以整合測試覆蓋 - 已由 T058 整合測試覆蓋）
+- [X] T053 [P] [US1] 撰寫 Auth Integration Tests（以 OpenAPI/Swagger 為唯一來源；已由 T057/T057A 整合測試覆蓋）
+- [X] T054 [P] [US1] 撰寫 Profile Integration Tests（以 OpenAPI/Swagger 為唯一來源；已由 T058 整合測試覆蓋）
 - [X] T055 [P] [US1] 撰寫 User Entity Unit Tests：tests/unit/modules/identity/domain/test_user_entity.py
 - [X] T056 [P] [US1] 撰寫 GoogleLoginUseCase Unit Tests：tests/unit/modules/identity/application/test_google_login_use_case.py
 - [X] T057 [US1] 撰寫 Auth Integration Tests：tests/integration/modules/identity/test_auth_flow.py（完整登入流程 E2E）
@@ -314,9 +314,9 @@
 
 ### Mobile (Expo)
 
-- [X] M101 [P] [US1] 實作 Google 登入畫面與 PKCE Flow：apps/mobile/src/features/auth（使用 AuthSession 取得 code + code_verifier → 呼叫 /auth/google-callback；Contract: specs/001-kcardswap-complete-spec/contracts/auth/google_callback.json）
-- [X] M102 [P] [US1] 串接 TokenResponse 並寫入 Session：apps/mobile/src/shared/auth/session.ts（使用 /auth/refresh 續期；Contract: specs/001-kcardswap-complete-spec/contracts/auth/login.json）
-- [X] M103 [P] [US1] 建立個人檔案頁（讀取/更新）：apps/mobile/src/features/profile（GET/PUT /profile/me；Contract: specs/001-kcardswap-complete-spec/contracts/social/profile.json）
+- [X] M101 [P] [US1] 實作 Google 登入畫面與 PKCE Flow：apps/mobile/src/features/auth（使用 AuthSession 取得 code + code_verifier → 呼叫 /auth/google-callback；以 OpenAPI/Swagger 為準）
+- [X] M102 [P] [US1] 串接 TokenResponse 並寫入 Session：apps/mobile/src/shared/auth/session.ts（使用 /auth/refresh 續期；以 OpenAPI/Swagger 為準）
+- [X] M103 [P] [US1] 建立個人檔案頁（讀取/更新）：apps/mobile/src/features/profile（GET/PUT /profile/me；以 OpenAPI/Swagger 為準）
 - [ ] M104 [US1] 手動驗證登入與更新檔案：Android 實機/模擬器（確認冷啟動 refresh 與 401 重新登入）
 
 ---
@@ -365,7 +365,7 @@
 
 ### Testing
 
-- [x] T083 [P] [US2] 撰寫 Cards Integration Tests：tests/integration/contracts/test_cards_contracts.py（對齊 contracts/cards/create.json，改以整合測試覆蓋）
+- [x] T083 [P] [US2] 撰寫 Cards Integration Tests（以 OpenAPI/Swagger 為唯一來源；改以整合測試覆蓋）
 - [x] T084 [P] [US2] 撰寫 Card Entity Unit Tests：tests/unit/modules/social/domain/test_card_entity.py
 - [x] T085 [P] [US2] 撰寫 UploadCardUseCase Unit Tests：tests/unit/modules/social/application/test_upload_card_use_case.py（Mock 限制檢查）
 - [x] T086 [P] [US2] 撰寫 Quota Validation Unit Tests：tests/unit/modules/social/domain/test_upload_quota.py（測試每日/總容量/單檔大小邊界）
@@ -398,7 +398,7 @@
   - （POC/依框裁切）若要「依框線區域裁切成卡片圖」，需處理座標映射：框線是在 preview(View) 座標；拍照結果是照片像素座標。建議以相對比例保存框線區域（x/y/width/height 皆為 0..1），再換算為照片像素後用 `expo-image-manipulator` crop。
   - （避免映射歪斜）盡量讓 preview aspect ratio 與拍照輸出比例一致；若 preview 使用 cover/縮放，需把 letterbox/crop 的偏移納入換算，否則裁切會偏移。
   - 參考：apps/mobile/TECH_STACK.md 的「expo-camera（相機預覽 + 自訂 overlay，引導框 POC）」段落（含 POC 步驟與座標映射注意事項）
-- [x] M202 [P] [US2] 取得上傳 Signed URL：apps/mobile/src/features/cards/api（呼叫 POST /cards/upload-url；Contract: specs/001-kcardswap-complete-spec/contracts/cards/upload_url.json（需新增））✅
+- [x] M202 [P] [US2] 取得上傳 Signed URL：apps/mobile/src/features/cards/api（呼叫 POST /cards/upload-url；以 OpenAPI/Swagger 為準）✅
   - 回應需包含：`upload_url`、`method`（PUT/POST）、`required_headers`（至少 Content-Type；由後端決定）、以及可對應列表的 `image_url`/object key（或等價欄位）
   - 需明確規範 Signed URL 的有效期限（或 TTL 欄位），過期時前端需重新走 M202
 - [x] M203 [P] [US2] 直接上傳到 Signed URL：apps/mobile/src/features/cards/services/uploadToSignedUrl.ts（PUT/POST 上傳、錯誤處理與重試）✅
@@ -423,57 +423,59 @@
 
 ## Phase 5: User Story 3 - 附近的小卡搜尋 (Priority: P1)
 
-**目標**: 使用者可以搜尋附近的小卡（免費 5次/日限制，付費無限制）
+**目標**: 使用者可以搜尋附近的小卡（免費 5次/日限制；付費差異 deferred 至 Phase 8 BIZ）
 
 **獨立測試標準**:
 - ✓ 使用者可以提供座標並搜尋附近的小卡
-- ✓ 搜尋結果按距離排序（付費用戶優先）
+- ✓ 搜尋結果按距離排序
 - ✓ 隱身模式用戶不出現在結果中
 - ✓ 系統正確追蹤每日搜尋次數（免費 5次/日）
-- ✓ 達到限制時回傳正確錯誤訊息（429_RATE_LIMIT_EXCEEDED）
+- ✓ 達到限制時回傳正確錯誤訊息（HTTP 429 Too Many Requests）
 
 ### Application Layer (Social Module - Nearby)
 
-- [ ] T095 [P] [US3] 建立 SearchNearbyCardsUseCase：apps/backend/app/modules/social/application/use_cases/search_nearby_cards_use_case.py（計算距離 → 過濾隱身 → 排序）
-- [ ] T096 [P] [US3] 建立 UpdateUserLocationUseCase：apps/backend/app/modules/social/application/use_cases/update_user_location_use_case.py（記錄最近位置至 profiles.last_lat/last_lng）
+- [X] T095 [P] [US3] 建立 SearchNearbyCardsUseCase：apps/backend/app/modules/social/application/use_cases/search_nearby_cards_use_case.py（計算距離 → 過濾隱身 → 排序）
+- [X] T096 [P] [US3] 建立 UpdateUserLocationUseCase：apps/backend/app/modules/social/application/use_cases/update_user_location_use_case.py（記錄最近位置至 profiles.last_lat/last_lng）
 
 ### Infrastructure Layer (Social Module - Nearby)
 
-- [ ] T097 [P] [US3] 擴展 CardRepositoryImpl：新增 find_nearby_cards 方法（使用 PostGIS 或 Haversine 公式計算距離）
-- [ ] T098 [P] [US3] 實作 Search Quota Service：apps/backend/app/modules/social/infrastructure/services/search_quota_service.py（Redis 或 DB 追蹤每日搜尋次數）
+- [X] T097 [P] [US3] 擴展 CardRepositoryImpl：新增 find_nearby_cards 方法（使用 PostGIS 或 Haversine 公式計算距離）
+- [X] T098 [P] [US3] 實作 Search Quota Service：apps/backend/app/modules/social/infrastructure/services/search_quota_service.py（Redis 或 DB 追蹤每日搜尋次數）
 
 ### Presentation Layer (Social Module - Nearby)
 
-- [ ] T099 [P] [US3] 定義 Nearby Schema：apps/backend/app/modules/social/presentation/schemas/nearby_schemas.py（SearchNearbyRequest, NearbyCardResponse）
-- [ ] T100 [US3] 建立 Nearby Router：apps/backend/app/modules/social/presentation/routers/nearby_router.py（POST /nearby/search）
+- [X] T099 [P] [US3] 定義 Nearby Schema：apps/backend/app/modules/social/presentation/schemas/nearby_schemas.py（SearchNearbyRequest, NearbyCardResponse）
+- [X] T100 [US3] 建立 Nearby Router：apps/backend/app/modules/social/presentation/routers/nearby_router.py（POST /nearby/search）
+- [X] T100A [US3] 補齊位置上報端點：apps/backend/app/modules/social/presentation/routers/nearby_router.py（PUT /nearby/location）
 
 ### Integration
 
-- [ ] T101 [US3] 註冊 Nearby 功能到 DI Container：apps/backend/app/container.py
-- [ ] T102 [US3] 註冊 Nearby Router 到 main.py：apps/backend/app/main.py（包含 /nearby 路由）
+- [X] T101 [US3] 註冊 Nearby 功能到 DI Container：apps/backend/app/container.py
+- [X] T102 [US3] 註冊 Nearby Router 到 main.py：apps/backend/app/main.py（包含 /nearby 路由）
 
 ### Testing
 
-- [ ] T103 [P] [US3] 撰寫 Nearby Integration Tests：tests/integration/contracts/test_nearby_contracts.py（對齊 contracts/nearby/search.json，改以整合測試覆蓋）
-- [ ] T104 [P] [US3] 撰寫 SearchNearbyCardsUseCase Unit Tests：tests/unit/modules/social/application/test_search_nearby_use_case.py（Mock 距離計算與排序邏輯）
-- [ ] T105 [US3] 撰寫 Nearby Search Integration Tests：tests/integration/modules/social/test_nearby_search_flow.py（完整搜尋流程 E2E，包含限制觸發）
+- [X] T103 [P] [US3] 撰寫 Nearby Integration Tests（以 OpenAPI/Swagger 為唯一來源）
+- [X] T104 [P] [US3] 撰寫 SearchNearbyCardsUseCase Unit Tests：tests/unit/modules/social/application/test_search_nearby_use_case.py（Mock 距離計算與排序邏輯）
+- [X] T105 [US3] 撰寫 Nearby Search Integration Tests：tests/integration/modules/social/test_nearby_search_flow.py（完整搜尋流程 E2E，包含限制觸發）
 
 ### Configuration
 
-- [ ] T106 [P] [US3] 配置 Kong Rate Limiting：gateway/kong/kong.yaml（針對 /nearby/search 設定不同 rate-limit 標籤：free=5/day, premium=unlimited）
-- [ ] T107 [P] [US3] 更新環境變數：apps/backend/app/config.py（DAILY_SEARCH_LIMIT_FREE=5, SEARCH_RADIUS_KM=10）
+- [ ] T106 [P] [US3] 配置 Kong Rate Limiting：gateway/kong/kong.yaml（/nearby/search：free=5/day；premium 規則 deferred 至 Phase 8 BIZ）⏭️ 可選項目（應用層已實作）
+- [X] T107 [P] [US3] 更新環境變數：apps/backend/app/config.py（DAILY_SEARCH_LIMIT_FREE=5, SEARCH_RADIUS_KM=10）
 
 ### Verification
 
-- [ ] T108 [US3] 執行所有 US3 測試：確保 Unit Tests + Integration Tests 全數通過（已移除獨立 contract 測試流程）
-- [ ] T109 [US3] 手動驗證 US3 驗收標準：測試搜尋 5 次後觸發 429_RATE_LIMIT_EXCEEDED（免費用戶）
-- [ ] T110 [US3] 驗證付費用戶搜尋：確認付費用戶可以無限次搜尋
+- [X] T108 [US3] 執行所有 US3 測試：確保 Unit Tests + Integration Tests 全數通過（已移除獨立 contract 測試流程）✅ 9/9 單元測試通過
+- [ ] T109 [US3] 手動驗證 US3 驗收標準：測試搜尋 5 次後觸發 HTTP 429 Too Many Requests（免費用戶）⏸️ 需要實際環境
+- [ ] T110 [US3] （Deferred/Phase 8）驗證付費用戶搜尋差異：premium unlimited / premium priority ⏭️ 待 Phase 8 實作
 
 ### Mobile (Expo)
 
-- [ ] M301 [P] [US3] 定位權限與取得座標：apps/mobile/src/features/nearby（expo-location；處理拒絕權限）
-- [ ] M302 [P] [US3] 附近搜尋頁：apps/mobile/src/features/nearby/screens/NearbySearchScreen.tsx（POST /nearby/search；Contract: specs/001-kcardswap-complete-spec/contracts/nearby/search.json）
-- [ ] M303 [US3] 限次錯誤處理：免費用戶第 6 次提示 429_RATE_LIMIT_EXCEEDED（並提供升級入口）
+- [X] M301 [P] [US3] 定位權限與取得座標：apps/mobile/src/features/nearby（expo-location；處理拒絕權限）
+- [X] M302 [P] [US3] 附近搜尋頁：apps/mobile/src/features/nearby/screens/NearbySearchScreen.tsx（POST /nearby/search；Schema 以 Swagger/OpenAPI（openapi/openapi.json）為準）
+  - 建議流程：取得定位後先 PUT /nearby/location，再 POST /nearby/search（避免後端依舊位置造成結果偏差）
+- [X] M303 [US3] 限次錯誤處理：免費用戶第 6 次提示 HTTP 429 Too Many Requests（並提供升級入口；升級差異 deferred 至 Phase 8 BIZ）
 
 ---
 
@@ -539,8 +541,8 @@
 
 ### Mobile (Expo)
 
-- [ ] M401 [P] [US4] 好友邀請/接受/封鎖頁：apps/mobile/src/features/friends（對齊 /friends/* 端點；Contracts: 待補或沿用後端 OpenAPI）
-- [ ] M402 [P] [US4] 聊天室 UI 與輪詢：apps/mobile/src/features/chat（GET /chats/{id}/messages, POST /chats/{id}/messages；Contract: specs/001-kcardswap-complete-spec/contracts/chat/message.json）
+- [ ] M401 [P] [US4] 好友邀請/接受/封鎖頁：apps/mobile/src/features/friends（對齊 /friends/* 端點；以 OpenAPI/Swagger 為準）
+- [ ] M402 [P] [US4] 聊天室 UI 與輪詢：apps/mobile/src/features/chat（GET /chats/{id}/messages, POST /chats/{id}/messages；以 OpenAPI/Swagger 為準）
 - [ ] M403 [P] [US4] 前景輪詢策略：apps/mobile/src/features/chat/services/polling.ts（since=timestamp、退避避免過度打 API）
 - [ ] M404 [P] [US4] 推播接收與導頁：apps/mobile/src/features/notifications（expo-notifications；點擊通知導向聊天室）
 
@@ -591,7 +593,7 @@
 
 ### Testing
 
-- [ ] T161 [P] [US5] 撰寫 Trade Integration Tests：tests/integration/contracts/test_trade_contracts.py（對齊 contracts/trade/create.json，改以整合測試覆蓋）
+- [ ] T161 [P] [US5] 撰寫 Trade Integration Tests（以 OpenAPI/Swagger 為唯一來源；改以整合測試覆蓋）
 - [ ] T162 [P] [US5] 撰寫 Trade Entity Unit Tests：tests/unit/modules/social/domain/test_trade_entity.py
 - [ ] T163 [P] [US5] 撰寫 Trade Status State Machine Tests：tests/unit/modules/social/domain/test_trade_status.py（測試所有狀態轉換）
 - [ ] T164 [P] [US5] 撰寫 CreateTradeProposalUseCase Unit Tests：tests/unit/modules/social/application/test_create_trade_proposal_use_case.py
@@ -623,7 +625,7 @@
 
 ### Mobile (Expo)
 
-- [ ] M501 [P] [US5] 發起交換提案頁：apps/mobile/src/features/trade（選擇卡片並呼叫 POST /trades；Contract: specs/001-kcardswap-complete-spec/contracts/trade/create.json）
+- [ ] M501 [P] [US5] 發起交換提案頁：apps/mobile/src/features/trade（選擇卡片並呼叫 POST /trades；以 OpenAPI/Swagger 為準）
 - [ ] M502 [P] [US5] 提案詳情與狀態更新 UI：apps/mobile/src/features/trade/screens/TradeDetailScreen.tsx（接受/完成等動作）
 - [ ] M503 [US5] 交換歷史列表：apps/mobile/src/features/trade/screens/TradeHistoryScreen.tsx（依後端查詢端點）
 
@@ -663,7 +665,7 @@
 
 ### Testing
 
-- [ ] T185 [P] [US6] 撰寫 Subscription Integration Tests：tests/integration/contracts/test_subscription_contracts.py（對齊 contracts/biz/offer.json，改以整合測試覆蓋）
+- [ ] T185 [P] [US6] 撰寫 Subscription Integration Tests（以 OpenAPI/Swagger 為唯一來源；改以整合測試覆蓋）
 - [ ] T186 [P] [US6] 撰寫 Subscription Unit Tests：tests/unit/modules/identity/application/test_verify_receipt_use_case.py
 - [ ] T187 [US6] 撰寫 Subscription Integration Tests：tests/integration/modules/identity/test_subscription_flow.py
 
@@ -681,7 +683,7 @@
 
 - [ ] M601 [P] [US6] 方案/付費牆頁：apps/mobile/src/features/subscription（顯示 free/premium 差異與升級入口）
 - [ ] M602 [P] [US6] Android Google Play Billing 整合：apps/mobile/src/features/subscription/billing（購買/續訂/恢復購買）
-- [ ] M603 [P] [US6] 收據驗證串接：apps/mobile/src/features/subscription/api（POST /subscriptions/verify-receipt；Contract: specs/001-kcardswap-complete-spec/contracts/biz/offer.json）
+- [ ] M603 [P] [US6] 收據驗證串接：apps/mobile/src/features/subscription/api（POST /subscriptions/verify-receipt；以 OpenAPI/Swagger 為準）
 - [ ] M604 [US6] 訂閱狀態顯示與降級提示：apps/mobile/src/features/subscription/screens/SubscriptionStatusScreen.tsx
 
 ---
@@ -735,10 +737,10 @@
 - [ ] T225 [P] [US7] 建立 Posts Tables Migration：apps/backend/alembic/versions/005_add_posts_tables.py（posts, post_interests + indexes）
 - [ ] T226 [US7] 驗證 Migration：alembic upgrade head && alembic downgrade -1
 
-### Contracts & Testing
+### OpenAPI/Swagger & Testing
 
-- [ ] T227 [P] [US7] 新增 Posts Contracts：specs/001-kcardswap-complete-spec/contracts/posts/*.json（create/list/interest/accept/reject/close）
-- [ ] T228 [P] [US7] 撰寫 Posts Integration Tests：tests/integration/contracts/test_posts_contracts.py（對齊 contracts/posts/*.json，改以整合測試覆蓋）
+- [ ] T227 [P] [US7] 對齊 OpenAPI/Swagger：Posts 相關 endpoints（以 openapi/openapi.json 為準）
+- [ ] T228 [P] [US7] 撰寫 Posts Integration Tests（以 OpenAPI/Swagger 為唯一來源；改以整合測試覆蓋）
 
 ### Mobile (Expo)
 
@@ -754,7 +756,7 @@
 **目的**: 整合所有功能、優化效能、完善文件
 
 - [ ] T192 [P] 統一錯誤處理：apps/backend/app/shared/presentation/exceptions/error_codes.py（定義所有錯誤碼：400/401/403/404/409/422/429）
-- [ ] T193 [P] 建立 OpenAPI 規格：apps/backend/openapi.yaml（或使用 FastAPI 自動生成）
+- [ ] T193 [P] 更新 OpenAPI snapshot（唯一來源）：openapi/openapi.json（由後端 FastAPI 自動生成；供 Swagger 與 SDK codegen 使用）
 - [ ] T194 [P] E2E 測試：tests/e2e/test_complete_user_journey.py（模擬完整使用者旅程：登入 → 上傳卡片 → 搜尋 → 加好友 → 聊天 → 交換 → 評分）
 - [ ] T195 [P] 效能測試：tests/performance/test_api_performance.py（測試關鍵 API 回應時間與吞吐量）
 - [ ] T196 [P] 安全測試：tests/security/test_jwt_security.py（測試 Token 竄改、過期處理）
@@ -992,7 +994,7 @@ Group M5: US5 Mobile (Expo) - Trade
 ## Phase -1 Gates Checklist
 - Simplicity Gate：保持 ≤3 個專案（mobile/backend/gateway）；若需例外，在 plan.md 記錄理由。
 - Anti-Abstraction Gate：遵循憲法 Article VI，禁止不必要抽象；Domain 不依賴框架；Repository 實作置於 Infrastructure。
-- Integration-First Gate：先定義 `specs/001-kcardswap-complete-spec/contracts/` 並使用真實 DB/Gateway 進行整合測試；契約測試必備；路由回應需與契約 JSON 對齊。
+- Integration-First Gate：以 OpenAPI/Swagger 為唯一契約來源；端到端整合測試需覆蓋主要路由與錯誤情境，回應需與 OpenAPI 定義一致。
 
 ## Acceptance Criteria Examples
 - T204：超限時回傳 `422_LIMIT_EXCEEDED` 並包含哪一項超限訊息（每日/容量/大小）

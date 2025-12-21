@@ -3,7 +3,7 @@ SQLAlchemy Card Repository Implementation
 """
 
 from datetime import datetime, timedelta
-from typing import List, Optional
+from typing import List, Optional, Tuple
 from uuid import UUID
 
 from sqlalchemy import select, func, and_
@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.modules.social.domain.entities.card import Card
 from app.modules.social.domain.repositories.card_repository import CardRepository
 from app.modules.social.infrastructure.database.models.card_model import CardModel
+from app.modules.social.infrastructure.utils.geolocation import haversine_distance
 
 
 class SQLAlchemyCardRepository(CardRepository):
@@ -134,6 +135,72 @@ class SQLAlchemyCardRepository(CardRepository):
         )
         models = result.scalars().all()
         return [self._to_entity(model) for model in models]
+
+    async def find_nearby_cards(
+        self,
+        lat: float,
+        lng: float,
+        radius_km: float,
+        exclude_user_id: UUID,
+        exclude_stealth_users: bool = True,
+    ) -> List[Tuple[Card, float, Optional[str]]]:
+        """
+        Find cards within a radius from a location.
+        
+        This method:
+        1. Joins cards with profiles to get owner location and nickname
+        2. Filters out users in stealth mode (if requested)
+        3. Filters out users without location set
+        4. Calculates distance using Haversine formula
+        5. Filters by radius
+        6. Sorts by distance (closest first)
+        
+        Returns list of (Card, distance_km, owner_nickname) tuples
+        """
+        from app.modules.identity.infrastructure.database.models.profile_model import (
+            ProfileModel,
+        )
+
+        # Build query: join cards with profiles
+        query = (
+            select(CardModel, ProfileModel)
+            .join(ProfileModel, CardModel.owner_id == ProfileModel.user_id)
+            .where(
+                and_(
+                    CardModel.owner_id != exclude_user_id,  # Exclude searcher
+                    CardModel.status == Card.STATUS_AVAILABLE,  # Only available cards
+                    ProfileModel.last_lat.isnot(None),  # Must have location
+                    ProfileModel.last_lng.isnot(None),
+                )
+            )
+        )
+
+        # Optionally exclude stealth mode users
+        if exclude_stealth_users:
+            query = query.where(ProfileModel.stealth_mode == False)
+
+        # Execute query
+        result = await self.session.execute(query)
+        rows = result.all()
+
+        # Calculate distances and filter by radius
+        nearby_results: List[Tuple[Card, float, Optional[str]]] = []
+
+        for card_model, profile_model in rows:
+            # Calculate distance using Haversine formula
+            distance = haversine_distance(
+                lat, lng, profile_model.last_lat, profile_model.last_lng
+            )
+
+            # Filter by radius
+            if distance <= radius_km:
+                card = self._to_entity(card_model)
+                nearby_results.append((card, distance, profile_model.nickname))
+
+        # Sort by distance (closest first)
+        nearby_results.sort(key=lambda x: x[1])
+
+        return nearby_results
 
     @staticmethod
     def _to_entity(model: CardModel) -> Card:

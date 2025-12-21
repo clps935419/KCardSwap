@@ -121,9 +121,16 @@ def create_application() -> FastAPI:
 
     app.include_router(cards_router, prefix=settings.API_PREFIX)
 
-    # Future module routers (Phase 5+)
-    # from .modules.social.presentation.routers.nearby_router import router as nearby_router
-    # app.include_router(nearby_router, prefix=settings.API_PREFIX)
+    # Phase 5: Social module (Nearby Search)
+    from .modules.social.presentation.routers.nearby_router import (
+        router as nearby_router,
+    )
+
+    app.include_router(nearby_router, prefix=settings.API_PREFIX)
+
+    # Future module routers (Phase 6+)
+    # from .modules.social.presentation.routers.friends_router import router as friends_router
+    # app.include_router(friends_router, prefix=settings.API_PREFIX)
 
     return app
 

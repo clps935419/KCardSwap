@@ -3,21 +3,48 @@
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
 import type {
-  GetMyCardsData,
-  GetMyCardsErrors,
-  GetMyCardsResponses,
-  GetMyProfileData,
-  GetMyProfileErrors,
-  GetMyProfileResponses,
-  GoogleCallbackData,
-  GoogleCallbackErrors,
-  GoogleCallbackResponses,
-  RefreshTokenData,
-  RefreshTokenErrors,
-  RefreshTokenResponses,
-  UpdateMyProfileData,
-  UpdateMyProfileErrors,
-  UpdateMyProfileResponses,
+  AdminLoginApiV1AuthAdminLoginPostData,
+  AdminLoginApiV1AuthAdminLoginPostErrors,
+  AdminLoginApiV1AuthAdminLoginPostResponses,
+  ApiHealthCheckApiV1HealthGetData,
+  ApiHealthCheckApiV1HealthGetResponses,
+  DeleteCardApiV1CardsCardIdDeleteData,
+  DeleteCardApiV1CardsCardIdDeleteErrors,
+  DeleteCardApiV1CardsCardIdDeleteResponses,
+  GetMyCardsApiV1CardsMeGetData,
+  GetMyCardsApiV1CardsMeGetErrors,
+  GetMyCardsApiV1CardsMeGetResponses,
+  GetMyProfileApiV1ProfileMeGetData,
+  GetMyProfileApiV1ProfileMeGetErrors,
+  GetMyProfileApiV1ProfileMeGetResponses,
+  GetQuotaStatusApiV1CardsQuotaStatusGetData,
+  GetQuotaStatusApiV1CardsQuotaStatusGetErrors,
+  GetQuotaStatusApiV1CardsQuotaStatusGetResponses,
+  GetUploadUrlApiV1CardsUploadUrlPostData,
+  GetUploadUrlApiV1CardsUploadUrlPostErrors,
+  GetUploadUrlApiV1CardsUploadUrlPostResponses,
+  GoogleCallbackApiV1AuthGoogleCallbackPostData,
+  GoogleCallbackApiV1AuthGoogleCallbackPostErrors,
+  GoogleCallbackApiV1AuthGoogleCallbackPostResponses,
+  GoogleLoginApiV1AuthGoogleLoginPostData,
+  GoogleLoginApiV1AuthGoogleLoginPostErrors,
+  GoogleLoginApiV1AuthGoogleLoginPostResponses,
+  HealthCheckHealthGetData,
+  HealthCheckHealthGetResponses,
+  RefreshTokenApiV1AuthRefreshPostData,
+  RefreshTokenApiV1AuthRefreshPostErrors,
+  RefreshTokenApiV1AuthRefreshPostResponses,
+  RootGetData,
+  RootGetResponses,
+  SearchNearbyCardsApiV1NearbySearchPostData,
+  SearchNearbyCardsApiV1NearbySearchPostErrors,
+  SearchNearbyCardsApiV1NearbySearchPostResponses,
+  UpdateMyProfileApiV1ProfileMePutData,
+  UpdateMyProfileApiV1ProfileMePutErrors,
+  UpdateMyProfileApiV1ProfileMePutResponses,
+  UpdateUserLocationApiV1NearbyLocationPutData,
+  UpdateUserLocationApiV1NearbyLocationPutErrors,
+  UpdateUserLocationApiV1NearbyLocationPutResponses,
 } from './types.gen';
 
 export type Options<
@@ -38,15 +65,100 @@ export type Options<
 };
 
 /**
- * Google OAuth callback with PKCE
+ * Health Check
  *
- * Authorization Code Flow for Expo AuthSession
+ * Health check endpoint for container orchestration.
  */
-export const googleCallback = <ThrowOnError extends boolean = false>(
-  options: Options<GoogleCallbackData, ThrowOnError>
+export const healthCheckHealthGet = <ThrowOnError extends boolean = false>(
+  options?: Options<HealthCheckHealthGetData, ThrowOnError>
 ) =>
-  (options.client ?? client).post<GoogleCallbackResponses, GoogleCallbackErrors, ThrowOnError>({
-    url: '/auth/google-callback',
+  (options?.client ?? client).get<HealthCheckHealthGetResponses, unknown, ThrowOnError>({
+    url: '/health',
+    ...options,
+  });
+
+/**
+ * Api Health Check
+ *
+ * API health check endpoint.
+ */
+export const apiHealthCheckApiV1HealthGet = <ThrowOnError extends boolean = false>(
+  options?: Options<ApiHealthCheckApiV1HealthGetData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<ApiHealthCheckApiV1HealthGetResponses, unknown, ThrowOnError>({
+    url: '/api/v1/health',
+    ...options,
+  });
+
+/**
+ * Root
+ *
+ * Root endpoint.
+ */
+export const rootGet = <ThrowOnError extends boolean = false>(
+  options?: Options<RootGetData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<RootGetResponses, unknown, ThrowOnError>({
+    url: '/',
+    ...options,
+  });
+
+/**
+ * Admin login with email/password
+ *
+ * Authenticate admin user with email and password. Only users with admin or super_admin role can login.
+ */
+export const adminLoginApiV1AuthAdminLoginPost = <ThrowOnError extends boolean = false>(
+  options: Options<AdminLoginApiV1AuthAdminLoginPostData, ThrowOnError>
+) =>
+  (options.client ?? client).post<
+    AdminLoginApiV1AuthAdminLoginPostResponses,
+    AdminLoginApiV1AuthAdminLoginPostErrors,
+    ThrowOnError
+  >({
+    url: '/api/v1/auth/admin-login',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Login with Google
+ *
+ * Authenticate user with Google OAuth token and receive JWT tokens
+ */
+export const googleLoginApiV1AuthGoogleLoginPost = <ThrowOnError extends boolean = false>(
+  options: Options<GoogleLoginApiV1AuthGoogleLoginPostData, ThrowOnError>
+) =>
+  (options.client ?? client).post<
+    GoogleLoginApiV1AuthGoogleLoginPostResponses,
+    GoogleLoginApiV1AuthGoogleLoginPostErrors,
+    ThrowOnError
+  >({
+    url: '/api/v1/auth/google-login',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Google OAuth Callback with PKCE
+ *
+ * Authenticate user with Google OAuth authorization code and PKCE code_verifier (Expo AuthSession)
+ */
+export const googleCallbackApiV1AuthGoogleCallbackPost = <ThrowOnError extends boolean = false>(
+  options: Options<GoogleCallbackApiV1AuthGoogleCallbackPostData, ThrowOnError>
+) =>
+  (options.client ?? client).post<
+    GoogleCallbackApiV1AuthGoogleCallbackPostResponses,
+    GoogleCallbackApiV1AuthGoogleCallbackPostErrors,
+    ThrowOnError
+  >({
+    url: '/api/v1/auth/google-callback',
     ...options,
     headers: {
       'Content-Type': 'application/json',
@@ -57,13 +169,17 @@ export const googleCallback = <ThrowOnError extends boolean = false>(
 /**
  * Refresh access token
  *
- * Get a new access token using refresh token
+ * Use refresh token to obtain new access and refresh tokens
  */
-export const refreshToken = <ThrowOnError extends boolean = false>(
-  options: Options<RefreshTokenData, ThrowOnError>
+export const refreshTokenApiV1AuthRefreshPost = <ThrowOnError extends boolean = false>(
+  options: Options<RefreshTokenApiV1AuthRefreshPostData, ThrowOnError>
 ) =>
-  (options.client ?? client).post<RefreshTokenResponses, RefreshTokenErrors, ThrowOnError>({
-    url: '/auth/refresh',
+  (options.client ?? client).post<
+    RefreshTokenApiV1AuthRefreshPostResponses,
+    RefreshTokenApiV1AuthRefreshPostErrors,
+    ThrowOnError
+  >({
+    url: '/api/v1/auth/refresh',
     ...options,
     headers: {
       'Content-Type': 'application/json',
@@ -72,30 +188,60 @@ export const refreshToken = <ThrowOnError extends boolean = false>(
   });
 
 /**
- * Get current user profile
+ * Get my profile
  *
- * Retrieve the authenticated user's profile
+ * Retrieve the authenticated user's profile information
  */
-export const getMyProfile = <ThrowOnError extends boolean = false>(
-  options?: Options<GetMyProfileData, ThrowOnError>
+export const getMyProfileApiV1ProfileMeGet = <ThrowOnError extends boolean = false>(
+  options?: Options<GetMyProfileApiV1ProfileMeGetData, ThrowOnError>
 ) =>
-  (options?.client ?? client).get<GetMyProfileResponses, GetMyProfileErrors, ThrowOnError>({
+  (options?.client ?? client).get<
+    GetMyProfileApiV1ProfileMeGetResponses,
+    GetMyProfileApiV1ProfileMeGetErrors,
+    ThrowOnError
+  >({
     security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/profile/me',
+    url: '/api/v1/profile/me',
     ...options,
   });
 
 /**
- * Update current user profile
+ * Update my profile
  *
  * Update the authenticated user's profile information
  */
-export const updateMyProfile = <ThrowOnError extends boolean = false>(
-  options: Options<UpdateMyProfileData, ThrowOnError>
+export const updateMyProfileApiV1ProfileMePut = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateMyProfileApiV1ProfileMePutData, ThrowOnError>
 ) =>
-  (options.client ?? client).put<UpdateMyProfileResponses, UpdateMyProfileErrors, ThrowOnError>({
+  (options.client ?? client).put<
+    UpdateMyProfileApiV1ProfileMePutResponses,
+    UpdateMyProfileApiV1ProfileMePutErrors,
+    ThrowOnError
+  >({
     security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/profile/me',
+    url: '/api/v1/profile/me',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Get upload signed URL
+ *
+ * Generate a signed URL for uploading a card image to GCS
+ */
+export const getUploadUrlApiV1CardsUploadUrlPost = <ThrowOnError extends boolean = false>(
+  options: Options<GetUploadUrlApiV1CardsUploadUrlPostData, ThrowOnError>
+) =>
+  (options.client ?? client).post<
+    GetUploadUrlApiV1CardsUploadUrlPostResponses,
+    GetUploadUrlApiV1CardsUploadUrlPostErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/cards/upload-url',
     ...options,
     headers: {
       'Content-Type': 'application/json',
@@ -108,11 +254,95 @@ export const updateMyProfile = <ThrowOnError extends boolean = false>(
  *
  * Retrieve all cards owned by the authenticated user
  */
-export const getMyCards = <ThrowOnError extends boolean = false>(
-  options?: Options<GetMyCardsData, ThrowOnError>
+export const getMyCardsApiV1CardsMeGet = <ThrowOnError extends boolean = false>(
+  options?: Options<GetMyCardsApiV1CardsMeGetData, ThrowOnError>
 ) =>
-  (options?.client ?? client).get<GetMyCardsResponses, GetMyCardsErrors, ThrowOnError>({
+  (options?.client ?? client).get<
+    GetMyCardsApiV1CardsMeGetResponses,
+    GetMyCardsApiV1CardsMeGetErrors,
+    ThrowOnError
+  >({
     security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/cards/me',
+    url: '/api/v1/cards/me',
     ...options,
+  });
+
+/**
+ * Delete a card
+ *
+ * Delete a card owned by the authenticated user
+ */
+export const deleteCardApiV1CardsCardIdDelete = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteCardApiV1CardsCardIdDeleteData, ThrowOnError>
+) =>
+  (options.client ?? client).delete<
+    DeleteCardApiV1CardsCardIdDeleteResponses,
+    DeleteCardApiV1CardsCardIdDeleteErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/cards/{card_id}',
+    ...options,
+  });
+
+/**
+ * Get quota status
+ *
+ * Check current upload quota usage
+ */
+export const getQuotaStatusApiV1CardsQuotaStatusGet = <ThrowOnError extends boolean = false>(
+  options?: Options<GetQuotaStatusApiV1CardsQuotaStatusGetData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    GetQuotaStatusApiV1CardsQuotaStatusGetResponses,
+    GetQuotaStatusApiV1CardsQuotaStatusGetErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/cards/quota/status',
+    ...options,
+  });
+
+/**
+ * Search for nearby cards
+ *
+ * Search for cards near a specific location. Free users: 5 searches/day. Premium users: unlimited.
+ */
+export const searchNearbyCardsApiV1NearbySearchPost = <ThrowOnError extends boolean = false>(
+  options: Options<SearchNearbyCardsApiV1NearbySearchPostData, ThrowOnError>
+) =>
+  (options.client ?? client).post<
+    SearchNearbyCardsApiV1NearbySearchPostResponses,
+    SearchNearbyCardsApiV1NearbySearchPostErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/nearby/search',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Update user location
+ *
+ * Update the user's current location for nearby search visibility
+ */
+export const updateUserLocationApiV1NearbyLocationPut = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateUserLocationApiV1NearbyLocationPutData, ThrowOnError>
+) =>
+  (options.client ?? client).put<
+    UpdateUserLocationApiV1NearbyLocationPutResponses,
+    UpdateUserLocationApiV1NearbyLocationPutErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/nearby/location',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });

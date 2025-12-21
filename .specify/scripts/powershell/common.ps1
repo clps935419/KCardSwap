@@ -109,7 +109,7 @@ function Get-FeaturePathsEnv {
         RESEARCH      = Join-Path $featureDir 'research.md'
         DATA_MODEL    = Join-Path $featureDir 'data-model.md'
         QUICKSTART    = Join-Path $featureDir 'quickstart.md'
-        CONTRACTS_DIR = Join-Path $featureDir 'contracts'
+        OPENAPI_SNAPSHOT = Join-Path $repoRoot 'openapi/openapi.json'
     }
 }
 

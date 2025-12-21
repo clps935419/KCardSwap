@@ -162,10 +162,6 @@ poetry run ruff check --fix .
 - **OpenAPI JSON**: http://localhost:8000/api/v1/openapi.json
 - **Kong Gateway**: http://localhost:8080/api/v1
 
-（可選）透過 Kong Proxy 存取 OpenAPI JSON：
-
-- http://localhost:8080/api/v1/openapi.json
-
 ## 架構原則
 
 ### DDD (Domain-Driven Design)

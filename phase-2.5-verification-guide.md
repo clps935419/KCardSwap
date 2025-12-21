@@ -370,7 +370,7 @@ export DEFAULT_ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
 - `PHASE-2.5-ADMIN-SCRIPTS-CLARIFICATION.md` - 腳本設計說明
 - `INIT-DATA-DESIGN.md` - 資料初始化設計文件
 - `specs/001-kcardswap-complete-spec/tasks.md` - 任務清單
-- `specs/001-kcardswap-complete-spec/contracts/auth/admin_login.json` - API Contract
+- `openapi/openapi.json` - OpenAPI/Swagger 規格快照
 
 ## 總結
 

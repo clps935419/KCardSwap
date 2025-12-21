@@ -5,7 +5,7 @@ Profile ORM model for Identity module
 import uuid
 from datetime import datetime
 
-from sqlalchemy import JSON, Column, DateTime, ForeignKey, String, Text
+from sqlalchemy import JSON, Boolean, Column, DateTime, Float, ForeignKey, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
@@ -37,6 +37,14 @@ class ProfileModel(Base):
             "show_online": True,
             "allow_stranger_chat": True,
         },
+    )
+    last_lat = Column(Float, nullable=True, comment="Last known latitude")
+    last_lng = Column(Float, nullable=True, comment="Last known longitude")
+    stealth_mode = Column(
+        Boolean,
+        nullable=False,
+        server_default="false",
+        comment="Hide from nearby search",
     )
     created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
     updated_at = Column(

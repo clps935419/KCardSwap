@@ -1,7 +1,9 @@
 # KCardSwap 技術規劃（Tech Plan）
 
-更新說明（2025-12-12）：本計畫已同步最新規格說明，DDD 架構原則改以專案憲法的 Article VI 作為唯一依據。此處僅保留與本專案實作直接相關的目錄結構與服務切分，避免重複規範。另新增契約與資料模型的集中維護，對應 Integration‑First Gate：
-1) 契約：specs/001-kcardswap-complete-spec/contracts/
+更新說明（2025-12-12）：本計畫已同步最新規格說明，DDD 架構原則改以專案憲法的 Article VI 作為唯一依據。此處僅保留與本專案實作直接相關的目錄結構與服務切分，避免重複規範。
+
+**API 單一真相來源（Single Source of Truth）**：本專案以 Swagger/OpenAPI 為唯一權威來源。
+1) OpenAPI snapshot：openapi/openapi.json（由後端 FastAPI 自動生成後提交到 repo）
 2) 資料模型綜覽：specs/001-kcardswap-complete-spec/data-model.md（與 infra/db/init.sql 對齊）
 
 本計劃對應 `specs/001-kcardswap-complete-spec/spec.md`，包含詳細的架構設計、API 規格、資料庫 Schema、前後端任務分解、限制與政策、測試策略、里程碑與風險控管。
@@ -140,20 +142,32 @@
 	- `cards(id, owner_id, idol, group, album, version, rarity, status, image_url, size_bytes, created_at, updated_at)`
 	- `card_upload_stats(user_id, date, created_count)`
 - 縮圖策略：Mobile 端本機產生 `200x200` WebP 並快取（後端不產生/不儲存/不回傳縮圖）。
+- Guardrails（硬性約束）：
+	- 禁止縮圖欄位：所有 API request/response 不得出現任何 `thumb_*` / `thumbnail_*` 欄位（例如 `thumb_url`, `thumbnail_url`）。
+	- 縮圖責任邊界：縮圖為 Mobile 端本機產生並本機快取；不上傳、不入後端 DB、後端不回傳。
+	- 後端只負責原圖：後端僅提供原圖上傳 Signed URL 與配額/限制檢查；物件路徑僅允許 `cards/{user_id}/{uuid}.jpg`，禁止 `thumbs/`。
 - 測試：
 	- 上傳前大小驗證；達上限時的錯誤碼（`422_LIMIT_EXCEEDED`）。
 	- 第三方整合測試分層：Unit/Integration 不打真實 GCS；僅 Staging/Nightly 以環境變數啟用少量真實 GCS Smoke（CORS/IAM/PUT 可用性）。
 
 ## 4. 附近搜尋（NEARBY）
 - API 規格：
-	- `GET /api/v1/nearby?radius=1|5|10|all`：回傳距離與行政區。
+	- `PUT /api/v1/nearby/location`：上報目前使用者位置（寫入 profile 的 last_lat/last_lng）。
+	- `POST /api/v1/nearby/search`：用座標搜尋附近小卡（距離排序、隱身排除、次數限制）。
 - 算法與資料：
-	- 使用者最近一次上傳座標（或明確定位）作為位置來源。
-	- 排序：距離升序，同距離付費會員優先。
+	- 位置來源：使用者主動上報位置（/nearby/location）與搜尋請求座標（/nearby/search）。
+	- 排序：距離升序。
 - 次數限制：
-	- 免費：5 次/天；付費：不限（Kong Rate Limit 標籤）。
+	- 免費：5 次/天。
+	- 付費差異（premium unlimited / premium priority）：**deferred 至 Phase 8（BIZ）**。
 - 測試：
 	- 隱身模式不出現在他人結果；限次計數與重置。
+
+使用流程（Mobile 建議）：
+	1. 取得定位權限與座標。
+	2. `PUT /api/v1/nearby/location` 上報位置（讓後端 profile.last_lat/last_lng 保持最新）。
+	3. `POST /api/v1/nearby/search` 進行搜尋。
+	4. 若回傳 HTTP 429（Too Many Requests）：顯示限次提示與升級入口（升級差異 deferred 至 Phase 8）。
 
 ## 5. 社交與好友（SOCIAL）
 - API 規格：
@@ -204,7 +218,7 @@
 	- `409_CONFLICT`
 	- `422_LIMIT_EXCEEDED`
 	- `429_RATE_LIMITED`
-- OpenAPI 規格：在 `apps/backend/openapi.yaml` 維護；自動產生文件站。
+- OpenAPI 規格：由後端 FastAPI 自動生成（Swagger/OpenAPI），並提交 snapshot 至 openapi/openapi.json 作為唯一權威來源。
 
 ## 10. UI/UX 詳細規劃
 - Flow：登入 → 完檔 → 上傳首卡 → 附近 → 好友/聊天 → 交換 → 評分。
@@ -223,7 +237,7 @@
 Phase -1 Gates（依憲法）
 - Simplicity Gate：專案數量 ≤3（mobile/backend/gateway）；避免過度設計，例外將記錄於本節。
 - Anti-Abstraction Gate：優先使用框架原生能力，禁止不必要抽象層。
-- Integration-First Gate：契約定義在 specs/001-kcardswap-complete-spec/contracts/；優先以真實 DB/Gateway 進行整合測試；路由實作需符合契約用例（成功/驗證失敗/未授權/衝突等）。
+- Integration-First Gate：以 Swagger/OpenAPI（openapi/openapi.json）作為唯一契約；優先以真實 DB/Gateway 進行整合測試；路由實作需符合 OpenAPI 定義（成功/驗證失敗/未授權/衝突等）。
 
 ## 12. 風險與緩解
 - 位置隱私爭議 → 預設不顯示精確地址、僅行政區與距離。

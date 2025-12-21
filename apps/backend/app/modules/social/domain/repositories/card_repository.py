@@ -4,7 +4,7 @@ Following DDD principles: Domain layer defines interface, infrastructure impleme
 """
 
 from abc import ABC, abstractmethod
-from typing import List, Optional
+from typing import List, Optional, Tuple
 from uuid import UUID
 
 from app.modules.social.domain.entities.card import Card
@@ -105,5 +105,30 @@ class CardRepository(ABC):
             
         Returns:
             List of matching cards
+        """
+        pass
+
+    @abstractmethod
+    async def find_nearby_cards(
+        self,
+        lat: float,
+        lng: float,
+        radius_km: float,
+        exclude_user_id: UUID,
+        exclude_stealth_users: bool = True,
+    ) -> List[Tuple[Card, float, Optional[str]]]:
+        """
+        Find cards within a radius from a location.
+        
+        Args:
+            lat: Latitude of search origin
+            lng: Longitude of search origin
+            radius_km: Search radius in kilometers
+            exclude_user_id: User ID to exclude from results (the searcher)
+            exclude_stealth_users: Whether to exclude users in stealth mode
+            
+        Returns:
+            List of tuples (Card, distance_km, owner_nickname)
+            Sorted by distance (closest first)
         """
         pass

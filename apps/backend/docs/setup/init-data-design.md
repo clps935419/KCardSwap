@@ -348,5 +348,5 @@ curl -X POST http://localhost:8000/api/v1/auth/admin-login \
 
 - `PHASE-2.5-COMPLETE.md` - Phase 2.5 完整說明
 - `scripts/create_admin.py` - 手動建立任意管理員帳號
-- `specs/001-kcardswap-complete-spec/contracts/auth/admin_login.json` - API 規格
+- OpenAPI/Swagger - API 規格（以 openapi/openapi.json 為準）
 - `apps/backend/docs/authentication.md` - 認證系統文件

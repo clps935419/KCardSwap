@@ -477,11 +477,10 @@ See examples in each endpoint section above.
 
 ---
 
-## Contract
+## OpenAPI/Swagger
 
-API contracts are defined in:
-```
-specs/001-kcardswap-complete-spec/contracts/cards/upload_url.json
-```
+API specification is defined by OpenAPI/Swagger:
 
-All responses must conform to the contract specification.
+- Repository snapshot: `openapi/openapi.json`
+
+All responses must conform to the OpenAPI definition.
