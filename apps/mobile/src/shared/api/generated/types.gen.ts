@@ -25,6 +25,46 @@ export type AdminLoginRequest = {
 };
 
 /**
+ * AverageRatingResponse
+ *
+ * Response schema for average rating
+ */
+export type AverageRatingResponse = {
+  /**
+   * User Id
+   *
+   * User ID
+   */
+  user_id: string;
+  /**
+   * Average Score
+   *
+   * Average rating score
+   */
+  average_score: number;
+  /**
+   * Total Ratings
+   *
+   * Total number of ratings received
+   */
+  total_ratings: number;
+};
+
+/**
+ * BlockUserRequest
+ *
+ * Request schema for blocking a user
+ */
+export type BlockUserRequest = {
+  /**
+   * User Id
+   *
+   * ID of user to block
+   */
+  user_id: string;
+};
+
+/**
  * CardResponse
  *
  * Response schema for card details
@@ -105,6 +145,96 @@ export type CardResponse = {
 };
 
 /**
+ * ChatRoomParticipantResponse
+ *
+ * Response schema for chat room participant
+ */
+export type ChatRoomParticipantResponse = {
+  /**
+   * User Id
+   *
+   * User ID
+   */
+  user_id: string;
+  /**
+   * Nickname
+   *
+   * User's nickname
+   */
+  nickname?: string | null;
+  /**
+   * Avatar Url
+   *
+   * User's avatar URL
+   */
+  avatar_url?: string | null;
+};
+
+/**
+ * ChatRoomResponse
+ *
+ * Response schema for chat room details
+ */
+export type ChatRoomResponse = {
+  /**
+   * Id
+   *
+   * Chat room ID
+   */
+  id: string;
+  /**
+   * Participants
+   *
+   * Room participants
+   */
+  participants: ChatRoomParticipantResponse[];
+  /**
+   * Last message in the room
+   */
+  last_message?: MessageResponse | null;
+  /**
+   * Unread Count
+   *
+   * Number of unread messages for current user
+   */
+  unread_count?: number;
+  /**
+   * Created At
+   *
+   * Creation timestamp
+   */
+  created_at: string;
+};
+
+/**
+ * ErrorResponse
+ *
+ * Error response schema
+ */
+export type ErrorResponse = {
+  /**
+   * Code
+   *
+   * Error code
+   */
+  code: string;
+  /**
+   * Message
+   *
+   * Error message
+   */
+  message: string;
+  /**
+   * Details
+   *
+   * Additional error details
+   */
+  details?: {
+    [key: string]: unknown;
+  } | null;
+};
+
+/**
  * ErrorWrapper
  *
  * Error wrapper response
@@ -114,7 +244,103 @@ export type ErrorWrapper = {
    * Data
    */
   data?: null;
-  error: AppModulesIdentityPresentationSchemasProfileSchemasErrorResponse;
+  error: ErrorResponse;
+};
+
+/**
+ * FriendListItemResponse
+ *
+ * Response schema for a single friend in the list
+ */
+export type FriendListItemResponse = {
+  /**
+   * User Id
+   *
+   * Friend's user ID
+   */
+  user_id: string;
+  /**
+   * Nickname
+   *
+   * Friend's nickname
+   */
+  nickname?: string | null;
+  /**
+   * Avatar Url
+   *
+   * Friend's avatar URL
+   */
+  avatar_url?: string | null;
+  /**
+   * Status
+   *
+   * Friendship status
+   */
+  status: string;
+  /**
+   * Created At
+   *
+   * When friendship was created
+   */
+  created_at: string;
+};
+
+/**
+ * FriendListResponse
+ *
+ * Response schema for friend list
+ */
+export type FriendListResponse = {
+  /**
+   * Friends
+   *
+   * List of friends
+   */
+  friends: FriendListItemResponse[];
+  /**
+   * Total
+   *
+   * Total number of friends
+   */
+  total: number;
+};
+
+/**
+ * FriendshipResponse
+ *
+ * Response schema for friendship details
+ */
+export type FriendshipResponse = {
+  /**
+   * Id
+   *
+   * Friendship ID
+   */
+  id: string;
+  /**
+   * User Id
+   *
+   * User ID
+   */
+  user_id: string;
+  /**
+   * Friend Id
+   *
+   * Friend ID
+   */
+  friend_id: string;
+  /**
+   * Status
+   *
+   * Friendship status
+   */
+  status: string;
+  /**
+   * Created At
+   *
+   * Creation timestamp
+   */
+  created_at: string;
 };
 
 /**
@@ -178,6 +404,76 @@ export type LoginResponse = {
    * Error
    */
   error?: null;
+};
+
+/**
+ * MessageResponse
+ *
+ * Response schema for a single message
+ */
+export type MessageResponse = {
+  /**
+   * Id
+   *
+   * Message ID
+   */
+  id: string;
+  /**
+   * Room Id
+   *
+   * Chat room ID
+   */
+  room_id: string;
+  /**
+   * Sender Id
+   *
+   * Sender user ID
+   */
+  sender_id: string;
+  /**
+   * Content
+   *
+   * Message content
+   */
+  content: string;
+  /**
+   * Status
+   *
+   * Message status
+   */
+  status: string;
+  /**
+   * Created At
+   *
+   * Creation timestamp
+   */
+  created_at: string;
+};
+
+/**
+ * MessagesListResponse
+ *
+ * Response schema for list of messages
+ */
+export type MessagesListResponse = {
+  /**
+   * Messages
+   *
+   * List of messages
+   */
+  messages: MessageResponse[];
+  /**
+   * Total
+   *
+   * Total number of messages
+   */
+  total: number;
+  /**
+   * Has More
+   *
+   * Whether there are more messages to fetch
+   */
+  has_more: boolean;
 };
 
 /**
@@ -258,7 +554,7 @@ export type ProfileErrorWrapper = {
    * Data
    */
   data?: null;
-  error: AppModulesIdentityPresentationSchemasProfileSchemasErrorResponse;
+  error: ErrorResponse;
 };
 
 /**
@@ -409,6 +705,108 @@ export type QuotaStatusResponse = {
 };
 
 /**
+ * RatingListResponse
+ *
+ * Response schema for list of ratings
+ */
+export type RatingListResponse = {
+  /**
+   * Ratings
+   *
+   * List of ratings
+   */
+  ratings: RatingResponse[];
+  /**
+   * Total
+   *
+   * Total number of ratings
+   */
+  total: number;
+};
+
+/**
+ * RatingRequest
+ *
+ * Request schema for submitting a rating
+ */
+export type RatingRequest = {
+  /**
+   * Rated User Id
+   *
+   * ID of user being rated
+   */
+  rated_user_id: string;
+  /**
+   * Trade Id
+   *
+   * Associated trade ID (optional)
+   */
+  trade_id?: string | null;
+  /**
+   * Score
+   *
+   * Rating score (1-5)
+   */
+  score: number;
+  /**
+   * Comment
+   *
+   * Optional comment
+   */
+  comment?: string | null;
+};
+
+/**
+ * RatingResponse
+ *
+ * Response schema for a rating
+ */
+export type RatingResponse = {
+  /**
+   * Id
+   *
+   * Rating ID
+   */
+  id: string;
+  /**
+   * Rater Id
+   *
+   * User who gave the rating
+   */
+  rater_id: string;
+  /**
+   * Rated User Id
+   *
+   * User who received the rating
+   */
+  rated_user_id: string;
+  /**
+   * Trade Id
+   *
+   * Associated trade ID
+   */
+  trade_id?: string | null;
+  /**
+   * Score
+   *
+   * Rating score (1-5)
+   */
+  score: number;
+  /**
+   * Comment
+   *
+   * Rating comment
+   */
+  comment?: string | null;
+  /**
+   * Created At
+   *
+   * Creation timestamp
+   */
+  created_at: string;
+};
+
+/**
  * RefreshTokenRequest
  *
  * Request schema for refreshing access token
@@ -420,6 +818,102 @@ export type RefreshTokenRequest = {
    * Refresh token
    */
   refresh_token: string;
+};
+
+/**
+ * ReportListResponse
+ *
+ * Response schema for list of reports
+ */
+export type ReportListResponse = {
+  /**
+   * Reports
+   *
+   * List of reports
+   */
+  reports: ReportResponse[];
+  /**
+   * Total
+   *
+   * Total number of reports
+   */
+  total: number;
+};
+
+/**
+ * ReportRequest
+ *
+ * Request schema for submitting a report
+ */
+export type ReportRequest = {
+  /**
+   * Reported User Id
+   *
+   * ID of user being reported
+   */
+  reported_user_id: string;
+  /**
+   * Reason
+   *
+   * Reason for report
+   */
+  reason: string;
+  /**
+   * Detail
+   *
+   * Detailed description of the issue
+   */
+  detail?: string | null;
+};
+
+/**
+ * ReportResponse
+ *
+ * Response schema for a report
+ */
+export type ReportResponse = {
+  /**
+   * Id
+   *
+   * Report ID
+   */
+  id: string;
+  /**
+   * Reporter Id
+   *
+   * User who filed the report
+   */
+  reporter_id: string;
+  /**
+   * Reported User Id
+   *
+   * User who was reported
+   */
+  reported_user_id: string;
+  /**
+   * Reason
+   *
+   * Reason for report
+   */
+  reason: string;
+  /**
+   * Detail
+   *
+   * Detailed description
+   */
+  detail?: string | null;
+  /**
+   * Status
+   *
+   * Report status
+   */
+  status: string;
+  /**
+   * Created At
+   *
+   * Creation timestamp
+   */
+  created_at: string;
 };
 
 /**
@@ -466,6 +960,34 @@ export type SearchNearbyResponse = {
    * Number of results returned
    */
   count: number;
+};
+
+/**
+ * SendFriendRequestRequest
+ *
+ * Request schema for sending friend request
+ */
+export type SendFriendRequestRequest = {
+  /**
+   * Friend Id
+   *
+   * ID of user to send friend request to
+   */
+  friend_id: string;
+};
+
+/**
+ * SendMessageRequest
+ *
+ * Request schema for sending a message
+ */
+export type SendMessageRequest = {
+  /**
+   * Content
+   *
+   * Message content
+   */
+  content: string;
 };
 
 /**
@@ -698,34 +1220,6 @@ export type ValidationError = {
    * Error Type
    */
   type: string;
-};
-
-/**
- * ErrorResponse
- *
- * Error response schema
- */
-export type AppModulesIdentityPresentationSchemasProfileSchemasErrorResponse = {
-  /**
-   * Code
-   *
-   * Error code
-   */
-  code: string;
-  /**
-   * Message
-   *
-   * Error message
-   */
-  message: string;
-  /**
-   * Details
-   *
-   * Additional error details
-   */
-  details?: {
-    [key: string]: unknown;
-  } | null;
 };
 
 export type HealthCheckHealthGetData = {
@@ -1177,3 +1671,549 @@ export type UpdateUserLocationApiV1NearbyLocationPutResponses = {
 
 export type UpdateUserLocationApiV1NearbyLocationPutResponse =
   UpdateUserLocationApiV1NearbyLocationPutResponses[keyof UpdateUserLocationApiV1NearbyLocationPutResponses];
+
+export type SendFriendRequestApiV1FriendsRequestPostData = {
+  body: SendFriendRequestRequest;
+  path?: never;
+  query?: never;
+  url: '/api/v1/friends/request';
+};
+
+export type SendFriendRequestApiV1FriendsRequestPostErrors = {
+  /**
+   * Bad request (validation failed)
+   */
+  400: unknown;
+  /**
+   * Unauthorized (not logged in)
+   */
+  401: unknown;
+  /**
+   * Unprocessable entity (cannot send request - already friends, pending, or blocked)
+   */
+  422: unknown;
+  /**
+   * Internal server error
+   */
+  500: unknown;
+};
+
+export type SendFriendRequestApiV1FriendsRequestPostResponses = {
+  /**
+   * Friend request sent successfully
+   */
+  201: FriendshipResponse;
+};
+
+export type SendFriendRequestApiV1FriendsRequestPostResponse =
+  SendFriendRequestApiV1FriendsRequestPostResponses[keyof SendFriendRequestApiV1FriendsRequestPostResponses];
+
+export type AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostData = {
+  body?: never;
+  path: {
+    /**
+     * Friendship Id
+     */
+    friendship_id: string;
+  };
+  query?: never;
+  url: '/api/v1/friends/{friendship_id}/accept';
+};
+
+export type AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostErrors = {
+  /**
+   * Unauthorized (not logged in)
+   */
+  401: unknown;
+  /**
+   * Forbidden (not authorized to accept this request)
+   */
+  403: unknown;
+  /**
+   * Friend request not found
+   */
+  404: unknown;
+  /**
+   * Unprocessable entity (request cannot be accepted)
+   */
+  422: unknown;
+  /**
+   * Internal server error
+   */
+  500: unknown;
+};
+
+export type AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostResponses = {
+  /**
+   * Friend request accepted successfully
+   */
+  200: FriendshipResponse;
+};
+
+export type AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostResponse =
+  AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostResponses[keyof AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostResponses];
+
+export type BlockUserApiV1FriendsBlockPostData = {
+  body: BlockUserRequest;
+  path?: never;
+  query?: never;
+  url: '/api/v1/friends/block';
+};
+
+export type BlockUserApiV1FriendsBlockPostErrors = {
+  /**
+   * Bad request (validation failed)
+   */
+  400: unknown;
+  /**
+   * Unauthorized (not logged in)
+   */
+  401: unknown;
+  /**
+   * Unprocessable entity (cannot block user)
+   */
+  422: unknown;
+  /**
+   * Internal server error
+   */
+  500: unknown;
+};
+
+export type BlockUserApiV1FriendsBlockPostResponses = {
+  /**
+   * User blocked successfully
+   */
+  200: FriendshipResponse;
+};
+
+export type BlockUserApiV1FriendsBlockPostResponse =
+  BlockUserApiV1FriendsBlockPostResponses[keyof BlockUserApiV1FriendsBlockPostResponses];
+
+export type GetFriendsApiV1FriendsGetData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Status
+     *
+     * Filter by friendship status (accepted, pending, blocked)
+     */
+    status?: string | null;
+  };
+  url: '/api/v1/friends';
+};
+
+export type GetFriendsApiV1FriendsGetErrors = {
+  /**
+   * Unauthorized (not logged in)
+   */
+  401: unknown;
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+  /**
+   * Internal server error
+   */
+  500: unknown;
+};
+
+export type GetFriendsApiV1FriendsGetError =
+  GetFriendsApiV1FriendsGetErrors[keyof GetFriendsApiV1FriendsGetErrors];
+
+export type GetFriendsApiV1FriendsGetResponses = {
+  /**
+   * Friend list retrieved successfully
+   */
+  200: FriendListResponse;
+};
+
+export type GetFriendsApiV1FriendsGetResponse =
+  GetFriendsApiV1FriendsGetResponses[keyof GetFriendsApiV1FriendsGetResponses];
+
+export type GetChatRoomsApiV1ChatsGetData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/v1/chats';
+};
+
+export type GetChatRoomsApiV1ChatsGetErrors = {
+  /**
+   * Unauthorized (not logged in)
+   */
+  401: unknown;
+  /**
+   * Internal server error
+   */
+  500: unknown;
+};
+
+export type GetChatRoomsApiV1ChatsGetResponses = {
+  /**
+   * Response Get Chat Rooms Api V1 Chats Get
+   *
+   * Chat rooms retrieved successfully
+   */
+  200: ChatRoomResponse[];
+};
+
+export type GetChatRoomsApiV1ChatsGetResponse =
+  GetChatRoomsApiV1ChatsGetResponses[keyof GetChatRoomsApiV1ChatsGetResponses];
+
+export type GetMessagesApiV1ChatsRoomIdMessagesGetData = {
+  body?: never;
+  path: {
+    /**
+     * Room Id
+     */
+    room_id: string;
+  };
+  query?: {
+    /**
+     * After Message Id
+     *
+     * Get messages after this message ID
+     */
+    after_message_id?: string | null;
+    /**
+     * Limit
+     *
+     * Maximum number of messages
+     */
+    limit?: number;
+  };
+  url: '/api/v1/chats/{room_id}/messages';
+};
+
+export type GetMessagesApiV1ChatsRoomIdMessagesGetErrors = {
+  /**
+   * Unauthorized (not logged in)
+   */
+  401: unknown;
+  /**
+   * Forbidden (not a participant of this room)
+   */
+  403: unknown;
+  /**
+   * Chat room not found
+   */
+  404: unknown;
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+  /**
+   * Internal server error
+   */
+  500: unknown;
+};
+
+export type GetMessagesApiV1ChatsRoomIdMessagesGetError =
+  GetMessagesApiV1ChatsRoomIdMessagesGetErrors[keyof GetMessagesApiV1ChatsRoomIdMessagesGetErrors];
+
+export type GetMessagesApiV1ChatsRoomIdMessagesGetResponses = {
+  /**
+   * Messages retrieved successfully
+   */
+  200: MessagesListResponse;
+};
+
+export type GetMessagesApiV1ChatsRoomIdMessagesGetResponse =
+  GetMessagesApiV1ChatsRoomIdMessagesGetResponses[keyof GetMessagesApiV1ChatsRoomIdMessagesGetResponses];
+
+export type SendMessageApiV1ChatsRoomIdMessagesPostData = {
+  body: SendMessageRequest;
+  path: {
+    /**
+     * Room Id
+     */
+    room_id: string;
+  };
+  query?: never;
+  url: '/api/v1/chats/{room_id}/messages';
+};
+
+export type SendMessageApiV1ChatsRoomIdMessagesPostErrors = {
+  /**
+   * Bad request (validation failed)
+   */
+  400: unknown;
+  /**
+   * Unauthorized (not logged in)
+   */
+  401: unknown;
+  /**
+   * Forbidden (not authorized to send message)
+   */
+  403: unknown;
+  /**
+   * Chat room not found
+   */
+  404: unknown;
+  /**
+   * Unprocessable entity (blocked or not friends)
+   */
+  422: unknown;
+  /**
+   * Internal server error
+   */
+  500: unknown;
+};
+
+export type SendMessageApiV1ChatsRoomIdMessagesPostResponses = {
+  /**
+   * Message sent successfully
+   */
+  201: MessageResponse;
+};
+
+export type SendMessageApiV1ChatsRoomIdMessagesPostResponse =
+  SendMessageApiV1ChatsRoomIdMessagesPostResponses[keyof SendMessageApiV1ChatsRoomIdMessagesPostResponses];
+
+export type MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostData = {
+  body?: never;
+  path: {
+    /**
+     * Room Id
+     */
+    room_id: string;
+    /**
+     * Message Id
+     */
+    message_id: string;
+  };
+  query?: never;
+  url: '/api/v1/chats/{room_id}/messages/{message_id}/read';
+};
+
+export type MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostErrors = {
+  /**
+   * Unauthorized (not logged in)
+   */
+  401: unknown;
+  /**
+   * Forbidden (not authorized)
+   */
+  403: unknown;
+  /**
+   * Message not found
+   */
+  404: unknown;
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+  /**
+   * Internal server error
+   */
+  500: unknown;
+};
+
+export type MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostError =
+  MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostErrors[keyof MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostErrors];
+
+export type MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostResponses = {
+  /**
+   * Message marked as read
+   */
+  204: void;
+};
+
+export type MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostResponse =
+  MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostResponses[keyof MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostResponses];
+
+export type SubmitRatingApiV1RatingsPostData = {
+  body: RatingRequest;
+  path?: never;
+  query?: never;
+  url: '/api/v1/ratings';
+};
+
+export type SubmitRatingApiV1RatingsPostErrors = {
+  /**
+   * Bad request (validation failed)
+   */
+  400: unknown;
+  /**
+   * Unauthorized (not logged in)
+   */
+  401: unknown;
+  /**
+   * Unprocessable entity (cannot rate user)
+   */
+  422: unknown;
+  /**
+   * Internal server error
+   */
+  500: unknown;
+};
+
+export type SubmitRatingApiV1RatingsPostResponses = {
+  /**
+   * Rating submitted successfully
+   */
+  201: RatingResponse;
+};
+
+export type SubmitRatingApiV1RatingsPostResponse =
+  SubmitRatingApiV1RatingsPostResponses[keyof SubmitRatingApiV1RatingsPostResponses];
+
+export type GetUserRatingsApiV1RatingsUserUserIdGetData = {
+  body?: never;
+  path: {
+    /**
+     * User Id
+     */
+    user_id: string;
+  };
+  query?: {
+    /**
+     * Limit
+     *
+     * Maximum number of ratings
+     */
+    limit?: number;
+  };
+  url: '/api/v1/ratings/user/{user_id}';
+};
+
+export type GetUserRatingsApiV1RatingsUserUserIdGetErrors = {
+  /**
+   * Unauthorized (not logged in)
+   */
+  401: unknown;
+  /**
+   * User not found
+   */
+  404: unknown;
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+  /**
+   * Internal server error
+   */
+  500: unknown;
+};
+
+export type GetUserRatingsApiV1RatingsUserUserIdGetError =
+  GetUserRatingsApiV1RatingsUserUserIdGetErrors[keyof GetUserRatingsApiV1RatingsUserUserIdGetErrors];
+
+export type GetUserRatingsApiV1RatingsUserUserIdGetResponses = {
+  /**
+   * Ratings retrieved successfully
+   */
+  200: RatingListResponse;
+};
+
+export type GetUserRatingsApiV1RatingsUserUserIdGetResponse =
+  GetUserRatingsApiV1RatingsUserUserIdGetResponses[keyof GetUserRatingsApiV1RatingsUserUserIdGetResponses];
+
+export type GetAverageRatingApiV1RatingsUserUserIdAverageGetData = {
+  body?: never;
+  path: {
+    /**
+     * User Id
+     */
+    user_id: string;
+  };
+  query?: never;
+  url: '/api/v1/ratings/user/{user_id}/average';
+};
+
+export type GetAverageRatingApiV1RatingsUserUserIdAverageGetErrors = {
+  /**
+   * Unauthorized (not logged in)
+   */
+  401: unknown;
+  /**
+   * User not found
+   */
+  404: unknown;
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+  /**
+   * Internal server error
+   */
+  500: unknown;
+};
+
+export type GetAverageRatingApiV1RatingsUserUserIdAverageGetError =
+  GetAverageRatingApiV1RatingsUserUserIdAverageGetErrors[keyof GetAverageRatingApiV1RatingsUserUserIdAverageGetErrors];
+
+export type GetAverageRatingApiV1RatingsUserUserIdAverageGetResponses = {
+  /**
+   * Average rating retrieved successfully
+   */
+  200: AverageRatingResponse;
+};
+
+export type GetAverageRatingApiV1RatingsUserUserIdAverageGetResponse =
+  GetAverageRatingApiV1RatingsUserUserIdAverageGetResponses[keyof GetAverageRatingApiV1RatingsUserUserIdAverageGetResponses];
+
+export type GetMyReportsApiV1ReportsGetData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/v1/reports';
+};
+
+export type GetMyReportsApiV1ReportsGetErrors = {
+  /**
+   * Unauthorized (not logged in)
+   */
+  401: unknown;
+  /**
+   * Internal server error
+   */
+  500: unknown;
+};
+
+export type GetMyReportsApiV1ReportsGetResponses = {
+  /**
+   * Reports retrieved successfully
+   */
+  200: ReportListResponse;
+};
+
+export type GetMyReportsApiV1ReportsGetResponse =
+  GetMyReportsApiV1ReportsGetResponses[keyof GetMyReportsApiV1ReportsGetResponses];
+
+export type SubmitReportApiV1ReportsPostData = {
+  body: ReportRequest;
+  path?: never;
+  query?: never;
+  url: '/api/v1/reports';
+};
+
+export type SubmitReportApiV1ReportsPostErrors = {
+  /**
+   * Bad request (validation failed)
+   */
+  400: unknown;
+  /**
+   * Unauthorized (not logged in)
+   */
+  401: unknown;
+  /**
+   * Unprocessable entity (cannot report user)
+   */
+  422: unknown;
+  /**
+   * Internal server error
+   */
+  500: unknown;
+};
+
+export type SubmitReportApiV1ReportsPostResponses = {
+  /**
+   * Report submitted successfully
+   */
+  201: ReportResponse;
+};
+
+export type SubmitReportApiV1ReportsPostResponse =
+  SubmitReportApiV1ReportsPostResponses[keyof SubmitReportApiV1ReportsPostResponses];
