@@ -532,10 +532,10 @@
 
 ### Presentation Layer (Social Module - Friends & Chat)
 
-- [ ] T139 [US4] 建立 Friends Router：apps/backend/app/modules/social/presentation/routers/friends_router.py（POST /friends/request, POST /friends/accept, POST /friends/block）
-- [ ] T140 [US4] 建立 Chat Router：apps/backend/app/modules/social/presentation/routers/chat_router.py（GET /chats/{id}/messages, POST /chats/{id}/messages）
-- [ ] T141 [US4] 建立 Rating Router：apps/backend/app/modules/social/presentation/routers/rating_router.py（POST /ratings）
-- [ ] T142 [US4] 建立 Report Router：apps/backend/app/modules/social/presentation/routers/report_router.py（POST /reports）
+- [X] T139 [US4] 建立 Friends Router：apps/backend/app/modules/social/presentation/routers/friends_router.py（POST /friends/request, POST /friends/accept, POST /friends/block）
+- [X] T140 [US4] 建立 Chat Router：apps/backend/app/modules/social/presentation/routers/chat_router.py（GET /chats/{id}/messages, POST /chats/{id}/messages）
+- [X] T141 [US4] 建立 Rating Router：apps/backend/app/modules/social/presentation/routers/rating_router.py（POST /ratings）
+- [X] T142 [US4] 建立 Report Router：apps/backend/app/modules/social/presentation/routers/report_router.py（POST /reports）
 
 ### Verification
 
