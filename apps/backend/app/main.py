@@ -128,9 +128,22 @@ def create_application() -> FastAPI:
 
     app.include_router(nearby_router, prefix=settings.API_PREFIX)
 
-    # Future module routers (Phase 6+)
-    # from .modules.social.presentation.routers.friends_router import router as friends_router
-    # app.include_router(friends_router, prefix=settings.API_PREFIX)
+    # Phase 6: Social module (Friends, Chat, Ratings, Reports)
+    from .modules.social.presentation.routers.friends_router import (
+        router as friends_router,
+    )
+    from .modules.social.presentation.routers.chat_router import router as chat_router
+    from .modules.social.presentation.routers.rating_router import (
+        router as rating_router,
+    )
+    from .modules.social.presentation.routers.report_router import (
+        router as report_router,
+    )
+
+    app.include_router(friends_router, prefix=settings.API_PREFIX)
+    app.include_router(chat_router, prefix=settings.API_PREFIX)
+    app.include_router(rating_router, prefix=settings.API_PREFIX)
+    app.include_router(report_router, prefix=settings.API_PREFIX)
 
     return app
 
