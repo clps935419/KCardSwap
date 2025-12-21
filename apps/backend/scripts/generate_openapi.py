@@ -13,7 +13,7 @@ Usage:
     python scripts/generate_openapi.py
 
 Output:
-    Creates/updates ../../openapi/openapi.json (repo root)
+    Creates/updates ../../../openapi/openapi.json (repo root)
 """
 
 import json
@@ -27,7 +27,7 @@ sys.path.insert(0, str(app_dir))
 from fastapi.openapi.utils import get_openapi
 
 
-def generate_openapi_spec(output_path: str = "../../openapi/openapi.json") -> None:
+def generate_openapi_spec(output_path: str = "../../../openapi/openapi.json") -> None:
     """Generate OpenAPI specification and save to file.
 
     Args:

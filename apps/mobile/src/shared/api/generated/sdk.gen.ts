@@ -3,26 +3,50 @@
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
 import type {
+  AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostData,
+  AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostErrors,
+  AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostResponses,
   AdminLoginApiV1AuthAdminLoginPostData,
   AdminLoginApiV1AuthAdminLoginPostErrors,
   AdminLoginApiV1AuthAdminLoginPostResponses,
   ApiHealthCheckApiV1HealthGetData,
   ApiHealthCheckApiV1HealthGetResponses,
+  BlockUserApiV1FriendsBlockPostData,
+  BlockUserApiV1FriendsBlockPostErrors,
+  BlockUserApiV1FriendsBlockPostResponses,
   DeleteCardApiV1CardsCardIdDeleteData,
   DeleteCardApiV1CardsCardIdDeleteErrors,
   DeleteCardApiV1CardsCardIdDeleteResponses,
+  GetAverageRatingApiV1RatingsUserUserIdAverageGetData,
+  GetAverageRatingApiV1RatingsUserUserIdAverageGetErrors,
+  GetAverageRatingApiV1RatingsUserUserIdAverageGetResponses,
+  GetChatRoomsApiV1ChatsGetData,
+  GetChatRoomsApiV1ChatsGetErrors,
+  GetChatRoomsApiV1ChatsGetResponses,
+  GetFriendsApiV1FriendsGetData,
+  GetFriendsApiV1FriendsGetErrors,
+  GetFriendsApiV1FriendsGetResponses,
+  GetMessagesApiV1ChatsRoomIdMessagesGetData,
+  GetMessagesApiV1ChatsRoomIdMessagesGetErrors,
+  GetMessagesApiV1ChatsRoomIdMessagesGetResponses,
   GetMyCardsApiV1CardsMeGetData,
   GetMyCardsApiV1CardsMeGetErrors,
   GetMyCardsApiV1CardsMeGetResponses,
   GetMyProfileApiV1ProfileMeGetData,
   GetMyProfileApiV1ProfileMeGetErrors,
   GetMyProfileApiV1ProfileMeGetResponses,
+  GetMyReportsApiV1ReportsGetData,
+  GetMyReportsApiV1ReportsGetErrors,
+  GetMyReportsApiV1ReportsGetResponses,
   GetQuotaStatusApiV1CardsQuotaStatusGetData,
   GetQuotaStatusApiV1CardsQuotaStatusGetErrors,
   GetQuotaStatusApiV1CardsQuotaStatusGetResponses,
   GetUploadUrlApiV1CardsUploadUrlPostData,
   GetUploadUrlApiV1CardsUploadUrlPostErrors,
   GetUploadUrlApiV1CardsUploadUrlPostResponses,
+  GetUserRatingsApiV1RatingsUserUserIdGetData,
+  GetUserRatingsApiV1RatingsUserUserIdGetErrors,
+  GetUserRatingsApiV1RatingsUserUserIdGetResponses,
   GoogleCallbackApiV1AuthGoogleCallbackPostData,
   GoogleCallbackApiV1AuthGoogleCallbackPostErrors,
   GoogleCallbackApiV1AuthGoogleCallbackPostResponses,
@@ -31,6 +55,9 @@ import type {
   GoogleLoginApiV1AuthGoogleLoginPostResponses,
   HealthCheckHealthGetData,
   HealthCheckHealthGetResponses,
+  MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostData,
+  MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostErrors,
+  MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostResponses,
   RefreshTokenApiV1AuthRefreshPostData,
   RefreshTokenApiV1AuthRefreshPostErrors,
   RefreshTokenApiV1AuthRefreshPostResponses,
@@ -39,6 +66,18 @@ import type {
   SearchNearbyCardsApiV1NearbySearchPostData,
   SearchNearbyCardsApiV1NearbySearchPostErrors,
   SearchNearbyCardsApiV1NearbySearchPostResponses,
+  SendFriendRequestApiV1FriendsRequestPostData,
+  SendFriendRequestApiV1FriendsRequestPostErrors,
+  SendFriendRequestApiV1FriendsRequestPostResponses,
+  SendMessageApiV1ChatsRoomIdMessagesPostData,
+  SendMessageApiV1ChatsRoomIdMessagesPostErrors,
+  SendMessageApiV1ChatsRoomIdMessagesPostResponses,
+  SubmitRatingApiV1RatingsPostData,
+  SubmitRatingApiV1RatingsPostErrors,
+  SubmitRatingApiV1RatingsPostResponses,
+  SubmitReportApiV1ReportsPostData,
+  SubmitReportApiV1ReportsPostErrors,
+  SubmitReportApiV1ReportsPostResponses,
   UpdateMyProfileApiV1ProfileMePutData,
   UpdateMyProfileApiV1ProfileMePutErrors,
   UpdateMyProfileApiV1ProfileMePutResponses,
@@ -340,6 +379,266 @@ export const updateUserLocationApiV1NearbyLocationPut = <ThrowOnError extends bo
   >({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/api/v1/nearby/location',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Send friend request
+ *
+ * Send a friend request to another user
+ */
+export const sendFriendRequestApiV1FriendsRequestPost = <ThrowOnError extends boolean = false>(
+  options: Options<SendFriendRequestApiV1FriendsRequestPostData, ThrowOnError>
+) =>
+  (options.client ?? client).post<
+    SendFriendRequestApiV1FriendsRequestPostResponses,
+    SendFriendRequestApiV1FriendsRequestPostErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/friends/request',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Accept friend request
+ *
+ * Accept a pending friend request
+ */
+export const acceptFriendRequestApiV1FriendsFriendshipIdAcceptPost = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostData, ThrowOnError>
+) =>
+  (options.client ?? client).post<
+    AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostResponses,
+    AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/friends/{friendship_id}/accept',
+    ...options,
+  });
+
+/**
+ * Block user
+ *
+ * Block another user (prevents all interactions)
+ */
+export const blockUserApiV1FriendsBlockPost = <ThrowOnError extends boolean = false>(
+  options: Options<BlockUserApiV1FriendsBlockPostData, ThrowOnError>
+) =>
+  (options.client ?? client).post<
+    BlockUserApiV1FriendsBlockPostResponses,
+    BlockUserApiV1FriendsBlockPostErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/friends/block',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Get friend list
+ *
+ * Get list of friends (optionally filtered by status)
+ */
+export const getFriendsApiV1FriendsGet = <ThrowOnError extends boolean = false>(
+  options?: Options<GetFriendsApiV1FriendsGetData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    GetFriendsApiV1FriendsGetResponses,
+    GetFriendsApiV1FriendsGetErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/friends',
+    ...options,
+  });
+
+/**
+ * Get chat rooms
+ *
+ * Get all chat rooms for the current user
+ */
+export const getChatRoomsApiV1ChatsGet = <ThrowOnError extends boolean = false>(
+  options?: Options<GetChatRoomsApiV1ChatsGetData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    GetChatRoomsApiV1ChatsGetResponses,
+    GetChatRoomsApiV1ChatsGetErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/chats',
+    ...options,
+  });
+
+/**
+ * Get messages
+ *
+ * Get messages from a chat room (with pagination support via after_message_id)
+ */
+export const getMessagesApiV1ChatsRoomIdMessagesGet = <ThrowOnError extends boolean = false>(
+  options: Options<GetMessagesApiV1ChatsRoomIdMessagesGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    GetMessagesApiV1ChatsRoomIdMessagesGetResponses,
+    GetMessagesApiV1ChatsRoomIdMessagesGetErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/chats/{room_id}/messages',
+    ...options,
+  });
+
+/**
+ * Send message
+ *
+ * Send a message in a chat room (triggers FCM push notification)
+ */
+export const sendMessageApiV1ChatsRoomIdMessagesPost = <ThrowOnError extends boolean = false>(
+  options: Options<SendMessageApiV1ChatsRoomIdMessagesPostData, ThrowOnError>
+) =>
+  (options.client ?? client).post<
+    SendMessageApiV1ChatsRoomIdMessagesPostResponses,
+    SendMessageApiV1ChatsRoomIdMessagesPostErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/chats/{room_id}/messages',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Mark message as read
+ *
+ * Mark a message as read by the current user
+ */
+export const markMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPost = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostData, ThrowOnError>
+) =>
+  (options.client ?? client).post<
+    MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostResponses,
+    MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/chats/{room_id}/messages/{message_id}/read',
+    ...options,
+  });
+
+/**
+ * Submit rating
+ *
+ * Submit a rating for another user after a trade
+ */
+export const submitRatingApiV1RatingsPost = <ThrowOnError extends boolean = false>(
+  options: Options<SubmitRatingApiV1RatingsPostData, ThrowOnError>
+) =>
+  (options.client ?? client).post<
+    SubmitRatingApiV1RatingsPostResponses,
+    SubmitRatingApiV1RatingsPostErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/ratings',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Get user ratings
+ *
+ * Get ratings received by a specific user
+ */
+export const getUserRatingsApiV1RatingsUserUserIdGet = <ThrowOnError extends boolean = false>(
+  options: Options<GetUserRatingsApiV1RatingsUserUserIdGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    GetUserRatingsApiV1RatingsUserUserIdGetResponses,
+    GetUserRatingsApiV1RatingsUserUserIdGetErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/ratings/user/{user_id}',
+    ...options,
+  });
+
+/**
+ * Get average rating
+ *
+ * Get average rating score for a specific user
+ */
+export const getAverageRatingApiV1RatingsUserUserIdAverageGet = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetAverageRatingApiV1RatingsUserUserIdAverageGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    GetAverageRatingApiV1RatingsUserUserIdAverageGetResponses,
+    GetAverageRatingApiV1RatingsUserUserIdAverageGetErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/ratings/user/{user_id}/average',
+    ...options,
+  });
+
+/**
+ * Get my reports
+ *
+ * Get reports submitted by the current user
+ */
+export const getMyReportsApiV1ReportsGet = <ThrowOnError extends boolean = false>(
+  options?: Options<GetMyReportsApiV1ReportsGetData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    GetMyReportsApiV1ReportsGetResponses,
+    GetMyReportsApiV1ReportsGetErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/reports',
+    ...options,
+  });
+
+/**
+ * Submit report
+ *
+ * Submit a report for inappropriate behavior or content
+ */
+export const submitReportApiV1ReportsPost = <ThrowOnError extends boolean = false>(
+  options: Options<SubmitReportApiV1ReportsPostData, ThrowOnError>
+) =>
+  (options.client ?? client).post<
+    SubmitReportApiV1ReportsPostResponses,
+    SubmitReportApiV1ReportsPostErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/reports',
     ...options,
     headers: {
       'Content-Type': 'application/json',

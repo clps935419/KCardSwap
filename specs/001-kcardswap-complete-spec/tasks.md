@@ -523,19 +523,19 @@
 - [ ] T130 [P] [US4] 實作 SQLAlchemy Message Model：apps/backend/app/modules/social/infrastructure/database/models/message_model.py
 - [ ] T131 [P] [US4] 實作 SQLAlchemy Rating Model：apps/backend/app/modules/social/infrastructure/database/models/rating_model.py
 - [ ] T132 [P] [US4] 實作 SQLAlchemy Report Model：apps/backend/app/modules/social/infrastructure/database/models/report_model.py
-- [ ] T133 [P] [US4] 實作 FriendshipRepositoryImpl：apps/backend/app/modules/social/infrastructure/repositories/friendship_repository_impl.py
-- [ ] T134 [P] [US4] 實作 ChatRoomRepositoryImpl：apps/backend/app/modules/social/infrastructure/repositories/chat_room_repository_impl.py
-- [ ] T135 [P] [US4] 實作 MessageRepositoryImpl：apps/backend/app/modules/social/infrastructure/repositories/message_repository_impl.py
-- [ ] T136 [P] [US4] 實作 RatingRepositoryImpl：apps/backend/app/modules/social/infrastructure/repositories/rating_repository_impl.py
-- [ ] T137 [P] [US4] 實作 ReportRepositoryImpl：apps/backend/app/modules/social/infrastructure/repositories/report_repository_impl.py
-- [ ] T138 [P] [US4] 實作 FCM Push Notification Service：apps/backend/app/shared/infrastructure/external/fcm_service.py（發送推播通知）
+- [X] T133 [P] [US4] 實作 FriendshipRepositoryImpl：apps/backend/app/modules/social/infrastructure/repositories/friendship_repository_impl.py
+- [X] T134 [P] [US4] 實作 ChatRoomRepositoryImpl：apps/backend/app/modules/social/infrastructure/repositories/chat_room_repository_impl.py
+- [X] T135 [P] [US4] 實作 MessageRepositoryImpl：apps/backend/app/modules/social/infrastructure/repositories/message_repository_impl.py
+- [X] T136 [P] [US4] 實作 RatingRepositoryImpl：apps/backend/app/modules/social/infrastructure/repositories/rating_repository_impl.py
+- [X] T137 [P] [US4] 實作 ReportRepositoryImpl：apps/backend/app/modules/social/infrastructure/repositories/report_repository_impl.py
+- [X] T138 [P] [US4] 實作 FCM Push Notification Service：apps/backend/app/shared/infrastructure/external/fcm_service.py（發送推播通知）
 
 ### Presentation Layer (Social Module - Friends & Chat)
 
-- [ ] T139 [US4] 建立 Friends Router：apps/backend/app/modules/social/presentation/routers/friends_router.py（POST /friends/request, POST /friends/accept, POST /friends/block）
-- [ ] T140 [US4] 建立 Chat Router：apps/backend/app/modules/social/presentation/routers/chat_router.py（GET /chats/{id}/messages, POST /chats/{id}/messages）
-- [ ] T141 [US4] 建立 Rating Router：apps/backend/app/modules/social/presentation/routers/rating_router.py（POST /ratings）
-- [ ] T142 [US4] 建立 Report Router：apps/backend/app/modules/social/presentation/routers/report_router.py（POST /reports）
+- [X] T139 [US4] 建立 Friends Router：apps/backend/app/modules/social/presentation/routers/friends_router.py（POST /friends/request, POST /friends/accept, POST /friends/block）
+- [X] T140 [US4] 建立 Chat Router：apps/backend/app/modules/social/presentation/routers/chat_router.py（GET /chats/{id}/messages, POST /chats/{id}/messages）
+- [X] T141 [US4] 建立 Rating Router：apps/backend/app/modules/social/presentation/routers/rating_router.py（POST /ratings）
+- [X] T142 [US4] 建立 Report Router：apps/backend/app/modules/social/presentation/routers/report_router.py（POST /reports）
 
 ### Verification
 

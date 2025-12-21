@@ -4,41 +4,74 @@ import { type DefaultError, queryOptions, type UseMutationOptions } from '@tanst
 
 import { client } from '../client.gen';
 import {
+  acceptFriendRequestApiV1FriendsFriendshipIdAcceptPost,
   adminLoginApiV1AuthAdminLoginPost,
   apiHealthCheckApiV1HealthGet,
+  blockUserApiV1FriendsBlockPost,
   deleteCardApiV1CardsCardIdDelete,
+  getAverageRatingApiV1RatingsUserUserIdAverageGet,
+  getChatRoomsApiV1ChatsGet,
+  getFriendsApiV1FriendsGet,
+  getMessagesApiV1ChatsRoomIdMessagesGet,
   getMyCardsApiV1CardsMeGet,
   getMyProfileApiV1ProfileMeGet,
+  getMyReportsApiV1ReportsGet,
   getQuotaStatusApiV1CardsQuotaStatusGet,
   getUploadUrlApiV1CardsUploadUrlPost,
+  getUserRatingsApiV1RatingsUserUserIdGet,
   googleCallbackApiV1AuthGoogleCallbackPost,
   googleLoginApiV1AuthGoogleLoginPost,
   healthCheckHealthGet,
+  markMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPost,
   type Options,
   refreshTokenApiV1AuthRefreshPost,
   rootGet,
   searchNearbyCardsApiV1NearbySearchPost,
+  sendFriendRequestApiV1FriendsRequestPost,
+  sendMessageApiV1ChatsRoomIdMessagesPost,
+  submitRatingApiV1RatingsPost,
+  submitReportApiV1ReportsPost,
   updateMyProfileApiV1ProfileMePut,
   updateUserLocationApiV1NearbyLocationPut,
 } from '../sdk.gen';
 import type {
+  AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostData,
+  AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostResponse,
   AdminLoginApiV1AuthAdminLoginPostData,
   AdminLoginApiV1AuthAdminLoginPostError,
   AdminLoginApiV1AuthAdminLoginPostResponse,
   ApiHealthCheckApiV1HealthGetData,
+  BlockUserApiV1FriendsBlockPostData,
+  BlockUserApiV1FriendsBlockPostResponse,
   DeleteCardApiV1CardsCardIdDeleteData,
   DeleteCardApiV1CardsCardIdDeleteError,
   DeleteCardApiV1CardsCardIdDeleteResponse,
+  GetAverageRatingApiV1RatingsUserUserIdAverageGetData,
+  GetAverageRatingApiV1RatingsUserUserIdAverageGetError,
+  GetAverageRatingApiV1RatingsUserUserIdAverageGetResponse,
+  GetChatRoomsApiV1ChatsGetData,
+  GetChatRoomsApiV1ChatsGetResponse,
+  GetFriendsApiV1FriendsGetData,
+  GetFriendsApiV1FriendsGetError,
+  GetFriendsApiV1FriendsGetResponse,
+  GetMessagesApiV1ChatsRoomIdMessagesGetData,
+  GetMessagesApiV1ChatsRoomIdMessagesGetError,
+  GetMessagesApiV1ChatsRoomIdMessagesGetResponse,
   GetMyCardsApiV1CardsMeGetData,
   GetMyCardsApiV1CardsMeGetError,
   GetMyCardsApiV1CardsMeGetResponse,
   GetMyProfileApiV1ProfileMeGetData,
   GetMyProfileApiV1ProfileMeGetError,
   GetMyProfileApiV1ProfileMeGetResponse,
+  GetMyReportsApiV1ReportsGetData,
+  GetMyReportsApiV1ReportsGetResponse,
   GetQuotaStatusApiV1CardsQuotaStatusGetData,
   GetQuotaStatusApiV1CardsQuotaStatusGetResponse,
   GetUploadUrlApiV1CardsUploadUrlPostData,
   GetUploadUrlApiV1CardsUploadUrlPostResponse,
+  GetUserRatingsApiV1RatingsUserUserIdGetData,
+  GetUserRatingsApiV1RatingsUserUserIdGetError,
+  GetUserRatingsApiV1RatingsUserUserIdGetResponse,
   GoogleCallbackApiV1AuthGoogleCallbackPostData,
   GoogleCallbackApiV1AuthGoogleCallbackPostError,
   GoogleCallbackApiV1AuthGoogleCallbackPostResponse,
@@ -46,6 +79,9 @@ import type {
   GoogleLoginApiV1AuthGoogleLoginPostError,
   GoogleLoginApiV1AuthGoogleLoginPostResponse,
   HealthCheckHealthGetData,
+  MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostData,
+  MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostError,
+  MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostResponse,
   RefreshTokenApiV1AuthRefreshPostData,
   RefreshTokenApiV1AuthRefreshPostError,
   RefreshTokenApiV1AuthRefreshPostResponse,
@@ -53,6 +89,14 @@ import type {
   SearchNearbyCardsApiV1NearbySearchPostData,
   SearchNearbyCardsApiV1NearbySearchPostError,
   SearchNearbyCardsApiV1NearbySearchPostResponse,
+  SendFriendRequestApiV1FriendsRequestPostData,
+  SendFriendRequestApiV1FriendsRequestPostResponse,
+  SendMessageApiV1ChatsRoomIdMessagesPostData,
+  SendMessageApiV1ChatsRoomIdMessagesPostResponse,
+  SubmitRatingApiV1RatingsPostData,
+  SubmitRatingApiV1RatingsPostResponse,
+  SubmitReportApiV1ReportsPostData,
+  SubmitReportApiV1ReportsPostResponse,
   UpdateMyProfileApiV1ProfileMePutData,
   UpdateMyProfileApiV1ProfileMePutError,
   UpdateMyProfileApiV1ProfileMePutResponse,
@@ -515,6 +559,389 @@ export const updateUserLocationApiV1NearbyLocationPutMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await updateUserLocationApiV1NearbyLocationPut({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Send friend request
+ *
+ * Send a friend request to another user
+ */
+export const sendFriendRequestApiV1FriendsRequestPostMutation = (
+  options?: Partial<Options<SendFriendRequestApiV1FriendsRequestPostData>>
+): UseMutationOptions<
+  SendFriendRequestApiV1FriendsRequestPostResponse,
+  DefaultError,
+  Options<SendFriendRequestApiV1FriendsRequestPostData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    SendFriendRequestApiV1FriendsRequestPostResponse,
+    DefaultError,
+    Options<SendFriendRequestApiV1FriendsRequestPostData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await sendFriendRequestApiV1FriendsRequestPost({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Accept friend request
+ *
+ * Accept a pending friend request
+ */
+export const acceptFriendRequestApiV1FriendsFriendshipIdAcceptPostMutation = (
+  options?: Partial<Options<AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostData>>
+): UseMutationOptions<
+  AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostResponse,
+  DefaultError,
+  Options<AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostResponse,
+    DefaultError,
+    Options<AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await acceptFriendRequestApiV1FriendsFriendshipIdAcceptPost({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Block user
+ *
+ * Block another user (prevents all interactions)
+ */
+export const blockUserApiV1FriendsBlockPostMutation = (
+  options?: Partial<Options<BlockUserApiV1FriendsBlockPostData>>
+): UseMutationOptions<
+  BlockUserApiV1FriendsBlockPostResponse,
+  DefaultError,
+  Options<BlockUserApiV1FriendsBlockPostData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    BlockUserApiV1FriendsBlockPostResponse,
+    DefaultError,
+    Options<BlockUserApiV1FriendsBlockPostData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await blockUserApiV1FriendsBlockPost({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const getFriendsApiV1FriendsGetQueryKey = (
+  options?: Options<GetFriendsApiV1FriendsGetData>
+) => createQueryKey('getFriendsApiV1FriendsGet', options);
+
+/**
+ * Get friend list
+ *
+ * Get list of friends (optionally filtered by status)
+ */
+export const getFriendsApiV1FriendsGetOptions = (
+  options?: Options<GetFriendsApiV1FriendsGetData>
+) =>
+  queryOptions<
+    GetFriendsApiV1FriendsGetResponse,
+    GetFriendsApiV1FriendsGetError,
+    GetFriendsApiV1FriendsGetResponse,
+    ReturnType<typeof getFriendsApiV1FriendsGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getFriendsApiV1FriendsGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getFriendsApiV1FriendsGetQueryKey(options),
+  });
+
+export const getChatRoomsApiV1ChatsGetQueryKey = (
+  options?: Options<GetChatRoomsApiV1ChatsGetData>
+) => createQueryKey('getChatRoomsApiV1ChatsGet', options);
+
+/**
+ * Get chat rooms
+ *
+ * Get all chat rooms for the current user
+ */
+export const getChatRoomsApiV1ChatsGetOptions = (
+  options?: Options<GetChatRoomsApiV1ChatsGetData>
+) =>
+  queryOptions<
+    GetChatRoomsApiV1ChatsGetResponse,
+    DefaultError,
+    GetChatRoomsApiV1ChatsGetResponse,
+    ReturnType<typeof getChatRoomsApiV1ChatsGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getChatRoomsApiV1ChatsGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getChatRoomsApiV1ChatsGetQueryKey(options),
+  });
+
+export const getMessagesApiV1ChatsRoomIdMessagesGetQueryKey = (
+  options: Options<GetMessagesApiV1ChatsRoomIdMessagesGetData>
+) => createQueryKey('getMessagesApiV1ChatsRoomIdMessagesGet', options);
+
+/**
+ * Get messages
+ *
+ * Get messages from a chat room (with pagination support via after_message_id)
+ */
+export const getMessagesApiV1ChatsRoomIdMessagesGetOptions = (
+  options: Options<GetMessagesApiV1ChatsRoomIdMessagesGetData>
+) =>
+  queryOptions<
+    GetMessagesApiV1ChatsRoomIdMessagesGetResponse,
+    GetMessagesApiV1ChatsRoomIdMessagesGetError,
+    GetMessagesApiV1ChatsRoomIdMessagesGetResponse,
+    ReturnType<typeof getMessagesApiV1ChatsRoomIdMessagesGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getMessagesApiV1ChatsRoomIdMessagesGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getMessagesApiV1ChatsRoomIdMessagesGetQueryKey(options),
+  });
+
+/**
+ * Send message
+ *
+ * Send a message in a chat room (triggers FCM push notification)
+ */
+export const sendMessageApiV1ChatsRoomIdMessagesPostMutation = (
+  options?: Partial<Options<SendMessageApiV1ChatsRoomIdMessagesPostData>>
+): UseMutationOptions<
+  SendMessageApiV1ChatsRoomIdMessagesPostResponse,
+  DefaultError,
+  Options<SendMessageApiV1ChatsRoomIdMessagesPostData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    SendMessageApiV1ChatsRoomIdMessagesPostResponse,
+    DefaultError,
+    Options<SendMessageApiV1ChatsRoomIdMessagesPostData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await sendMessageApiV1ChatsRoomIdMessagesPost({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Mark message as read
+ *
+ * Mark a message as read by the current user
+ */
+export const markMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostMutation = (
+  options?: Partial<Options<MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostData>>
+): UseMutationOptions<
+  MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostResponse,
+  MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostError,
+  Options<MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostResponse,
+    MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostError,
+    Options<MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await markMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPost({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Submit rating
+ *
+ * Submit a rating for another user after a trade
+ */
+export const submitRatingApiV1RatingsPostMutation = (
+  options?: Partial<Options<SubmitRatingApiV1RatingsPostData>>
+): UseMutationOptions<
+  SubmitRatingApiV1RatingsPostResponse,
+  DefaultError,
+  Options<SubmitRatingApiV1RatingsPostData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    SubmitRatingApiV1RatingsPostResponse,
+    DefaultError,
+    Options<SubmitRatingApiV1RatingsPostData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await submitRatingApiV1RatingsPost({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const getUserRatingsApiV1RatingsUserUserIdGetQueryKey = (
+  options: Options<GetUserRatingsApiV1RatingsUserUserIdGetData>
+) => createQueryKey('getUserRatingsApiV1RatingsUserUserIdGet', options);
+
+/**
+ * Get user ratings
+ *
+ * Get ratings received by a specific user
+ */
+export const getUserRatingsApiV1RatingsUserUserIdGetOptions = (
+  options: Options<GetUserRatingsApiV1RatingsUserUserIdGetData>
+) =>
+  queryOptions<
+    GetUserRatingsApiV1RatingsUserUserIdGetResponse,
+    GetUserRatingsApiV1RatingsUserUserIdGetError,
+    GetUserRatingsApiV1RatingsUserUserIdGetResponse,
+    ReturnType<typeof getUserRatingsApiV1RatingsUserUserIdGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getUserRatingsApiV1RatingsUserUserIdGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getUserRatingsApiV1RatingsUserUserIdGetQueryKey(options),
+  });
+
+export const getAverageRatingApiV1RatingsUserUserIdAverageGetQueryKey = (
+  options: Options<GetAverageRatingApiV1RatingsUserUserIdAverageGetData>
+) => createQueryKey('getAverageRatingApiV1RatingsUserUserIdAverageGet', options);
+
+/**
+ * Get average rating
+ *
+ * Get average rating score for a specific user
+ */
+export const getAverageRatingApiV1RatingsUserUserIdAverageGetOptions = (
+  options: Options<GetAverageRatingApiV1RatingsUserUserIdAverageGetData>
+) =>
+  queryOptions<
+    GetAverageRatingApiV1RatingsUserUserIdAverageGetResponse,
+    GetAverageRatingApiV1RatingsUserUserIdAverageGetError,
+    GetAverageRatingApiV1RatingsUserUserIdAverageGetResponse,
+    ReturnType<typeof getAverageRatingApiV1RatingsUserUserIdAverageGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getAverageRatingApiV1RatingsUserUserIdAverageGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getAverageRatingApiV1RatingsUserUserIdAverageGetQueryKey(options),
+  });
+
+export const getMyReportsApiV1ReportsGetQueryKey = (
+  options?: Options<GetMyReportsApiV1ReportsGetData>
+) => createQueryKey('getMyReportsApiV1ReportsGet', options);
+
+/**
+ * Get my reports
+ *
+ * Get reports submitted by the current user
+ */
+export const getMyReportsApiV1ReportsGetOptions = (
+  options?: Options<GetMyReportsApiV1ReportsGetData>
+) =>
+  queryOptions<
+    GetMyReportsApiV1ReportsGetResponse,
+    DefaultError,
+    GetMyReportsApiV1ReportsGetResponse,
+    ReturnType<typeof getMyReportsApiV1ReportsGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getMyReportsApiV1ReportsGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getMyReportsApiV1ReportsGetQueryKey(options),
+  });
+
+/**
+ * Submit report
+ *
+ * Submit a report for inappropriate behavior or content
+ */
+export const submitReportApiV1ReportsPostMutation = (
+  options?: Partial<Options<SubmitReportApiV1ReportsPostData>>
+): UseMutationOptions<
+  SubmitReportApiV1ReportsPostResponse,
+  DefaultError,
+  Options<SubmitReportApiV1ReportsPostData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    SubmitReportApiV1ReportsPostResponse,
+    DefaultError,
+    Options<SubmitReportApiV1ReportsPostData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await submitReportApiV1ReportsPost({
         ...options,
         ...fnOptions,
         throwOnError: true,
