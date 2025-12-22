@@ -6,6 +6,9 @@ import type {
   AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostData,
   AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostErrors,
   AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostResponses,
+  AcceptTradeApiV1TradesTradeIdAcceptPostData,
+  AcceptTradeApiV1TradesTradeIdAcceptPostErrors,
+  AcceptTradeApiV1TradesTradeIdAcceptPostResponses,
   AdminLoginApiV1AuthAdminLoginPostData,
   AdminLoginApiV1AuthAdminLoginPostErrors,
   AdminLoginApiV1AuthAdminLoginPostResponses,
@@ -14,6 +17,15 @@ import type {
   BlockUserApiV1FriendsBlockPostData,
   BlockUserApiV1FriendsBlockPostErrors,
   BlockUserApiV1FriendsBlockPostResponses,
+  CancelTradeApiV1TradesTradeIdCancelPostData,
+  CancelTradeApiV1TradesTradeIdCancelPostErrors,
+  CancelTradeApiV1TradesTradeIdCancelPostResponses,
+  CompleteTradeApiV1TradesTradeIdCompletePostData,
+  CompleteTradeApiV1TradesTradeIdCompletePostErrors,
+  CompleteTradeApiV1TradesTradeIdCompletePostResponses,
+  CreateTradeApiV1TradesPostData,
+  CreateTradeApiV1TradesPostErrors,
+  CreateTradeApiV1TradesPostResponses,
   DeleteCardApiV1CardsCardIdDeleteData,
   DeleteCardApiV1CardsCardIdDeleteErrors,
   DeleteCardApiV1CardsCardIdDeleteResponses,
@@ -41,6 +53,9 @@ import type {
   GetQuotaStatusApiV1CardsQuotaStatusGetData,
   GetQuotaStatusApiV1CardsQuotaStatusGetErrors,
   GetQuotaStatusApiV1CardsQuotaStatusGetResponses,
+  GetTradeHistoryApiV1TradesHistoryGetData,
+  GetTradeHistoryApiV1TradesHistoryGetErrors,
+  GetTradeHistoryApiV1TradesHistoryGetResponses,
   GetUploadUrlApiV1CardsUploadUrlPostData,
   GetUploadUrlApiV1CardsUploadUrlPostErrors,
   GetUploadUrlApiV1CardsUploadUrlPostResponses,
@@ -61,6 +76,9 @@ import type {
   RefreshTokenApiV1AuthRefreshPostData,
   RefreshTokenApiV1AuthRefreshPostErrors,
   RefreshTokenApiV1AuthRefreshPostResponses,
+  RejectTradeApiV1TradesTradeIdRejectPostData,
+  RejectTradeApiV1TradesTradeIdRejectPostErrors,
+  RejectTradeApiV1TradesTradeIdRejectPostResponses,
   RootGetData,
   RootGetResponses,
   SearchNearbyCardsApiV1NearbySearchPostData,
@@ -549,7 +567,7 @@ export const markMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPost = <
 /**
  * Submit rating
  *
- * Submit a rating for another user after a trade
+ * Submit a rating for another user (based on friendship or completed trade)
  */
 export const submitRatingApiV1RatingsPost = <ThrowOnError extends boolean = false>(
   options: Options<SubmitRatingApiV1RatingsPostData, ThrowOnError>
@@ -644,4 +662,116 @@ export const submitReportApiV1ReportsPost = <ThrowOnError extends boolean = fals
       'Content-Type': 'application/json',
       ...options.headers,
     },
+  });
+
+/**
+ * Create trade proposal
+ *
+ * Create a new trade proposal between two users
+ */
+export const createTradeApiV1TradesPost = <ThrowOnError extends boolean = false>(
+  options: Options<CreateTradeApiV1TradesPostData, ThrowOnError>
+) =>
+  (options.client ?? client).post<
+    CreateTradeApiV1TradesPostResponses,
+    CreateTradeApiV1TradesPostErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/trades',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Accept trade proposal
+ *
+ * Accept a trade proposal (responder only)
+ */
+export const acceptTradeApiV1TradesTradeIdAcceptPost = <ThrowOnError extends boolean = false>(
+  options: Options<AcceptTradeApiV1TradesTradeIdAcceptPostData, ThrowOnError>
+) =>
+  (options.client ?? client).post<
+    AcceptTradeApiV1TradesTradeIdAcceptPostResponses,
+    AcceptTradeApiV1TradesTradeIdAcceptPostErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/trades/{trade_id}/accept',
+    ...options,
+  });
+
+/**
+ * Reject trade proposal
+ *
+ * Reject a trade proposal (responder only)
+ */
+export const rejectTradeApiV1TradesTradeIdRejectPost = <ThrowOnError extends boolean = false>(
+  options: Options<RejectTradeApiV1TradesTradeIdRejectPostData, ThrowOnError>
+) =>
+  (options.client ?? client).post<
+    RejectTradeApiV1TradesTradeIdRejectPostResponses,
+    RejectTradeApiV1TradesTradeIdRejectPostErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/trades/{trade_id}/reject',
+    ...options,
+  });
+
+/**
+ * Cancel trade
+ *
+ * Cancel a trade (either party can cancel)
+ */
+export const cancelTradeApiV1TradesTradeIdCancelPost = <ThrowOnError extends boolean = false>(
+  options: Options<CancelTradeApiV1TradesTradeIdCancelPostData, ThrowOnError>
+) =>
+  (options.client ?? client).post<
+    CancelTradeApiV1TradesTradeIdCancelPostResponses,
+    CancelTradeApiV1TradesTradeIdCancelPostErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/trades/{trade_id}/cancel',
+    ...options,
+  });
+
+/**
+ * Confirm trade completion
+ *
+ * Confirm trade completion (each party confirms independently)
+ */
+export const completeTradeApiV1TradesTradeIdCompletePost = <ThrowOnError extends boolean = false>(
+  options: Options<CompleteTradeApiV1TradesTradeIdCompletePostData, ThrowOnError>
+) =>
+  (options.client ?? client).post<
+    CompleteTradeApiV1TradesTradeIdCompletePostResponses,
+    CompleteTradeApiV1TradesTradeIdCompletePostErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/trades/{trade_id}/complete',
+    ...options,
+  });
+
+/**
+ * Get trade history
+ *
+ * Get all trades for current user (as initiator or responder)
+ */
+export const getTradeHistoryApiV1TradesHistoryGet = <ThrowOnError extends boolean = false>(
+  options?: Options<GetTradeHistoryApiV1TradesHistoryGetData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    GetTradeHistoryApiV1TradesHistoryGetResponses,
+    GetTradeHistoryApiV1TradesHistoryGetErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/trades/history',
+    ...options,
   });
