@@ -207,31 +207,29 @@ export type ChatRoomResponse = {
 };
 
 /**
- * ErrorResponse
+ * CreateTradeRequest
  *
- * Error response schema
+ * Request schema for creating a trade proposal
  */
-export type ErrorResponse = {
+export type CreateTradeRequest = {
   /**
-   * Code
+   * Responder Id
    *
-   * Error code
+   * User ID of the responder
    */
-  code: string;
+  responder_id: string;
   /**
-   * Message
+   * Initiator Card Ids
    *
-   * Error message
+   * List of card IDs from initiator
    */
-  message: string;
+  initiator_card_ids: string[];
   /**
-   * Details
+   * Responder Card Ids
    *
-   * Additional error details
+   * List of card IDs from responder
    */
-  details?: {
-    [key: string]: unknown;
-  } | null;
+  responder_card_ids: string[];
 };
 
 /**
@@ -244,7 +242,7 @@ export type ErrorWrapper = {
    * Data
    */
   data?: null;
-  error: ErrorResponse;
+  error: AppModulesIdentityPresentationSchemasAuthSchemasErrorResponse;
 };
 
 /**
@@ -554,7 +552,7 @@ export type ProfileErrorWrapper = {
    * Data
    */
   data?: null;
-  error: ErrorResponse;
+  error: AppModulesIdentityPresentationSchemasAuthSchemasErrorResponse;
 };
 
 /**
@@ -1041,6 +1039,156 @@ export type TokenResponse = {
 };
 
 /**
+ * TradeHistoryResponse
+ *
+ * Response schema for trade history list
+ */
+export type TradeHistoryResponse = {
+  /**
+   * Trades
+   *
+   * List of trades
+   */
+  trades: TradeResponse[];
+  /**
+   * Total
+   *
+   * Total number of trades
+   */
+  total: number;
+  /**
+   * Limit
+   *
+   * Limit used
+   */
+  limit: number;
+  /**
+   * Offset
+   *
+   * Offset used
+   */
+  offset: number;
+};
+
+/**
+ * TradeItemResponse
+ *
+ * Response schema for a trade item
+ */
+export type TradeItemResponse = {
+  /**
+   * Id
+   *
+   * Trade item ID
+   */
+  id: string;
+  /**
+   * Trade Id
+   *
+   * Trade ID
+   */
+  trade_id: string;
+  /**
+   * Card Id
+   *
+   * Card ID
+   */
+  card_id: string;
+  /**
+   * Owner Side
+   *
+   * Which party owns this card
+   */
+  owner_side: string;
+  /**
+   * Created At
+   *
+   * Creation timestamp
+   */
+  created_at: string;
+};
+
+/**
+ * TradeResponse
+ *
+ * Response schema for trade details
+ */
+export type TradeResponse = {
+  /**
+   * Id
+   *
+   * Trade ID
+   */
+  id: string;
+  /**
+   * Initiator Id
+   *
+   * Initiator user ID
+   */
+  initiator_id: string;
+  /**
+   * Responder Id
+   *
+   * Responder user ID
+   */
+  responder_id: string;
+  /**
+   * Status
+   *
+   * Trade status
+   */
+  status: string;
+  /**
+   * Accepted At
+   *
+   * Acceptance timestamp
+   */
+  accepted_at?: string | null;
+  /**
+   * Initiator Confirmed At
+   *
+   * Initiator confirmation timestamp
+   */
+  initiator_confirmed_at?: string | null;
+  /**
+   * Responder Confirmed At
+   *
+   * Responder confirmation timestamp
+   */
+  responder_confirmed_at?: string | null;
+  /**
+   * Completed At
+   *
+   * Completion timestamp
+   */
+  completed_at?: string | null;
+  /**
+   * Canceled At
+   *
+   * Cancellation timestamp
+   */
+  canceled_at?: string | null;
+  /**
+   * Created At
+   *
+   * Creation timestamp
+   */
+  created_at: string;
+  /**
+   * Updated At
+   *
+   * Last update timestamp
+   */
+  updated_at: string;
+  /**
+   * Items
+   *
+   * Trade items (cards being exchanged)
+   */
+  items?: TradeItemResponse[] | null;
+};
+
+/**
  * UpdateLocationRequest
  *
  * Request schema for updating user location
@@ -1220,6 +1368,34 @@ export type ValidationError = {
    * Error Type
    */
   type: string;
+};
+
+/**
+ * ErrorResponse
+ *
+ * Error response schema
+ */
+export type AppModulesIdentityPresentationSchemasAuthSchemasErrorResponse = {
+  /**
+   * Code
+   *
+   * Error code
+   */
+  code: string;
+  /**
+   * Message
+   *
+   * Error message
+   */
+  message: string;
+  /**
+   * Details
+   *
+   * Additional error details
+   */
+  details?: {
+    [key: string]: unknown;
+  } | null;
 };
 
 export type HealthCheckHealthGetData = {
@@ -2217,3 +2393,216 @@ export type SubmitReportApiV1ReportsPostResponses = {
 
 export type SubmitReportApiV1ReportsPostResponse =
   SubmitReportApiV1ReportsPostResponses[keyof SubmitReportApiV1ReportsPostResponses];
+
+export type CreateTradeApiV1TradesPostData = {
+  body: CreateTradeRequest;
+  path?: never;
+  query?: never;
+  url: '/api/v1/trades';
+};
+
+export type CreateTradeApiV1TradesPostErrors = {
+  /**
+   * Bad request (validation failed)
+   */
+  400: unknown;
+  /**
+   * Unauthorized (not logged in)
+   */
+  401: unknown;
+  /**
+   * Unprocessable entity (validation error)
+   */
+  422: unknown;
+  /**
+   * Internal server error
+   */
+  500: unknown;
+};
+
+export type CreateTradeApiV1TradesPostResponses = {
+  /**
+   * Trade proposal created successfully
+   */
+  201: TradeResponse;
+};
+
+export type CreateTradeApiV1TradesPostResponse =
+  CreateTradeApiV1TradesPostResponses[keyof CreateTradeApiV1TradesPostResponses];
+
+export type AcceptTradeApiV1TradesTradeIdAcceptPostData = {
+  body?: never;
+  path: {
+    /**
+     * Trade Id
+     */
+    trade_id: string;
+  };
+  query?: never;
+  url: '/api/v1/trades/{trade_id}/accept';
+};
+
+export type AcceptTradeApiV1TradesTradeIdAcceptPostErrors = {
+  /**
+   * Unauthorized (not logged in)
+   */
+  401: unknown;
+  /**
+   * Trade not found
+   */
+  404: unknown;
+  /**
+   * Unprocessable entity (cannot accept trade)
+   */
+  422: unknown;
+  /**
+   * Internal server error
+   */
+  500: unknown;
+};
+
+export type AcceptTradeApiV1TradesTradeIdAcceptPostResponses = {
+  /**
+   * Trade accepted successfully
+   */
+  200: TradeResponse;
+};
+
+export type AcceptTradeApiV1TradesTradeIdAcceptPostResponse =
+  AcceptTradeApiV1TradesTradeIdAcceptPostResponses[keyof AcceptTradeApiV1TradesTradeIdAcceptPostResponses];
+
+export type RejectTradeApiV1TradesTradeIdRejectPostData = {
+  body?: never;
+  path: {
+    /**
+     * Trade Id
+     */
+    trade_id: string;
+  };
+  query?: never;
+  url: '/api/v1/trades/{trade_id}/reject';
+};
+
+export type RejectTradeApiV1TradesTradeIdRejectPostErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type RejectTradeApiV1TradesTradeIdRejectPostError =
+  RejectTradeApiV1TradesTradeIdRejectPostErrors[keyof RejectTradeApiV1TradesTradeIdRejectPostErrors];
+
+export type RejectTradeApiV1TradesTradeIdRejectPostResponses = {
+  /**
+   * Successful Response
+   */
+  200: TradeResponse;
+};
+
+export type RejectTradeApiV1TradesTradeIdRejectPostResponse =
+  RejectTradeApiV1TradesTradeIdRejectPostResponses[keyof RejectTradeApiV1TradesTradeIdRejectPostResponses];
+
+export type CancelTradeApiV1TradesTradeIdCancelPostData = {
+  body?: never;
+  path: {
+    /**
+     * Trade Id
+     */
+    trade_id: string;
+  };
+  query?: never;
+  url: '/api/v1/trades/{trade_id}/cancel';
+};
+
+export type CancelTradeApiV1TradesTradeIdCancelPostErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type CancelTradeApiV1TradesTradeIdCancelPostError =
+  CancelTradeApiV1TradesTradeIdCancelPostErrors[keyof CancelTradeApiV1TradesTradeIdCancelPostErrors];
+
+export type CancelTradeApiV1TradesTradeIdCancelPostResponses = {
+  /**
+   * Successful Response
+   */
+  200: TradeResponse;
+};
+
+export type CancelTradeApiV1TradesTradeIdCancelPostResponse =
+  CancelTradeApiV1TradesTradeIdCancelPostResponses[keyof CancelTradeApiV1TradesTradeIdCancelPostResponses];
+
+export type CompleteTradeApiV1TradesTradeIdCompletePostData = {
+  body?: never;
+  path: {
+    /**
+     * Trade Id
+     */
+    trade_id: string;
+  };
+  query?: never;
+  url: '/api/v1/trades/{trade_id}/complete';
+};
+
+export type CompleteTradeApiV1TradesTradeIdCompletePostErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type CompleteTradeApiV1TradesTradeIdCompletePostError =
+  CompleteTradeApiV1TradesTradeIdCompletePostErrors[keyof CompleteTradeApiV1TradesTradeIdCompletePostErrors];
+
+export type CompleteTradeApiV1TradesTradeIdCompletePostResponses = {
+  /**
+   * Successful Response
+   */
+  200: TradeResponse;
+};
+
+export type CompleteTradeApiV1TradesTradeIdCompletePostResponse =
+  CompleteTradeApiV1TradesTradeIdCompletePostResponses[keyof CompleteTradeApiV1TradesTradeIdCompletePostResponses];
+
+export type GetTradeHistoryApiV1TradesHistoryGetData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Limit
+     *
+     * Maximum number of results
+     */
+    limit?: number;
+    /**
+     * Offset
+     *
+     * Number of results to skip
+     */
+    offset?: number;
+  };
+  url: '/api/v1/trades/history';
+};
+
+export type GetTradeHistoryApiV1TradesHistoryGetErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type GetTradeHistoryApiV1TradesHistoryGetError =
+  GetTradeHistoryApiV1TradesHistoryGetErrors[keyof GetTradeHistoryApiV1TradesHistoryGetErrors];
+
+export type GetTradeHistoryApiV1TradesHistoryGetResponses = {
+  /**
+   * Successful Response
+   */
+  200: TradeHistoryResponse;
+};
+
+export type GetTradeHistoryApiV1TradesHistoryGetResponse =
+  GetTradeHistoryApiV1TradesHistoryGetResponses[keyof GetTradeHistoryApiV1TradesHistoryGetResponses];

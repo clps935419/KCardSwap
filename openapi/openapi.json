@@ -1201,7 +1201,7 @@
           "Ratings"
         ],
         "summary": "Submit rating",
-        "description": "Submit a rating for another user after a trade",
+        "description": "Submit a rating for another user (based on friendship or completed trade)",
         "operationId": "submit_rating_api_v1_ratings_post",
         "requestBody": {
           "content": {
@@ -1452,6 +1452,319 @@
             "HTTPBearer": []
           }
         ]
+      }
+    },
+    "/api/v1/trades": {
+      "post": {
+        "tags": [
+          "Trades"
+        ],
+        "summary": "Create trade proposal",
+        "description": "Create a new trade proposal between two users",
+        "operationId": "create_trade_api_v1_trades_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTradeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Trade proposal created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TradeResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (validation failed)"
+          },
+          "401": {
+            "description": "Unauthorized (not logged in)"
+          },
+          "422": {
+            "description": "Unprocessable entity (validation error)"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/trades/{trade_id}/accept": {
+      "post": {
+        "tags": [
+          "Trades"
+        ],
+        "summary": "Accept trade proposal",
+        "description": "Accept a trade proposal (responder only)",
+        "operationId": "accept_trade_api_v1_trades__trade_id__accept_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "trade_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Trade Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Trade accepted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TradeResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (not logged in)"
+          },
+          "404": {
+            "description": "Trade not found"
+          },
+          "422": {
+            "description": "Unprocessable entity (cannot accept trade)"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/trades/{trade_id}/reject": {
+      "post": {
+        "tags": [
+          "Trades"
+        ],
+        "summary": "Reject trade proposal",
+        "description": "Reject a trade proposal (responder only)",
+        "operationId": "reject_trade_api_v1_trades__trade_id__reject_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "trade_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Trade Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TradeResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/trades/{trade_id}/cancel": {
+      "post": {
+        "tags": [
+          "Trades"
+        ],
+        "summary": "Cancel trade",
+        "description": "Cancel a trade (either party can cancel)",
+        "operationId": "cancel_trade_api_v1_trades__trade_id__cancel_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "trade_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Trade Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TradeResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/trades/{trade_id}/complete": {
+      "post": {
+        "tags": [
+          "Trades"
+        ],
+        "summary": "Confirm trade completion",
+        "description": "Confirm trade completion (each party confirms independently)",
+        "operationId": "complete_trade_api_v1_trades__trade_id__complete_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "trade_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Trade Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TradeResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/trades/history": {
+      "get": {
+        "tags": [
+          "Trades"
+        ],
+        "summary": "Get trade history",
+        "description": "Get all trades for current user (as initiator or responder)",
+        "operationId": "get_trade_history_api_v1_trades_history_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Maximum number of results",
+              "default": 50,
+              "title": "Limit"
+            },
+            "description": "Maximum number of results"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Number of results to skip",
+              "default": 0,
+              "title": "Offset"
+            },
+            "description": "Number of results to skip"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TradeHistoryResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     }
   },
@@ -1793,39 +2106,64 @@
           "unread_count": 0
         }
       },
-      "ErrorResponse": {
+      "CreateTradeRequest": {
         "properties": {
-          "code": {
+          "responder_id": {
             "type": "string",
-            "title": "Code",
-            "description": "Error code"
+            "format": "uuid",
+            "title": "Responder Id",
+            "description": "User ID of the responder"
           },
-          "message": {
-            "type": "string",
-            "title": "Message",
-            "description": "Error message"
+          "initiator_card_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Initiator Card Ids",
+            "description": "List of card IDs from initiator",
+            "examples": [
+              [
+                "123e4567-e89b-12d3-a456-426614174000"
+              ]
+            ]
           },
-          "details": {
-            "anyOf": [
-              {
-                "additionalProperties": true,
-                "type": "object"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Details",
-            "description": "Additional error details"
+          "responder_card_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Responder Card Ids",
+            "description": "List of card IDs from responder",
+            "examples": [
+              [
+                "223e4567-e89b-12d3-a456-426614174000"
+              ]
+            ]
           }
         },
         "type": "object",
         "required": [
-          "code",
-          "message"
+          "responder_id",
+          "initiator_card_ids",
+          "responder_card_ids"
         ],
-        "title": "ErrorResponse",
-        "description": "Error response schema"
+        "title": "CreateTradeRequest",
+        "description": "Request schema for creating a trade proposal",
+        "example": {
+          "initiator_card_ids": [
+            "123e4567-e89b-12d3-a456-426614174000",
+            "124e4567-e89b-12d3-a456-426614174000"
+          ],
+          "responder_card_ids": [
+            "223e4567-e89b-12d3-a456-426614174000",
+            "224e4567-e89b-12d3-a456-426614174000"
+          ],
+          "responder_id": "323e4567-e89b-12d3-a456-426614174000"
+        }
       },
       "ErrorWrapper": {
         "properties": {
@@ -1834,7 +2172,7 @@
             "title": "Data"
           },
           "error": {
-            "$ref": "#/components/schemas/ErrorResponse"
+            "$ref": "#/components/schemas/app__modules__identity__presentation__schemas__auth_schemas__ErrorResponse"
           }
         },
         "type": "object",
@@ -2315,7 +2653,7 @@
             "title": "Data"
           },
           "error": {
-            "$ref": "#/components/schemas/ErrorResponse"
+            "$ref": "#/components/schemas/app__modules__identity__presentation__schemas__auth_schemas__ErrorResponse"
           }
         },
         "type": "object",
@@ -3109,6 +3447,250 @@
           "user_id": "123e4567-e89b-12d3-a456-426614174000"
         }
       },
+      "TradeHistoryResponse": {
+        "properties": {
+          "trades": {
+            "items": {
+              "$ref": "#/components/schemas/TradeResponse"
+            },
+            "type": "array",
+            "title": "Trades",
+            "description": "List of trades"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total",
+            "description": "Total number of trades"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit",
+            "description": "Limit used"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset",
+            "description": "Offset used"
+          }
+        },
+        "type": "object",
+        "required": [
+          "trades",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "TradeHistoryResponse",
+        "description": "Response schema for trade history list",
+        "example": {
+          "limit": 50,
+          "offset": 0,
+          "total": 5,
+          "trades": []
+        }
+      },
+      "TradeItemResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id",
+            "description": "Trade item ID"
+          },
+          "trade_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Trade Id",
+            "description": "Trade ID"
+          },
+          "card_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Card Id",
+            "description": "Card ID"
+          },
+          "owner_side": {
+            "type": "string",
+            "title": "Owner Side",
+            "description": "Which party owns this card",
+            "examples": [
+              "initiator",
+              "responder"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At",
+            "description": "Creation timestamp"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "trade_id",
+          "card_id",
+          "owner_side",
+          "created_at"
+        ],
+        "title": "TradeItemResponse",
+        "description": "Response schema for a trade item"
+      },
+      "TradeResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id",
+            "description": "Trade ID"
+          },
+          "initiator_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Initiator Id",
+            "description": "Initiator user ID"
+          },
+          "responder_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Responder Id",
+            "description": "Responder user ID"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "description": "Trade status",
+            "examples": [
+              "draft",
+              "proposed",
+              "accepted",
+              "completed",
+              "rejected",
+              "canceled"
+            ]
+          },
+          "accepted_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accepted At",
+            "description": "Acceptance timestamp"
+          },
+          "initiator_confirmed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Initiator Confirmed At",
+            "description": "Initiator confirmation timestamp"
+          },
+          "responder_confirmed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Responder Confirmed At",
+            "description": "Responder confirmation timestamp"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At",
+            "description": "Completion timestamp"
+          },
+          "canceled_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Canceled At",
+            "description": "Cancellation timestamp"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At",
+            "description": "Creation timestamp"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At",
+            "description": "Last update timestamp"
+          },
+          "items": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/TradeItemResponse"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Items",
+            "description": "Trade items (cards being exchanged)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "initiator_id",
+          "responder_id",
+          "status",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "TradeResponse",
+        "description": "Response schema for trade details",
+        "example": {
+          "created_at": "2025-01-01T00:00:00Z",
+          "id": "423e4567-e89b-12d3-a456-426614174000",
+          "initiator_id": "523e4567-e89b-12d3-a456-426614174000",
+          "items": [
+            {
+              "card_id": "123e4567-e89b-12d3-a456-426614174000",
+              "created_at": "2025-01-01T00:00:00Z",
+              "id": "723e4567-e89b-12d3-a456-426614174000",
+              "owner_side": "initiator",
+              "trade_id": "423e4567-e89b-12d3-a456-426614174000"
+            }
+          ],
+          "responder_id": "623e4567-e89b-12d3-a456-426614174000",
+          "status": "proposed",
+          "updated_at": "2025-01-01T00:00:00Z"
+        }
+      },
       "UpdateLocationRequest": {
         "properties": {
           "lat": {
@@ -3431,6 +4013,40 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "app__modules__identity__presentation__schemas__auth_schemas__ErrorResponse": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code",
+            "description": "Error code"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "description": "Error message"
+          },
+          "details": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Details",
+            "description": "Additional error details"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "title": "ErrorResponse",
+        "description": "Error response schema"
       }
     },
     "securitySchemes": {
