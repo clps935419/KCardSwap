@@ -481,6 +481,8 @@
 
 ## Phase 6: User Story 4 - 好友系統與聊天 (Priority: P1)
 
+**狀態**: ✅ **Backend 97% Complete** (32/33 tasks, PR #23 已實作)
+
 **目標**: 使用者可以加好友、聊天、評分、檢舉
 
 **獨立測試標準**:
@@ -923,8 +925,8 @@ Group M5: US5 Mobile (Expo) - Trade
 ### Statistics（統計）
 
 - **Total Tasks**: 228 (Backend) + 13 (Mobile Phase 1M) + 6 (Mobile Tooling: Phase 1M.1) + Mobile US tasks = 247+
-- **Completed**: 63 (Backend: Phase 1: 8/8, Phase 2: 20/20, Phase 3: 35/37) + 13 (Mobile: Phase 1M: 13/13) + 3 (Mobile: Phase 3: 3/4) = 79
-- **Remaining**: 165 (Backend) + Mobile US tasks (M104, M201-M704)
+- **Completed**: 95 (Backend: Phase 1: 8/8, Phase 2: 20/20, Phase 3: 35/37, Phase 6: 32/33) + 13 (Mobile: Phase 1M: 13/13) + 3 (Mobile: Phase 3: 3/4) = 111
+- **Remaining**: 133 (Backend) + Mobile US tasks (M104, M201-M704)
 - **Estimated Duration**: 8 weeks (remaining sprints)
 
 ### Task Breakdown by Phase（各階段任務分布）
@@ -940,7 +942,7 @@ Group M5: US5 Mobile (Expo) - Trade
 | 3 | US1 - Mobile | 4 | P1 🎯 MVP | ⏳ 75% Complete (3/4, M104 pending) |
 | 4 | US2 - Card Upload | 29 | P1 | ⏸️ Not Started |
 | 5 | US3 - Nearby Search | 16 | P1 | ⏸️ Not Started |
-| 6 | US4 - Friends & Chat | 33 | P1 | ⏸️ Not Started |
+| 6 | US4 - Friends & Chat | 33 | P1 | ✅ 97% Complete (32/33, Backend完成, T143待驗證) |
 | 7 | US5 - Trade | 31 | P1 | ⏸️ Not Started |
 | 8 | US6 - Subscription | 17 | P2 | ⏸️ Not Started |
 | 8.5 | US7 - Board Posts | 23 | P2 | ⏸️ Not Started |
