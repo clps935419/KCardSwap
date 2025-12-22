@@ -17,6 +17,9 @@ from app.modules.social.application.use_cases.ratings.rate_user_use_case import 
 from app.modules.social.infrastructure.repositories.rating_repository_impl import (
     RatingRepositoryImpl,
 )
+from app.modules.social.infrastructure.repositories.friendship_repository_impl import (
+    FriendshipRepositoryImpl,
+)
 from app.modules.social.presentation.schemas.rating_schemas import (
     AverageRatingResponse,
     RatingListResponse,
@@ -43,7 +46,7 @@ router = APIRouter(prefix="/ratings", tags=["Ratings"])
         500: {"description": "Internal server error"},
     },
     summary="Submit rating",
-    description="Submit a rating for another user after a trade",
+    description="Submit a rating for another user (based on friendship or completed trade)",
 )
 async def submit_rating(
     request: RatingRequest,
@@ -53,26 +56,28 @@ async def submit_rating(
     """
     Submit a rating for another user.
 
-    Business rules:
+    Business rules (FR-SOCIAL-003A):
     - Cannot rate yourself
     - Score must be between 1-5
-    - Optional trade_id for linking to specific trade
+    - Must be friends OR provide trade_id
+    - Cannot rate if either party has blocked the other
     - Optional comment for detailed feedback
 
     Ratings help build trust in the community.
     """
     try:
-        # Initialize repository and use case
+        # Initialize repositories and use case
         rating_repo = RatingRepositoryImpl(session)
-        use_case = RateUserUseCase(rating_repo)
+        friendship_repo = FriendshipRepositoryImpl(session)
+        use_case = RateUserUseCase(rating_repo, friendship_repo)
 
         # Execute use case
         rating = await use_case.execute(
             rater_id=str(current_user_id),
             rated_user_id=str(request.rated_user_id),
-            trade_id=str(request.trade_id) if request.trade_id else None,
             score=request.score,
             comment=request.comment,
+            trade_id=str(request.trade_id) if request.trade_id else None,
         )
 
         return RatingResponse(

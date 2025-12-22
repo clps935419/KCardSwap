@@ -483,7 +483,7 @@
 
 ## Phase 6: User Story 4 - 好友系統與聊天 (Priority: P1)
 
-**狀態**: ✅ **Backend 97% Complete** (32/33 tasks, PR #23 已實作)
+**狀態**: ✅ **Backend 100% Complete** (33/33 tasks, PR #23 已實作 + Rating 系統已依 FR-SOCIAL-003A 更新)
 
 **目標**: 使用者可以加好友、聊天、評分、檢舉
 
@@ -516,6 +516,13 @@
 - [X] T124 [P] [US4] 建立 SendMessageUseCase：apps/backend/app/modules/social/application/use_cases/send_message_use_case.py（發送訊息 → 觸發 FCM 推播）
 - [X] T125 [P] [US4] 建立 GetMessagesUseCase：apps/backend/app/modules/social/application/use_cases/get_messages_use_case.py（輪詢機制：after_message_id）
 - [X] T126 [P] [US4] 建立 RateUserUseCase：apps/backend/app/modules/social/application/use_cases/ratings/rate_user_use_case.py（ratings 基礎能力：建立評分；基本驗證：不可自評、分數 1–5、封鎖禁止；權限規則：好友或提供 trade_id）
+  - [X] T126A 修正 Rating Entity - trade_id 改為 Optional（對應 FR-SOCIAL-003A）
+  - [X] T126B 修正 Rating Model - trade_id nullable=True
+  - [X] T126C 擴充 RateUserUseCase - 新增權限驗證（好友或 trade_id）與封鎖檢查
+  - [X] T126D 更新 Rating Router - 注入 FriendshipRepository
+  - [X] T126E 更新 Rating Repository - 處理 nullable trade_id
+  - [X] T126F 建立 Alembic Migration 009 - 修改 ratings.trade_id 為 nullable
+  - [X] T126G 更新 Rating Tests - 涵蓋好友評分和 trade 評分場景
 - [X] T127 [P] [US4] 建立 ReportUserUseCase：apps/backend/app/modules/social/application/use_cases/report_user_use_case.py
 
 - [ ] T125A [DEFERRED] [US4] 訊息保留政策：伺服器端保留 30 天；清理/清除 job（例如每日排程）清除超過 30 天的 messages（先在文件/規格中定義，實作延後）
@@ -580,6 +587,10 @@
 - [ ] T150 [P] [US5] 建立 AcceptTradeUseCase：apps/backend/app/modules/social/application/use_cases/accept_trade_use_case.py
 - [ ] T151 [P] [US5] 建立 RejectTradeUseCase：apps/backend/app/modules/social/application/use_cases/reject_trade_use_case.py
 - [ ] T152 [P] [US5] 建立 CompleteTradeUseCase：apps/backend/app/modules/social/application/use_cases/complete_trade_use_case.py（各自獨立標記完成；雙方都確認後才轉 completed 並鎖定卡片；完成後提供導流評分所需的 trade_id）
+  - [ ] T152A 擴充 RateUserUseCase - 新增 trade 完成狀態驗證（FR-SOCIAL-003B）：
+    - 驗證 trade_id 對應的 trade 狀態為 completed
+    - 確保評分者是該 trade 的參與者（initiator_id 或 responder_id）
+    - 注入 TradeRepository 進行驗證
 - [ ] T153 [P] [US5] 建立 GetTradeHistoryUseCase：apps/backend/app/modules/social/application/use_cases/get_trade_history_use_case.py
 
 ### Infrastructure Layer (Social Module - Trade)
@@ -929,8 +940,8 @@ Group M5: US5 Mobile (Expo) - Trade
 ### Statistics（統計）
 
 - **Total Tasks**: 228 (Backend) + 13 (Mobile Phase 1M) + 6 (Mobile Tooling: Phase 1M.1) + Mobile US tasks = 247+
-- **Completed**: 95 (Backend: Phase 1: 8/8, Phase 2: 20/20, Phase 3: 35/37, Phase 6: 32/33) + 13 (Mobile: Phase 1M: 13/13) + 3 (Mobile: Phase 3: 3/4) = 111
-- **Remaining**: 133 (Backend) + Mobile US tasks (M104, M201-M704)
+- **Completed**: 96 (Backend: Phase 1: 8/8, Phase 2: 20/20, Phase 3: 35/37, Phase 6: 33/33) + 13 (Mobile: Phase 1M: 13/13) + 3 (Mobile: Phase 3: 3/4) = 112
+- **Remaining**: 132 (Backend) + Mobile US tasks (M104, M201-M704)
 - **Estimated Duration**: 8 weeks (remaining sprints)
 
 ### Task Breakdown by Phase（各階段任務分布）
