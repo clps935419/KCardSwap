@@ -197,6 +197,7 @@
 - **FR-TRADE-002**：系統必須限制同一對使用者在任一時間最多存在有限數量的「進行中」交換提案，以避免混亂。
 - **FR-TRADE-003**：雙方在面對面完成交換後，必須各自獨立標記「交換完成」，僅當兩邊都確認時，狀態才轉為已完成並鎖定相關小卡為已交換狀態。
 - **FR-TRADE-004**：所有交換紀錄必須可在「交換歷史」頁面依時間排序檢視，並保留對應的評分與回饋內容。
+- **FR-TRADE-005**：交換提案進入「已接受（accepted）」後，若在可配置的時間窗內（預設 48 小時；由 `TRADE_CONFIRMATION_TIMEOUT_HOURS` 控制）仍未完成「雙方都確認完成」，系統必須將該 trade 標記為 **canceled**（不新增 `expired` 狀態）。
 
 #### 7. 商業模式細節（免費/付費限制、計費、升級邏輯）
 
@@ -220,6 +221,13 @@
 
 - **FR-API-001**：所有對外後端服務必須透過 `/api/v1/...` 路徑，由 Kong Gateway 統一代理與套用 JWT 驗證、Rate Limiting、CORS 等策略。
 - **FR-API-002**：每個主要資源（users、cards、trades、chats、subscriptions）必須具備清楚的 RESTful 端點與對應 HTTP 動詞（GET/POST/PATCH/DELETE）。
+**FR-API-002-TRADE**：Trade 相關端點至少必須包含：
+  - `POST /api/v1/trades`（建立交換提案）
+  - `POST /api/v1/trades/{id}/accept`（接受提案）
+  - `POST /api/v1/trades/{id}/reject`（拒絕提案）
+  - `POST /api/v1/trades/{id}/cancel`（取消提案）
+  - `POST /api/v1/trades/{id}/complete`（我方標記完成；雙方皆完成後轉 completed）
+  - `GET /api/v1/trades/history`（交換歷史查詢，分頁）
 - **FR-API-003**：所有 API 回應需採用一致格式（例如 `{ "data": ..., "error": null }` 或 `{ "data": null, "error": { code, message } }`）。
 - **FR-API-004**：系統必須定義標準錯誤碼集合（例如 400_xxx 驗證錯誤、401_xxx 未授權、403_xxx 權限不足、404_xxx 資源不存在、429_xxx 超出限流）。
 

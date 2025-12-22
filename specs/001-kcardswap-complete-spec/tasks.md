@@ -247,9 +247,9 @@
 
 - [X] T046 [P] [US1] 定義 Login Schema：apps/backend/app/modules/identity/presentation/schemas/auth_schemas.py（GoogleLoginRequest, TokenResponse）
 - [X] T047 [P] [US1] 定義 Profile Schema：apps/backend/app/modules/identity/presentation/schemas/profile_schemas.py（ProfileResponse, UpdateProfileRequest）
-- [X] T048 [US1] 建立 Auth Router：apps/backend/app/modules/identity/presentation/routers/auth_router.py（POST /auth/google-login, POST /auth/refresh）
-- [X] T048A [US1] （Expo/PKCE）擴展 Auth Router：apps/backend/app/modules/identity/presentation/routers/auth_router.py（新增 POST /auth/google-callback：接收 { code, code_verifier, redirect_uri? }，回傳 TokenResponse）
-- [X] T049 [US1] 建立 Profile Router：apps/backend/app/modules/identity/presentation/routers/profile_router.py（GET /profile/me, PUT /profile/me）
+- [X] T048 [US1] 建立 Auth Router：apps/backend/app/modules/identity/presentation/routers/auth_router.py（POST /api/v1/auth/google-login, POST /api/v1/auth/refresh）
+- [X] T048A [US1] （Expo/PKCE）擴展 Auth Router：apps/backend/app/modules/identity/presentation/routers/auth_router.py（新增 POST /api/v1/auth/google-callback：接收 { code, code_verifier, redirect_uri? }，回傳 TokenResponse）
+- [X] T049 [US1] 建立 Profile Router：apps/backend/app/modules/identity/presentation/routers/profile_router.py（GET /api/v1/profile/me, PUT /api/v1/profile/me）
 - [X] T050 [P] [US1] 實作 JWT Authentication Dependency：apps/backend/app/modules/identity/presentation/dependencies/auth_deps.py（get_current_user）
 
 ### Phase 3.1: Google OAuth Callback with PKCE（Expo 標準做法）✅
@@ -316,9 +316,9 @@
 
 ### Mobile (Expo)
 
-- [X] M101 [P] [US1] 實作 Google 登入畫面與 PKCE Flow：apps/mobile/src/features/auth（使用 AuthSession 取得 code + code_verifier → 呼叫 /auth/google-callback；以更新後的 OpenAPI snapshot 作為驗證/對齊基準）
-- [X] M102 [P] [US1] 串接 TokenResponse 並寫入 Session：apps/mobile/src/shared/auth/session.ts（使用 /auth/refresh 續期；以更新後的 OpenAPI snapshot 作為驗證/對齊基準）
-- [X] M103 [P] [US1] 建立個人檔案頁（讀取/更新）：apps/mobile/src/features/profile（GET/PUT /profile/me；以更新後的 OpenAPI snapshot 作為驗證/對齊基準）
+- [X] M101 [P] [US1] 實作 Google 登入畫面與 PKCE Flow：apps/mobile/src/features/auth（使用 AuthSession 取得 code + code_verifier → 呼叫 /api/v1/auth/google-callback；以更新後的 OpenAPI snapshot 作為驗證/對齊基準）
+- [X] M102 [P] [US1] 串接 TokenResponse 並寫入 Session：apps/mobile/src/shared/auth/session.ts（使用 /api/v1/auth/refresh 續期；以更新後的 OpenAPI snapshot 作為驗證/對齊基準）
+- [X] M103 [P] [US1] 建立個人檔案頁（讀取/更新）：apps/mobile/src/features/profile（GET/PUT /api/v1/profile/me；以更新後的 OpenAPI snapshot 作為驗證/對齊基準）
 - [ ] M104 [US1] 手動驗證登入與更新檔案：Android 實機/模擬器（確認冷啟動 refresh 與 401 重新登入）
 
 ---
@@ -358,7 +358,7 @@
 ### Presentation Layer (Social Module - Cards)
 
 - [x] T079 [P] [US2] 定義 Card Schema：apps/backend/app/modules/social/presentation/schemas/card_schemas.py（CreateCardRequest, CardResponse, UploadUrlResponse）
-- [x] T080 [US2] 建立 Cards Router：apps/backend/app/modules/social/presentation/routers/cards_router.py（POST /cards/upload-url, GET /cards/me, DELETE /cards/{id}）
+- [x] T080 [US2] 建立 Cards Router：apps/backend/app/modules/social/presentation/routers/cards_router.py（POST /api/v1/cards/upload-url, GET /api/v1/cards/me, DELETE /api/v1/cards/{id}）
 
 ### Integration
 
@@ -400,7 +400,7 @@
   - （POC/依框裁切）若要「依框線區域裁切成卡片圖」，需處理座標映射：框線是在 preview(View) 座標；拍照結果是照片像素座標。建議以相對比例保存框線區域（x/y/width/height 皆為 0..1），再換算為照片像素後用 `expo-image-manipulator` crop。
   - （避免映射歪斜）盡量讓 preview aspect ratio 與拍照輸出比例一致；若 preview 使用 cover/縮放，需把 letterbox/crop 的偏移納入換算，否則裁切會偏移。
   - 參考：apps/mobile/TECH_STACK.md 的「expo-camera（相機預覽 + 自訂 overlay，引導框 POC）」段落（含 POC 步驟與座標映射注意事項）
-- [x] M202 [P] [US2] 取得上傳 Signed URL：apps/mobile/src/features/cards/api（呼叫 POST /cards/upload-url；以更新後的 OpenAPI snapshot 作為驗證/對齊基準）✅
+- [x] M202 [P] [US2] 取得上傳 Signed URL：apps/mobile/src/features/cards/api（呼叫 POST /api/v1/cards/upload-url；以更新後的 OpenAPI snapshot 作為驗證/對齊基準）✅
   - 回應需包含：`upload_url`、`method`（PUT/POST）、`required_headers`（至少 Content-Type；由後端決定）、以及可對應列表的 `image_url`/object key（或等價欄位）
   - 需明確規範 Signed URL 的有效期限（或 TTL 欄位），過期時前端需重新走 M202
 - [x] M203 [P] [US2] 直接上傳到 Signed URL：apps/mobile/src/features/cards/services/uploadToSignedUrl.ts（PUT/POST 上傳、錯誤處理與重試）✅
@@ -411,10 +411,10 @@
 - [x] M203A [P] [US2] 產生 200x200 WebP 縮圖並本機快取：apps/mobile/src/features/cards（縮圖僅供列表快速載入，不上傳、不進後端 API 定義）✅
   - 縮圖快取需定義 key（建議以 card_id 或 image_url 雜湊），並提供失效策略：卡片刪除時移除縮圖；找不到縮圖時回退載入原圖
   - 若 WebP 在特定平台不可用，需定義 fallback（例如 JPEG），但仍維持 200x200 尺寸
-- [x] M204 [P] [US2] 我的卡冊列表：apps/mobile/src/features/cards/screens/MyCardsScreen.tsx（GET /cards/me）✅（已使用 Gluestack UI）
+- [x] M204 [P] [US2] 我的卡冊列表：apps/mobile/src/features/cards/screens/MyCardsScreen.tsx（GET /api/v1/cards/me）✅（已使用 Gluestack UI）
   - 列表圖片載入順序：本機縮圖 → 原圖（fallback）；原圖載入失敗需顯示可重試狀態
   - UI 狀態：loading/空狀態/錯誤狀態（含重試）需可見且一致
-- [x] M205 [P] [US2] 刪除卡片：apps/mobile/src/features/cards/api（DELETE /cards/{id}）✅
+- [x] M205 [P] [US2] 刪除卡片：apps/mobile/src/features/cards/api（DELETE /api/v1/cards/{id}）✅
   - 刪除成功後需同步清除該卡片的縮圖快取，並刷新列表資料
   - 刪除失敗需顯示原因與重試入口（401/403 需導回登入或提示無權限，遵循既有錯誤映射策略）
 - [ ] M206 [US2] 手動驗證上傳限制與錯誤 UX：Android 實機/模擬器 ⚠️（程式碼完成，待實機測試）
@@ -447,8 +447,8 @@
 ### Presentation Layer (Social Module - Nearby)
 
 - [X] T099 [P] [US3] 定義 Nearby Schema：apps/backend/app/modules/social/presentation/schemas/nearby_schemas.py（SearchNearbyRequest, NearbyCardResponse）
-- [X] T100 [US3] 建立 Nearby Router：apps/backend/app/modules/social/presentation/routers/nearby_router.py（POST /nearby/search）
-- [X] T100A [US3] 補齊位置上報端點：apps/backend/app/modules/social/presentation/routers/nearby_router.py（PUT /nearby/location）
+- [X] T100 [US3] 建立 Nearby Router：apps/backend/app/modules/social/presentation/routers/nearby_router.py（POST /api/v1/nearby/search）
+- [X] T100A [US3] 補齊位置上報端點：apps/backend/app/modules/social/presentation/routers/nearby_router.py（PUT /api/v1/nearby/location）
 
 ### Integration
 
@@ -475,8 +475,8 @@
 ### Mobile (Expo)
 
 - [X] M301 [P] [US3] 定位權限與取得座標：apps/mobile/src/features/nearby（expo-location；處理拒絕權限）
-- [X] M302 [P] [US3] 附近搜尋頁：apps/mobile/src/features/nearby/screens/NearbySearchScreen.tsx（POST /nearby/search；Schema 以更新後的 Swagger/OpenAPI snapshot（openapi/openapi.json）作為驗證/對齊基準）
-  - 建議流程：取得定位後先 PUT /nearby/location，再 POST /nearby/search（避免後端依舊位置造成結果偏差）
+- [X] M302 [P] [US3] 附近搜尋頁：apps/mobile/src/features/nearby/screens/NearbySearchScreen.tsx（POST /api/v1/nearby/search；Schema 以更新後的 Swagger/OpenAPI snapshot（openapi/openapi.json）作為驗證/對齊基準）
+  - 建議流程：取得定位後先 PUT /api/v1/nearby/location，再 POST /api/v1/nearby/search（避免後端依舊位置造成結果偏差）
 - [X] M303 [US3] 限次錯誤處理：免費用戶第 6 次提示 HTTP 429 Too Many Requests（並提供升級入口；升級差異 deferred 至 Phase 8 BIZ）
 
 ---
@@ -543,10 +543,10 @@
 
 ### Presentation Layer (Social Module - Friends & Chat)
 
-- [X] T139 [US4] 建立 Friends Router：apps/backend/app/modules/social/presentation/routers/friends_router.py（POST /friends/request, POST /friends/accept, POST /friends/block）
-- [X] T140 [US4] 建立 Chat Router：apps/backend/app/modules/social/presentation/routers/chat_router.py（GET /chats/{id}/messages, POST /chats/{id}/messages）
-- [X] T141 [US4] 建立 Rating Router：apps/backend/app/modules/social/presentation/routers/rating_router.py（POST /ratings, GET /ratings/user/{user_id}, GET /ratings/user/{user_id}/average）
-- [X] T142 [US4] 建立 Report Router：apps/backend/app/modules/social/presentation/routers/report_router.py（POST /reports）
+- [X] T139 [US4] 建立 Friends Router：apps/backend/app/modules/social/presentation/routers/friends_router.py（POST /api/v1/friends/request, POST /api/v1/friends/accept, POST /api/v1/friends/block）
+- [X] T140 [US4] 建立 Chat Router：apps/backend/app/modules/social/presentation/routers/chat_router.py（GET /api/v1/chats/{id}/messages, POST /api/v1/chats/{id}/messages）
+- [X] T141 [US4] 建立 Rating Router：apps/backend/app/modules/social/presentation/routers/rating_router.py（POST /api/v1/ratings, GET /api/v1/ratings/user/{user_id}, GET /api/v1/ratings/user/{user_id}/average）
+- [X] T142 [US4] 建立 Report Router：apps/backend/app/modules/social/presentation/routers/report_router.py（POST /api/v1/reports）
 
 ### Verification
 
@@ -554,8 +554,8 @@
 
 ### Mobile (Expo)
 
-- [ ] M401 [P] [US4] 好友邀請/接受/封鎖頁：apps/mobile/src/features/friends（對齊 /friends/* 端點；以更新後的 OpenAPI snapshot 作為驗證/對齊基準）
-- [ ] M402 [P] [US4] 聊天室 UI 與輪詢：apps/mobile/src/features/chat（GET /chats/{id}/messages, POST /chats/{id}/messages；以更新後的 OpenAPI snapshot 作為驗證/對齊基準）
+- [ ] M401 [P] [US4] 好友邀請/接受/封鎖頁：apps/mobile/src/features/friends（對齊 /api/v1/friends/* 端點；以更新後的 OpenAPI snapshot 作為驗證/對齊基準）
+- [ ] M402 [P] [US4] 聊天室 UI 與輪詢：apps/mobile/src/features/chat（GET /api/v1/chats/{id}/messages, POST /api/v1/chats/{id}/messages；以更新後的 OpenAPI snapshot 作為驗證/對齊基準）
 - [ ] M403 [P] [US4] 前景輪詢策略：apps/mobile/src/features/chat/services/polling.ts（after_message_id、退避避免過度打 API）
 - [ ] M404 [P] [US4] 推播接收與導頁：apps/mobile/src/features/notifications（expo-notifications；點擊通知導向聊天室）
 
@@ -575,8 +575,8 @@
 
 ### Domain Layer (Social Module - Trade)
 
-- [ ] T144 [P] [US5] 建立 Trade Entity：apps/backend/app/modules/social/domain/entities/trade.py（id, initiator_id, responder_id, status: draft/proposed/accepted/completed/rejected/canceled, created_at）
-- [ ] T145 [P] [US5] 建立 TradeItem Entity：apps/backend/app/modules/social/domain/entities/trade_item.py（id, trade_id, card_id, owner_id）
+- [ ] T144 [P] [US5] 建立 Trade Entity：apps/backend/app/modules/social/domain/entities/trade.py（id, initiator_id, responder_id, status: draft/proposed/accepted/completed/rejected/canceled, accepted_at, initiator_confirmed_at, responder_confirmed_at, completed_at, canceled_at, created_at）
+- [ ] T145 [P] [US5] 建立 TradeItem Entity：apps/backend/app/modules/social/domain/entities/trade_item.py（id, trade_id, card_id, owner_side）
 - [ ] T146 [P] [US5] 建立 Trade Status Value Object：apps/backend/app/modules/social/domain/value_objects/trade_status.py（狀態機邏輯）
 - [ ] T147 [P] [US5] 定義 TradeRepository Interface：apps/backend/app/modules/social/domain/repositories/trade_repository.py
 - [ ] T148 [P] [US5] 定義 Trade Domain Service：apps/backend/app/modules/social/domain/services/trade_validation_service.py（驗證卡片所有權、狀態流轉規則）
@@ -591,6 +591,7 @@
     - 驗證 trade_id 對應的 trade 狀態為 completed
     - 確保評分者是該 trade 的參與者（initiator_id 或 responder_id）
     - 注入 TradeRepository 進行驗證
+-  - [ ] T152B [P] [US5] 交換確認 Timeout 規則（48h）：trade 進入 accepted 後超過 `TRADE_CONFIRMATION_TIMEOUT_HOURS`（預設 48 小時）仍未雙方完成確認時，必須視為 `canceled`（不新增 `expired` 狀態）；此規則需在 complete/讀取 trade 時能被正確套用
 - [ ] T153 [P] [US5] 建立 GetTradeHistoryUseCase：apps/backend/app/modules/social/application/use_cases/get_trade_history_use_case.py
 
 ### Infrastructure Layer (Social Module - Trade)
@@ -602,7 +603,7 @@
 ### Presentation Layer (Social Module - Trade)
 
 - [ ] T157 [P] [US5] 定義 Trade Schema：apps/backend/app/modules/social/presentation/schemas/trade_schemas.py（CreateTradeRequest, TradeResponse）
-- [ ] T158 [US5] 建立 Trade Router：apps/backend/app/modules/social/presentation/routers/trade_router.py（POST /trades, POST /trades/{id}/accept, POST /trades/{id}/reject, POST /trades/{id}/cancel, POST /trades/{id}/complete）
+- [ ] T158 [US5] 建立 Trade Router：apps/backend/app/modules/social/presentation/routers/trade_router.py（POST /api/v1/trades, POST /api/v1/trades/{id}/accept, POST /api/v1/trades/{id}/reject, POST /api/v1/trades/{id}/cancel, POST /api/v1/trades/{id}/complete, GET /api/v1/trades/history）
 
 ### Integration
 
@@ -643,10 +644,10 @@
 
 ### Mobile (Expo)
 
-- [ ] M501 [P] [US5] 發起交換提案頁：apps/mobile/src/features/trade（選擇卡片並呼叫 POST /trades；以更新後的 OpenAPI snapshot 作為驗證/對齊基準）
+- [ ] M501 [P] [US5] 發起交換提案頁：apps/mobile/src/features/trade（選擇卡片並呼叫 POST /api/v1/trades；以更新後的 OpenAPI snapshot 作為驗證/對齊基準）
 - [ ] M502 [P] [US5] 提案詳情與狀態更新 UI：apps/mobile/src/features/trade/screens/TradeDetailScreen.tsx（接受/完成等動作）
-- [ ] M503 [US5] 交換歷史列表：apps/mobile/src/features/trade/screens/TradeHistoryScreen.tsx（依後端查詢端點）
-- [ ] M504 [US5] trade 完成後導流評分：在 TradeDetail/TradeHistory 顯示「去評分」入口並導向評分流程（POST /ratings 並帶 trade_id；依後端一次性規則處理重複評分）
+- [ ] M503 [US5] 交換歷史列表：apps/mobile/src/features/trade/screens/TradeHistoryScreen.tsx（GET /api/v1/trades/history）
+- [ ] M504 [US5] trade 完成後導流評分：在 TradeDetail/TradeHistory 顯示「去評分」入口並導向評分流程（POST /api/v1/ratings 並帶 trade_id；依後端一次性規則處理重複評分）
 
 ---
 
@@ -679,7 +680,7 @@
 
 ### Presentation Layer
 
-- [ ] T183 [P] [US6] 建立 Subscription Router：apps/backend/app/modules/identity/presentation/routers/subscription_router.py（POST /subscriptions/verify-receipt, GET /subscriptions/status）
+- [ ] T183 [P] [US6] 建立 Subscription Router：apps/backend/app/modules/identity/presentation/routers/subscription_router.py（POST /api/v1/subscriptions/verify-receipt, GET /api/v1/subscriptions/status）
 - [ ] T184 [US6] 實作 Subscription Permission Middleware：apps/backend/app/shared/presentation/middleware/subscription_check.py（檢查權限並注入到 request.state）
 
 ### Testing
@@ -702,7 +703,7 @@
 
 - [ ] M601 [P] [US6] 方案/付費牆頁：apps/mobile/src/features/subscription（顯示 free/premium 差異與升級入口）
 - [ ] M602 [P] [US6] Android Google Play Billing 整合：apps/mobile/src/features/subscription/billing（購買/續訂/恢復購買）
-- [ ] M603 [P] [US6] 收據驗證串接：apps/mobile/src/features/subscription/api（POST /subscriptions/verify-receipt；以更新後的 OpenAPI snapshot 作為驗證/對齊基準）
+- [ ] M603 [P] [US6] 收據驗證串接：apps/mobile/src/features/subscription/api（POST /api/v1/subscriptions/verify-receipt；以更新後的 OpenAPI snapshot 作為驗證/對齊基準）
 - [ ] M604 [US6] 訂閱狀態顯示與降級提示：apps/mobile/src/features/subscription/screens/SubscriptionStatusScreen.tsx
 
 ---
@@ -744,7 +745,7 @@
 ### Presentation Layer (Posts Module)
 
 - [ ] T221 [P] [US7] 定義 Posts Schemas：apps/backend/app/modules/posts/presentation/schemas/post_schemas.py
-- [ ] T222 [US7] 建立 Posts Router：apps/backend/app/modules/posts/presentation/routers/posts_router.py（POST /posts, GET /posts, POST /posts/{id}/interest, POST /posts/{id}/interests/{interest_id}/accept, POST /posts/{id}/interests/{interest_id}/reject, POST /posts/{id}/close）
+- [ ] T222 [US7] 建立 Posts Router：apps/backend/app/modules/posts/presentation/routers/posts_router.py（POST /api/v1/posts, GET /api/v1/posts, POST /api/v1/posts/{id}/interest, POST /api/v1/posts/{id}/interests/{interest_id}/accept, POST /api/v1/posts/{id}/interests/{interest_id}/reject, POST /api/v1/posts/{id}/close）
 
 ### Integration
 
@@ -763,9 +764,9 @@
 
 ### Mobile (Expo)
 
-- [ ] M701 [P] [US7] 城市/行政區佈告欄列表：apps/mobile/src/features/posts/screens/BoardPostsScreen.tsx（GET /posts?city_code=...）
-- [ ] M702 [P] [US7] 建立貼文頁：apps/mobile/src/features/posts/screens/CreatePostScreen.tsx（POST /posts；city_code/district_code + 內容）
-- [ ] M703 [P] [US7] 貼文詳情與「有興趣」：apps/mobile/src/features/posts/screens/PostDetailScreen.tsx（POST /posts/{id}/interest）
+- [ ] M701 [P] [US7] 城市/行政區佈告欄列表：apps/mobile/src/features/posts/screens/BoardPostsScreen.tsx（GET /api/v1/posts?city_code=...）
+- [ ] M702 [P] [US7] 建立貼文頁：apps/mobile/src/features/posts/screens/CreatePostScreen.tsx（POST /api/v1/posts；city_code/district_code + 內容）
+- [ ] M703 [P] [US7] 貼文詳情與「有興趣」：apps/mobile/src/features/posts/screens/PostDetailScreen.tsx（POST /api/v1/posts/{id}/interest）
 - [ ] M704 [US7] 作者端興趣清單與接受導流聊天：apps/mobile/src/features/posts/screens/MyPostInterestsScreen.tsx（accept/reject；導向 chat）
 
 ---

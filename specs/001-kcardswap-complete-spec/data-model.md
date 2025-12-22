@@ -285,9 +285,11 @@ poetry run alembic history
 | initiator_id | UUID | NOT NULL, FK(users.id) | 發起者 |
 | responder_id | UUID | NOT NULL, FK(users.id) | 接受/回應者 |
 | status | VARCHAR(20) | NOT NULL | draft/proposed/accepted/completed/rejected/canceled |
+| accepted_at | TIMESTAMP WITH TIME ZONE | NULLABLE | 提案被接受時間（進入 accepted 的時間點） |
 | initiator_confirmed_at | TIMESTAMP WITH TIME ZONE | NULLABLE | 發起者標記「完成」時間 |
 | responder_confirmed_at | TIMESTAMP WITH TIME ZONE | NULLABLE | 回應者標記「完成」時間 |
 | completed_at | TIMESTAMP WITH TIME ZONE | NULLABLE | 兩邊都完成後的完成時間 |
+| canceled_at | TIMESTAMP WITH TIME ZONE | NULLABLE | 取消時間（包含逾時自動取消） |
 | created_at | TIMESTAMP WITH TIME ZONE | DEFAULT CURRENT_TIMESTAMP | 建立時間 |
 | updated_at | TIMESTAMP WITH TIME ZONE | DEFAULT CURRENT_TIMESTAMP | 更新時間 |
 
@@ -310,7 +312,7 @@ poetry run alembic history
 | id | UUID | PK, DEFAULT uuid_generate_v4() | 交換項目唯一識別碼 |
 | trade_id | UUID | NOT NULL, FK(trades.id) ON DELETE CASCADE | 對應 trade |
 | card_id | UUID | NOT NULL, FK(cards.id) | 對應小卡 |
-| owner_id | UUID | NOT NULL, FK(users.id) | 此卡片原擁有者 |
+| owner_side | VARCHAR(20) | NOT NULL | 此卡片由哪一方提供（initiator/responder） |
 | created_at | TIMESTAMP WITH TIME ZONE | DEFAULT CURRENT_TIMESTAMP | 建立時間 |
 
 **索引/約束（建議）**:

@@ -210,8 +210,9 @@
 	- `POST /api/v1/trades/{id}/complete`（我方標記完成；僅當雙方都完成確認後才會轉為 completed 並鎖定卡片）
 	- `GET /api/v1/trades/history`（分頁）
 - 狀態機：draft → proposed → accepted → completed | rejected | canceled。
+- Timeout 規則：trade 進入 accepted 後，若在 `TRADE_CONFIRMATION_TIMEOUT_HOURS`（預設 48 小時）內未達成「雙方都確認完成」，系統應將該 trade 標記為 `canceled`（不新增 `expired` 狀態）。
 - 資料表：
-	- `trades(id, initiator_id, responder_id, status, initiator_confirmed_at, responder_confirmed_at, completed_at, created_at)`
+	- `trades(id, initiator_id, responder_id, status, accepted_at, initiator_confirmed_at, responder_confirmed_at, completed_at, created_at)`
 	- `trade_items(id, trade_id, card_id, owner_side)`
 - 完成鎖定：兩邊確認後，關聯小卡狀態改為已交換。
 
