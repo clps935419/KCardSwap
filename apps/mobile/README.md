@@ -2,6 +2,12 @@
 
 React Native mobile application for KCardSwap, built with Expo SDK 54.
 
+## 📚 Documentation
+
+- **[ROUTING_GUIDE.md](./ROUTING_GUIDE.md)** - 🆕 完整的路由架構與導航指南
+- **[TECH_STACK.md](./TECH_STACK.md)** - 技術棧與套件使用說明
+- **[PHASE6_IMPLEMENTATION_GUIDE.md](./PHASE6_IMPLEMENTATION_GUIDE.md)** - Phase 6 實作指南
+
 ## Tech Stack
 
 **完整技術文件請見 [TECH_STACK.md](./TECH_STACK.md)**
