@@ -613,10 +613,10 @@
 ### Testing
 
 - [ ] T161 [P] [US5] 撰寫 Trade Integration Tests（以 OpenAPI/Swagger（由程式碼生成的 snapshot）作為回應/路由對齊驗證；改以整合測試覆蓋）
-- [ ] T162 [P] [US5] 撰寫 Trade Entity Unit Tests：tests/unit/modules/social/domain/test_trade_entity.py
-- [ ] T163 [P] [US5] 撰寫 Trade Status State Machine Tests：tests/unit/modules/social/domain/test_trade_status.py（測試所有狀態轉換）
-- [ ] T164 [P] [US5] 撰寫 CreateTradeProposalUseCase Unit Tests：tests/unit/modules/social/application/test_create_trade_proposal_use_case.py
-- [ ] T165 [US5] 撰寫 Trade Flow Integration Tests：tests/integration/modules/social/test_trade_flow.py（完整交換流程 E2E）
+- [X] T162 [P] [US5] 撰寫 Trade Entity Unit Tests：tests/unit/modules/social/domain/test_trade_entity.py
+- [X] T163 [P] [US5] 撰寫 Trade Status State Machine Tests：tests/unit/modules/social/domain/test_trade_status.py（測試所有狀態轉換）
+- [X] T164 [P] [US5] 撰寫 CreateTradeProposalUseCase Unit Tests：tests/unit/modules/social/application/test_create_trade_proposal_use_case.py
+- [X] T165 [US5] 撰寫 Trade Flow Integration Tests：tests/integration/modules/social/test_trade_flow.py（完整交換流程 E2E）
 
 ### Alembic Migration
 
@@ -961,9 +961,9 @@ Group M5: US5 Mobile (Expo) - Trade
 | 6 | US4 - Friends & Chat (Backend) | 33 | P1 | ✅ 100% Complete |
 | 6 | US4 - Friends & Chat (Mobile) | 4 | P1 | ✅ 100% Complete (M401-M404) |
 | 7 | US5 - Trade (Backend Core) | 18 | P1 | ✅ 83% Complete (15/18: T144-T160, T166, T168) |
+| 7 | US5 - Trade (Testing) | 5 | P1 | ✅ 80% Complete (4/5: T162-T165) |
 | 7 | US5 - Trade (Mobile) | 4 | P1 | ✅ 100% Complete (M501-M504) |
-| 7 | US5 - Trade (Testing & Docs) | 9 | P1 | ⏸️ Pending (T161-T165, T167, T169-T171) |
-| 7 | US5 - Trade (Verification) | 3 | P1 | ⏸️ Pending (T172-T174) |
+| 7 | US5 - Trade (Docs & Verification) | 7 | P1 | ⏸️ Pending (T167, T169-T174) |
 | 8 | US6 - Subscription | 17 | P2 | ⏸️ Not Started |
 | 8.5 | US7 - Board Posts | 23 | P2 | ⏸️ Not Started |
 | 9 | Polish | 14 | - | ⏸️ Not Started |
