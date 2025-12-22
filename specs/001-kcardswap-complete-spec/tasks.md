@@ -483,7 +483,7 @@
 
 ## Phase 6: User Story 4 - 好友系統與聊天 (Priority: P1)
 
-**狀態**: ✅ **Backend 100% Complete** (33/33 tasks, PR #23 已實作 + Rating 系統已依 FR-SOCIAL-003A 更新)
+**狀態**: ✅ **100% Complete** (Backend 33/33 + Mobile 4/4, PR #23 已實作 + Rating 系統已依 FR-SOCIAL-003A 更新)
 
 **目標**: 使用者可以加好友、聊天、評分、檢舉
 
@@ -554,10 +554,10 @@
 
 ### Mobile (Expo)
 
-- [ ] M401 [P] [US4] 好友邀請/接受/封鎖頁：apps/mobile/src/features/friends（對齊 /api/v1/friends/* 端點；以更新後的 OpenAPI snapshot 作為驗證/對齊基準）
-- [ ] M402 [P] [US4] 聊天室 UI 與輪詢：apps/mobile/src/features/chat（GET /api/v1/chats/{id}/messages, POST /api/v1/chats/{id}/messages；以更新後的 OpenAPI snapshot 作為驗證/對齊基準）
-- [ ] M403 [P] [US4] 前景輪詢策略：apps/mobile/src/features/chat/services/polling.ts（after_message_id、退避避免過度打 API）
-- [ ] M404 [P] [US4] 推播接收與導頁：apps/mobile/src/features/notifications（expo-notifications；點擊通知導向聊天室）
+- [X] M401 [P] [US4] 好友邀請/接受/封鎖頁：apps/mobile/src/features/friends（對齊 /api/v1/friends/* 端點；以更新後的 OpenAPI snapshot 作為驗證/對齊基準）
+- [X] M402 [P] [US4] 聊天室 UI 與輪詢：apps/mobile/src/features/chat（GET /api/v1/chats/{id}/messages, POST /api/v1/chats/{id}/messages；以更新後的 OpenAPI snapshot 作為驗證/對齊基準）
+- [X] M403 [P] [US4] 前景輪詢策略：apps/mobile/src/features/chat/services/polling.ts（after_message_id、退避避免過度打 API）
+- [X] M404 [P] [US4] 推播接收與導頁：apps/mobile/src/features/notifications（expo-notifications；點擊通知導向聊天室）
 
 ---
 
@@ -958,7 +958,8 @@ Group M5: US5 Mobile (Expo) - Trade
 | 3 | US1 - Mobile | 4 | P1 🎯 MVP | ⏳ 75% Complete (3/4, M104 pending) |
 | 4 | US2 - Card Upload | 29 | P1 | ⏸️ Not Started |
 | 5 | US3 - Nearby Search | 16 | P1 | ⏸️ Not Started |
-| 6 | US4 - Friends & Chat | 33 | P1 | ✅ 97% Complete (32/33, Backend完成, T143待驗證) |
+| 6 | US4 - Friends & Chat (Backend) | 33 | P1 | ✅ 100% Complete |
+| 6 | US4 - Friends & Chat (Mobile) | 4 | P1 | ✅ 100% Complete (M401-M404) |
 | 7 | US5 - Trade | 31 | P1 | ⏸️ Not Started |
 | 8 | US6 - Subscription | 17 | P2 | ⏸️ Not Started |
 | 8.5 | US7 - Board Posts | 23 | P2 | ⏸️ Not Started |
