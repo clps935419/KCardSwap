@@ -174,13 +174,16 @@
 
 ## 5. 社交與好友（SOCIAL）
 - API 規格：
-	- `POST /api/v1/friends/{user_id}/invite`、`POST /api/v1/friends/{user_id}/accept`、`DELETE /api/v1/friends/{user_id}`。
-	- `GET /api/v1/friends`：好友列表（暱稱、頭像、評分、完成次數、線上狀態）。
-	- `POST /api/v1/reports`：檢舉；`POST /api/v1/ratings`：評分。
+	- `POST /api/v1/friends/request`、`POST /api/v1/friends/accept`、`POST /api/v1/friends/block`。
+	- `GET /api/v1/friends`：好友列表（暱稱、頭像、評分平均、完成交換次數、線上狀態）。
+	- `POST /api/v1/reports`：檢舉。
+	- `POST /api/v1/ratings`：建立評分（1–5 星 + 可選文字回饋；需符合「好友」或「提供 trade_id」等規則）。
+	- `GET /api/v1/ratings/user/{user_id}`：查詢使用者收到的評分（列表）。
+	- `GET /api/v1/ratings/user/{user_id}/average`：查詢使用者平均分數（供列表快速顯示）。
 - 資料表：
 	- `friendships(requester_id, accepter_id, status, created_at)`
-	- `ratings(rater_id, target_id, trade_id, score, comment, created_at)`
-	- `reports(reporter_id, target_id, reason, detail, created_at)`
+	- `ratings(rater_id, rated_user_id, trade_id, score, comment, created_at)`
+	- `reports(reporter_id, reported_user_id, reason, detail, created_at)`
 - 政策與流程：
 	- 檢舉累積觸發審查/暫停機制。
 
@@ -201,11 +204,14 @@
 ## 7. 交換流程（TRADE）
 - API 規格：
 	- `POST /api/v1/trades`（提案）
-	- `PATCH /api/v1/trades/{id}`（狀態轉換：送出/接受/拒絕/取消/完成）
+	- `POST /api/v1/trades/{id}/accept`（接受提案）
+	- `POST /api/v1/trades/{id}/reject`（拒絕提案）
+	- `POST /api/v1/trades/{id}/cancel`（取消提案）
+	- `POST /api/v1/trades/{id}/complete`（我方標記完成；僅當雙方都完成確認後才會轉為 completed 並鎖定卡片）
 	- `GET /api/v1/trades/history`（分頁）
 - 狀態機：draft → proposed → accepted → completed | rejected | canceled。
 - 資料表：
-	- `trades(id, a_id, b_id, status, created_at, completed_at)`
+	- `trades(id, initiator_id, responder_id, status, initiator_confirmed_at, responder_confirmed_at, completed_at, created_at)`
 	- `trade_items(id, trade_id, card_id, owner_side)`
 - 完成鎖定：兩邊確認後，關聯小卡狀態改為已交換。
 

@@ -277,6 +277,72 @@ poetry run alembic history
 
 ---
 
+### trades（交換提案與歷史）— Schema 草案（US5 / 待實作）
+
+| 欄位 | 型別 | 約束 | 說明 |
+|------|------|------|------|
+| id | UUID | PK, DEFAULT uuid_generate_v4() | 交換唯一識別碼 |
+| initiator_id | UUID | NOT NULL, FK(users.id) | 發起者 |
+| responder_id | UUID | NOT NULL, FK(users.id) | 接受/回應者 |
+| status | VARCHAR(20) | NOT NULL | draft/proposed/accepted/completed/rejected/canceled |
+| initiator_confirmed_at | TIMESTAMP WITH TIME ZONE | NULLABLE | 發起者標記「完成」時間 |
+| responder_confirmed_at | TIMESTAMP WITH TIME ZONE | NULLABLE | 回應者標記「完成」時間 |
+| completed_at | TIMESTAMP WITH TIME ZONE | NULLABLE | 兩邊都完成後的完成時間 |
+| created_at | TIMESTAMP WITH TIME ZONE | DEFAULT CURRENT_TIMESTAMP | 建立時間 |
+| updated_at | TIMESTAMP WITH TIME ZONE | DEFAULT CURRENT_TIMESTAMP | 更新時間 |
+
+**索引（建議）**:
+- `idx_trades_initiator_id_created_at` ON (initiator_id, created_at DESC)
+- `idx_trades_responder_id_created_at` ON (responder_id, created_at DESC)
+- `idx_trades_status_created_at` ON (status, created_at DESC)
+
+**不變條件（應用層 + DB 層）**:
+- status ∈ {draft, proposed, accepted, completed, rejected, canceled}
+- completed_at 只能在 initiator_confirmed_at 與 responder_confirmed_at 皆有值時寫入
+- status=completed 時 completed_at 必須有值
+
+---
+
+### trade_items（交換物品清單）— Schema 草案（US5 / 待實作）
+
+| 欄位 | 型別 | 約束 | 說明 |
+|------|------|------|------|
+| id | UUID | PK, DEFAULT uuid_generate_v4() | 交換項目唯一識別碼 |
+| trade_id | UUID | NOT NULL, FK(trades.id) ON DELETE CASCADE | 對應 trade |
+| card_id | UUID | NOT NULL, FK(cards.id) | 對應小卡 |
+| owner_id | UUID | NOT NULL, FK(users.id) | 此卡片原擁有者 |
+| created_at | TIMESTAMP WITH TIME ZONE | DEFAULT CURRENT_TIMESTAMP | 建立時間 |
+
+**索引/約束（建議）**:
+- UNIQUE(trade_id, card_id)（避免同一 trade 重複加入同卡）
+
+---
+
+### ratings（評分記錄）— Schema 草案（US4/US5 / 待實作）
+
+| 欄位 | 型別 | 約束 | 說明 |
+|------|------|------|------|
+| id | UUID | PK, DEFAULT uuid_generate_v4() | 評分唯一識別碼 |
+| rater_id | UUID | NOT NULL, FK(users.id) | 評分者 |
+| rated_user_id | UUID | NOT NULL, FK(users.id) | 被評分者 |
+| trade_id | UUID | NULLABLE, FK(trades.id) | 若提供則代表此評分關聯某筆交換 |
+| score | INTEGER | NOT NULL | 1–5 |
+| comment | TEXT | NULLABLE | 可選文字回饋 |
+| created_at | TIMESTAMP WITH TIME ZONE | DEFAULT CURRENT_TIMESTAMP | 建立時間 |
+
+**索引/約束（建議）**:
+- `idx_ratings_rated_user_id_created_at` ON (rated_user_id, created_at DESC)
+- `idx_ratings_trade_id` ON (trade_id)
+- UNIQUE(trade_id, rater_id)（trade_id 不為 NULL 時，確保同一筆 trade 每人最多評一次；可用 partial unique index）
+
+**不變條件（應用層 + DB 層）**:
+- score 必須在 1..5
+- rater_id != rated_user_id
+- 若提供 trade_id：trade 必須存在且 status=completed，且評分者/被評分者必須是該 trade 的兩位參與者
+- 若未提供 trade_id：僅允許對「已成為好友」的對象評分（供 ratings 基礎能力；trade 完成後導流則應帶 trade_id）
+
+---
+
 ### posts（佈告欄貼文）— Schema 草案（US7 / 待實作）
 
 | 欄位 | 型別 | 約束 | 說明 |

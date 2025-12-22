@@ -492,7 +492,7 @@
 - ✓ 使用者可以封鎖其他用戶（封鎖後雙方無法互動）
 - ✓ 使用者可以發送/接收聊天訊息（輪詢機制）
 - ✓ 使用者可以收到 FCM 推播通知（背景）
-- ✓ 使用者可以對交易對象評分
+- ✓ 使用者可以對他人評分（規則：必須是好友，或提供 trade_id 且該 trade 與雙方關聯）
 - ✓ 使用者可以檢舉違規內容
 
 ### Domain Layer (Social Module - Friends & Chat)
@@ -515,7 +515,7 @@
 - [X] T123 [P] [US4] 建立 BlockUserUseCase：apps/backend/app/modules/social/application/use_cases/block_user_use_case.py
 - [X] T124 [P] [US4] 建立 SendMessageUseCase：apps/backend/app/modules/social/application/use_cases/send_message_use_case.py（發送訊息 → 觸發 FCM 推播）
 - [X] T125 [P] [US4] 建立 GetMessagesUseCase：apps/backend/app/modules/social/application/use_cases/get_messages_use_case.py（輪詢機制：after_message_id）
-- [X] T126 [P] [US4] 建立 RateUserUseCase：apps/backend/app/modules/social/application/use_cases/rate_user_use_case.py（交易完成後評分）
+- [X] T126 [P] [US4] 建立 RateUserUseCase：apps/backend/app/modules/social/application/use_cases/ratings/rate_user_use_case.py（ratings 基礎能力：建立評分；基本驗證：不可自評、分數 1–5、封鎖禁止；權限規則：好友或提供 trade_id）
 - [X] T127 [P] [US4] 建立 ReportUserUseCase：apps/backend/app/modules/social/application/use_cases/report_user_use_case.py
 
 - [ ] T125A [DEFERRED] [US4] 訊息保留政策：伺服器端保留 30 天；清理/清除 job（例如每日排程）清除超過 30 天的 messages（先在文件/規格中定義，實作延後）
@@ -538,7 +538,7 @@
 
 - [X] T139 [US4] 建立 Friends Router：apps/backend/app/modules/social/presentation/routers/friends_router.py（POST /friends/request, POST /friends/accept, POST /friends/block）
 - [X] T140 [US4] 建立 Chat Router：apps/backend/app/modules/social/presentation/routers/chat_router.py（GET /chats/{id}/messages, POST /chats/{id}/messages）
-- [X] T141 [US4] 建立 Rating Router：apps/backend/app/modules/social/presentation/routers/rating_router.py（POST /ratings）
+- [X] T141 [US4] 建立 Rating Router：apps/backend/app/modules/social/presentation/routers/rating_router.py（POST /ratings, GET /ratings/user/{user_id}, GET /ratings/user/{user_id}/average）
 - [X] T142 [US4] 建立 Report Router：apps/backend/app/modules/social/presentation/routers/report_router.py（POST /reports）
 
 ### Verification
@@ -562,6 +562,7 @@
 - ✓ 使用者可以建立交換提案（選擇雙方卡片）
 - ✓ 對方可以接受/拒絕提案
 - ✓ 雙方確認後交換完成，卡片狀態更新為「已交換」
+- ✓ trade completed 後前端顯示「去評分」入口/引導，並以 trade_id 建立評分
 - ✓ 交換歷史可以查詢
 - ✓ 狀態機正確流轉（draft → proposed → accepted → completed）
 
@@ -578,7 +579,7 @@
 - [ ] T149 [P] [US5] 建立 CreateTradeProposalUseCase：apps/backend/app/modules/social/application/use_cases/create_trade_proposal_use_case.py
 - [ ] T150 [P] [US5] 建立 AcceptTradeUseCase：apps/backend/app/modules/social/application/use_cases/accept_trade_use_case.py
 - [ ] T151 [P] [US5] 建立 RejectTradeUseCase：apps/backend/app/modules/social/application/use_cases/reject_trade_use_case.py
-- [ ] T152 [P] [US5] 建立 CompleteTradeUseCase：apps/backend/app/modules/social/application/use_cases/complete_trade_use_case.py（雙方確認後鎖定卡片）
+- [ ] T152 [P] [US5] 建立 CompleteTradeUseCase：apps/backend/app/modules/social/application/use_cases/complete_trade_use_case.py（各自獨立標記完成；雙方都確認後才轉 completed 並鎖定卡片；完成後提供導流評分所需的 trade_id）
 - [ ] T153 [P] [US5] 建立 GetTradeHistoryUseCase：apps/backend/app/modules/social/application/use_cases/get_trade_history_use_case.py
 
 ### Infrastructure Layer (Social Module - Trade)
@@ -590,7 +591,7 @@
 ### Presentation Layer (Social Module - Trade)
 
 - [ ] T157 [P] [US5] 定義 Trade Schema：apps/backend/app/modules/social/presentation/schemas/trade_schemas.py（CreateTradeRequest, TradeResponse）
-- [ ] T158 [US5] 建立 Trade Router：apps/backend/app/modules/social/presentation/routers/trade_router.py（POST /trades, POST /trades/{id}/accept, POST /trades/{id}/complete）
+- [ ] T158 [US5] 建立 Trade Router：apps/backend/app/modules/social/presentation/routers/trade_router.py（POST /trades, POST /trades/{id}/accept, POST /trades/{id}/reject, POST /trades/{id}/cancel, POST /trades/{id}/complete）
 
 ### Integration
 
@@ -634,6 +635,7 @@
 - [ ] M501 [P] [US5] 發起交換提案頁：apps/mobile/src/features/trade（選擇卡片並呼叫 POST /trades；以更新後的 OpenAPI snapshot 作為驗證/對齊基準）
 - [ ] M502 [P] [US5] 提案詳情與狀態更新 UI：apps/mobile/src/features/trade/screens/TradeDetailScreen.tsx（接受/完成等動作）
 - [ ] M503 [US5] 交換歷史列表：apps/mobile/src/features/trade/screens/TradeHistoryScreen.tsx（依後端查詢端點）
+- [ ] M504 [US5] trade 完成後導流評分：在 TradeDetail/TradeHistory 顯示「去評分」入口並導向評分流程（POST /ratings 並帶 trade_id；依後端一次性規則處理重複評分）
 
 ---
 
