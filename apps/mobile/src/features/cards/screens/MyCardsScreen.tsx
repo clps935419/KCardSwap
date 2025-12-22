@@ -13,6 +13,7 @@
 
 import React, { useState } from 'react';
 import { FlatList, RefreshControl, Alert } from 'react-native';
+import { useRouter } from 'expo-router';
 import { Box, Text, Pressable, Spinner, Button, ButtonText } from '@/src/shared/ui/components';
 import { useMyCards, useDeleteCard, useQuotaStatus } from '@/src/features/cards/hooks/useCards';
 import { CardItem } from '@/src/features/cards/components/CardItem';
@@ -26,6 +27,7 @@ const STATUS_FILTERS: { label: string; value: CardStatus | 'all' }[] = [
 ];
 
 export function MyCardsScreen() {
+  const router = useRouter();
   const [selectedStatus, setSelectedStatus] = useState<CardStatus | 'all'>('all');
 
   const statusFilter = selectedStatus === 'all' ? undefined : selectedStatus;
@@ -172,6 +174,21 @@ export function MyCardsScreen() {
           <Text className="mt-3 text-base text-white font-semibold">刪除中...</Text>
         </Box>
       )}
+
+      {/* Floating Action Button - Upload Card */}
+      <Pressable
+        className="absolute bottom-6 right-6 w-16 h-16 bg-blue-500 rounded-full items-center justify-center shadow-lg"
+        onPress={() => router.push('/(tabs)/cards/upload')}
+        style={{
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.25,
+          shadowRadius: 3.84,
+          elevation: 5,
+        }}
+      >
+        <Text className="text-white text-3xl font-bold">+</Text>
+      </Pressable>
     </Box>
   );
 }
