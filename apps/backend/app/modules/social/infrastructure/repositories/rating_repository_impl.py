@@ -25,7 +25,7 @@ class SQLAlchemyRatingRepository(RatingRepository):
             id=UUID(rating.id) if isinstance(rating.id, str) else rating.id,
             rater_id=UUID(rating.rater_id) if isinstance(rating.rater_id, str) else rating.rater_id,
             rated_user_id=UUID(rating.rated_user_id) if isinstance(rating.rated_user_id, str) else rating.rated_user_id,
-            trade_id=UUID(rating.trade_id) if isinstance(rating.trade_id, str) else rating.trade_id,
+            trade_id=UUID(rating.trade_id) if rating.trade_id and isinstance(rating.trade_id, str) else (rating.trade_id if rating.trade_id else None),
             score=rating.score,
             comment=rating.comment,
             created_at=rating.created_at,
@@ -127,10 +127,10 @@ class SQLAlchemyRatingRepository(RatingRepository):
             id=str(model.id),
             rater_id=str(model.rater_id),
             rated_user_id=str(model.rated_user_id),
-            trade_id=str(model.trade_id),
             score=model.score,
             comment=model.comment,
             created_at=model.created_at,
+            trade_id=str(model.trade_id) if model.trade_id else None,
         )
 
 
