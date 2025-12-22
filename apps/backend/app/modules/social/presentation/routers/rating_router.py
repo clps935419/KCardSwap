@@ -46,7 +46,7 @@ router = APIRouter(prefix="/ratings", tags=["Ratings"])
         500: {"description": "Internal server error"},
     },
     summary="Submit rating",
-    description="Submit a rating for another user after a trade",
+    description="Submit a rating for another user (based on friendship or completed trade)",
 )
 async def submit_rating(
     request: RatingRequest,
