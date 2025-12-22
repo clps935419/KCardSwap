@@ -1,79 +1,109 @@
 import { ScrollView } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useAuthStore } from '@/src/shared/state/authStore';
-import {
-  Box,
-  Text,
-  Heading,
-  Button,
-  ButtonText,
-  Card,
-  Input,
-  InputField,
-} from '@/src/shared/ui/components';
+import { Box } from '@/components/ui/box';
+import { Text } from '@/components/ui/text';
+import { Heading } from '@/components/ui/heading';
+import { Pressable } from '@/components/ui/pressable';
+import { HStack } from '@/components/ui/hstack';
+import { VStack } from '@/components/ui/vstack';
+import { Card } from '@/components/ui/card';
 
 export default function HomeScreen() {
   const { user } = useAuthStore();
+  const router = useRouter();
 
   return (
-    <ScrollView className="flex-1 bg-white">
+    <ScrollView className="flex-1 bg-gray-50">
       <Box className="p-4">
-        <Heading size="2xl" className="mb-4 text-gray-800">
-          Welcome to KCardSwap!
-        </Heading>
-        {user && (
-          <Text size="md" className="text-gray-600 mb-4">
-            Hello, {user.nickname || user.email}
-          </Text>
-        )}
-
-        {/* Gluestack UI Components Demo */}
-        <Card className="p-4 mb-4">
-          <Heading size="lg" className="mb-2">
-            Gluestack UI Integration ✅
+        {/* Welcome Header */}
+        <Box className="mb-6">
+          <Heading size="2xl" className="text-gray-800 mb-2">
+            歡迎回來！
           </Heading>
-          <Text size="sm" className="text-gray-600 mb-4">
-            Phase 1M Mobile Setup Complete with Gluestack UI components.
+          {user && (
+            <Text className="text-gray-600">
+              Hello, {user.nickname || user.email}
+            </Text>
+          )}
+        </Box>
+
+        {/* Quick Actions */}
+        <Box className="mb-6">
+          <Text className="text-lg font-semibold text-gray-800 mb-3">
+            快速導航
           </Text>
+          <HStack className="space-x-3">
+            {/* Friends Entry */}
+            <Pressable
+              onPress={() => router.push('/friends')}
+              className="flex-1"
+            >
+              <Card className="bg-blue-50 p-4 items-center">
+                <Text className="text-3xl mb-2">👥</Text>
+                <Text className="font-semibold text-blue-900">好友</Text>
+                <Text className="text-sm text-blue-700">管理好友關係</Text>
+              </Card>
+            </Pressable>
 
-          {/* Button Examples */}
-          <Box className="mb-4">
-            <Text size="sm" className="font-medium mb-2">
-              Buttons:
-            </Text>
-            <Box className="flex-row gap-2 mb-2">
-              <Button variant="solid" size="md">
-                <ButtonText>Solid Button</ButtonText>
-              </Button>
-              <Button variant="outline" size="md">
-                <ButtonText>Outline</ButtonText>
-              </Button>
-            </Box>
-          </Box>
+            {/* Chat Entry */}
+            <Pressable
+              onPress={() => router.push('/chat')}
+              className="flex-1"
+            >
+              <Card className="bg-green-50 p-4 items-center">
+                <Text className="text-3xl mb-2">💬</Text>
+                <Text className="font-semibold text-green-900">聊天</Text>
+                <Text className="text-sm text-green-700">即時訊息</Text>
+              </Card>
+            </Pressable>
+          </HStack>
+        </Box>
 
-          {/* Input Example */}
-          <Box className="mb-4">
-            <Text size="sm" className="font-medium mb-2">
-              Input:
-            </Text>
-            <Input>
-              <InputField placeholder="Enter your text here..." />
-            </Input>
-          </Box>
-        </Card>
+        {/* Feature Status */}
+        <Box className="mb-6">
+          <Text className="text-lg font-semibold text-gray-800 mb-3">
+            功能狀態
+          </Text>
+          <Card className="p-4">
+            <VStack className="space-y-2">
+              <HStack className="items-center space-x-2">
+                <Text className="text-green-500">✅</Text>
+                <Text className="text-gray-700">US1: Google 登入與個人檔案</Text>
+              </HStack>
+              <HStack className="items-center space-x-2">
+                <Text className="text-green-500">✅</Text>
+                <Text className="text-gray-700">US2: 小卡上傳 (部分完成)</Text>
+              </HStack>
+              <HStack className="items-center space-x-2">
+                <Text className="text-green-500">✅</Text>
+                <Text className="text-gray-700">US3: 附近搜尋</Text>
+              </HStack>
+              <HStack className="items-center space-x-2">
+                <Text className="text-green-500">✅</Text>
+                <Text className="text-gray-700">US4: 好友系統與聊天 (Phase 6)</Text>
+              </HStack>
+              <HStack className="items-center space-x-2">
+                <Text className="text-orange-500">⏳</Text>
+                <Text className="text-gray-700">US5: 小卡交換</Text>
+              </HStack>
+              <HStack className="items-center space-x-2">
+                <Text className="text-orange-500">⏳</Text>
+                <Text className="text-gray-700">US6: 訂閱與付費</Text>
+              </HStack>
+            </VStack>
+          </Card>
+        </Box>
 
-        {/* Feature Roadmap Card */}
-        <Card className="p-4">
-          <Heading size="lg" className="mb-2">
-            Feature Roadmap
-          </Heading>
-          <Text size="sm" className="text-gray-600">
-            Features to be implemented in User Story phases:{'\n\n'}
-            • US1: Google Login & Profile{'\n'}
-            • US2: Card Upload{'\n'}
-            • US3: Nearby Search{'\n'}
-            • US4: Friends & Chat{'\n'}
-            • US5: Trading{'\n'}
-            • US6: Subscription
+        {/* Info Card */}
+        <Card className="p-4 bg-blue-50">
+          <Text className="text-sm text-blue-800 font-medium mb-2">
+            💡 提示
+          </Text>
+          <Text className="text-xs text-blue-700">
+            • 點擊上方「好友」進入好友管理頁面{'\n'}
+            • 點擊「聊天」查看所有對話{'\n'}
+            • 使用底部導航切換到「我的卡冊」、「附近」或「個人檔案」
           </Text>
         </Card>
       </Box>
