@@ -644,10 +644,10 @@
 
 ### Mobile (Expo)
 
-- [ ] M501 [P] [US5] 發起交換提案頁：apps/mobile/src/features/trade（選擇卡片並呼叫 POST /api/v1/trades；以更新後的 OpenAPI snapshot 作為驗證/對齊基準）
-- [ ] M502 [P] [US5] 提案詳情與狀態更新 UI：apps/mobile/src/features/trade/screens/TradeDetailScreen.tsx（接受/完成等動作）
-- [ ] M503 [US5] 交換歷史列表：apps/mobile/src/features/trade/screens/TradeHistoryScreen.tsx（GET /api/v1/trades/history）
-- [ ] M504 [US5] trade 完成後導流評分：在 TradeDetail/TradeHistory 顯示「去評分」入口並導向評分流程（POST /api/v1/ratings 並帶 trade_id；依後端一次性規則處理重複評分）
+- [X] M501 [P] [US5] 發起交換提案頁：apps/mobile/src/features/trade（選擇卡片並呼叫 POST /api/v1/trades；以更新後的 OpenAPI snapshot 作為驗證/對齊基準）
+- [X] M502 [P] [US5] 提案詳情與狀態更新 UI：apps/mobile/src/features/trade/screens/TradeDetailScreen.tsx（接受/完成等動作）
+- [X] M503 [US5] 交換歷史列表：apps/mobile/src/features/trade/screens/TradeHistoryScreen.tsx（GET /api/v1/trades/history）
+- [X] M504 [US5] trade 完成後導流評分：在 TradeDetail/TradeHistory 顯示「去評分」入口並導向評分流程（POST /api/v1/ratings 並帶 trade_id；依後端一次性規則處理重複評分）
 
 ---
 
@@ -961,9 +961,9 @@ Group M5: US5 Mobile (Expo) - Trade
 | 6 | US4 - Friends & Chat (Backend) | 33 | P1 | ✅ 100% Complete |
 | 6 | US4 - Friends & Chat (Mobile) | 4 | P1 | ✅ 100% Complete (M401-M404) |
 | 7 | US5 - Trade (Backend Core) | 18 | P1 | ✅ 83% Complete (15/18: T144-T160, T166, T168) |
+| 7 | US5 - Trade (Mobile) | 4 | P1 | ✅ 100% Complete (M501-M504) |
 | 7 | US5 - Trade (Testing & Docs) | 9 | P1 | ⏸️ Pending (T161-T165, T167, T169-T171) |
 | 7 | US5 - Trade (Verification) | 3 | P1 | ⏸️ Pending (T172-T174) |
-| 7 | US5 - Trade (Mobile) | 4 | P1 | ⏸️ Not Started (M501-M504) |
 | 8 | US6 - Subscription | 17 | P2 | ⏸️ Not Started |
 | 8.5 | US7 - Board Posts | 23 | P2 | ⏸️ Not Started |
 | 9 | Polish | 14 | - | ⏸️ Not Started |
