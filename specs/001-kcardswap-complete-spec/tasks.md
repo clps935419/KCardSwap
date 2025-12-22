@@ -575,40 +575,40 @@
 
 ### Domain Layer (Social Module - Trade)
 
-- [ ] T144 [P] [US5] 建立 Trade Entity：apps/backend/app/modules/social/domain/entities/trade.py（id, initiator_id, responder_id, status: draft/proposed/accepted/completed/rejected/canceled, accepted_at, initiator_confirmed_at, responder_confirmed_at, completed_at, canceled_at, created_at）
-- [ ] T145 [P] [US5] 建立 TradeItem Entity：apps/backend/app/modules/social/domain/entities/trade_item.py（id, trade_id, card_id, owner_side）
-- [ ] T146 [P] [US5] 建立 Trade Status Value Object：apps/backend/app/modules/social/domain/value_objects/trade_status.py（狀態機邏輯）
-- [ ] T147 [P] [US5] 定義 TradeRepository Interface：apps/backend/app/modules/social/domain/repositories/trade_repository.py
-- [ ] T148 [P] [US5] 定義 Trade Domain Service：apps/backend/app/modules/social/domain/services/trade_validation_service.py（驗證卡片所有權、狀態流轉規則）
+- [X] T144 [P] [US5] 建立 Trade Entity：apps/backend/app/modules/social/domain/entities/trade.py（id, initiator_id, responder_id, status: draft/proposed/accepted/completed/rejected/canceled, accepted_at, initiator_confirmed_at, responder_confirmed_at, completed_at, canceled_at, created_at）
+- [X] T145 [P] [US5] 建立 TradeItem Entity：apps/backend/app/modules/social/domain/entities/trade_item.py（id, trade_id, card_id, owner_side）
+- [X] T146 [P] [US5] 建立 Trade Status Value Object：apps/backend/app/modules/social/domain/value_objects/trade_status.py（狀態機邏輯）
+- [X] T147 [P] [US5] 定義 TradeRepository Interface：apps/backend/app/modules/social/domain/repositories/trade_repository.py
+- [X] T148 [P] [US5] 定義 Trade Domain Service：apps/backend/app/modules/social/domain/services/trade_validation_service.py（驗證卡片所有權、狀態流轉規則）
 
 ### Application Layer (Social Module - Trade)
 
-- [ ] T149 [P] [US5] 建立 CreateTradeProposalUseCase：apps/backend/app/modules/social/application/use_cases/create_trade_proposal_use_case.py
-- [ ] T150 [P] [US5] 建立 AcceptTradeUseCase：apps/backend/app/modules/social/application/use_cases/accept_trade_use_case.py
-- [ ] T151 [P] [US5] 建立 RejectTradeUseCase：apps/backend/app/modules/social/application/use_cases/reject_trade_use_case.py
-- [ ] T152 [P] [US5] 建立 CompleteTradeUseCase：apps/backend/app/modules/social/application/use_cases/complete_trade_use_case.py（各自獨立標記完成；雙方都確認後才轉 completed 並鎖定卡片；完成後提供導流評分所需的 trade_id）
+- [X] T149 [P] [US5] 建立 CreateTradeProposalUseCase：apps/backend/app/modules/social/application/use_cases/create_trade_proposal_use_case.py
+- [X] T150 [P] [US5] 建立 AcceptTradeUseCase：apps/backend/app/modules/social/application/use_cases/accept_trade_use_case.py
+- [X] T151 [P] [US5] 建立 RejectTradeUseCase：apps/backend/app/modules/social/application/use_cases/reject_trade_use_case.py
+- [X] T152 [P] [US5] 建立 CompleteTradeUseCase：apps/backend/app/modules/social/application/use_cases/complete_trade_use_case.py（各自獨立標記完成；雙方都確認後才轉 completed 並鎖定卡片；完成後提供導流評分所需的 trade_id）
   - [ ] T152A 擴充 RateUserUseCase - 新增 trade 完成狀態驗證（FR-SOCIAL-003B）：
     - 驗證 trade_id 對應的 trade 狀態為 completed
     - 確保評分者是該 trade 的參與者（initiator_id 或 responder_id）
     - 注入 TradeRepository 進行驗證
--  - [ ] T152B [P] [US5] 交換確認 Timeout 規則（48h）：trade 進入 accepted 後超過 `TRADE_CONFIRMATION_TIMEOUT_HOURS`（預設 48 小時）仍未雙方完成確認時，必須視為 `canceled`（不新增 `expired` 狀態）；此規則需在 complete/讀取 trade 時能被正確套用
-- [ ] T153 [P] [US5] 建立 GetTradeHistoryUseCase：apps/backend/app/modules/social/application/use_cases/get_trade_history_use_case.py
+-  - [X] T152B [P] [US5] 交換確認 Timeout 規則（48h）：trade 進入 accepted 後超過 `TRADE_CONFIRMATION_TIMEOUT_HOURS`（預設 48 小時）仍未雙方完成確認時，必須視為 `canceled`（不新增 `expired` 狀態）；此規則需在 complete/讀取 trade 時能被正確套用
+- [X] T153 [P] [US5] 建立 GetTradeHistoryUseCase：apps/backend/app/modules/social/application/use_cases/get_trade_history_use_case.py
 
 ### Infrastructure Layer (Social Module - Trade)
 
-- [ ] T154 [P] [US5] 實作 SQLAlchemy Trade Model：apps/backend/app/modules/social/infrastructure/database/models/trade_model.py
-- [ ] T155 [P] [US5] 實作 SQLAlchemy TradeItem Model：apps/backend/app/modules/social/infrastructure/database/models/trade_item_model.py
-- [ ] T156 [P] [US5] 實作 TradeRepositoryImpl：apps/backend/app/modules/social/infrastructure/repositories/trade_repository_impl.py
+- [X] T154 [P] [US5] 實作 SQLAlchemy Trade Model：apps/backend/app/modules/social/infrastructure/database/models/trade_model.py
+- [X] T155 [P] [US5] 實作 SQLAlchemy TradeItem Model：apps/backend/app/modules/social/infrastructure/database/models/trade_item_model.py
+- [X] T156 [P] [US5] 實作 TradeRepositoryImpl：apps/backend/app/modules/social/infrastructure/repositories/trade_repository_impl.py
 
 ### Presentation Layer (Social Module - Trade)
 
-- [ ] T157 [P] [US5] 定義 Trade Schema：apps/backend/app/modules/social/presentation/schemas/trade_schemas.py（CreateTradeRequest, TradeResponse）
-- [ ] T158 [US5] 建立 Trade Router：apps/backend/app/modules/social/presentation/routers/trade_router.py（POST /api/v1/trades, POST /api/v1/trades/{id}/accept, POST /api/v1/trades/{id}/reject, POST /api/v1/trades/{id}/cancel, POST /api/v1/trades/{id}/complete, GET /api/v1/trades/history）
+- [X] T157 [P] [US5] 定義 Trade Schema：apps/backend/app/modules/social/presentation/schemas/trade_schemas.py（CreateTradeRequest, TradeResponse）
+- [X] T158 [US5] 建立 Trade Router：apps/backend/app/modules/social/presentation/routers/trade_router.py（POST /api/v1/trades, POST /api/v1/trades/{id}/accept, POST /api/v1/trades/{id}/reject, POST /api/v1/trades/{id}/cancel, POST /api/v1/trades/{id}/complete, GET /api/v1/trades/history）
 
 ### Integration
 
-- [ ] T159 [US5] 註冊 Trade 功能到 DI Container：apps/backend/app/container.py
-- [ ] T160 [US5] 註冊 Trade Router 到 main.py：apps/backend/app/main.py
+- [X] T159 [US5] 註冊 Trade 功能到 DI Container：apps/backend/app/container.py（使用 FastAPI 內建依賴注入，無需額外註冊）
+- [X] T160 [US5] 註冊 Trade Router 到 main.py：apps/backend/app/main.py
 
 ### Testing
 
@@ -620,12 +620,12 @@
 
 ### Alembic Migration
 
-- [ ] T166 [P] [US5] 建立 Trade Tables Migration：alembic/versions/003_add_trade_tables.py（trades, trade_items）
+- [X] T166 [P] [US5] 建立 Trade Tables Migration：alembic/versions/010_add_trade_tables.py（trades, trade_items）
 - [ ] T167 [US5] 執行並驗證 Migration：alembic upgrade head && alembic downgrade -1
 
 ### Configuration
 
-- [ ] T168 [P] [US5] 更新環境變數：apps/backend/app/config.py（TRADE_CONFIRMATION_TIMEOUT_HOURS=48）
+- [X] T168 [P] [US5] 更新環境變數：apps/backend/app/config.py（TRADE_CONFIRMATION_TIMEOUT_HOURS=48）
 
 ### Documentation
 
@@ -960,7 +960,10 @@ Group M5: US5 Mobile (Expo) - Trade
 | 5 | US3 - Nearby Search | 16 | P1 | ⏸️ Not Started |
 | 6 | US4 - Friends & Chat (Backend) | 33 | P1 | ✅ 100% Complete |
 | 6 | US4 - Friends & Chat (Mobile) | 4 | P1 | ✅ 100% Complete (M401-M404) |
-| 7 | US5 - Trade | 31 | P1 | ⏸️ Not Started |
+| 7 | US5 - Trade (Backend Core) | 18 | P1 | ✅ 83% Complete (15/18: T144-T160, T166, T168) |
+| 7 | US5 - Trade (Testing & Docs) | 9 | P1 | ⏸️ Pending (T161-T165, T167, T169-T171) |
+| 7 | US5 - Trade (Verification) | 3 | P1 | ⏸️ Pending (T172-T174) |
+| 7 | US5 - Trade (Mobile) | 4 | P1 | ⏸️ Not Started (M501-M504) |
 | 8 | US6 - Subscription | 17 | P2 | ⏸️ Not Started |
 | 8.5 | US7 - Board Posts | 23 | P2 | ⏸️ Not Started |
 | 9 | Polish | 14 | - | ⏸️ Not Started |
