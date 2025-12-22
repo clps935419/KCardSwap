@@ -129,6 +129,8 @@ EXPO_PUBLIC_GOOGLE_CLIENT_ID=your-google-client-id
 
 - Repo snapshot：`openapi/openapi.json`（由後端程式碼直接生成）
 
+⚠️ 注意：repo 內的 snapshot 可能落後於程式碼（或落後於文件/任務的更新）。每次後端 API 有變更時，必須先更新並提交 snapshot，否則 SDK 生成/Swagger 檢視會仍是舊版本；文件討論請以 spec/plan/tasks 為準。
+
 OpenAPI snapshot 生成/更新請見：`/openapi/README.md`
 
 ### 重要：baseURL 規則（避免 /api/v1/api/v1）

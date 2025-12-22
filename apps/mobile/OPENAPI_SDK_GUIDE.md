@@ -39,6 +39,8 @@ We commit an **OpenAPI snapshot** generated from backend code because:
 
 > Note: This snapshot reflects the **implemented API** at the time it was generated. Product requirements still come from the User Stories / spec / plan / tasks.
 
+> Important: The snapshot can be **stale** if the backend changed (or documents/tasks changed) but `openapi/openapi.json` was not regenerated and committed yet. Do not use the snapshot to infer product requirements or completion status; use it for deterministic SDK generation and verification only.
+
 ## Usage
 
 ### 1. Generating the SDK

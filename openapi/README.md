@@ -5,6 +5,10 @@
 - Mobile（或其他前端）在本機/CI/雲端 agent 進行 codegen
 - 避免 codegen 依賴 `localhost` 或內網可達性
 
+⚠️ 注意：`openapi/openapi.json` 是由程式碼生成的開發後產物，可能落後於程式碼（例如你先更新文件/任務，但尚未實作 API、或實作後尚未 regenerate+commit）。
+- 文件/需求/任務討論：以 spec/plan/tasks 為準
+- SDK/Swagger/測試對齊：以「更新後的 snapshot」為準（未更新時先 regenerate）
+
 ---
 
 ## ⚠️ 重要：開發工作流程

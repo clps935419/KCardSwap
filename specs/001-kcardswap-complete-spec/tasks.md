@@ -90,6 +90,8 @@
 - OpenAPI paths 已包含 `/api/v1`，生成 client 的 baseUrl 必須使用 host-only（例如 `http://localhost:8080`），避免 `/api/v1/api/v1`。
 - 生成輸出（generated）**不 commit**；每次需要時重新 generate。
 
+⚠️ 注意：`openapi/openapi.json` 是由程式碼生成的開發後產物，可能落後於程式碼。它用於 Swagger 檢視、SDK codegen 與整合測試對齊；討論需求/任務時請以 spec/plan/tasks 為準，不要用 snapshot 推論需求是否已完成。
+
 - [x] M015 [P] [TOOLING] 新增/更新 OpenAPI snapshot：建立 `openapi/openapi.json`（來源：從後端程式碼自動生成，已執行）
 - [x] M016 [P] [TOOLING] 建立 hey-api codegen config：`apps/mobile/openapi-ts.config.ts`（Axios client + `@tanstack/react-query` plugin；input 指向 `openapi/openapi.json`；output 至 `apps/mobile/src/shared/api/generated/`）
 - [x] M017 [P] [TOOLING] 加入 codegen scripts：更新 `apps/mobile/package.json`（新增 `sdk:generate` / `sdk:clean`；確保可在乾淨環境執行）
@@ -187,7 +189,7 @@
 - [X] T034 [Admin-Auth] 添加 Admin Login Endpoint：POST /api/v1/auth/admin-login（apps/backend/app/modules/identity/presentation/routers/auth_router.py，標記 tags=["Admin"]）
 - [X] T035 [Admin-Auth] 創建管理員工具腳本（手動）：apps/backend/scripts/create_admin.py（接受 --email, --password, --role 參數，生成 bcrypt hash 並插入資料庫；用於手動建立額外管理員，email 重複會報錯）
 - [X] T035A [Admin-Auth] 創建自動初始化腳本（idempotent）：apps/backend/scripts/init_admin.py（支援環境變數、預設值、隨機密碼生成；idempotent 設計可重複執行；整合至 Docker 啟動流程 start.sh；用於自動化部署）
-- [X] T036 [Admin-Auth] 對齊 OpenAPI/Swagger：/auth/admin-login（以 openapi/openapi.json 為準）
+- [X] T036 [Admin-Auth] 對齊 OpenAPI/Swagger：/auth/admin-login（以更新後的 openapi/openapi.json snapshot 作為驗證基準；需先 regenerate+commit 才會反映最新程式碼）
 - [X] T037 [Admin-Auth] 更新資料模型文件：specs/001-kcardswap-complete-spec/data-model.md（更新 users 表定義與不變條件）
 - [X] T038 [Admin-Auth] 撰寫單元測試：tests/unit/application/use_cases/test_admin_login.py（測試正確密碼、錯誤密碼、非管理員帳號）
 - [X] T039 [Admin-Auth] 添加 pyproject.toml 依賴：bcrypt = "^4.1.0"
@@ -271,7 +273,7 @@
 
 #### Testing
 
-- [X] T053A [P] [US1] （Expo/PKCE）對齊 OpenAPI/Swagger：/auth/google-callback（以 openapi/openapi.json 為準）
+- [X] T053A [P] [US1] （Expo/PKCE）對齊 OpenAPI/Swagger：/auth/google-callback（以更新後的 openapi/openapi.json snapshot 作為驗證基準；需先 regenerate+commit 才會反映最新程式碼）
 - [X] T057A [P] [US1] （Expo/PKCE）Auth Integration Tests：tests/integration/modules/identity/test_auth_flow.py（mock Google token endpoint，覆蓋 code+pkce 流程）
 
 #### Documentation
@@ -314,9 +316,9 @@
 
 ### Mobile (Expo)
 
-- [X] M101 [P] [US1] 實作 Google 登入畫面與 PKCE Flow：apps/mobile/src/features/auth（使用 AuthSession 取得 code + code_verifier → 呼叫 /auth/google-callback；以 OpenAPI/Swagger 為準）
-- [X] M102 [P] [US1] 串接 TokenResponse 並寫入 Session：apps/mobile/src/shared/auth/session.ts（使用 /auth/refresh 續期；以 OpenAPI/Swagger 為準）
-- [X] M103 [P] [US1] 建立個人檔案頁（讀取/更新）：apps/mobile/src/features/profile（GET/PUT /profile/me；以 OpenAPI/Swagger 為準）
+- [X] M101 [P] [US1] 實作 Google 登入畫面與 PKCE Flow：apps/mobile/src/features/auth（使用 AuthSession 取得 code + code_verifier → 呼叫 /auth/google-callback；以更新後的 OpenAPI snapshot 作為驗證/對齊基準）
+- [X] M102 [P] [US1] 串接 TokenResponse 並寫入 Session：apps/mobile/src/shared/auth/session.ts（使用 /auth/refresh 續期；以更新後的 OpenAPI snapshot 作為驗證/對齊基準）
+- [X] M103 [P] [US1] 建立個人檔案頁（讀取/更新）：apps/mobile/src/features/profile（GET/PUT /profile/me；以更新後的 OpenAPI snapshot 作為驗證/對齊基準）
 - [ ] M104 [US1] 手動驗證登入與更新檔案：Android 實機/模擬器（確認冷啟動 refresh 與 401 重新登入）
 
 ---
@@ -398,7 +400,7 @@
   - （POC/依框裁切）若要「依框線區域裁切成卡片圖」，需處理座標映射：框線是在 preview(View) 座標；拍照結果是照片像素座標。建議以相對比例保存框線區域（x/y/width/height 皆為 0..1），再換算為照片像素後用 `expo-image-manipulator` crop。
   - （避免映射歪斜）盡量讓 preview aspect ratio 與拍照輸出比例一致；若 preview 使用 cover/縮放，需把 letterbox/crop 的偏移納入換算，否則裁切會偏移。
   - 參考：apps/mobile/TECH_STACK.md 的「expo-camera（相機預覽 + 自訂 overlay，引導框 POC）」段落（含 POC 步驟與座標映射注意事項）
-- [x] M202 [P] [US2] 取得上傳 Signed URL：apps/mobile/src/features/cards/api（呼叫 POST /cards/upload-url；以 OpenAPI/Swagger 為準）✅
+- [x] M202 [P] [US2] 取得上傳 Signed URL：apps/mobile/src/features/cards/api（呼叫 POST /cards/upload-url；以更新後的 OpenAPI snapshot 作為驗證/對齊基準）✅
   - 回應需包含：`upload_url`、`method`（PUT/POST）、`required_headers`（至少 Content-Type；由後端決定）、以及可對應列表的 `image_url`/object key（或等價欄位）
   - 需明確規範 Signed URL 的有效期限（或 TTL 欄位），過期時前端需重新走 M202
 - [x] M203 [P] [US2] 直接上傳到 Signed URL：apps/mobile/src/features/cards/services/uploadToSignedUrl.ts（PUT/POST 上傳、錯誤處理與重試）✅
@@ -473,7 +475,7 @@
 ### Mobile (Expo)
 
 - [X] M301 [P] [US3] 定位權限與取得座標：apps/mobile/src/features/nearby（expo-location；處理拒絕權限）
-- [X] M302 [P] [US3] 附近搜尋頁：apps/mobile/src/features/nearby/screens/NearbySearchScreen.tsx（POST /nearby/search；Schema 以 Swagger/OpenAPI（openapi/openapi.json）為準）
+- [X] M302 [P] [US3] 附近搜尋頁：apps/mobile/src/features/nearby/screens/NearbySearchScreen.tsx（POST /nearby/search；Schema 以更新後的 Swagger/OpenAPI snapshot（openapi/openapi.json）作為驗證/對齊基準）
   - 建議流程：取得定位後先 PUT /nearby/location，再 POST /nearby/search（避免後端依舊位置造成結果偏差）
 - [X] M303 [US3] 限次錯誤處理：免費用戶第 6 次提示 HTTP 429 Too Many Requests（並提供升級入口；升級差異 deferred 至 Phase 8 BIZ）
 
@@ -545,8 +547,8 @@
 
 ### Mobile (Expo)
 
-- [ ] M401 [P] [US4] 好友邀請/接受/封鎖頁：apps/mobile/src/features/friends（對齊 /friends/* 端點；以 OpenAPI/Swagger 為準）
-- [ ] M402 [P] [US4] 聊天室 UI 與輪詢：apps/mobile/src/features/chat（GET /chats/{id}/messages, POST /chats/{id}/messages；以 OpenAPI/Swagger 為準）
+- [ ] M401 [P] [US4] 好友邀請/接受/封鎖頁：apps/mobile/src/features/friends（對齊 /friends/* 端點；以更新後的 OpenAPI snapshot 作為驗證/對齊基準）
+- [ ] M402 [P] [US4] 聊天室 UI 與輪詢：apps/mobile/src/features/chat（GET /chats/{id}/messages, POST /chats/{id}/messages；以更新後的 OpenAPI snapshot 作為驗證/對齊基準）
 - [ ] M403 [P] [US4] 前景輪詢策略：apps/mobile/src/features/chat/services/polling.ts（after_message_id、退避避免過度打 API）
 - [ ] M404 [P] [US4] 推播接收與導頁：apps/mobile/src/features/notifications（expo-notifications；點擊通知導向聊天室）
 
@@ -629,7 +631,7 @@
 
 ### Mobile (Expo)
 
-- [ ] M501 [P] [US5] 發起交換提案頁：apps/mobile/src/features/trade（選擇卡片並呼叫 POST /trades；以 OpenAPI/Swagger 為準）
+- [ ] M501 [P] [US5] 發起交換提案頁：apps/mobile/src/features/trade（選擇卡片並呼叫 POST /trades；以更新後的 OpenAPI snapshot 作為驗證/對齊基準）
 - [ ] M502 [P] [US5] 提案詳情與狀態更新 UI：apps/mobile/src/features/trade/screens/TradeDetailScreen.tsx（接受/完成等動作）
 - [ ] M503 [US5] 交換歷史列表：apps/mobile/src/features/trade/screens/TradeHistoryScreen.tsx（依後端查詢端點）
 
@@ -687,7 +689,7 @@
 
 - [ ] M601 [P] [US6] 方案/付費牆頁：apps/mobile/src/features/subscription（顯示 free/premium 差異與升級入口）
 - [ ] M602 [P] [US6] Android Google Play Billing 整合：apps/mobile/src/features/subscription/billing（購買/續訂/恢復購買）
-- [ ] M603 [P] [US6] 收據驗證串接：apps/mobile/src/features/subscription/api（POST /subscriptions/verify-receipt；以 OpenAPI/Swagger 為準）
+- [ ] M603 [P] [US6] 收據驗證串接：apps/mobile/src/features/subscription/api（POST /subscriptions/verify-receipt；以更新後的 OpenAPI snapshot 作為驗證/對齊基準）
 - [ ] M604 [US6] 訂閱狀態顯示與降級提示：apps/mobile/src/features/subscription/screens/SubscriptionStatusScreen.tsx
 
 ---
@@ -743,7 +745,7 @@
 
 ### OpenAPI/Swagger & Testing
 
-- [ ] T227 [P] [US7] 對齊 OpenAPI/Swagger：Posts 相關 endpoints（以 openapi/openapi.json 為準）
+- [ ] T227 [P] [US7] 對齊 OpenAPI/Swagger：Posts 相關 endpoints（以更新後的 openapi/openapi.json snapshot 作為驗證基準；需先 regenerate+commit 才會反映最新程式碼）
 - [ ] T228 [P] [US7] 撰寫 Posts Integration Tests（以 OpenAPI/Swagger（由程式碼生成的 snapshot）作為回應/路由對齊驗證；改以整合測試覆蓋）
 
 ### Mobile (Expo)
@@ -998,7 +1000,7 @@ Group M5: US5 Mobile (Expo) - Trade
 ## Phase -1 Gates Checklist
 - Simplicity Gate：保持 ≤3 個專案（mobile/backend/gateway）；若需例外，在 plan.md 記錄理由。
 - Anti-Abstraction Gate：遵循憲法 Article VI，禁止不必要抽象；Domain 不依賴框架；Repository 實作置於 Infrastructure。
-- Integration-First Gate：以 OpenAPI/Swagger（由程式碼生成的 snapshot）作為對齊基準；端到端整合測試需覆蓋主要路由與錯誤情境，回應需與 OpenAPI 定義一致（非開發前契約）。
+- Integration-First Gate：以 OpenAPI/Swagger（由程式碼生成的 snapshot：openapi/openapi.json）作為「同一版 commit 的實作輸出」進行整合測試對齊；若 snapshot 未更新，請先 regenerate+commit 再做對齊（非開發前契約；需求來源仍以 spec/plan/tasks 為準）。
 
 ## Acceptance Criteria Examples
 - T204：超限時回傳 `422_LIMIT_EXCEEDED` 並包含哪一項超限訊息（每日/容量/大小）
