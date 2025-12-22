@@ -145,6 +145,13 @@ def create_application() -> FastAPI:
     app.include_router(rating_router, prefix=settings.API_PREFIX)
     app.include_router(report_router, prefix=settings.API_PREFIX)
 
+    # Phase 7: Social module (Trade)
+    from .modules.social.presentation.routers.trade_router import (
+        router as trade_router,
+    )
+
+    app.include_router(trade_router, prefix=settings.API_PREFIX)
+
     return app
 
 

@@ -52,6 +52,11 @@ class Config:
     DAILY_SEARCH_LIMIT_FREE: int = int(os.getenv("DAILY_SEARCH_LIMIT_FREE", "5"))
     SEARCH_RADIUS_KM: float = float(os.getenv("SEARCH_RADIUS_KM", "10.0"))
 
+    # Trade Configuration
+    TRADE_CONFIRMATION_TIMEOUT_HOURS: int = int(
+        os.getenv("TRADE_CONFIRMATION_TIMEOUT_HOURS", "48")
+    )
+
     # API
     API_VERSION: str = "v1"
     API_PREFIX: str = f"/api/{API_VERSION}"
