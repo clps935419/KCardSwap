@@ -481,6 +481,8 @@
 
 ## Phase 6: User Story 4 - 好友系統與聊天 (Priority: P1)
 
+**狀態**: ✅ **Backend 97% Complete** (32/33 tasks, PR #23 已實作)
+
 **目標**: 使用者可以加好友、聊天、評分、檢舉
 
 **獨立測試標準**:
@@ -493,36 +495,36 @@
 
 ### Domain Layer (Social Module - Friends & Chat)
 
-- [ ] T111 [P] [US4] 建立 Friendship Entity：apps/backend/app/modules/social/domain/entities/friendship.py（id, user_id, friend_id, status: pending/accepted/blocked, created_at）
-- [ ] T112 [P] [US4] 建立 ChatRoom Entity：apps/backend/app/modules/social/domain/entities/chat_room.py（id, participant_ids, created_at）
-- [ ] T113 [P] [US4] 建立 Message Entity：apps/backend/app/modules/social/domain/entities/message.py（id, room_id, sender_id, content, status: sent/delivered/read, created_at）
-- [ ] T114 [P] [US4] 建立 Rating Entity：apps/backend/app/modules/social/domain/entities/rating.py（id, rater_id, rated_user_id, trade_id, score, comment, created_at）
-- [ ] T115 [P] [US4] 建立 Report Entity：apps/backend/app/modules/social/domain/entities/report.py（id, reporter_id, reported_user_id, reason, created_at）
-- [ ] T116 [P] [US4] 定義 FriendshipRepository Interface：apps/backend/app/modules/social/domain/repositories/friendship_repository.py
-- [ ] T117 [P] [US4] 定義 ChatRoomRepository Interface：apps/backend/app/modules/social/domain/repositories/chat_room_repository.py
-- [ ] T118 [P] [US4] 定義 MessageRepository Interface：apps/backend/app/modules/social/domain/repositories/message_repository.py
-- [ ] T119 [P] [US4] 定義 RatingRepository Interface：apps/backend/app/modules/social/domain/repositories/rating_repository.py
-- [ ] T120 [P] [US4] 定義 ReportRepository Interface：apps/backend/app/modules/social/domain/repositories/report_repository.py
+- [X] T111 [P] [US4] 建立 Friendship Entity：apps/backend/app/modules/social/domain/entities/friendship.py（id, user_id, friend_id, status: pending/accepted/blocked, created_at）
+- [X] T112 [P] [US4] 建立 ChatRoom Entity：apps/backend/app/modules/social/domain/entities/chat_room.py（id, participant_ids, created_at）
+- [X] T113 [P] [US4] 建立 Message Entity：apps/backend/app/modules/social/domain/entities/message.py（id, room_id, sender_id, content, status: sent/delivered/read, created_at）
+- [X] T114 [P] [US4] 建立 Rating Entity：apps/backend/app/modules/social/domain/entities/rating.py（id, rater_id, rated_user_id, trade_id, score, comment, created_at）
+- [X] T115 [P] [US4] 建立 Report Entity：apps/backend/app/modules/social/domain/entities/report.py（id, reporter_id, reported_user_id, reason, created_at）
+- [X] T116 [P] [US4] 定義 FriendshipRepository Interface：apps/backend/app/modules/social/domain/repositories/friendship_repository.py
+- [X] T117 [P] [US4] 定義 ChatRoomRepository Interface：apps/backend/app/modules/social/domain/repositories/chat_room_repository.py
+- [X] T118 [P] [US4] 定義 MessageRepository Interface：apps/backend/app/modules/social/domain/repositories/message_repository.py
+- [X] T119 [P] [US4] 定義 RatingRepository Interface：apps/backend/app/modules/social/domain/repositories/rating_repository.py
+- [X] T120 [P] [US4] 定義 ReportRepository Interface：apps/backend/app/modules/social/domain/repositories/report_repository.py
 
 ### Application Layer (Social Module - Friends & Chat)
 
-- [ ] T121 [P] [US4] 建立 SendFriendRequestUseCase：apps/backend/app/modules/social/application/use_cases/send_friend_request_use_case.py
-- [ ] T122 [P] [US4] 建立 AcceptFriendRequestUseCase：apps/backend/app/modules/social/application/use_cases/accept_friend_request_use_case.py
-- [ ] T123 [P] [US4] 建立 BlockUserUseCase：apps/backend/app/modules/social/application/use_cases/block_user_use_case.py
-- [ ] T124 [P] [US4] 建立 SendMessageUseCase：apps/backend/app/modules/social/application/use_cases/send_message_use_case.py（發送訊息 → 觸發 FCM 推播）
-- [ ] T125 [P] [US4] 建立 GetMessagesUseCase：apps/backend/app/modules/social/application/use_cases/get_messages_use_case.py（輪詢機制：after_message_id）
-- [ ] T126 [P] [US4] 建立 RateUserUseCase：apps/backend/app/modules/social/application/use_cases/rate_user_use_case.py（交易完成後評分）
-- [ ] T127 [P] [US4] 建立 ReportUserUseCase：apps/backend/app/modules/social/application/use_cases/report_user_use_case.py
+- [X] T121 [P] [US4] 建立 SendFriendRequestUseCase：apps/backend/app/modules/social/application/use_cases/send_friend_request_use_case.py
+- [X] T122 [P] [US4] 建立 AcceptFriendRequestUseCase：apps/backend/app/modules/social/application/use_cases/accept_friend_request_use_case.py
+- [X] T123 [P] [US4] 建立 BlockUserUseCase：apps/backend/app/modules/social/application/use_cases/block_user_use_case.py
+- [X] T124 [P] [US4] 建立 SendMessageUseCase：apps/backend/app/modules/social/application/use_cases/send_message_use_case.py（發送訊息 → 觸發 FCM 推播）
+- [X] T125 [P] [US4] 建立 GetMessagesUseCase：apps/backend/app/modules/social/application/use_cases/get_messages_use_case.py（輪詢機制：after_message_id）
+- [X] T126 [P] [US4] 建立 RateUserUseCase：apps/backend/app/modules/social/application/use_cases/rate_user_use_case.py（交易完成後評分）
+- [X] T127 [P] [US4] 建立 ReportUserUseCase：apps/backend/app/modules/social/application/use_cases/report_user_use_case.py
 
 - [ ] T125A [DEFERRED] [US4] 訊息保留政策：伺服器端保留 30 天；清理/清除 job（例如每日排程）清除超過 30 天的 messages（先在文件/規格中定義，實作延後）
 
 ### Infrastructure Layer (Social Module - Friends & Chat)
 
-- [ ] T128 [P] [US4] 實作 SQLAlchemy Friendship Model：apps/backend/app/modules/social/infrastructure/database/models/friendship_model.py
-- [ ] T129 [P] [US4] 實作 SQLAlchemy ChatRoom Model：apps/backend/app/modules/social/infrastructure/database/models/chat_room_model.py
-- [ ] T130 [P] [US4] 實作 SQLAlchemy Message Model：apps/backend/app/modules/social/infrastructure/database/models/message_model.py
-- [ ] T131 [P] [US4] 實作 SQLAlchemy Rating Model：apps/backend/app/modules/social/infrastructure/database/models/rating_model.py
-- [ ] T132 [P] [US4] 實作 SQLAlchemy Report Model：apps/backend/app/modules/social/infrastructure/database/models/report_model.py
+- [X] T128 [P] [US4] 實作 SQLAlchemy Friendship Model：apps/backend/app/modules/social/infrastructure/database/models/friendship_model.py
+- [X] T129 [P] [US4] 實作 SQLAlchemy ChatRoom Model：apps/backend/app/modules/social/infrastructure/database/models/chat_room_model.py
+- [X] T130 [P] [US4] 實作 SQLAlchemy Message Model：apps/backend/app/modules/social/infrastructure/database/models/message_model.py
+- [X] T131 [P] [US4] 實作 SQLAlchemy Rating Model：apps/backend/app/modules/social/infrastructure/database/models/rating_model.py
+- [X] T132 [P] [US4] 實作 SQLAlchemy Report Model：apps/backend/app/modules/social/infrastructure/database/models/report_model.py
 - [X] T133 [P] [US4] 實作 FriendshipRepositoryImpl：apps/backend/app/modules/social/infrastructure/repositories/friendship_repository_impl.py
 - [X] T134 [P] [US4] 實作 ChatRoomRepositoryImpl：apps/backend/app/modules/social/infrastructure/repositories/chat_room_repository_impl.py
 - [X] T135 [P] [US4] 實作 MessageRepositoryImpl：apps/backend/app/modules/social/infrastructure/repositories/message_repository_impl.py
@@ -923,8 +925,8 @@ Group M5: US5 Mobile (Expo) - Trade
 ### Statistics（統計）
 
 - **Total Tasks**: 228 (Backend) + 13 (Mobile Phase 1M) + 6 (Mobile Tooling: Phase 1M.1) + Mobile US tasks = 247+
-- **Completed**: 63 (Backend: Phase 1: 8/8, Phase 2: 20/20, Phase 3: 35/37) + 13 (Mobile: Phase 1M: 13/13) + 3 (Mobile: Phase 3: 3/4) = 79
-- **Remaining**: 165 (Backend) + Mobile US tasks (M104, M201-M704)
+- **Completed**: 95 (Backend: Phase 1: 8/8, Phase 2: 20/20, Phase 3: 35/37, Phase 6: 32/33) + 13 (Mobile: Phase 1M: 13/13) + 3 (Mobile: Phase 3: 3/4) = 111
+- **Remaining**: 133 (Backend) + Mobile US tasks (M104, M201-M704)
 - **Estimated Duration**: 8 weeks (remaining sprints)
 
 ### Task Breakdown by Phase（各階段任務分布）
@@ -940,7 +942,7 @@ Group M5: US5 Mobile (Expo) - Trade
 | 3 | US1 - Mobile | 4 | P1 🎯 MVP | ⏳ 75% Complete (3/4, M104 pending) |
 | 4 | US2 - Card Upload | 29 | P1 | ⏸️ Not Started |
 | 5 | US3 - Nearby Search | 16 | P1 | ⏸️ Not Started |
-| 6 | US4 - Friends & Chat | 33 | P1 | ⏸️ Not Started |
+| 6 | US4 - Friends & Chat | 33 | P1 | ✅ 97% Complete (32/33, Backend完成, T143待驗證) |
 | 7 | US5 - Trade | 31 | P1 | ⏸️ Not Started |
 | 8 | US6 - Subscription | 17 | P2 | ⏸️ Not Started |
 | 8.5 | US7 - Board Posts | 23 | P2 | ⏸️ Not Started |
