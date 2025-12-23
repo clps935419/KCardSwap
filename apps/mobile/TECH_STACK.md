@@ -42,6 +42,18 @@
 
 ---
 
+## In-App Purchases（Subscriptions / US6）
+
+### POC 決議
+
+- **需要 Expo Development Build**：IAP/Billing 依賴原生模組，Expo Go 不支援
+- **套件選型（POC）**：`react-native-iap`（Android subscriptions）
+- **購買成功判準**：App 端不可只以購買 UI/回呼成功視為 premium 生效；必須取得 `purchase_token` 後呼叫後端 `POST /api/v1/subscriptions/verify-receipt`，並以回傳 `entitlement_active=true` 更新權限與 UI
+- **同步策略（無 RTDN）**：App 開啟/回前景呼叫 `GET /api/v1/subscriptions/status`；後端每日排程降級兜底
+- **Restore（不新增 API）**：App 端 query 既有購買 → 逐一呼叫 `verify-receipt` 恢復 entitlement
+
+---
+
 ## Expo 套件清單 (Expo Packages)
 
 ### 認證與安全 (Authentication & Security)

@@ -27,6 +27,13 @@ React Native mobile application for KCardSwap, built with Expo SDK 54.
 - **Testing**: Jest + React Native Testing Library
 - **Code Quality**: ESLint + Prettier
 
+### In-App Purchase（Subscriptions / US6）
+
+- **前提**：Google Play Billing 需要原生模組，必須使用 Expo Development Build（Expo Go 不支援）
+- **建議套件（POC）**：`react-native-iap`
+- **購買成功判準**：App 端不可只以 Google Play 購買 UI/回呼成功視為升級成功；必須在取得 `purchase_token` 後呼叫後端 `POST /api/v1/subscriptions/verify-receipt`，並以回傳 `entitlement_active=true` 作為生效依據
+- **同步**：App 開啟/回前景時呼叫 `GET /api/v1/subscriptions/status` 更新 UI
+
 ### Expo Packages Installed
 
 **Authentication & Security:**

@@ -260,6 +260,36 @@ poetry run alembic history
 
 以下是計劃中但尚未實作的表結構（Phase 2-6）:
 
+### subscription_purchase_tokens（訂閱收據/去重用）— Schema 草案（US6 / 待實作）
+
+**目的**:
+- 保存 Google Play purchase_token 與驗證結果摘要，提供：token 綁定、冪等、跨裝置 restore、以及稽核追蹤
+- 避免「App 端僅以 UI 成功即升級」的風險：權限以後端 verify-receipt 驗證後更新為準
+
+| 欄位 | 型別 | 約束 | 說明 |
+|------|------|------|------|
+| id | UUID | PK, DEFAULT uuid_generate_v4() | 記錄唯一識別碼 |
+| user_id | UUID | NOT NULL, FK(users.id) ON DELETE CASCADE | 綁定的使用者 |
+| platform | VARCHAR(20) | NOT NULL | android（POC 僅 android） |
+| purchase_token | TEXT | UNIQUE, NOT NULL | Google Play purchase token（不可跨 user 重放） |
+| product_id | VARCHAR(120) | NOT NULL | 對應的訂閱商品 ID |
+| purchase_time | TIMESTAMP WITH TIME ZONE | NULLABLE | 購買時間（若可取得） |
+| expires_at | TIMESTAMP WITH TIME ZONE | NULLABLE | 到期時間（由 server verify 結果寫入） |
+| acknowledged_at | TIMESTAMP WITH TIME ZONE | NULLABLE | acknowledge 成功時間（POC 建議由後端寫入） |
+| last_verified_at | TIMESTAMP WITH TIME ZONE | NULLABLE | 最近一次後端驗證時間 |
+| raw_payload | JSONB | NULLABLE | 原始驗證回應/必要欄位（可選，避免存敏感資訊過量） |
+| created_at | TIMESTAMP WITH TIME ZONE | DEFAULT CURRENT_TIMESTAMP | 建立時間 |
+| updated_at | TIMESTAMP WITH TIME ZONE | DEFAULT CURRENT_TIMESTAMP | 更新時間 |
+
+**索引/約束（建議）**:
+- UNIQUE(purchase_token)
+- `idx_subscription_purchase_tokens_user_id_created_at` ON (user_id, created_at DESC)
+
+**不變條件（應用層 + DB 層）**:
+- purchase_token 必須唯一且不可跨 user 綁定（防重放）
+- 同 purchase_token 重送 verify-receipt 應回傳冪等結果（避免重複升級/寫入）
+- entitlement 的 source of truth 為後端驗證結果（而非 App UI）
+
 ### 待實作表
 
 - **trades**: 交換提案與歷史

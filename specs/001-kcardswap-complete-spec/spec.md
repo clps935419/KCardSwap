@@ -207,6 +207,13 @@
 - **FR-BIZ-004**：升級與續訂流程需整合適當的金流（未在此規格細化具體金流供應商），並提供失敗重試與退款例外處理流程。
  - **FR-BIZ-004**：升級與續訂流程在 Android 採「Google Play Billing」；iOS 次階段採「Apple IAP」。後端僅負責訂閱收據驗證與 `subscriptions` 狀態同步（生效/過期/取消），退款由平台機制處理。需提供失敗重試與狀態回滾例外處理流程。
 
+**FR-BIZ-004（POC 補充約束）**:
+- **購買成功判準（App UI 規則）**：App 端不可只以 Google Play 購買 UI/回呼成功視為升級成功；必須以後端 `POST /api/v1/subscriptions/verify-receipt` 驗證通過且回傳 `entitlement_active=true` 為準（避免 purchase_token 被重放造成越權）。
+- **Acknowledge（後端責任）**：POC 階段由後端在 server-side 驗證通過後負責完成 acknowledge；需具備冪等與重試（避免因網路/暫時性錯誤導致漏 ack）。
+- **RTDN/Webhook（deferred）**：POC 不新增 RTDN/webhook；狀態同步採：App 開啟/回前景時呼叫 `GET /api/v1/subscriptions/status` + 後端定期排程降級兜底。
+- **Restore（不新增 API）**：使用者換機/重裝時，App 端 query 既有購買並重送 `verify-receipt` 以恢復 entitlement。
+- **防重放/綁定**：purchase_token 必須與 user 綁定且不可跨 user 重放；同一 token 的重送需冪等回應。
+
 ##### 免費 vs 付費會員資源限制一覽
 
 | 項目 | 免費會員 | 付費會員 |

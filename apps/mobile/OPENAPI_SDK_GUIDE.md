@@ -41,6 +41,12 @@ We commit an **OpenAPI snapshot** generated from backend code because:
 
 > Important: The snapshot can be **stale** if the backend changed (or documents/tasks changed) but `openapi/openapi.json` was not regenerated and committed yet. Do not use the snapshot to infer product requirements or completion status; use it for deterministic SDK generation and verification only.
 
+## Subscriptions (US6) Note
+
+- `POST /api/v1/subscriptions/verify-receipt` 與 `GET /api/v1/subscriptions/status` 會在後端端點實作完成後，透過 `make generate-openapi` 生成並更新到 `openapi/openapi.json`。
+- **禁止手動編輯** `openapi/openapi.json` 來「先加端點」：snapshot 必須反映實作。
+- Mobile 端呼叫仍必須遵循本文件規範：使用 generated TanStack Query options/mutations；並以 `verify-receipt` 回傳的 `entitlement_active` 作為「購買成功」判準。
+
 ## Usage
 
 ### 1. Generating the SDK

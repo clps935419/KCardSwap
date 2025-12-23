@@ -222,6 +222,19 @@
 - 降級邏輯：過期自動回免費；提示 UI。
 - 後台參數：每日貼文上限可配置（預設免費 2、付費不限）。
 
+**Phase 8 / US6：API 變更清單（新增/影響範圍）**
+
+- **新增 API（2 支）**：
+	- `POST /api/v1/subscriptions/verify-receipt`：App 傳 `purchase_token` 供後端做 server-side 驗證，回傳 `entitlement_active` 與到期時間
+	- `GET /api/v1/subscriptions/status`：App 查詢目前 subscription/entitlement（App 開啟/回前景會呼叫）
+- **不新增的 API（POC 決議）**：
+	- 不新增 RTDN/webhook endpoint（Phase 8 POC deferred）
+	- 不新增 `restore` endpoint（restore 流程重用 `verify-receipt`）
+- **既有 API 行為會被影響（不改路由，但會套用訂閱限制/權限）**：
+	- `POST /api/v1/cards/upload-url`、`POST /api/v1/cards`：依會員等級套用單張大小/總容量/每日張數限制
+	- `POST /api/v1/nearby/search`：依會員等級套用每日次數限制與排序差異（premium priority）
+	- `POST /api/v1/posts`（若 Phase 8 納入貼文限制）：依會員等級套用每日貼文上限
+
 ## 9. API 標準與錯誤處理
 - 統一格式：`{ data, error }`；錯誤例如：
 	- `400_VALIDATION_FAILED`

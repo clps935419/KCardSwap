@@ -657,31 +657,65 @@
 
 **獨立測試標準**:
 - ✓ 系統可以驗證 Google Play 收據
-- ✓ 訂閱成功後使用者權限升級（每日上傳無限、搜尋無限）
+- ✓ 訂閱成功後使用者權限升級（以後端 verify-receipt 驗證通過 + entitlement 生效為準；不可只以 UI 顯示成功為準）
 - ✓ 訂閱到期後自動降級為免費用戶
 - ✓ 權限檢查中介層正確限制 API 存取
 
+**POC 決議（文件即合約，實作需對齊）**:
+- ✅ 不新增 RTDN/webhook（Phase 8 POC 先不做）；狀態同步採：App 開啟/回前景時呼叫 `GET /api/v1/subscriptions/status` + 後端每日排程降級兜底
+- ✅ Acknowledge 由後端負責（在 server-side 驗證成功後完成 acknowledge；需具備冪等與重試）
+- ✅ Restore 流程不新增 API：App 端 query 現有購買 → 以同一個 `POST /api/v1/subscriptions/verify-receipt` 重新驗證並更新 entitlement
+
+**API 合約（POC 最小集合）**:
+- `POST /api/v1/subscriptions/verify-receipt`
+  - 請求（最小）：`{ platform: "android", purchase_token: string, product_id: string }`
+  - 回應（最小）：`{ plan: "free"|"premium", status: "active"|"inactive"|"expired"|"pending", expires_at: string|null, entitlement_active: boolean, source: "google_play" }`
+  - 行為：必須做 token 綁定（purchase_token 只能綁定一個 user）、防重放（同 token 重送需冪等/拒絕跨 user）、並在驗證通過後更新 entitlement
+- `GET /api/v1/subscriptions/status`
+  - 回應（最小）：同上（以伺服器端資料為準）
+
+**狀態與錯誤碼（POC 最小集合；前後端需對齊）**:
+- `status` 值定義（後端回傳的業務狀態）：
+  - `active`：已生效；`entitlement_active=true`
+  - `expired`：已過期；`entitlement_active=false`
+  - `inactive`：未訂閱或不可用（包含取消後到期、或後端判定不應授權的狀態）；`entitlement_active=false`
+  - `pending`：Google Play 購買/付款仍在 pending（或暫時無法確認已生效）；`entitlement_active=false`；App UI 應顯示「待確認」並允許稍後重試
+- `verify-receipt` 常見錯誤（HTTP + `error.code`）：
+  - `401_UNAUTHORIZED`：未登入/Token 過期（需重新登入或 refresh）
+  - `400_VALIDATION_FAILED`：缺欄位、platform 不支援、product_id 格式錯誤等
+  - `409_CONFLICT`：purchase_token 已綁定到其他 user（防重放/綁定衝突；不得自動轉移；App 顯示「此購買已被其他帳號使用」）
+  - `503_SERVICE_UNAVAILABLE`：Google Play 驗證服務暫時不可用或逾時（可重試；App 顯示「驗證暫時失敗，請稍後再試」）
+- `status` 常見錯誤（HTTP + `error.code`）：
+  - `401_UNAUTHORIZED`：未登入/Token 過期
+  - `503_SERVICE_UNAVAILABLE`：資料庫或依賴服務暫時不可用（可重試）
+
+**冪等/重試規則（必須）**:
+- 同一個 `purchase_token`、同一個 user 重送 `verify-receipt`：後端必須冪等（回傳目前的 `plan/status/entitlement_active`），不可重複升級/寫入重複資料
+- 同一個 `purchase_token`、不同 user 重送：必須拒絕並回 `409_CONFLICT`
+
 ### Domain Layer (Identity Module - Subscription)
 
-- [ ] T175 [P] [US6] 建立 Subscription Entity：apps/backend/app/modules/identity/domain/entities/subscription.py（id, user_id, plan: free/premium, status: active/expired, expires_at）
+- [ ] T175 [P] [US6] 建立 Subscription Entity：apps/backend/app/modules/identity/domain/entities/subscription.py（id, user_id, plan: free/premium, status: active/inactive/expired/pending, expires_at）
 - [ ] T176 [P] [US6] 定義 SubscriptionRepository Interface：apps/backend/app/modules/identity/domain/repositories/subscription_repository.py
 
 ### Application Layer (Identity Module - Subscription)
 
-- [ ] T177 [P] [US6] 建立 VerifyReceiptUseCase：apps/backend/app/modules/identity/application/use_cases/verify_receipt_use_case.py（驗證 Google Play 收據 → 更新訂閱狀態）
+- [ ] T177 [P] [US6] 建立 VerifyReceiptUseCase：apps/backend/app/modules/identity/application/use_cases/verify_receipt_use_case.py（驗證 Google Play 收據 → 更新訂閱狀態；冪等；token 綁定；防重放；成功後需觸發 acknowledge）
 - [ ] T178 [P] [US6] 建立 CheckSubscriptionStatusUseCase：apps/backend/app/modules/identity/application/use_cases/check_subscription_status_use_case.py
 - [ ] T179 [P] [US6] 建立 ExpireSubscriptionsUseCase：apps/backend/app/modules/identity/application/use_cases/expire_subscriptions_use_case.py（定期任務：檢查並降級過期訂閱）
 
 ### Infrastructure Layer (Identity Module - Subscription)
 
 - [ ] T180 [P] [US6] 實作 SQLAlchemy Subscription Model：apps/backend/app/modules/identity/infrastructure/database/models/subscription_model.py
+- [ ] T180A [P] [US6] 新增/擴展 Alembic migration：保存 Google Play purchase_token 與去重資訊（建議新增 subscription_purchase_tokens 表；purchase_token UNIQUE；用於 token 綁定/防重放）
 - [ ] T181 [P] [US6] 實作 SubscriptionRepositoryImpl：apps/backend/app/modules/identity/infrastructure/repositories/subscription_repository_impl.py
-- [ ] T182 [P] [US6] 實作 Google Play Billing Service：apps/backend/app/modules/identity/infrastructure/external/google_play_billing_service.py（驗證收據）
+- [ ] T182 [P] [US6] 實作 Google Play Billing Service：apps/backend/app/modules/identity/infrastructure/external/google_play_billing_service.py（驗證收據 + acknowledge；需可重試且冪等）
+- [ ] T182A [P] [US6] 實作 token 綁定/防重放策略：同 purchase_token 不可跨 user 重放（DB UNIQUE + 應用層檢查；重送需冪等回傳）
 
 ### Presentation Layer
 
-- [ ] T183 [P] [US6] 建立 Subscription Router：apps/backend/app/modules/identity/presentation/routers/subscription_router.py（POST /api/v1/subscriptions/verify-receipt, GET /api/v1/subscriptions/status）
-- [ ] T184 [US6] 實作 Subscription Permission Middleware：apps/backend/app/shared/presentation/middleware/subscription_check.py（檢查權限並注入到 request.state）
+- [ ] T183 [P] [US6] 建立 Subscription Router：apps/backend/app/modules/identity/presentation/routers/subscription_router.py（POST /api/v1/subscriptions/verify-receipt, GET /api/v1/subscriptions/status；回應需包含 entitlement_active 與 expires_at）
+- [ ] T184 [US6] 實作 Subscription Permission Middleware：apps/backend/app/shared/presentation/middleware/subscription_check.py（依 subscriptions.plan/status 套用限制；影響 cards upload-url/create、nearby search、posts create；並注入到 request.state）
 
 ### Testing
 
@@ -702,9 +736,10 @@
 ### Mobile (Expo)
 
 - [ ] M601 [P] [US6] 方案/付費牆頁：apps/mobile/src/features/subscription（顯示 free/premium 差異與升級入口）
-- [ ] M602 [P] [US6] Android Google Play Billing 整合：apps/mobile/src/features/subscription/billing（購買/續訂/恢復購買）
-- [ ] M603 [P] [US6] 收據驗證串接：apps/mobile/src/features/subscription/api（POST /api/v1/subscriptions/verify-receipt；以更新後的 OpenAPI snapshot 作為驗證/對齊基準）
+- [ ] M602 [P] [US6] Android Google Play Billing 整合：apps/mobile/src/features/subscription/billing（採用 Expo Dev Build；Expo Go 不支援；建議使用 react-native-iap；購買/續訂/恢復購買）
+- [ ] M603 [P] [US6] 收據驗證串接：apps/mobile/src/features/subscription/api（購買回呼取得 purchase_token 後，必須呼叫 POST /api/v1/subscriptions/verify-receipt；以後端回傳 entitlement_active 作為「購買成功」判準；以更新後的 OpenAPI snapshot 作為驗證/對齊基準）
 - [ ] M604 [US6] 訂閱狀態顯示與降級提示：apps/mobile/src/features/subscription/screens/SubscriptionStatusScreen.tsx
+- [ ] M605 [P] [US6] Restore 購買流程：App 端 query 既有購買 → 逐一呼叫 verify-receipt → 以 status/entitlement 更新 UI（不新增 restore API）
 
 ---
 
