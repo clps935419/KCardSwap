@@ -1,6 +1,7 @@
 import { ScrollView, Alert } from 'react-native';
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'expo-router';
 import { useAuthStore } from '@/src/shared/state/authStore';
 import {
   getMyProfileOptions,
@@ -20,15 +21,21 @@ import {
   InputField,
   Spinner,
   Switch,
+  Pressable,
 } from '@/src/shared/ui/components';
+import { useSubscriptionStatus } from '@/src/features/subscription';
 
 export default function ProfileScreen() {
   const queryClient = useQueryClient();
+  const router = useRouter();
   const { user, logout } = useAuthStore();
   
   // Use TanStack Query for fetching profile
   const { data: profileData, isLoading, error } = useQuery(getMyProfileOptions());
   const profile = profileData?.data;
+  
+  // Get subscription status
+  const { subscription, isPremium } = useSubscriptionStatus();
   
   // Use TanStack Query mutation for updating profile
   const updateProfile = useMutation({
@@ -165,6 +172,37 @@ export default function ProfileScreen() {
             <Text size="sm" className="text-gray-600">{user.email}</Text>
           )}
         </Box>
+
+        {/* Subscription Card */}
+        <Pressable
+          onPress={() => router.push('/subscription')}
+          className="mb-6 p-4 rounded-lg border-2"
+          style={{
+            borderColor: isPremium ? '#3b82f6' : '#d1d5db',
+            backgroundColor: isPremium ? '#eff6ff' : '#f9fafb',
+          }}
+        >
+          <Box className="flex-row justify-between items-center">
+            <Box className="flex-1">
+              <Text className="text-lg font-bold mb-1">
+                {isPremium ? '✨ 付費方案' : '📦 免費方案'}
+              </Text>
+              {isPremium && subscription?.expires_at && (
+                <Text size="sm" className="text-gray-600">
+                  到期日: {new Date(subscription.expires_at).toLocaleDateString('zh-TW')}
+                </Text>
+              )}
+              {!isPremium && (
+                <Text size="sm" className="text-gray-600">
+                  升級享受無限上傳與搜尋
+                </Text>
+              )}
+            </Box>
+            <Box className="ml-4">
+              <Text size="lg">→</Text>
+            </Box>
+          </Box>
+        </Pressable>
 
         {/* Profile Form */}
         <Box className="mb-6">

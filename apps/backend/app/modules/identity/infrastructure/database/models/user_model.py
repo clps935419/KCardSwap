@@ -41,3 +41,9 @@ class UserModel(Base):
         back_populates="user",
         cascade="all, delete-orphan",
     )
+    subscription = relationship(
+        "SubscriptionModel",
+        back_populates="user",
+        uselist=False,
+        cascade="all, delete-orphan",
+    )

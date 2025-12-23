@@ -242,7 +242,27 @@ export type ErrorWrapper = {
    * Data
    */
   data?: null;
-  error: AppModulesIdentityPresentationSchemasAuthSchemasErrorResponse;
+  error: AppModulesIdentityPresentationSchemasProfileSchemasErrorResponse;
+};
+
+/**
+ * ExpireSubscriptionsResponse
+ *
+ * Response schema for expire subscriptions job
+ */
+export type ExpireSubscriptionsResponse = {
+  /**
+   * Expired Count
+   *
+   * Number of subscriptions expired
+   */
+  expired_count: number;
+  /**
+   * Processed At
+   *
+   * Processing timestamp (ISO format)
+   */
+  processed_at: string;
 };
 
 /**
@@ -552,7 +572,7 @@ export type ProfileErrorWrapper = {
    * Data
    */
   data?: null;
-  error: AppModulesIdentityPresentationSchemasAuthSchemasErrorResponse;
+  error: AppModulesIdentityPresentationSchemasProfileSchemasErrorResponse;
 };
 
 /**
@@ -989,6 +1009,44 @@ export type SendMessageRequest = {
 };
 
 /**
+ * SubscriptionStatusResponse
+ *
+ * Response schema for subscription status
+ */
+export type SubscriptionStatusResponse = {
+  /**
+   * Plan
+   *
+   * Subscription plan: 'free' or 'premium'
+   */
+  plan: string;
+  /**
+   * Status
+   *
+   * Subscription status: 'active', 'inactive', 'expired', 'pending'
+   */
+  status: string;
+  /**
+   * Expires At
+   *
+   * Expiry datetime (ISO format)
+   */
+  expires_at?: string | null;
+  /**
+   * Entitlement Active
+   *
+   * Whether user has active premium entitlement
+   */
+  entitlement_active: boolean;
+  /**
+   * Source
+   *
+   * Subscription source: 'google_play'
+   */
+  source: string;
+};
+
+/**
  * TokenResponse
  *
  * Response schema for authentication tokens
@@ -1371,11 +1429,37 @@ export type ValidationError = {
 };
 
 /**
+ * VerifyReceiptRequest
+ *
+ * Request schema for verifying purchase receipt
+ */
+export type VerifyReceiptRequest = {
+  /**
+   * Platform
+   *
+   * Platform: 'android' or 'ios'
+   */
+  platform: string;
+  /**
+   * Purchase Token
+   *
+   * Purchase token from Google Play
+   */
+  purchase_token: string;
+  /**
+   * Product Id
+   *
+   * Product/SKU ID
+   */
+  product_id: string;
+};
+
+/**
  * ErrorResponse
  *
  * Error response schema
  */
-export type AppModulesIdentityPresentationSchemasAuthSchemasErrorResponse = {
+export type AppModulesIdentityPresentationSchemasProfileSchemasErrorResponse = {
   /**
    * Code
    *
@@ -2606,3 +2690,64 @@ export type GetTradeHistoryApiV1TradesHistoryGetResponses = {
 
 export type GetTradeHistoryApiV1TradesHistoryGetResponse =
   GetTradeHistoryApiV1TradesHistoryGetResponses[keyof GetTradeHistoryApiV1TradesHistoryGetResponses];
+
+export type VerifyReceiptApiV1SubscriptionsVerifyReceiptPostData = {
+  body: VerifyReceiptRequest;
+  path?: never;
+  query?: never;
+  url: '/api/v1/subscriptions/verify-receipt';
+};
+
+export type VerifyReceiptApiV1SubscriptionsVerifyReceiptPostErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type VerifyReceiptApiV1SubscriptionsVerifyReceiptPostError =
+  VerifyReceiptApiV1SubscriptionsVerifyReceiptPostErrors[keyof VerifyReceiptApiV1SubscriptionsVerifyReceiptPostErrors];
+
+export type VerifyReceiptApiV1SubscriptionsVerifyReceiptPostResponses = {
+  /**
+   * Successful Response
+   */
+  200: SubscriptionStatusResponse;
+};
+
+export type VerifyReceiptApiV1SubscriptionsVerifyReceiptPostResponse =
+  VerifyReceiptApiV1SubscriptionsVerifyReceiptPostResponses[keyof VerifyReceiptApiV1SubscriptionsVerifyReceiptPostResponses];
+
+export type GetSubscriptionStatusApiV1SubscriptionsStatusGetData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/v1/subscriptions/status';
+};
+
+export type GetSubscriptionStatusApiV1SubscriptionsStatusGetResponses = {
+  /**
+   * Successful Response
+   */
+  200: SubscriptionStatusResponse;
+};
+
+export type GetSubscriptionStatusApiV1SubscriptionsStatusGetResponse =
+  GetSubscriptionStatusApiV1SubscriptionsStatusGetResponses[keyof GetSubscriptionStatusApiV1SubscriptionsStatusGetResponses];
+
+export type ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/v1/subscriptions/expire-subscriptions';
+};
+
+export type ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostResponses = {
+  /**
+   * Successful Response
+   */
+  200: ExpireSubscriptionsResponse;
+};
+
+export type ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostResponse =
+  ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostResponses[keyof ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostResponses];

@@ -152,6 +152,13 @@ def create_application() -> FastAPI:
 
     app.include_router(trade_router, prefix=settings.API_PREFIX)
 
+    # Phase 8: Identity module (Subscription)
+    from .modules.identity.presentation.routers.subscription_router import (
+        router as subscription_router,
+    )
+
+    app.include_router(subscription_router, prefix=settings.API_PREFIX)
+
     return app
 
 

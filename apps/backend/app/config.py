@@ -57,6 +57,12 @@ class Config:
         os.getenv("TRADE_CONFIRMATION_TIMEOUT_HOURS", "48")
     )
 
+    # Google Play Billing (Subscription)
+    GOOGLE_PLAY_PACKAGE_NAME: str = os.getenv("GOOGLE_PLAY_PACKAGE_NAME", "")
+    GOOGLE_PLAY_SERVICE_ACCOUNT_KEY_PATH: str | None = os.getenv(
+        "GOOGLE_PLAY_SERVICE_ACCOUNT_KEY_PATH"
+    )
+
     # API
     API_VERSION: str = "v1"
     API_PREFIX: str = f"/api/{API_VERSION}"
@@ -78,3 +84,8 @@ settings = Config()
 
 # For backward compatibility
 config = settings
+
+
+def get_settings() -> Config:
+    """Get the global settings instance."""
+    return settings
