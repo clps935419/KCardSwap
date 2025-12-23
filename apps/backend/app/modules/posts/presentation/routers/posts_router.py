@@ -118,12 +118,12 @@ async def create_post(
     description="List all open posts for a specific city with optional filters",
 )
 async def list_posts(
-    city_code: Annotated[str, Query(..., description="City code (required)")],
-    idol: Annotated[Optional[str], Query(None, description="Filter by idol name")] = None,
-    idol_group: Annotated[Optional[str], Query(None, description="Filter by idol group")] = None,
-    limit: Annotated[int, Query(50, ge=1, le=100, description="Maximum results")] = 50,
-    offset: Annotated[int, Query(0, ge=0, description="Pagination offset")] = 0,
-    session: Annotated[AsyncSession, Depends(get_db_session)] = Depends(get_db_session),
+    city_code: Annotated[str, Query(description="City code (required)")],
+    session: Annotated[AsyncSession, Depends(get_db_session)],
+    idol: Annotated[Optional[str], Query(description="Filter by idol name")] = None,
+    idol_group: Annotated[Optional[str], Query(description="Filter by idol group")] = None,
+    limit: Annotated[int, Query(ge=1, le=100, description="Maximum results")] = 50,
+    offset: Annotated[int, Query(ge=0, description="Pagination offset")] = 0,
 ) -> PostListResponse:
     """
     List posts for a city board.

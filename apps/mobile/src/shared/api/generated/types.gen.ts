@@ -5,6 +5,32 @@ export type ClientOptions = {
 };
 
 /**
+ * AcceptInterestResponse
+ *
+ * Response schema for accepting an interest
+ */
+export type AcceptInterestResponse = {
+  /**
+   * Interest Id
+   *
+   * Interest ID
+   */
+  interest_id: string;
+  /**
+   * Friendship Created
+   *
+   * Whether a new friendship was created
+   */
+  friendship_created: boolean;
+  /**
+   * Chat Room Id
+   *
+   * Chat room ID for conversation
+   */
+  chat_room_id: string;
+};
+
+/**
  * AdminLoginRequest
  *
  * Request schema for admin login with email/password
@@ -204,6 +230,50 @@ export type ChatRoomResponse = {
    * Creation timestamp
    */
   created_at: string;
+};
+
+/**
+ * CreatePostRequest
+ *
+ * Request schema for creating a post
+ */
+export type CreatePostRequest = {
+  /**
+   * City Code
+   *
+   * City code (e.g., 'TPE')
+   */
+  city_code: string;
+  /**
+   * Title
+   *
+   * Post title
+   */
+  title: string;
+  /**
+   * Content
+   *
+   * Post content
+   */
+  content: string;
+  /**
+   * Idol
+   *
+   * Idol name for filtering
+   */
+  idol?: string | null;
+  /**
+   * Idol Group
+   *
+   * Idol group for filtering
+   */
+  idol_group?: string | null;
+  /**
+   * Expires At
+   *
+   * Expiry datetime (defaults to 14 days from now)
+   */
+  expires_at?: string | null;
 };
 
 /**
@@ -560,6 +630,144 @@ export type NearbyCardResponse = {
    * Owner's nickname
    */
   owner_nickname?: string | null;
+};
+
+/**
+ * PostInterestResponse
+ *
+ * Response schema for post interest details
+ */
+export type PostInterestResponse = {
+  /**
+   * Id
+   *
+   * Interest ID
+   */
+  id: string;
+  /**
+   * Post Id
+   *
+   * Post ID
+   */
+  post_id: string;
+  /**
+   * User Id
+   *
+   * User ID who expressed interest
+   */
+  user_id: string;
+  /**
+   * Status
+   *
+   * Interest status
+   */
+  status: string;
+  /**
+   * Created At
+   *
+   * Creation timestamp
+   */
+  created_at: string;
+  /**
+   * Updated At
+   *
+   * Last update timestamp
+   */
+  updated_at: string;
+};
+
+/**
+ * PostListResponse
+ *
+ * Response schema for post list
+ */
+export type PostListResponse = {
+  /**
+   * Posts
+   *
+   * List of posts
+   */
+  posts: PostResponse[];
+  /**
+   * Total
+   *
+   * Total number of posts
+   */
+  total: number;
+};
+
+/**
+ * PostResponse
+ *
+ * Response schema for post details
+ */
+export type PostResponse = {
+  /**
+   * Id
+   *
+   * Post ID
+   */
+  id: string;
+  /**
+   * Owner Id
+   *
+   * Owner user ID
+   */
+  owner_id: string;
+  /**
+   * City Code
+   *
+   * City code
+   */
+  city_code: string;
+  /**
+   * Title
+   *
+   * Post title
+   */
+  title: string;
+  /**
+   * Content
+   *
+   * Post content
+   */
+  content: string;
+  /**
+   * Idol
+   *
+   * Idol name
+   */
+  idol?: string | null;
+  /**
+   * Idol Group
+   *
+   * Idol group
+   */
+  idol_group?: string | null;
+  /**
+   * Status
+   *
+   * Post status
+   */
+  status: string;
+  /**
+   * Expires At
+   *
+   * Expiry datetime
+   */
+  expires_at: string;
+  /**
+   * Created At
+   *
+   * Creation timestamp
+   */
+  created_at: string;
+  /**
+   * Updated At
+   *
+   * Last update timestamp
+   */
+  updated_at: string;
 };
 
 /**
@@ -2751,3 +2959,289 @@ export type ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostResponse
 
 export type ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostResponse =
   ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostResponses[keyof ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostResponses];
+
+export type ListPostsApiV1PostsGetData = {
+  body?: never;
+  path?: never;
+  query: {
+    /**
+     * City Code
+     *
+     * City code (required)
+     */
+    city_code: string;
+    /**
+     * Idol
+     *
+     * Filter by idol name
+     */
+    idol?: string | null;
+    /**
+     * Idol Group
+     *
+     * Filter by idol group
+     */
+    idol_group?: string | null;
+    /**
+     * Limit
+     *
+     * Maximum results
+     */
+    limit?: number;
+    /**
+     * Offset
+     *
+     * Pagination offset
+     */
+    offset?: number;
+  };
+  url: '/api/v1/posts';
+};
+
+export type ListPostsApiV1PostsGetErrors = {
+  /**
+   * Bad request (city_code required)
+   */
+  400: unknown;
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+  /**
+   * Internal server error
+   */
+  500: unknown;
+};
+
+export type ListPostsApiV1PostsGetError =
+  ListPostsApiV1PostsGetErrors[keyof ListPostsApiV1PostsGetErrors];
+
+export type ListPostsApiV1PostsGetResponses = {
+  /**
+   * Posts retrieved successfully
+   */
+  200: PostListResponse;
+};
+
+export type ListPostsApiV1PostsGetResponse =
+  ListPostsApiV1PostsGetResponses[keyof ListPostsApiV1PostsGetResponses];
+
+export type CreatePostApiV1PostsPostData = {
+  body: CreatePostRequest;
+  path?: never;
+  query?: never;
+  url: '/api/v1/posts';
+};
+
+export type CreatePostApiV1PostsPostErrors = {
+  /**
+   * Bad request (validation failed)
+   */
+  400: unknown;
+  /**
+   * Unauthorized (not logged in)
+   */
+  401: unknown;
+  /**
+   * Unprocessable entity (daily limit exceeded or validation failed)
+   */
+  422: unknown;
+  /**
+   * Internal server error
+   */
+  500: unknown;
+};
+
+export type CreatePostApiV1PostsPostResponses = {
+  /**
+   * Post created successfully
+   */
+  201: PostResponse;
+};
+
+export type CreatePostApiV1PostsPostResponse =
+  CreatePostApiV1PostsPostResponses[keyof CreatePostApiV1PostsPostResponses];
+
+export type ExpressInterestApiV1PostsPostIdInterestPostData = {
+  body?: never;
+  path: {
+    /**
+     * Post Id
+     */
+    post_id: string;
+  };
+  query?: never;
+  url: '/api/v1/posts/{post_id}/interest';
+};
+
+export type ExpressInterestApiV1PostsPostIdInterestPostErrors = {
+  /**
+   * Unauthorized (not logged in)
+   */
+  401: unknown;
+  /**
+   * Post not found
+   */
+  404: unknown;
+  /**
+   * Unprocessable entity (validation failed)
+   */
+  422: unknown;
+  /**
+   * Internal server error
+   */
+  500: unknown;
+};
+
+export type ExpressInterestApiV1PostsPostIdInterestPostResponses = {
+  /**
+   * Interest expressed successfully
+   */
+  201: PostInterestResponse;
+};
+
+export type ExpressInterestApiV1PostsPostIdInterestPostResponse =
+  ExpressInterestApiV1PostsPostIdInterestPostResponses[keyof ExpressInterestApiV1PostsPostIdInterestPostResponses];
+
+export type AcceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostData = {
+  body?: never;
+  path: {
+    /**
+     * Post Id
+     */
+    post_id: string;
+    /**
+     * Interest Id
+     */
+    interest_id: string;
+  };
+  query?: never;
+  url: '/api/v1/posts/{post_id}/interests/{interest_id}/accept';
+};
+
+export type AcceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostErrors = {
+  /**
+   * Unauthorized (not logged in)
+   */
+  401: unknown;
+  /**
+   * Forbidden (not post owner)
+   */
+  403: unknown;
+  /**
+   * Post or interest not found
+   */
+  404: unknown;
+  /**
+   * Unprocessable entity (validation failed)
+   */
+  422: unknown;
+  /**
+   * Internal server error
+   */
+  500: unknown;
+};
+
+export type AcceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostResponses = {
+  /**
+   * Interest accepted successfully
+   */
+  200: AcceptInterestResponse;
+};
+
+export type AcceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostResponse =
+  AcceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostResponses[keyof AcceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostResponses];
+
+export type RejectInterestApiV1PostsPostIdInterestsInterestIdRejectPostData = {
+  body?: never;
+  path: {
+    /**
+     * Post Id
+     */
+    post_id: string;
+    /**
+     * Interest Id
+     */
+    interest_id: string;
+  };
+  query?: never;
+  url: '/api/v1/posts/{post_id}/interests/{interest_id}/reject';
+};
+
+export type RejectInterestApiV1PostsPostIdInterestsInterestIdRejectPostErrors = {
+  /**
+   * Unauthorized (not logged in)
+   */
+  401: unknown;
+  /**
+   * Forbidden (not post owner)
+   */
+  403: unknown;
+  /**
+   * Post or interest not found
+   */
+  404: unknown;
+  /**
+   * Unprocessable entity (validation failed)
+   */
+  422: unknown;
+  /**
+   * Internal server error
+   */
+  500: unknown;
+};
+
+export type RejectInterestApiV1PostsPostIdInterestsInterestIdRejectPostResponses = {
+  /**
+   * Interest rejected successfully
+   */
+  204: void;
+};
+
+export type RejectInterestApiV1PostsPostIdInterestsInterestIdRejectPostResponse =
+  RejectInterestApiV1PostsPostIdInterestsInterestIdRejectPostResponses[keyof RejectInterestApiV1PostsPostIdInterestsInterestIdRejectPostResponses];
+
+export type ClosePostApiV1PostsPostIdClosePostData = {
+  body?: never;
+  path: {
+    /**
+     * Post Id
+     */
+    post_id: string;
+  };
+  query?: never;
+  url: '/api/v1/posts/{post_id}/close';
+};
+
+export type ClosePostApiV1PostsPostIdClosePostErrors = {
+  /**
+   * Unauthorized (not logged in)
+   */
+  401: unknown;
+  /**
+   * Forbidden (not post owner)
+   */
+  403: unknown;
+  /**
+   * Post not found
+   */
+  404: unknown;
+  /**
+   * Unprocessable entity (post not open)
+   */
+  422: unknown;
+  /**
+   * Internal server error
+   */
+  500: unknown;
+};
+
+export type ClosePostApiV1PostsPostIdClosePostResponses = {
+  /**
+   * Post closed successfully
+   */
+  204: void;
+};
+
+export type ClosePostApiV1PostsPostIdClosePostResponse =
+  ClosePostApiV1PostsPostIdClosePostResponses[keyof ClosePostApiV1PostsPostIdClosePostResponses];

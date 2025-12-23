@@ -1862,10 +1862,424 @@
           }
         }
       }
+    },
+    "/api/v1/posts": {
+      "post": {
+        "tags": [
+          "Posts"
+        ],
+        "summary": "Create a new city board post",
+        "description": "Create a new post on a city board. Free users limited to 2 posts per day.",
+        "operationId": "create_post_api_v1_posts_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePostRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Post created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (validation failed)"
+          },
+          "401": {
+            "description": "Unauthorized (not logged in)"
+          },
+          "422": {
+            "description": "Unprocessable entity (daily limit exceeded or validation failed)"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Posts"
+        ],
+        "summary": "List posts on a city board",
+        "description": "List all open posts for a specific city with optional filters",
+        "operationId": "list_posts_api_v1_posts_get",
+        "parameters": [
+          {
+            "name": "city_code",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "City code (required)",
+              "title": "City Code"
+            },
+            "description": "City code (required)"
+          },
+          {
+            "name": "idol",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by idol name",
+              "title": "Idol"
+            },
+            "description": "Filter by idol name"
+          },
+          {
+            "name": "idol_group",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by idol group",
+              "title": "Idol Group"
+            },
+            "description": "Filter by idol group"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Maximum results",
+              "default": 50,
+              "title": "Limit"
+            },
+            "description": "Maximum results"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Pagination offset",
+              "default": 0,
+              "title": "Offset"
+            },
+            "description": "Pagination offset"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Posts retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (city_code required)"
+          },
+          "500": {
+            "description": "Internal server error"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/posts/{post_id}/interest": {
+      "post": {
+        "tags": [
+          "Posts"
+        ],
+        "summary": "Express interest in a post",
+        "description": "Express interest in a post. Cannot express interest in your own post or duplicate interests.",
+        "operationId": "express_interest_api_v1_posts__post_id__interest_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "post_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Post Id"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Interest expressed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostInterestResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (not logged in)"
+          },
+          "404": {
+            "description": "Post not found"
+          },
+          "422": {
+            "description": "Unprocessable entity (validation failed)"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/posts/{post_id}/interests/{interest_id}/accept": {
+      "post": {
+        "tags": [
+          "Posts"
+        ],
+        "summary": "Accept an interest",
+        "description": "Accept an interest. Automatically creates friendship and chat room.",
+        "operationId": "accept_interest_api_v1_posts__post_id__interests__interest_id__accept_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "post_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Post Id"
+            }
+          },
+          {
+            "name": "interest_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Interest Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Interest accepted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptInterestResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (not logged in)"
+          },
+          "403": {
+            "description": "Forbidden (not post owner)"
+          },
+          "404": {
+            "description": "Post or interest not found"
+          },
+          "422": {
+            "description": "Unprocessable entity (validation failed)"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/posts/{post_id}/interests/{interest_id}/reject": {
+      "post": {
+        "tags": [
+          "Posts"
+        ],
+        "summary": "Reject an interest",
+        "description": "Reject an interest. Only post owner can reject.",
+        "operationId": "reject_interest_api_v1_posts__post_id__interests__interest_id__reject_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "post_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Post Id"
+            }
+          },
+          {
+            "name": "interest_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Interest Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Interest rejected successfully"
+          },
+          "401": {
+            "description": "Unauthorized (not logged in)"
+          },
+          "403": {
+            "description": "Forbidden (not post owner)"
+          },
+          "404": {
+            "description": "Post or interest not found"
+          },
+          "422": {
+            "description": "Unprocessable entity (validation failed)"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/posts/{post_id}/close": {
+      "post": {
+        "tags": [
+          "Posts"
+        ],
+        "summary": "Close a post",
+        "description": "Manually close a post. Only post owner can close.",
+        "operationId": "close_post_api_v1_posts__post_id__close_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "post_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Post Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Post closed successfully"
+          },
+          "401": {
+            "description": "Unauthorized (not logged in)"
+          },
+          "403": {
+            "description": "Forbidden (not post owner)"
+          },
+          "404": {
+            "description": "Post not found"
+          },
+          "422": {
+            "description": "Unprocessable entity (post not open)"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "AcceptInterestResponse": {
+        "properties": {
+          "interest_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Interest Id",
+            "description": "Interest ID"
+          },
+          "friendship_created": {
+            "type": "boolean",
+            "title": "Friendship Created",
+            "description": "Whether a new friendship was created"
+          },
+          "chat_room_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Chat Room Id",
+            "description": "Chat room ID for conversation"
+          }
+        },
+        "type": "object",
+        "required": [
+          "interest_id",
+          "friendship_created",
+          "chat_room_id"
+        ],
+        "title": "AcceptInterestResponse",
+        "description": "Response schema for accepting an interest",
+        "example": {
+          "chat_room_id": "987e6543-e21b-12d3-a456-426614174000",
+          "friendship_created": true,
+          "interest_id": "123e4567-e89b-12d3-a456-426614174000"
+        }
+      },
       "AdminLoginRequest": {
         "properties": {
           "email": {
@@ -2200,6 +2614,96 @@
             }
           ],
           "unread_count": 0
+        }
+      },
+      "CreatePostRequest": {
+        "properties": {
+          "city_code": {
+            "type": "string",
+            "maxLength": 20,
+            "title": "City Code",
+            "description": "City code (e.g., 'TPE')",
+            "examples": [
+              "TPE"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 120,
+            "title": "Title",
+            "description": "Post title",
+            "examples": [
+              "Looking for BTS cards in Taipei"
+            ]
+          },
+          "content": {
+            "type": "string",
+            "title": "Content",
+            "description": "Post content",
+            "examples": [
+              "I have Jungkook cards and looking for V cards"
+            ]
+          },
+          "idol": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Idol",
+            "description": "Idol name for filtering",
+            "examples": [
+              "Jungkook"
+            ]
+          },
+          "idol_group": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Idol Group",
+            "description": "Idol group for filtering",
+            "examples": [
+              "BTS"
+            ]
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At",
+            "description": "Expiry datetime (defaults to 14 days from now)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "city_code",
+          "title",
+          "content"
+        ],
+        "title": "CreatePostRequest",
+        "description": "Request schema for creating a post",
+        "example": {
+          "city_code": "TPE",
+          "content": "I have Jungkook cards and looking for V cards",
+          "idol": "Jungkook",
+          "idol_group": "BTS",
+          "title": "Looking for BTS cards in Taipei"
         }
       },
       "CreateTradeRequest": {
@@ -2765,6 +3269,222 @@
           "owner_nickname": "CardCollector123",
           "rarity": "rare",
           "version": "Standard"
+        }
+      },
+      "PostInterestResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id",
+            "description": "Interest ID"
+          },
+          "post_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Post Id",
+            "description": "Post ID"
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "User Id",
+            "description": "User ID who expressed interest"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "description": "Interest status",
+            "examples": [
+              "pending",
+              "accepted",
+              "rejected"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At",
+            "description": "Creation timestamp"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At",
+            "description": "Last update timestamp"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "post_id",
+          "user_id",
+          "status",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "PostInterestResponse",
+        "description": "Response schema for post interest details",
+        "example": {
+          "created_at": "2024-01-01T00:00:00Z",
+          "id": "123e4567-e89b-12d3-a456-426614174000",
+          "post_id": "987e6543-e21b-12d3-a456-426614174000",
+          "status": "pending",
+          "updated_at": "2024-01-01T00:00:00Z",
+          "user_id": "456e7890-e12b-34d5-a678-901234567000"
+        }
+      },
+      "PostListResponse": {
+        "properties": {
+          "posts": {
+            "items": {
+              "$ref": "#/components/schemas/PostResponse"
+            },
+            "type": "array",
+            "title": "Posts",
+            "description": "List of posts"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total",
+            "description": "Total number of posts"
+          }
+        },
+        "type": "object",
+        "required": [
+          "posts",
+          "total"
+        ],
+        "title": "PostListResponse",
+        "description": "Response schema for post list",
+        "example": {
+          "posts": [
+            {
+              "city_code": "TPE",
+              "content": "I have Jungkook cards",
+              "created_at": "2024-01-01T00:00:00Z",
+              "expires_at": "2024-02-01T00:00:00Z",
+              "id": "123e4567-e89b-12d3-a456-426614174000",
+              "idol": "Jungkook",
+              "idol_group": "BTS",
+              "owner_id": "987e6543-e21b-12d3-a456-426614174000",
+              "status": "open",
+              "title": "Looking for BTS cards",
+              "updated_at": "2024-01-01T00:00:00Z"
+            }
+          ],
+          "total": 1
+        }
+      },
+      "PostResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id",
+            "description": "Post ID"
+          },
+          "owner_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Owner Id",
+            "description": "Owner user ID"
+          },
+          "city_code": {
+            "type": "string",
+            "title": "City Code",
+            "description": "City code"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title",
+            "description": "Post title"
+          },
+          "content": {
+            "type": "string",
+            "title": "Content",
+            "description": "Post content"
+          },
+          "idol": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Idol",
+            "description": "Idol name"
+          },
+          "idol_group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Idol Group",
+            "description": "Idol group"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "description": "Post status",
+            "examples": [
+              "open",
+              "closed",
+              "expired",
+              "deleted"
+            ]
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Expires At",
+            "description": "Expiry datetime"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At",
+            "description": "Creation timestamp"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At",
+            "description": "Last update timestamp"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "owner_id",
+          "city_code",
+          "title",
+          "content",
+          "status",
+          "expires_at",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "PostResponse",
+        "description": "Response schema for post details",
+        "example": {
+          "city_code": "TPE",
+          "content": "I have Jungkook cards and looking for V cards",
+          "created_at": "2024-01-01T00:00:00Z",
+          "expires_at": "2024-02-01T00:00:00Z",
+          "id": "123e4567-e89b-12d3-a456-426614174000",
+          "idol": "Jungkook",
+          "idol_group": "BTS",
+          "owner_id": "987e6543-e21b-12d3-a456-426614174000",
+          "status": "open",
+          "title": "Looking for BTS cards in Taipei",
+          "updated_at": "2024-01-01T00:00:00Z"
         }
       },
       "ProfileErrorWrapper": {

@@ -1,24 +1,24 @@
 /**
  * Posts Hooks
- * React Query hooks for posts management
+ * React Query hooks for posts management using generated SDK
  */
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  listPostsApiV1PostsGet,
+  createPostApiV1PostsPost,
+  expressInterestApiV1PostsPostIdInterestPost,
+  acceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPost,
+  rejectInterestApiV1PostsPostIdInterestsInterestIdRejectPost,
+  closePostApiV1PostsPostIdClosePost,
+} from '@/src/shared/api/sdk';
 import type {
   Post,
   PostInterest,
   CreatePostRequest,
+  PostListResponse,
   AcceptInterestResponse,
 } from '../types';
-import {
-  createPost,
-  fetchBoardPosts,
-  expressInterest,
-  acceptInterest,
-  rejectInterest,
-  closePost,
-  fetchPostInterests,
-} from '../api';
 
 // Query keys
 export const postsKeys = {
@@ -42,8 +42,17 @@ export function useBoardPosts(params: {
       idol: params.idol,
       idol_group: params.idol_group,
     }),
-    queryFn: () => fetchBoardPosts(params),
-    enabled: !!params.city_code, // 只有當 city_code 存在時才執行
+    queryFn: async () => {
+      const response = await listPostsApiV1PostsGet({
+        query: {
+          city_code: params.city_code,
+          idol: params.idol,
+          idol_group: params.idol_group,
+        },
+      });
+      return response.data as PostListResponse;
+    },
+    enabled: !!params.city_code,
     staleTime: 1000 * 60 * 2, // 2 分鐘內不重新請求
   });
 }
@@ -56,7 +65,12 @@ export function useCreatePost() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: CreatePostRequest) => createPost(data),
+    mutationFn: async (data: CreatePostRequest) => {
+      const response = await createPostApiV1PostsPost({
+        body: data,
+      });
+      return response.data as Post;
+    },
     onSuccess: (newPost) => {
       // 使該城市的看板列表失效，強制重新載入
       queryClient.invalidateQueries({
@@ -74,7 +88,12 @@ export function useExpressInterest() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (postId: string) => expressInterest(postId),
+    mutationFn: async (postId: string) => {
+      const response = await expressInterestApiV1PostsPostIdInterestPost({
+        path: { post_id: postId },
+      });
+      return response.data as PostInterest;
+    },
     onSuccess: (_, postId) => {
       // 使該貼文的興趣清單失效
       queryClient.invalidateQueries({
@@ -92,8 +111,12 @@ export function useAcceptInterest() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ postId, interestId }: { postId: string; interestId: string }) =>
-      acceptInterest(postId, interestId),
+    mutationFn: async ({ postId, interestId }: { postId: string; interestId: string }) => {
+      const response = await acceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPost({
+        path: { post_id: postId, interest_id: interestId },
+      });
+      return response.data as AcceptInterestResponse;
+    },
     onSuccess: (_, { postId }) => {
       // 使該貼文的興趣清單失效
       queryClient.invalidateQueries({
@@ -119,8 +142,12 @@ export function useRejectInterest() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ postId, interestId }: { postId: string; interestId: string }) =>
-      rejectInterest(postId, interestId),
+    mutationFn: async ({ postId, interestId }: { postId: string; interestId: string }) => {
+      const response = await rejectInterestApiV1PostsPostIdInterestsInterestIdRejectPost({
+        path: { post_id: postId, interest_id: interestId },
+      });
+      return response.data;
+    },
     onSuccess: (_, { postId }) => {
       // 使該貼文的興趣清單失效
       queryClient.invalidateQueries({
@@ -137,7 +164,12 @@ export function useClosePost() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (postId: string) => closePost(postId),
+    mutationFn: async (postId: string) => {
+      const response = await closePostApiV1PostsPostIdClosePost({
+        path: { post_id: postId },
+      });
+      return response.data;
+    },
     onSuccess: () => {
       // 使所有看板列表失效
       queryClient.invalidateQueries({
@@ -150,11 +182,23 @@ export function useClosePost() {
 /**
  * Hook: 取得貼文的興趣清單
  * M704: 作者端興趣清單與接受導流
+ * 
+ * Note: 這個功能需要後端新增對應的 API endpoint
+ * GET /api/v1/posts/{id}/interests
  */
 export function usePostInterests(postId: string) {
   return useQuery({
     queryKey: postsKeys.interests(postId),
-    queryFn: () => fetchPostInterests(postId),
+    queryFn: async () => {
+      // TODO: 等待後端實作 GET /api/v1/posts/{id}/interests endpoint
+      // const response = await fetchPostInterestsApiV1PostsPostIdInterestsGet({
+      //   path: { post_id: postId },
+      // });
+      // return response.data as PostInterest[];
+      
+      // 暫時返回空陣列
+      return [] as PostInterest[];
+    },
     enabled: !!postId,
     staleTime: 1000 * 60, // 1 分鐘內不重新請求
   });

@@ -6,6 +6,9 @@ import type {
   AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostData,
   AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostErrors,
   AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostResponses,
+  AcceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostData,
+  AcceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostErrors,
+  AcceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostResponses,
   AcceptTradeApiV1TradesTradeIdAcceptPostData,
   AcceptTradeApiV1TradesTradeIdAcceptPostErrors,
   AcceptTradeApiV1TradesTradeIdAcceptPostResponses,
@@ -20,9 +23,15 @@ import type {
   CancelTradeApiV1TradesTradeIdCancelPostData,
   CancelTradeApiV1TradesTradeIdCancelPostErrors,
   CancelTradeApiV1TradesTradeIdCancelPostResponses,
+  ClosePostApiV1PostsPostIdClosePostData,
+  ClosePostApiV1PostsPostIdClosePostErrors,
+  ClosePostApiV1PostsPostIdClosePostResponses,
   CompleteTradeApiV1TradesTradeIdCompletePostData,
   CompleteTradeApiV1TradesTradeIdCompletePostErrors,
   CompleteTradeApiV1TradesTradeIdCompletePostResponses,
+  CreatePostApiV1PostsPostData,
+  CreatePostApiV1PostsPostErrors,
+  CreatePostApiV1PostsPostResponses,
   CreateTradeApiV1TradesPostData,
   CreateTradeApiV1TradesPostErrors,
   CreateTradeApiV1TradesPostResponses,
@@ -31,6 +40,9 @@ import type {
   DeleteCardApiV1CardsCardIdDeleteResponses,
   ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostData,
   ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostResponses,
+  ExpressInterestApiV1PostsPostIdInterestPostData,
+  ExpressInterestApiV1PostsPostIdInterestPostErrors,
+  ExpressInterestApiV1PostsPostIdInterestPostResponses,
   GetAverageRatingApiV1RatingsUserUserIdAverageGetData,
   GetAverageRatingApiV1RatingsUserUserIdAverageGetErrors,
   GetAverageRatingApiV1RatingsUserUserIdAverageGetResponses,
@@ -74,12 +86,18 @@ import type {
   GoogleLoginApiV1AuthGoogleLoginPostResponses,
   HealthCheckHealthGetData,
   HealthCheckHealthGetResponses,
+  ListPostsApiV1PostsGetData,
+  ListPostsApiV1PostsGetErrors,
+  ListPostsApiV1PostsGetResponses,
   MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostData,
   MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostErrors,
   MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostResponses,
   RefreshTokenApiV1AuthRefreshPostData,
   RefreshTokenApiV1AuthRefreshPostErrors,
   RefreshTokenApiV1AuthRefreshPostResponses,
+  RejectInterestApiV1PostsPostIdInterestsInterestIdRejectPostData,
+  RejectInterestApiV1PostsPostIdInterestsInterestIdRejectPostErrors,
+  RejectInterestApiV1PostsPostIdInterestsInterestIdRejectPostResponses,
   RejectTradeApiV1TradesTradeIdRejectPostData,
   RejectTradeApiV1TradesTradeIdRejectPostErrors,
   RejectTradeApiV1TradesTradeIdRejectPostResponses,
@@ -870,3 +888,115 @@ export const expireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPost = <
     unknown,
     ThrowOnError
   >({ url: '/api/v1/subscriptions/expire-subscriptions', ...options });
+
+/**
+ * List posts on a city board
+ *
+ * List all open posts for a specific city with optional filters
+ */
+export const listPostsApiV1PostsGet = <ThrowOnError extends boolean = false>(
+  options: Options<ListPostsApiV1PostsGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    ListPostsApiV1PostsGetResponses,
+    ListPostsApiV1PostsGetErrors,
+    ThrowOnError
+  >({ url: '/api/v1/posts', ...options });
+
+/**
+ * Create a new city board post
+ *
+ * Create a new post on a city board. Free users limited to 2 posts per day.
+ */
+export const createPostApiV1PostsPost = <ThrowOnError extends boolean = false>(
+  options: Options<CreatePostApiV1PostsPostData, ThrowOnError>
+) =>
+  (options.client ?? client).post<
+    CreatePostApiV1PostsPostResponses,
+    CreatePostApiV1PostsPostErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/posts',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Express interest in a post
+ *
+ * Express interest in a post. Cannot express interest in your own post or duplicate interests.
+ */
+export const expressInterestApiV1PostsPostIdInterestPost = <ThrowOnError extends boolean = false>(
+  options: Options<ExpressInterestApiV1PostsPostIdInterestPostData, ThrowOnError>
+) =>
+  (options.client ?? client).post<
+    ExpressInterestApiV1PostsPostIdInterestPostResponses,
+    ExpressInterestApiV1PostsPostIdInterestPostErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/posts/{post_id}/interest',
+    ...options,
+  });
+
+/**
+ * Accept an interest
+ *
+ * Accept an interest. Automatically creates friendship and chat room.
+ */
+export const acceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPost = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<AcceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostData, ThrowOnError>
+) =>
+  (options.client ?? client).post<
+    AcceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostResponses,
+    AcceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/posts/{post_id}/interests/{interest_id}/accept',
+    ...options,
+  });
+
+/**
+ * Reject an interest
+ *
+ * Reject an interest. Only post owner can reject.
+ */
+export const rejectInterestApiV1PostsPostIdInterestsInterestIdRejectPost = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<RejectInterestApiV1PostsPostIdInterestsInterestIdRejectPostData, ThrowOnError>
+) =>
+  (options.client ?? client).post<
+    RejectInterestApiV1PostsPostIdInterestsInterestIdRejectPostResponses,
+    RejectInterestApiV1PostsPostIdInterestsInterestIdRejectPostErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/posts/{post_id}/interests/{interest_id}/reject',
+    ...options,
+  });
+
+/**
+ * Close a post
+ *
+ * Manually close a post. Only post owner can close.
+ */
+export const closePostApiV1PostsPostIdClosePost = <ThrowOnError extends boolean = false>(
+  options: Options<ClosePostApiV1PostsPostIdClosePostData, ThrowOnError>
+) =>
+  (options.client ?? client).post<
+    ClosePostApiV1PostsPostIdClosePostResponses,
+    ClosePostApiV1PostsPostIdClosePostErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/posts/{post_id}/close',
+    ...options,
+  });
