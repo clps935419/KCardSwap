@@ -11,15 +11,19 @@ import {
 import { client } from '../client.gen';
 import {
   acceptFriendRequestApiV1FriendsFriendshipIdAcceptPost,
+  acceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPost,
   acceptTradeApiV1TradesTradeIdAcceptPost,
   adminLoginApiV1AuthAdminLoginPost,
   apiHealthCheckApiV1HealthGet,
   blockUserApiV1FriendsBlockPost,
   cancelTradeApiV1TradesTradeIdCancelPost,
+  closePostApiV1PostsPostIdClosePost,
   completeTradeApiV1TradesTradeIdCompletePost,
+  createPostApiV1PostsPost,
   createTradeApiV1TradesPost,
   deleteCardApiV1CardsCardIdDelete,
   expireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPost,
+  expressInterestApiV1PostsPostIdInterestPost,
   getAverageRatingApiV1RatingsUserUserIdAverageGet,
   getChatRoomsApiV1ChatsGet,
   getFriendsApiV1FriendsGet,
@@ -35,9 +39,11 @@ import {
   googleCallbackApiV1AuthGoogleCallbackPost,
   googleLoginApiV1AuthGoogleLoginPost,
   healthCheckHealthGet,
+  listPostsApiV1PostsGet,
   markMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPost,
   type Options,
   refreshTokenApiV1AuthRefreshPost,
+  rejectInterestApiV1PostsPostIdInterestsInterestIdRejectPost,
   rejectTradeApiV1TradesTradeIdRejectPost,
   rootGet,
   searchNearbyCardsApiV1NearbySearchPost,
@@ -52,6 +58,8 @@ import {
 import type {
   AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostData,
   AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostResponse,
+  AcceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostData,
+  AcceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostResponse,
   AcceptTradeApiV1TradesTradeIdAcceptPostData,
   AcceptTradeApiV1TradesTradeIdAcceptPostResponse,
   AdminLoginApiV1AuthAdminLoginPostData,
@@ -63,9 +71,13 @@ import type {
   CancelTradeApiV1TradesTradeIdCancelPostData,
   CancelTradeApiV1TradesTradeIdCancelPostError,
   CancelTradeApiV1TradesTradeIdCancelPostResponse,
+  ClosePostApiV1PostsPostIdClosePostData,
+  ClosePostApiV1PostsPostIdClosePostResponse,
   CompleteTradeApiV1TradesTradeIdCompletePostData,
   CompleteTradeApiV1TradesTradeIdCompletePostError,
   CompleteTradeApiV1TradesTradeIdCompletePostResponse,
+  CreatePostApiV1PostsPostData,
+  CreatePostApiV1PostsPostResponse,
   CreateTradeApiV1TradesPostData,
   CreateTradeApiV1TradesPostResponse,
   DeleteCardApiV1CardsCardIdDeleteData,
@@ -73,6 +85,8 @@ import type {
   DeleteCardApiV1CardsCardIdDeleteResponse,
   ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostData,
   ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostResponse,
+  ExpressInterestApiV1PostsPostIdInterestPostData,
+  ExpressInterestApiV1PostsPostIdInterestPostResponse,
   GetAverageRatingApiV1RatingsUserUserIdAverageGetData,
   GetAverageRatingApiV1RatingsUserUserIdAverageGetError,
   GetAverageRatingApiV1RatingsUserUserIdAverageGetResponse,
@@ -111,12 +125,17 @@ import type {
   GoogleLoginApiV1AuthGoogleLoginPostError,
   GoogleLoginApiV1AuthGoogleLoginPostResponse,
   HealthCheckHealthGetData,
+  ListPostsApiV1PostsGetData,
+  ListPostsApiV1PostsGetError,
+  ListPostsApiV1PostsGetResponse,
   MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostData,
   MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostError,
   MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostResponse,
   RefreshTokenApiV1AuthRefreshPostData,
   RefreshTokenApiV1AuthRefreshPostError,
   RefreshTokenApiV1AuthRefreshPostResponse,
+  RejectInterestApiV1PostsPostIdInterestsInterestIdRejectPostData,
+  RejectInterestApiV1PostsPostIdInterestsInterestIdRejectPostResponse,
   RejectTradeApiV1TradesTradeIdRejectPostData,
   RejectTradeApiV1TradesTradeIdRejectPostError,
   RejectTradeApiV1TradesTradeIdRejectPostResponse,
@@ -1357,6 +1376,227 @@ export const expireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostMutatio
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await expireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPost({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const listPostsApiV1PostsGetQueryKey = (options: Options<ListPostsApiV1PostsGetData>) =>
+  createQueryKey('listPostsApiV1PostsGet', options);
+
+/**
+ * List posts on a city board
+ *
+ * List all open posts for a specific city with optional filters
+ */
+export const listPostsApiV1PostsGetOptions = (options: Options<ListPostsApiV1PostsGetData>) =>
+  queryOptions<
+    ListPostsApiV1PostsGetResponse,
+    ListPostsApiV1PostsGetError,
+    ListPostsApiV1PostsGetResponse,
+    ReturnType<typeof listPostsApiV1PostsGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await listPostsApiV1PostsGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: listPostsApiV1PostsGetQueryKey(options),
+  });
+
+export const listPostsApiV1PostsGetInfiniteQueryKey = (
+  options: Options<ListPostsApiV1PostsGetData>
+): QueryKey<Options<ListPostsApiV1PostsGetData>> =>
+  createQueryKey('listPostsApiV1PostsGet', options, true);
+
+/**
+ * List posts on a city board
+ *
+ * List all open posts for a specific city with optional filters
+ */
+export const listPostsApiV1PostsGetInfiniteOptions = (
+  options: Options<ListPostsApiV1PostsGetData>
+) =>
+  infiniteQueryOptions<
+    ListPostsApiV1PostsGetResponse,
+    ListPostsApiV1PostsGetError,
+    InfiniteData<ListPostsApiV1PostsGetResponse>,
+    QueryKey<Options<ListPostsApiV1PostsGetData>>,
+    | number
+    | Pick<QueryKey<Options<ListPostsApiV1PostsGetData>>[0], 'body' | 'headers' | 'path' | 'query'>
+  >(
+    // @ts-ignore
+    {
+      queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<
+          QueryKey<Options<ListPostsApiV1PostsGetData>>[0],
+          'body' | 'headers' | 'path' | 'query'
+        > =
+          typeof pageParam === 'object'
+            ? pageParam
+            : {
+                query: {
+                  offset: pageParam,
+                },
+              };
+        const params = createInfiniteParams(queryKey, page);
+        const { data } = await listPostsApiV1PostsGet({
+          ...options,
+          ...params,
+          signal,
+          throwOnError: true,
+        });
+        return data;
+      },
+      queryKey: listPostsApiV1PostsGetInfiniteQueryKey(options),
+    }
+  );
+
+/**
+ * Create a new city board post
+ *
+ * Create a new post on a city board. Free users limited to 2 posts per day.
+ */
+export const createPostApiV1PostsPostMutation = (
+  options?: Partial<Options<CreatePostApiV1PostsPostData>>
+): UseMutationOptions<
+  CreatePostApiV1PostsPostResponse,
+  DefaultError,
+  Options<CreatePostApiV1PostsPostData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CreatePostApiV1PostsPostResponse,
+    DefaultError,
+    Options<CreatePostApiV1PostsPostData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await createPostApiV1PostsPost({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Express interest in a post
+ *
+ * Express interest in a post. Cannot express interest in your own post or duplicate interests.
+ */
+export const expressInterestApiV1PostsPostIdInterestPostMutation = (
+  options?: Partial<Options<ExpressInterestApiV1PostsPostIdInterestPostData>>
+): UseMutationOptions<
+  ExpressInterestApiV1PostsPostIdInterestPostResponse,
+  DefaultError,
+  Options<ExpressInterestApiV1PostsPostIdInterestPostData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    ExpressInterestApiV1PostsPostIdInterestPostResponse,
+    DefaultError,
+    Options<ExpressInterestApiV1PostsPostIdInterestPostData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await expressInterestApiV1PostsPostIdInterestPost({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Accept an interest
+ *
+ * Accept an interest. Automatically creates friendship and chat room.
+ */
+export const acceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostMutation = (
+  options?: Partial<Options<AcceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostData>>
+): UseMutationOptions<
+  AcceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostResponse,
+  DefaultError,
+  Options<AcceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    AcceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostResponse,
+    DefaultError,
+    Options<AcceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await acceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPost({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Reject an interest
+ *
+ * Reject an interest. Only post owner can reject.
+ */
+export const rejectInterestApiV1PostsPostIdInterestsInterestIdRejectPostMutation = (
+  options?: Partial<Options<RejectInterestApiV1PostsPostIdInterestsInterestIdRejectPostData>>
+): UseMutationOptions<
+  RejectInterestApiV1PostsPostIdInterestsInterestIdRejectPostResponse,
+  DefaultError,
+  Options<RejectInterestApiV1PostsPostIdInterestsInterestIdRejectPostData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    RejectInterestApiV1PostsPostIdInterestsInterestIdRejectPostResponse,
+    DefaultError,
+    Options<RejectInterestApiV1PostsPostIdInterestsInterestIdRejectPostData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await rejectInterestApiV1PostsPostIdInterestsInterestIdRejectPost({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Close a post
+ *
+ * Manually close a post. Only post owner can close.
+ */
+export const closePostApiV1PostsPostIdClosePostMutation = (
+  options?: Partial<Options<ClosePostApiV1PostsPostIdClosePostData>>
+): UseMutationOptions<
+  ClosePostApiV1PostsPostIdClosePostResponse,
+  DefaultError,
+  Options<ClosePostApiV1PostsPostIdClosePostData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    ClosePostApiV1PostsPostIdClosePostResponse,
+    DefaultError,
+    Options<ClosePostApiV1PostsPostIdClosePostData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await closePostApiV1PostsPostIdClosePost({
         ...options,
         ...fnOptions,
         throwOnError: true,

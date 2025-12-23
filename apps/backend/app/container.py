@@ -69,6 +69,19 @@ class SocialModuleContainer(containers.DeclarativeContainer):
     # upload_card_use_case = providers.Factory(...)
 
 
+class PostsModuleContainer(containers.DeclarativeContainer):
+    """Posts module container.
+
+    Provides city board posts related dependencies.
+    """
+
+    # Shared dependencies
+    shared = providers.DependenciesContainer()
+
+    # Repositories and use cases are instantiated in routers for now
+    # Can be moved here for centralized DI if needed
+
+
 class ApplicationContainer(containers.DeclarativeContainer):
     """Main application container.
 
@@ -77,7 +90,7 @@ class ApplicationContainer(containers.DeclarativeContainer):
 
     # Wire configuration - modules that need dependency injection
     wiring_config = containers.WiringConfiguration(
-        packages=["app.modules.identity", "app.modules.social", "app.shared"]
+        packages=["app.modules.identity", "app.modules.social", "app.modules.posts", "app.shared"]
     )
 
     # Shared Kernel
@@ -87,6 +100,8 @@ class ApplicationContainer(containers.DeclarativeContainer):
     identity = providers.Container(IdentityModuleContainer, shared=shared)
 
     social = providers.Container(SocialModuleContainer, shared=shared)
+    
+    posts = providers.Container(PostsModuleContainer, shared=shared)
 
 
 # Global container instance

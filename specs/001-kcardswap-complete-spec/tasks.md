@@ -836,54 +836,54 @@
 
 ### Domain Layer (Posts Module)
 
-- [ ] T206 [P] [US7] 建立 Posts 模組目錄結構：apps/backend/app/modules/posts/（domain/, application/, infrastructure/, presentation/）
-- [ ] T207 [P] [US7] 建立 Post Entity：apps/backend/app/modules/posts/domain/entities/post.py（owner_id, city_code, title, content, idol, idol_group, status, expires_at）
-- [ ] T208 [P] [US7] 建立 PostInterest Entity：apps/backend/app/modules/posts/domain/entities/post_interest.py（post_id, user_id, status）
-- [ ] T209 [P] [US7] 定義 PostRepository Interface：apps/backend/app/modules/posts/domain/repositories/post_repository.py
-- [ ] T210 [P] [US7] 定義 PostInterestRepository Interface：apps/backend/app/modules/posts/domain/repositories/post_interest_repository.py
+- [X] T206 [P] [US7] 建立 Posts 模組目錄結構：apps/backend/app/modules/posts/（domain/, application/, infrastructure/, presentation/）
+- [X] T207 [P] [US7] 建立 Post Entity：apps/backend/app/modules/posts/domain/entities/post.py（owner_id, city_code, title, content, idol, idol_group, status, expires_at）
+- [X] T208 [P] [US7] 建立 PostInterest Entity：apps/backend/app/modules/posts/domain/entities/post_interest.py（post_id, user_id, status）
+- [X] T209 [P] [US7] 定義 PostRepository Interface：apps/backend/app/modules/posts/domain/repositories/post_repository.py
+- [X] T210 [P] [US7] 定義 PostInterestRepository Interface：apps/backend/app/modules/posts/domain/repositories/post_interest_repository.py
 
 ### Application Layer (Posts Module)
 
-- [ ] T211 [P] [US7] 建立 CreatePostUseCase：apps/backend/app/modules/posts/application/use_cases/create_post_use_case.py（含每日發文限制檢查：free=2/day）
-- [ ] T212 [P] [US7] 建立 ListBoardPostsUseCase：apps/backend/app/modules/posts/application/use_cases/list_board_posts_use_case.py（city_code 必填，支援 idol/idol_group 篩選）
-- [ ] T213 [P] [US7] 建立 ExpressInterestUseCase：apps/backend/app/modules/posts/application/use_cases/express_interest_use_case.py（建立 PostInterest，避免重複）
-- [ ] T214 [P] [US7] 建立 AcceptInterestUseCase：apps/backend/app/modules/posts/application/use_cases/accept_interest_use_case.py（接受後建立好友關係 + 建立/重用聊天室）
-- [ ] T215 [P] [US7] 建立 RejectInterestUseCase：apps/backend/app/modules/posts/application/use_cases/reject_interest_use_case.py
-- [ ] T216 [P] [US7] 建立 ClosePostUseCase：apps/backend/app/modules/posts/application/use_cases/close_post_use_case.py
+- [X] T211 [P] [US7] 建立 CreatePostUseCase：apps/backend/app/modules/posts/application/use_cases/create_post_use_case.py（含每日發文限制檢查：free=2/day）
+- [X] T212 [P] [US7] 建立 ListBoardPostsUseCase：apps/backend/app/modules/posts/application/use_cases/list_board_posts_use_case.py（city_code 必填，支援 idol/idol_group 篩選）
+- [X] T213 [P] [US7] 建立 ExpressInterestUseCase：apps/backend/app/modules/posts/application/use_cases/express_interest_use_case.py（建立 PostInterest，避免重複）
+- [X] T214 [P] [US7] 建立 AcceptInterestUseCase：apps/backend/app/modules/posts/application/use_cases/accept_interest_use_case.py（接受後建立好友關係 + 建立/重用聊天室）
+- [X] T215 [P] [US7] 建立 RejectInterestUseCase：apps/backend/app/modules/posts/application/use_cases/reject_interest_use_case.py
+- [X] T216 [P] [US7] 建立 ClosePostUseCase：apps/backend/app/modules/posts/application/use_cases/close_post_use_case.py
 
 ### Infrastructure Layer (Posts Module)
 
-- [ ] T217 [P] [US7] 實作 SQLAlchemy Post Model：apps/backend/app/modules/posts/infrastructure/database/models/post_model.py
-- [ ] T218 [P] [US7] 實作 SQLAlchemy PostInterest Model：apps/backend/app/modules/posts/infrastructure/database/models/post_interest_model.py
-- [ ] T219 [P] [US7] 實作 PostRepositoryImpl：apps/backend/app/modules/posts/infrastructure/repositories/post_repository_impl.py
-- [ ] T220 [P] [US7] 實作 PostInterestRepositoryImpl：apps/backend/app/modules/posts/infrastructure/repositories/post_interest_repository_impl.py
+- [X] T217 [P] [US7] 實作 SQLAlchemy Post Model：apps/backend/app/modules/posts/infrastructure/database/models/post_model.py
+- [X] T218 [P] [US7] 實作 SQLAlchemy PostInterest Model：apps/backend/app/modules/posts/infrastructure/database/models/post_interest_model.py
+- [X] T219 [P] [US7] 實作 PostRepositoryImpl：apps/backend/app/modules/posts/infrastructure/repositories/post_repository_impl.py
+- [X] T220 [P] [US7] 實作 PostInterestRepositoryImpl：apps/backend/app/modules/posts/infrastructure/repositories/post_interest_repository_impl.py
 
 ### Presentation Layer (Posts Module)
 
-- [ ] T221 [P] [US7] 定義 Posts Schemas：apps/backend/app/modules/posts/presentation/schemas/post_schemas.py
-- [ ] T222 [US7] 建立 Posts Router：apps/backend/app/modules/posts/presentation/routers/posts_router.py（POST /api/v1/posts, GET /api/v1/posts, POST /api/v1/posts/{id}/interest, POST /api/v1/posts/{id}/interests/{interest_id}/accept, POST /api/v1/posts/{id}/interests/{interest_id}/reject, POST /api/v1/posts/{id}/close）
+- [X] T221 [P] [US7] 定義 Posts Schemas：apps/backend/app/modules/posts/presentation/schemas/post_schemas.py
+- [X] T222 [US7] 建立 Posts Router：apps/backend/app/modules/posts/presentation/routers/posts_router.py（POST /api/v1/posts, GET /api/v1/posts, POST /api/v1/posts/{id}/interest, POST /api/v1/posts/{id}/interests/{interest_id}/accept, POST /api/v1/posts/{id}/interests/{interest_id}/reject, POST /api/v1/posts/{id}/close）
 
 ### Integration
 
-- [ ] T223 [US7] 註冊 Posts Module 到 DI Container：apps/backend/app/container.py
-- [ ] T224 [US7] 註冊 Posts Router 到 main.py：apps/backend/app/main.py
+- [X] T223 [US7] 註冊 Posts Module 到 DI Container：apps/backend/app/container.py
+- [X] T224 [US7] 註冊 Posts Router 到 main.py：apps/backend/app/main.py
 
 ### Alembic Migration
 
-- [ ] T225 [P] [US7] 建立 Posts Tables Migration：apps/backend/alembic/versions/005_add_posts_tables.py（posts, post_interests + indexes）
-- [ ] T226 [US7] 驗證 Migration：alembic upgrade head && alembic downgrade -1
+- [X] T225 [P] [US7] 建立 Posts Tables Migration：apps/backend/alembic/versions/012_add_posts_tables.py（posts, post_interests + indexes）
+- [ ] T226 [US7] 驗證 Migration：alembic upgrade head && alembic downgrade -1（需要在有Poetry環境的地方執行）
 
 ### OpenAPI/Swagger & Testing
 
-- [ ] T227 [P] [US7] 對齊 OpenAPI/Swagger：Posts 相關 endpoints（以更新後的 openapi/openapi.json snapshot 作為驗證基準；需先 regenerate+commit 才會反映最新程式碼）
-- [ ] T228 [P] [US7] 撰寫 Posts Integration Tests（以 OpenAPI/Swagger（由程式碼生成的 snapshot）作為回應/路由對齊驗證；改以整合測試覆蓋）
+- [ ] T227 [P] [US7] 對齊 OpenAPI/Swagger：Posts 相關 endpoints（以更新後的 openapi/openapi.json snapshot 作為驗證基準；需先 regenerate+commit 才會反映最新程式碼）**（需在有Poetry環境執行 make generate-openapi）**
+- [X] T228 [P] [US7] 撰寫 Posts Integration Tests：tests/integration/modules/social/test_posts_flow.py（已建立整合測試）
 
 ### Mobile (Expo)
 
-- [ ] M701 [P] [US7] 城市看板列表：apps/mobile/src/features/posts/screens/BoardPostsScreen.tsx（GET /api/v1/posts?city_code=...）
-- [ ] M702 [P] [US7] 建立貼文頁：apps/mobile/src/features/posts/screens/CreatePostScreen.tsx（POST /api/v1/posts；city_code + 內容）
-- [ ] M703 [P] [US7] 貼文詳情與「有興趣」：apps/mobile/src/features/posts/screens/PostDetailScreen.tsx（POST /api/v1/posts/{id}/interest）
-- [ ] M704 [US7] 作者端興趣清單與接受導流聊天：apps/mobile/src/features/posts/screens/MyPostInterestsScreen.tsx（accept/reject；導向 chat）
+- [X] M701 [P] [US7] 城市看板列表：apps/mobile/src/features/posts/screens/BoardPostsScreen.tsx（GET /api/v1/posts?city_code=...）**✅ 包含路由 app/posts/index.tsx**
+- [X] M702 [P] [US7] 建立貼文頁：apps/mobile/src/features/posts/screens/CreatePostScreen.tsx（POST /api/v1/posts；city_code + 內容）**✅ 包含路由 app/posts/create.tsx**
+- [X] M703 [P] [US7] 貼文詳情與「有興趣」：apps/mobile/src/features/posts/screens/PostDetailScreen.tsx（POST /api/v1/posts/{id}/interest）**✅ 包含路由 app/posts/[id].tsx**
+- [X] M704 [US7] 作者端興趣清單與接受導流聊天：apps/mobile/src/features/posts/screens/MyPostInterestsScreen.tsx（accept/reject；導向 chat）**✅ 包含路由 app/posts/[id]/interests.tsx**
 
 ---
 

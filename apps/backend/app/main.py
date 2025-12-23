@@ -159,6 +159,13 @@ def create_application() -> FastAPI:
 
     app.include_router(subscription_router, prefix=settings.API_PREFIX)
 
+    # Phase 8.5: Posts module (City Board Posts)
+    from .modules.posts.presentation.routers.posts_router import (
+        router as posts_router,
+    )
+
+    app.include_router(posts_router, prefix=settings.API_PREFIX)
+
     return app
 
 
