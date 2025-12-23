@@ -162,6 +162,8 @@ App Root
  ├─→ Nearby Tab → /nearby (附近搜尋)
  │
  └─→ Profile Tab → /profile (個人檔案)
+      └─→ 訂閱卡片 → /subscription (訂閱方案)
+           └─→ 查看狀態 → /subscription/status (訂閱狀態)
 ```
 
 ### 推播通知導航
@@ -191,6 +193,8 @@ App Root
 | `/chat` | `app/chat/index.tsx` | Stack | 從 Home 進入 |
 | `/chat/[roomId]` | `app/chat/[roomId].tsx` | Stack | 從 /chat 或推播進入 |
 | `/auth/login` | `app/auth/login.tsx` | Stack | 未登入自動導向 |
+| `/subscription` | `app/subscription/index.tsx` | Stack | 從 Profile 進入 |
+| `/subscription/status` | `app/subscription/status.tsx` | Stack | 從 /subscription 進入 |
 
 ---
 
@@ -339,14 +343,40 @@ const responseListener = Notifications.addNotificationResponseReceivedListener(
 
 ### Subscription (訂閱) - Phase 8
 
+#### 1. Subscription Plans - `/subscription`
+- **檔案**: `app/subscription/index.tsx`
+- **從哪裡進入**:
+  - 從 **Profile** 的「訂閱卡片」
+  - 從功能限制提示 (quota exceeded)
+  - 從 Home 的「升級會員」提示
+- **功能**:
+  - 顯示 Free vs Premium 方案對比
+  - 功能列表與價格
+  - Google Play Billing 購買流程
+  - 當前訂閱狀態顯示
+
+#### 2. Subscription Status - `/subscription/status`
+- **檔案**: `app/subscription/status.tsx`
+- **從哪裡進入**:
+  - 從 Subscription Plans 的「查看狀態」
+  - 從 Profile 的訂閱卡片 (Premium 用戶)
+- **功能**:
+  - 顯示訂閱狀態（active/expired/pending/inactive）
+  - 到期日顯示
+  - 恢復購買功能
+  - 重新整理狀態
+
+### Subscription (訂閱) - Phase 8
+
 ```
-/subscription       → 訂閱方案
-/subscription/status → 訂閱狀態
+/subscription       → 訂閱方案（付費牆）
+/subscription/status → 訂閱狀態管理
 ```
 
 **從哪裡進入**:
-- 從 Profile 的「升級會員」
+- 從 Profile 的「升級會員」卡片
 - 從功能限制提示 (quota exceeded)
+- 從 Home 的升級提示
 
 ---
 
