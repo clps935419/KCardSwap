@@ -1,0 +1,35 @@
+{
+  "folders": [
+    {
+      "name": "project-root",
+      "path": ".."
+    },
+    {
+      "name": "backend",
+      "path": "../apps/backend"
+    },
+    {
+      "name": "mobile",
+      "path": "../apps/mobile"
+    },
+    {
+      "name": "openapi",
+      "path": "../openapi"
+    },
+    {
+      "name": "gateway",
+      "path": "../gateway"
+    },
+    {
+      "name": "infra",
+      "path": "../infra"
+    },
+    {
+      "name": "specs",
+      "path": "../specs"
+    }
+  ],
+  "settings": {
+    "files.eol": "\n"
+  }
+}
