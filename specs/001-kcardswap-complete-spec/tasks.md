@@ -824,12 +824,12 @@
 
 ---
 
-## Phase 8.5: User Story 7 - 城市/行政區佈告欄貼文 (Priority: P2)
+## Phase 8.5: User Story 7 - 城市看板貼文 (Priority: P2)
 
-**目標**: 使用者可以在指定城市/行政區看板發起交換貼文，其他使用者可表達「有興趣」，作者接受後導流建立好友 + 一對一聊天室協商交換。
+**目標**: 使用者可以在指定城市（縣市）看板發起交換貼文，其他使用者可表達「有興趣」，作者接受後導流建立好友 + 一對一聊天室協商交換。
 
 **獨立測試標準**:
-- ✓ A 能在「台北市/大安區」建立貼文並出現在看板列表
+- ✓ A 能在「台北市」建立貼文並出現在看板列表
 - ✓ B 能在該城市看板找到貼文並送出「有興趣」
 - ✓ A 接受後，系統建立好友關係並建立/導向聊天室
 - ✓ 貼文可手動關閉或到期自動下架
@@ -837,7 +837,7 @@
 ### Domain Layer (Posts Module)
 
 - [ ] T206 [P] [US7] 建立 Posts 模組目錄結構：apps/backend/app/modules/posts/（domain/, application/, infrastructure/, presentation/）
-- [ ] T207 [P] [US7] 建立 Post Entity：apps/backend/app/modules/posts/domain/entities/post.py（owner_id, city_code, district_code, title, content, idol, idol_group, status, expires_at）
+- [ ] T207 [P] [US7] 建立 Post Entity：apps/backend/app/modules/posts/domain/entities/post.py（owner_id, city_code, title, content, idol, idol_group, status, expires_at）
 - [ ] T208 [P] [US7] 建立 PostInterest Entity：apps/backend/app/modules/posts/domain/entities/post_interest.py（post_id, user_id, status）
 - [ ] T209 [P] [US7] 定義 PostRepository Interface：apps/backend/app/modules/posts/domain/repositories/post_repository.py
 - [ ] T210 [P] [US7] 定義 PostInterestRepository Interface：apps/backend/app/modules/posts/domain/repositories/post_interest_repository.py
@@ -845,7 +845,7 @@
 ### Application Layer (Posts Module)
 
 - [ ] T211 [P] [US7] 建立 CreatePostUseCase：apps/backend/app/modules/posts/application/use_cases/create_post_use_case.py（含每日發文限制檢查：free=2/day）
-- [ ] T212 [P] [US7] 建立 ListBoardPostsUseCase：apps/backend/app/modules/posts/application/use_cases/list_board_posts_use_case.py（city_code 必填，district_code 選填，支援 idol/idol_group 篩選）
+- [ ] T212 [P] [US7] 建立 ListBoardPostsUseCase：apps/backend/app/modules/posts/application/use_cases/list_board_posts_use_case.py（city_code 必填，支援 idol/idol_group 篩選）
 - [ ] T213 [P] [US7] 建立 ExpressInterestUseCase：apps/backend/app/modules/posts/application/use_cases/express_interest_use_case.py（建立 PostInterest，避免重複）
 - [ ] T214 [P] [US7] 建立 AcceptInterestUseCase：apps/backend/app/modules/posts/application/use_cases/accept_interest_use_case.py（接受後建立好友關係 + 建立/重用聊天室）
 - [ ] T215 [P] [US7] 建立 RejectInterestUseCase：apps/backend/app/modules/posts/application/use_cases/reject_interest_use_case.py
@@ -880,8 +880,8 @@
 
 ### Mobile (Expo)
 
-- [ ] M701 [P] [US7] 城市/行政區佈告欄列表：apps/mobile/src/features/posts/screens/BoardPostsScreen.tsx（GET /api/v1/posts?city_code=...）
-- [ ] M702 [P] [US7] 建立貼文頁：apps/mobile/src/features/posts/screens/CreatePostScreen.tsx（POST /api/v1/posts；city_code/district_code + 內容）
+- [ ] M701 [P] [US7] 城市看板列表：apps/mobile/src/features/posts/screens/BoardPostsScreen.tsx（GET /api/v1/posts?city_code=...）
+- [ ] M702 [P] [US7] 建立貼文頁：apps/mobile/src/features/posts/screens/CreatePostScreen.tsx（POST /api/v1/posts；city_code + 內容）
 - [ ] M703 [P] [US7] 貼文詳情與「有興趣」：apps/mobile/src/features/posts/screens/PostDetailScreen.tsx（POST /api/v1/posts/{id}/interest）
 - [ ] M704 [US7] 作者端興趣清單與接受導流聊天：apps/mobile/src/features/posts/screens/MyPostInterestsScreen.tsx（accept/reject；導向 chat）
 

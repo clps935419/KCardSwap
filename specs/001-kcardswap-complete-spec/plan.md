@@ -16,7 +16,7 @@
 - M1（Week 1-2）：AUTH + PROFILE 完成（Google OAuth、JWT、個人檔案）。
 - M2（Week 3-4）：CARD 上傳與管理完成（含上限檢查與 Mobile-only 縮圖快取）。
 - M3（Week 5）：NEARBY 附近搜尋（距離計算、隱私、排序、次數限制）。
-- M3.5（Week 5-6）：POSTS 城市/行政區佈告欄（發文、看板列表、興趣請求、接受後導流聊天、到期/關閉）。
+- M3.5（Week 5-6）：POSTS 城市看板（發文、看板列表、興趣請求、接受後導流聊天、到期/關閉）。
 - M4（Week 6-7）：SOCIAL + CHAT（好友、評分、檢舉、輪詢 + 推播）。
 - M5（Week 8）：TRADE（提案、狀態機、歷史）。
 - M6（Week 9）：BIZ（免費/付費權限、容量與大小限制、升級/降級）。
@@ -45,7 +45,7 @@
     │       ├── presentation/
     │       └── __init__.py
 	│
-	│   └── posts/              # [Module] 城市/行政區佈告欄貼文（Posts / Bulletin Board）
+	│   └── posts/              # [Module] 城市看板貼文（Posts / City Board）
 	│       ├── domain/
 	│       ├── application/
 	│       ├── infrastructure/
@@ -266,7 +266,7 @@ Phase -1 Gates（依憲法）
 - Integration-First Gate：以 Swagger/OpenAPI（由程式碼生成的 snapshot：openapi/openapi.json）作為「同一版 commit 的實作輸出」進行整合測試對齊；若 snapshot 未更新，請先 regenerate+commit 再進行對齊；需求來源仍以 spec/plan/tasks 為準。
 
 ## 12. 風險與緩解
-- 位置隱私爭議 → 預設不顯示精確地址、僅行政區與距離。
+- 位置隱私爭議 → 預設不顯示精確地址、僅縣市與距離。
 - 上傳濫用 → 檔案型別與大小驗證、Kong Request Size Limiter。
 - 推播延遲 → 前景輪詢兜底、通知重試機制。
 - 成本上升 → GCS 單價與容量政策可調，付費方案門檻保守。
@@ -295,7 +295,7 @@ Phase -1 Gates（依憲法）
 	- [ ] 距離計算與排序、隱身過濾
 	- [ ] 次數限制與重置機制
 - POSTS
-	- [ ] 城市/行政區佈告欄貼文 CRUD（建立/列表/詳情/關閉/刪除）
+	- [ ] 城市看板貼文 CRUD（建立/列表/詳情/關閉/刪除）
 	- [ ] 興趣請求流程（送出/清單/接受→建立好友+聊天室/拒絕）
 	- [ ] 到期策略與下架（expired）
 - SOCIAL
@@ -315,7 +315,7 @@ Phase -1 Gates（依憲法）
 - [ ] 登入/註冊/隱私設定頁
 - [ ] 我的小卡（上傳、列表、編輯、刪除、過濾）
 - [ ] 附近的人（權限、篩選、排序、次數提示）
-- [ ] 城市/行政區佈告欄（列表、發文、詳情、我有興趣/作者接受導流聊天）
+- [ ] 城市看板（列表、發文、詳情、我有興趣/作者接受導流聊天）
 - [ ] 好友列表與個人頁
 - [ ] 聊天列表與聊天室（輪詢、推播導覽）
 - [ ] 交換流程（提案、確認、歷史）

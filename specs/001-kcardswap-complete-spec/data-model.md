@@ -302,7 +302,7 @@ poetry run alembic history
 - **messages**: 訊息記錄
 - **notifications**: 推播通知記錄
 - **card_upload_stats**: 上傳統計（用於限制檢查）
-- **posts**: 城市/行政區佈告欄貼文（看板發文）
+- **posts**: 城市看板貼文（看板發文）
 - **post_interests**: 對貼文表達「有興趣」的請求（作者接受後導流聊天/好友）
 
 ---
@@ -382,7 +382,6 @@ poetry run alembic history
 | id | UUID | PK, DEFAULT uuid_generate_v4() | 貼文唯一識別碼 |
 | owner_id | UUID | NOT NULL, FK(users.id) ON DELETE CASCADE | 作者 |
 | city_code | VARCHAR(20) | NOT NULL | 城市代碼（例如 TPE） |
-| district_code | VARCHAR(20) | NULLABLE | 行政區代碼（例如 Daan） |
 | title | VARCHAR(120) | NOT NULL | 標題 |
 | content | TEXT | NOT NULL | 內容（禁止精確地址/聯絡方式等個資） |
 | idol | VARCHAR(100) | NULLABLE | 偶像名稱（篩選用） |
@@ -393,7 +392,7 @@ poetry run alembic history
 | updated_at | TIMESTAMP WITH TIME ZONE | DEFAULT CURRENT_TIMESTAMP | 更新時間 |
 
 **索引（建議）**:
-- `idx_posts_board_status_created_at` ON (city_code, district_code, status, created_at DESC)
+- `idx_posts_board_status_created_at` ON (city_code, status, created_at DESC)
 - `idx_posts_owner_id` ON (owner_id)
 - `idx_posts_idol` ON (idol)
 - `idx_posts_idol_group` ON (idol_group)
@@ -402,7 +401,7 @@ poetry run alembic history
 **不變條件（應用層 + DB 層）**:
 - status ∈ {open, closed, expired, deleted}
 - expires_at > created_at
-- city_code 必填；district_code 可選
+- city_code 必填
 
 ---
 
