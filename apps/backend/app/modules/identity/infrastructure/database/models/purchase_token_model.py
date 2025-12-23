@@ -6,7 +6,7 @@ from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Index
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
-from app.shared.infrastructure.database.base import Base
+from app.shared.infrastructure.database.connection import Base
 
 
 class PurchaseTokenModel(Base):

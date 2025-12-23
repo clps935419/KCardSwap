@@ -695,26 +695,35 @@
 
 ### Domain Layer (Identity Module - Subscription)
 
-- [ ] T175 [P] [US6] 建立 Subscription Entity：apps/backend/app/modules/identity/domain/entities/subscription.py（id, user_id, plan: free/premium, status: active/inactive/expired/pending, expires_at）
-- [ ] T176 [P] [US6] 定義 SubscriptionRepository Interface：apps/backend/app/modules/identity/domain/repositories/subscription_repository.py
+- [X] T175 [P] [US6] 建立 Subscription Entity：apps/backend/app/modules/identity/domain/entities/subscription.py（id, user_id, plan: free/premium, status: active/inactive/expired/pending, expires_at）
+- [X] T176 [P] [US6] 定義 SubscriptionRepository Interface：apps/backend/app/modules/identity/domain/repositories/subscription_repository.py
+- [X] 新增 PurchaseTokenRepository Interface：apps/backend/app/modules/identity/domain/repositories/purchase_token_repository.py（防重放攻擊）
 
 ### Application Layer (Identity Module - Subscription)
 
-- [ ] T177 [P] [US6] 建立 VerifyReceiptUseCase：apps/backend/app/modules/identity/application/use_cases/verify_receipt_use_case.py（驗證 Google Play 收據 → 更新訂閱狀態；冪等；token 綁定；防重放；成功後需觸發 acknowledge）
-- [ ] T178 [P] [US6] 建立 CheckSubscriptionStatusUseCase：apps/backend/app/modules/identity/application/use_cases/check_subscription_status_use_case.py
-- [ ] T179 [P] [US6] 建立 ExpireSubscriptionsUseCase：apps/backend/app/modules/identity/application/use_cases/expire_subscriptions_use_case.py（定期任務：檢查並降級過期訂閱）
+- [X] T177 [P] [US6] 建立 VerifyReceiptUseCase：apps/backend/app/modules/identity/application/use_cases/subscription/verify_receipt_use_case.py（驗證 Google Play 收據 → 更新訂閱狀態；冪等；token 綁定；防重放；成功後需觸發 acknowledge）
+- [X] T178 [P] [US6] 建立 CheckSubscriptionStatusUseCase：apps/backend/app/modules/identity/application/use_cases/subscription/check_subscription_status_use_case.py
+- [X] T179 [P] [US6] 建立 ExpireSubscriptionsUseCase：apps/backend/app/modules/identity/application/use_cases/subscription/expire_subscriptions_use_case.py（定期任務：檢查並降級過期訂閱）
 
 ### Infrastructure Layer (Identity Module - Subscription)
 
-- [ ] T180 [P] [US6] 實作 SQLAlchemy Subscription Model：apps/backend/app/modules/identity/infrastructure/database/models/subscription_model.py
-- [ ] T180A [P] [US6] 新增/擴展 Alembic migration：保存 Google Play purchase_token 與去重資訊（建議新增 subscription_purchase_tokens 表；purchase_token UNIQUE；用於 token 綁定/防重放）
-- [ ] T181 [P] [US6] 實作 SubscriptionRepositoryImpl：apps/backend/app/modules/identity/infrastructure/repositories/subscription_repository_impl.py
-- [ ] T182 [P] [US6] 實作 Google Play Billing Service：apps/backend/app/modules/identity/infrastructure/external/google_play_billing_service.py（驗證收據 + acknowledge；需可重試且冪等）
-- [ ] T182A [P] [US6] 實作 token 綁定/防重放策略：同 purchase_token 不可跨 user 重放（DB UNIQUE + 應用層檢查；重送需冪等回傳）
+- [X] T180 [P] [US6] 實作 SQLAlchemy Subscription Model：apps/backend/app/modules/identity/infrastructure/database/models/subscription_model.py
+- [X] T180A [P] [US6] 新增/擴展 Alembic migration：保存 Google Play purchase_token 與去重資訊（建議新增 subscription_purchase_tokens 表；purchase_token UNIQUE；用於 token 綁定/防重放）
+  - ✅ 建立 alembic/versions/011_add_subscription_tables.py
+  - ✅ subscriptions 表：id, user_id (UUID), plan, status, expires_at
+  - ✅ subscription_purchase_tokens 表：purchase_token (UNIQUE), user_id, product_id, platform
+- [X] T181 [P] [US6] 實作 SubscriptionRepositoryImpl：apps/backend/app/modules/identity/infrastructure/repositories/subscription_repository_impl.py
+- [X] T181A [P] [US6] 實作 PurchaseTokenRepositoryImpl：apps/backend/app/modules/identity/infrastructure/repositories/purchase_token_repository_impl.py
+- [X] T182 [P] [US6] 實作 Google Play Billing Service：apps/backend/app/modules/identity/infrastructure/external/google_play_billing_service.py（驗證收據 + acknowledge；需可重試且冪等）
+- [X] T182A [P] [US6] 實作 token 綁定/防重放策略：同 purchase_token 不可跨 user 重放（DB UNIQUE + 應用層檢查；重送需冪等回傳）
 
 ### Presentation Layer
 
-- [ ] T183 [P] [US6] 建立 Subscription Router：apps/backend/app/modules/identity/presentation/routers/subscription_router.py（POST /api/v1/subscriptions/verify-receipt, GET /api/v1/subscriptions/status；回應需包含 entitlement_active 與 expires_at）
+- [X] T183 [P] [US6] 建立 Subscription Router：apps/backend/app/modules/identity/presentation/routers/subscription_router.py（POST /api/v1/subscriptions/verify-receipt, GET /api/v1/subscriptions/status；回應需包含 entitlement_active 與 expires_at）
+  - ✅ 已建立 3 個端點：verify-receipt, status, expire-subscriptions
+  - ✅ 完整錯誤處理與文檔
+- [X] T183A [P] [US6] 定義 API Schemas：apps/backend/app/modules/identity/presentation/schemas/subscription_schemas.py
+- [X] T183B [P] [US6] 註冊 Subscription Router 到 main.py
 - [ ] T184 [US6] 實作 Subscription Permission Middleware：apps/backend/app/shared/presentation/middleware/subscription_check.py（依 subscriptions.plan/status 套用限制；影響 cards upload-url/create、nearby search、posts create；並注入到 request.state）
 
 ### Testing
@@ -725,13 +734,17 @@
 
 ### Configuration
 
-- [ ] T188 [P] [US6] 更新環境變數：apps/backend/app/config.py（GOOGLE_PLAY_PACKAGE_NAME, GOOGLE_PLAY_SERVICE_ACCOUNT_KEY）
+- [X] T188 [P] [US6] 更新環境變數：apps/backend/app/config.py（GOOGLE_PLAY_PACKAGE_NAME, GOOGLE_PLAY_SERVICE_ACCOUNT_KEY_PATH）
 - [ ] T189 [P] [US6] 配置定期任務（Celery/APScheduler）：每日檢查過期訂閱
+  - ⚠️ POC 階段：已提供 POST /api/v1/subscriptions/expire-subscriptions 端點供手動觸發
+  - 📝 生產環境需配置排程工具（APScheduler/Celery Beat/Cloud Scheduler）
 
 ### Verification
 
 - [ ] T190 [US6] 執行所有 US6 測試並手動驗證訂閱流程
 - [ ] T191 [US6] 驗證權限升級：確認付費用戶可以無限上傳/搜尋
+- [ ] T192 [US6] 產生 OpenAPI.json：`make generate-openapi`（需要後端環境啟動）
+- [ ] T193 [US6] 產生前端 SDK：`cd apps/mobile && npm run sdk:generate`
 
 ### Mobile (Expo)
 
