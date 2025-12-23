@@ -19,6 +19,7 @@ import {
   completeTradeApiV1TradesTradeIdCompletePost,
   createTradeApiV1TradesPost,
   deleteCardApiV1CardsCardIdDelete,
+  expireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPost,
   getAverageRatingApiV1RatingsUserUserIdAverageGet,
   getChatRoomsApiV1ChatsGet,
   getFriendsApiV1FriendsGet,
@@ -27,6 +28,7 @@ import {
   getMyProfileApiV1ProfileMeGet,
   getMyReportsApiV1ReportsGet,
   getQuotaStatusApiV1CardsQuotaStatusGet,
+  getSubscriptionStatusApiV1SubscriptionsStatusGet,
   getTradeHistoryApiV1TradesHistoryGet,
   getUploadUrlApiV1CardsUploadUrlPost,
   getUserRatingsApiV1RatingsUserUserIdGet,
@@ -45,6 +47,7 @@ import {
   submitReportApiV1ReportsPost,
   updateMyProfileApiV1ProfileMePut,
   updateUserLocationApiV1NearbyLocationPut,
+  verifyReceiptApiV1SubscriptionsVerifyReceiptPost,
 } from '../sdk.gen';
 import type {
   AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostData,
@@ -68,6 +71,8 @@ import type {
   DeleteCardApiV1CardsCardIdDeleteData,
   DeleteCardApiV1CardsCardIdDeleteError,
   DeleteCardApiV1CardsCardIdDeleteResponse,
+  ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostData,
+  ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostResponse,
   GetAverageRatingApiV1RatingsUserUserIdAverageGetData,
   GetAverageRatingApiV1RatingsUserUserIdAverageGetError,
   GetAverageRatingApiV1RatingsUserUserIdAverageGetResponse,
@@ -89,6 +94,8 @@ import type {
   GetMyReportsApiV1ReportsGetResponse,
   GetQuotaStatusApiV1CardsQuotaStatusGetData,
   GetQuotaStatusApiV1CardsQuotaStatusGetResponse,
+  GetSubscriptionStatusApiV1SubscriptionsStatusGetData,
+  GetSubscriptionStatusApiV1SubscriptionsStatusGetResponse,
   GetTradeHistoryApiV1TradesHistoryGetData,
   GetTradeHistoryApiV1TradesHistoryGetError,
   GetTradeHistoryApiV1TradesHistoryGetResponse,
@@ -131,6 +138,9 @@ import type {
   UpdateUserLocationApiV1NearbyLocationPutData,
   UpdateUserLocationApiV1NearbyLocationPutError,
   UpdateUserLocationApiV1NearbyLocationPutResponse,
+  VerifyReceiptApiV1SubscriptionsVerifyReceiptPostData,
+  VerifyReceiptApiV1SubscriptionsVerifyReceiptPostError,
+  VerifyReceiptApiV1SubscriptionsVerifyReceiptPostResponse,
 } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
@@ -1240,3 +1250,119 @@ export const getTradeHistoryApiV1TradesHistoryGetInfiniteOptions = (
       queryKey: getTradeHistoryApiV1TradesHistoryGetInfiniteQueryKey(options),
     }
   );
+
+/**
+ * Verify Receipt
+ *
+ * Verify Google Play purchase receipt and update subscription.
+ *
+ * Features:
+ * - Idempotent: Same token + same user returns current status
+ * - Token binding: Prevents cross-user replay attacks
+ * - Auto-acknowledge: Acknowledges purchase after verification
+ *
+ * Error codes:
+ * - 400_VALIDATION_FAILED: Invalid platform or missing fields
+ * - 401_UNAUTHORIZED: Not logged in
+ * - 409_CONFLICT: Purchase token already used by another user
+ * - 503_SERVICE_UNAVAILABLE: Google Play API unavailable
+ */
+export const verifyReceiptApiV1SubscriptionsVerifyReceiptPostMutation = (
+  options?: Partial<Options<VerifyReceiptApiV1SubscriptionsVerifyReceiptPostData>>
+): UseMutationOptions<
+  VerifyReceiptApiV1SubscriptionsVerifyReceiptPostResponse,
+  VerifyReceiptApiV1SubscriptionsVerifyReceiptPostError,
+  Options<VerifyReceiptApiV1SubscriptionsVerifyReceiptPostData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    VerifyReceiptApiV1SubscriptionsVerifyReceiptPostResponse,
+    VerifyReceiptApiV1SubscriptionsVerifyReceiptPostError,
+    Options<VerifyReceiptApiV1SubscriptionsVerifyReceiptPostData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await verifyReceiptApiV1SubscriptionsVerifyReceiptPost({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const getSubscriptionStatusApiV1SubscriptionsStatusGetQueryKey = (
+  options?: Options<GetSubscriptionStatusApiV1SubscriptionsStatusGetData>
+) => createQueryKey('getSubscriptionStatusApiV1SubscriptionsStatusGet', options);
+
+/**
+ * Get Subscription Status
+ *
+ * Get current subscription status for authenticated user.
+ *
+ * Returns server-side subscription state.
+ * Called by app when opening or returning to foreground.
+ *
+ * Error codes:
+ * - 401_UNAUTHORIZED: Not logged in
+ * - 503_SERVICE_UNAVAILABLE: Database unavailable
+ */
+export const getSubscriptionStatusApiV1SubscriptionsStatusGetOptions = (
+  options?: Options<GetSubscriptionStatusApiV1SubscriptionsStatusGetData>
+) =>
+  queryOptions<
+    GetSubscriptionStatusApiV1SubscriptionsStatusGetResponse,
+    DefaultError,
+    GetSubscriptionStatusApiV1SubscriptionsStatusGetResponse,
+    ReturnType<typeof getSubscriptionStatusApiV1SubscriptionsStatusGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getSubscriptionStatusApiV1SubscriptionsStatusGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getSubscriptionStatusApiV1SubscriptionsStatusGetQueryKey(options),
+  });
+
+/**
+ * Expire Subscriptions
+ *
+ * Expire active subscriptions that have passed their expiry date.
+ *
+ * This endpoint should be called by a scheduled background task (e.g., daily cron job).
+ * For POC, it's exposed as an HTTP endpoint for manual triggering.
+ *
+ * In production, this should be:
+ * - Protected by admin authentication or internal-only access
+ * - Triggered by a scheduler (APScheduler, Celery Beat, Cloud Scheduler, etc.)
+ *
+ * Returns:
+ * Number of subscriptions expired and processing timestamp
+ */
+export const expireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostMutation = (
+  options?: Partial<Options<ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostData>>
+): UseMutationOptions<
+  ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostResponse,
+  DefaultError,
+  Options<ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostResponse,
+    DefaultError,
+    Options<ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await expireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPost({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};

@@ -29,6 +29,8 @@ import type {
   DeleteCardApiV1CardsCardIdDeleteData,
   DeleteCardApiV1CardsCardIdDeleteErrors,
   DeleteCardApiV1CardsCardIdDeleteResponses,
+  ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostData,
+  ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostResponses,
   GetAverageRatingApiV1RatingsUserUserIdAverageGetData,
   GetAverageRatingApiV1RatingsUserUserIdAverageGetErrors,
   GetAverageRatingApiV1RatingsUserUserIdAverageGetResponses,
@@ -53,6 +55,8 @@ import type {
   GetQuotaStatusApiV1CardsQuotaStatusGetData,
   GetQuotaStatusApiV1CardsQuotaStatusGetErrors,
   GetQuotaStatusApiV1CardsQuotaStatusGetResponses,
+  GetSubscriptionStatusApiV1SubscriptionsStatusGetData,
+  GetSubscriptionStatusApiV1SubscriptionsStatusGetResponses,
   GetTradeHistoryApiV1TradesHistoryGetData,
   GetTradeHistoryApiV1TradesHistoryGetErrors,
   GetTradeHistoryApiV1TradesHistoryGetResponses,
@@ -102,6 +106,9 @@ import type {
   UpdateUserLocationApiV1NearbyLocationPutData,
   UpdateUserLocationApiV1NearbyLocationPutErrors,
   UpdateUserLocationApiV1NearbyLocationPutResponses,
+  VerifyReceiptApiV1SubscriptionsVerifyReceiptPostData,
+  VerifyReceiptApiV1SubscriptionsVerifyReceiptPostErrors,
+  VerifyReceiptApiV1SubscriptionsVerifyReceiptPostResponses,
 } from './types.gen';
 
 export type Options<
@@ -775,3 +782,91 @@ export const getTradeHistoryApiV1TradesHistoryGet = <ThrowOnError extends boolea
     url: '/api/v1/trades/history',
     ...options,
   });
+
+/**
+ * Verify Receipt
+ *
+ * Verify Google Play purchase receipt and update subscription.
+ *
+ * Features:
+ * - Idempotent: Same token + same user returns current status
+ * - Token binding: Prevents cross-user replay attacks
+ * - Auto-acknowledge: Acknowledges purchase after verification
+ *
+ * Error codes:
+ * - 400_VALIDATION_FAILED: Invalid platform or missing fields
+ * - 401_UNAUTHORIZED: Not logged in
+ * - 409_CONFLICT: Purchase token already used by another user
+ * - 503_SERVICE_UNAVAILABLE: Google Play API unavailable
+ */
+export const verifyReceiptApiV1SubscriptionsVerifyReceiptPost = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<VerifyReceiptApiV1SubscriptionsVerifyReceiptPostData, ThrowOnError>
+) =>
+  (options.client ?? client).post<
+    VerifyReceiptApiV1SubscriptionsVerifyReceiptPostResponses,
+    VerifyReceiptApiV1SubscriptionsVerifyReceiptPostErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/subscriptions/verify-receipt',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Get Subscription Status
+ *
+ * Get current subscription status for authenticated user.
+ *
+ * Returns server-side subscription state.
+ * Called by app when opening or returning to foreground.
+ *
+ * Error codes:
+ * - 401_UNAUTHORIZED: Not logged in
+ * - 503_SERVICE_UNAVAILABLE: Database unavailable
+ */
+export const getSubscriptionStatusApiV1SubscriptionsStatusGet = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<GetSubscriptionStatusApiV1SubscriptionsStatusGetData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    GetSubscriptionStatusApiV1SubscriptionsStatusGetResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/subscriptions/status',
+    ...options,
+  });
+
+/**
+ * Expire Subscriptions
+ *
+ * Expire active subscriptions that have passed their expiry date.
+ *
+ * This endpoint should be called by a scheduled background task (e.g., daily cron job).
+ * For POC, it's exposed as an HTTP endpoint for manual triggering.
+ *
+ * In production, this should be:
+ * - Protected by admin authentication or internal-only access
+ * - Triggered by a scheduler (APScheduler, Celery Beat, Cloud Scheduler, etc.)
+ *
+ * Returns:
+ * Number of subscriptions expired and processing timestamp
+ */
+export const expireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPost = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostData, ThrowOnError>
+) =>
+  (options?.client ?? client).post<
+    ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostResponses,
+    unknown,
+    ThrowOnError
+  >({ url: '/api/v1/subscriptions/expire-subscriptions', ...options });

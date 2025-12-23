@@ -8,23 +8,14 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { AppState, AppStateStatus } from 'react-native';
 
-import type { SubscriptionInfo, VerifyReceiptRequest } from '../types';
+import {
+  getSubscriptionStatusApiV1SubscriptionsStatusGet,
+  verifyReceiptApiV1SubscriptionsVerifyReceiptPostMutation,
+  type VerifyReceiptApiV1SubscriptionsVerifyReceiptPostData,
+  type GetSubscriptionStatusApiV1SubscriptionsStatusGetResponse,
+} from '@/src/shared/api/generated';
 
-// Note: These will be replaced with generated SDK after OpenAPI generation
-// For now, using placeholder API functions
-const subscriptionApi = {
-  getStatus: async (): Promise<SubscriptionInfo> => {
-    // TODO: Replace with generated SDK
-    // return await getSubscriptionsStatusOptions()
-    throw new Error('SDK not yet generated. Run: npm run sdk:generate');
-  },
-  
-  verifyReceipt: async (data: VerifyReceiptRequest): Promise<SubscriptionInfo> => {
-    // TODO: Replace with generated SDK
-    // return await verifyReceiptMutation({ body: data })
-    throw new Error('SDK not yet generated. Run: npm run sdk:generate');
-  },
-};
+import type { SubscriptionInfo } from '../types';
 
 /**
  * Hook for subscription status
@@ -35,7 +26,10 @@ export function useSubscriptionStatus() {
   
   const query = useQuery({
     queryKey: ['subscription', 'status'],
-    queryFn: subscriptionApi.getStatus,
+    queryFn: async () => {
+      const response = await getSubscriptionStatusApiV1SubscriptionsStatusGet();
+      return response.data as SubscriptionInfo;
+    },
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 2,
   });
@@ -71,7 +65,7 @@ export function useVerifyReceipt() {
   const queryClient = useQueryClient();
   
   const mutation = useMutation({
-    mutationFn: subscriptionApi.verifyReceipt,
+    ...verifyReceiptApiV1SubscriptionsVerifyReceiptPostMutation(),
     onSuccess: (data) => {
       // Update subscription status cache
       queryClient.setQueryData(['subscription', 'status'], data);
@@ -85,7 +79,7 @@ export function useVerifyReceipt() {
     isSuccess: mutation.isSuccess,
     isError: mutation.isError,
     error: mutation.error,
-    data: mutation.data,
+    data: mutation.data as SubscriptionInfo | undefined,
   };
 }
 

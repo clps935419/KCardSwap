@@ -1766,6 +1766,102 @@
           }
         }
       }
+    },
+    "/api/v1/subscriptions/verify-receipt": {
+      "post": {
+        "tags": [
+          "Subscriptions"
+        ],
+        "summary": "Verify Receipt",
+        "description": "Verify Google Play purchase receipt and update subscription.\n\nFeatures:\n- Idempotent: Same token + same user returns current status\n- Token binding: Prevents cross-user replay attacks  \n- Auto-acknowledge: Acknowledges purchase after verification\n\nError codes:\n- 400_VALIDATION_FAILED: Invalid platform or missing fields\n- 401_UNAUTHORIZED: Not logged in\n- 409_CONFLICT: Purchase token already used by another user\n- 503_SERVICE_UNAVAILABLE: Google Play API unavailable",
+        "operationId": "verify_receipt_api_v1_subscriptions_verify_receipt_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyReceiptRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionStatusResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/subscriptions/status": {
+      "get": {
+        "tags": [
+          "Subscriptions"
+        ],
+        "summary": "Get Subscription Status",
+        "description": "Get current subscription status for authenticated user.\n\nReturns server-side subscription state.\nCalled by app when opening or returning to foreground.\n\nError codes:\n- 401_UNAUTHORIZED: Not logged in\n- 503_SERVICE_UNAVAILABLE: Database unavailable",
+        "operationId": "get_subscription_status_api_v1_subscriptions_status_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionStatusResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/subscriptions/expire-subscriptions": {
+      "post": {
+        "tags": [
+          "Subscriptions"
+        ],
+        "summary": "Expire Subscriptions",
+        "description": "Expire active subscriptions that have passed their expiry date.\n\nThis endpoint should be called by a scheduled background task (e.g., daily cron job).\nFor POC, it's exposed as an HTTP endpoint for manual triggering.\n\nIn production, this should be:\n- Protected by admin authentication or internal-only access\n- Triggered by a scheduler (APScheduler, Celery Beat, Cloud Scheduler, etc.)\n\nReturns:\n    Number of subscriptions expired and processing timestamp",
+        "operationId": "expire_subscriptions_api_v1_subscriptions_expire_subscriptions_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExpireSubscriptionsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2172,7 +2268,7 @@
             "title": "Data"
           },
           "error": {
-            "$ref": "#/components/schemas/app__modules__identity__presentation__schemas__auth_schemas__ErrorResponse"
+            "$ref": "#/components/schemas/app__modules__identity__presentation__schemas__profile_schemas__ErrorResponse"
           }
         },
         "type": "object",
@@ -2181,6 +2277,31 @@
         ],
         "title": "ErrorWrapper",
         "description": "Error wrapper response"
+      },
+      "ExpireSubscriptionsResponse": {
+        "properties": {
+          "expired_count": {
+            "type": "integer",
+            "title": "Expired Count",
+            "description": "Number of subscriptions expired"
+          },
+          "processed_at": {
+            "type": "string",
+            "title": "Processed At",
+            "description": "Processing timestamp (ISO format)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "expired_count",
+          "processed_at"
+        ],
+        "title": "ExpireSubscriptionsResponse",
+        "description": "Response schema for expire subscriptions job",
+        "example": {
+          "expired_count": 5,
+          "processed_at": "2025-12-23T00:00:00"
+        }
       },
       "FriendListItemResponse": {
         "properties": {
@@ -2653,7 +2774,7 @@
             "title": "Data"
           },
           "error": {
-            "$ref": "#/components/schemas/app__modules__identity__presentation__schemas__auth_schemas__ErrorResponse"
+            "$ref": "#/components/schemas/app__modules__identity__presentation__schemas__profile_schemas__ErrorResponse"
           }
         },
         "type": "object",
@@ -3379,6 +3500,58 @@
           "content": "Hello! I'm interested in trading cards."
         }
       },
+      "SubscriptionStatusResponse": {
+        "properties": {
+          "plan": {
+            "type": "string",
+            "title": "Plan",
+            "description": "Subscription plan: 'free' or 'premium'"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "description": "Subscription status: 'active', 'inactive', 'expired', 'pending'"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At",
+            "description": "Expiry datetime (ISO format)"
+          },
+          "entitlement_active": {
+            "type": "boolean",
+            "title": "Entitlement Active",
+            "description": "Whether user has active premium entitlement"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source",
+            "description": "Subscription source: 'google_play'"
+          }
+        },
+        "type": "object",
+        "required": [
+          "plan",
+          "status",
+          "entitlement_active",
+          "source"
+        ],
+        "title": "SubscriptionStatusResponse",
+        "description": "Response schema for subscription status",
+        "example": {
+          "entitlement_active": true,
+          "expires_at": "2025-12-31T23:59:59",
+          "plan": "premium",
+          "source": "google_play",
+          "status": "active"
+        }
+      },
       "TokenResponse": {
         "properties": {
           "access_token": {
@@ -4014,7 +4187,39 @@
         ],
         "title": "ValidationError"
       },
-      "app__modules__identity__presentation__schemas__auth_schemas__ErrorResponse": {
+      "VerifyReceiptRequest": {
+        "properties": {
+          "platform": {
+            "type": "string",
+            "title": "Platform",
+            "description": "Platform: 'android' or 'ios'"
+          },
+          "purchase_token": {
+            "type": "string",
+            "title": "Purchase Token",
+            "description": "Purchase token from Google Play"
+          },
+          "product_id": {
+            "type": "string",
+            "title": "Product Id",
+            "description": "Product/SKU ID"
+          }
+        },
+        "type": "object",
+        "required": [
+          "platform",
+          "purchase_token",
+          "product_id"
+        ],
+        "title": "VerifyReceiptRequest",
+        "description": "Request schema for verifying purchase receipt",
+        "example": {
+          "platform": "android",
+          "product_id": "premium_monthly",
+          "purchase_token": "abc123xyz..."
+        }
+      },
+      "app__modules__identity__presentation__schemas__profile_schemas__ErrorResponse": {
         "properties": {
           "code": {
             "type": "string",

@@ -129,11 +129,12 @@ class ConflictException(APIException):
 
     def __init__(
         self,
+        error_code: str = "409_CONFLICT",
         message: str = "Resource conflict",
         details: Optional[Dict[str, Any]] = None,
     ) -> None:
         super().__init__(
-            message=message, status_code=409, error_code="409_CONFLICT", details=details
+            message=message, status_code=409, error_code=error_code, details=details
         )
 
 
@@ -151,3 +152,24 @@ class InternalServerException(APIException):
             error_code="500_INTERNAL_ERROR",
             details=details,
         )
+
+
+class ServiceUnavailableException(APIException):
+    """503 Service Unavailable - External service unavailable."""
+
+    def __init__(
+        self,
+        error_code: str = "503_SERVICE_UNAVAILABLE",
+        message: str = "Service temporarily unavailable",
+        details: Optional[Dict[str, Any]] = None,
+    ) -> None:
+        super().__init__(
+            message=message,
+            status_code=503,
+            error_code=error_code,
+            details=details,
+        )
+
+
+# Alias for compatibility
+ValidationException = BadRequestException
