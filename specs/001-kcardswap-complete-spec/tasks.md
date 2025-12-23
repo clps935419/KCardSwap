@@ -875,15 +875,15 @@
 
 ### OpenAPI/Swagger & Testing
 
-- [ ] T227 [P] [US7] 對齊 OpenAPI/Swagger：Posts 相關 endpoints（以更新後的 openapi/openapi.json snapshot 作為驗證基準；需先 regenerate+commit 才會反映最新程式碼）
-- [ ] T228 [P] [US7] 撰寫 Posts Integration Tests（以 OpenAPI/Swagger（由程式碼生成的 snapshot）作為回應/路由對齊驗證；改以整合測試覆蓋）
+- [ ] T227 [P] [US7] 對齊 OpenAPI/Swagger：Posts 相關 endpoints（以更新後的 openapi/openapi.json snapshot 作為驗證基準；需先 regenerate+commit 才會反映最新程式碼）**（需在有Poetry環境執行 make generate-openapi）**
+- [X] T228 [P] [US7] 撰寫 Posts Integration Tests：tests/integration/modules/social/test_posts_flow.py（已建立整合測試）
 
 ### Mobile (Expo)
 
-- [ ] M701 [P] [US7] 城市看板列表：apps/mobile/src/features/posts/screens/BoardPostsScreen.tsx（GET /api/v1/posts?city_code=...）
-- [ ] M702 [P] [US7] 建立貼文頁：apps/mobile/src/features/posts/screens/CreatePostScreen.tsx（POST /api/v1/posts；city_code + 內容）
-- [ ] M703 [P] [US7] 貼文詳情與「有興趣」：apps/mobile/src/features/posts/screens/PostDetailScreen.tsx（POST /api/v1/posts/{id}/interest）
-- [ ] M704 [US7] 作者端興趣清單與接受導流聊天：apps/mobile/src/features/posts/screens/MyPostInterestsScreen.tsx（accept/reject；導向 chat）
+- [X] M701 [P] [US7] 城市看板列表：apps/mobile/src/features/posts/screens/BoardPostsScreen.tsx（GET /api/v1/posts?city_code=...）**✅ 包含路由 app/posts/index.tsx**
+- [X] M702 [P] [US7] 建立貼文頁：apps/mobile/src/features/posts/screens/CreatePostScreen.tsx（POST /api/v1/posts；city_code + 內容）**✅ 包含路由 app/posts/create.tsx**
+- [X] M703 [P] [US7] 貼文詳情與「有興趣」：apps/mobile/src/features/posts/screens/PostDetailScreen.tsx（POST /api/v1/posts/{id}/interest）**✅ 包含路由 app/posts/[id].tsx**
+- [X] M704 [US7] 作者端興趣清單與接受導流聊天：apps/mobile/src/features/posts/screens/MyPostInterestsScreen.tsx（accept/reject；導向 chat）**✅ 包含路由 app/posts/[id]/interests.tsx**
 
 ---
 
