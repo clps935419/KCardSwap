@@ -7,7 +7,6 @@ from typing import Annotated, List, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
 from app.modules.identity.presentation.dependencies.auth_deps import get_current_user_id
@@ -21,26 +20,21 @@ from app.modules.social.application.use_cases.cards.get_my_cards import (
 from app.modules.social.application.use_cases.cards.upload_card import (
     UploadCardUseCase,
 )
-from app.modules.social.domain.repositories.card_repository import CardRepository
-from app.modules.social.domain.services.card_validation_service import (
-    CardValidationService,
-)
 from app.modules.social.domain.value_objects.upload_quota import (
     QuotaExceeded,
     UploadQuota,
 )
-from app.modules.social.infrastructure.repositories.card_repository_impl import (
-    CardRepositoryImpl,
+from app.modules.social.presentation.dependencies.use_cases import (
+    get_check_quota_use_case,
+    get_delete_card_use_case,
+    get_my_cards_use_case,
+    get_upload_card_use_case,
 )
 from app.modules.social.presentation.schemas.card_schemas import (
     CardResponse,
     QuotaStatusResponse,
     UploadCardRequest,
     UploadUrlResponse,
-)
-from app.shared.infrastructure.database.connection import get_db_session
-from app.shared.infrastructure.external.storage_service_factory import (
-    get_storage_service,
 )
 
 # Create router
@@ -76,8 +70,8 @@ def get_user_quota() -> UploadQuota:
 async def get_upload_url(
     request: UploadCardRequest,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
-    session: Annotated[AsyncSession, Depends(get_db_session)],
     quota: Annotated[UploadQuota, Depends(get_user_quota)],
+    use_case: Annotated[UploadCardUseCase, Depends(get_upload_card_use_case)],
 ) -> UploadUrlResponse:
     """
     Get a signed URL for uploading a card image.
@@ -92,18 +86,6 @@ async def get_upload_url(
     1. Upload the file directly to GCS using PUT method
     2. Include the required Content-Type header
     """
-    # Initialize dependencies
-    card_repo: CardRepository = CardRepositoryImpl(session)
-    validation_service = CardValidationService()
-    gcs_service = get_storage_service()
-
-    # Create and execute use case
-    use_case = UploadCardUseCase(
-        card_repository=card_repo,
-        validation_service=validation_service,
-        gcs_service=gcs_service,
-    )
-
     try:
         result = await use_case.execute(
             owner_id=current_user_id,
@@ -154,7 +136,7 @@ async def get_upload_url(
 )
 async def get_my_cards(
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
-    session: Annotated[AsyncSession, Depends(get_db_session)],
+    use_case: Annotated[GetMyCardsUseCase, Depends(get_my_cards_use_case)],
     status_filter: Optional[str] = Query(
         None, description="Filter by status (available/trading/traded)"
     ),
@@ -164,11 +146,6 @@ async def get_my_cards(
 
     Optionally filter by card status.
     """
-    # Initialize dependencies
-    card_repo: CardRepository = CardRepositoryImpl(session)
-
-    # Create and execute use case
-    use_case = GetMyCardsUseCase(card_repository=card_repo)
     cards = await use_case.execute(owner_id=current_user_id, status=status_filter)
 
     # Convert to response
@@ -206,7 +183,7 @@ async def get_my_cards(
 async def delete_card(
     card_id: UUID,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
-    session: Annotated[AsyncSession, Depends(get_db_session)],
+    use_case: Annotated[DeleteCardUseCase, Depends(get_delete_card_use_case)],
 ) -> None:
     """
     Delete a card.
@@ -214,13 +191,6 @@ async def delete_card(
     Only the owner can delete their own cards.
     Cards in active trades cannot be deleted.
     """
-    # Initialize dependencies
-    card_repo: CardRepository = CardRepositoryImpl(session)
-    gcs_service = get_storage_service()
-
-    # Create and execute use case
-    use_case = DeleteCardUseCase(card_repository=card_repo, gcs_service=gcs_service)
-
     try:
         deleted = await use_case.execute(card_id=card_id, owner_id=current_user_id)
 
@@ -249,8 +219,8 @@ async def delete_card(
 )
 async def get_quota_status(
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
-    session: Annotated[AsyncSession, Depends(get_db_session)],
     quota: Annotated[UploadQuota, Depends(get_user_quota)],
+    use_case: Annotated[CheckUploadQuotaUseCase, Depends(get_check_quota_use_case)],
 ) -> QuotaStatusResponse:
     """
     Get current quota status for the user.
@@ -260,11 +230,6 @@ async def get_quota_status(
     - Storage used / storage limit
     - Remaining uploads and storage
     """
-    # Initialize dependencies
-    card_repo: CardRepository = CardRepositoryImpl(session)
-
-    # Create and execute use case
-    use_case = CheckUploadQuotaUseCase(card_repository=card_repo)
     status_result = await use_case.execute(owner_id=current_user_id, quota=quota)
 
     return QuotaStatusResponse(**status_result.to_dict())
