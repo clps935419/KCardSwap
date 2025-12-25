@@ -36,8 +36,13 @@ async def lifespan(app: FastAPI):
     - In Docker: Migrations run automatically via Dockerfile entrypoint
     - In local dev: Run `poetry run alembic upgrade head` before starting the app
     """
-    # Initialize container wiring (will be expanded when modules add routers)
-    # container.wire() is called automatically via wiring_config in container
+    # Wire the IoC container for dependency injection
+    container.wire(packages=[
+        "app.modules.identity",
+        "app.modules.social",
+        "app.modules.posts",
+        "app.shared",
+    ])
 
     yield
 
