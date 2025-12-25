@@ -32,8 +32,8 @@ router = APIRouter(prefix="/subscriptions", tags=["Subscriptions"])
 @router.post("/verify-receipt", response_model=SubscriptionStatusResponse)
 async def verify_receipt(
     request: VerifyReceiptRequest,
-    current_user: dict = Depends(get_current_user),
     use_case: Annotated[VerifyReceiptUseCase, Depends(get_verify_receipt_use_case)],
+    current_user: dict = Depends(get_current_user),
 ):
     """
     Verify Google Play purchase receipt and update subscription.
@@ -63,10 +63,10 @@ async def verify_receipt(
 
 @router.get("/status", response_model=SubscriptionStatusResponse)
 async def get_subscription_status(
-    current_user: dict = Depends(get_current_user),
     use_case: Annotated[
         CheckSubscriptionStatusUseCase, Depends(get_check_subscription_status_use_case)
     ],
+    current_user: dict = Depends(get_current_user),
 ):
     """
     Get current subscription status for authenticated user.
