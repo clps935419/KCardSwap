@@ -30,6 +30,7 @@ from app.modules.social.application.use_cases.trades.get_trade_history_use_case 
 from app.modules.social.application.use_cases.trades.reject_trade_use_case import (
     RejectTradeUseCase,
 )
+from app.modules.social.domain.repositories.trade_repository import TradeRepository
 from app.modules.social.presentation.dependencies.use_cases import (
     get_accept_trade_use_case,
     get_cancel_trade_use_case,
@@ -37,6 +38,7 @@ from app.modules.social.presentation.dependencies.use_cases import (
     get_create_trade_proposal_use_case,
     get_reject_trade_use_case,
     get_trade_history_use_case,
+    get_trade_repository,
 )
 from app.modules.social.presentation.schemas.trade_schemas import (
     CreateTradeRequest,
@@ -68,7 +70,8 @@ router = APIRouter(prefix="/trades", tags=["Trades"])
 async def create_trade(
     request: CreateTradeRequest,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
-    session: Annotated[AsyncSession, Depends(get_db_session)],
+    use_case: Annotated[CreateTradeProposalUseCase, Depends(get_create_trade_proposal_use_case)],
+    trade_repo: Annotated[TradeRepository, Depends(get_trade_repository)],
 ) -> TradeResponse:
     """
     Create a new trade proposal.
@@ -79,22 +82,7 @@ async def create_trade(
     - Maximum 3 active trades between two users
     """
     try:
-        # Initialize repositories and services
-        trade_repo = SQLAlchemyTradeRepository(session)
-        card_repo = CardRepositoryImpl(session)
-        friendship_repo = SQLAlchemyFriendshipRepository(session)
-        validation_service = TradeValidationService()
-        
-        # Create use case
-        use_case = CreateTradeProposalUseCase(
-            trade_repository=trade_repo,
-            card_repository=card_repo,
-            friendship_repository=friendship_repo,
-            validation_service=validation_service,
-            max_active_trades_per_pair=3,
-        )
-        
-        # Execute
+        # Execute use case
         trade = await use_case.execute(
             CreateTradeProposalRequest(
                 initiator_id=current_user_id,
@@ -161,18 +149,11 @@ async def create_trade(
 async def accept_trade(
     trade_id: UUID,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
-    session: Annotated[AsyncSession, Depends(get_db_session)],
+    use_case: Annotated[AcceptTradeUseCase, Depends(get_accept_trade_use_case)],
+    trade_repo: Annotated[TradeRepository, Depends(get_trade_repository)],
 ) -> TradeResponse:
     """Accept a trade proposal."""
     try:
-        trade_repo = SQLAlchemyTradeRepository(session)
-        validation_service = TradeValidationService()
-        
-        use_case = AcceptTradeUseCase(
-            trade_repository=trade_repo,
-            validation_service=validation_service,
-        )
-        
         trade = await use_case.execute(trade_id, current_user_id)
         items = await trade_repo.get_items_by_trade_id(trade.id)
         
@@ -225,20 +206,11 @@ async def accept_trade(
 async def reject_trade(
     trade_id: UUID,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
-    session: Annotated[AsyncSession, Depends(get_db_session)],
+    use_case: Annotated[RejectTradeUseCase, Depends(get_reject_trade_use_case)],
+    trade_repo: Annotated[TradeRepository, Depends(get_trade_repository)],
 ) -> TradeResponse:
     """Reject a trade proposal."""
     try:
-        trade_repo = SQLAlchemyTradeRepository(session)
-        card_repo = CardRepositoryImpl(session)
-        validation_service = TradeValidationService()
-        
-        use_case = RejectTradeUseCase(
-            trade_repository=trade_repo,
-            card_repository=card_repo,
-            validation_service=validation_service,
-        )
-        
         trade = await use_case.execute(trade_id, current_user_id)
         items = await trade_repo.get_items_by_trade_id(trade.id)
         
@@ -291,20 +263,11 @@ async def reject_trade(
 async def cancel_trade(
     trade_id: UUID,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
-    session: Annotated[AsyncSession, Depends(get_db_session)],
+    use_case: Annotated[CancelTradeUseCase, Depends(get_cancel_trade_use_case)],
+    trade_repo: Annotated[TradeRepository, Depends(get_trade_repository)],
 ) -> TradeResponse:
     """Cancel a trade."""
     try:
-        trade_repo = SQLAlchemyTradeRepository(session)
-        card_repo = CardRepositoryImpl(session)
-        validation_service = TradeValidationService()
-        
-        use_case = CancelTradeUseCase(
-            trade_repository=trade_repo,
-            card_repository=card_repo,
-            validation_service=validation_service,
-        )
-        
         trade = await use_case.execute(trade_id, current_user_id)
         items = await trade_repo.get_items_by_trade_id(trade.id)
         
@@ -357,7 +320,8 @@ async def cancel_trade(
 async def complete_trade(
     trade_id: UUID,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
-    session: Annotated[AsyncSession, Depends(get_db_session)],
+    use_case: Annotated[CompleteTradeUseCase, Depends(get_complete_trade_use_case)],
+    trade_repo: Annotated[TradeRepository, Depends(get_trade_repository)],
 ) -> TradeResponse:
     """
     Confirm trade completion.
@@ -366,20 +330,6 @@ async def complete_trade(
     Enforces 48h timeout from acceptance.
     """
     try:
-        trade_repo = SQLAlchemyTradeRepository(session)
-        card_repo = CardRepositoryImpl(session)
-        validation_service = TradeValidationService()
-        
-        # Get timeout from config (default 48)
-        timeout_hours = getattr(settings, 'TRADE_CONFIRMATION_TIMEOUT_HOURS', 48)
-        
-        use_case = CompleteTradeUseCase(
-            trade_repository=trade_repo,
-            card_repository=card_repo,
-            validation_service=validation_service,
-            confirmation_timeout_hours=timeout_hours,
-        )
-        
         trade = await use_case.execute(trade_id, current_user_id)
         items = await trade_repo.get_items_by_trade_id(trade.id)
         
@@ -431,16 +381,13 @@ async def complete_trade(
 )
 async def get_trade_history(
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
-    session: Annotated[AsyncSession, Depends(get_db_session)],
+    use_case: Annotated[GetTradeHistoryUseCase, Depends(get_trade_history_use_case)],
+    trade_repo: Annotated[TradeRepository, Depends(get_trade_repository)],
     limit: int = Query(50, ge=1, le=100, description="Maximum number of results"),
     offset: int = Query(0, ge=0, description="Number of results to skip"),
 ) -> TradeHistoryResponse:
     """Get trade history for current user."""
     try:
-        trade_repo = SQLAlchemyTradeRepository(session)
-        
-        use_case = GetTradeHistoryUseCase(trade_repository=trade_repo)
-        
         trades = await use_case.execute(
             user_id=current_user_id,
             limit=limit,
