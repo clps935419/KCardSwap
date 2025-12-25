@@ -37,6 +37,11 @@ from app.modules.social.domain.services.trade_validation_service import (
     TradeValidationService,
 )
 
+# Import infrastructure services
+from app.modules.social.infrastructure.services.search_quota_service import (
+    SearchQuotaService,
+)
+
 # Import use cases - Cards
 from app.modules.social.application.use_cases.cards.upload_card import UploadCardUseCase
 from app.modules.social.application.use_cases.cards.get_my_cards import GetMyCardsUseCase
@@ -117,6 +122,9 @@ class SocialModuleContainer(containers.DeclarativeContainer):
     card_validation_service = providers.Factory(CardValidationService)
     trade_validation_service = providers.Factory(TradeValidationService)
 
+    # ========== Infrastructure Services ==========
+    search_quota_service = providers.Factory(SearchQuotaService)
+
     # ========== Use Case Factories - Cards ==========
     upload_card_use_case_factory = providers.Factory(
         UploadCardUseCase,
@@ -134,7 +142,10 @@ class SocialModuleContainer(containers.DeclarativeContainer):
     check_quota_use_case_factory = providers.Factory(CheckUploadQuotaUseCase)
 
     # ========== Use Case Factories - Nearby ==========
-    search_nearby_cards_use_case_factory = providers.Factory(SearchNearbyCardsUseCase)
+    search_nearby_cards_use_case_factory = providers.Factory(
+        SearchNearbyCardsUseCase,
+        quota_service=search_quota_service,
+    )
 
     update_user_location_use_case_factory = providers.Factory(UpdateUserLocationUseCase)
 

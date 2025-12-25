@@ -7,59 +7,29 @@ from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.identity.presentation.dependencies.auth_deps import get_current_user_id
-from app.modules.identity.domain.repositories.profile_repository import (
-    IProfileRepository,
+from app.modules.social.application.dtos.nearby_dtos import (
+    SearchNearbyRequest as SearchRequestDTO,
 )
-from app.modules.identity.infrastructure.repositories.profile_repository_impl import (
-    ProfileRepositoryImpl,
-)
-from app.modules.social.application.dtos.nearby_dtos import SearchNearbyRequest as SearchRequestDTO
 from app.modules.social.application.use_cases.nearby import (
+    RateLimitExceededException,
     SearchNearbyCardsUseCase,
     UpdateUserLocationUseCase,
-    RateLimitExceededException,
 )
-from app.modules.social.domain.repositories.card_repository import CardRepository
-from app.modules.social.infrastructure.repositories.card_repository_impl import (
-    CardRepositoryImpl,
-)
-from app.modules.social.infrastructure.services.search_quota_service import (
-    SearchQuotaService,
+from app.modules.social.presentation.dependencies.use_cases import (
+    get_search_nearby_cards_use_case,
+    get_update_user_location_use_case,
 )
 from app.modules.social.presentation.schemas.nearby_schemas import (
+    NearbyCardResponse,
     SearchNearbyRequest,
     SearchNearbyResponse,
-    NearbyCardResponse,
     UpdateLocationRequest,
 )
-from app.shared.infrastructure.database.connection import get_db_session
 
 # Create router
 router = APIRouter(prefix="/nearby", tags=["Nearby Search"])
-
-
-async def get_card_repository(
-    session: Annotated[AsyncSession, Depends(get_db_session)]
-) -> CardRepository:
-    """Dependency: Get card repository"""
-    return CardRepositoryImpl(session)
-
-
-async def get_profile_repository(
-    session: Annotated[AsyncSession, Depends(get_db_session)]
-) -> IProfileRepository:
-    """Dependency: Get profile repository"""
-    return ProfileRepositoryImpl(session)
-
-
-async def get_search_quota_service(
-    session: Annotated[AsyncSession, Depends(get_db_session)]
-) -> SearchQuotaService:
-    """Dependency: Get search quota service"""
-    return SearchQuotaService(session)
 
 
 @router.post(
@@ -108,8 +78,7 @@ async def get_search_quota_service(
 async def search_nearby_cards(
     request: SearchNearbyRequest,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
-    card_repository: Annotated[CardRepository, Depends(get_card_repository)],
-    quota_service: Annotated[SearchQuotaService, Depends(get_search_quota_service)],
+    use_case: Annotated[SearchNearbyCardsUseCase, Depends(get_search_nearby_cards_use_case)],
 ) -> SearchNearbyResponse:
     """
     Search for cards near a specific location.
@@ -121,12 +90,6 @@ async def search_nearby_cards(
     - Returns card details with distance and owner information
     """
     try:
-        # Create use case
-        use_case = SearchNearbyCardsUseCase(
-            card_repository=card_repository,
-            quota_service=quota_service,
-        )
-
         # Execute search
         # TODO(Phase 8): Check if user is premium from subscription status
         # For now, assume all users are free (will be implemented in Phase 8: US6)
@@ -191,7 +154,7 @@ async def search_nearby_cards(
 async def update_user_location(
     request: UpdateLocationRequest,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
-    profile_repository: Annotated[IProfileRepository, Depends(get_profile_repository)],
+    use_case: Annotated[UpdateUserLocationUseCase, Depends(get_update_user_location_use_case)],
 ):
     """
     Update the user's current location.
@@ -200,9 +163,6 @@ async def update_user_location(
     Users in stealth mode will not appear in search results.
     """
     try:
-        # Create use case
-        use_case = UpdateUserLocationUseCase(profile_repository=profile_repository)
-
         # Execute update
         await use_case.execute(
             user_id=current_user_id, lat=request.lat, lng=request.lng
