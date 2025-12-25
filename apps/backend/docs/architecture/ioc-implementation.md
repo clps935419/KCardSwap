@@ -23,10 +23,12 @@
 - `app/container.py`
   - 匯總 shared providers 與各模組 container。
   - 只宣告 providers，不在這裡做任何「啟動副作用」。
-- `app/modules/<module>/container.py`（建議）
-  - 模組內的組裝規則（高內聚）：repo factory / use case factory 等。
+- `app/modules/<module>/container.py`（必須）
+    - 模組內的**組裝規則**（高內聚）：repo factory / use case factory 等都定義在這裡。
+    - 重點：這裡是在「宣告 providers（工廠/單例）」，不是在處理 request-scope（例如 session）。
 - `app/modules/<module>/presentation/dependencies/*.py`
-  - **唯一**負責把 request-scope（例如 `AsyncSession`）接起來，組出 use case。
+    - **唯一**負責把 request-scope（例如 `AsyncSession`）接起來：從 container 取出 factory，帶入 session，產生 use case 實例。
+    - 重點：這裡不是「組裝容器」，容器的組裝已經在 `app/modules/<module>/container.py` 完成；這裡是在「解析/產生實例」。
 - `app/modules/<module>/presentation/routers/*.py`
   - 路由只 `Depends(get_<use_case>)`（低耦合）。
 
@@ -60,12 +62,12 @@ from app.container import container
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-  container.wire(packages=[
-    "app.modules",
-    "app.shared",
-  ])
+    container.wire(packages=[
+        "app.modules",
+        "app.shared",
+    ])
     yield
-  container.unwire()
+    container.unwire()
 
 
 def create_application() -> FastAPI:
@@ -138,15 +140,18 @@ container = ApplicationContainer()
 
 重點：
 - `AsyncSession` 由 `Depends(get_db_session)` 提供
-- 在這裡完成 repo/use case 組裝
+- 在這裡把「request-scope 的 session」接到「container 內宣告的 factories」
 - router 只拿到 use case
 
 ```python
 # app/modules/social/presentation/dependencies/use_cases.py（示意）
+from collections.abc import Callable
+
 from dependency_injector.wiring import Provide, inject
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.container import container
 from app.modules.social.application.use_cases.cards.upload_card import UploadCardUseCase
 from app.modules.social.domain.repositories.card_repository import CardRepository
 from app.shared.infrastructure.database.connection import get_db_session
@@ -155,11 +160,17 @@ from app.shared.infrastructure.database.connection import get_db_session
 @inject
 def get_upload_card_use_case(
     session: AsyncSession = Depends(get_db_session),
-  repo_factory=Provide["container.social.card_repository"],
-  use_case_factory=Provide["container.social.upload_card_use_case_factory"],
+    repo_factory: Callable[[AsyncSession], CardRepository] = Provide[
+        container.social.card_repository
+    ],
+    use_case_factory: Callable[..., UploadCardUseCase] = Provide[
+        container.social.upload_card_use_case_factory
+    ],
 ) -> UploadCardUseCase:
-  card_repo: CardRepository = repo_factory(session)
-  return use_case_factory(card_repo=card_repo)
+    # 這裡不是組裝容器：容器已在 module container 宣告好 providers
+    # 這裡是「解析 providers 並產生本次 request 的 use case 實例」
+    card_repo = repo_factory(session)
+    return use_case_factory(card_repo=card_repo)
 ```
 
 ### 4) Router：只 Depends(use case)
