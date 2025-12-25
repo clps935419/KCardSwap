@@ -126,7 +126,10 @@ class SocialModuleContainer(containers.DeclarativeContainer):
 
     get_my_cards_use_case_factory = providers.Factory(GetMyCardsUseCase)
 
-    delete_card_use_case_factory = providers.Factory(DeleteCardUseCase)
+    delete_card_use_case_factory = providers.Factory(
+        DeleteCardUseCase,
+        gcs_service=shared.gcs_storage_provider,
+    )
 
     check_quota_use_case_factory = providers.Factory(CheckUploadQuotaUseCase)
 

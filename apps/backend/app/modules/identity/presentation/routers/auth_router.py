@@ -245,8 +245,10 @@ async def refresh_token(
     new_access_token, new_refresh_token = result
 
     # Extract user info from new access token for response
-    from app.shared.infrastructure.security.jwt_service import JWTService
-    jwt_service = JWTService()
+    # Note: jwt_service is used by the use case to create the token,
+    # we create a new instance here only to parse the payload for the response
+    # This is acceptable as JWT verification is stateless
+    from app.shared.infrastructure.security.jwt_service import jwt_service
     
     try:
         payload = jwt_service.verify_token(new_access_token, expected_type="access")
