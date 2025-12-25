@@ -73,6 +73,9 @@ from app.modules.social.application.use_cases.friends.block_user_use_case import
 from app.modules.social.application.use_cases.chat.send_message_use_case import (
     SendMessageUseCase,
 )
+from app.modules.social.application.use_cases.chat.get_messages_use_case import (
+    GetMessagesUseCase,
+)
 
 # Import use cases - Ratings
 from app.modules.social.application.use_cases.ratings.rate_user_use_case import (
@@ -93,6 +96,15 @@ from app.modules.social.application.use_cases.trades.accept_trade_use_case impor
 )
 from app.modules.social.application.use_cases.trades.cancel_trade_use_case import (
     CancelTradeUseCase,
+)
+from app.modules.social.application.use_cases.trades.reject_trade_use_case import (
+    RejectTradeUseCase,
+)
+from app.modules.social.application.use_cases.trades.complete_trade_use_case import (
+    CompleteTradeUseCase,
+)
+from app.modules.social.application.use_cases.trades.get_trade_history_use_case import (
+    GetTradeHistoryUseCase,
 )
 
 
@@ -161,6 +173,8 @@ class SocialModuleContainer(containers.DeclarativeContainer):
     # ========== Use Case Factories - Chat ==========
     send_message_use_case_factory = providers.Factory(SendMessageUseCase)
 
+    get_messages_use_case_factory = providers.Factory(GetMessagesUseCase)
+
     # ========== Use Case Factories - Ratings ==========
     rate_user_use_case_factory = providers.Factory(RateUserUseCase)
 
@@ -179,3 +193,10 @@ class SocialModuleContainer(containers.DeclarativeContainer):
     )
 
     cancel_trade_use_case_factory = providers.Factory(CancelTradeUseCase)
+
+    reject_trade_use_case_factory = providers.Factory(RejectTradeUseCase)
+
+    complete_trade_use_case_factory = providers.Factory(CompleteTradeUseCase)
+
+    get_trade_history_use_case_factory = providers.Factory(GetTradeHistoryUseCase)
+

@@ -24,6 +24,9 @@ from app.modules.social.application.use_cases.cards.upload_card import (
 from app.modules.social.application.use_cases.chat.send_message_use_case import (
     SendMessageUseCase,
 )
+from app.modules.social.application.use_cases.chat.get_messages_use_case import (
+    GetMessagesUseCase,
+)
 from app.modules.social.application.use_cases.friends.accept_friend_request_use_case import (
     AcceptFriendRequestUseCase,
 )
@@ -50,6 +53,15 @@ from app.modules.social.application.use_cases.trades.accept_trade_use_case impor
 )
 from app.modules.social.application.use_cases.trades.cancel_trade_use_case import (
     CancelTradeUseCase,
+)
+from app.modules.social.application.use_cases.trades.complete_trade_use_case import (
+    CompleteTradeUseCase,
+)
+from app.modules.social.application.use_cases.trades.get_trade_history_use_case import (
+    GetTradeHistoryUseCase,
+)
+from app.modules.social.application.use_cases.trades.reject_trade_use_case import (
+    RejectTradeUseCase,
 )
 from app.modules.social.application.use_cases.trades.create_trade_proposal_use_case import (
     CreateTradeProposalUseCase,
@@ -362,4 +374,100 @@ def get_friendship_repository(
     ],
 ) -> FriendshipRepository:
     """Get FriendshipRepository instance with request-scope dependencies."""
+    return repo_factory(session)
+
+
+@inject
+def get_chat_room_repository(
+    session: AsyncSession = Depends(get_db_session),
+    repo_factory: Callable[[AsyncSession], ChatRoomRepository] = Provide[
+        container.social.chat_room_repository
+    ],
+) -> ChatRoomRepository:
+    """Get ChatRoomRepository instance with request-scope dependencies."""
+    return repo_factory(session)
+
+
+@inject
+def get_message_repository(
+    session: AsyncSession = Depends(get_db_session),
+    repo_factory: Callable[[AsyncSession], MessageRepository] = Provide[
+        container.social.message_repository
+    ],
+) -> MessageRepository:
+    """Get MessageRepository instance with request-scope dependencies."""
+    return repo_factory(session)
+
+
+# ========== Chat Use Cases (continued) ==========
+
+
+@inject
+def get_messages_use_case(
+    session: AsyncSession = Depends(get_db_session),
+    message_repo_factory: Callable[[AsyncSession], MessageRepository] = Provide[
+        container.social.message_repository
+    ],
+    use_case_factory: Callable[..., GetMessagesUseCase] = Provide[
+        container.social.get_messages_use_case_factory
+    ],
+) -> GetMessagesUseCase:
+    """Get GetMessagesUseCase instance with request-scope dependencies."""
+    message_repo = message_repo_factory(session)
+    return use_case_factory(message_repository=message_repo)
+
+
+@inject
+def get_reject_trade_use_case(
+    session: AsyncSession = Depends(get_db_session),
+    trade_repo_factory: Callable[[AsyncSession], TradeRepository] = Provide[
+        container.social.trade_repository
+    ],
+    use_case_factory: Callable[..., RejectTradeUseCase] = Provide[
+        container.social.reject_trade_use_case_factory
+    ],
+) -> RejectTradeUseCase:
+    """Get RejectTradeUseCase instance with request-scope dependencies."""
+    trade_repo = trade_repo_factory(session)
+    return use_case_factory(trade_repository=trade_repo)
+
+
+@inject
+def get_complete_trade_use_case(
+    session: AsyncSession = Depends(get_db_session),
+    trade_repo_factory: Callable[[AsyncSession], TradeRepository] = Provide[
+        container.social.trade_repository
+    ],
+    use_case_factory: Callable[..., CompleteTradeUseCase] = Provide[
+        container.social.complete_trade_use_case_factory
+    ],
+) -> CompleteTradeUseCase:
+    """Get CompleteTradeUseCase instance with request-scope dependencies."""
+    trade_repo = trade_repo_factory(session)
+    return use_case_factory(trade_repository=trade_repo)
+
+
+@inject
+def get_trade_history_use_case(
+    session: AsyncSession = Depends(get_db_session),
+    trade_repo_factory: Callable[[AsyncSession], TradeRepository] = Provide[
+        container.social.trade_repository
+    ],
+    use_case_factory: Callable[..., GetTradeHistoryUseCase] = Provide[
+        container.social.get_trade_history_use_case_factory
+    ],
+) -> GetTradeHistoryUseCase:
+    """Get GetTradeHistoryUseCase instance with request-scope dependencies."""
+    trade_repo = trade_repo_factory(session)
+    return use_case_factory(trade_repository=trade_repo)
+
+
+@inject
+def get_trade_repository(
+    session: AsyncSession = Depends(get_db_session),
+    repo_factory: Callable[[AsyncSession], TradeRepository] = Provide[
+        container.social.trade_repository
+    ],
+) -> TradeRepository:
+    """Get TradeRepository instance with request-scope dependencies."""
     return repo_factory(session)

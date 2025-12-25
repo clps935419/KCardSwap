@@ -8,7 +8,6 @@ from typing import Annotated, List, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.identity.presentation.dependencies.auth_deps import get_current_user_id
 from app.modules.social.application.use_cases.chat.get_messages_use_case import (
@@ -17,14 +16,15 @@ from app.modules.social.application.use_cases.chat.get_messages_use_case import 
 from app.modules.social.application.use_cases.chat.send_message_use_case import (
     SendMessageUseCase,
 )
-from app.modules.social.infrastructure.repositories.chat_room_repository_impl import (
-    ChatRoomRepositoryImpl,
+from app.modules.social.domain.repositories.chat_room_repository import (
+    ChatRoomRepository,
 )
-from app.modules.social.infrastructure.repositories.friendship_repository_impl import (
-    FriendshipRepositoryImpl,
-)
-from app.modules.social.infrastructure.repositories.message_repository_impl import (
-    MessageRepositoryImpl,
+from app.modules.social.domain.repositories.message_repository import MessageRepository
+from app.modules.social.presentation.dependencies.use_cases import (
+    get_chat_room_repository,
+    get_messages_use_case,
+    get_message_repository,
+    get_send_message_use_case,
 )
 from app.modules.social.presentation.schemas.chat_schemas import (
     ChatRoomResponse,
@@ -32,7 +32,6 @@ from app.modules.social.presentation.schemas.chat_schemas import (
     MessagesListResponse,
     SendMessageRequest,
 )
-from app.shared.infrastructure.database.connection import get_db_session
 from app.shared.infrastructure.external.fcm_service import get_fcm_service
 
 logger = logging.getLogger(__name__)
@@ -55,7 +54,7 @@ router = APIRouter(prefix="/chats", tags=["Chat"])
 )
 async def get_chat_rooms(
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
-    session: Annotated[AsyncSession, Depends(get_db_session)],
+    chat_room_repo: Annotated[ChatRoomRepository, Depends(get_chat_room_repository)],
 ) -> List[ChatRoomResponse]:
     """
     Get all chat rooms for the current user.
@@ -67,9 +66,6 @@ async def get_chat_rooms(
     - Unread count (placeholder)
     """
     try:
-        # Initialize repository
-        chat_room_repo = ChatRoomRepositoryImpl(session)
-
         # Get chat rooms for user
         chat_rooms = await chat_room_repo.find_by_user(str(current_user_id))
 
@@ -130,7 +126,7 @@ async def get_chat_rooms(
 async def get_messages(
     room_id: UUID,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
-    session: Annotated[AsyncSession, Depends(get_db_session)],
+    use_case: Annotated[GetMessagesUseCase, Depends(get_messages_use_case)],
     after_message_id: Optional[UUID] = Query(
         None, description="Get messages after this message ID"
     ),
@@ -144,11 +140,6 @@ async def get_messages(
     - Useful for implementing polling mechanism in client
     """
     try:
-        # Initialize repositories and use case
-        message_repo = MessageRepositoryImpl(session)
-        chat_room_repo = ChatRoomRepositoryImpl(session)
-        use_case = GetMessagesUseCase(message_repo, chat_room_repo)
-
         # Execute use case
         messages = await use_case.execute(
             room_id=str(room_id),
@@ -214,7 +205,8 @@ async def send_message(
     room_id: UUID,
     request: SendMessageRequest,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
-    session: Annotated[AsyncSession, Depends(get_db_session)],
+    use_case: Annotated[SendMessageUseCase, Depends(get_send_message_use_case)],
+    chat_room_repo: Annotated[ChatRoomRepository, Depends(get_chat_room_repository)],
 ) -> MessageResponse:
     """
     Send a message in a chat room.
@@ -229,15 +221,6 @@ async def send_message(
     - Notification failure does not fail the request
     """
     try:
-        # Initialize repositories and use case
-        message_repo = MessageRepositoryImpl(session)
-        chat_room_repo = ChatRoomRepositoryImpl(session)
-        friendship_repo = FriendshipRepositoryImpl(session)
-
-        use_case = SendMessageUseCase(
-            message_repo, chat_room_repo, friendship_repo
-        )
-
         # Execute use case
         message = await use_case.execute(
             room_id=str(room_id),
@@ -318,7 +301,8 @@ async def mark_message_read(
     room_id: UUID,
     message_id: UUID,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
-    session: Annotated[AsyncSession, Depends(get_db_session)],
+    message_repo: Annotated[MessageRepository, Depends(get_message_repository)],
+    chat_room_repo: Annotated[ChatRoomRepository, Depends(get_chat_room_repository)],
 ) -> None:
     """
     Mark a message as read.
@@ -332,10 +316,6 @@ async def mark_message_read(
     Full implementation would update message status.
     """
     try:
-        # Initialize repositories
-        message_repo = MessageRepositoryImpl(session)
-        chat_room_repo = ChatRoomRepositoryImpl(session)
-
         # Verify room exists and user is participant
         chat_room = await chat_room_repo.get_by_id(str(room_id))
         if not chat_room:

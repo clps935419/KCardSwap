@@ -8,8 +8,8 @@ from typing import Annotated, List
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.config import settings
 from app.modules.identity.presentation.dependencies.auth_deps import get_current_user_id
 from app.modules.social.application.use_cases.trades.accept_trade_use_case import (
     AcceptTradeUseCase,
@@ -30,17 +30,13 @@ from app.modules.social.application.use_cases.trades.get_trade_history_use_case 
 from app.modules.social.application.use_cases.trades.reject_trade_use_case import (
     RejectTradeUseCase,
 )
-from app.modules.social.domain.services.trade_validation_service import (
-    TradeValidationService,
-)
-from app.modules.social.infrastructure.repositories.card_repository_impl import (
-    CardRepositoryImpl,
-)
-from app.modules.social.infrastructure.repositories.friendship_repository_impl import (
-    SQLAlchemyFriendshipRepository,
-)
-from app.modules.social.infrastructure.repositories.trade_repository_impl import (
-    SQLAlchemyTradeRepository,
+from app.modules.social.presentation.dependencies.use_cases import (
+    get_accept_trade_use_case,
+    get_cancel_trade_use_case,
+    get_complete_trade_use_case,
+    get_create_trade_proposal_use_case,
+    get_reject_trade_use_case,
+    get_trade_history_use_case,
 )
 from app.modules.social.presentation.schemas.trade_schemas import (
     CreateTradeRequest,
@@ -48,8 +44,6 @@ from app.modules.social.presentation.schemas.trade_schemas import (
     TradeItemResponse,
     TradeResponse,
 )
-from app.shared.infrastructure.database.connection import get_db_session
-from app.config import settings
 
 logger = logging.getLogger(__name__)
 
