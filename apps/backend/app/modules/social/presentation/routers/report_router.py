@@ -8,21 +8,19 @@ from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.identity.presentation.dependencies.auth_deps import get_current_user_id
 from app.modules.social.application.use_cases.reports.report_user_use_case import (
     ReportUserUseCase,
 )
-from app.modules.social.infrastructure.repositories.report_repository_impl import (
-    ReportRepositoryImpl,
+from app.modules.social.presentation.dependencies.use_cases import (
+    get_report_user_use_case,
 )
 from app.modules.social.presentation.schemas.report_schemas import (
     ReportListResponse,
     ReportRequest,
     ReportResponse,
 )
-from app.shared.infrastructure.database.connection import get_db_session
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +45,7 @@ router = APIRouter(prefix="/reports", tags=["Reports"])
 async def submit_report(
     request: ReportRequest,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
-    session: Annotated[AsyncSession, Depends(get_db_session)],
+    use_case: Annotated[ReportUserUseCase, Depends(get_report_user_use_case)],
 ) -> ReportResponse:
     """
     Submit a report for another user.
@@ -67,10 +65,6 @@ async def submit_report(
     - Other (please specify in detail)
     """
     try:
-        # Initialize repository and use case
-        report_repo = ReportRepositoryImpl(session)
-        use_case = ReportUserUseCase(report_repo)
-
         # Execute use case
         report = await use_case.execute(
             reporter_id=str(current_user_id),

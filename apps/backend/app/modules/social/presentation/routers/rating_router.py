@@ -8,17 +8,13 @@ from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.identity.presentation.dependencies.auth_deps import get_current_user_id
 from app.modules.social.application.use_cases.ratings.rate_user_use_case import (
     RateUserUseCase,
 )
-from app.modules.social.infrastructure.repositories.rating_repository_impl import (
-    RatingRepositoryImpl,
-)
-from app.modules.social.infrastructure.repositories.friendship_repository_impl import (
-    FriendshipRepositoryImpl,
+from app.modules.social.presentation.dependencies.use_cases import (
+    get_rate_user_use_case,
 )
 from app.modules.social.presentation.schemas.rating_schemas import (
     AverageRatingResponse,
@@ -26,7 +22,6 @@ from app.modules.social.presentation.schemas.rating_schemas import (
     RatingRequest,
     RatingResponse,
 )
-from app.shared.infrastructure.database.connection import get_db_session
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +46,7 @@ router = APIRouter(prefix="/ratings", tags=["Ratings"])
 async def submit_rating(
     request: RatingRequest,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
-    session: Annotated[AsyncSession, Depends(get_db_session)],
+    use_case: Annotated[RateUserUseCase, Depends(get_rate_user_use_case)],
 ) -> RatingResponse:
     """
     Submit a rating for another user.
@@ -66,11 +61,6 @@ async def submit_rating(
     Ratings help build trust in the community.
     """
     try:
-        # Initialize repositories and use case
-        rating_repo = RatingRepositoryImpl(session)
-        friendship_repo = FriendshipRepositoryImpl(session)
-        use_case = RateUserUseCase(rating_repo, friendship_repo)
-
         # Execute use case
         rating = await use_case.execute(
             rater_id=str(current_user_id),

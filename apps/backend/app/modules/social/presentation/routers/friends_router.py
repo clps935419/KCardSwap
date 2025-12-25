@@ -8,7 +8,6 @@ from typing import Annotated, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.identity.presentation.dependencies.auth_deps import get_current_user_id
 from app.modules.social.application.use_cases.friends.accept_friend_request_use_case import (
@@ -20,8 +19,14 @@ from app.modules.social.application.use_cases.friends.block_user_use_case import
 from app.modules.social.application.use_cases.friends.send_friend_request_use_case import (
     SendFriendRequestUseCase,
 )
-from app.modules.social.infrastructure.repositories.friendship_repository_impl import (
-    FriendshipRepositoryImpl,
+from app.modules.social.domain.repositories.friendship_repository import (
+    FriendshipRepository,
+)
+from app.modules.social.presentation.dependencies.use_cases import (
+    get_accept_friend_request_use_case,
+    get_block_user_use_case,
+    get_friendship_repository,
+    get_send_friend_request_use_case,
 )
 from app.modules.social.presentation.schemas.friends_schemas import (
     BlockUserRequest,
@@ -29,7 +34,6 @@ from app.modules.social.presentation.schemas.friends_schemas import (
     FriendshipResponse,
     SendFriendRequestRequest,
 )
-from app.shared.infrastructure.database.connection import get_db_session
 
 logger = logging.getLogger(__name__)
 
@@ -56,7 +60,7 @@ router = APIRouter(prefix="/friends", tags=["Friends"])
 async def send_friend_request(
     request: SendFriendRequestRequest,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
-    session: Annotated[AsyncSession, Depends(get_db_session)],
+    use_case: Annotated[SendFriendRequestUseCase, Depends(get_send_friend_request_use_case)],
 ) -> FriendshipResponse:
     """
     Send a friend request to another user.
@@ -68,10 +72,6 @@ async def send_friend_request(
     - Cannot send request if user is blocked
     """
     try:
-        # Initialize repository and use case
-        friendship_repo = FriendshipRepositoryImpl(session)
-        use_case = SendFriendRequestUseCase(friendship_repo)
-
         # Execute use case
         friendship = await use_case.execute(
             user_id=str(current_user_id), friend_id=str(request.friend_id)
@@ -114,7 +114,7 @@ async def send_friend_request(
 async def accept_friend_request(
     friendship_id: UUID,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
-    session: Annotated[AsyncSession, Depends(get_db_session)],
+    use_case: Annotated[AcceptFriendRequestUseCase, Depends(get_accept_friend_request_use_case)],
 ) -> FriendshipResponse:
     """
     Accept a pending friend request.
@@ -124,10 +124,6 @@ async def accept_friend_request(
     - Request must be in pending status
     """
     try:
-        # Initialize repository and use case
-        friendship_repo = FriendshipRepositoryImpl(session)
-        use_case = AcceptFriendRequestUseCase(friendship_repo)
-
         # Execute use case
         friendship = await use_case.execute(
             friendship_id=str(friendship_id), accepter_id=str(current_user_id)
@@ -180,7 +176,7 @@ async def accept_friend_request(
 async def block_user(
     request: BlockUserRequest,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
-    session: Annotated[AsyncSession, Depends(get_db_session)],
+    use_case: Annotated[BlockUserUseCase, Depends(get_block_user_use_case)],
 ) -> FriendshipResponse:
     """
     Block another user.
@@ -191,10 +187,6 @@ async def block_user(
     - Blocked users cannot send messages or interact
     """
     try:
-        # Initialize repository and use case
-        friendship_repo = FriendshipRepositoryImpl(session)
-        use_case = BlockUserUseCase(friendship_repo)
-
         # Execute use case
         friendship = await use_case.execute(
             blocker_id=str(current_user_id), blocked_id=str(request.user_id)
@@ -235,7 +227,7 @@ async def block_user(
 )
 async def get_friends(
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
-    session: Annotated[AsyncSession, Depends(get_db_session)],
+    friendship_repo: Annotated[FriendshipRepository, Depends(get_friendship_repository)],
     status_filter: Optional[str] = Query(
         "accepted",
         alias="status",
@@ -251,9 +243,6 @@ async def get_friends(
     - blocked: Only blocked users
     """
     try:
-        # Initialize repository
-        friendship_repo = FriendshipRepositoryImpl(session)
-
         # Get friendships by status
         friendships = await friendship_repo.find_by_user_and_status(
             str(current_user_id), status_filter

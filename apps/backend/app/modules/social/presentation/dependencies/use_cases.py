@@ -348,3 +348,18 @@ def get_cancel_trade_use_case(
     """Get CancelTradeUseCase instance with request-scope dependencies."""
     trade_repo = trade_repo_factory(session)
     return use_case_factory(trade_repository=trade_repo)
+
+
+# ========== Repository Dependencies ==========
+# For simple queries that don't need use cases
+
+
+@inject
+def get_friendship_repository(
+    session: AsyncSession = Depends(get_db_session),
+    repo_factory: Callable[[AsyncSession], FriendshipRepository] = Provide[
+        container.social.friendship_repository
+    ],
+) -> FriendshipRepository:
+    """Get FriendshipRepository instance with request-scope dependencies."""
+    return repo_factory(session)
