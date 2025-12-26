@@ -128,7 +128,9 @@ class TestNearbySearchIntegration:
         search_payload = {"lat": 25.0330, "lng": 121.5654, "radius_km": 10.0}
 
         # Act
-        response = client.post(f"{settings.API_PREFIX}/nearby/search", json=search_payload)
+        response = client.post(
+            f"{settings.API_PREFIX}/nearby/search", json=search_payload
+        )
 
         # Assert
         assert response.status_code == 200
@@ -162,7 +164,9 @@ class TestNearbySearchIntegration:
         search_payload = {"lat": 25.0330, "lng": 121.5654, "radius_km": 10.0}
 
         # Act
-        response = client.post(f"{settings.API_PREFIX}/nearby/search", json=search_payload)
+        response = client.post(
+            f"{settings.API_PREFIX}/nearby/search", json=search_payload
+        )
 
         # Assert
         assert response.status_code == 429
@@ -180,7 +184,9 @@ class TestNearbySearchIntegration:
         search_payload = {"lat": 91.0, "lng": 121.5654, "radius_km": 10.0}
 
         # Act
-        response = client.post(f"{settings.API_PREFIX}/nearby/search", json=search_payload)
+        response = client.post(
+            f"{settings.API_PREFIX}/nearby/search", json=search_payload
+        )
 
         # Assert
         assert response.status_code == 422  # Pydantic validation error
@@ -195,7 +201,9 @@ class TestNearbySearchIntegration:
         search_payload = {"lat": 25.0330, "lng": 181.0, "radius_km": 10.0}
 
         # Act
-        response = client.post(f"{settings.API_PREFIX}/nearby/search", json=search_payload)
+        response = client.post(
+            f"{settings.API_PREFIX}/nearby/search", json=search_payload
+        )
 
         # Assert
         assert response.status_code == 422  # Pydantic validation error
@@ -206,7 +214,9 @@ class TestNearbySearchIntegration:
         search_payload = {"lat": 25.0330}  # Missing lng
 
         # Act
-        response = client.post(f"{settings.API_PREFIX}/nearby/search", json=search_payload)
+        response = client.post(
+            f"{settings.API_PREFIX}/nearby/search", json=search_payload
+        )
 
         # Assert
         assert response.status_code == 422
@@ -223,7 +233,9 @@ class TestNearbySearchIntegration:
         search_payload = {"lat": 25.0330, "lng": 121.5654}  # No radius
 
         # Act
-        response = client.post(f"{settings.API_PREFIX}/nearby/search", json=search_payload)
+        response = client.post(
+            f"{settings.API_PREFIX}/nearby/search", json=search_payload
+        )
 
         # Assert
         assert response.status_code == 200
@@ -297,7 +309,9 @@ class TestUpdateLocationIntegration:
         location_payload = {"lat": 25.0330, "lng": 121.5654}
 
         # Act
-        response = client.put(f"{settings.API_PREFIX}/nearby/location", json=location_payload)
+        response = client.put(
+            f"{settings.API_PREFIX}/nearby/location", json=location_payload
+        )
 
         # Assert
         assert response.status_code == 204
@@ -316,7 +330,9 @@ class TestUpdateLocationIntegration:
         location_payload = {"lat": 91.0, "lng": 121.5654}
 
         # Act
-        response = client.put(f"{settings.API_PREFIX}/nearby/location", json=location_payload)
+        response = client.put(
+            f"{settings.API_PREFIX}/nearby/location", json=location_payload
+        )
 
         # Assert
         assert response.status_code == 422
@@ -331,7 +347,9 @@ class TestUpdateLocationIntegration:
         location_payload = {"lat": 25.0330, "lng": 181.0}
 
         # Act
-        response = client.put(f"{settings.API_PREFIX}/nearby/location", json=location_payload)
+        response = client.put(
+            f"{settings.API_PREFIX}/nearby/location", json=location_payload
+        )
 
         # Assert
         assert response.status_code == 422
@@ -342,7 +360,9 @@ class TestUpdateLocationIntegration:
         location_payload = {"lat": 25.0330}  # Missing lng
 
         # Act
-        response = client.put(f"{settings.API_PREFIX}/nearby/location", json=location_payload)
+        response = client.put(
+            f"{settings.API_PREFIX}/nearby/location", json=location_payload
+        )
 
         # Assert
         assert response.status_code == 422

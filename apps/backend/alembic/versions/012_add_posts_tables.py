@@ -22,7 +22,7 @@ depends_on: Union[str, Sequence[str], None] = None
 def upgrade() -> None:
     """
     Create posts and post_interests tables for city board feature.
-    
+
     posts: City board posts for card exchange
     post_interests: User interests in posts
     """

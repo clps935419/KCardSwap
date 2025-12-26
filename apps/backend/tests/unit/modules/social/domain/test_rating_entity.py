@@ -18,7 +18,7 @@ class TestRatingCreation:
         rated_user_id = str(uuid4())
         trade_id = str(uuid4())
         created_at = datetime.utcnow()
-        
+
         rating = Rating(
             id=str(uuid4()),
             rater_id=rater_id,
@@ -26,9 +26,9 @@ class TestRatingCreation:
             score=5,
             comment="Great trader!",
             created_at=created_at,
-            trade_id=trade_id
+            trade_id=trade_id,
         )
-        
+
         assert rating.rater_id == rater_id
         assert rating.rated_user_id == rated_user_id
         assert rating.trade_id == trade_id
@@ -41,7 +41,7 @@ class TestRatingCreation:
         rater_id = str(uuid4())
         rated_user_id = str(uuid4())
         created_at = datetime.utcnow()
-        
+
         rating = Rating(
             id=str(uuid4()),
             rater_id=rater_id,
@@ -49,9 +49,9 @@ class TestRatingCreation:
             score=4,
             comment="Good friend!",
             created_at=created_at,
-            trade_id=None
+            trade_id=None,
         )
-        
+
         assert rating.rater_id == rater_id
         assert rating.rated_user_id == rated_user_id
         assert rating.trade_id is None
@@ -62,7 +62,7 @@ class TestRatingCreation:
         """Test rating creation with minimal required fields (no comment, no trade_id)"""
         rater_id = str(uuid4())
         rated_user_id = str(uuid4())
-        
+
         rating = Rating(
             id=str(uuid4()),
             rater_id=rater_id,
@@ -70,9 +70,9 @@ class TestRatingCreation:
             score=3,
             comment=None,
             created_at=datetime.utcnow(),
-            trade_id=None
+            trade_id=None,
         )
-        
+
         assert rating.rater_id == rater_id
         assert rating.rated_user_id == rated_user_id
         assert rating.score == 3
@@ -87,7 +87,7 @@ class TestRatingValidation:
         """Test that rating score must be 1-5"""
         rater_id = str(uuid4())
         rated_user_id = str(uuid4())
-        
+
         # Valid scores
         for score in [1, 2, 3, 4, 5]:
             rating = Rating(
@@ -96,7 +96,7 @@ class TestRatingValidation:
                 rated_user_id=rated_user_id,
                 score=score,
                 comment=None,
-                created_at=datetime.utcnow()
+                created_at=datetime.utcnow(),
             )
             assert rating.score == score
 
@@ -109,7 +109,7 @@ class TestRatingValidation:
                 rated_user_id=str(uuid4()),
                 score=0,
                 comment=None,
-                created_at=datetime.utcnow()
+                created_at=datetime.utcnow(),
             )
 
     def test_rating_score_above_5_raises_error(self):
@@ -121,13 +121,13 @@ class TestRatingValidation:
                 rated_user_id=str(uuid4()),
                 score=6,
                 comment=None,
-                created_at=datetime.utcnow()
+                created_at=datetime.utcnow(),
             )
 
     def test_user_cannot_rate_themselves(self):
         """Test that user cannot rate themselves"""
         user_id = str(uuid4())
-        
+
         with pytest.raises(ValueError, match="User cannot rate themselves"):
             Rating(
                 id=str(uuid4()),
@@ -135,13 +135,13 @@ class TestRatingValidation:
                 rated_user_id=user_id,  # Same as rater_id
                 score=5,
                 comment=None,
-                created_at=datetime.utcnow()
+                created_at=datetime.utcnow(),
             )
 
     def test_comment_cannot_exceed_1000_characters(self):
         """Test that comment length is limited to 1000 characters"""
         long_comment = "x" * 1001
-        
+
         with pytest.raises(ValueError, match="Rating comment exceeds maximum length"):
             Rating(
                 id=str(uuid4()),
@@ -149,22 +149,22 @@ class TestRatingValidation:
                 rated_user_id=str(uuid4()),
                 score=5,
                 comment=long_comment,
-                created_at=datetime.utcnow()
+                created_at=datetime.utcnow(),
             )
 
     def test_comment_exactly_1000_characters_is_valid(self):
         """Test that comment with exactly 1000 characters is valid"""
         comment = "x" * 1000
-        
+
         rating = Rating(
             id=str(uuid4()),
             rater_id=str(uuid4()),
             rated_user_id=str(uuid4()),
             score=5,
             comment=comment,
-            created_at=datetime.utcnow()
+            created_at=datetime.utcnow(),
         )
-        
+
         assert len(rating.comment) == 1000
 
 
@@ -180,7 +180,7 @@ class TestRatingHelperMethods:
                 rated_user_id=str(uuid4()),
                 score=score,
                 comment=None,
-                created_at=datetime.utcnow()
+                created_at=datetime.utcnow(),
             )
             assert rating.is_positive() is True
 
@@ -193,7 +193,7 @@ class TestRatingHelperMethods:
                 rated_user_id=str(uuid4()),
                 score=score,
                 comment=None,
-                created_at=datetime.utcnow()
+                created_at=datetime.utcnow(),
             )
             assert rating.is_positive() is False
 
@@ -206,7 +206,7 @@ class TestRatingHelperMethods:
                 rated_user_id=str(uuid4()),
                 score=score,
                 comment=None,
-                created_at=datetime.utcnow()
+                created_at=datetime.utcnow(),
             )
             assert rating.is_negative() is True
 
@@ -219,6 +219,6 @@ class TestRatingHelperMethods:
                 rated_user_id=str(uuid4()),
                 score=score,
                 comment=None,
-                created_at=datetime.utcnow()
+                created_at=datetime.utcnow(),
             )
             assert rating.is_negative() is False

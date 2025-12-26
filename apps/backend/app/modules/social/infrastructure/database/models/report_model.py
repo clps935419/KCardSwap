@@ -33,7 +33,9 @@ class ReportModel(Base):
     # fraud, fake_card, harassment, inappropriate_content, spam, other
     detail = Column(Text, nullable=True)
     created_at = Column(DateTime(timezone=True), default=datetime.utcnow, index=True)
-    resolved = Column(Boolean, nullable=False, default=False, server_default="false", index=True)
+    resolved = Column(
+        Boolean, nullable=False, default=False, server_default="false", index=True
+    )
     resolved_at = Column(DateTime(timezone=True), nullable=True)
 
     # Compound indexes for efficient querying

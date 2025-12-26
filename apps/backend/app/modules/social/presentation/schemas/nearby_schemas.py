@@ -37,7 +37,9 @@ class NearbyCardResponse(BaseModel):
 
     card_id: UUID = Field(..., description="Card unique identifier")
     owner_id: UUID = Field(..., description="Card owner's user ID")
-    distance_km: float = Field(..., description="Distance from search origin in kilometers")
+    distance_km: float = Field(
+        ..., description="Distance from search origin in kilometers"
+    )
     idol: Optional[str] = Field(None, description="Idol name")
     idol_group: Optional[str] = Field(None, description="Idol group name")
     album: Optional[str] = Field(None, description="Album name")
@@ -66,9 +68,7 @@ class NearbyCardResponse(BaseModel):
 class SearchNearbyResponse(BaseModel):
     """Response schema for nearby search results"""
 
-    results: List[NearbyCardResponse] = Field(
-        ..., description="List of nearby cards"
-    )
+    results: List[NearbyCardResponse] = Field(..., description="List of nearby cards")
     count: int = Field(..., description="Number of results returned")
 
     class Config:

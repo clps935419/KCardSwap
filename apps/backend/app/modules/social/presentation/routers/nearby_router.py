@@ -16,7 +16,9 @@ from app.modules.identity.domain.repositories.profile_repository import (
 from app.modules.identity.infrastructure.repositories.profile_repository_impl import (
     ProfileRepositoryImpl,
 )
-from app.modules.social.application.dtos.nearby_dtos import SearchNearbyRequest as SearchRequestDTO
+from app.modules.social.application.dtos.nearby_dtos import (
+    SearchNearbyRequest as SearchRequestDTO,
+)
 from app.modules.social.application.use_cases.nearby import (
     SearchNearbyCardsUseCase,
     UpdateUserLocationUseCase,
@@ -42,21 +44,21 @@ router = APIRouter(prefix="/nearby", tags=["Nearby Search"])
 
 
 async def get_card_repository(
-    session: Annotated[AsyncSession, Depends(get_db_session)]
+    session: Annotated[AsyncSession, Depends(get_db_session)],
 ) -> CardRepository:
     """Dependency: Get card repository"""
     return CardRepositoryImpl(session)
 
 
 async def get_profile_repository(
-    session: Annotated[AsyncSession, Depends(get_db_session)]
+    session: Annotated[AsyncSession, Depends(get_db_session)],
 ) -> IProfileRepository:
     """Dependency: Get profile repository"""
     return ProfileRepositoryImpl(session)
 
 
 async def get_search_quota_service(
-    session: Annotated[AsyncSession, Depends(get_db_session)]
+    session: Annotated[AsyncSession, Depends(get_db_session)],
 ) -> SearchQuotaService:
     """Dependency: Get search quota service"""
     return SearchQuotaService(session)
@@ -113,7 +115,7 @@ async def search_nearby_cards(
 ) -> SearchNearbyResponse:
     """
     Search for cards near a specific location.
-    
+
     Features:
     - Filters out stealth mode users
     - Sorts by distance (closest first)
@@ -158,7 +160,9 @@ async def search_nearby_cards(
             for r in results
         ]
 
-        return SearchNearbyResponse(results=response_results, count=len(response_results))
+        return SearchNearbyResponse(
+            results=response_results, count=len(response_results)
+        )
 
     except RateLimitExceededException as e:
         raise HTTPException(
@@ -195,7 +199,7 @@ async def update_user_location(
 ):
     """
     Update the user's current location.
-    
+
     This location will be used for nearby card searches.
     Users in stealth mode will not appear in search results.
     """

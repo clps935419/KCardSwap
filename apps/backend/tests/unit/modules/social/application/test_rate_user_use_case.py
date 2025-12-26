@@ -175,7 +175,9 @@ class TestRateUserUseCaseValidation:
 
         mock_friendship_repository.is_blocked = AsyncMock(side_effect=is_blocked_mock)
 
-        with pytest.raises(ValueError, match="Cannot rate user: one party has blocked the other"):
+        with pytest.raises(
+            ValueError, match="Cannot rate user: one party has blocked the other"
+        ):
             await use_case.execute(
                 rater_id=rater_id,
                 rated_user_id=rated_user_id,
@@ -202,7 +204,9 @@ class TestRateUserUseCaseValidation:
 
         mock_friendship_repository.is_blocked = AsyncMock(side_effect=is_blocked_mock)
 
-        with pytest.raises(ValueError, match="Cannot rate user: one party has blocked the other"):
+        with pytest.raises(
+            ValueError, match="Cannot rate user: one party has blocked the other"
+        ):
             await use_case.execute(
                 rater_id=rater_id,
                 rated_user_id=rated_user_id,
@@ -226,7 +230,9 @@ class TestRateUserUseCaseValidation:
         rater_id = str(uuid4())
         rated_user_id = str(uuid4())
 
-        with pytest.raises(ValueError, match="must be friends or provide a valid trade_id"):
+        with pytest.raises(
+            ValueError, match="must be friends or provide a valid trade_id"
+        ):
             await use_case.execute(
                 rater_id=rater_id,
                 rated_user_id=rated_user_id,
@@ -309,7 +315,9 @@ class TestRateUserUseCaseBlockingScenarios:
         rater_id = str(uuid4())
         rated_user_id = str(uuid4())
 
-        with pytest.raises(ValueError, match="Cannot rate user: one party has blocked the other"):
+        with pytest.raises(
+            ValueError, match="Cannot rate user: one party has blocked the other"
+        ):
             await use_case.execute(
                 rater_id=rater_id,
                 rated_user_id=rated_user_id,

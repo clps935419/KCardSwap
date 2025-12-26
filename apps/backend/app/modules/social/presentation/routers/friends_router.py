@@ -87,7 +87,9 @@ async def send_friend_request(
 
     except ValueError as e:
         logger.warning(f"Friend request validation failed: {e}")
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e)
+        )
     except Exception as e:
         logger.error(f"Error sending friend request: {e}", exc_info=True)
         raise HTTPException(
@@ -144,13 +146,9 @@ async def accept_friend_request(
     except ValueError as e:
         error_msg = str(e).lower()
         if "not found" in error_msg:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail=str(e)
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
         elif "not authorized" in error_msg or "only" in error_msg:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN, detail=str(e)
-            )
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
         else:
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e)

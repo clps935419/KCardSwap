@@ -114,9 +114,7 @@ class QuotaStatusResponse(BaseModel):
     remaining_uploads: int = Field(..., description="Remaining uploads for today")
     storage_used_bytes: int = Field(..., description="Total storage used in bytes")
     storage_limit_bytes: int = Field(..., description="Storage limit in bytes")
-    remaining_storage_bytes: int = Field(
-        ..., description="Remaining storage in bytes"
-    )
+    remaining_storage_bytes: int = Field(..., description="Remaining storage in bytes")
     storage_used_mb: float = Field(..., description="Storage used in MB")
     storage_limit_mb: float = Field(..., description="Storage limit in MB")
     remaining_storage_mb: float = Field(..., description="Remaining storage in MB")

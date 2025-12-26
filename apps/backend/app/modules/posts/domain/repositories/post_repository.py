@@ -12,17 +12,17 @@ from app.modules.posts.domain.entities.post import Post, PostStatus
 
 class PostRepository(ABC):
     """Repository interface for Post entity persistence"""
-    
+
     @abstractmethod
     async def create(self, post: Post) -> Post:
         """Create a new post"""
         pass
-    
+
     @abstractmethod
     async def get_by_id(self, post_id: str) -> Optional[Post]:
         """Get post by ID"""
         pass
-    
+
     @abstractmethod
     async def list_by_city(
         self,
@@ -31,11 +31,11 @@ class PostRepository(ABC):
         idol: Optional[str] = None,
         idol_group: Optional[str] = None,
         limit: int = 50,
-        offset: int = 0
+        offset: int = 0,
     ) -> List[Post]:
         """
         List posts for a specific city with optional filters
-        
+
         Args:
             city_code: City code (required)
             status: Filter by post status
@@ -45,7 +45,7 @@ class PostRepository(ABC):
             offset: Pagination offset
         """
         pass
-    
+
     @abstractmethod
     async def count_user_posts_today(self, user_id: str) -> int:
         """
@@ -53,27 +53,24 @@ class PostRepository(ABC):
         Used for daily post limit checking
         """
         pass
-    
+
     @abstractmethod
     async def update(self, post: Post) -> Post:
         """Update an existing post"""
         pass
-    
+
     @abstractmethod
     async def delete(self, post_id: str) -> None:
         """Delete a post (hard delete)"""
         pass
-    
+
     @abstractmethod
     async def get_by_owner_id(
-        self,
-        owner_id: str,
-        limit: int = 50,
-        offset: int = 0
+        self, owner_id: str, limit: int = 50, offset: int = 0
     ) -> List[Post]:
         """Get posts by owner ID"""
         pass
-    
+
     @abstractmethod
     async def mark_expired_posts(self) -> int:
         """

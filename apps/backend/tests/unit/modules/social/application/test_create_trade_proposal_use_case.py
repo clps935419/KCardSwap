@@ -159,7 +159,9 @@ class TestCreateTradeProposalUseCaseValidation:
             responder_card_ids=[uuid4()],
         )
 
-        with pytest.raises(ValueError, match="Initiator must provide at least one card"):
+        with pytest.raises(
+            ValueError, match="Initiator must provide at least one card"
+        ):
             await use_case.execute(request)
 
     @pytest.mark.asyncio
@@ -179,7 +181,9 @@ class TestCreateTradeProposalUseCaseValidation:
             responder_card_ids=[],  # Empty
         )
 
-        with pytest.raises(ValueError, match="Responder must provide at least one card"):
+        with pytest.raises(
+            ValueError, match="Responder must provide at least one card"
+        ):
             await use_case.execute(request)
 
     @pytest.mark.asyncio

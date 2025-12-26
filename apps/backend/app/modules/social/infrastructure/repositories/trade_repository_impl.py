@@ -39,7 +39,7 @@ class SQLAlchemyTradeRepository(ITradeRepository):
             updated_at=trade.updated_at,
         )
         self.session.add(trade_model)
-        
+
         # Create item models
         for item in items:
             item_model = TradeItemModel(
@@ -50,10 +50,10 @@ class SQLAlchemyTradeRepository(ITradeRepository):
                 created_at=item.created_at,
             )
             self.session.add(item_model)
-        
+
         await self.session.flush()
         await self.session.refresh(trade_model)
-        
+
         return self._to_entity(trade_model)
 
     async def get_by_id(self, trade_id: UUID) -> Optional[Trade]:
@@ -80,10 +80,10 @@ class SQLAlchemyTradeRepository(ITradeRepository):
             select(TradeModel).where(TradeModel.id == trade.id)
         )
         model = result.scalar_one_or_none()
-        
+
         if not model:
             raise ValueError(f"Trade {trade.id} not found")
-        
+
         # Update fields
         model.status = trade.status
         model.accepted_at = trade.accepted_at
@@ -92,10 +92,10 @@ class SQLAlchemyTradeRepository(ITradeRepository):
         model.completed_at = trade.completed_at
         model.canceled_at = trade.canceled_at
         model.updated_at = trade.updated_at
-        
+
         await self.session.flush()
         await self.session.refresh(model)
-        
+
         return self._to_entity(model)
 
     async def get_user_trades(
@@ -132,7 +132,7 @@ class SQLAlchemyTradeRepository(ITradeRepository):
             Trade.STATUS_PROPOSED,
             Trade.STATUS_ACCEPTED,
         ]
-        
+
         result = await self.session.execute(
             select(TradeModel)
             .options(selectinload(TradeModel.items))
@@ -167,7 +167,7 @@ class SQLAlchemyTradeRepository(ITradeRepository):
             Trade.STATUS_PROPOSED,
             Trade.STATUS_ACCEPTED,
         ]
-        
+
         result = await self.session.execute(
             select(func.count(TradeModel.id)).where(
                 and_(

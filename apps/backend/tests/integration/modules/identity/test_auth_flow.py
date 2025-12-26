@@ -23,18 +23,24 @@ class TestGoogleCallbackPKCE:
     @pytest.fixture
     def mock_google_oauth_service(self):
         """Mock GoogleOAuthService for testing"""
-        with patch('app.modules.identity.presentation.routers.auth_router.GoogleOAuthService') as mock:
+        with patch(
+            "app.modules.identity.presentation.routers.auth_router.GoogleOAuthService"
+        ) as mock:
             service = Mock()
             # Mock successful token exchange
-            service.exchange_code_with_pkce = AsyncMock(return_value="mock_id_token_12345")
+            service.exchange_code_with_pkce = AsyncMock(
+                return_value="mock_id_token_12345"
+            )
             # Mock successful token verification
-            service.verify_google_token = AsyncMock(return_value={
-                "google_id": "google_user_123",
-                "email": "test@example.com",
-                "name": "Test User",
-                "picture": "https://example.com/avatar.jpg",
-                "email_verified": True
-            })
+            service.verify_google_token = AsyncMock(
+                return_value={
+                    "google_id": "google_user_123",
+                    "email": "test@example.com",
+                    "name": "Test User",
+                    "picture": "https://example.com/avatar.jpg",
+                    "email_verified": True,
+                }
+            )
             mock.return_value = service
             yield service
 
@@ -51,7 +57,7 @@ class TestGoogleCallbackPKCE:
         request_data = {
             "code": "4/0AY0e-g7XXXXXXXXXXX",
             "code_verifier": "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk",
-            "redirect_uri": "exp://192.168.1.1:19000"
+            "redirect_uri": "exp://192.168.1.1:19000",
         }
 
         response = client.post("/api/v1/auth/google-callback", json=request_data)
@@ -77,9 +83,7 @@ class TestGoogleCallbackPKCE:
 
         Expected: 422 validation error
         """
-        request_data = {
-            "code_verifier": "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk"
-        }
+        request_data = {"code_verifier": "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk"}
 
         response = client.post("/api/v1/auth/google-callback", json=request_data)
 
@@ -93,9 +97,7 @@ class TestGoogleCallbackPKCE:
 
         Expected: 422 validation error
         """
-        request_data = {
-            "code": "4/0AY0e-g7XXXXXXXXXXX"
-        }
+        request_data = {"code": "4/0AY0e-g7XXXXXXXXXXX"}
 
         response = client.post("/api/v1/auth/google-callback", json=request_data)
 
@@ -112,7 +114,7 @@ class TestGoogleCallbackPKCE:
         """
         request_data = {
             "code": "4/0AY0e-g7XXXXXXXXXXX",
-            "code_verifier": "too_short"  # Less than 43 characters
+            "code_verifier": "too_short",  # Less than 43 characters
         }
 
         response = client.post("/api/v1/auth/google-callback", json=request_data)
@@ -135,7 +137,7 @@ class TestGoogleCallbackPKCE:
 
         request_data = {
             "code": "invalid_code",
-            "code_verifier": "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk"
+            "code_verifier": "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk",
         }
 
         response = client.post("/api/v1/auth/google-callback", json=request_data)
@@ -149,7 +151,9 @@ class TestGoogleCallbackPKCE:
         # For now, just verify the endpoint exists
         assert response.status_code in [401, 500]  # 500 if DB not configured
 
-    def test_google_callback_with_optional_redirect_uri(self, mock_google_oauth_service):
+    def test_google_callback_with_optional_redirect_uri(
+        self, mock_google_oauth_service
+    ):
         """
         Test PKCE flow with optional redirect_uri parameter
 
@@ -158,7 +162,7 @@ class TestGoogleCallbackPKCE:
         request_data = {
             "code": "4/0AY0e-g7XXXXXXXXXXX",
             "code_verifier": "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk",
-            "redirect_uri": "exp://custom-redirect-uri"
+            "redirect_uri": "exp://custom-redirect-uri",
         }
 
         response = client.post("/api/v1/auth/google-callback", json=request_data)
@@ -178,7 +182,7 @@ class TestGoogleCallbackPKCE:
         """
         request_data = {
             "code": "4/0AY0e-g7XXXXXXXXXXX",
-            "code_verifier": "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk"
+            "code_verifier": "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk",
         }
 
         # First request creates the user
@@ -226,7 +230,9 @@ class TestGoogleCallbackPKCETimeout:
     @pytest.fixture
     def mock_google_oauth_timeout(self):
         """Mock GoogleOAuthService with timeout"""
-        with patch('app.modules.identity.presentation.routers.auth_router.GoogleOAuthService') as mock:
+        with patch(
+            "app.modules.identity.presentation.routers.auth_router.GoogleOAuthService"
+        ) as mock:
             service = Mock()
             # Mock timeout during token exchange
             service.exchange_code_with_pkce = AsyncMock(return_value=None)
@@ -242,7 +248,7 @@ class TestGoogleCallbackPKCETimeout:
         """
         request_data = {
             "code": "4/0AY0e-g7XXXXXXXXXXX",
-            "code_verifier": "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk"
+            "code_verifier": "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk",
         }
 
         response = client.post("/api/v1/auth/google-callback", json=request_data)

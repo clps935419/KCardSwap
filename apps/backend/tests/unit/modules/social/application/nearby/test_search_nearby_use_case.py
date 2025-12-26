@@ -250,9 +250,7 @@ class TestSearchNearbyCardsUseCase:
         mock_quota_service.check_quota_available.return_value = (True, 0)
 
         card = Card(id=uuid4(), owner_id=uuid4(), status=Card.STATUS_AVAILABLE)
-        mock_card_repository.find_nearby_cards.return_value = [
-            (card, 2.56789, "User1")
-        ]
+        mock_card_repository.find_nearby_cards.return_value = [(card, 2.56789, "User1")]
 
         # Act
         results = await use_case.execute(request, is_premium=False)

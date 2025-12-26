@@ -86,9 +86,7 @@ class TradeResponse(BaseModel):
         None, description="Responder confirmation timestamp"
     )
     completed_at: Optional[datetime] = Field(None, description="Completion timestamp")
-    canceled_at: Optional[datetime] = Field(
-        None, description="Cancellation timestamp"
-    )
+    canceled_at: Optional[datetime] = Field(None, description="Cancellation timestamp")
     created_at: datetime = Field(..., description="Creation timestamp")
     updated_at: datetime = Field(..., description="Last update timestamp")
     items: Optional[List[TradeItemResponse]] = Field(

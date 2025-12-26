@@ -144,9 +144,7 @@ class MessagesListResponse(BaseModel):
 
     messages: List[MessageResponse] = Field(..., description="List of messages")
     total: int = Field(..., description="Total number of messages")
-    has_more: bool = Field(
-        ..., description="Whether there are more messages to fetch"
-    )
+    has_more: bool = Field(..., description="Whether there are more messages to fetch")
 
     class Config:
         json_schema_extra = {

@@ -150,9 +150,7 @@ async def get_my_reports(
             for report in reports
         ]
 
-        return ReportListResponse(
-            reports=report_responses, total=len(report_responses)
-        )
+        return ReportListResponse(reports=report_responses, total=len(report_responses))
 
     except Exception as e:
         logger.error(f"Error getting reports: {e}", exc_info=True)

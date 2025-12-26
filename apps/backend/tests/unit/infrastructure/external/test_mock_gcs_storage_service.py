@@ -68,7 +68,9 @@ class TestMockGCSStorageService:
 
     def test_get_blob_metadata_returns_none_for_nonexistent(self, mock_gcs_service):
         """Test that get_blob_metadata returns None for non-existent blobs."""
-        assert mock_gcs_service.get_blob_metadata("cards/user123/nonexistent.jpg") is None
+        assert (
+            mock_gcs_service.get_blob_metadata("cards/user123/nonexistent.jpg") is None
+        )
 
     def test_get_blob_metadata_returns_dict_for_existing(self, mock_gcs_service):
         """Test that get_blob_metadata returns metadata for existing blobs."""

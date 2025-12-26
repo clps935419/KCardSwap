@@ -9,8 +9,12 @@ from sqlalchemy import select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.social.domain.entities.chat_room import ChatRoom
-from app.modules.social.domain.repositories.chat_room_repository import ChatRoomRepository
-from app.modules.social.infrastructure.database.models.chat_room_model import ChatRoomModel
+from app.modules.social.domain.repositories.chat_room_repository import (
+    ChatRoomRepository,
+)
+from app.modules.social.infrastructure.database.models.chat_room_model import (
+    ChatRoomModel,
+)
 
 
 class SQLAlchemyChatRoomRepository(ChatRoomRepository):
@@ -22,11 +26,13 @@ class SQLAlchemyChatRoomRepository(ChatRoomRepository):
     async def create(self, chat_room: ChatRoom) -> ChatRoom:
         """Create a new chat room"""
         # Convert participant IDs to UUIDs and sort them
-        participant_uuids = sorted([
-            UUID(pid) if isinstance(pid, str) else pid 
-            for pid in chat_room.participant_ids
-        ])
-        
+        participant_uuids = sorted(
+            [
+                UUID(pid) if isinstance(pid, str) else pid
+                for pid in chat_room.participant_ids
+            ]
+        )
+
         model = ChatRoomModel(
             id=UUID(chat_room.id) if isinstance(chat_room.id, str) else chat_room.id,
             participant_ids=participant_uuids,
@@ -45,14 +51,18 @@ class SQLAlchemyChatRoomRepository(ChatRoomRepository):
         model = result.scalar_one_or_none()
         return self._to_entity(model) if model else None
 
-    async def get_by_participants(self, user_id_1: str, user_id_2: str) -> Optional[ChatRoom]:
+    async def get_by_participants(
+        self, user_id_1: str, user_id_2: str
+    ) -> Optional[ChatRoom]:
         """Get chat room by two participants (either order)"""
         # Convert to UUIDs and sort to match storage format
-        participant_uuids = sorted([
-            UUID(user_id_1) if isinstance(user_id_1, str) else user_id_1,
-            UUID(user_id_2) if isinstance(user_id_2, str) else user_id_2
-        ])
-        
+        participant_uuids = sorted(
+            [
+                UUID(user_id_1) if isinstance(user_id_1, str) else user_id_1,
+                UUID(user_id_2) if isinstance(user_id_2, str) else user_id_2,
+            ]
+        )
+
         # Query for exact match of sorted participant array
         result = await self.session.execute(
             select(ChatRoomModel).where(
@@ -65,12 +75,12 @@ class SQLAlchemyChatRoomRepository(ChatRoomRepository):
     async def get_rooms_by_user_id(self, user_id: str) -> List[ChatRoom]:
         """Get all chat rooms for a user"""
         user_uuid = UUID(user_id) if isinstance(user_id, str) else user_id
-        
+
         # Use array contains operator to find rooms where user is a participant
         result = await self.session.execute(
-            select(ChatRoomModel).where(
-                ChatRoomModel.participant_ids.contains([user_uuid])
-            ).order_by(ChatRoomModel.created_at.desc())
+            select(ChatRoomModel)
+            .where(ChatRoomModel.participant_ids.contains([user_uuid]))
+            .order_by(ChatRoomModel.created_at.desc())
         )
         models = result.scalars().all()
         return [self._to_entity(model) for model in models]
@@ -81,7 +91,7 @@ class SQLAlchemyChatRoomRepository(ChatRoomRepository):
             select(ChatRoomModel).where(ChatRoomModel.id == UUID(room_id))
         )
         model = result.scalar_one_or_none()
-        
+
         if model:
             await self.session.delete(model)
             await self.session.flush()

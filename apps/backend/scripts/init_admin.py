@@ -47,7 +47,9 @@ from sqlalchemy.orm import sessionmaker
 
 from app.config import settings
 from app.modules.identity.infrastructure.database.models.user_model import UserModel
-from app.modules.identity.infrastructure.database.models.profile_model import ProfileModel
+from app.modules.identity.infrastructure.database.models.profile_model import (
+    ProfileModel,
+)
 from app.shared.infrastructure.security.password_hasher import password_hasher
 
 

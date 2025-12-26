@@ -173,7 +173,8 @@ async def get_messages(
         return MessagesListResponse(
             messages=message_responses,
             total=len(message_responses),
-            has_more=len(messages) == limit,  # If we got exactly limit, there might be more
+            has_more=len(messages)
+            == limit,  # If we got exactly limit, there might be more
         )
 
     except ValueError as e:
@@ -234,9 +235,7 @@ async def send_message(
         chat_room_repo = ChatRoomRepositoryImpl(session)
         friendship_repo = FriendshipRepositoryImpl(session)
 
-        use_case = SendMessageUseCase(
-            message_repo, chat_room_repo, friendship_repo
-        )
+        use_case = SendMessageUseCase(message_repo, chat_room_repo, friendship_repo)
 
         # Execute use case
         message = await use_case.execute(
@@ -258,18 +257,19 @@ async def send_message(
         # Send FCM push notification (non-blocking, failures are logged)
         try:
             fcm_service = get_fcm_service()
-            
+
             # Get chat room to find recipient
             chat_room = await chat_room_repo.get_by_id(str(room_id))
             if chat_room:
                 recipient_id = chat_room.get_other_participant(str(current_user_id))
-                
+
                 # Send notification
                 # Note: In production, we would fetch FCM token from user profile
                 await fcm_service.send_notification(
                     user_id=recipient_id,
                     title="New message",
-                    body=message.content[:50] + ("..." if len(message.content) > 50 else ""),
+                    body=message.content[:50]
+                    + ("..." if len(message.content) > 50 else ""),
                     data={
                         "type": "chat_message",
                         "room_id": str(room_id),

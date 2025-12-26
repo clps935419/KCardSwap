@@ -21,9 +21,7 @@ class SearchQuotaModel(Base):
 
     __tablename__ = "search_quotas"
 
-    user_id = Column(
-        PGUUID(as_uuid=True), primary_key=True, nullable=False, index=True
-    )
+    user_id = Column(PGUUID(as_uuid=True), primary_key=True, nullable=False, index=True)
     date = Column(Date, primary_key=True, nullable=False, index=True)
     count = Column(Integer, nullable=False, default=0)
 
@@ -43,7 +41,7 @@ class SearchQuotaService:
     @staticmethod
     def _get_today_utc() -> datetime.date:
         """Get current date in UTC.
-        
+
         Returns:
             Current date in UTC timezone
         """

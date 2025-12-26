@@ -95,9 +95,7 @@ class FriendListItemResponse(BaseModel):
 class FriendListResponse(BaseModel):
     """Response schema for friend list"""
 
-    friends: List[FriendListItemResponse] = Field(
-        ..., description="List of friends"
-    )
+    friends: List[FriendListItemResponse] = Field(..., description="List of friends")
     total: int = Field(..., description="Total number of friends")
 
     class Config:

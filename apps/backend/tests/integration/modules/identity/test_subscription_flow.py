@@ -24,17 +24,21 @@ class TestSubscriptionFlow:
     @pytest.fixture
     def mock_google_billing_service(self):
         """Mock GooglePlayBillingService for testing"""
-        with patch('app.modules.identity.presentation.routers.subscription_router.GooglePlayBillingService') as mock:
+        with patch(
+            "app.modules.identity.presentation.routers.subscription_router.GooglePlayBillingService"
+        ) as mock:
             service = Mock()
             # Mock successful subscription verification
             expires_at = datetime.utcnow() + timedelta(days=30)
-            service.verify_subscription_purchase = AsyncMock(return_value={
-                "is_valid": True,
-                "expires_at": expires_at,
-                "auto_renewing": True,
-                "payment_state": 1,
-                "acknowledgement_state": 0,
-            })
+            service.verify_subscription_purchase = AsyncMock(
+                return_value={
+                    "is_valid": True,
+                    "expires_at": expires_at,
+                    "auto_renewing": True,
+                    "payment_state": 1,
+                    "acknowledgement_state": 0,
+                }
+            )
             # Mock successful acknowledgment
             service.acknowledge_subscription_purchase = AsyncMock(return_value=True)
             mock.return_value = service
@@ -59,20 +63,22 @@ class TestSubscriptionFlow:
         request_data = {
             "platform": "android",
             "purchase_token": "test_purchase_token_abc123",
-            "product_id": "premium_monthly"
+            "product_id": "premium_monthly",
         }
 
         # Mock authentication dependency
-        with patch('app.modules.identity.presentation.dependencies.auth_deps.get_current_user') as mock_auth:
+        with patch(
+            "app.modules.identity.presentation.dependencies.auth_deps.get_current_user"
+        ) as mock_auth:
             mock_auth.return_value = {
                 "id": "123e4567-e89b-12d3-a456-426614174000",
-                "email": "test@example.com"
+                "email": "test@example.com",
             }
 
             response = client.post(
                 "/api/v1/subscriptions/verify-receipt",
                 json=request_data,
-                headers=auth_headers
+                headers=auth_headers,
             )
 
             # Note: This test will fail until database is properly configured
@@ -92,16 +98,15 @@ class TestSubscriptionFlow:
         - User requests their subscription status
         - Backend returns current status from database
         """
-        with patch('app.modules.identity.presentation.dependencies.auth_deps.get_current_user') as mock_auth:
+        with patch(
+            "app.modules.identity.presentation.dependencies.auth_deps.get_current_user"
+        ) as mock_auth:
             mock_auth.return_value = {
                 "id": "123e4567-e89b-12d3-a456-426614174000",
-                "email": "test@example.com"
+                "email": "test@example.com",
             }
 
-            response = client.get(
-                "/api/v1/subscriptions/status",
-                headers=auth_headers
-            )
+            response = client.get("/api/v1/subscriptions/status", headers=auth_headers)
 
             # Note: This test will fail until database is properly configured
             # Expected behavior when working:
@@ -116,26 +121,30 @@ class TestSubscriptionFlow:
         request_data = {
             "platform": "windows",  # Invalid
             "purchase_token": "test_token",
-            "product_id": "premium_monthly"
+            "product_id": "premium_monthly",
         }
 
-        with patch('app.modules.identity.presentation.dependencies.auth_deps.get_current_user') as mock_auth:
+        with patch(
+            "app.modules.identity.presentation.dependencies.auth_deps.get_current_user"
+        ) as mock_auth:
             mock_auth.return_value = {
                 "id": "123e4567-e89b-12d3-a456-426614174000",
-                "email": "test@example.com"
+                "email": "test@example.com",
             }
 
             response = client.post(
                 "/api/v1/subscriptions/verify-receipt",
                 json=request_data,
-                headers=auth_headers
+                headers=auth_headers,
             )
 
             # Expected: validation error
             # assert response.status_code == 400
             # assert "UNSUPPORTED_PLATFORM" in response.text
 
-    def test_verify_receipt_cross_user_replay(self, mock_google_billing_service, auth_headers):
+    def test_verify_receipt_cross_user_replay(
+        self, mock_google_billing_service, auth_headers
+    ):
         """
         Test rejection of cross-user replay attack
 
@@ -147,20 +156,24 @@ class TestSubscriptionFlow:
         request_data = {
             "platform": "android",
             "purchase_token": "already_used_token",
-            "product_id": "premium_monthly"
+            "product_id": "premium_monthly",
         }
 
         # First purchase by User A (would succeed)
         # Second attempt by User B with same token (should fail)
 
-        with patch('app.modules.identity.presentation.dependencies.auth_deps.get_current_user') as mock_auth:
+        with patch(
+            "app.modules.identity.presentation.dependencies.auth_deps.get_current_user"
+        ) as mock_auth:
             mock_auth.return_value = {
                 "id": "different-user-uuid",
-                "email": "userb@example.com"
+                "email": "userb@example.com",
             }
 
             # Mock token repository to simulate token already bound to different user
-            with patch('app.modules.identity.infrastructure.repositories.purchase_token_repository_impl.PurchaseTokenRepositoryImpl') as mock_repo:
+            with patch(
+                "app.modules.identity.infrastructure.repositories.purchase_token_repository_impl.PurchaseTokenRepositoryImpl"
+            ) as mock_repo:
                 mock_instance = Mock()
                 mock_instance.get_user_id_for_token = AsyncMock(
                     return_value="original-user-uuid"  # Different user
@@ -170,7 +183,7 @@ class TestSubscriptionFlow:
                 response = client.post(
                     "/api/v1/subscriptions/verify-receipt",
                     json=request_data,
-                    headers=auth_headers
+                    headers=auth_headers,
                 )
 
                 # Expected: conflict error
@@ -189,28 +202,27 @@ class TestSubscriptionFlow:
         request_data = {
             "platform": "android",
             "purchase_token": "same_token_retry",
-            "product_id": "premium_monthly"
+            "product_id": "premium_monthly",
         }
 
-        with patch('app.modules.identity.presentation.dependencies.auth_deps.get_current_user') as mock_auth:
+        with patch(
+            "app.modules.identity.presentation.dependencies.auth_deps.get_current_user"
+        ) as mock_auth:
             user_id = "123e4567-e89b-12d3-a456-426614174000"
-            mock_auth.return_value = {
-                "id": user_id,
-                "email": "test@example.com"
-            }
+            mock_auth.return_value = {"id": user_id, "email": "test@example.com"}
 
             # First call - would verify with Google Play
             response1 = client.post(
                 "/api/v1/subscriptions/verify-receipt",
                 json=request_data,
-                headers=auth_headers
+                headers=auth_headers,
             )
 
             # Second call - should be idempotent
             response2 = client.post(
                 "/api/v1/subscriptions/verify-receipt",
                 json=request_data,
-                headers=auth_headers
+                headers=auth_headers,
             )
 
             # Both should return same result

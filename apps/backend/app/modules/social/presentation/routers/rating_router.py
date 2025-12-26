@@ -152,9 +152,7 @@ async def get_user_ratings(
             for rating in ratings
         ]
 
-        return RatingListResponse(
-            ratings=rating_responses, total=len(rating_responses)
-        )
+        return RatingListResponse(ratings=rating_responses, total=len(rating_responses))
 
     except Exception as e:
         logger.error(f"Error getting user ratings: {e}", exc_info=True)

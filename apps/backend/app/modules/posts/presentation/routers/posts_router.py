@@ -11,17 +11,37 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.identity.presentation.dependencies.auth_deps import get_current_user_id
-from app.modules.posts.application.use_cases.create_post_use_case import CreatePostUseCase
-from app.modules.posts.application.use_cases.list_board_posts_use_case import ListBoardPostsUseCase
-from app.modules.posts.application.use_cases.express_interest_use_case import ExpressInterestUseCase
-from app.modules.posts.application.use_cases.accept_interest_use_case import AcceptInterestUseCase
-from app.modules.posts.application.use_cases.reject_interest_use_case import RejectInterestUseCase
+from app.modules.posts.application.use_cases.create_post_use_case import (
+    CreatePostUseCase,
+)
+from app.modules.posts.application.use_cases.list_board_posts_use_case import (
+    ListBoardPostsUseCase,
+)
+from app.modules.posts.application.use_cases.express_interest_use_case import (
+    ExpressInterestUseCase,
+)
+from app.modules.posts.application.use_cases.accept_interest_use_case import (
+    AcceptInterestUseCase,
+)
+from app.modules.posts.application.use_cases.reject_interest_use_case import (
+    RejectInterestUseCase,
+)
 from app.modules.posts.application.use_cases.close_post_use_case import ClosePostUseCase
-from app.modules.posts.infrastructure.repositories.post_repository_impl import PostRepositoryImpl
-from app.modules.posts.infrastructure.repositories.post_interest_repository_impl import PostInterestRepositoryImpl
-from app.modules.identity.infrastructure.repositories.subscription_repository_impl import SubscriptionRepositoryImpl
-from app.modules.social.infrastructure.repositories.friendship_repository_impl import FriendshipRepositoryImpl
-from app.modules.social.infrastructure.repositories.chat_room_repository_impl import ChatRoomRepositoryImpl
+from app.modules.posts.infrastructure.repositories.post_repository_impl import (
+    PostRepositoryImpl,
+)
+from app.modules.posts.infrastructure.repositories.post_interest_repository_impl import (
+    PostInterestRepositoryImpl,
+)
+from app.modules.identity.infrastructure.repositories.subscription_repository_impl import (
+    SubscriptionRepositoryImpl,
+)
+from app.modules.social.infrastructure.repositories.friendship_repository_impl import (
+    FriendshipRepositoryImpl,
+)
+from app.modules.social.infrastructure.repositories.chat_room_repository_impl import (
+    ChatRoomRepositoryImpl,
+)
 from app.modules.posts.presentation.schemas.post_schemas import (
     CreatePostRequest,
     PostResponse,
@@ -45,7 +65,9 @@ router = APIRouter(prefix="/posts", tags=["Posts"])
         201: {"description": "Post created successfully"},
         400: {"description": "Bad request (validation failed)"},
         401: {"description": "Unauthorized (not logged in)"},
-        422: {"description": "Unprocessable entity (daily limit exceeded or validation failed)"},
+        422: {
+            "description": "Unprocessable entity (daily limit exceeded or validation failed)"
+        },
         500: {"description": "Internal server error"},
     },
     summary="Create a new city board post",
@@ -97,7 +119,9 @@ async def create_post(
 
     except ValueError as e:
         logger.warning(f"Post creation validation failed: {e}")
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e)
+        )
     except Exception as e:
         logger.error(f"Error creating post: {e}", exc_info=True)
         raise HTTPException(
@@ -121,7 +145,9 @@ async def list_posts(
     city_code: Annotated[str, Query(description="City code (required)")],
     session: Annotated[AsyncSession, Depends(get_db_session)],
     idol: Annotated[Optional[str], Query(description="Filter by idol name")] = None,
-    idol_group: Annotated[Optional[str], Query(description="Filter by idol group")] = None,
+    idol_group: Annotated[
+        Optional[str], Query(description="Filter by idol group")
+    ] = None,
     limit: Annotated[int, Query(ge=1, le=100, description="Maximum results")] = 50,
     offset: Annotated[int, Query(ge=0, description="Pagination offset")] = 0,
 ) -> PostListResponse:
@@ -228,7 +254,9 @@ async def express_interest(
         if "not found" in error_msg:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
         logger.warning(f"Interest validation failed: {e}")
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e)
+        )
     except Exception as e:
         logger.error(f"Error expressing interest: {e}", exc_info=True)
         raise HTTPException(
@@ -296,7 +324,9 @@ async def accept_interest(
         elif "only post owner" in error_msg:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
         logger.warning(f"Accept interest validation failed: {e}")
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e)
+        )
     except Exception as e:
         logger.error(f"Error accepting interest: {e}", exc_info=True)
         raise HTTPException(
@@ -352,7 +382,9 @@ async def reject_interest(
         elif "only post owner" in error_msg:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
         logger.warning(f"Reject interest validation failed: {e}")
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e)
+        )
     except Exception as e:
         logger.error(f"Error rejecting interest: {e}", exc_info=True)
         raise HTTPException(
@@ -405,7 +437,9 @@ async def close_post(
         elif "only post owner" in error_msg:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
         logger.warning(f"Close post validation failed: {e}")
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e)
+        )
     except Exception as e:
         logger.error(f"Error closing post: {e}", exc_info=True)
         raise HTTPException(

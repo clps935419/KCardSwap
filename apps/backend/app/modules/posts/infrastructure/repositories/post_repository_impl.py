@@ -24,13 +24,17 @@ class SQLAlchemyPostRepository(PostRepository):
         """Create a new post"""
         model = PostModel(
             id=UUID(post.id) if isinstance(post.id, str) else post.id,
-            owner_id=UUID(post.owner_id) if isinstance(post.owner_id, str) else post.owner_id,
+            owner_id=UUID(post.owner_id)
+            if isinstance(post.owner_id, str)
+            else post.owner_id,
             city_code=post.city_code,
             title=post.title,
             content=post.content,
             idol=post.idol,
             idol_group=post.idol_group,
-            status=post.status.value if isinstance(post.status, PostStatus) else post.status,
+            status=post.status.value
+            if isinstance(post.status, PostStatus)
+            else post.status,
             expires_at=post.expires_at,
             created_at=post.created_at,
             updated_at=post.updated_at,
@@ -55,7 +59,7 @@ class SQLAlchemyPostRepository(PostRepository):
         idol: Optional[str] = None,
         idol_group: Optional[str] = None,
         limit: int = 50,
-        offset: int = 0
+        offset: int = 0,
     ) -> List[Post]:
         """
         List posts for a specific city with optional filters
@@ -83,16 +87,18 @@ class SQLAlchemyPostRepository(PostRepository):
         Count how many posts a user has created today
         """
         user_uuid = UUID(user_id) if isinstance(user_id, str) else user_id
-        
+
         # Get start of day (UTC)
-        today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
-        
+        today_start = datetime.utcnow().replace(
+            hour=0, minute=0, second=0, microsecond=0
+        )
+
         result = await self.session.execute(
             select(func.count(PostModel.id)).where(
                 and_(
                     PostModel.owner_id == user_uuid,
                     PostModel.created_at >= today_start,
-                    PostModel.status != PostStatus.DELETED.value
+                    PostModel.status != PostStatus.DELETED.value,
                 )
             )
         )
@@ -115,7 +121,9 @@ class SQLAlchemyPostRepository(PostRepository):
         model.content = post.content
         model.idol = post.idol
         model.idol_group = post.idol_group
-        model.status = post.status.value if isinstance(post.status, PostStatus) else post.status
+        model.status = (
+            post.status.value if isinstance(post.status, PostStatus) else post.status
+        )
         model.expires_at = post.expires_at
         model.updated_at = post.updated_at
 
@@ -135,14 +143,11 @@ class SQLAlchemyPostRepository(PostRepository):
             await self.session.flush()
 
     async def get_by_owner_id(
-        self,
-        owner_id: str,
-        limit: int = 50,
-        offset: int = 0
+        self, owner_id: str, limit: int = 50, offset: int = 0
     ) -> List[Post]:
         """Get posts by owner ID"""
         owner_uuid = UUID(owner_id) if isinstance(owner_id, str) else owner_id
-        
+
         query = (
             select(PostModel)
             .where(PostModel.owner_id == owner_uuid)
@@ -161,28 +166,28 @@ class SQLAlchemyPostRepository(PostRepository):
         Returns the number of posts marked as expired
         """
         now = datetime.utcnow()
-        
+
         # Find all open posts that have expired
         result = await self.session.execute(
             select(PostModel).where(
                 and_(
                     PostModel.status == PostStatus.OPEN.value,
-                    PostModel.expires_at <= now
+                    PostModel.expires_at <= now,
                 )
             )
         )
         expired_posts = result.scalars().all()
-        
+
         # Mark them as expired
         count = 0
         for model in expired_posts:
             model.status = PostStatus.EXPIRED.value
             model.updated_at = now
             count += 1
-        
+
         if count > 0:
             await self.session.flush()
-        
+
         return count
 
     @staticmethod

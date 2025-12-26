@@ -56,7 +56,7 @@ class Profile:
             raise ValueError("Nickname must be 100 characters or less")
         if self._bio and len(self._bio) > 1000:
             raise ValueError("Bio must be 1000 characters or less")
-        
+
         # Validate coordinates if provided
         if self._last_lat is not None:
             if not -90 <= self._last_lat <= 90:
@@ -163,7 +163,7 @@ class Profile:
             raise ValueError("Latitude must be between -90 and 90")
         if not -180 <= lng <= 180:
             raise ValueError("Longitude must be between -180 and 180")
-        
+
         self._last_lat = lat
         self._last_lng = lng
         self._updated_at = datetime.utcnow()

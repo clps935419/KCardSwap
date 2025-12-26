@@ -140,7 +140,11 @@ class TestTradeStatusChecks:
 
     def test_can_cancel_active_statuses(self):
         """Test can_cancel returns True for draft, proposed, accepted"""
-        for status in [Trade.STATUS_DRAFT, Trade.STATUS_PROPOSED, Trade.STATUS_ACCEPTED]:
+        for status in [
+            Trade.STATUS_DRAFT,
+            Trade.STATUS_PROPOSED,
+            Trade.STATUS_ACCEPTED,
+        ]:
             trade = Trade(
                 id=uuid4(),
                 initiator_id=uuid4(),
@@ -178,7 +182,7 @@ class TestTradeStatusChecks:
     def test_is_completed_partial_confirmation(self):
         """Test is_completed returns False with partial confirmation"""
         now = datetime.utcnow()
-        
+
         trade = Trade(
             id=uuid4(),
             initiator_id=uuid4(),
@@ -195,7 +199,11 @@ class TestTradeStateQueries:
 
     def test_is_active(self):
         """Test is_active returns True for draft, proposed, accepted"""
-        for status in [Trade.STATUS_DRAFT, Trade.STATUS_PROPOSED, Trade.STATUS_ACCEPTED]:
+        for status in [
+            Trade.STATUS_DRAFT,
+            Trade.STATUS_PROPOSED,
+            Trade.STATUS_ACCEPTED,
+        ]:
             trade = Trade(
                 id=uuid4(),
                 initiator_id=uuid4(),
@@ -207,8 +215,12 @@ class TestTradeStateQueries:
     def test_is_terminal(self):
         """Test is_terminal returns True for completed, rejected, canceled"""
         now = datetime.utcnow()
-        
-        for status in [Trade.STATUS_COMPLETED, Trade.STATUS_REJECTED, Trade.STATUS_CANCELED]:
+
+        for status in [
+            Trade.STATUS_COMPLETED,
+            Trade.STATUS_REJECTED,
+            Trade.STATUS_CANCELED,
+        ]:
             if status == Trade.STATUS_COMPLETED:
                 trade = Trade(
                     id=uuid4(),

@@ -90,7 +90,12 @@ class ApplicationContainer(containers.DeclarativeContainer):
 
     # Wire configuration - modules that need dependency injection
     wiring_config = containers.WiringConfiguration(
-        packages=["app.modules.identity", "app.modules.social", "app.modules.posts", "app.shared"]
+        packages=[
+            "app.modules.identity",
+            "app.modules.social",
+            "app.modules.posts",
+            "app.shared",
+        ]
     )
 
     # Shared Kernel
@@ -100,7 +105,7 @@ class ApplicationContainer(containers.DeclarativeContainer):
     identity = providers.Container(IdentityModuleContainer, shared=shared)
 
     social = providers.Container(SocialModuleContainer, shared=shared)
-    
+
     posts = providers.Container(PostsModuleContainer, shared=shared)
 
 

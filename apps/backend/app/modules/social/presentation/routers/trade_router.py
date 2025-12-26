@@ -78,7 +78,7 @@ async def create_trade(
 ) -> TradeResponse:
     """
     Create a new trade proposal.
-    
+
     Business rules:
     - Must be friends with responder
     - All cards must exist and be available
@@ -90,7 +90,7 @@ async def create_trade(
         card_repo = CardRepositoryImpl(session)
         friendship_repo = SQLAlchemyFriendshipRepository(session)
         validation_service = TradeValidationService()
-        
+
         # Create use case
         use_case = CreateTradeProposalUseCase(
             trade_repository=trade_repo,
@@ -99,7 +99,7 @@ async def create_trade(
             validation_service=validation_service,
             max_active_trades_per_pair=3,
         )
-        
+
         # Execute
         trade = await use_case.execute(
             CreateTradeProposalRequest(
@@ -109,10 +109,10 @@ async def create_trade(
                 responder_card_ids=request.responder_card_ids,
             )
         )
-        
+
         # Get items for response
         items = await trade_repo.get_items_by_trade_id(trade.id)
-        
+
         return TradeResponse(
             id=trade.id,
             initiator_id=trade.initiator_id,
@@ -136,7 +136,7 @@ async def create_trade(
                 for item in items
             ],
         )
-        
+
     except ValueError as e:
         logger.warning(f"Trade creation validation failed: {e}")
         raise HTTPException(
@@ -173,15 +173,15 @@ async def accept_trade(
     try:
         trade_repo = SQLAlchemyTradeRepository(session)
         validation_service = TradeValidationService()
-        
+
         use_case = AcceptTradeUseCase(
             trade_repository=trade_repo,
             validation_service=validation_service,
         )
-        
+
         trade = await use_case.execute(trade_id, current_user_id)
         items = await trade_repo.get_items_by_trade_id(trade.id)
-        
+
         return TradeResponse(
             id=trade.id,
             initiator_id=trade.initiator_id,
@@ -205,7 +205,7 @@ async def accept_trade(
                 for item in items
             ],
         )
-        
+
     except ValueError as e:
         if "not found" in str(e).lower():
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
@@ -238,16 +238,16 @@ async def reject_trade(
         trade_repo = SQLAlchemyTradeRepository(session)
         card_repo = CardRepositoryImpl(session)
         validation_service = TradeValidationService()
-        
+
         use_case = RejectTradeUseCase(
             trade_repository=trade_repo,
             card_repository=card_repo,
             validation_service=validation_service,
         )
-        
+
         trade = await use_case.execute(trade_id, current_user_id)
         items = await trade_repo.get_items_by_trade_id(trade.id)
-        
+
         return TradeResponse(
             id=trade.id,
             initiator_id=trade.initiator_id,
@@ -271,7 +271,7 @@ async def reject_trade(
                 for item in items
             ],
         )
-        
+
     except ValueError as e:
         if "not found" in str(e).lower():
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
@@ -304,16 +304,16 @@ async def cancel_trade(
         trade_repo = SQLAlchemyTradeRepository(session)
         card_repo = CardRepositoryImpl(session)
         validation_service = TradeValidationService()
-        
+
         use_case = CancelTradeUseCase(
             trade_repository=trade_repo,
             card_repository=card_repo,
             validation_service=validation_service,
         )
-        
+
         trade = await use_case.execute(trade_id, current_user_id)
         items = await trade_repo.get_items_by_trade_id(trade.id)
-        
+
         return TradeResponse(
             id=trade.id,
             initiator_id=trade.initiator_id,
@@ -337,7 +337,7 @@ async def cancel_trade(
                 for item in items
             ],
         )
-        
+
     except ValueError as e:
         if "not found" in str(e).lower():
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
@@ -367,7 +367,7 @@ async def complete_trade(
 ) -> TradeResponse:
     """
     Confirm trade completion.
-    
+
     Each party confirms independently. When both confirm, status becomes 'completed'.
     Enforces 48h timeout from acceptance.
     """
@@ -375,20 +375,20 @@ async def complete_trade(
         trade_repo = SQLAlchemyTradeRepository(session)
         card_repo = CardRepositoryImpl(session)
         validation_service = TradeValidationService()
-        
+
         # Get timeout from config (default 48)
-        timeout_hours = getattr(settings, 'TRADE_CONFIRMATION_TIMEOUT_HOURS', 48)
-        
+        timeout_hours = getattr(settings, "TRADE_CONFIRMATION_TIMEOUT_HOURS", 48)
+
         use_case = CompleteTradeUseCase(
             trade_repository=trade_repo,
             card_repository=card_repo,
             validation_service=validation_service,
             confirmation_timeout_hours=timeout_hours,
         )
-        
+
         trade = await use_case.execute(trade_id, current_user_id)
         items = await trade_repo.get_items_by_trade_id(trade.id)
-        
+
         return TradeResponse(
             id=trade.id,
             initiator_id=trade.initiator_id,
@@ -412,7 +412,7 @@ async def complete_trade(
                 for item in items
             ],
         )
-        
+
     except ValueError as e:
         if "not found" in str(e).lower():
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
@@ -444,15 +444,15 @@ async def get_trade_history(
     """Get trade history for current user."""
     try:
         trade_repo = SQLAlchemyTradeRepository(session)
-        
+
         use_case = GetTradeHistoryUseCase(trade_repository=trade_repo)
-        
+
         trades = await use_case.execute(
             user_id=current_user_id,
             limit=limit,
             offset=offset,
         )
-        
+
         # Get items for each trade
         trade_responses = []
         for trade in trades:
@@ -482,14 +482,14 @@ async def get_trade_history(
                     ],
                 )
             )
-        
+
         return TradeHistoryResponse(
             trades=trade_responses,
             total=len(trades),
             limit=limit,
             offset=offset,
         )
-        
+
     except ValueError as e:
         logger.warning(f"Trade history validation failed: {e}")
         raise HTTPException(

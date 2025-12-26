@@ -8,9 +8,16 @@ from uuid import UUID
 from sqlalchemy import select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.posts.domain.entities.post_interest import PostInterest, PostInterestStatus
-from app.modules.posts.domain.repositories.post_interest_repository import PostInterestRepository
-from app.modules.posts.infrastructure.database.models.post_interest_model import PostInterestModel
+from app.modules.posts.domain.entities.post_interest import (
+    PostInterest,
+    PostInterestStatus,
+)
+from app.modules.posts.domain.repositories.post_interest_repository import (
+    PostInterestRepository,
+)
+from app.modules.posts.infrastructure.database.models.post_interest_model import (
+    PostInterestModel,
+)
 
 
 class SQLAlchemyPostInterestRepository(PostInterestRepository):
@@ -22,10 +29,18 @@ class SQLAlchemyPostInterestRepository(PostInterestRepository):
     async def create(self, post_interest: PostInterest) -> PostInterest:
         """Create a new post interest"""
         model = PostInterestModel(
-            id=UUID(post_interest.id) if isinstance(post_interest.id, str) else post_interest.id,
-            post_id=UUID(post_interest.post_id) if isinstance(post_interest.post_id, str) else post_interest.post_id,
-            user_id=UUID(post_interest.user_id) if isinstance(post_interest.user_id, str) else post_interest.user_id,
-            status=post_interest.status.value if isinstance(post_interest.status, PostInterestStatus) else post_interest.status,
+            id=UUID(post_interest.id)
+            if isinstance(post_interest.id, str)
+            else post_interest.id,
+            post_id=UUID(post_interest.post_id)
+            if isinstance(post_interest.post_id, str)
+            else post_interest.post_id,
+            user_id=UUID(post_interest.user_id)
+            if isinstance(post_interest.user_id, str)
+            else post_interest.user_id,
+            status=post_interest.status.value
+            if isinstance(post_interest.status, PostInterestStatus)
+            else post_interest.status,
             created_at=post_interest.created_at,
             updated_at=post_interest.updated_at,
         )
@@ -43,9 +58,7 @@ class SQLAlchemyPostInterestRepository(PostInterestRepository):
         return self._to_entity(model) if model else None
 
     async def get_by_post_and_user(
-        self,
-        post_id: str,
-        user_id: str
+        self, post_id: str, user_id: str
     ) -> Optional[PostInterest]:
         """
         Get post interest by post and user
@@ -53,12 +66,12 @@ class SQLAlchemyPostInterestRepository(PostInterestRepository):
         """
         post_uuid = UUID(post_id) if isinstance(post_id, str) else post_id
         user_uuid = UUID(user_id) if isinstance(user_id, str) else user_id
-        
+
         result = await self.session.execute(
             select(PostInterestModel).where(
                 and_(
                     PostInterestModel.post_id == post_uuid,
-                    PostInterestModel.user_id == user_uuid
+                    PostInterestModel.user_id == user_uuid,
                 )
             )
         )
@@ -70,21 +83,27 @@ class SQLAlchemyPostInterestRepository(PostInterestRepository):
         post_id: str,
         status: Optional[PostInterestStatus] = None,
         limit: int = 50,
-        offset: int = 0
+        offset: int = 0,
     ) -> List[PostInterest]:
         """
         List all interests for a specific post
         Optionally filtered by status
         """
         post_uuid = UUID(post_id) if isinstance(post_id, str) else post_id
-        
+
         query = select(PostInterestModel).where(PostInterestModel.post_id == post_uuid)
 
         if status:
-            status_value = status.value if isinstance(status, PostInterestStatus) else status
+            status_value = (
+                status.value if isinstance(status, PostInterestStatus) else status
+            )
             query = query.where(PostInterestModel.status == status_value)
 
-        query = query.order_by(PostInterestModel.created_at.desc()).limit(limit).offset(offset)
+        query = (
+            query.order_by(PostInterestModel.created_at.desc())
+            .limit(limit)
+            .offset(offset)
+        )
 
         result = await self.session.execute(query)
         models = result.scalars().all()
@@ -95,21 +114,27 @@ class SQLAlchemyPostInterestRepository(PostInterestRepository):
         user_id: str,
         status: Optional[PostInterestStatus] = None,
         limit: int = 50,
-        offset: int = 0
+        offset: int = 0,
     ) -> List[PostInterest]:
         """
         List all interests by a specific user
         Optionally filtered by status
         """
         user_uuid = UUID(user_id) if isinstance(user_id, str) else user_id
-        
+
         query = select(PostInterestModel).where(PostInterestModel.user_id == user_uuid)
 
         if status:
-            status_value = status.value if isinstance(status, PostInterestStatus) else status
+            status_value = (
+                status.value if isinstance(status, PostInterestStatus) else status
+            )
             query = query.where(PostInterestModel.status == status_value)
 
-        query = query.order_by(PostInterestModel.created_at.desc()).limit(limit).offset(offset)
+        query = (
+            query.order_by(PostInterestModel.created_at.desc())
+            .limit(limit)
+            .offset(offset)
+        )
 
         result = await self.session.execute(query)
         models = result.scalars().all()
@@ -119,7 +144,12 @@ class SQLAlchemyPostInterestRepository(PostInterestRepository):
         """Update an existing post interest"""
         result = await self.session.execute(
             select(PostInterestModel).where(
-                PostInterestModel.id == (UUID(post_interest.id) if isinstance(post_interest.id, str) else post_interest.id)
+                PostInterestModel.id
+                == (
+                    UUID(post_interest.id)
+                    if isinstance(post_interest.id, str)
+                    else post_interest.id
+                )
             )
         )
         model = result.scalar_one_or_none()
@@ -127,7 +157,11 @@ class SQLAlchemyPostInterestRepository(PostInterestRepository):
         if not model:
             raise ValueError(f"PostInterest with id {post_interest.id} not found")
 
-        model.status = post_interest.status.value if isinstance(post_interest.status, PostInterestStatus) else post_interest.status
+        model.status = (
+            post_interest.status.value
+            if isinstance(post_interest.status, PostInterestStatus)
+            else post_interest.status
+        )
         model.updated_at = post_interest.updated_at
 
         await self.session.flush()

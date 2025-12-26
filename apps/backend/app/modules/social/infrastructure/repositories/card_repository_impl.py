@@ -98,7 +98,9 @@ class SQLAlchemyCardRepository(CardRepository):
     async def count_uploads_today(self, owner_id: UUID) -> int:
         """Count uploads today (since 00:00 UTC)"""
         # Calculate start of day in UTC
-        today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+        today_start = datetime.utcnow().replace(
+            hour=0, minute=0, second=0, microsecond=0
+        )
 
         result = await self.session.execute(
             select(func.count(CardModel.id)).where(
@@ -146,7 +148,7 @@ class SQLAlchemyCardRepository(CardRepository):
     ) -> List[Tuple[Card, float, Optional[str]]]:
         """
         Find cards within a radius from a location.
-        
+
         This method:
         1. Joins cards with profiles to get owner location and nickname
         2. Filters out users in stealth mode (if requested)
@@ -154,7 +156,7 @@ class SQLAlchemyCardRepository(CardRepository):
         4. Calculates distance using Haversine formula
         5. Filters by radius
         6. Sorts by distance (closest first)
-        
+
         Returns list of (Card, distance_km, owner_nickname) tuples
         """
         from app.modules.identity.infrastructure.database.models.profile_model import (

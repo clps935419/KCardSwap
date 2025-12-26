@@ -56,10 +56,12 @@ class UploadQuota:
         )
 
     @classmethod
-    def from_mb_gb(cls, daily_limit: int, max_file_mb: int, total_storage_gb: int) -> "UploadQuota":
+    def from_mb_gb(
+        cls, daily_limit: int, max_file_mb: int, total_storage_gb: int
+    ) -> "UploadQuota":
         """
         Create quota from MB/GB values for convenience.
-        
+
         Args:
             daily_limit: Daily upload limit
             max_file_mb: Max file size in MB

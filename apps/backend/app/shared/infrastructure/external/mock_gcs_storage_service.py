@@ -57,10 +57,14 @@ class MockGCSStorageService:
         """
         # Validate blob_name follows the correct pattern
         if not blob_name.startswith("cards/"):
-            raise ValueError(f"Invalid blob path: {blob_name}. Must start with 'cards/'")
+            raise ValueError(
+                f"Invalid blob path: {blob_name}. Must start with 'cards/'"
+            )
 
         if "thumbs" in blob_name.lower():
-            raise ValueError(f"Invalid blob path: {blob_name}. 'thumbs/' is not allowed")
+            raise ValueError(
+                f"Invalid blob path: {blob_name}. 'thumbs/' is not allowed"
+            )
 
         # Return a mock URL that looks realistic but won't actually work
         base_url = f"https://storage.googleapis.com/{self._bucket_name}/{blob_name}"
@@ -84,7 +88,9 @@ class MockGCSStorageService:
         """
         # Validate blob_name follows the correct pattern
         if not blob_name.startswith("cards/"):
-            raise ValueError(f"Invalid blob path: {blob_name}. Must start with 'cards/'")
+            raise ValueError(
+                f"Invalid blob path: {blob_name}. Must start with 'cards/'"
+            )
 
         base_url = f"https://storage.googleapis.com/{self._bucket_name}/{blob_name}"
         mock_signature = f"X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=mock&X-Goog-Date=mock&X-Goog-Expires={expiration_minutes}00&X-Goog-SignedHeaders=host&X-Goog-Signature=mock_signature"

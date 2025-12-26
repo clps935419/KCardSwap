@@ -145,9 +145,7 @@ async def test_admin_login_user_not_found(
     mock_user_repo.get_by_email.return_value = None
 
     # Act
-    result = await admin_login_use_case.execute(
-        "nonexistent@example.com", "password"
-    )
+    result = await admin_login_use_case.execute("nonexistent@example.com", "password")
 
     # Assert
     assert result is None

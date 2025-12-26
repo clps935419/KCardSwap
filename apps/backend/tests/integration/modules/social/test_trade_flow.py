@@ -77,7 +77,7 @@ class TestTradeFlowIntegration:
             "app.modules.social.infrastructure.repositories.trade_repository_impl.SQLAlchemyTradeRepository"
         ) as mock:
             repo_instance = Mock()
-            
+
             # Mock trade creation
             created_trade = Trade(
                 id=test_trade_data["trade_id"],
@@ -93,7 +93,7 @@ class TestTradeFlowIntegration:
             repo_instance.get_items_by_trade_id = AsyncMock(return_value=[])
             repo_instance.count_active_trades_between_users = AsyncMock(return_value=0)
             repo_instance.get_user_trades = AsyncMock(return_value=[created_trade])
-            
+
             mock.return_value = repo_instance
             yield repo_instance
 
@@ -104,7 +104,7 @@ class TestTradeFlowIntegration:
             "app.modules.social.infrastructure.repositories.card_repository_impl.CardRepositoryImpl"
         ) as mock:
             repo_instance = Mock()
-            
+
             # Mock cards
             initiator_card = Card(
                 owner_id=test_trade_data["initiator"],
@@ -116,16 +116,18 @@ class TestTradeFlowIntegration:
                 id=test_trade_data["responder_card_id"],
                 status=Card.STATUS_AVAILABLE,
             )
-            
+
             repo_instance.find_by_id = AsyncMock(
                 side_effect=lambda card_id: (
-                    initiator_card if card_id == test_trade_data["initiator_card_id"]
-                    else responder_card if card_id == test_trade_data["responder_card_id"]
+                    initiator_card
+                    if card_id == test_trade_data["initiator_card_id"]
+                    else responder_card
+                    if card_id == test_trade_data["responder_card_id"]
                     else None
                 )
             )
             repo_instance.save = AsyncMock(side_effect=lambda card: card)
-            
+
             mock.return_value = repo_instance
             yield repo_instance
 
@@ -136,7 +138,7 @@ class TestTradeFlowIntegration:
             "app.modules.social.infrastructure.repositories.friendship_repository_impl.SQLAlchemyFriendshipRepository"
         ) as mock:
             repo_instance = Mock()
-            
+
             # Mock friendship
             friendship = Friendship(
                 id=str(uuid4()),
@@ -147,7 +149,7 @@ class TestTradeFlowIntegration:
             )
             repo_instance.get_by_users = AsyncMock(return_value=friendship)
             repo_instance.is_blocked = AsyncMock(return_value=False)
-            
+
             mock.return_value = repo_instance
             yield repo_instance
 
@@ -209,9 +211,7 @@ class TestTradeFlowIntegration:
         )
         mock_trade_repository.get_by_id = AsyncMock(return_value=proposed_trade)
 
-        response = client.post(
-            f"/api/v1/trades/{test_trade_data['trade_id']}/accept"
-        )
+        response = client.post(f"/api/v1/trades/{test_trade_data['trade_id']}/accept")
 
         assert response.status_code == 200
         data = response.json()
@@ -238,9 +238,7 @@ class TestTradeFlowIntegration:
         )
         mock_trade_repository.get_by_id = AsyncMock(return_value=proposed_trade)
 
-        response = client.post(
-            f"/api/v1/trades/{test_trade_data['trade_id']}/reject"
-        )
+        response = client.post(f"/api/v1/trades/{test_trade_data['trade_id']}/reject")
 
         assert response.status_code == 200
 
@@ -265,9 +263,7 @@ class TestTradeFlowIntegration:
         )
         mock_trade_repository.get_by_id = AsyncMock(return_value=accepted_trade)
 
-        response = client.post(
-            f"/api/v1/trades/{test_trade_data['trade_id']}/cancel"
-        )
+        response = client.post(f"/api/v1/trades/{test_trade_data['trade_id']}/cancel")
 
         assert response.status_code == 200
 
@@ -336,7 +332,7 @@ class TestTradeFlowTimeout:
         """Test trade is auto-canceled after 48h timeout"""
         # Setup: trade accepted more than 48 hours ago
         old_time = datetime.utcnow() - timedelta(hours=49)
-        
+
         trade_id = uuid4()
         initiator_id = uuid4()
         responder_id = uuid4()
@@ -363,7 +359,7 @@ class TestTradeFlowTimeout:
         ) as mock_card_repo:
             # Setup mocks
             mock_session.return_value = Mock()
-            
+
             repo_instance = Mock()
             repo_instance.get_by_id = AsyncMock(return_value=accepted_trade)
             repo_instance.update = AsyncMock(side_effect=lambda trade: trade)
@@ -380,4 +376,7 @@ class TestTradeFlowTimeout:
 
             # Should return error due to timeout
             assert response.status_code == 422
-            assert "timeout" in response.json()["detail"].lower() or "cancel" in response.json()["detail"].lower()
+            assert (
+                "timeout" in response.json()["detail"].lower()
+                or "cancel" in response.json()["detail"].lower()
+            )

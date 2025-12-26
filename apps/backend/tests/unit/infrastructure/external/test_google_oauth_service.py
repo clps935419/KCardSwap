@@ -17,11 +17,14 @@ class TestGoogleOAuthServicePKCE:
     @pytest.fixture
     def mock_env(self):
         """Mock environment variables"""
-        with patch.dict(os.environ, {
-            'GOOGLE_CLIENT_ID': 'test_client_id',
-            'GOOGLE_CLIENT_SECRET': 'test_client_secret',
-            'GOOGLE_REDIRECT_URI': 'http://localhost:3000/callback'
-        }):
+        with patch.dict(
+            os.environ,
+            {
+                "GOOGLE_CLIENT_ID": "test_client_id",
+                "GOOGLE_CLIENT_SECRET": "test_client_secret",
+                "GOOGLE_REDIRECT_URI": "http://localhost:3000/callback",
+            },
+        ):
             yield
 
     @pytest.mark.asyncio
@@ -45,17 +48,17 @@ class TestGoogleOAuthServicePKCE:
             "access_token": "mock_access_token",
             "id_token": "mock_id_token",
             "expires_in": 3600,
-            "token_type": "Bearer"
+            "token_type": "Bearer",
         }
 
         mock_client = AsyncMock()
         mock_client.__aenter__.return_value.post = AsyncMock(return_value=mock_response)
 
-        with patch('httpx.AsyncClient', return_value=mock_client):
+        with patch("httpx.AsyncClient", return_value=mock_client):
             result = await service.exchange_code_with_pkce(
                 code="test_authorization_code",
                 code_verifier="test_code_verifier_must_be_43_to_128_chars_long_12345678",
-                redirect_uri="http://localhost:3000/callback"
+                redirect_uri="http://localhost:3000/callback",
             )
 
             # Verify the result
@@ -66,13 +69,18 @@ class TestGoogleOAuthServicePKCE:
             call_args = mock_client.__aenter__.return_value.post.call_args
 
             # Check the data payload
-            data = call_args[1]['data']
-            assert data['code'] == "test_authorization_code"
-            assert data['client_id'] == "test_client_id"
-            assert data['client_secret'] == "test_client_secret"  # THIS IS THE KEY ASSERTION
-            assert data['code_verifier'] == "test_code_verifier_must_be_43_to_128_chars_long_12345678"
-            assert data['redirect_uri'] == "http://localhost:3000/callback"
-            assert data['grant_type'] == "authorization_code"
+            data = call_args[1]["data"]
+            assert data["code"] == "test_authorization_code"
+            assert data["client_id"] == "test_client_id"
+            assert (
+                data["client_secret"] == "test_client_secret"
+            )  # THIS IS THE KEY ASSERTION
+            assert (
+                data["code_verifier"]
+                == "test_code_verifier_must_be_43_to_128_chars_long_12345678"
+            )
+            assert data["redirect_uri"] == "http://localhost:3000/callback"
+            assert data["grant_type"] == "authorization_code"
 
     @pytest.mark.asyncio
     async def test_exchange_code_with_pkce_uses_fallback_redirect_uri(self, mock_env):
@@ -88,10 +96,10 @@ class TestGoogleOAuthServicePKCE:
         mock_client = AsyncMock()
         mock_client.__aenter__.return_value.post = AsyncMock(return_value=mock_response)
 
-        with patch('httpx.AsyncClient', return_value=mock_client):
+        with patch("httpx.AsyncClient", return_value=mock_client):
             result = await service.exchange_code_with_pkce(
                 code="test_code",
-                code_verifier="test_verifier_43_chars_minimum_required_1234567890"
+                code_verifier="test_verifier_43_chars_minimum_required_1234567890",
                 # No redirect_uri provided
             )
 
@@ -99,8 +107,8 @@ class TestGoogleOAuthServicePKCE:
 
             # Verify fallback redirect_uri was used
             call_args = mock_client.__aenter__.return_value.post.call_args
-            data = call_args[1]['data']
-            assert data['redirect_uri'] == "http://localhost:3000/callback"
+            data = call_args[1]["data"]
+            assert data["redirect_uri"] == "http://localhost:3000/callback"
 
     @pytest.mark.asyncio
     async def test_exchange_code_with_pkce_handles_error_response(self, mock_env):
@@ -113,16 +121,16 @@ class TestGoogleOAuthServicePKCE:
         mock_response.status_code = 400
         mock_response.json.return_value = {
             "error": "invalid_grant",
-            "error_description": "Invalid authorization code"
+            "error_description": "Invalid authorization code",
         }
 
         mock_client = AsyncMock()
         mock_client.__aenter__.return_value.post = AsyncMock(return_value=mock_response)
 
-        with patch('httpx.AsyncClient', return_value=mock_client):
+        with patch("httpx.AsyncClient", return_value=mock_client):
             result = await service.exchange_code_with_pkce(
                 code="invalid_code",
-                code_verifier="test_verifier_43_chars_minimum_required_1234567890"
+                code_verifier="test_verifier_43_chars_minimum_required_1234567890",
             )
 
             assert result is None
@@ -139,10 +147,10 @@ class TestGoogleOAuthServicePKCE:
             side_effect=Exception("Timeout")
         )
 
-        with patch('httpx.AsyncClient', return_value=mock_client):
+        with patch("httpx.AsyncClient", return_value=mock_client):
             result = await service.exchange_code_with_pkce(
                 code="test_code",
-                code_verifier="test_verifier_43_chars_minimum_required_1234567890"
+                code_verifier="test_verifier_43_chars_minimum_required_1234567890",
             )
 
             assert result is None
@@ -168,11 +176,11 @@ class TestGoogleOAuthServicePKCE:
         mock_client = AsyncMock()
         mock_client.__aenter__.return_value.post = AsyncMock(return_value=mock_response)
 
-        with patch('httpx.AsyncClient', return_value=mock_client):
+        with patch("httpx.AsyncClient", return_value=mock_client):
             # Test regular exchange
             await service.exchange_code_for_token(code="test_code")
             regular_call_args = mock_client.__aenter__.return_value.post.call_args
-            regular_data = regular_call_args[1]['data']
+            regular_data = regular_call_args[1]["data"]
 
             # Reset mock
             mock_client.__aenter__.return_value.post.reset_mock()
@@ -180,16 +188,16 @@ class TestGoogleOAuthServicePKCE:
             # Test PKCE exchange
             await service.exchange_code_with_pkce(
                 code="test_code",
-                code_verifier="test_verifier_43_chars_minimum_required_1234567890"
+                code_verifier="test_verifier_43_chars_minimum_required_1234567890",
             )
             pkce_call_args = mock_client.__aenter__.return_value.post.call_args
-            pkce_data = pkce_call_args[1]['data']
+            pkce_data = pkce_call_args[1]["data"]
 
             # Both should include client_secret
-            assert 'client_secret' in regular_data
-            assert 'client_secret' in pkce_data
-            assert regular_data['client_secret'] == pkce_data['client_secret']
+            assert "client_secret" in regular_data
+            assert "client_secret" in pkce_data
+            assert regular_data["client_secret"] == pkce_data["client_secret"]
 
             # PKCE should have code_verifier, regular should not
-            assert 'code_verifier' not in regular_data
-            assert 'code_verifier' in pkce_data
+            assert "code_verifier" not in regular_data
+            assert "code_verifier" in pkce_data

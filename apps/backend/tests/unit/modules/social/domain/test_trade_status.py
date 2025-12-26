@@ -100,7 +100,11 @@ class TestTradeStatusTransitions:
 
     def test_terminal_states_no_transitions(self):
         """Test terminal states cannot transition"""
-        for terminal_status in [TradeStatus.COMPLETED, TradeStatus.REJECTED, TradeStatus.CANCELED]:
+        for terminal_status in [
+            TradeStatus.COMPLETED,
+            TradeStatus.REJECTED,
+            TradeStatus.CANCELED,
+        ]:
             status = TradeStatus(terminal_status)
 
             # Cannot transition to any state
@@ -113,25 +117,41 @@ class TestTradeStatusStateQueries:
 
     def test_is_terminal(self):
         """Test is_terminal returns True for terminal statuses"""
-        for status_value in [TradeStatus.COMPLETED, TradeStatus.REJECTED, TradeStatus.CANCELED]:
+        for status_value in [
+            TradeStatus.COMPLETED,
+            TradeStatus.REJECTED,
+            TradeStatus.CANCELED,
+        ]:
             status = TradeStatus(status_value)
             assert status.is_terminal() is True
 
     def test_is_not_terminal(self):
         """Test is_terminal returns False for active statuses"""
-        for status_value in [TradeStatus.DRAFT, TradeStatus.PROPOSED, TradeStatus.ACCEPTED]:
+        for status_value in [
+            TradeStatus.DRAFT,
+            TradeStatus.PROPOSED,
+            TradeStatus.ACCEPTED,
+        ]:
             status = TradeStatus(status_value)
             assert status.is_terminal() is False
 
     def test_is_active(self):
         """Test is_active returns True for active statuses"""
-        for status_value in [TradeStatus.DRAFT, TradeStatus.PROPOSED, TradeStatus.ACCEPTED]:
+        for status_value in [
+            TradeStatus.DRAFT,
+            TradeStatus.PROPOSED,
+            TradeStatus.ACCEPTED,
+        ]:
             status = TradeStatus(status_value)
             assert status.is_active() is True
 
     def test_is_not_active(self):
         """Test is_active returns False for terminal statuses"""
-        for status_value in [TradeStatus.COMPLETED, TradeStatus.REJECTED, TradeStatus.CANCELED]:
+        for status_value in [
+            TradeStatus.COMPLETED,
+            TradeStatus.REJECTED,
+            TradeStatus.CANCELED,
+        ]:
             status = TradeStatus(status_value)
             assert status.is_active() is False
 
