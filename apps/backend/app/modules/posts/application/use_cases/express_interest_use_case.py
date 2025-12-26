@@ -10,7 +10,7 @@ from app.modules.posts.domain.entities.post_interest import (
 from app.modules.posts.domain.repositories.i_post_interest_repository import (
     IPostInterestRepository,
 )
-from app.modules.posts.domain.repositories.post_repository import IPostRepository
+from app.modules.posts.domain.repositories.i_post_repository import IPostRepository
 
 
 class ExpressInterestUseCase:

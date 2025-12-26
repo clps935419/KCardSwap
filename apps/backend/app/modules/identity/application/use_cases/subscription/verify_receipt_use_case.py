@@ -10,7 +10,7 @@ from uuid import UUID
 from app.modules.identity.domain.repositories.i_subscription_repository import (
     ISubscriptionRepository,
 )
-from app.modules.identity.domain.repositories.purchase_token_repository import (
+from app.modules.identity.domain.repositories.i_purchase_token_repository import (
     IPurchaseTokenRepository,
 )
 from app.modules.identity.infrastructure.external.google_play_billing_service import (

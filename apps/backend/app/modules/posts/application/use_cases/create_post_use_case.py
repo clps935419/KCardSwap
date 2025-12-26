@@ -5,8 +5,8 @@ from datetime import datetime, timedelta
 from typing import Optional
 
 from app.modules.posts.domain.entities.post import Post, PostStatus
-from app.modules.posts.domain.repositories.post_repository import IPostRepository
-from app.modules.identity.domain.repositories.subscription_repository import (
+from app.modules.posts.domain.repositories.i_post_repository import IPostRepository
+from app.modules.identity.domain.repositories.i_subscription_repository import (
     ISubscriptionRepository,
 )
 

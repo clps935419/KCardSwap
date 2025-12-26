@@ -109,6 +109,23 @@ class RefreshTokenRepositoryImpl(IRefreshTokenRepository):
 
         return result.rowcount
 
+    async def revoke_token(self, user_id: UUID, token: str) -> bool:
+        """Revoke a specific refresh token for a user."""
+        stmt = select(RefreshTokenModel).where(
+            RefreshTokenModel.token == token,
+            RefreshTokenModel.user_id == user_id,
+            RefreshTokenModel.revoked == False,
+        )
+        result = await self._session.execute(stmt)
+        token_model = result.scalar_one_or_none()
+
+        if token_model:
+            token_model.revoked = True
+            await self._session.flush()
+            return True
+
+        return False
+
     @staticmethod
     def _model_to_entity(model: RefreshTokenModel) -> RefreshToken:
         """Convert ORM model to domain entity."""

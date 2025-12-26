@@ -87,3 +87,16 @@ class IRefreshTokenRepository(ABC):
             Number of tokens revoked
         """
         pass
+
+    @abstractmethod
+    async def revoke_token(self, user_id: UUID, token: str) -> bool:
+        """Revoke a specific refresh token for a user.
+
+        Args:
+            user_id: User ID
+            token: Token string to revoke
+
+        Returns:
+            True if token was revoked, False if not found or already revoked
+        """
+        pass

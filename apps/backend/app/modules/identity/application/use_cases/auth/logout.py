@@ -4,17 +4,16 @@ Logout Use Case - Revoke refresh token
 
 from uuid import UUID
 
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from app.modules.identity.infrastructure.database.models import RefreshTokenModel
+from app.modules.identity.domain.repositories.i_refresh_token_repository import (
+    IRefreshTokenRepository,
+)
 
 
 class LogoutUseCase:
     """Use case for logging out (revoking refresh token)"""
 
-    def __init__(self, session: AsyncSession):
-        self.session = session
+    def __init__(self, refresh_token_repo: IRefreshTokenRepository):
+        self.refresh_token_repo = refresh_token_repo
 
     async def execute(self, user_id: UUID, refresh_token: str) -> bool:
         """
@@ -27,19 +26,5 @@ class LogoutUseCase:
         Returns:
             True if successful, False otherwise
         """
-        # Find and revoke the refresh token
-        result = await self.session.execute(
-            select(RefreshTokenModel).where(
-                RefreshTokenModel.token == refresh_token,
-                RefreshTokenModel.user_id == user_id,
-                RefreshTokenModel.revoked is False,
-            )
-        )
-        token_model = result.scalar_one_or_none()
-
-        if token_model:
-            token_model.revoked = True
-            await self.session.flush()
-            return True
-
-        return False
+        # Revoke the refresh token using repository
+        return await self.refresh_token_repo.revoke_token(user_id, refresh_token)

@@ -3,7 +3,7 @@
 from typing import List, Optional
 
 from app.modules.posts.domain.entities.post import Post, PostStatus
-from app.modules.posts.domain.repositories.post_repository import IPostRepository
+from app.modules.posts.domain.repositories.i_post_repository import IPostRepository
 
 
 class ListBoardPostsUseCase:

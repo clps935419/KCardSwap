@@ -4,7 +4,7 @@ Check Subscription Status Use Case
 
 from uuid import UUID
 
-from app.modules.identity.domain.repositories.subscription_repository import (
+from app.modules.identity.domain.repositories.i_subscription_repository import (
     ISubscriptionRepository,
 )
 

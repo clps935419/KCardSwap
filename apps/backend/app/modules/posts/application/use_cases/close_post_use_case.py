@@ -1,6 +1,6 @@
 """Close Post Use Case - Manually close a post"""
 
-from app.modules.posts.domain.repositories.post_repository import IPostRepository
+from app.modules.posts.domain.repositories.i_post_repository import IPostRepository
 
 
 class ClosePostUseCase:

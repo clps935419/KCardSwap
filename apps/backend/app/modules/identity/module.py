@@ -128,7 +128,7 @@ class IdentityModule(Module):
     def provide_logout_use_case(self, session: AsyncSession) -> LogoutUseCase:
         """Provide LogoutUseCase with dependencies."""
         refresh_token_repo = RefreshTokenRepositoryImpl(session)
-        return LogoutUseCase(refresh_token_repository=refresh_token_repo)
+        return LogoutUseCase(refresh_token_repo=refresh_token_repo)
 
     @provider
     def provide_admin_login_use_case(
