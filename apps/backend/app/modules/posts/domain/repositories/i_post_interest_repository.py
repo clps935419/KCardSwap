@@ -1,5 +1,5 @@
 """
-PostInterest Repository Interface
+Post Interest Repository Interface
 
 Domain layer repository interface - defines contract for post interest persistence
 """
@@ -13,7 +13,7 @@ from app.modules.posts.domain.entities.post_interest import (
 )
 
 
-class PostInterestRepository(ABC):
+class IIPostInterestRepository(ABC):
     """Repository interface for PostInterest entity persistence"""
 
     @abstractmethod

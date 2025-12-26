@@ -1,6 +1,6 @@
 """Close Post Use Case - Manually close a post"""
 
-from app.modules.posts.domain.repositories.post_repository import PostRepository
+from app.modules.posts.domain.repositories.post_repository import IPostRepository
 
 
 class ClosePostUseCase:
@@ -12,7 +12,7 @@ class ClosePostUseCase:
     - Post must be open
     """
 
-    def __init__(self, post_repository: PostRepository):
+    def __init__(self, post_repository: IPostRepository):
         self.post_repository = post_repository
 
     async def execute(self, post_id: str, current_user_id: str) -> None:

@@ -10,11 +10,11 @@ from sqlalchemy import select, and_, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.posts.domain.entities.post import Post, PostStatus
-from app.modules.posts.domain.repositories.post_repository import PostRepository
+from app.modules.posts.domain.repositories.i_post_repository import IPostRepository
 from app.modules.posts.infrastructure.database.models.post_model import PostModel
 
 
-class SQLAlchemyPostRepository(PostRepository):
+class PostRepositoryImpl(IPostRepository):
     """SQLAlchemy implementation of Post repository"""
 
     def __init__(self, session: AsyncSession):

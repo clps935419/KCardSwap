@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from typing import Optional
 
 from app.modules.posts.domain.entities.post import Post, PostStatus
-from app.modules.posts.domain.repositories.post_repository import PostRepository
+from app.modules.posts.domain.repositories.post_repository import IPostRepository
 from app.modules.identity.domain.repositories.subscription_repository import (
     SubscriptionRepository,
 )
@@ -29,7 +29,7 @@ class CreatePostUseCase:
 
     def __init__(
         self,
-        post_repository: PostRepository,
+        post_repository: IPostRepository,
         subscription_repository: SubscriptionRepository,
     ):
         self.post_repository = post_repository

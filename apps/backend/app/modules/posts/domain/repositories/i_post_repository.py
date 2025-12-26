@@ -11,7 +11,7 @@ from typing import List, Optional
 from app.modules.posts.domain.entities.post import Post, PostStatus
 
 
-class PostRepository(ABC):
+class IPostRepository(ABC):
     """Repository interface for Post entity persistence"""
 
     @abstractmethod
