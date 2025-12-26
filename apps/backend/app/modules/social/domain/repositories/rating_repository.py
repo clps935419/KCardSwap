@@ -3,6 +3,7 @@ Rating Repository Interface
 
 Domain layer repository interface - defines contract for rating persistence
 """
+
 from abc import ABC, abstractmethod
 from typing import List, Optional
 

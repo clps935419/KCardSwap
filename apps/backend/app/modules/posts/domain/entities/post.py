@@ -3,6 +3,7 @@ Post Entity - Represents a city board post for card exchange
 
 Domain Entity following DDD principles - framework independent
 """
+
 from datetime import datetime
 from enum import Enum
 from typing import Optional

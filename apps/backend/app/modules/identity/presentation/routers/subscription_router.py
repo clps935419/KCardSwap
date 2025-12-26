@@ -1,35 +1,33 @@
 """
 Subscription Router - API endpoints for subscription management
 """
+
+from typing import Annotated
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.shared.infrastructure.database.connection import get_db_session
-from app.modules.identity.presentation.dependencies.auth_deps import get_current_user
-from app.modules.identity.presentation.schemas.subscription_schemas import (
-    VerifyReceiptRequest,
-    SubscriptionStatusResponse,
-    ExpireSubscriptionsResponse,
-)
-from app.modules.identity.application.use_cases.subscription.verify_receipt_use_case import (
-    VerifyReceiptUseCase,
-)
 from app.modules.identity.application.use_cases.subscription.check_subscription_status_use_case import (
     CheckSubscriptionStatusUseCase,
 )
 from app.modules.identity.application.use_cases.subscription.expire_subscriptions_use_case import (
     ExpireSubscriptionsUseCase,
 )
-from app.modules.identity.infrastructure.repositories.subscription_repository_impl import (
-    SubscriptionRepositoryImpl,
+from app.modules.identity.application.use_cases.subscription.verify_receipt_use_case import (
+    VerifyReceiptUseCase,
 )
-from app.modules.identity.infrastructure.repositories.purchase_token_repository_impl import (
-    PurchaseTokenRepositoryImpl,
+from app.modules.identity.presentation.dependencies.auth_deps import get_current_user
+from app.modules.identity.presentation.dependencies.use_case_deps import (
+    get_check_subscription_status_use_case,
+    get_expire_subscriptions_use_case,
+    get_verify_receipt_use_case,
 )
-from app.modules.identity.infrastructure.external.google_play_billing_service import (
-    GooglePlayBillingService,
+from app.modules.identity.presentation.schemas.subscription_schemas import (
+    ExpireSubscriptionsResponse,
+    SubscriptionStatusResponse,
+    VerifyReceiptRequest,
 )
-from app.config import get_settings
+from app.shared.infrastructure.database.connection import get_db_session
 
 router = APIRouter(prefix="/subscriptions", tags=["Subscriptions"])
 
@@ -37,8 +35,9 @@ router = APIRouter(prefix="/subscriptions", tags=["Subscriptions"])
 @router.post("/verify-receipt", response_model=SubscriptionStatusResponse)
 async def verify_receipt(
     request: VerifyReceiptRequest,
+    session: Annotated[AsyncSession, Depends(get_db_session)],
+    use_case: Annotated[VerifyReceiptUseCase, Depends(get_verify_receipt_use_case)],
     current_user: dict = Depends(get_current_user),
-    session: AsyncSession = Depends(get_db_session),
 ):
     """
     Verify Google Play purchase receipt and update subscription.
@@ -54,26 +53,9 @@ async def verify_receipt(
     - 409_CONFLICT: Purchase token already used by another user
     - 503_SERVICE_UNAVAILABLE: Google Play API unavailable
     """
-    settings = get_settings()
     user_id = current_user["id"]
 
-    # Initialize repositories
-    subscription_repo = SubscriptionRepositoryImpl(session)
-    token_repo = PurchaseTokenRepositoryImpl(session)
-
-    # Initialize billing service
-    billing_service = GooglePlayBillingService(
-        package_name=settings.GOOGLE_PLAY_PACKAGE_NAME,
-        service_account_key_path=settings.GOOGLE_PLAY_SERVICE_ACCOUNT_KEY_PATH,
-    )
-
     # Execute use case
-    use_case = VerifyReceiptUseCase(
-        subscription_repository=subscription_repo,
-        purchase_token_repository=token_repo,
-        billing_service=billing_service,
-    )
-
     result = await use_case.execute(
         user_id=user_id,
         platform=request.platform,
@@ -87,8 +69,11 @@ async def verify_receipt(
 
 @router.get("/status", response_model=SubscriptionStatusResponse)
 async def get_subscription_status(
+    session: Annotated[AsyncSession, Depends(get_db_session)],
+    use_case: Annotated[
+        CheckSubscriptionStatusUseCase, Depends(get_check_subscription_status_use_case)
+    ],
     current_user: dict = Depends(get_current_user),
-    session: AsyncSession = Depends(get_db_session),
 ):
     """
     Get current subscription status for authenticated user.
@@ -102,11 +87,7 @@ async def get_subscription_status(
     """
     user_id = current_user["id"]
 
-    # Initialize repository
-    subscription_repo = SubscriptionRepositoryImpl(session)
-
     # Execute use case
-    use_case = CheckSubscriptionStatusUseCase(subscription_repo)
     result = await use_case.execute(user_id=user_id)
 
     await session.commit()
@@ -115,7 +96,10 @@ async def get_subscription_status(
 
 @router.post("/expire-subscriptions", response_model=ExpireSubscriptionsResponse)
 async def expire_subscriptions(
-    session: AsyncSession = Depends(get_db_session),
+    session: Annotated[AsyncSession, Depends(get_db_session)],
+    use_case: Annotated[
+        ExpireSubscriptionsUseCase, Depends(get_expire_subscriptions_use_case)
+    ],
 ):
     """
     Expire active subscriptions that have passed their expiry date.
@@ -130,11 +114,7 @@ async def expire_subscriptions(
     Returns:
         Number of subscriptions expired and processing timestamp
     """
-    # Initialize repository
-    subscription_repo = SubscriptionRepositoryImpl(session)
-
     # Execute use case
-    use_case = ExpireSubscriptionsUseCase(subscription_repo)
     result = await use_case.execute()
 
     await session.commit()

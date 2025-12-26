@@ -3,6 +3,7 @@ PostInterest Repository Interface
 
 Domain layer repository interface - defines contract for post interest persistence
 """
+
 from abc import ABC, abstractmethod
 from typing import List, Optional
 

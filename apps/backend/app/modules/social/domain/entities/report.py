@@ -3,6 +3,7 @@ Report Entity - Represents a user report for violations
 
 Domain Entity following DDD principles - framework independent
 """
+
 from datetime import datetime
 from enum import Enum
 from typing import Optional

@@ -1,6 +1,7 @@
 """
 Rating ORM model for Social module
 """
+
 import uuid
 from datetime import datetime
 

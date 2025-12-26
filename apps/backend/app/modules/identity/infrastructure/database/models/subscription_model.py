@@ -1,6 +1,7 @@
 """
 Subscription SQLAlchemy Model
 """
+
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Index
 from sqlalchemy.dialects.postgresql import UUID

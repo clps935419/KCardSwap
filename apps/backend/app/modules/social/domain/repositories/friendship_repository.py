@@ -3,6 +3,7 @@ Friendship Repository Interface
 
 Domain layer repository interface - defines contract for friendship persistence
 """
+
 from abc import ABC, abstractmethod
 from typing import List, Optional
 

@@ -1,4 +1,5 @@
 """Social domain entities"""
+
 from .card import Card
 from .chat_room import ChatRoom
 from .friendship import Friendship, FriendshipStatus

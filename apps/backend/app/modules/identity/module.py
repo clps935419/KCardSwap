@@ -55,7 +55,11 @@ from app.modules.identity.infrastructure.repositories.user_repository_impl impor
 from app.modules.identity.infrastructure.security.password_service import (
     PasswordService,
 )
+from app.modules.identity.infrastructure.external.google_play_billing_service import (
+    GooglePlayBillingService,
+)
 from app.shared.infrastructure.security.jwt_service import JWTService
+from app.config import Settings
 
 
 class IdentityModule(Module):
@@ -153,14 +157,19 @@ class IdentityModule(Module):
     # Subscription Use Cases
     @provider
     def provide_verify_receipt_use_case(
-        self, session: AsyncSession
+        self, session: AsyncSession, settings: Settings
     ) -> VerifyReceiptUseCase:
         """Provide VerifyReceiptUseCase with dependencies."""
         subscription_repo = SubscriptionRepositoryImpl(session)
         purchase_token_repo = PurchaseTokenRepositoryImpl(session)
+        billing_service = GooglePlayBillingService(
+            package_name=settings.GOOGLE_PLAY_PACKAGE_NAME,
+            service_account_key_path=settings.GOOGLE_PLAY_SERVICE_ACCOUNT_KEY_PATH,
+        )
         return VerifyReceiptUseCase(
             subscription_repository=subscription_repo,
             purchase_token_repository=purchase_token_repo,
+            billing_service=billing_service,
         )
 
     @provider

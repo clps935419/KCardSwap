@@ -1,4 +1,5 @@
 """Social domain repositories"""
+
 from .card_repository import CardRepository
 from .chat_room_repository import ChatRoomRepository
 from .friendship_repository import FriendshipRepository

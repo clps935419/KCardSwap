@@ -1,4 +1,5 @@
 """Accept Interest Use Case - Accept an interest and create friendship + chat room"""
+
 import uuid
 from datetime import datetime
 

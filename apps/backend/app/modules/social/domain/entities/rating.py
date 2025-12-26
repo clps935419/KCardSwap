@@ -3,6 +3,7 @@ Rating Entity - Represents a user rating after a trade
 
 Domain Entity following DDD principles - framework independent
 """
+
 from datetime import datetime
 from typing import Optional
 

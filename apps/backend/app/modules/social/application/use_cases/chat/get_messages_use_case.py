@@ -1,4 +1,5 @@
 """Get Messages Use Case"""
+
 from typing import List, Optional
 
 from app.modules.social.domain.entities.message import Message

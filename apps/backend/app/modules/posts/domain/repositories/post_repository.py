@@ -3,6 +3,7 @@ Post Repository Interface
 
 Domain layer repository interface - defines contract for post persistence
 """
+
 from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import List, Optional

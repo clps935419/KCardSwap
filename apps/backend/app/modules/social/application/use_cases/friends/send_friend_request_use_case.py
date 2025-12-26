@@ -1,4 +1,5 @@
 """Send Friend Request Use Case"""
+
 import uuid
 from datetime import datetime
 

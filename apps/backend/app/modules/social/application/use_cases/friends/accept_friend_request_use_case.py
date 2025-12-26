@@ -1,4 +1,5 @@
 """Accept Friend Request Use Case"""
+
 from app.modules.social.domain.entities.chat_room import ChatRoom
 from app.modules.social.domain.repositories.chat_room_repository import (
     ChatRoomRepository,

@@ -1,4 +1,5 @@
 """List Board Posts Use Case - List posts for a specific city with filters"""
+
 from typing import List, Optional
 
 from app.modules.posts.domain.entities.post import Post, PostStatus

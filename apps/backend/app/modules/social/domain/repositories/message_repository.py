@@ -3,6 +3,7 @@ Message Repository Interface
 
 Domain layer repository interface - defines contract for message persistence
 """
+
 from abc import ABC, abstractmethod
 from typing import List, Optional
 

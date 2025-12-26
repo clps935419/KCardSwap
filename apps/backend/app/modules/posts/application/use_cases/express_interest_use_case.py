@@ -1,4 +1,5 @@
 """Express Interest Use Case - Express interest in a post"""
+
 import uuid
 from datetime import datetime
 

@@ -1,6 +1,7 @@
 """
 Purchase Token Repository Interface - For tracking Google Play purchase tokens
 """
+
 from abc import ABC, abstractmethod
 from typing import Optional
 from uuid import UUID

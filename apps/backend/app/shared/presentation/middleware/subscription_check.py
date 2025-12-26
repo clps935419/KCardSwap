@@ -4,6 +4,7 @@ Subscription Permission Middleware
 Enforces subscription-based limits on API endpoints.
 Checks user's subscription status and applies restrictions based on plan.
 """
+
 from typing import Callable
 from fastapi import Request, Response, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession

@@ -1,6 +1,7 @@
 """
 PostInterest ORM model for Posts module
 """
+
 import uuid
 from datetime import datetime
 

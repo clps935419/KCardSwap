@@ -1,4 +1,5 @@
 """Report User Use Case"""
+
 import uuid
 from datetime import datetime
 from typing import Optional

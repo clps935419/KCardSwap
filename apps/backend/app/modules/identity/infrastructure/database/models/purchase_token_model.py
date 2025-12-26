@@ -1,6 +1,7 @@
 """
 Purchase Token SQLAlchemy Model - For tracking and preventing replay attacks
 """
+
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Index
 from sqlalchemy.dialects.postgresql import UUID

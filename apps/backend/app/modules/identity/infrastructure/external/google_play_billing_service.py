@@ -1,6 +1,7 @@
 """
 Google Play Billing Service - For verifying and acknowledging purchase receipts
 """
+
 import httpx
 import logging
 from datetime import datetime

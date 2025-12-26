@@ -15,13 +15,11 @@ from app.modules.identity.application.use_cases.profile.get_profile import (
 from app.modules.identity.application.use_cases.profile.update_profile import (
     UpdateProfileUseCase,
 )
-from app.modules.identity.domain.repositories.profile_repository import (
-    IProfileRepository,
-)
-from app.modules.identity.infrastructure.repositories.profile_repository_impl import (
-    ProfileRepositoryImpl,
-)
 from app.modules.identity.presentation.dependencies.auth_deps import get_current_user
+from app.modules.identity.presentation.dependencies.use_case_deps import (
+    get_get_profile_use_case,
+    get_update_profile_use_case,
+)
 from app.modules.identity.presentation.schemas.profile_schemas import (
     ProfileErrorWrapper,
     ProfileResponse,
@@ -49,17 +47,14 @@ router = APIRouter(prefix="/profile", tags=["Profile"])
 async def get_my_profile(
     current_user_id: Annotated[UUID, Depends(get_current_user)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
+    use_case: Annotated[GetProfileUseCase, Depends(get_get_profile_use_case)],
 ) -> ProfileResponseWrapper:
     """
     Get current user's profile.
 
     Requires authentication (Bearer token).
     """
-    # Initialize dependencies
-    profile_repo: IProfileRepository = ProfileRepositoryImpl(session)
-
-    # Create and execute use case
-    use_case = GetProfileUseCase(profile_repo=profile_repo)
+    # Execute use case
     profile = await use_case.execute(current_user_id)
 
     if profile is None:
@@ -102,6 +97,7 @@ async def update_my_profile(
     request: UpdateProfileRequest,
     current_user_id: Annotated[UUID, Depends(get_current_user)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
+    use_case: Annotated[UpdateProfileUseCase, Depends(get_update_profile_use_case)],
 ) -> ProfileResponseWrapper:
     """
     Update current user's profile.
@@ -109,11 +105,7 @@ async def update_my_profile(
     Requires authentication (Bearer token).
     Can update any combination of profile fields.
     """
-    # Initialize dependencies
-    profile_repo: IProfileRepository = ProfileRepositoryImpl(session)
-
-    # Create and execute use case
-    use_case = UpdateProfileUseCase(profile_repo=profile_repo)
+    # Execute use case
     profile = await use_case.execute(
         user_id=current_user_id,
         nickname=request.nickname,

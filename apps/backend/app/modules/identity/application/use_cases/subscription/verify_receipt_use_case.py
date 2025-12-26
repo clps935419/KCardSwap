@@ -1,6 +1,7 @@
 """
 Verify Receipt Use Case - Verify Google Play purchase and update subscription
 """
+
 import logging
 from datetime import datetime
 from typing import Optional

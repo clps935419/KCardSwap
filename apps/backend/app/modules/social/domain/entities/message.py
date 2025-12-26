@@ -3,6 +3,7 @@ Message Entity - Represents a chat message in a room
 
 Domain Entity following DDD principles - framework independent
 """
+
 from datetime import datetime
 from enum import Enum
 from typing import Optional

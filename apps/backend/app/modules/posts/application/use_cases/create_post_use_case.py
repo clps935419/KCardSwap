@@ -1,4 +1,5 @@
 """Create Post Use Case - Create a new city board post with daily limit check"""
+
 import uuid
 from datetime import datetime, timedelta
 from typing import Optional

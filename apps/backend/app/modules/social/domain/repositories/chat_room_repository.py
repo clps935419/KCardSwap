@@ -3,6 +3,7 @@ ChatRoom Repository Interface
 
 Domain layer repository interface - defines contract for chat room persistence
 """
+
 from abc import ABC, abstractmethod
 from typing import List, Optional
 

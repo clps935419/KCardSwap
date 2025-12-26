@@ -1,4 +1,5 @@
 """Block User Use Case"""
+
 import uuid
 from datetime import datetime
 
