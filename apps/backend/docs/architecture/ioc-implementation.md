@@ -1,201 +1,99 @@
-# IoC Container 規範（精簡版）
+# IoC Container 規範（python-injector 單一路線）
 
-本文件只定義**一套**實作方式與**一個**端到端範例。
+本文件僅定義一套實作方式，與 job-service 相同：使用 `python-injector`，不使用 `dependency-injector` 的 Provide/wire。保持路由與 use case 呼叫方式不變。
 
-## 目標
+## 核心原則
 
-- 路由（Presentation）不直接 `new` repository / service / use case。
-- Use Case（Application）只依賴 Domain 介面（抽象），Infrastructure 提供實作。
-- request-scope 依賴（特別是 DB session）由 FastAPI `Depends()` 管理；IoC container 不管理 session 生命週期。
+- Router 不直接 new repo/service/use case，只透過依賴取得 use case。
+- Use case 只依賴 Domain 介面；Infrastructure 提供實作。
+- Request-scope（尤其 DB `AsyncSession`）由 FastAPI/middleware 控制生命週期，必要時在 dependency function 以 child injector 綁定 session。
 
-## 本文件規範：一律使用 Provide + @inject
+## 組件角色
 
-本專案的 IoC/DI 規範固定採用 `dependency-injector` 的 **wiring** 機制：
+- `app/api/common/injector.py`（或後端對應路徑）：建立全域 `Injector`，組合所有 `Module`。
+- `app/modules/<module>/module.py`：該模組的 `injector.Module`，用 `@provider` 回傳 use case / service；需要 repo 時可在 provider 內直接 new（吃 session）。
+- `app/modules/<module>/presentation/dependencies/*.py`：
+  - 不用 `Provide/@inject`。
+  - 從全域 injector 取 use case：`injector.get(UseCase)`；若需 session，先用 child injector 綁定 `AsyncSession`。
+- `app/main.py`：啟動時把 injector 掛到 `app.state`，註冊 routers，無需 `container.wire/unwire`。
+- `app/container.py`（舊架構）：請移除或停用，不再使用 dependency-injector ApplicationContainer。改用全域 `Injector`（app/injector.py）聚合各 `Module`。
 
-- 依賴取得：`Provide[...]`
-- 注入啟用：`@inject`
-- 啟動時 wiring：在 `app/main.py` 的 lifespan 呼叫 `container.wire(...)`
-
-因此本文件的所有範例都以 **Provide + @inject** 為前提，不提供其他替代寫法。
-
-## 專案約定（放哪裡、誰負責什麼）
-
-- `app/container.py`
-  - 匯總 shared providers 與各模組 container。
-  - 只宣告 providers，不在這裡做任何「啟動副作用」。
-- `app/modules/<module>/container.py`（必須）
-    - 模組內的**組裝規則**（高內聚）：repo factory / use case factory 等都定義在這裡。
-    - 重點：這裡是在「宣告 providers（工廠/單例）」，不是在處理 request-scope（例如 session）。
-- `app/modules/<module>/presentation/dependencies/*.py`
-    - **唯一**負責把 request-scope（例如 `AsyncSession`）接起來：從 container 取出 factory，帶入 session，產生 use case 實例。
-    - 重點：這裡不是「組裝容器」，容器的組裝已經在 `app/modules/<module>/container.py` 完成；這裡是在「解析/產生實例」。
-- `app/modules/<module>/presentation/routers/*.py`
-  - 路由只 `Depends(get_<use_case>)`（低耦合）。
-
-## Main（`app/main.py`）的角色與要設定什麼
-
-`app/main.py` 是 **composition root**：負責「啟動時把各部件接起來」，但不承擔 request-scope 的組裝工作。
-
-你需要做的設定（以 IoC/DI 角度）：
-
-- 建立 FastAPI app（`create_application()`）
-- 把 IoC container 掛到 app（例如 `app.container = container` 或 `app.state.container = container`）
-- 註冊各模組 router（`app.include_router(...)`）
-- 在 lifespan：
-  - startup：`container.wire(...)`
-  - shutdown：`container.unwire()`
-
-不建議放在 main 的事情：
-
-- DB schema 初始化（本專案交給 Alembic migrations；不要在 lifespan `init_db()`）
-- 在 router 內組 repo/service/use case（組裝在 `presentation/dependencies`）
-
-最短示意：
+### app/injector.py 組裝示意
 
 ```python
-# app/main.py（示意）
-from contextlib import asynccontextmanager
+# app/injector.py（示意，可依實際路徑命名）
+from injector import Injector
+from app.modules.identity.module import IdentityModule
+from app.modules.posts.module import PostsModule
+from app.modules.social.module import SocialModule
+from app.shared.module import SharedModule  # 若有共用依賴可集中
+
+injector = Injector(
+	[
+		SharedModule(),
+		IdentityModule(),
+		PostsModule(),
+		SocialModule(),
+	]
+)
+```
+
+> 若沒有 shared module，可直接把各 BC module 放入列表；重點是用 Injector 聚合，不需舊的 ApplicationContainer。
+
+## Main（組合根）示意
+
+```python
 from fastapi import FastAPI
-
-from app.container import container
-
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    container.wire(packages=[
-        "app.modules",
-        "app.shared",
-    ])
-    yield
-    container.unwire()
-
+from app.api.common.injector import injector
+from app.api.routes import api_v1
 
 def create_application() -> FastAPI:
-    app = FastAPI(lifespan=lifespan)
-    app.container = container
-    # app.include_router(...)
-    return app
+	app = FastAPI()
+	app.state.injector = injector
+	app.mount("/api/v1", api_v1)
+	return app
 ```
 
-## 端到端範例（唯一範例）：Social / UploadCard
-
-### 1) 模組 container：宣告 providers
+## Module 示意（provider 內 new repo，不獨立 repo provider）
 
 ```python
-# app/modules/social/container.py（示意）
-from dependency_injector import containers, providers
+from injector import Module, provider
+from sqlalchemy.ext.asyncio import AsyncSession
+from app.modules.identity.infrastructure.repositories.user_repository_impl import UserRepositoryImpl
+from app.modules.identity.infrastructure.repositories.refresh_token_repository_impl import RefreshTokenRepositoryImpl
+from app.modules.identity.application.use_cases.auth.admin_login import AdminLoginUseCase
 
-from app.modules.social.application.use_cases.cards.upload_card import UploadCardUseCase
-from app.modules.social.domain.services.card_validation_service import CardValidationService
-from app.modules.social.infrastructure.repositories.card_repository_impl import CardRepositoryImpl
-
-
-class SocialModuleContainer(containers.DeclarativeContainer):
-    shared = providers.DependenciesContainer()
-
-    # repo 需要 request-scope session：用 Factory，session 由呼叫端傳入
-    card_repository = providers.Factory(CardRepositoryImpl)
-
-    validation_service = providers.Factory(CardValidationService)
-
-    # use case 的固定依賴（不含 session）在這裡宣告
-    upload_card_use_case_factory = providers.Factory(
-        UploadCardUseCase,
-        validation_service=validation_service,
-        gcs_service=shared.gcs_storage_provider,
-    )
+class IdentityModule(Module):
+	@provider
+	def provide_admin_login_use_case(self, session: AsyncSession) -> AdminLoginUseCase:
+		user_repo = UserRepositoryImpl(session)
+		refresh_repo = RefreshTokenRepositoryImpl(session)
+		return AdminLoginUseCase(user_repository=user_repo, refresh_token_repository=refresh_repo)
 ```
 
-### 2) App container：匯總 shared + module
+## Dependency function 示意（保持 use case 呼叫方式）
 
 ```python
-# app/container.py（示意）
-from dependency_injector import containers, providers
-
-from app.config import settings
-from app.modules.social.container import SocialModuleContainer
-from app.shared.infrastructure.database.connection import db_connection
-from app.shared.infrastructure.external.gcs_storage_service import gcs_storage_service
-from app.shared.infrastructure.security.jwt_service import jwt_service
-from app.shared.infrastructure.security.password_hasher import password_hasher
-
-
-class SharedContainer(containers.DeclarativeContainer):
-    config = providers.Singleton(lambda: settings)
-    db_connection_provider = providers.Singleton(lambda: db_connection)
-    jwt_service_provider = providers.Singleton(lambda: jwt_service)
-    password_hasher_provider = providers.Singleton(lambda: password_hasher)
-    gcs_storage_provider = providers.Singleton(lambda: gcs_storage_service)
-
-
-class ApplicationContainer(containers.DeclarativeContainer):
-    shared = providers.Container(SharedContainer)
-    social = providers.Container(SocialModuleContainer, shared=shared)
-
-
-container = ApplicationContainer()
-```
-
-### 3) 模組 dependencies：把 session 串進來，回傳 use case
-
-重點：
-- `AsyncSession` 由 `Depends(get_db_session)` 提供
-- 在這裡把「request-scope 的 session」接到「container 內宣告的 factories」
-- router 只拿到 use case
-
-```python
-# app/modules/social/presentation/dependencies/use_cases.py（示意）
-from collections.abc import Callable
-
-from dependency_injector.wiring import Provide, inject
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from app.container import container
-from app.modules.social.application.use_cases.cards.upload_card import UploadCardUseCase
-from app.modules.social.domain.repositories.card_repository import CardRepository
+from app.api.common.injector import injector
 from app.shared.infrastructure.database.connection import get_db_session
+from app.modules.identity.application.use_cases.auth.admin_login import AdminLoginUseCase
 
-
-@inject
-def get_upload_card_use_case(
-    session: AsyncSession = Depends(get_db_session),
-    repo_factory: Callable[[AsyncSession], CardRepository] = Provide[
-        container.social.card_repository
-    ],
-    use_case_factory: Callable[..., UploadCardUseCase] = Provide[
-        container.social.upload_card_use_case_factory
-    ],
-) -> UploadCardUseCase:
-    # 這裡不是組裝容器：容器已在 module container 宣告好 providers
-    # 這裡是「解析 providers 並產生本次 request 的 use case 實例」
-    card_repo = repo_factory(session)
-    return use_case_factory(card_repo=card_repo)
+async def get_admin_login_use_case(session: AsyncSession = Depends(get_db_session)) -> AdminLoginUseCase:
+	# 將 request-scope session 綁到 child injector，再取 use case
+	with injector.create_child_injector({AsyncSession: session}) as child:
+		return child.get(AdminLoginUseCase)
 ```
 
-### 4) Router：只 Depends(use case)
+## Request-scope 建議
 
-```python
-# app/modules/social/presentation/routers/cards_router.py（示意）
-from fastapi import Depends
+- 若使用 `Depends(get_db_session)`，在 dependency function 內以 child injector 綁定 session，再取 use case。
+- 若用 middleware 管理 session，也可在 middleware 建 child injector 並以 contextvar 傳遞，router 端直接 `injector.get(...)`。
 
-from app.modules.social.application.use_cases.cards.upload_card import UploadCardUseCase
-from app.modules.social.presentation.dependencies.use_cases import get_upload_card_use_case
+## 遷移步驟（實作指引）
 
-
-@router.post("/upload-url")
-async def get_upload_url(
-    use_case: UploadCardUseCase = Depends(get_upload_card_use_case),
-):
-    return await use_case.execute(...)
-```
-
-## 啟動流程（本專案現況）
-
-- DB schema 由 Alembic migrations 管理，不在 FastAPI lifespan 內 `init_db()`
-  - Docker：`apps/backend/start.sh` 會執行 `alembic upgrade head`
-  - 本機：啟動前先跑 `poetry run alembic upgrade head`
-
-## 補充（只留一段）
-
-- 測試想替換依賴時，可用 `container.override(...)` 或替換對應 provider。
+1) 建立全域 `Injector` 並組合各 Module（如 job）。
+2) 為 identity 等模組撰寫 `module.py`，provider 內直接 new repo/use case（吃 session）。
+3) 調整 dependencies 檔：改用 `injector.get(...)`；移除 Provide/@inject/wire。
+4) main 掛載 injector，確保 session/middleware 與依賴取用一致。

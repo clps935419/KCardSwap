@@ -9,6 +9,10 @@
       "path": "../apps/backend"
     },
     {
+      "name": "example",
+      "path": "../../job-execution"
+    },
+    {
       "name": "mobile",
       "path": "../apps/mobile"
     },
