@@ -19,6 +19,9 @@ from app.shared.infrastructure.security.password_hasher import (
     PasswordHasher,
     password_hasher,
 )
+from app.modules.identity.infrastructure.external.google_oauth_service import (
+    GoogleOAuthService,
+)
 
 
 class SharedModule(Module):
@@ -56,3 +59,9 @@ class SharedModule(Module):
     def provide_gcs_storage(self) -> GCSStorageService:
         """Provide GCS storage service."""
         return gcs_storage_service
+
+    @provider
+    @singleton
+    def provide_google_oauth_service(self) -> GoogleOAuthService:
+        """Provide Google OAuth service."""
+        return GoogleOAuthService()
