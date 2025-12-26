@@ -3,7 +3,7 @@
 Provides identity and authentication related use cases using python-injector.
 """
 
-from injector import Module, provider
+from injector import Module, provider, singleton
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.identity.application.use_cases.auth.admin_login import (
@@ -67,6 +67,12 @@ class IdentityModule(Module):
 
     Provides identity and authentication related dependencies.
     """
+
+    @provider
+    @singleton
+    def provide_google_oauth_service(self) -> GoogleOAuthService:
+        """Provide Google OAuth service."""
+        return GoogleOAuthService()
 
     # Auth Use Cases
     @provider
