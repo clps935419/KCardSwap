@@ -5,7 +5,7 @@ Expire Subscriptions Use Case - For periodic background tasks
 import logging
 from datetime import datetime
 
-from app.modules.identity.domain.repositories.subscription_repository import (
+from app.modules.identity.domain.repositories.i_subscription_repository import (
     SubscriptionRepository,
 )
 

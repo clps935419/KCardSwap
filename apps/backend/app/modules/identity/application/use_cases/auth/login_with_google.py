@@ -10,13 +10,13 @@ from typing import Optional, Tuple
 from app.modules.identity.domain.entities.profile import Profile
 from app.modules.identity.domain.entities.refresh_token import RefreshToken
 from app.modules.identity.domain.entities.user import User
-from app.modules.identity.domain.repositories.profile_repository import (
+from app.modules.identity.domain.repositories.i_profile_repository import (
     IProfileRepository,
 )
-from app.modules.identity.domain.repositories.refresh_token_repository import (
+from app.modules.identity.domain.repositories.i_refresh_token_repository import (
     RefreshTokenRepository,
 )
-from app.modules.identity.domain.repositories.user_repository import IUserRepository
+from app.modules.identity.domain.repositories.i_user_repository import IUserRepository
 from app.modules.identity.infrastructure.external.google_oauth_service import (
     GoogleOAuthService,
 )

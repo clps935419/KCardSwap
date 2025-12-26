@@ -9,16 +9,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from app.modules.identity.domain.entities.subscription import Subscription
-from app.modules.identity.domain.repositories.subscription_repository import (
-    SubscriptionRepository,
+from app.modules.identity.domain.repositories.i_subscription_repository import (
+    ISubscriptionRepository,
 )
 from app.modules.identity.infrastructure.database.models.subscription_model import (
     SubscriptionModel,
 )
 
 
-class SubscriptionRepositoryImpl(SubscriptionRepository):
-    """SQLAlchemy implementation of SubscriptionRepository"""
+class SubscriptionRepositoryImpl(ISubscriptionRepository):
+    """SQLAlchemy implementation of ISubscriptionRepository"""
 
     def __init__(self, session: AsyncSession):
         self.session = session

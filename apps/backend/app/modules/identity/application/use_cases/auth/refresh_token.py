@@ -11,7 +11,7 @@ from uuid import UUID
 from jose import JWTError
 
 from app.modules.identity.domain.entities.refresh_token import RefreshToken
-from app.modules.identity.domain.repositories.refresh_token_repository import (
+from app.modules.identity.domain.repositories.i_refresh_token_repository import (
     RefreshTokenRepository,
 )
 from app.shared.infrastructure.security.jwt_service import JWTService

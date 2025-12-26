@@ -7,7 +7,7 @@ from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
-from app.modules.identity.domain.repositories.subscription_repository import (
+from app.modules.identity.domain.repositories.i_subscription_repository import (
     SubscriptionRepository,
 )
 from app.modules.identity.domain.repositories.purchase_token_repository import (

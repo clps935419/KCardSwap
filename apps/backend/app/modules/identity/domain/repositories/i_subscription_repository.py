@@ -10,7 +10,7 @@ from uuid import UUID
 from ..entities.subscription import Subscription
 
 
-class SubscriptionRepository(ABC):
+class ISubscriptionRepository(ABC):
     """Repository interface for Subscription entity"""
 
     @abstractmethod
