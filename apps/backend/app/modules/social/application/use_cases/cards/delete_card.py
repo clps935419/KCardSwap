@@ -4,7 +4,7 @@ Delete Card Use Case - Remove a card from collection
 
 from uuid import UUID
 
-from app.modules.social.domain.repositories.i_card_repository import CardRepository
+from app.modules.social.domain.repositories.i_card_repository import ICardRepository
 
 
 class DeleteCardUseCase:
@@ -12,7 +12,7 @@ class DeleteCardUseCase:
 
     def __init__(
         self,
-        card_repository: CardRepository,
+        card_repository: ICardRepository,
         gcs_service,  # GCSStorageService or MockGCSStorageService
     ):
         self.card_repository = card_repository

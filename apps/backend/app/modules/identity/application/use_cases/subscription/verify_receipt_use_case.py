@@ -8,10 +8,10 @@ from typing import Optional
 from uuid import UUID
 
 from app.modules.identity.domain.repositories.i_subscription_repository import (
-    SubscriptionRepository,
+    ISubscriptionRepository,
 )
 from app.modules.identity.domain.repositories.purchase_token_repository import (
-    PurchaseTokenRepository,
+    IPurchaseTokenRepository,
 )
 from app.modules.identity.infrastructure.external.google_play_billing_service import (
     GooglePlayBillingService,
@@ -37,8 +37,8 @@ class VerifyReceiptUseCase:
 
     def __init__(
         self,
-        subscription_repository: SubscriptionRepository,
-        purchase_token_repository: PurchaseTokenRepository,
+        subscription_repository: ISubscriptionRepository,
+        purchase_token_repository: IPurchaseTokenRepository,
         billing_service: GooglePlayBillingService,
     ):
         self.subscription_repo = subscription_repository

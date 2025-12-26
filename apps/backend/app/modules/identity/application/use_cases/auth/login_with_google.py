@@ -14,7 +14,7 @@ from app.modules.identity.domain.repositories.i_profile_repository import (
     IProfileRepository,
 )
 from app.modules.identity.domain.repositories.i_refresh_token_repository import (
-    RefreshTokenRepository,
+    IRefreshTokenRepository,
 )
 from app.modules.identity.domain.repositories.i_user_repository import IUserRepository
 from app.modules.identity.infrastructure.external.google_oauth_service import (
@@ -37,7 +37,7 @@ class GoogleLoginUseCase:
         self,
         user_repo: IUserRepository,
         profile_repo: IProfileRepository,
-        refresh_token_repo: RefreshTokenRepository,
+        refresh_token_repo: IRefreshTokenRepository,
         google_oauth_service: GoogleOAuthService,
         jwt_service: JWTService,
     ):

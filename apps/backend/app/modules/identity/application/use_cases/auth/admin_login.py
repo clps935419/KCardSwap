@@ -9,7 +9,7 @@ from typing import Optional, Tuple
 from app.modules.identity.domain.entities.refresh_token import RefreshToken
 from app.modules.identity.domain.entities.user import User
 from app.modules.identity.domain.repositories.i_refresh_token_repository import (
-    RefreshTokenRepository,
+    IRefreshTokenRepository,
 )
 from app.modules.identity.domain.repositories.i_user_repository import IUserRepository
 from app.modules.identity.infrastructure.security.password_service import (
@@ -30,7 +30,7 @@ class AdminLoginUseCase:
     def __init__(
         self,
         user_repo: IUserRepository,
-        refresh_token_repo: RefreshTokenRepository,
+        refresh_token_repo: IRefreshTokenRepository,
         password_service: PasswordService,
         jwt_service: JWTService,
     ):

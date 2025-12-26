@@ -11,7 +11,7 @@ from app.modules.social.domain.repositories.i_chat_room_repository import (
 from app.modules.social.domain.repositories.i_friendship_repository import (
     FriendshipRepository,
 )
-from app.modules.social.domain.repositories.i_message_repository import MessageRepository
+from app.modules.social.domain.repositories.i_message_repository import IMessageRepository
 
 
 class SendMessageUseCase:
@@ -31,7 +31,7 @@ class SendMessageUseCase:
 
     def __init__(
         self,
-        message_repository: MessageRepository,
+        message_repository: IMessageRepository,
         chat_room_repository: ChatRoomRepository,
         friendship_repository: FriendshipRepository,
     ):

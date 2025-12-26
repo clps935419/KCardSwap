@@ -7,7 +7,7 @@ from typing import Optional
 from app.modules.posts.domain.entities.post import Post, PostStatus
 from app.modules.posts.domain.repositories.post_repository import IPostRepository
 from app.modules.identity.domain.repositories.subscription_repository import (
-    SubscriptionRepository,
+    ISubscriptionRepository,
 )
 
 
@@ -30,7 +30,7 @@ class CreatePostUseCase:
     def __init__(
         self,
         post_repository: IPostRepository,
-        subscription_repository: SubscriptionRepository,
+        subscription_repository: ISubscriptionRepository,
     ):
         self.post_repository = post_repository
         self.subscription_repository = subscription_repository

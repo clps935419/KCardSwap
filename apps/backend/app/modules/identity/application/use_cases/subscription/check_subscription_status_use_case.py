@@ -5,7 +5,7 @@ Check Subscription Status Use Case
 from uuid import UUID
 
 from app.modules.identity.domain.repositories.subscription_repository import (
-    SubscriptionRepository,
+    ISubscriptionRepository,
 )
 
 
@@ -15,7 +15,7 @@ class CheckSubscriptionStatusUseCase:
     Returns server-side subscription state.
     """
 
-    def __init__(self, subscription_repository: SubscriptionRepository):
+    def __init__(self, subscription_repository: ISubscriptionRepository):
         self.subscription_repo = subscription_repository
 
     async def execute(self, user_id: UUID) -> dict:

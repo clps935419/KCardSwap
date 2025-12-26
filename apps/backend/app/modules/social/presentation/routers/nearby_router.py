@@ -24,7 +24,7 @@ from app.modules.social.application.use_cases.nearby import (
     UpdateUserLocationUseCase,
     RateLimitExceededException,
 )
-from app.modules.social.domain.repositories.i_card_repository import CardRepository
+from app.modules.social.domain.repositories.i_card_repository import ICardRepository
 from app.modules.social.infrastructure.repositories.card_repository_impl import (
     CardRepositoryImpl,
 )

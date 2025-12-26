@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import Optional
 
 from app.modules.social.domain.entities.rating import Rating
-from app.modules.social.domain.repositories.i_rating_repository import RatingRepository
+from app.modules.social.domain.repositories.i_rating_repository import IRatingRepository
 from app.modules.social.domain.repositories.i_friendship_repository import (
     FriendshipRepository,
 )
@@ -28,7 +28,7 @@ class RateUserUseCase:
 
     def __init__(
         self,
-        rating_repository: RatingRepository,
+        rating_repository: IRatingRepository,
         friendship_repository: FriendshipRepository,
     ):
         self.rating_repository = rating_repository

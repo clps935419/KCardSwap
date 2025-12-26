@@ -12,7 +12,7 @@ from jose import JWTError
 
 from app.modules.identity.domain.entities.refresh_token import RefreshToken
 from app.modules.identity.domain.repositories.i_refresh_token_repository import (
-    RefreshTokenRepository,
+    IRefreshTokenRepository,
 )
 from app.shared.infrastructure.security.jwt_service import JWTService
 
@@ -21,7 +21,7 @@ class RefreshTokenUseCase:
     """Use case for refreshing access token using refresh token"""
 
     def __init__(
-        self, refresh_token_repo: RefreshTokenRepository, jwt_service: JWTService
+        self, refresh_token_repo: IRefreshTokenRepository, jwt_service: JWTService
     ):
         self._refresh_token_repo = refresh_token_repo
         self._jwt_service = jwt_service

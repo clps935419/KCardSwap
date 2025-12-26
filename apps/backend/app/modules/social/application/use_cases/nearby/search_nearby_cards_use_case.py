@@ -10,7 +10,7 @@ from app.modules.social.application.dtos.nearby_dtos import (
     NearbyCardResult,
     SearchNearbyRequest,
 )
-from app.modules.social.domain.repositories.i_card_repository import CardRepository
+from app.modules.social.domain.repositories.i_card_repository import ICardRepository
 from app.modules.social.infrastructure.services.search_quota_service import (
     SearchQuotaService,
 )
@@ -41,7 +41,7 @@ class SearchNearbyCardsUseCase:
 
     def __init__(
         self,
-        card_repository: CardRepository,
+        card_repository: ICardRepository,
         quota_service: SearchQuotaService,
     ):
         """

@@ -6,7 +6,7 @@ from uuid import UUID, uuid4
 
 from app.modules.social.domain.entities.trade import Trade
 from app.modules.social.domain.entities.trade_item import TradeItem
-from app.modules.social.domain.repositories.i_card_repository import CardRepository
+from app.modules.social.domain.repositories.i_card_repository import ICardRepository
 from app.modules.social.domain.repositories.i_friendship_repository import (
     FriendshipRepository,
 )
@@ -48,7 +48,7 @@ class CreateTradeProposalUseCase:
     def __init__(
         self,
         trade_repository: ITradeRepository,
-        card_repository: CardRepository,
+        card_repository: ICardRepository,
         friendship_repository: FriendshipRepository,
         validation_service: TradeValidationService,
         max_active_trades_per_pair: int = 3,
