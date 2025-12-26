@@ -21,7 +21,7 @@ from app.modules.social.application.use_cases.cards.get_my_cards import (
 from app.modules.social.application.use_cases.cards.upload_card import (
     UploadCardUseCase,
 )
-from app.modules.social.domain.repositories.card_repository import CardRepository
+from app.modules.social.domain.repositories.i_card_repository import CardRepository
 from app.modules.social.domain.services.card_validation_service import (
     CardValidationService,
 )

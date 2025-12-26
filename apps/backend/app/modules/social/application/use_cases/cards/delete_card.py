@@ -4,7 +4,7 @@ Delete Card Use Case - Remove a card from collection
 
 from uuid import UUID
 
-from app.modules.social.domain.repositories.card_repository import CardRepository
+from app.modules.social.domain.repositories.i_card_repository import CardRepository
 
 
 class DeleteCardUseCase:

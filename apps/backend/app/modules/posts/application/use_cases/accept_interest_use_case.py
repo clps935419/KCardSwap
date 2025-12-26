@@ -9,11 +9,11 @@ from app.modules.posts.domain.repositories.i_post_interest_repository import (
 from app.modules.posts.domain.repositories.post_repository import IPostRepository
 from app.modules.social.domain.entities.friendship import Friendship, FriendshipStatus
 from app.modules.social.domain.entities.chat_room import ChatRoom
-from app.modules.social.domain.repositories.friendship_repository import (
-    FriendshipRepository,
+from app.modules.social.domain.repositories.i_friendship_repository import (
+    IFriendshipRepository,
 )
-from app.modules.social.domain.repositories.chat_room_repository import (
-    ChatRoomRepository,
+from app.modules.social.domain.repositories.i_chat_room_repository import (
+    IChatRoomRepository,
 )
 
 
@@ -41,8 +41,8 @@ class AcceptInterestUseCase:
         self,
         post_repository: IPostRepository,
         post_interest_repository: IPostInterestRepository,
-        friendship_repository: FriendshipRepository,
-        chat_room_repository: ChatRoomRepository,
+        friendship_repository: IFriendshipRepository,
+        chat_room_repository: IChatRoomRepository,
     ):
         self.post_repository = post_repository
         self.post_interest_repository = post_interest_repository

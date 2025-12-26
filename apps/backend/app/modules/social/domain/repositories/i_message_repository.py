@@ -10,7 +10,7 @@ from typing import List, Optional
 from app.modules.social.domain.entities.message import Message, MessageStatus
 
 
-class MessageRepository(ABC):
+class IMessageRepository(ABC):
     """Repository interface for Message entity persistence"""
 
     @abstractmethod

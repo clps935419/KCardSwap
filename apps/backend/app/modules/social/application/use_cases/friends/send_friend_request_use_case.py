@@ -4,7 +4,7 @@ import uuid
 from datetime import datetime
 
 from app.modules.social.domain.entities.friendship import Friendship, FriendshipStatus
-from app.modules.social.domain.repositories.friendship_repository import (
+from app.modules.social.domain.repositories.i_friendship_repository import (
     FriendshipRepository,
 )
 

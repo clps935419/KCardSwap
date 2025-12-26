@@ -9,11 +9,11 @@ from sqlalchemy import select, and_, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.social.domain.entities.report import Report, ReportReason
-from app.modules.social.domain.repositories.report_repository import ReportRepository
+from app.modules.social.domain.repositories.i_report_repository import IReportRepository
 from app.modules.social.infrastructure.database.models.report_model import ReportModel
 
 
-class SQLAlchemyReportRepository(ReportRepository):
+class ReportRepositoryImpl(IReportRepository):
     """SQLAlchemy implementation of Report repository"""
 
     def __init__(self, session: AsyncSession):
@@ -165,4 +165,4 @@ class SQLAlchemyReportRepository(ReportRepository):
 
 
 # Alias for consistency
-ReportRepositoryImpl = SQLAlchemyReportRepository
+ReportRepositoryImpl = ReportRepositoryImpl

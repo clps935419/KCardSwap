@@ -7,7 +7,7 @@ from typing import Dict
 from uuid import UUID, uuid4
 
 from app.modules.social.domain.entities.card import Card
-from app.modules.social.domain.repositories.card_repository import CardRepository
+from app.modules.social.domain.repositories.i_card_repository import CardRepository
 from app.modules.social.domain.services.card_validation_service import (
     CardValidationService,
 )

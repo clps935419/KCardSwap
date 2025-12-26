@@ -1,17 +1,19 @@
-"""Social domain repositories"""
+"""Domain repositories for Social module."""
 
-from .card_repository import CardRepository
-from .chat_room_repository import ChatRoomRepository
-from .friendship_repository import FriendshipRepository
-from .message_repository import MessageRepository
-from .rating_repository import RatingRepository
-from .report_repository import ReportRepository
+from .i_card_repository import ICardRepository
+from .i_chat_room_repository import IChatRoomRepository
+from .i_friendship_repository import IFriendshipRepository
+from .i_message_repository import IMessageRepository
+from .i_rating_repository import IRatingRepository
+from .i_report_repository import IReportRepository
+from .i_trade_repository import ITradeRepository
 
 __all__ = [
-    "CardRepository",
-    "ChatRoomRepository",
-    "FriendshipRepository",
-    "MessageRepository",
-    "RatingRepository",
-    "ReportRepository",
+    "ICardRepository",
+    "IChatRoomRepository",
+    "IFriendshipRepository",
+    "IMessageRepository",
+    "IRatingRepository",
+    "IReportRepository",
+    "ITradeRepository",
 ]

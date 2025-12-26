@@ -6,7 +6,7 @@ from typing import List
 from uuid import UUID
 
 from app.modules.social.domain.entities.card import Card
-from app.modules.social.domain.repositories.card_repository import CardRepository
+from app.modules.social.domain.repositories.i_card_repository import CardRepository
 
 
 class GetMyCardsUseCase:

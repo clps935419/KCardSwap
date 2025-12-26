@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import Optional
 
 from app.modules.social.domain.entities.report import Report, ReportReason
-from app.modules.social.domain.repositories.report_repository import ReportRepository
+from app.modules.social.domain.repositories.i_report_repository import ReportRepository
 
 
 class ReportUserUseCase:

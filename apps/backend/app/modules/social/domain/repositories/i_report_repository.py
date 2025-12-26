@@ -10,7 +10,7 @@ from typing import List, Optional
 from app.modules.social.domain.entities.report import Report, ReportReason
 
 
-class ReportRepository(ABC):
+class IReportRepository(ABC):
     """Repository interface for Report entity persistence"""
 
     @abstractmethod

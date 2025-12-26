@@ -10,7 +10,7 @@ from typing import List, Optional
 from app.modules.social.domain.entities.friendship import Friendship, FriendshipStatus
 
 
-class FriendshipRepository(ABC):
+class IFriendshipRepository(ABC):
     """Repository interface for Friendship entity persistence"""
 
     @abstractmethod

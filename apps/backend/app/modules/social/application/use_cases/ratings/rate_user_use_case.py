@@ -5,8 +5,8 @@ from datetime import datetime
 from typing import Optional
 
 from app.modules.social.domain.entities.rating import Rating
-from app.modules.social.domain.repositories.rating_repository import RatingRepository
-from app.modules.social.domain.repositories.friendship_repository import (
+from app.modules.social.domain.repositories.i_rating_repository import RatingRepository
+from app.modules.social.domain.repositories.i_friendship_repository import (
     FriendshipRepository,
 )
 

@@ -6,11 +6,11 @@ from uuid import UUID, uuid4
 
 from app.modules.social.domain.entities.trade import Trade
 from app.modules.social.domain.entities.trade_item import TradeItem
-from app.modules.social.domain.repositories.card_repository import CardRepository
-from app.modules.social.domain.repositories.friendship_repository import (
+from app.modules.social.domain.repositories.i_card_repository import CardRepository
+from app.modules.social.domain.repositories.i_friendship_repository import (
     FriendshipRepository,
 )
-from app.modules.social.domain.repositories.trade_repository import ITradeRepository
+from app.modules.social.domain.repositories.i_trade_repository import ITradeRepository
 from app.modules.social.domain.services.trade_validation_service import (
     TradeValidationService,
 )

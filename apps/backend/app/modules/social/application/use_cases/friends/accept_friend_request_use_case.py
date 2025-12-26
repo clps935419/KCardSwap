@@ -1,10 +1,10 @@
 """Accept Friend Request Use Case"""
 
 from app.modules.social.domain.entities.chat_room import ChatRoom
-from app.modules.social.domain.repositories.chat_room_repository import (
+from app.modules.social.domain.repositories.i_chat_room_repository import (
     ChatRoomRepository,
 )
-from app.modules.social.domain.repositories.friendship_repository import (
+from app.modules.social.domain.repositories.i_friendship_repository import (
     FriendshipRepository,
 )
 import uuid

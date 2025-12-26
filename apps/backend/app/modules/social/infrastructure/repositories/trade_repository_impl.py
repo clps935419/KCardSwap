@@ -9,14 +9,14 @@ from sqlalchemy.orm import selectinload
 
 from app.modules.social.domain.entities.trade import Trade
 from app.modules.social.domain.entities.trade_item import TradeItem
-from app.modules.social.domain.repositories.trade_repository import ITradeRepository
+from app.modules.social.domain.repositories.i_trade_repository import ITradeRepository
 from app.modules.social.infrastructure.database.models.trade_model import TradeModel
 from app.modules.social.infrastructure.database.models.trade_item_model import (
     TradeItemModel,
 )
 
 
-class SQLAlchemyTradeRepository(ITradeRepository):
+class TradeRepositoryImpl(ITradeRepository):
     """SQLAlchemy implementation of Trade repository"""
 
     def __init__(self, session: AsyncSession):

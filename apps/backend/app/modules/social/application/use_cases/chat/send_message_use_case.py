@@ -5,13 +5,13 @@ from datetime import datetime
 from typing import Optional
 
 from app.modules.social.domain.entities.message import Message, MessageStatus
-from app.modules.social.domain.repositories.chat_room_repository import (
+from app.modules.social.domain.repositories.i_chat_room_repository import (
     ChatRoomRepository,
 )
-from app.modules.social.domain.repositories.friendship_repository import (
+from app.modules.social.domain.repositories.i_friendship_repository import (
     FriendshipRepository,
 )
-from app.modules.social.domain.repositories.message_repository import MessageRepository
+from app.modules.social.domain.repositories.i_message_repository import MessageRepository
 
 
 class SendMessageUseCase:

@@ -5,7 +5,7 @@ Check Upload Quota Use Case - Check user's upload quota status
 from typing import Dict
 from uuid import UUID
 
-from app.modules.social.domain.repositories.card_repository import CardRepository
+from app.modules.social.domain.repositories.i_card_repository import CardRepository
 from app.modules.social.domain.value_objects.upload_quota import UploadQuota
 
 

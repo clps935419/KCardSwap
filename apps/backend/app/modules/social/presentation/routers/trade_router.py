@@ -37,10 +37,10 @@ from app.modules.social.infrastructure.repositories.card_repository_impl import 
     CardRepositoryImpl,
 )
 from app.modules.social.infrastructure.repositories.friendship_repository_impl import (
-    SQLAlchemyFriendshipRepository,
+    FriendshipRepositoryImpl,
 )
 from app.modules.social.infrastructure.repositories.trade_repository_impl import (
-    SQLAlchemyTradeRepository,
+    TradeRepositoryImpl,
 )
 from app.modules.social.presentation.schemas.trade_schemas import (
     CreateTradeRequest,
@@ -86,9 +86,9 @@ async def create_trade(
     """
     try:
         # Initialize repositories and services
-        trade_repo = SQLAlchemyTradeRepository(session)
+        trade_repo = TradeRepositoryImpl(session)
         card_repo = CardRepositoryImpl(session)
-        friendship_repo = SQLAlchemyFriendshipRepository(session)
+        friendship_repo = FriendshipRepositoryImpl(session)
         validation_service = TradeValidationService()
 
         # Create use case
@@ -171,7 +171,7 @@ async def accept_trade(
 ) -> TradeResponse:
     """Accept a trade proposal."""
     try:
-        trade_repo = SQLAlchemyTradeRepository(session)
+        trade_repo = TradeRepositoryImpl(session)
         validation_service = TradeValidationService()
 
         use_case = AcceptTradeUseCase(
@@ -235,7 +235,7 @@ async def reject_trade(
 ) -> TradeResponse:
     """Reject a trade proposal."""
     try:
-        trade_repo = SQLAlchemyTradeRepository(session)
+        trade_repo = TradeRepositoryImpl(session)
         card_repo = CardRepositoryImpl(session)
         validation_service = TradeValidationService()
 
@@ -301,7 +301,7 @@ async def cancel_trade(
 ) -> TradeResponse:
     """Cancel a trade."""
     try:
-        trade_repo = SQLAlchemyTradeRepository(session)
+        trade_repo = TradeRepositoryImpl(session)
         card_repo = CardRepositoryImpl(session)
         validation_service = TradeValidationService()
 
@@ -372,7 +372,7 @@ async def complete_trade(
     Enforces 48h timeout from acceptance.
     """
     try:
-        trade_repo = SQLAlchemyTradeRepository(session)
+        trade_repo = TradeRepositoryImpl(session)
         card_repo = CardRepositoryImpl(session)
         validation_service = TradeValidationService()
 
@@ -443,7 +443,7 @@ async def get_trade_history(
 ) -> TradeHistoryResponse:
     """Get trade history for current user."""
     try:
-        trade_repo = SQLAlchemyTradeRepository(session)
+        trade_repo = TradeRepositoryImpl(session)
 
         use_case = GetTradeHistoryUseCase(trade_repository=trade_repo)
 
