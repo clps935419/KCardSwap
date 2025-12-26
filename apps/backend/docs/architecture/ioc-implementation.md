@@ -16,6 +16,19 @@
 - 注入啟用：`@inject`
 - 啟動時 wiring：在 `app/main.py` 的 lifespan 呼叫 `container.wire(...)`
 
+### FastAPI 重要補充：在 dependencies 內一律用 `Depends(Provide[...])`
+
+在 `presentation/dependencies/*.py` 這類「給 FastAPI 當 dependency function」的地方，
+**不要**把 `Provide[...]` 直接當作函式參數的預設值：
+
+- ✅ 正確：`repo_factory = Depends(Provide[...])`
+- ❌ 錯誤：`repo_factory = Provide[...]`
+
+原因：FastAPI 在產生 OpenAPI 時，會解析 dependency function 的參數型別與預設值。
+若 `Provide[...]` 直接當預設值，且型別又是 `Callable[...]`（工廠函式），
+在 Pydantic v2 下可能導致它嘗試替 `Callable` 產生 JSON Schema，進而拋出
+`PydanticInvalidForJsonSchema: CallableSchema`，使 `/openapi.json` 直接 500。
+
 因此本文件的所有範例都以 **Provide + @inject** 為前提，不提供其他替代寫法。
 
 ## 專案約定（放哪裡、誰負責什麼）
@@ -168,7 +181,6 @@ from dependency_injector.wiring import Provide, inject
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.container import container
 from app.modules.social.application.use_cases.cards.upload_card import UploadCardUseCase
 from app.modules.social.domain.repositories.i_card_repository import ICardRepository
 from app.shared.infrastructure.database.connection import get_db_session
@@ -177,12 +189,12 @@ from app.shared.infrastructure.database.connection import get_db_session
 @inject
 def get_upload_card_use_case(
     session: AsyncSession = Depends(get_db_session),
-    repo_factory: Callable[[AsyncSession], ICardRepository] = Provide[
-        container.social.card_repository
-    ],
-    use_case_factory: Callable[..., UploadCardUseCase] = Provide[
-        container.social.upload_card_use_case_factory
-    ],
+    repo_factory: Callable[[AsyncSession], ICardRepository] = Depends(
+        Provide["social.card_repository"]
+    ),
+    use_case_factory: Callable[..., UploadCardUseCase] = Depends(
+        Provide["social.upload_card_use_case_factory"]
+    ),
 ) -> UploadCardUseCase:
     # 這裡不是組裝容器：容器已在 module container 宣告好 providers
     # 這裡是「解析 providers 並產生本次 request 的 use case 實例」
