@@ -9,7 +9,7 @@ from typing import List, Optional
 from app.modules.social.domain.entities.rating import Rating
 
 
-class RatingRepository(ABC):
+class IRatingRepository(ABC):
     """Repository interface for Rating entity persistence"""
 
     @abstractmethod

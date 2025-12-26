@@ -29,7 +29,7 @@ from app.modules.social.application.use_cases.trades.get_trade_history_use_case 
 from app.modules.social.application.use_cases.trades.reject_trade_use_case import (
     RejectTradeUseCase,
 )
-from app.modules.social.domain.repositories.trade_repository import ITradeRepository
+from app.modules.social.domain.repositories.i_trade_repository import ITradeRepository
 from app.modules.social.presentation.dependencies.use_cases import (
     get_accept_trade_use_case,
     get_cancel_trade_use_case,

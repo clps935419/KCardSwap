@@ -9,15 +9,15 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.social.domain.entities.chat_room import ChatRoom
-from app.modules.social.domain.repositories.chat_room_repository import (
-    ChatRoomRepository,
+from app.modules.social.domain.repositories.i_chat_room_repository import (
+    IChatRoomRepository,
 )
 from app.modules.social.infrastructure.database.models.chat_room_model import (
     ChatRoomModel,
 )
 
 
-class SQLAlchemyChatRoomRepository(ChatRoomRepository):
+class ChatRoomRepositoryImpl(IChatRoomRepository):
     """SQLAlchemy implementation of ChatRoom repository"""
 
     def __init__(self, session: AsyncSession):
@@ -101,4 +101,4 @@ class SQLAlchemyChatRoomRepository(ChatRoomRepository):
 
 
 # Alias for consistency
-ChatRoomRepositoryImpl = SQLAlchemyChatRoomRepository
+ChatRoomRepositoryImpl = ChatRoomRepositoryImpl

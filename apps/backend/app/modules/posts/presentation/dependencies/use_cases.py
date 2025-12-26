@@ -13,7 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 if TYPE_CHECKING:
     pass
-from app.modules.identity.domain.repositories.subscription_repository import (
+from app.modules.identity.domain.repositories.i_subscription_repository import (
     ISubscriptionRepository,
 )
 from app.modules.posts.application.use_cases.accept_interest_use_case import (
@@ -34,15 +34,15 @@ from app.modules.posts.application.use_cases.list_board_posts_use_case import (
 from app.modules.posts.application.use_cases.reject_interest_use_case import (
     RejectInterestUseCase,
 )
-from app.modules.posts.domain.repositories.post_interest_repository import (
+from app.modules.posts.domain.repositories.i_post_interest_repository import (
     IPostInterestRepository,
 )
-from app.modules.posts.domain.repositories.post_repository import IPostRepository
-from app.modules.social.domain.repositories.chat_room_repository import (
-    ChatRoomRepository,
+from app.modules.posts.domain.repositories.i_post_repository import IPostRepository
+from app.modules.social.domain.repositories.i_chat_room_repository import (
+    IChatRoomRepository,
 )
-from app.modules.social.domain.repositories.friendship_repository import (
-    FriendshipRepository,
+from app.modules.social.domain.repositories.i_friendship_repository import (
+    IFriendshipRepository,
 )
 from app.shared.infrastructure.database.connection import get_db_session
 
@@ -115,10 +115,10 @@ def get_accept_interest_use_case(
     post_interest_repo_factory: Callable[
         [AsyncSession], IPostInterestRepository
     ] = Provide["posts.post_interest_repository"],
-    friendship_repo_factory: Callable[[AsyncSession], FriendshipRepository] = Provide[
+    friendship_repo_factory: Callable[[AsyncSession], IFriendshipRepository] = Provide[
         "social.friendship_repository"
     ],
-    chat_room_repo_factory: Callable[[AsyncSession], ChatRoomRepository] = Provide[
+    chat_room_repo_factory: Callable[[AsyncSession], IChatRoomRepository] = Provide[
         "social.chat_room_repository"
     ],
     use_case_factory: Callable[..., AcceptInterestUseCase] = Provide[

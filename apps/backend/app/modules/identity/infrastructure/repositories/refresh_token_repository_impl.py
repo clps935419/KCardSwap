@@ -1,5 +1,5 @@
 """
-RefreshTokenRepository Implementation using SQLAlchemy
+IRefreshTokenRepository Implementation using SQLAlchemy
 """
 
 from typing import Optional
@@ -9,16 +9,16 @@ from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.identity.domain.entities.refresh_token import RefreshToken
-from app.modules.identity.domain.repositories.refresh_token_repository import (
-    RefreshTokenRepository,
+from app.modules.identity.domain.repositories.i_refresh_token_repository import (
+    IRefreshTokenRepository,
 )
 from app.modules.identity.infrastructure.database.models.refresh_token_model import (
     RefreshTokenModel,
 )
 
 
-class RefreshTokenRepositoryImpl(RefreshTokenRepository):
-    """SQLAlchemy implementation of RefreshTokenRepository."""
+class RefreshTokenRepositoryImpl(IRefreshTokenRepository):
+    """SQLAlchemy implementation of IRefreshTokenRepository."""
 
     def __init__(self, session: AsyncSession):
         """Initialize repository with database session.

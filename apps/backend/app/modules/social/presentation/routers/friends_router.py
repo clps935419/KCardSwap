@@ -19,8 +19,8 @@ from app.modules.social.application.use_cases.friends.block_user_use_case import
 from app.modules.social.application.use_cases.friends.send_friend_request_use_case import (
     SendFriendRequestUseCase,
 )
-from app.modules.social.domain.repositories.friendship_repository import (
-    FriendshipRepository,
+from app.modules.social.domain.repositories.i_friendship_repository import (
+    IFriendshipRepository,
 )
 from app.modules.social.presentation.dependencies.use_cases import (
     get_accept_friend_request_use_case,
@@ -227,7 +227,7 @@ async def block_user(
 )
 async def get_friends(
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
-    friendship_repo: Annotated[FriendshipRepository, Depends(get_friendship_repository)],
+    friendship_repo: Annotated[IFriendshipRepository, Depends(get_friendship_repository)],
     status_filter: Optional[str] = Query(
         "accepted",
         alias="status",

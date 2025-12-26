@@ -1,5 +1,5 @@
 """
-RefreshTokenRepository Interface - Data access abstraction for refresh tokens
+IRefreshTokenRepository Interface - Data access abstraction for refresh tokens
 Following DDD principles: Interface in domain layer, implementation in infrastructure
 """
 
@@ -10,7 +10,7 @@ from uuid import UUID
 from app.modules.identity.domain.entities.refresh_token import RefreshToken
 
 
-class RefreshTokenRepository(ABC):
+class IRefreshTokenRepository(ABC):
     """
     Repository interface for RefreshToken entity.
     Defines contract for data access operations.

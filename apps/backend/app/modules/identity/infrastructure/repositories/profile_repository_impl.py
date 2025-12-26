@@ -9,13 +9,13 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.identity.domain.entities.profile import Profile
-from app.modules.identity.domain.repositories.profile_repository import (
+from app.modules.identity.domain.repositories.i_profile_repository import (
     IProfileRepository,
 )
 from app.modules.identity.infrastructure.database.models import ProfileModel
 
 
-class SQLAlchemyProfileRepository(IProfileRepository):
+class ProfileRepositoryImpl(IProfileRepository):
     """SQLAlchemy implementation of Profile repository"""
 
     def __init__(self, session: AsyncSession):
@@ -110,4 +110,4 @@ class SQLAlchemyProfileRepository(IProfileRepository):
 
 
 # Alias for backward compatibility
-ProfileRepositoryImpl = SQLAlchemyProfileRepository
+ProfileRepositoryImpl = ProfileRepositoryImpl

@@ -6,7 +6,7 @@ from typing import Optional
 from uuid import UUID
 
 
-class PurchaseTokenRepository(ABC):
+class IPurchaseTokenRepository(ABC):
     """Repository interface for tracking purchase tokens to prevent replay attacks"""
 
     @abstractmethod

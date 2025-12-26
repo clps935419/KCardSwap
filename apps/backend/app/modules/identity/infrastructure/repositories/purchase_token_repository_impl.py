@@ -8,8 +8,8 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.identity.domain.repositories.purchase_token_repository import (
-    PurchaseTokenRepository,
+from app.modules.identity.domain.repositories.i_purchase_token_repository import (
+    IPurchaseTokenRepository,
 )
 from app.modules.identity.infrastructure.database.models.purchase_token_model import (
     PurchaseTokenModel,
@@ -17,8 +17,8 @@ from app.modules.identity.infrastructure.database.models.purchase_token_model im
 from app.shared.presentation.exceptions.api_exceptions import ConflictException
 
 
-class PurchaseTokenRepositoryImpl(PurchaseTokenRepository):
-    """SQLAlchemy implementation of PurchaseTokenRepository"""
+class PurchaseTokenRepositoryImpl(IPurchaseTokenRepository):
+    """SQLAlchemy implementation of IPurchaseTokenRepository"""
 
     def __init__(self, session: AsyncSession):
         self.session = session

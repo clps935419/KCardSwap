@@ -4,8 +4,8 @@ Expire Subscriptions Use Case - For periodic background tasks
 import logging
 from datetime import datetime
 
-from app.modules.identity.domain.repositories.subscription_repository import (
-    SubscriptionRepository,
+from app.modules.identity.domain.repositories.i_subscription_repository import (
+    ISubscriptionRepository,
 )
 
 logger = logging.getLogger(__name__)
@@ -17,7 +17,7 @@ class ExpireSubscriptionsUseCase:
     Should be run as a daily background task.
     """
 
-    def __init__(self, subscription_repository: SubscriptionRepository):
+    def __init__(self, subscription_repository: ISubscriptionRepository):
         self.subscription_repo = subscription_repository
 
     async def execute(self) -> dict:

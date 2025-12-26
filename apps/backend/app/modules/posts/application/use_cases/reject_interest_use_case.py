@@ -1,9 +1,9 @@
 """Reject Interest Use Case - Reject an interest in a post"""
 
-from app.modules.posts.domain.repositories.post_interest_repository import (
-    PostInterestRepository,
+from app.modules.posts.domain.repositories.i_post_interest_repository import (
+    IPostInterestRepository,
 )
-from app.modules.posts.domain.repositories.post_repository import PostRepository
+from app.modules.posts.domain.repositories.i_post_repository import IPostRepository
 
 
 class RejectInterestUseCase:
@@ -17,8 +17,8 @@ class RejectInterestUseCase:
 
     def __init__(
         self,
-        post_repository: PostRepository,
-        post_interest_repository: PostInterestRepository
+        post_repository: IPostRepository,
+        post_interest_repository: IPostInterestRepository
     ):
         self.post_repository = post_repository
         self.post_interest_repository = post_interest_repository

@@ -3,11 +3,11 @@ import uuid
 from datetime import datetime
 
 from app.modules.social.domain.entities.chat_room import ChatRoom
-from app.modules.social.domain.repositories.chat_room_repository import (
-    ChatRoomRepository,
+from app.modules.social.domain.repositories.i_chat_room_repository import (
+    IChatRoomRepository,
 )
-from app.modules.social.domain.repositories.friendship_repository import (
-    FriendshipRepository,
+from app.modules.social.domain.repositories.i_friendship_repository import (
+    IFriendshipRepository,
 )
 
 
@@ -23,8 +23,8 @@ class AcceptFriendRequestUseCase:
 
     def __init__(
         self,
-        friendship_repository: FriendshipRepository,
-        chat_room_repository: ChatRoomRepository
+        friendship_repository: IFriendshipRepository,
+        chat_room_repository: IChatRoomRepository
     ):
         self.friendship_repository = friendship_repository
         self.chat_room_repository = chat_room_repository

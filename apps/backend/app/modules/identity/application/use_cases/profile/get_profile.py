@@ -6,7 +6,7 @@ from typing import Optional
 from uuid import UUID
 
 from app.modules.identity.domain.entities.profile import Profile
-from app.modules.identity.domain.repositories.profile_repository import (
+from app.modules.identity.domain.repositories.i_profile_repository import (
     IProfileRepository,
 )
 

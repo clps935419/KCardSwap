@@ -10,12 +10,12 @@ from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.social.domain.entities.card import Card
-from app.modules.social.domain.repositories.card_repository import CardRepository
+from app.modules.social.domain.repositories.i_card_repository import ICardRepository
 from app.modules.social.infrastructure.database.models.card_model import CardModel
 from app.modules.social.infrastructure.utils.geolocation import haversine_distance
 
 
-class SQLAlchemyCardRepository(CardRepository):
+class CardRepositoryImpl(ICardRepository):
     """SQLAlchemy implementation of Card repository"""
 
     def __init__(self, session: AsyncSession):
@@ -224,4 +224,4 @@ class SQLAlchemyCardRepository(CardRepository):
 
 
 # Alias for consistency
-CardRepositoryImpl = SQLAlchemyCardRepository
+CardRepositoryImpl = CardRepositoryImpl

@@ -4,10 +4,10 @@ from datetime import datetime
 from typing import Optional
 
 from app.modules.social.domain.entities.rating import Rating
-from app.modules.social.domain.repositories.friendship_repository import (
-    FriendshipRepository,
+from app.modules.social.domain.repositories.i_friendship_repository import (
+    IFriendshipRepository,
 )
-from app.modules.social.domain.repositories.rating_repository import RatingRepository
+from app.modules.social.domain.repositories.i_rating_repository import IRatingRepository
 
 
 class RateUserUseCase:
@@ -27,8 +27,8 @@ class RateUserUseCase:
 
     def __init__(
         self,
-        rating_repository: RatingRepository,
-        friendship_repository: FriendshipRepository
+        rating_repository: IRatingRepository,
+        friendship_repository: IFriendshipRepository
     ):
         self.rating_repository = rating_repository
         self.friendship_repository = friendship_repository
@@ -79,7 +79,7 @@ class RateUserUseCase:
                 raise ValueError("User has already rated this trade")
 
             # TODO Phase 7 (FR-SOCIAL-003B): Validate trade is completed and involves both parties
-            # This requires TradeRepository which will be implemented in Phase 7
+            # This requires ITradeRepository which will be implemented in Phase 7
 
         # Create rating (validation happens in entity)
         rating = Rating(

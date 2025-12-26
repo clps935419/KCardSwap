@@ -102,7 +102,7 @@ from app.modules.social.infrastructure.repositories.report_repository_impl impor
     ReportRepositoryImpl,
 )
 from app.modules.social.infrastructure.repositories.trade_repository_impl import (
-    SQLAlchemyTradeRepository,
+    TradeRepositoryImpl,
 )
 
 # Import infrastructure services
@@ -131,7 +131,7 @@ class SocialModuleContainer(containers.DeclarativeContainer):
     message_repository = providers.Factory(MessageRepositoryImpl)
     rating_repository = providers.Factory(RatingRepositoryImpl)
     report_repository = providers.Factory(ReportRepositoryImpl)
-    trade_repository = providers.Factory(SQLAlchemyTradeRepository)
+    trade_repository = providers.Factory(TradeRepositoryImpl)
 
     # ========== Domain Services ==========
     card_validation_service = providers.Factory(CardValidationService)

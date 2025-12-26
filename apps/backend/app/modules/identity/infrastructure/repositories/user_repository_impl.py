@@ -10,11 +10,11 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.identity.domain.entities.user import User
-from app.modules.identity.domain.repositories.user_repository import IUserRepository
+from app.modules.identity.domain.repositories.i_user_repository import IUserRepository
 from app.modules.identity.infrastructure.database.models import UserModel
 
 
-class SQLAlchemyUserRepository(IUserRepository):
+class UserRepositoryImpl(IUserRepository):
     """SQLAlchemy implementation of User repository"""
 
     def __init__(self, session: AsyncSession):
@@ -104,4 +104,4 @@ class SQLAlchemyUserRepository(IUserRepository):
 
 
 # Alias for backward compatibility
-UserRepositoryImpl = SQLAlchemyUserRepository
+UserRepositoryImpl = UserRepositoryImpl

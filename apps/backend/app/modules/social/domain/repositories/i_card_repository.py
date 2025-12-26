@@ -1,5 +1,5 @@
 """
-CardRepository Interface - Repository abstraction for Card entities
+ICardRepository Interface - Repository abstraction for Card entities
 Following DDD principles: Domain layer defines interface, infrastructure implements
 """
 
@@ -10,7 +10,7 @@ from uuid import UUID
 from app.modules.social.domain.entities.card import Card
 
 
-class CardRepository(ABC):
+class ICardRepository(ABC):
     """
     Repository interface for Card aggregate.
     Defines all persistence operations for cards.

@@ -12,7 +12,7 @@ from app.modules.posts.domain.entities.post_interest import (
 )
 
 
-class PostInterestRepository(ABC):
+class IPostInterestRepository(ABC):
     """Repository interface for PostInterest entity persistence"""
 
     @abstractmethod

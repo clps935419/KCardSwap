@@ -16,10 +16,10 @@ from app.modules.social.application.use_cases.chat.get_messages_use_case import 
 from app.modules.social.application.use_cases.chat.send_message_use_case import (
     SendMessageUseCase,
 )
-from app.modules.social.domain.repositories.chat_room_repository import (
-    ChatRoomRepository,
+from app.modules.social.domain.repositories.i_chat_room_repository import (
+    IChatRoomRepository,
 )
-from app.modules.social.domain.repositories.message_repository import MessageRepository
+from app.modules.social.domain.repositories.i_message_repository import IMessageRepository
 from app.modules.social.presentation.dependencies.use_cases import (
     get_chat_room_repository,
     get_message_repository,
@@ -54,7 +54,7 @@ router = APIRouter(prefix="/chats", tags=["Chat"])
 )
 async def get_chat_rooms(
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
-    chat_room_repo: Annotated[ChatRoomRepository, Depends(get_chat_room_repository)],
+    chat_room_repo: Annotated[IChatRoomRepository, Depends(get_chat_room_repository)],
 ) -> List[ChatRoomResponse]:
     """
     Get all chat rooms for the current user.
@@ -206,7 +206,7 @@ async def send_message(
     request: SendMessageRequest,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
     use_case: Annotated[SendMessageUseCase, Depends(get_send_message_use_case)],
-    chat_room_repo: Annotated[ChatRoomRepository, Depends(get_chat_room_repository)],
+    chat_room_repo: Annotated[IChatRoomRepository, Depends(get_chat_room_repository)],
 ) -> MessageResponse:
     """
     Send a message in a chat room.
@@ -301,8 +301,8 @@ async def mark_message_read(
     room_id: UUID,
     message_id: UUID,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
-    message_repo: Annotated[MessageRepository, Depends(get_message_repository)],
-    chat_room_repo: Annotated[ChatRoomRepository, Depends(get_chat_room_repository)],
+    message_repo: Annotated[IMessageRepository, Depends(get_message_repository)],
+    chat_room_repo: Annotated[IChatRoomRepository, Depends(get_chat_room_repository)],
 ) -> None:
     """
     Mark a message as read.

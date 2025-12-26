@@ -2,17 +2,17 @@
 import uuid
 from datetime import datetime
 
-from app.modules.posts.domain.repositories.post_interest_repository import (
-    PostInterestRepository,
+from app.modules.posts.domain.repositories.i_post_interest_repository import (
+    IPostInterestRepository,
 )
-from app.modules.posts.domain.repositories.post_repository import PostRepository
+from app.modules.posts.domain.repositories.i_post_repository import IPostRepository
 from app.modules.social.domain.entities.chat_room import ChatRoom
 from app.modules.social.domain.entities.friendship import Friendship, FriendshipStatus
-from app.modules.social.domain.repositories.chat_room_repository import (
-    ChatRoomRepository,
+from app.modules.social.domain.repositories.i_chat_room_repository import (
+    IChatRoomRepository,
 )
-from app.modules.social.domain.repositories.friendship_repository import (
-    FriendshipRepository,
+from app.modules.social.domain.repositories.i_friendship_repository import (
+    IFriendshipRepository,
 )
 
 
@@ -43,10 +43,10 @@ class AcceptInterestUseCase:
 
     def __init__(
         self,
-        post_repository: PostRepository,
-        post_interest_repository: PostInterestRepository,
-        friendship_repository: FriendshipRepository,
-        chat_room_repository: ChatRoomRepository
+        post_repository: IPostRepository,
+        post_interest_repository: IPostInterestRepository,
+        friendship_repository: IFriendshipRepository,
+        chat_room_repository: IChatRoomRepository
     ):
         self.post_repository = post_repository
         self.post_interest_repository = post_interest_repository

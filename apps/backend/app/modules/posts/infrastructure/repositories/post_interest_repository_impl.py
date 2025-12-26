@@ -12,15 +12,15 @@ from app.modules.posts.domain.entities.post_interest import (
     PostInterest,
     PostInterestStatus,
 )
-from app.modules.posts.domain.repositories.post_interest_repository import (
-    PostInterestRepository,
+from app.modules.posts.domain.repositories.i_post_interest_repository import (
+    IPostInterestRepository,
 )
 from app.modules.posts.infrastructure.database.models.post_interest_model import (
     PostInterestModel,
 )
 
 
-class SQLAlchemyPostInterestRepository(PostInterestRepository):
+class PostInterestRepositoryImpl(IPostInterestRepository):
     """SQLAlchemy implementation of PostInterest repository"""
 
     def __init__(self, session: AsyncSession):
@@ -166,4 +166,4 @@ class SQLAlchemyPostInterestRepository(PostInterestRepository):
 
 
 # Alias for consistency
-PostInterestRepositoryImpl = SQLAlchemyPostInterestRepository
+PostInterestRepositoryImpl = PostInterestRepositoryImpl

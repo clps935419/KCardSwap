@@ -7,7 +7,7 @@ from typing import Dict
 from uuid import UUID
 
 from app.modules.social.domain.entities.card import Card
-from app.modules.social.domain.repositories.card_repository import CardRepository
+from app.modules.social.domain.repositories.i_card_repository import ICardRepository
 from app.modules.social.domain.services.card_validation_service import (
     CardValidationService,
 )
@@ -45,7 +45,7 @@ class UploadCardUseCase:
 
     def __init__(
         self,
-        card_repository: CardRepository,
+        card_repository: ICardRepository,
         validation_service: CardValidationService,
         gcs_service,  # GCSStorageService or MockGCSStorageService
     ):

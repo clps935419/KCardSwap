@@ -4,7 +4,7 @@ from typing import List
 from uuid import UUID
 
 from app.modules.social.domain.entities.trade import Trade
-from app.modules.social.domain.repositories.trade_repository import ITradeRepository
+from app.modules.social.domain.repositories.i_trade_repository import ITradeRepository
 
 
 class GetTradeHistoryUseCase:

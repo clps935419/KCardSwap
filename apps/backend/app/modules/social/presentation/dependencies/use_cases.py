@@ -68,17 +68,17 @@ from app.modules.social.application.use_cases.trades.get_trade_history_use_case 
 from app.modules.social.application.use_cases.trades.reject_trade_use_case import (
     RejectTradeUseCase,
 )
-from app.modules.social.domain.repositories.card_repository import CardRepository
-from app.modules.social.domain.repositories.chat_room_repository import (
-    ChatRoomRepository,
+from app.modules.social.domain.repositories.i_card_repository import ICardRepository
+from app.modules.social.domain.repositories.i_chat_room_repository import (
+    IChatRoomRepository,
 )
-from app.modules.social.domain.repositories.friendship_repository import (
-    FriendshipRepository,
+from app.modules.social.domain.repositories.i_friendship_repository import (
+    IFriendshipRepository,
 )
-from app.modules.social.domain.repositories.message_repository import MessageRepository
-from app.modules.social.domain.repositories.rating_repository import RatingRepository
-from app.modules.social.domain.repositories.report_repository import ReportRepository
-from app.modules.social.domain.repositories.trade_repository import ITradeRepository
+from app.modules.social.domain.repositories.i_message_repository import IMessageRepository
+from app.modules.social.domain.repositories.i_rating_repository import IRatingRepository
+from app.modules.social.domain.repositories.i_report_repository import IReportRepository
+from app.modules.social.domain.repositories.i_trade_repository import ITradeRepository
 from app.shared.infrastructure.database.connection import get_db_session
 
 # ========== Cards Use Cases ==========
@@ -87,7 +87,7 @@ from app.shared.infrastructure.database.connection import get_db_session
 @inject
 def get_upload_card_use_case(
     session: AsyncSession = Depends(get_db_session),
-    repo_factory: Callable[[AsyncSession], CardRepository] = Provide[
+    repo_factory: Callable[[AsyncSession], ICardRepository] = Provide[
         "social.card_repository"
     ],
     use_case_factory: Callable[..., UploadCardUseCase] = Provide[
@@ -102,7 +102,7 @@ def get_upload_card_use_case(
 @inject
 def get_my_cards_use_case(
     session: AsyncSession = Depends(get_db_session),
-    repo_factory: Callable[[AsyncSession], CardRepository] = Provide[
+    repo_factory: Callable[[AsyncSession], ICardRepository] = Provide[
         "social.card_repository"
     ],
     use_case_factory: Callable[..., GetMyCardsUseCase] = Provide[
@@ -117,7 +117,7 @@ def get_my_cards_use_case(
 @inject
 def get_delete_card_use_case(
     session: AsyncSession = Depends(get_db_session),
-    repo_factory: Callable[[AsyncSession], CardRepository] = Provide[
+    repo_factory: Callable[[AsyncSession], ICardRepository] = Provide[
         "social.card_repository"
     ],
     use_case_factory: Callable[..., DeleteCardUseCase] = Provide[
@@ -132,7 +132,7 @@ def get_delete_card_use_case(
 @inject
 def get_check_quota_use_case(
     session: AsyncSession = Depends(get_db_session),
-    repo_factory: Callable[[AsyncSession], CardRepository] = Provide[
+    repo_factory: Callable[[AsyncSession], ICardRepository] = Provide[
         "social.card_repository"
     ],
     use_case_factory: Callable[..., CheckUploadQuotaUseCase] = Provide[
@@ -150,7 +150,7 @@ def get_check_quota_use_case(
 @inject
 def get_search_nearby_cards_use_case(
     session: AsyncSession = Depends(get_db_session),
-    card_repo_factory: Callable[[AsyncSession], CardRepository] = Provide[
+    card_repo_factory: Callable[[AsyncSession], ICardRepository] = Provide[
         "social.card_repository"
     ],
     use_case_factory: Callable[..., SearchNearbyCardsUseCase] = Provide[
@@ -165,7 +165,7 @@ def get_search_nearby_cards_use_case(
 @inject
 def get_update_user_location_use_case(
     session: AsyncSession = Depends(get_db_session),
-    card_repo_factory: Callable[[AsyncSession], CardRepository] = Provide[
+    card_repo_factory: Callable[[AsyncSession], ICardRepository] = Provide[
         "social.card_repository"
     ],
     use_case_factory: Callable[..., UpdateUserLocationUseCase] = Provide[
@@ -183,7 +183,7 @@ def get_update_user_location_use_case(
 @inject
 def get_send_friend_request_use_case(
     session: AsyncSession = Depends(get_db_session),
-    friendship_repo_factory: Callable[[AsyncSession], FriendshipRepository] = Provide[
+    friendship_repo_factory: Callable[[AsyncSession], IFriendshipRepository] = Provide[
         "social.friendship_repository"
     ],
     use_case_factory: Callable[..., SendFriendRequestUseCase] = Provide[
@@ -198,7 +198,7 @@ def get_send_friend_request_use_case(
 @inject
 def get_accept_friend_request_use_case(
     session: AsyncSession = Depends(get_db_session),
-    friendship_repo_factory: Callable[[AsyncSession], FriendshipRepository] = Provide[
+    friendship_repo_factory: Callable[[AsyncSession], IFriendshipRepository] = Provide[
         "social.friendship_repository"
     ],
     use_case_factory: Callable[..., AcceptFriendRequestUseCase] = Provide[
@@ -213,7 +213,7 @@ def get_accept_friend_request_use_case(
 @inject
 def get_block_user_use_case(
     session: AsyncSession = Depends(get_db_session),
-    friendship_repo_factory: Callable[[AsyncSession], FriendshipRepository] = Provide[
+    friendship_repo_factory: Callable[[AsyncSession], IFriendshipRepository] = Provide[
         "social.friendship_repository"
     ],
     use_case_factory: Callable[..., BlockUserUseCase] = Provide[
@@ -231,10 +231,10 @@ def get_block_user_use_case(
 @inject
 def get_send_message_use_case(
     session: AsyncSession = Depends(get_db_session),
-    chat_room_repo_factory: Callable[[AsyncSession], ChatRoomRepository] = Provide[
+    chat_room_repo_factory: Callable[[AsyncSession], IChatRoomRepository] = Provide[
         "social.chat_room_repository"
     ],
-    message_repo_factory: Callable[[AsyncSession], MessageRepository] = Provide[
+    message_repo_factory: Callable[[AsyncSession], IMessageRepository] = Provide[
         "social.message_repository"
     ],
     use_case_factory: Callable[..., SendMessageUseCase] = Provide[
@@ -255,10 +255,10 @@ def get_send_message_use_case(
 @inject
 def get_rate_user_use_case(
     session: AsyncSession = Depends(get_db_session),
-    rating_repo_factory: Callable[[AsyncSession], RatingRepository] = Provide[
+    rating_repo_factory: Callable[[AsyncSession], IRatingRepository] = Provide[
         "social.rating_repository"
     ],
-    friendship_repo_factory: Callable[[AsyncSession], FriendshipRepository] = Provide[
+    friendship_repo_factory: Callable[[AsyncSession], IFriendshipRepository] = Provide[
         "social.friendship_repository"
     ],
     use_case_factory: Callable[..., RateUserUseCase] = Provide[
@@ -279,7 +279,7 @@ def get_rate_user_use_case(
 @inject
 def get_report_user_use_case(
     session: AsyncSession = Depends(get_db_session),
-    report_repo_factory: Callable[[AsyncSession], ReportRepository] = Provide[
+    report_repo_factory: Callable[[AsyncSession], IReportRepository] = Provide[
         "social.report_repository"
     ],
     use_case_factory: Callable[..., ReportUserUseCase] = Provide[
@@ -300,10 +300,10 @@ def get_create_trade_proposal_use_case(
     trade_repo_factory: Callable[[AsyncSession], ITradeRepository] = Provide[
         "social.trade_repository"
     ],
-    card_repo_factory: Callable[[AsyncSession], CardRepository] = Provide[
+    card_repo_factory: Callable[[AsyncSession], ICardRepository] = Provide[
         "social.card_repository"
     ],
-    friendship_repo_factory: Callable[[AsyncSession], FriendshipRepository] = Provide[
+    friendship_repo_factory: Callable[[AsyncSession], IFriendshipRepository] = Provide[
         "social.friendship_repository"
     ],
     use_case_factory: Callable[..., CreateTradeProposalUseCase] = Provide[
@@ -327,10 +327,10 @@ def get_accept_trade_use_case(
     trade_repo_factory: Callable[[AsyncSession], ITradeRepository] = Provide[
         "social.trade_repository"
     ],
-    card_repo_factory: Callable[[AsyncSession], CardRepository] = Provide[
+    card_repo_factory: Callable[[AsyncSession], ICardRepository] = Provide[
         "social.card_repository"
     ],
-    chat_room_repo_factory: Callable[[AsyncSession], ChatRoomRepository] = Provide[
+    chat_room_repo_factory: Callable[[AsyncSession], IChatRoomRepository] = Provide[
         "social.chat_room_repository"
     ],
     use_case_factory: Callable[..., AcceptTradeUseCase] = Provide[
@@ -370,33 +370,33 @@ def get_cancel_trade_use_case(
 @inject
 def get_friendship_repository(
     session: AsyncSession = Depends(get_db_session),
-    repo_factory: Callable[[AsyncSession], FriendshipRepository] = Provide[
+    repo_factory: Callable[[AsyncSession], IFriendshipRepository] = Provide[
         "social.friendship_repository"
     ],
-) -> FriendshipRepository:
-    """Get FriendshipRepository instance with request-scope dependencies."""
+) -> IFriendshipRepository:
+    """Get IFriendshipRepository instance with request-scope dependencies."""
     return repo_factory(session)
 
 
 @inject
 def get_chat_room_repository(
     session: AsyncSession = Depends(get_db_session),
-    repo_factory: Callable[[AsyncSession], ChatRoomRepository] = Provide[
+    repo_factory: Callable[[AsyncSession], IChatRoomRepository] = Provide[
         "social.chat_room_repository"
     ],
-) -> ChatRoomRepository:
-    """Get ChatRoomRepository instance with request-scope dependencies."""
+) -> IChatRoomRepository:
+    """Get IChatRoomRepository instance with request-scope dependencies."""
     return repo_factory(session)
 
 
 @inject
 def get_message_repository(
     session: AsyncSession = Depends(get_db_session),
-    repo_factory: Callable[[AsyncSession], MessageRepository] = Provide[
+    repo_factory: Callable[[AsyncSession], IMessageRepository] = Provide[
         "social.message_repository"
     ],
-) -> MessageRepository:
-    """Get MessageRepository instance with request-scope dependencies."""
+) -> IMessageRepository:
+    """Get IMessageRepository instance with request-scope dependencies."""
     return repo_factory(session)
 
 
@@ -406,7 +406,7 @@ def get_message_repository(
 @inject
 def get_messages_use_case(
     session: AsyncSession = Depends(get_db_session),
-    message_repo_factory: Callable[[AsyncSession], MessageRepository] = Provide[
+    message_repo_factory: Callable[[AsyncSession], IMessageRepository] = Provide[
         "social.message_repository"
     ],
     use_case_factory: Callable[..., GetMessagesUseCase] = Provide[
@@ -470,5 +470,5 @@ def get_trade_repository(
         "social.trade_repository"
     ],
 ) -> ITradeRepository:
-    """Get TradeRepository instance with request-scope dependencies."""
+    """Get ITradeRepository instance with request-scope dependencies."""
     return repo_factory(session)

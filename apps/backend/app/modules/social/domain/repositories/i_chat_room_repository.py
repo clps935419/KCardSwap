@@ -9,7 +9,7 @@ from typing import List, Optional
 from app.modules.social.domain.entities.chat_room import ChatRoom
 
 
-class ChatRoomRepository(ABC):
+class IChatRoomRepository(ABC):
     """Repository interface for ChatRoom entity persistence"""
 
     @abstractmethod

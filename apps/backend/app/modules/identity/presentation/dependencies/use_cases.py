@@ -38,19 +38,19 @@ from app.modules.identity.application.use_cases.subscription.expire_subscription
 from app.modules.identity.application.use_cases.subscription.verify_receipt_use_case import (
     VerifyReceiptUseCase,
 )
-from app.modules.identity.domain.repositories.profile_repository import (
+from app.modules.identity.domain.repositories.i_profile_repository import (
     IProfileRepository,
 )
-from app.modules.identity.domain.repositories.purchase_token_repository import (
-    PurchaseTokenRepository,
+from app.modules.identity.domain.repositories.i_purchase_token_repository import (
+    IPurchaseTokenRepository,
 )
-from app.modules.identity.domain.repositories.refresh_token_repository import (
-    RefreshTokenRepository,
+from app.modules.identity.domain.repositories.i_refresh_token_repository import (
+    IRefreshTokenRepository,
 )
-from app.modules.identity.domain.repositories.subscription_repository import (
-    SubscriptionRepository,
+from app.modules.identity.domain.repositories.i_subscription_repository import (
+    ISubscriptionRepository,
 )
-from app.modules.identity.domain.repositories.user_repository import IUserRepository
+from app.modules.identity.domain.repositories.i_user_repository import IUserRepository
 from app.shared.infrastructure.database.connection import get_db_session
 
 # ========== Auth Use Cases ==========
@@ -79,7 +79,7 @@ def get_google_callback_use_case(
         "identity.profile_repository"
     ],
     refresh_token_repo_factory: Callable[
-        [AsyncSession], RefreshTokenRepository
+        [AsyncSession], IRefreshTokenRepository
     ] = Provide["identity.refresh_token_repository"],
     use_case_factory: Callable[..., GoogleCallbackUseCase] = Provide[
         "identity.google_callback_use_case_factory"
@@ -103,7 +103,7 @@ def get_refresh_token_use_case(
         "identity.user_repository"
     ],
     refresh_token_repo_factory: Callable[
-        [AsyncSession], RefreshTokenRepository
+        [AsyncSession], IRefreshTokenRepository
     ] = Provide["identity.refresh_token_repository"],
     use_case_factory: Callable[..., RefreshTokenUseCase] = Provide[
         "identity.refresh_token_use_case_factory"
@@ -122,7 +122,7 @@ def get_admin_login_use_case(
         "identity.user_repository"
     ],
     refresh_token_repo_factory: Callable[
-        [AsyncSession], RefreshTokenRepository
+        [AsyncSession], IRefreshTokenRepository
     ] = Provide["identity.refresh_token_repository"],
     use_case_factory: Callable[..., AdminLoginUseCase] = Provide[
         "identity.admin_login_use_case_factory"
@@ -138,7 +138,7 @@ def get_admin_login_use_case(
 def get_logout_use_case(
     session: AsyncSession = Depends(get_db_session),
     refresh_token_repo_factory: Callable[
-        [AsyncSession], RefreshTokenRepository
+        [AsyncSession], IRefreshTokenRepository
     ] = Provide["identity.refresh_token_repository"],
     use_case_factory: Callable[..., LogoutUseCase] = Provide[
         "identity.logout_use_case_factory"
@@ -189,10 +189,10 @@ def get_update_profile_use_case(
 def get_verify_receipt_use_case(
     session: AsyncSession = Depends(get_db_session),
     subscription_repo_factory: Callable[
-        [AsyncSession], SubscriptionRepository
+        [AsyncSession], ISubscriptionRepository
     ] = Provide["identity.subscription_repository"],
     purchase_token_repo_factory: Callable[
-        [AsyncSession], PurchaseTokenRepository
+        [AsyncSession], IPurchaseTokenRepository
     ] = Provide["identity.purchase_token_repository"],
     use_case_factory: Callable[..., VerifyReceiptUseCase] = Provide[
         "identity.verify_receipt_use_case_factory"
@@ -211,7 +211,7 @@ def get_verify_receipt_use_case(
 def get_check_subscription_status_use_case(
     session: AsyncSession = Depends(get_db_session),
     subscription_repo_factory: Callable[
-        [AsyncSession], SubscriptionRepository
+        [AsyncSession], ISubscriptionRepository
     ] = Provide["identity.subscription_repository"],
     use_case_factory: Callable[..., CheckSubscriptionStatusUseCase] = Provide[
         "identity.check_subscription_status_use_case_factory"
@@ -226,7 +226,7 @@ def get_check_subscription_status_use_case(
 def get_expire_subscriptions_use_case(
     session: AsyncSession = Depends(get_db_session),
     subscription_repo_factory: Callable[
-        [AsyncSession], SubscriptionRepository
+        [AsyncSession], ISubscriptionRepository
     ] = Provide["identity.subscription_repository"],
     use_case_factory: Callable[..., ExpireSubscriptionsUseCase] = Provide[
         "identity.expire_subscriptions_use_case_factory"

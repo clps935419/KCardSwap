@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Optional
 
 from app.modules.social.domain.entities.report import Report, ReportReason
-from app.modules.social.domain.repositories.report_repository import ReportRepository
+from app.modules.social.domain.repositories.i_report_repository import IReportRepository
 
 
 class ReportUserUseCase:
@@ -18,7 +18,7 @@ class ReportUserUseCase:
     - Serious violations (fraud, fake cards, harassment) are flagged for priority review
     """
 
-    def __init__(self, report_repository: ReportRepository):
+    def __init__(self, report_repository: IReportRepository):
         self.report_repository = report_repository
 
     async def execute(
