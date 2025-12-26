@@ -59,7 +59,7 @@ def get_create_post_use_case(
     ],
     subscription_repo_factory: Callable[
         [AsyncSession], ISubscriptionRepository
-    ] = Provide[container.identity.subscription_repository],
+    ] = Provide["identity.subscription_repository"],
     use_case_factory: Callable[..., CreatePostUseCase] = Provide[
         "posts.create_post_use_case_factory"
     ],
@@ -118,10 +118,10 @@ def get_accept_interest_use_case(
         [AsyncSession], IPostInterestRepository
     ] = Provide["posts.post_interest_repository"],
     friendship_repo_factory: Callable[[AsyncSession], FriendshipRepository] = Provide[
-        container.social.friendship_repository
+        "social.friendship_repository"
     ],
     chat_room_repo_factory: Callable[[AsyncSession], ChatRoomRepository] = Provide[
-        container.social.chat_room_repository
+        "social.chat_room_repository"
     ],
     use_case_factory: Callable[..., AcceptInterestUseCase] = Provide[
         "posts.accept_interest_use_case_factory"
