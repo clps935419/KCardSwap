@@ -97,3 +97,9 @@ async def get_admin_login_use_case(session: AsyncSession = Depends(get_db_sessio
 2) 為 identity 等模組撰寫 `module.py`，provider 內直接 new repo/use case（吃 session）。
 3) 調整 dependencies 檔：改用 `injector.get(...)`；移除 Provide/@inject/wire。
 4) main 掛載 injector，確保 session/middleware 與依賴取用一致。
+
+## 命名規範（介面/實作）
+
+- 介面類別：`I<Feature>Repository`，檔名 `i_<feature>_repository.py`（snake_case 對應 feature 名）。
+- 實作類別：`<Feature>RepositoryImpl`，檔名 `<feature>_repository_impl.py`。
+- 類別名稱中的 `<Feature>` 與檔名中的 `<feature>` 段落需一一對應，保持大小寫/蛇形轉換一致。
