@@ -69,7 +69,9 @@ router = APIRouter(prefix="/trades", tags=["Trades"])
 async def create_trade(
     request: CreateTradeRequest,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
-    use_case: Annotated[CreateTradeProposalUseCase, Depends(get_create_trade_proposal_use_case)],
+    use_case: Annotated[
+        CreateTradeProposalUseCase, Depends(get_create_trade_proposal_use_case)
+    ],
     trade_repo: Annotated[ITradeRepository, Depends(get_trade_repository)],
 ) -> TradeResponse:
     """

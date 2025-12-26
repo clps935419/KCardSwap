@@ -100,10 +100,7 @@ class DatabaseSeeder:
         users = []
         for user_data in users_data:
             # Create user
-            user = UserModel(
-                google_id=user_data["google_id"],
-                email=user_data["email"]
-            )
+            user = UserModel(google_id=user_data["google_id"], email=user_data["email"])
             self.session.add(user)
             await self.session.flush()
 
@@ -117,8 +114,8 @@ class DatabaseSeeder:
                 privacy_flags={
                     "nearby_visible": True,
                     "show_online": True,
-                    "allow_stranger_chat": True
-                }
+                    "allow_stranger_chat": True,
+                },
             )
             self.session.add(profile)
 
@@ -138,7 +135,7 @@ class DatabaseSeeder:
                 user_id=user.id,
                 token=f"refresh_token_{uuid.uuid4()}",
                 expires_at=datetime.utcnow() + timedelta(days=7),
-                revoked=False
+                revoked=False,
             )
             self.session.add(token)
             tokens.append(token)
@@ -172,7 +169,7 @@ async def main():
     parser.add_argument(
         "--clear",
         action="store_true",
-        help="Clear existing data before seeding (WARNING: Destructive!)"
+        help="Clear existing data before seeding (WARNING: Destructive!)",
     )
     args = parser.parse_args()
 
@@ -181,7 +178,9 @@ async def main():
     if not database_url:
         print("❌ ERROR: DATABASE_URL environment variable not set")
         print("\nExample:")
-        print('  export DATABASE_URL="postgresql+asyncpg://user:pass@localhost:5432/db"')
+        print(
+            '  export DATABASE_URL="postgresql+asyncpg://user:pass@localhost:5432/db"'
+        )
         print("  poetry run python scripts/seed.py")
         sys.exit(1)
 
@@ -199,7 +198,9 @@ async def main():
 
     # Create engine and session
     engine = create_async_engine(database_url, echo=False)
-    async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+    async_session = async_sessionmaker(
+        engine, class_=AsyncSession, expire_on_commit=False
+    )
 
     try:
         async with async_session() as session:
@@ -208,6 +209,7 @@ async def main():
     except Exception as e:
         print(f"\n❌ Error seeding database: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)
     finally:

@@ -98,7 +98,9 @@ class SQLAlchemyCardRepository(CardRepository):
     async def count_uploads_today(self, owner_id: UUID) -> int:
         """Count uploads today (since 00:00 UTC)"""
         # Calculate start of day in UTC
-        today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+        today_start = datetime.utcnow().replace(
+            hour=0, minute=0, second=0, microsecond=0
+        )
 
         result = await self.session.execute(
             select(func.count(CardModel.id)).where(

@@ -119,9 +119,13 @@ class TestTradeFlowIntegration:
 
             repo_instance.find_by_id = AsyncMock(
                 side_effect=lambda card_id: (
-                    initiator_card if card_id == test_trade_data["initiator_card_id"]
-                    else responder_card if card_id == test_trade_data["responder_card_id"]
-                    else None
+                    initiator_card
+                    if card_id == test_trade_data["initiator_card_id"]
+                    else (
+                        responder_card
+                        if card_id == test_trade_data["responder_card_id"]
+                        else None
+                    )
                 )
             )
             repo_instance.save = AsyncMock(side_effect=lambda card: card)
@@ -209,9 +213,7 @@ class TestTradeFlowIntegration:
         )
         mock_trade_repository.get_by_id = AsyncMock(return_value=proposed_trade)
 
-        response = client.post(
-            f"/api/v1/trades/{test_trade_data['trade_id']}/accept"
-        )
+        response = client.post(f"/api/v1/trades/{test_trade_data['trade_id']}/accept")
 
         assert response.status_code == 200
         _data = response.json()
@@ -238,9 +240,7 @@ class TestTradeFlowIntegration:
         )
         mock_trade_repository.get_by_id = AsyncMock(return_value=proposed_trade)
 
-        response = client.post(
-            f"/api/v1/trades/{test_trade_data['trade_id']}/reject"
-        )
+        response = client.post(f"/api/v1/trades/{test_trade_data['trade_id']}/reject")
 
         assert response.status_code == 200
 
@@ -265,9 +265,7 @@ class TestTradeFlowIntegration:
         )
         mock_trade_repository.get_by_id = AsyncMock(return_value=accepted_trade)
 
-        response = client.post(
-            f"/api/v1/trades/{test_trade_data['trade_id']}/cancel"
-        )
+        response = client.post(f"/api/v1/trades/{test_trade_data['trade_id']}/cancel")
 
         assert response.status_code == 200
 
@@ -351,16 +349,21 @@ class TestTradeFlowTimeout:
             updated_at=old_time,
         )
 
-        with patch(
-            "app.modules.social.presentation.routers.trade_router.get_current_user_id",
-            return_value=initiator_id,
-        ), patch(
-            "app.modules.social.presentation.routers.trade_router.get_db_session"
-        ) as mock_session, patch(
-            "app.modules.social.infrastructure.repositories.trade_repository_impl.SQLAlchemyTradeRepository"
-        ) as mock_trade_repo, patch(
-            "app.modules.social.infrastructure.repositories.card_repository_impl.CardRepositoryImpl"
-        ) as mock_card_repo:
+        with (
+            patch(
+                "app.modules.social.presentation.routers.trade_router.get_current_user_id",
+                return_value=initiator_id,
+            ),
+            patch(
+                "app.modules.social.presentation.routers.trade_router.get_db_session"
+            ) as mock_session,
+            patch(
+                "app.modules.social.infrastructure.repositories.trade_repository_impl.SQLAlchemyTradeRepository"
+            ) as mock_trade_repo,
+            patch(
+                "app.modules.social.infrastructure.repositories.card_repository_impl.CardRepositoryImpl"
+            ) as mock_card_repo,
+        ):
             # Setup mocks
             mock_session.return_value = Mock()
 
@@ -380,4 +383,7 @@ class TestTradeFlowTimeout:
 
             # Should return error due to timeout
             assert response.status_code == 422
-            assert "timeout" in response.json()["detail"].lower() or "cancel" in response.json()["detail"].lower()
+            assert (
+                "timeout" in response.json()["detail"].lower()
+                or "cancel" in response.json()["detail"].lower()
+            )

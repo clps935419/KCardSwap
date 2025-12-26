@@ -37,12 +37,14 @@ async def lifespan(app: FastAPI):
     - In local dev: Run `poetry run alembic upgrade head` before starting the app
     """
     # Wire the IoC container for dependency injection
-    container.wire(packages=[
-        "app.modules.identity",
-        "app.modules.social",
-        "app.modules.posts",
-        "app.shared",
-    ])
+    container.wire(
+        packages=[
+            "app.modules.identity",
+            "app.modules.social",
+            "app.modules.posts",
+            "app.shared",
+        ]
+    )
 
     yield
 

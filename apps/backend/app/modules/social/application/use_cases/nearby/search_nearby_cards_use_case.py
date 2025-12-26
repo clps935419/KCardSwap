@@ -83,8 +83,10 @@ class SearchNearbyCardsUseCase:
 
         # Check quota (free users only)
         if not is_premium:
-            quota_available, current_count = await self.quota_service.check_quota_available(
-                request.user_id, settings.DAILY_SEARCH_LIMIT_FREE, is_premium=False
+            quota_available, current_count = (
+                await self.quota_service.check_quota_available(
+                    request.user_id, settings.DAILY_SEARCH_LIMIT_FREE, is_premium=False
+                )
             )
             if not quota_available:
                 raise RateLimitExceededException(

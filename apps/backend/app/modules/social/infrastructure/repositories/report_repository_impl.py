@@ -23,9 +23,21 @@ class SQLAlchemyReportRepository(ReportRepository):
         """Create a new report"""
         model = ReportModel(
             id=UUID(report.id) if isinstance(report.id, str) else report.id,
-            reporter_id=UUID(report.reporter_id) if isinstance(report.reporter_id, str) else report.reporter_id,
-            reported_user_id=UUID(report.reported_user_id) if isinstance(report.reported_user_id, str) else report.reported_user_id,
-            reason=report.reason.value if isinstance(report.reason, ReportReason) else report.reason,
+            reporter_id=(
+                UUID(report.reporter_id)
+                if isinstance(report.reporter_id, str)
+                else report.reporter_id
+            ),
+            reported_user_id=(
+                UUID(report.reported_user_id)
+                if isinstance(report.reported_user_id, str)
+                else report.reported_user_id
+            ),
+            reason=(
+                report.reason.value
+                if isinstance(report.reason, ReportReason)
+                else report.reason
+            ),
             detail=report.detail,
             created_at=report.created_at,
             resolved=report.resolved,
@@ -45,12 +57,14 @@ class SQLAlchemyReportRepository(ReportRepository):
         return self._to_entity(model) if model else None
 
     async def get_reports_by_reported_user_id(
-        self,
-        reported_user_id: str,
-        resolved: Optional[bool] = None
+        self, reported_user_id: str, resolved: Optional[bool] = None
     ) -> List[Report]:
         """Get all reports for a specific user, optionally filtered by resolution status"""
-        user_uuid = UUID(reported_user_id) if isinstance(reported_user_id, str) else reported_user_id
+        user_uuid = (
+            UUID(reported_user_id)
+            if isinstance(reported_user_id, str)
+            else reported_user_id
+        )
 
         query = select(ReportModel).where(ReportModel.reported_user_id == user_uuid)
 
@@ -65,7 +79,9 @@ class SQLAlchemyReportRepository(ReportRepository):
 
     async def get_reports_by_reporter_id(self, reporter_id: str) -> List[Report]:
         """Get all reports filed by a specific user"""
-        reporter_uuid = UUID(reporter_id) if isinstance(reporter_id, str) else reporter_id
+        reporter_uuid = (
+            UUID(reporter_id) if isinstance(reporter_id, str) else reporter_id
+        )
 
         result = await self.session.execute(
             select(ReportModel)
@@ -90,7 +106,8 @@ class SQLAlchemyReportRepository(ReportRepository):
         """Update an existing report"""
         result = await self.session.execute(
             select(ReportModel).where(
-                ReportModel.id == (UUID(report.id) if isinstance(report.id, str) else report.id)
+                ReportModel.id
+                == (UUID(report.id) if isinstance(report.id, str) else report.id)
             )
         )
         model = result.scalar_one_or_none()
@@ -106,12 +123,14 @@ class SQLAlchemyReportRepository(ReportRepository):
         return self._to_entity(model)
 
     async def get_report_count_by_user(
-        self,
-        reported_user_id: str,
-        reason: Optional[ReportReason] = None
+        self, reported_user_id: str, reason: Optional[ReportReason] = None
     ) -> int:
         """Get count of reports against a user, optionally filtered by reason"""
-        user_uuid = UUID(reported_user_id) if isinstance(reported_user_id, str) else reported_user_id
+        user_uuid = (
+            UUID(reported_user_id)
+            if isinstance(reported_user_id, str)
+            else reported_user_id
+        )
 
         query = select(func.count(ReportModel.id)).where(
             ReportModel.reported_user_id == user_uuid

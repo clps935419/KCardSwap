@@ -112,9 +112,7 @@ def get_refresh_token_use_case(
     """Get RefreshTokenUseCase instance with request-scope dependencies."""
     user_repo = user_repo_factory(session)
     refresh_token_repo = refresh_token_repo_factory(session)
-    return use_case_factory(
-        user_repo=user_repo, refresh_token_repo=refresh_token_repo
-    )
+    return use_case_factory(user_repo=user_repo, refresh_token_repo=refresh_token_repo)
 
 
 @inject
@@ -133,9 +131,7 @@ def get_admin_login_use_case(
     """Get AdminLoginUseCase instance with request-scope dependencies."""
     user_repo = user_repo_factory(session)
     refresh_token_repo = refresh_token_repo_factory(session)
-    return use_case_factory(
-        user_repo=user_repo, refresh_token_repo=refresh_token_repo
-    )
+    return use_case_factory(user_repo=user_repo, refresh_token_repo=refresh_token_repo)
 
 
 @inject

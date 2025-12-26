@@ -35,8 +35,8 @@ async def seed_users():
             "privacy_flags": {
                 "nearby_visible": True,
                 "show_online": True,
-                "allow_stranger_chat": True
-            }
+                "allow_stranger_chat": True,
+            },
         },
         {
             "google_id": "test_google_id_2",
@@ -48,8 +48,8 @@ async def seed_users():
             "privacy_flags": {
                 "nearby_visible": True,
                 "show_online": False,
-                "allow_stranger_chat": False
-            }
+                "allow_stranger_chat": False,
+            },
         },
         {
             "google_id": "test_google_id_3",
@@ -61,8 +61,8 @@ async def seed_users():
             "privacy_flags": {
                 "nearby_visible": False,
                 "show_online": True,
-                "allow_stranger_chat": True
-            }
+                "allow_stranger_chat": True,
+            },
         },
         {
             "google_id": "test_google_id_4",
@@ -74,8 +74,8 @@ async def seed_users():
             "privacy_flags": {
                 "nearby_visible": True,
                 "show_online": True,
-                "allow_stranger_chat": True
-            }
+                "allow_stranger_chat": True,
+            },
         },
         {
             "google_id": "test_google_id_5",
@@ -87,9 +87,9 @@ async def seed_users():
             "privacy_flags": {
                 "nearby_visible": True,
                 "show_online": True,
-                "allow_stranger_chat": True
-            }
-        }
+                "allow_stranger_chat": True,
+            },
+        },
     ]
 
     # Use async session
@@ -101,8 +101,11 @@ async def seed_users():
             for user_data in test_users:
                 # Check if user already exists
                 from sqlalchemy import select
+
                 result = await session.execute(
-                    select(UserModel).where(UserModel.google_id == user_data["google_id"])
+                    select(UserModel).where(
+                        UserModel.google_id == user_data["google_id"]
+                    )
                 )
                 existing_user = result.scalar_one_or_none()
 
@@ -116,7 +119,7 @@ async def seed_users():
                 user_model = UserModel(
                     id=user_id,
                     google_id=user_data["google_id"],
-                    email=user_data["email"]
+                    email=user_data["email"],
                 )
                 session.add(user_model)
 
@@ -128,11 +131,13 @@ async def seed_users():
                     avatar_url=user_data["avatar_url"],
                     region=user_data["region"],
                     preferences={},
-                    privacy_flags=user_data["privacy_flags"]
+                    privacy_flags=user_data["privacy_flags"],
                 )
                 session.add(profile_model)
 
-                print(f"✅ Created user: {user_data['email']} ({user_data['nickname']})")
+                print(
+                    f"✅ Created user: {user_data['email']} ({user_data['nickname']})"
+                )
                 created_count += 1
 
             # Commit all changes
@@ -194,9 +199,7 @@ async def main():
 
     parser = argparse.ArgumentParser(description="Seed test users")
     parser.add_argument(
-        "--clear",
-        action="store_true",
-        help="Clear all users before seeding"
+        "--clear", action="store_true", help="Clear all users before seeding"
     )
 
     args = parser.parse_args()

@@ -202,4 +202,3 @@ class SocialModuleContainer(containers.DeclarativeContainer):
     complete_trade_use_case_factory = providers.Factory(CompleteTradeUseCase)
 
     get_trade_history_use_case_factory = providers.Factory(GetTradeHistoryUseCase)
-

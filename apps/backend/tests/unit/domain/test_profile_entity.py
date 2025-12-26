@@ -1,6 +1,7 @@
 """
 Unit tests for Profile entity
 """
+
 from uuid import uuid4
 
 import pytest
@@ -25,10 +26,7 @@ def test_profile_with_data():
     """Test profile creation with data"""
     user_id = uuid4()
     profile = Profile(
-        user_id=user_id,
-        nickname="TestUser",
-        bio="Test bio",
-        region="Seoul"
+        user_id=user_id, nickname="TestUser", bio="Test bio", region="Seoul"
     )
 
     assert profile.id is not None
@@ -56,11 +54,7 @@ def test_profile_update():
     user_id = uuid4()
     profile = Profile(user_id=user_id)
 
-    profile.update_profile(
-        nickname="NewNick",
-        bio="New bio",
-        region="Busan"
-    )
+    profile.update_profile(nickname="NewNick", bio="New bio", region="Busan")
 
     assert profile.nickname == "NewNick"
     assert profile.bio == "New bio"
@@ -72,10 +66,7 @@ def test_profile_privacy_settings():
     user_id = uuid4()
     profile = Profile(user_id=user_id)
 
-    profile.update_privacy_settings({
-        "nearby_visible": False,
-        "show_online": False
-    })
+    profile.update_privacy_settings({"nearby_visible": False, "show_online": False})
 
     assert profile.is_nearby_visible() is False
     assert profile.shows_online_status() is False

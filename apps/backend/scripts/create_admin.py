@@ -44,9 +44,7 @@ async def create_admin_user(email: str, password: str, role: str):
 
     # Create async engine
     engine = create_async_engine(settings.DATABASE_URL, echo=False)
-    async_session = sessionmaker(
-        engine, class_=AsyncSession, expire_on_commit=False
-    )
+    async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
     async with async_session() as session:
         try:
@@ -68,7 +66,7 @@ async def create_admin_user(email: str, password: str, role: str):
                 email=email.lower(),
                 password_hash=hashed_password,
                 role=role,
-                google_id=None  # Admin users don't use Google OAuth
+                google_id=None,  # Admin users don't use Google OAuth
             )
 
             session.add(admin_user)
@@ -98,7 +96,9 @@ async def create_admin_user(email: str, password: str, role: str):
             print(f"   User ID: {admin_user.id}")
             print(f"   Profile created: {admin_profile.nickname}")
             print("\nYou can now login at POST /api/v1/auth/admin-login with:")
-            print(f"   {{\n     \"email\": \"{email}\",\n     \"password\": \"[your-password]\"\n   }}")
+            print(
+                f'   {{\n     "email": "{email}",\n     "password": "[your-password]"\n   }}'
+            )
 
         except Exception as e:
             print(f"Error creating admin user: {e}")
@@ -113,21 +113,17 @@ def main():
     parser = argparse.ArgumentParser(
         description="Create an admin user with email/password authentication"
     )
-    parser.add_argument(
-        "--email",
-        required=True,
-        help="Admin email address"
-    )
+    parser.add_argument("--email", required=True, help="Admin email address")
     parser.add_argument(
         "--password",
         required=True,
-        help="Admin password (minimum 8 characters recommended)"
+        help="Admin password (minimum 8 characters recommended)",
     )
     parser.add_argument(
         "--role",
         choices=["admin", "super_admin"],
         default="admin",
-        help="Admin role (default: admin)"
+        help="Admin role (default: admin)",
     )
 
     args = parser.parse_args()
@@ -136,7 +132,7 @@ def main():
     if len(args.password) < 8:
         print("Warning: Password should be at least 8 characters for security.")
         response = input("Continue anyway? (y/n): ")
-        if response.lower() != 'y':
+        if response.lower() != "y":
             print("Aborted.")
             sys.exit(0)
 
