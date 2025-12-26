@@ -10,7 +10,10 @@ from dependency_injector.wiring import Provide, inject
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.container import container
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.container import ApplicationContainer
 from app.modules.social.application.use_cases.cards.check_quota import (
     CheckUploadQuotaUseCase,
 )
@@ -87,10 +90,10 @@ from app.shared.infrastructure.database.connection import get_db_session
 def get_upload_card_use_case(
     session: AsyncSession = Depends(get_db_session),
     repo_factory: Callable[[AsyncSession], CardRepository] = Provide[
-        container.social.card_repository
+        "social.card_repository"
     ],
     use_case_factory: Callable[..., UploadCardUseCase] = Provide[
-        container.social.upload_card_use_case_factory
+        "social.upload_card_use_case_factory"
     ],
 ) -> UploadCardUseCase:
     """Get UploadCardUseCase instance with request-scope dependencies."""
@@ -102,10 +105,10 @@ def get_upload_card_use_case(
 def get_my_cards_use_case(
     session: AsyncSession = Depends(get_db_session),
     repo_factory: Callable[[AsyncSession], CardRepository] = Provide[
-        container.social.card_repository
+        "social.card_repository"
     ],
     use_case_factory: Callable[..., GetMyCardsUseCase] = Provide[
-        container.social.get_my_cards_use_case_factory
+        "social.get_my_cards_use_case_factory"
     ],
 ) -> GetMyCardsUseCase:
     """Get GetMyCardsUseCase instance with request-scope dependencies."""
@@ -117,10 +120,10 @@ def get_my_cards_use_case(
 def get_delete_card_use_case(
     session: AsyncSession = Depends(get_db_session),
     repo_factory: Callable[[AsyncSession], CardRepository] = Provide[
-        container.social.card_repository
+        "social.card_repository"
     ],
     use_case_factory: Callable[..., DeleteCardUseCase] = Provide[
-        container.social.delete_card_use_case_factory
+        "social.delete_card_use_case_factory"
     ],
 ) -> DeleteCardUseCase:
     """Get DeleteCardUseCase instance with request-scope dependencies."""
@@ -132,10 +135,10 @@ def get_delete_card_use_case(
 def get_check_quota_use_case(
     session: AsyncSession = Depends(get_db_session),
     repo_factory: Callable[[AsyncSession], CardRepository] = Provide[
-        container.social.card_repository
+        "social.card_repository"
     ],
     use_case_factory: Callable[..., CheckUploadQuotaUseCase] = Provide[
-        container.social.check_quota_use_case_factory
+        "social.check_quota_use_case_factory"
     ],
 ) -> CheckUploadQuotaUseCase:
     """Get CheckUploadQuotaUseCase instance with request-scope dependencies."""
@@ -150,10 +153,10 @@ def get_check_quota_use_case(
 def get_search_nearby_cards_use_case(
     session: AsyncSession = Depends(get_db_session),
     card_repo_factory: Callable[[AsyncSession], CardRepository] = Provide[
-        container.social.card_repository
+        "social.card_repository"
     ],
     use_case_factory: Callable[..., SearchNearbyCardsUseCase] = Provide[
-        container.social.search_nearby_cards_use_case_factory
+        "social.search_nearby_cards_use_case_factory"
     ],
 ) -> SearchNearbyCardsUseCase:
     """Get SearchNearbyCardsUseCase instance with request-scope dependencies."""
@@ -165,10 +168,10 @@ def get_search_nearby_cards_use_case(
 def get_update_user_location_use_case(
     session: AsyncSession = Depends(get_db_session),
     card_repo_factory: Callable[[AsyncSession], CardRepository] = Provide[
-        container.social.card_repository
+        "social.card_repository"
     ],
     use_case_factory: Callable[..., UpdateUserLocationUseCase] = Provide[
-        container.social.update_user_location_use_case_factory
+        "social.update_user_location_use_case_factory"
     ],
 ) -> UpdateUserLocationUseCase:
     """Get UpdateUserLocationUseCase instance with request-scope dependencies."""
@@ -183,10 +186,10 @@ def get_update_user_location_use_case(
 def get_send_friend_request_use_case(
     session: AsyncSession = Depends(get_db_session),
     friendship_repo_factory: Callable[[AsyncSession], FriendshipRepository] = Provide[
-        container.social.friendship_repository
+        "social.friendship_repository"
     ],
     use_case_factory: Callable[..., SendFriendRequestUseCase] = Provide[
-        container.social.send_friend_request_use_case_factory
+        "social.send_friend_request_use_case_factory"
     ],
 ) -> SendFriendRequestUseCase:
     """Get SendFriendRequestUseCase instance with request-scope dependencies."""
@@ -198,10 +201,10 @@ def get_send_friend_request_use_case(
 def get_accept_friend_request_use_case(
     session: AsyncSession = Depends(get_db_session),
     friendship_repo_factory: Callable[[AsyncSession], FriendshipRepository] = Provide[
-        container.social.friendship_repository
+        "social.friendship_repository"
     ],
     use_case_factory: Callable[..., AcceptFriendRequestUseCase] = Provide[
-        container.social.accept_friend_request_use_case_factory
+        "social.accept_friend_request_use_case_factory"
     ],
 ) -> AcceptFriendRequestUseCase:
     """Get AcceptFriendRequestUseCase instance with request-scope dependencies."""
@@ -213,10 +216,10 @@ def get_accept_friend_request_use_case(
 def get_block_user_use_case(
     session: AsyncSession = Depends(get_db_session),
     friendship_repo_factory: Callable[[AsyncSession], FriendshipRepository] = Provide[
-        container.social.friendship_repository
+        "social.friendship_repository"
     ],
     use_case_factory: Callable[..., BlockUserUseCase] = Provide[
-        container.social.block_user_use_case_factory
+        "social.block_user_use_case_factory"
     ],
 ) -> BlockUserUseCase:
     """Get BlockUserUseCase instance with request-scope dependencies."""
@@ -231,13 +234,13 @@ def get_block_user_use_case(
 def get_send_message_use_case(
     session: AsyncSession = Depends(get_db_session),
     chat_room_repo_factory: Callable[[AsyncSession], ChatRoomRepository] = Provide[
-        container.social.chat_room_repository
+        "social.chat_room_repository"
     ],
     message_repo_factory: Callable[[AsyncSession], MessageRepository] = Provide[
-        container.social.message_repository
+        "social.message_repository"
     ],
     use_case_factory: Callable[..., SendMessageUseCase] = Provide[
-        container.social.send_message_use_case_factory
+        "social.send_message_use_case_factory"
     ],
 ) -> SendMessageUseCase:
     """Get SendMessageUseCase instance with request-scope dependencies."""
@@ -255,13 +258,13 @@ def get_send_message_use_case(
 def get_rate_user_use_case(
     session: AsyncSession = Depends(get_db_session),
     rating_repo_factory: Callable[[AsyncSession], RatingRepository] = Provide[
-        container.social.rating_repository
+        "social.rating_repository"
     ],
     friendship_repo_factory: Callable[[AsyncSession], FriendshipRepository] = Provide[
-        container.social.friendship_repository
+        "social.friendship_repository"
     ],
     use_case_factory: Callable[..., RateUserUseCase] = Provide[
-        container.social.rate_user_use_case_factory
+        "social.rate_user_use_case_factory"
     ],
 ) -> RateUserUseCase:
     """Get RateUserUseCase instance with request-scope dependencies."""
@@ -279,10 +282,10 @@ def get_rate_user_use_case(
 def get_report_user_use_case(
     session: AsyncSession = Depends(get_db_session),
     report_repo_factory: Callable[[AsyncSession], ReportRepository] = Provide[
-        container.social.report_repository
+        "social.report_repository"
     ],
     use_case_factory: Callable[..., ReportUserUseCase] = Provide[
-        container.social.report_user_use_case_factory
+        "social.report_user_use_case_factory"
     ],
 ) -> ReportUserUseCase:
     """Get ReportUserUseCase instance with request-scope dependencies."""
@@ -297,16 +300,16 @@ def get_report_user_use_case(
 def get_create_trade_proposal_use_case(
     session: AsyncSession = Depends(get_db_session),
     trade_repo_factory: Callable[[AsyncSession], TradeRepository] = Provide[
-        container.social.trade_repository
+        "social.trade_repository"
     ],
     card_repo_factory: Callable[[AsyncSession], CardRepository] = Provide[
-        container.social.card_repository
+        "social.card_repository"
     ],
     friendship_repo_factory: Callable[[AsyncSession], FriendshipRepository] = Provide[
-        container.social.friendship_repository
+        "social.friendship_repository"
     ],
     use_case_factory: Callable[..., CreateTradeProposalUseCase] = Provide[
-        container.social.create_trade_proposal_use_case_factory
+        "social.create_trade_proposal_use_case_factory"
     ],
 ) -> CreateTradeProposalUseCase:
     """Get CreateTradeProposalUseCase instance with request-scope dependencies."""
@@ -324,16 +327,16 @@ def get_create_trade_proposal_use_case(
 def get_accept_trade_use_case(
     session: AsyncSession = Depends(get_db_session),
     trade_repo_factory: Callable[[AsyncSession], TradeRepository] = Provide[
-        container.social.trade_repository
+        "social.trade_repository"
     ],
     card_repo_factory: Callable[[AsyncSession], CardRepository] = Provide[
-        container.social.card_repository
+        "social.card_repository"
     ],
     chat_room_repo_factory: Callable[[AsyncSession], ChatRoomRepository] = Provide[
-        container.social.chat_room_repository
+        "social.chat_room_repository"
     ],
     use_case_factory: Callable[..., AcceptTradeUseCase] = Provide[
-        container.social.accept_trade_use_case_factory
+        "social.accept_trade_use_case_factory"
     ],
 ) -> AcceptTradeUseCase:
     """Get AcceptTradeUseCase instance with request-scope dependencies."""
@@ -351,10 +354,10 @@ def get_accept_trade_use_case(
 def get_cancel_trade_use_case(
     session: AsyncSession = Depends(get_db_session),
     trade_repo_factory: Callable[[AsyncSession], TradeRepository] = Provide[
-        container.social.trade_repository
+        "social.trade_repository"
     ],
     use_case_factory: Callable[..., CancelTradeUseCase] = Provide[
-        container.social.cancel_trade_use_case_factory
+        "social.cancel_trade_use_case_factory"
     ],
 ) -> CancelTradeUseCase:
     """Get CancelTradeUseCase instance with request-scope dependencies."""
@@ -370,7 +373,7 @@ def get_cancel_trade_use_case(
 def get_friendship_repository(
     session: AsyncSession = Depends(get_db_session),
     repo_factory: Callable[[AsyncSession], FriendshipRepository] = Provide[
-        container.social.friendship_repository
+        "social.friendship_repository"
     ],
 ) -> FriendshipRepository:
     """Get FriendshipRepository instance with request-scope dependencies."""
@@ -381,7 +384,7 @@ def get_friendship_repository(
 def get_chat_room_repository(
     session: AsyncSession = Depends(get_db_session),
     repo_factory: Callable[[AsyncSession], ChatRoomRepository] = Provide[
-        container.social.chat_room_repository
+        "social.chat_room_repository"
     ],
 ) -> ChatRoomRepository:
     """Get ChatRoomRepository instance with request-scope dependencies."""
@@ -392,7 +395,7 @@ def get_chat_room_repository(
 def get_message_repository(
     session: AsyncSession = Depends(get_db_session),
     repo_factory: Callable[[AsyncSession], MessageRepository] = Provide[
-        container.social.message_repository
+        "social.message_repository"
     ],
 ) -> MessageRepository:
     """Get MessageRepository instance with request-scope dependencies."""
@@ -406,10 +409,10 @@ def get_message_repository(
 def get_messages_use_case(
     session: AsyncSession = Depends(get_db_session),
     message_repo_factory: Callable[[AsyncSession], MessageRepository] = Provide[
-        container.social.message_repository
+        "social.message_repository"
     ],
     use_case_factory: Callable[..., GetMessagesUseCase] = Provide[
-        container.social.get_messages_use_case_factory
+        "social.get_messages_use_case_factory"
     ],
 ) -> GetMessagesUseCase:
     """Get GetMessagesUseCase instance with request-scope dependencies."""
@@ -421,10 +424,10 @@ def get_messages_use_case(
 def get_reject_trade_use_case(
     session: AsyncSession = Depends(get_db_session),
     trade_repo_factory: Callable[[AsyncSession], TradeRepository] = Provide[
-        container.social.trade_repository
+        "social.trade_repository"
     ],
     use_case_factory: Callable[..., RejectTradeUseCase] = Provide[
-        container.social.reject_trade_use_case_factory
+        "social.reject_trade_use_case_factory"
     ],
 ) -> RejectTradeUseCase:
     """Get RejectTradeUseCase instance with request-scope dependencies."""
@@ -436,10 +439,10 @@ def get_reject_trade_use_case(
 def get_complete_trade_use_case(
     session: AsyncSession = Depends(get_db_session),
     trade_repo_factory: Callable[[AsyncSession], TradeRepository] = Provide[
-        container.social.trade_repository
+        "social.trade_repository"
     ],
     use_case_factory: Callable[..., CompleteTradeUseCase] = Provide[
-        container.social.complete_trade_use_case_factory
+        "social.complete_trade_use_case_factory"
     ],
 ) -> CompleteTradeUseCase:
     """Get CompleteTradeUseCase instance with request-scope dependencies."""
@@ -451,10 +454,10 @@ def get_complete_trade_use_case(
 def get_trade_history_use_case(
     session: AsyncSession = Depends(get_db_session),
     trade_repo_factory: Callable[[AsyncSession], TradeRepository] = Provide[
-        container.social.trade_repository
+        "social.trade_repository"
     ],
     use_case_factory: Callable[..., GetTradeHistoryUseCase] = Provide[
-        container.social.get_trade_history_use_case_factory
+        "social.get_trade_history_use_case_factory"
     ],
 ) -> GetTradeHistoryUseCase:
     """Get GetTradeHistoryUseCase instance with request-scope dependencies."""
@@ -466,7 +469,7 @@ def get_trade_history_use_case(
 def get_trade_repository(
     session: AsyncSession = Depends(get_db_session),
     repo_factory: Callable[[AsyncSession], TradeRepository] = Provide[
-        container.social.trade_repository
+        "social.trade_repository"
     ],
 ) -> TradeRepository:
     """Get TradeRepository instance with request-scope dependencies."""

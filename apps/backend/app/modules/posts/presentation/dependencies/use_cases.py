@@ -10,7 +10,10 @@ from dependency_injector.wiring import Provide, inject
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.container import container
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.container import ApplicationContainer
 from app.modules.posts.application.use_cases.accept_interest_use_case import (
     AcceptInterestUseCase,
 )
@@ -52,13 +55,13 @@ from app.shared.infrastructure.database.connection import get_db_session
 def get_create_post_use_case(
     session: AsyncSession = Depends(get_db_session),
     post_repo_factory: Callable[[AsyncSession], IPostRepository] = Provide[
-        container.posts.post_repository
+        "posts.post_repository"
     ],
     subscription_repo_factory: Callable[
         [AsyncSession], ISubscriptionRepository
     ] = Provide[container.identity.subscription_repository],
     use_case_factory: Callable[..., CreatePostUseCase] = Provide[
-        container.posts.create_post_use_case_factory
+        "posts.create_post_use_case_factory"
     ],
 ) -> CreatePostUseCase:
     """Get CreatePostUseCase instance with request-scope dependencies."""
@@ -73,10 +76,10 @@ def get_create_post_use_case(
 def get_list_board_posts_use_case(
     session: AsyncSession = Depends(get_db_session),
     post_repo_factory: Callable[[AsyncSession], IPostRepository] = Provide[
-        container.posts.post_repository
+        "posts.post_repository"
     ],
     use_case_factory: Callable[..., ListBoardPostsUseCase] = Provide[
-        container.posts.list_board_posts_use_case_factory
+        "posts.list_board_posts_use_case_factory"
     ],
 ) -> ListBoardPostsUseCase:
     """Get ListBoardPostsUseCase instance with request-scope dependencies."""
@@ -88,13 +91,13 @@ def get_list_board_posts_use_case(
 def get_express_interest_use_case(
     session: AsyncSession = Depends(get_db_session),
     post_repo_factory: Callable[[AsyncSession], IPostRepository] = Provide[
-        container.posts.post_repository
+        "posts.post_repository"
     ],
     post_interest_repo_factory: Callable[
         [AsyncSession], IPostInterestRepository
-    ] = Provide[container.posts.post_interest_repository],
+    ] = Provide["posts.post_interest_repository"],
     use_case_factory: Callable[..., ExpressInterestUseCase] = Provide[
-        container.posts.express_interest_use_case_factory
+        "posts.express_interest_use_case_factory"
     ],
 ) -> ExpressInterestUseCase:
     """Get ExpressInterestUseCase instance with request-scope dependencies."""
@@ -109,11 +112,11 @@ def get_express_interest_use_case(
 def get_accept_interest_use_case(
     session: AsyncSession = Depends(get_db_session),
     post_repo_factory: Callable[[AsyncSession], IPostRepository] = Provide[
-        container.posts.post_repository
+        "posts.post_repository"
     ],
     post_interest_repo_factory: Callable[
         [AsyncSession], IPostInterestRepository
-    ] = Provide[container.posts.post_interest_repository],
+    ] = Provide["posts.post_interest_repository"],
     friendship_repo_factory: Callable[[AsyncSession], FriendshipRepository] = Provide[
         container.social.friendship_repository
     ],
@@ -121,7 +124,7 @@ def get_accept_interest_use_case(
         container.social.chat_room_repository
     ],
     use_case_factory: Callable[..., AcceptInterestUseCase] = Provide[
-        container.posts.accept_interest_use_case_factory
+        "posts.accept_interest_use_case_factory"
     ],
 ) -> AcceptInterestUseCase:
     """Get AcceptInterestUseCase instance with request-scope dependencies."""
@@ -141,13 +144,13 @@ def get_accept_interest_use_case(
 def get_reject_interest_use_case(
     session: AsyncSession = Depends(get_db_session),
     post_repo_factory: Callable[[AsyncSession], IPostRepository] = Provide[
-        container.posts.post_repository
+        "posts.post_repository"
     ],
     post_interest_repo_factory: Callable[
         [AsyncSession], IPostInterestRepository
-    ] = Provide[container.posts.post_interest_repository],
+    ] = Provide["posts.post_interest_repository"],
     use_case_factory: Callable[..., RejectInterestUseCase] = Provide[
-        container.posts.reject_interest_use_case_factory
+        "posts.reject_interest_use_case_factory"
     ],
 ) -> RejectInterestUseCase:
     """Get RejectInterestUseCase instance with request-scope dependencies."""
@@ -162,10 +165,10 @@ def get_reject_interest_use_case(
 def get_close_post_use_case(
     session: AsyncSession = Depends(get_db_session),
     post_repo_factory: Callable[[AsyncSession], IPostRepository] = Provide[
-        container.posts.post_repository
+        "posts.post_repository"
     ],
     use_case_factory: Callable[..., ClosePostUseCase] = Provide[
-        container.posts.close_post_use_case_factory
+        "posts.close_post_use_case_factory"
     ],
 ) -> ClosePostUseCase:
     """Get ClosePostUseCase instance with request-scope dependencies."""

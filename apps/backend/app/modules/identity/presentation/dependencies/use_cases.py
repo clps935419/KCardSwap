@@ -10,7 +10,10 @@ from dependency_injector.wiring import Provide, inject
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.container import container
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.container import ApplicationContainer
 from app.modules.identity.application.use_cases.auth.admin_login import (
     AdminLoginUseCase,
 )
@@ -61,7 +64,7 @@ from app.shared.infrastructure.database.connection import get_db_session
 @inject
 def get_google_login_use_case(
     use_case_factory: Callable[..., GoogleLoginUseCase] = Provide[
-        container.identity.google_login_use_case_factory
+        "identity.google_login_use_case_factory"
     ],
 ) -> GoogleLoginUseCase:
     """Get GoogleLoginUseCase instance.
@@ -75,16 +78,16 @@ def get_google_login_use_case(
 def get_google_callback_use_case(
     session: AsyncSession = Depends(get_db_session),
     user_repo_factory: Callable[[AsyncSession], IUserRepository] = Provide[
-        container.identity.user_repository
+        "identity.user_repository"
     ],
     profile_repo_factory: Callable[[AsyncSession], IProfileRepository] = Provide[
-        container.identity.profile_repository
+        "identity.profile_repository"
     ],
     refresh_token_repo_factory: Callable[
         [AsyncSession], RefreshTokenRepository
-    ] = Provide[container.identity.refresh_token_repository],
+    ] = Provide["identity.refresh_token_repository"],
     use_case_factory: Callable[..., GoogleCallbackUseCase] = Provide[
-        container.identity.google_callback_use_case_factory
+        "identity.google_callback_use_case_factory"
     ],
 ) -> GoogleCallbackUseCase:
     """Get GoogleCallbackUseCase instance with request-scope dependencies."""
@@ -102,13 +105,13 @@ def get_google_callback_use_case(
 def get_refresh_token_use_case(
     session: AsyncSession = Depends(get_db_session),
     user_repo_factory: Callable[[AsyncSession], IUserRepository] = Provide[
-        container.identity.user_repository
+        "identity.user_repository"
     ],
     refresh_token_repo_factory: Callable[
         [AsyncSession], RefreshTokenRepository
-    ] = Provide[container.identity.refresh_token_repository],
+    ] = Provide["identity.refresh_token_repository"],
     use_case_factory: Callable[..., RefreshTokenUseCase] = Provide[
-        container.identity.refresh_token_use_case_factory
+        "identity.refresh_token_use_case_factory"
     ],
 ) -> RefreshTokenUseCase:
     """Get RefreshTokenUseCase instance with request-scope dependencies."""
@@ -123,13 +126,13 @@ def get_refresh_token_use_case(
 def get_admin_login_use_case(
     session: AsyncSession = Depends(get_db_session),
     user_repo_factory: Callable[[AsyncSession], IUserRepository] = Provide[
-        container.identity.user_repository
+        "identity.user_repository"
     ],
     refresh_token_repo_factory: Callable[
         [AsyncSession], RefreshTokenRepository
-    ] = Provide[container.identity.refresh_token_repository],
+    ] = Provide["identity.refresh_token_repository"],
     use_case_factory: Callable[..., AdminLoginUseCase] = Provide[
-        container.identity.admin_login_use_case_factory
+        "identity.admin_login_use_case_factory"
     ],
 ) -> AdminLoginUseCase:
     """Get AdminLoginUseCase instance with request-scope dependencies."""
@@ -145,9 +148,9 @@ def get_logout_use_case(
     session: AsyncSession = Depends(get_db_session),
     refresh_token_repo_factory: Callable[
         [AsyncSession], RefreshTokenRepository
-    ] = Provide[container.identity.refresh_token_repository],
+    ] = Provide["identity.refresh_token_repository"],
     use_case_factory: Callable[..., LogoutUseCase] = Provide[
-        container.identity.logout_use_case_factory
+        "identity.logout_use_case_factory"
     ],
 ) -> LogoutUseCase:
     """Get LogoutUseCase instance with request-scope dependencies."""
@@ -162,10 +165,10 @@ def get_logout_use_case(
 def get_profile_use_case(
     session: AsyncSession = Depends(get_db_session),
     profile_repo_factory: Callable[[AsyncSession], IProfileRepository] = Provide[
-        container.identity.profile_repository
+        "identity.profile_repository"
     ],
     use_case_factory: Callable[..., GetProfileUseCase] = Provide[
-        container.identity.get_profile_use_case_factory
+        "identity.get_profile_use_case_factory"
     ],
 ) -> GetProfileUseCase:
     """Get GetProfileUseCase instance with request-scope dependencies."""
@@ -177,10 +180,10 @@ def get_profile_use_case(
 def get_update_profile_use_case(
     session: AsyncSession = Depends(get_db_session),
     profile_repo_factory: Callable[[AsyncSession], IProfileRepository] = Provide[
-        container.identity.profile_repository
+        "identity.profile_repository"
     ],
     use_case_factory: Callable[..., UpdateProfileUseCase] = Provide[
-        container.identity.update_profile_use_case_factory
+        "identity.update_profile_use_case_factory"
     ],
 ) -> UpdateProfileUseCase:
     """Get UpdateProfileUseCase instance with request-scope dependencies."""
@@ -196,12 +199,12 @@ def get_verify_receipt_use_case(
     session: AsyncSession = Depends(get_db_session),
     subscription_repo_factory: Callable[
         [AsyncSession], ISubscriptionRepository
-    ] = Provide[container.identity.subscription_repository],
+    ] = Provide["identity.subscription_repository"],
     purchase_token_repo_factory: Callable[
         [AsyncSession], IPurchaseTokenRepository
-    ] = Provide[container.identity.purchase_token_repository],
+    ] = Provide["identity.purchase_token_repository"],
     use_case_factory: Callable[..., VerifyReceiptUseCase] = Provide[
-        container.identity.verify_receipt_use_case_factory
+        "identity.verify_receipt_use_case_factory"
     ],
 ) -> VerifyReceiptUseCase:
     """Get VerifyReceiptUseCase instance with request-scope dependencies."""
@@ -218,9 +221,9 @@ def get_check_subscription_status_use_case(
     session: AsyncSession = Depends(get_db_session),
     subscription_repo_factory: Callable[
         [AsyncSession], ISubscriptionRepository
-    ] = Provide[container.identity.subscription_repository],
+    ] = Provide["identity.subscription_repository"],
     use_case_factory: Callable[..., CheckSubscriptionStatusUseCase] = Provide[
-        container.identity.check_subscription_status_use_case_factory
+        "identity.check_subscription_status_use_case_factory"
     ],
 ) -> CheckSubscriptionStatusUseCase:
     """Get CheckSubscriptionStatusUseCase instance with request-scope dependencies."""
@@ -233,9 +236,9 @@ def get_expire_subscriptions_use_case(
     session: AsyncSession = Depends(get_db_session),
     subscription_repo_factory: Callable[
         [AsyncSession], ISubscriptionRepository
-    ] = Provide[container.identity.subscription_repository],
+    ] = Provide["identity.subscription_repository"],
     use_case_factory: Callable[..., ExpireSubscriptionsUseCase] = Provide[
-        container.identity.expire_subscriptions_use_case_factory
+        "identity.expire_subscriptions_use_case_factory"
     ],
 ) -> ExpireSubscriptionsUseCase:
     """Get ExpireSubscriptionsUseCase instance with request-scope dependencies."""
