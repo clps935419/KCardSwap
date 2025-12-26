@@ -6,12 +6,14 @@ from typing import Optional
 
 from app.modules.social.domain.entities.message import Message, MessageStatus
 from app.modules.social.domain.repositories.i_chat_room_repository import (
-    ChatRoomRepository,
+    IChatRoomRepository,
 )
 from app.modules.social.domain.repositories.i_friendship_repository import (
-    FriendshipRepository,
+    IFriendshipRepository,
 )
-from app.modules.social.domain.repositories.i_message_repository import IMessageRepository
+from app.modules.social.domain.repositories.i_message_repository import (
+    IMessageRepository,
+)
 
 
 class SendMessageUseCase:
@@ -32,8 +34,8 @@ class SendMessageUseCase:
     def __init__(
         self,
         message_repository: IMessageRepository,
-        chat_room_repository: ChatRoomRepository,
-        friendship_repository: FriendshipRepository,
+        chat_room_repository: IChatRoomRepository,
+        friendship_repository: IFriendshipRepository,
     ):
         self.message_repository = message_repository
         self.chat_room_repository = chat_room_repository

@@ -7,7 +7,7 @@ from typing import Optional
 from app.modules.social.domain.entities.rating import Rating
 from app.modules.social.domain.repositories.i_rating_repository import IRatingRepository
 from app.modules.social.domain.repositories.i_friendship_repository import (
-    FriendshipRepository,
+    IFriendshipRepository,
 )
 
 
@@ -29,7 +29,7 @@ class RateUserUseCase:
     def __init__(
         self,
         rating_repository: IRatingRepository,
-        friendship_repository: FriendshipRepository,
+        friendship_repository: IFriendshipRepository,
     ):
         self.rating_repository = rating_repository
         self.friendship_repository = friendship_repository

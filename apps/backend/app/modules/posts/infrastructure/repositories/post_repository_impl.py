@@ -24,17 +24,19 @@ class PostRepositoryImpl(IPostRepository):
         """Create a new post"""
         model = PostModel(
             id=UUID(post.id) if isinstance(post.id, str) else post.id,
-            owner_id=UUID(post.owner_id)
-            if isinstance(post.owner_id, str)
-            else post.owner_id,
+            owner_id=(
+                UUID(post.owner_id) if isinstance(post.owner_id, str) else post.owner_id
+            ),
             city_code=post.city_code,
             title=post.title,
             content=post.content,
             idol=post.idol,
             idol_group=post.idol_group,
-            status=post.status.value
-            if isinstance(post.status, PostStatus)
-            else post.status,
+            status=(
+                post.status.value
+                if isinstance(post.status, PostStatus)
+                else post.status
+            ),
             expires_at=post.expires_at,
             created_at=post.created_at,
             updated_at=post.updated_at,
@@ -209,4 +211,4 @@ class PostRepositoryImpl(IPostRepository):
 
 
 # Alias for consistency
-PostRepositoryImpl = SQLAlchemyPostRepository
+PostRepositoryImpl = PostRepositoryImpl

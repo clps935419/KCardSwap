@@ -8,7 +8,7 @@ from app.modules.social.domain.entities.trade import Trade
 from app.modules.social.domain.entities.trade_item import TradeItem
 from app.modules.social.domain.repositories.i_card_repository import ICardRepository
 from app.modules.social.domain.repositories.i_friendship_repository import (
-    FriendshipRepository,
+    IFriendshipRepository,
 )
 from app.modules.social.domain.repositories.i_trade_repository import ITradeRepository
 from app.modules.social.domain.services.trade_validation_service import (
@@ -49,7 +49,7 @@ class CreateTradeProposalUseCase:
         self,
         trade_repository: ITradeRepository,
         card_repository: ICardRepository,
-        friendship_repository: FriendshipRepository,
+        friendship_repository: IFriendshipRepository,
         validation_service: TradeValidationService,
         max_active_trades_per_pair: int = 3,
     ):

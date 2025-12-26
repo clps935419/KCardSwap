@@ -7,7 +7,7 @@ from injector import Module, provider
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.social.application.use_cases.cards.check_quota import (
-    CheckQuotaUseCase,
+    CheckUploadQuotaUseCase,
 )
 from app.modules.social.application.use_cases.cards.delete_card import (
     DeleteCardUseCase,
@@ -129,11 +129,13 @@ class SocialModule(Module):
         return DeleteCardUseCase(card_repository=card_repo, storage_service=gcs_storage)
 
     @provider
-    def provide_check_quota_use_case(self, session: AsyncSession) -> CheckQuotaUseCase:
-        """Provide CheckQuotaUseCase with dependencies."""
+    def provide_check_quota_use_case(
+        self, session: AsyncSession
+    ) -> CheckUploadQuotaUseCase:
+        """Provide CheckUploadQuotaUseCase with dependencies."""
         card_repo = CardRepositoryImpl(session)
         subscription_repo = SubscriptionRepositoryImpl(session)
-        return CheckQuotaUseCase(
+        return CheckUploadQuotaUseCase(
             card_repository=card_repo, subscription_repository=subscription_repo
         )
 

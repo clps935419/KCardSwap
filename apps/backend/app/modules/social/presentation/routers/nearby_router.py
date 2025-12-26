@@ -45,7 +45,7 @@ router = APIRouter(prefix="/nearby", tags=["Nearby Search"])
 
 async def get_card_repository(
     session: Annotated[AsyncSession, Depends(get_db_session)],
-) -> CardRepository:
+) -> ICardRepository:
     """Dependency: Get card repository"""
     return CardRepositoryImpl(session)
 
@@ -110,7 +110,7 @@ async def get_search_quota_service(
 async def search_nearby_cards(
     request: SearchNearbyRequest,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
-    card_repository: Annotated[CardRepository, Depends(get_card_repository)],
+    card_repository: Annotated[ICardRepository, Depends(get_card_repository)],
     quota_service: Annotated[SearchQuotaService, Depends(get_search_quota_service)],
 ) -> SearchNearbyResponse:
     """
