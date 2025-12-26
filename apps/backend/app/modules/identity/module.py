@@ -50,6 +50,9 @@ from app.modules.identity.infrastructure.repositories.subscription_repository_im
 from app.modules.identity.infrastructure.repositories.user_repository_impl import (
     UserRepositoryImpl,
 )
+from app.modules.identity.infrastructure.security.password_service import (
+    PasswordService,
+)
 from app.shared.infrastructure.security.jwt_service import JWTService
 
 
@@ -81,10 +84,22 @@ class IdentityModule(Module):
 
     @provider
     def provide_google_callback_use_case(
-        self, google_oauth_service: GoogleOAuthService
+        self,
+        session: AsyncSession,
+        google_oauth_service: GoogleOAuthService,
+        jwt_service: JWTService,
     ) -> GoogleCallbackUseCase:
         """Provide GoogleCallbackUseCase with dependencies."""
-        return GoogleCallbackUseCase(google_oauth_service=google_oauth_service)
+        user_repo = UserRepositoryImpl(session)
+        profile_repo = ProfileRepositoryImpl(session)
+        refresh_token_repo = RefreshTokenRepositoryImpl(session)
+        return GoogleCallbackUseCase(
+            user_repo=user_repo,
+            profile_repo=profile_repo,
+            refresh_token_repo=refresh_token_repo,
+            google_oauth_service=google_oauth_service,
+            jwt_service=jwt_service,
+        )
 
     @provider
     def provide_refresh_token_use_case(
@@ -92,10 +107,8 @@ class IdentityModule(Module):
     ) -> RefreshTokenUseCase:
         """Provide RefreshTokenUseCase with dependencies."""
         refresh_token_repo = RefreshTokenRepositoryImpl(session)
-        user_repo = UserRepositoryImpl(session)
         return RefreshTokenUseCase(
-            refresh_token_repository=refresh_token_repo,
-            user_repository=user_repo,
+            refresh_token_repo=refresh_token_repo,
             jwt_service=jwt_service,
         )
 
@@ -112,9 +125,11 @@ class IdentityModule(Module):
         """Provide AdminLoginUseCase with dependencies."""
         user_repo = UserRepositoryImpl(session)
         refresh_token_repo = RefreshTokenRepositoryImpl(session)
+        password_service = PasswordService()
         return AdminLoginUseCase(
-            user_repository=user_repo,
-            refresh_token_repository=refresh_token_repo,
+            user_repo=user_repo,
+            refresh_token_repo=refresh_token_repo,
+            password_service=password_service,
             jwt_service=jwt_service,
         )
 
