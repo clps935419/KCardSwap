@@ -18,7 +18,7 @@ from app.modules.social.domain.services.trade_validation_service import (
 
 class CreateTradeProposalRequest:
     """Request DTO for creating a trade proposal"""
-    
+
     def __init__(
         self,
         initiator_id: UUID,
@@ -35,7 +35,7 @@ class CreateTradeProposalRequest:
 class CreateTradeProposalUseCase:
     """
     Use case for creating a trade proposal.
-    
+
     Business Rules:
     - Initiator and responder must be different users
     - Both parties must provide at least one card
@@ -44,7 +44,7 @@ class CreateTradeProposalUseCase:
     - Users must be friends
     - Maximum active trades between two users is limited (configurable)
     """
-    
+
     def __init__(
         self,
         trade_repository: ITradeRepository,
@@ -58,30 +58,30 @@ class CreateTradeProposalUseCase:
         self.friendship_repository = friendship_repository
         self.validation_service = validation_service
         self.max_active_trades_per_pair = max_active_trades_per_pair
-    
+
     async def execute(self, request: CreateTradeProposalRequest) -> Trade:
         """
         Create a trade proposal.
-        
+
         Args:
             request: CreateTradeProposalRequest containing trade details
-            
+
         Returns:
             Created Trade entity
-            
+
         Raises:
             ValueError: If trade proposal is invalid
         """
         # Validate: different users
         if request.initiator_id == request.responder_id:
             raise ValueError("Cannot create trade with yourself")
-        
+
         # Validate: at least one card from each side
         if not request.initiator_card_ids:
             raise ValueError("Initiator must provide at least one card")
         if not request.responder_card_ids:
             raise ValueError("Responder must provide at least one card")
-        
+
         # Validate: users are friends
         friendship = await self.friendship_repository.get_by_users(
             str(request.initiator_id),
@@ -89,7 +89,7 @@ class CreateTradeProposalUseCase:
         )
         if not friendship or not friendship.is_accepted():
             raise ValueError("Can only create trades with friends")
-        
+
         # Validate: not too many active trades
         active_count = await self.trade_repository.count_active_trades_between_users(
             request.initiator_id,
@@ -100,7 +100,7 @@ class CreateTradeProposalUseCase:
                 f"Maximum of {self.max_active_trades_per_pair} active trades "
                 f"between users exceeded"
             )
-        
+
         # Fetch and validate initiator cards
         initiator_cards = []
         for card_id in request.initiator_card_ids:
@@ -108,14 +108,14 @@ class CreateTradeProposalUseCase:
             if not card:
                 raise ValueError(f"Card {card_id} not found")
             initiator_cards.append(card)
-        
+
         self.validation_service.validate_card_ownership(
             initiator_cards,
             request.initiator_id,
             "initiator",
         )
         self.validation_service.validate_card_availability(initiator_cards)
-        
+
         # Fetch and validate responder cards
         responder_cards = []
         for card_id in request.responder_card_ids:
@@ -123,18 +123,18 @@ class CreateTradeProposalUseCase:
             if not card:
                 raise ValueError(f"Card {card_id} not found")
             responder_cards.append(card)
-        
+
         self.validation_service.validate_card_ownership(
             responder_cards,
             request.responder_id,
             "responder",
         )
         self.validation_service.validate_card_availability(responder_cards)
-        
+
         # Create trade entity
         trade_id = uuid4()
         now = datetime.utcnow()
-        
+
         trade = Trade(
             id=trade_id,
             initiator_id=request.initiator_id,
@@ -143,10 +143,10 @@ class CreateTradeProposalUseCase:
             created_at=now,
             updated_at=now,
         )
-        
+
         # Create trade items
         items = []
-        
+
         for card_id in request.initiator_card_ids:
             items.append(
                 TradeItem(
@@ -157,7 +157,7 @@ class CreateTradeProposalUseCase:
                     created_at=now,
                 )
             )
-        
+
         for card_id in request.responder_card_ids:
             items.append(
                 TradeItem(
@@ -168,20 +168,20 @@ class CreateTradeProposalUseCase:
                     created_at=now,
                 )
             )
-        
+
         # Validate trade items
         self.validation_service.validate_trade_items(
             items,
             request.initiator_id,
             request.responder_id,
         )
-        
+
         # Mark cards as trading
         for card in initiator_cards + responder_cards:
             card.set_status("trading")
             await self.card_repository.save(card)
-        
+
         # Save trade with items
         created_trade = await self.trade_repository.create(trade, items)
-        
+
         return created_trade

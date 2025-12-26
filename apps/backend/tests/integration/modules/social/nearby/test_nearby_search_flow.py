@@ -3,14 +3,14 @@ Integration tests for Nearby Search Flow (Phase 5 US3)
 Tests complete nearby search flow end-to-end including rate limiting
 """
 
-import pytest
-from fastapi.testclient import TestClient
 from unittest.mock import AsyncMock, Mock, patch
 from uuid import uuid4
 
-from app.main import app
-from app.config import settings
+import pytest
+from fastapi.testclient import TestClient
 
+from app.config import settings
+from app.main import app
 
 client = TestClient(app)
 

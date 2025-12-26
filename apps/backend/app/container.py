@@ -49,7 +49,7 @@ class ApplicationContainer(containers.DeclarativeContainer):
     identity = providers.Container(IdentityModuleContainer, shared=shared)
 
     social = providers.Container(SocialModuleContainer, shared=shared)
-    
+
     posts = providers.Container(PostsModuleContainer, shared=shared)
 
 

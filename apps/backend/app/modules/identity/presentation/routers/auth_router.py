@@ -14,21 +14,12 @@ from app.modules.identity.application.use_cases.auth.admin_login import (
 from app.modules.identity.application.use_cases.auth.google_callback import (
     GoogleCallbackUseCase,
 )
-from app.modules.identity.application.use_cases.auth.login_with_google import (
-    GoogleLoginUseCase,
-)
-from app.modules.identity.application.use_cases.auth.logout import LogoutUseCase
 from app.modules.identity.application.use_cases.auth.refresh_token import (
     RefreshTokenUseCase,
-)
-from app.modules.identity.presentation.dependencies.auth_deps import (
-    get_current_user_id,
 )
 from app.modules.identity.presentation.dependencies.use_cases import (
     get_admin_login_use_case,
     get_google_callback_use_case,
-    get_google_login_use_case,
-    get_logout_use_case,
     get_refresh_token_use_case,
 )
 from app.modules.identity.presentation.schemas.auth_schemas import (
@@ -249,7 +240,7 @@ async def refresh_token(
     # we create a new instance here only to parse the payload for the response
     # This is acceptable as JWT verification is stateless
     from app.shared.infrastructure.security.jwt_service import jwt_service
-    
+
     try:
         payload = jwt_service.verify_token(new_access_token, expected_type="access")
         user_id = payload["sub"]

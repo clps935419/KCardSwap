@@ -5,15 +5,14 @@ with IoC container providers to create use case instances.
 """
 
 from collections.abc import Callable
+from typing import TYPE_CHECKING
 
 from dependency_injector.wiring import Provide, inject
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
-    from app.container import ApplicationContainer
+    pass
 from app.modules.social.application.use_cases.cards.check_quota import (
     CheckUploadQuotaUseCase,
 )
@@ -24,11 +23,11 @@ from app.modules.social.application.use_cases.cards.get_my_cards import (
 from app.modules.social.application.use_cases.cards.upload_card import (
     UploadCardUseCase,
 )
-from app.modules.social.application.use_cases.chat.send_message_use_case import (
-    SendMessageUseCase,
-)
 from app.modules.social.application.use_cases.chat.get_messages_use_case import (
     GetMessagesUseCase,
+)
+from app.modules.social.application.use_cases.chat.send_message_use_case import (
+    SendMessageUseCase,
 )
 from app.modules.social.application.use_cases.friends.accept_friend_request_use_case import (
     AcceptFriendRequestUseCase,
@@ -60,14 +59,14 @@ from app.modules.social.application.use_cases.trades.cancel_trade_use_case impor
 from app.modules.social.application.use_cases.trades.complete_trade_use_case import (
     CompleteTradeUseCase,
 )
+from app.modules.social.application.use_cases.trades.create_trade_proposal_use_case import (
+    CreateTradeProposalUseCase,
+)
 from app.modules.social.application.use_cases.trades.get_trade_history_use_case import (
     GetTradeHistoryUseCase,
 )
 from app.modules.social.application.use_cases.trades.reject_trade_use_case import (
     RejectTradeUseCase,
-)
-from app.modules.social.application.use_cases.trades.create_trade_proposal_use_case import (
-    CreateTradeProposalUseCase,
 )
 from app.modules.social.domain.repositories.card_repository import CardRepository
 from app.modules.social.domain.repositories.chat_room_repository import (
@@ -79,9 +78,8 @@ from app.modules.social.domain.repositories.friendship_repository import (
 from app.modules.social.domain.repositories.message_repository import MessageRepository
 from app.modules.social.domain.repositories.rating_repository import RatingRepository
 from app.modules.social.domain.repositories.report_repository import ReportRepository
-from app.modules.social.domain.repositories.trade_repository import TradeRepository
+from app.modules.social.domain.repositories.trade_repository import ITradeRepository
 from app.shared.infrastructure.database.connection import get_db_session
-
 
 # ========== Cards Use Cases ==========
 
@@ -299,7 +297,7 @@ def get_report_user_use_case(
 @inject
 def get_create_trade_proposal_use_case(
     session: AsyncSession = Depends(get_db_session),
-    trade_repo_factory: Callable[[AsyncSession], TradeRepository] = Provide[
+    trade_repo_factory: Callable[[AsyncSession], ITradeRepository] = Provide[
         "social.trade_repository"
     ],
     card_repo_factory: Callable[[AsyncSession], CardRepository] = Provide[
@@ -326,7 +324,7 @@ def get_create_trade_proposal_use_case(
 @inject
 def get_accept_trade_use_case(
     session: AsyncSession = Depends(get_db_session),
-    trade_repo_factory: Callable[[AsyncSession], TradeRepository] = Provide[
+    trade_repo_factory: Callable[[AsyncSession], ITradeRepository] = Provide[
         "social.trade_repository"
     ],
     card_repo_factory: Callable[[AsyncSession], CardRepository] = Provide[
@@ -353,7 +351,7 @@ def get_accept_trade_use_case(
 @inject
 def get_cancel_trade_use_case(
     session: AsyncSession = Depends(get_db_session),
-    trade_repo_factory: Callable[[AsyncSession], TradeRepository] = Provide[
+    trade_repo_factory: Callable[[AsyncSession], ITradeRepository] = Provide[
         "social.trade_repository"
     ],
     use_case_factory: Callable[..., CancelTradeUseCase] = Provide[
@@ -423,7 +421,7 @@ def get_messages_use_case(
 @inject
 def get_reject_trade_use_case(
     session: AsyncSession = Depends(get_db_session),
-    trade_repo_factory: Callable[[AsyncSession], TradeRepository] = Provide[
+    trade_repo_factory: Callable[[AsyncSession], ITradeRepository] = Provide[
         "social.trade_repository"
     ],
     use_case_factory: Callable[..., RejectTradeUseCase] = Provide[
@@ -438,7 +436,7 @@ def get_reject_trade_use_case(
 @inject
 def get_complete_trade_use_case(
     session: AsyncSession = Depends(get_db_session),
-    trade_repo_factory: Callable[[AsyncSession], TradeRepository] = Provide[
+    trade_repo_factory: Callable[[AsyncSession], ITradeRepository] = Provide[
         "social.trade_repository"
     ],
     use_case_factory: Callable[..., CompleteTradeUseCase] = Provide[
@@ -453,7 +451,7 @@ def get_complete_trade_use_case(
 @inject
 def get_trade_history_use_case(
     session: AsyncSession = Depends(get_db_session),
-    trade_repo_factory: Callable[[AsyncSession], TradeRepository] = Provide[
+    trade_repo_factory: Callable[[AsyncSession], ITradeRepository] = Provide[
         "social.trade_repository"
     ],
     use_case_factory: Callable[..., GetTradeHistoryUseCase] = Provide[
@@ -468,9 +466,9 @@ def get_trade_history_use_case(
 @inject
 def get_trade_repository(
     session: AsyncSession = Depends(get_db_session),
-    repo_factory: Callable[[AsyncSession], TradeRepository] = Provide[
+    repo_factory: Callable[[AsyncSession], ITradeRepository] = Provide[
         "social.trade_repository"
     ],
-) -> TradeRepository:
+) -> ITradeRepository:
     """Get TradeRepository instance with request-scope dependencies."""
     return repo_factory(session)

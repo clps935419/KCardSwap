@@ -2,9 +2,10 @@
 Unit tests for Card Entity (T084)
 Following DDD principles and test patterns from test_user_entity.py
 """
-import pytest
 from datetime import datetime
-from uuid import uuid4, UUID
+from uuid import UUID, uuid4
+
+import pytest
 
 from app.modules.social.domain.entities.card import Card
 
@@ -15,9 +16,9 @@ class TestCardCreation:
     def test_card_creation_with_required_fields(self):
         """Test card creation with only required fields"""
         owner_id = uuid4()
-        
+
         card = Card(owner_id=owner_id)
-        
+
         assert card.owner_id == owner_id
         assert card.id is not None
         assert isinstance(card.id, UUID)
@@ -37,7 +38,7 @@ class TestCardCreation:
         owner_id = uuid4()
         card_id = uuid4()
         created_at = datetime.utcnow()
-        
+
         card = Card(
             id=card_id,
             owner_id=owner_id,
@@ -51,7 +52,7 @@ class TestCardCreation:
             size_bytes=1024000,
             created_at=created_at,
         )
-        
+
         assert card.id == card_id
         assert card.owner_id == owner_id
         assert card.idol == "IU"
@@ -72,21 +73,21 @@ class TestCardCreation:
     def test_card_validation_invalid_status(self):
         """Test validation fails for invalid status"""
         owner_id = uuid4()
-        
+
         with pytest.raises(ValueError, match="Invalid status"):
             Card(owner_id=owner_id, status="invalid_status")
 
     def test_card_validation_invalid_rarity(self):
         """Test validation fails for invalid rarity"""
         owner_id = uuid4()
-        
+
         with pytest.raises(ValueError, match="Invalid rarity"):
             Card(owner_id=owner_id, rarity="super_ultra_rare")
 
     def test_card_validation_negative_size(self):
         """Test validation fails for negative size_bytes"""
         owner_id = uuid4()
-        
+
         with pytest.raises(ValueError, match="size_bytes must be non-negative"):
             Card(owner_id=owner_id, size_bytes=-100)
 
@@ -99,9 +100,9 @@ class TestCardStatusTransitions:
         owner_id = uuid4()
         card = Card(owner_id=owner_id, status=Card.STATUS_AVAILABLE)
         original_updated_at = card.updated_at
-        
+
         card.mark_as_trading()
-        
+
         assert card.status == Card.STATUS_TRADING
         assert card.updated_at > original_updated_at
 
@@ -110,9 +111,9 @@ class TestCardStatusTransitions:
         owner_id = uuid4()
         card = Card(owner_id=owner_id, status=Card.STATUS_TRADING)
         original_updated_at = card.updated_at
-        
+
         card.mark_as_traded()
-        
+
         assert card.status == Card.STATUS_TRADED
         assert card.updated_at > original_updated_at
 
@@ -121,9 +122,9 @@ class TestCardStatusTransitions:
         owner_id = uuid4()
         card = Card(owner_id=owner_id, status=Card.STATUS_TRADING)
         original_updated_at = card.updated_at
-        
+
         card.mark_as_available()
-        
+
         assert card.status == Card.STATUS_AVAILABLE
         assert card.updated_at > original_updated_at
 
@@ -131,7 +132,7 @@ class TestCardStatusTransitions:
         """Test that a traded card cannot be marked as trading"""
         owner_id = uuid4()
         card = Card(owner_id=owner_id, status=Card.STATUS_TRADED)
-        
+
         with pytest.raises(ValueError, match="Cannot trade an already traded card"):
             card.mark_as_trading()
 
@@ -139,18 +140,18 @@ class TestCardStatusTransitions:
         """Test that a traded card cannot be made available again"""
         owner_id = uuid4()
         card = Card(owner_id=owner_id, status=Card.STATUS_TRADED)
-        
+
         with pytest.raises(ValueError, match="Cannot make a traded card available again"):
             card.mark_as_available()
 
     def test_is_available(self):
         """Test is_available method"""
         owner_id = uuid4()
-        
+
         available_card = Card(owner_id=owner_id, status=Card.STATUS_AVAILABLE)
         trading_card = Card(owner_id=owner_id, status=Card.STATUS_TRADING)
         traded_card = Card(owner_id=owner_id, status=Card.STATUS_TRADED)
-        
+
         assert available_card.is_available() is True
         assert trading_card.is_available() is False
         assert traded_card.is_available() is False
@@ -164,12 +165,12 @@ class TestCardImageOperations:
         owner_id = uuid4()
         card = Card(owner_id=owner_id)
         original_updated_at = card.updated_at
-        
+
         new_url = "https://storage.googleapis.com/kcardswap/cards/new.jpg"
         new_size = 2048000
-        
+
         card.update_image(new_url, new_size)
-        
+
         assert card.image_url == new_url
         assert card.size_bytes == new_size
         assert card.updated_at > original_updated_at
@@ -178,7 +179,7 @@ class TestCardImageOperations:
         """Test that update_image validates size_bytes"""
         owner_id = uuid4()
         card = Card(owner_id=owner_id)
-        
+
         with pytest.raises(ValueError, match="size_bytes must be non-negative"):
             card.update_image("https://example.com/image.jpg", -100)
 
@@ -191,11 +192,11 @@ class TestCardEquality:
         card_id = uuid4()
         owner_id1 = uuid4()
         owner_id2 = uuid4()
-        
+
         card1 = Card(id=card_id, owner_id=owner_id1)
         card2 = Card(id=card_id, owner_id=owner_id2)
         card3 = Card(owner_id=owner_id1)
-        
+
         assert card1 == card2  # Same ID
         assert card1 != card3  # Different ID
 
@@ -203,13 +204,13 @@ class TestCardEquality:
         """Test card can be hashed for use in sets and dicts"""
         card_id = uuid4()
         owner_id = uuid4()
-        
+
         card1 = Card(id=card_id, owner_id=owner_id)
         card2 = Card(id=card_id, owner_id=owner_id)
-        
+
         # Cards with same ID should have same hash
         assert hash(card1) == hash(card2)
-        
+
         # Can be used in sets
         card_set = {card1, card2}
         assert len(card_set) == 1  # Same card
@@ -218,9 +219,9 @@ class TestCardEquality:
         """Test card string representation"""
         owner_id = uuid4()
         card = Card(owner_id=owner_id, status=Card.STATUS_AVAILABLE)
-        
+
         repr_str = repr(card)
-        
+
         assert "Card" in repr_str
         assert str(card.id) in repr_str
         assert str(owner_id) in repr_str

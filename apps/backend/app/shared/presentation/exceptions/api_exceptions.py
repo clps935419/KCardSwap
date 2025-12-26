@@ -6,7 +6,7 @@ This module provides custom exception classes for API error responses.
 from typing import Any, Dict, Optional
 
 
-class APIException(Exception):
+class APIException(Exception):  # noqa: N818
     """Base API exception class.
 
     All API exceptions should inherit from this class.

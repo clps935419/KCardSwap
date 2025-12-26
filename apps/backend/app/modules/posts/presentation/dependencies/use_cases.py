@@ -5,15 +5,17 @@ with IoC container providers to create use case instances.
 """
 
 from collections.abc import Callable
+from typing import TYPE_CHECKING
 
 from dependency_injector.wiring import Provide, inject
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
-    from app.container import ApplicationContainer
+    pass
+from app.modules.identity.domain.repositories.subscription_repository import (
+    ISubscriptionRepository,
+)
 from app.modules.posts.application.use_cases.accept_interest_use_case import (
     AcceptInterestUseCase,
 )
@@ -36,17 +38,13 @@ from app.modules.posts.domain.repositories.post_interest_repository import (
     IPostInterestRepository,
 )
 from app.modules.posts.domain.repositories.post_repository import IPostRepository
-from app.modules.identity.domain.repositories.subscription_repository import (
-    ISubscriptionRepository,
+from app.modules.social.domain.repositories.chat_room_repository import (
+    ChatRoomRepository,
 )
 from app.modules.social.domain.repositories.friendship_repository import (
     FriendshipRepository,
 )
-from app.modules.social.domain.repositories.chat_room_repository import (
-    ChatRoomRepository,
-)
 from app.shared.infrastructure.database.connection import get_db_session
-
 
 # ========== Posts Use Cases ==========
 

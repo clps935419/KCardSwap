@@ -18,15 +18,15 @@ class Card:
     STATUS_AVAILABLE = "available"
     STATUS_TRADING = "trading"
     STATUS_TRADED = "traded"
-    
+
     VALID_STATUSES = {STATUS_AVAILABLE, STATUS_TRADING, STATUS_TRADED}
-    
+
     # Valid rarities
     RARITY_COMMON = "common"
     RARITY_RARE = "rare"
     RARITY_EPIC = "epic"
     RARITY_LEGENDARY = "legendary"
-    
+
     VALID_RARITIES = {RARITY_COMMON, RARITY_RARE, RARITY_EPIC, RARITY_LEGENDARY}
 
     def __init__(
@@ -63,17 +63,17 @@ class Card:
         """Validate card data"""
         if not self._owner_id:
             raise ValueError("owner_id is required")
-        
+
         if self._status not in self.VALID_STATUSES:
             raise ValueError(
                 f"Invalid status. Must be one of: {', '.join(self.VALID_STATUSES)}"
             )
-        
+
         if self._rarity is not None and self._rarity not in self.VALID_RARITIES:
             raise ValueError(
                 f"Invalid rarity. Must be one of: {', '.join(self.VALID_RARITIES)}"
             )
-        
+
         if self._size_bytes is not None and self._size_bytes < 0:
             raise ValueError("size_bytes must be non-negative")
 

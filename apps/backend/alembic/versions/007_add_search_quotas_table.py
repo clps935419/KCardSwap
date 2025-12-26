@@ -8,10 +8,10 @@ Add search_quotas table to track daily search counts for rate limiting.
 """
 from typing import Sequence, Union
 
-from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = '007'
@@ -22,7 +22,7 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     """Create search_quotas table."""
-    
+
     op.create_table(
         'search_quotas',
         sa.Column('user_id', postgresql.UUID(as_uuid=True), nullable=False),
@@ -30,14 +30,14 @@ def upgrade() -> None:
         sa.Column('count', sa.Integer, nullable=False, server_default='0'),
         sa.PrimaryKeyConstraint('user_id', 'date'),
     )
-    
+
     # Create indexes for efficient queries
     op.create_index(
         'idx_search_quotas_user_id',
         'search_quotas',
         ['user_id']
     )
-    
+
     op.create_index(
         'idx_search_quotas_date',
         'search_quotas',
@@ -47,7 +47,7 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     """Drop search_quotas table."""
-    
+
     op.drop_index('idx_search_quotas_date', table_name='search_quotas')
     op.drop_index('idx_search_quotas_user_id', table_name='search_quotas')
     op.drop_table('search_quotas')

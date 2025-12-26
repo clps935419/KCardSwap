@@ -6,22 +6,25 @@ Domain layer repository interface - defines contract for post interest persisten
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
-from app.modules.posts.domain.entities.post_interest import PostInterest, PostInterestStatus
+from app.modules.posts.domain.entities.post_interest import (
+    PostInterest,
+    PostInterestStatus,
+)
 
 
 class PostInterestRepository(ABC):
     """Repository interface for PostInterest entity persistence"""
-    
+
     @abstractmethod
     async def create(self, post_interest: PostInterest) -> PostInterest:
         """Create a new post interest"""
         pass
-    
+
     @abstractmethod
     async def get_by_id(self, interest_id: str) -> Optional[PostInterest]:
         """Get post interest by ID"""
         pass
-    
+
     @abstractmethod
     async def get_by_post_and_user(
         self,
@@ -33,7 +36,7 @@ class PostInterestRepository(ABC):
         Used to check for duplicate interests
         """
         pass
-    
+
     @abstractmethod
     async def list_by_post_id(
         self,
@@ -47,7 +50,7 @@ class PostInterestRepository(ABC):
         Optionally filtered by status
         """
         pass
-    
+
     @abstractmethod
     async def list_by_user_id(
         self,
@@ -61,12 +64,12 @@ class PostInterestRepository(ABC):
         Optionally filtered by status
         """
         pass
-    
+
     @abstractmethod
     async def update(self, post_interest: PostInterest) -> PostInterest:
         """Update an existing post interest"""
         pass
-    
+
     @abstractmethod
     async def delete(self, interest_id: str) -> None:
         """Delete a post interest"""

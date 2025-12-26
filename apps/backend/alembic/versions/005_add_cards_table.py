@@ -9,10 +9,10 @@ Includes fields for owner, idol info, image URL, size, and status tracking.
 """
 from typing import Sequence, Union
 
-from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = '005'
@@ -23,12 +23,12 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     """Create cards table if it doesn't exist (idempotent for existing installations)."""
-    
+
     # Check if cards table already exists (from migration 001)
     connection = op.get_bind()
     inspector = sa.inspect(connection)
     tables = inspector.get_table_names()
-    
+
     if 'cards' not in tables:
         # Table doesn't exist, create it
         op.create_table(
@@ -45,11 +45,11 @@ def upgrade() -> None:
             sa.Column('size_bytes', sa.Integer(), nullable=True),
             sa.Column('created_at', sa.DateTime(timezone=True), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
             sa.Column('updated_at', sa.DateTime(timezone=True), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
-            
+
             # Foreign key constraint
             sa.ForeignKeyConstraint(['owner_id'], ['users.id'], ondelete='CASCADE'),
         )
-        
+
         # Create trigger for automatic updated_at
         op.execute("""
             CREATE TRIGGER update_cards_updated_at
@@ -57,43 +57,43 @@ def upgrade() -> None:
             FOR EACH ROW
             EXECUTE FUNCTION update_updated_at_column();
         """)
-    
+
     # Create indexes if they don't exist (idempotent)
     indexes = [idx['name'] for idx in inspector.get_indexes('cards')] if 'cards' in tables else []
-    
+
     if 'idx_cards_owner_id' not in indexes:
         op.create_index('idx_cards_owner_id', 'cards', ['owner_id'])
-    
+
     if 'idx_cards_status' not in indexes:
         op.create_index('idx_cards_status', 'cards', ['status'])
-    
+
     if 'idx_cards_created_at' not in indexes:
         op.create_index('idx_cards_created_at', 'cards', ['created_at'])
 
 
 def downgrade() -> None:
     """Drop cards table (idempotent)."""
-    
+
     # Check if cards table exists before attempting to drop
     connection = op.get_bind()
     inspector = sa.inspect(connection)
     tables = inspector.get_table_names()
-    
+
     if 'cards' in tables:
         # Drop trigger first if it exists
         op.execute("DROP TRIGGER IF EXISTS update_cards_updated_at ON cards;")
-        
+
         # Drop indexes if they exist
         indexes = [idx['name'] for idx in inspector.get_indexes('cards')]
-        
+
         if 'idx_cards_created_at' in indexes:
             op.drop_index('idx_cards_created_at', 'cards')
-        
+
         if 'idx_cards_status' in indexes:
             op.drop_index('idx_cards_status', 'cards')
-        
+
         if 'idx_cards_owner_id' in indexes:
             op.drop_index('idx_cards_owner_id', 'cards')
-        
+
         # Drop table
         op.drop_table('cards')

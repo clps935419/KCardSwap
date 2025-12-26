@@ -5,12 +5,19 @@ SQLAlchemy PostInterest Repository Implementation
 from typing import List, Optional
 from uuid import UUID
 
-from sqlalchemy import select, and_
+from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.posts.domain.entities.post_interest import PostInterest, PostInterestStatus
-from app.modules.posts.domain.repositories.post_interest_repository import PostInterestRepository
-from app.modules.posts.infrastructure.database.models.post_interest_model import PostInterestModel
+from app.modules.posts.domain.entities.post_interest import (
+    PostInterest,
+    PostInterestStatus,
+)
+from app.modules.posts.domain.repositories.post_interest_repository import (
+    PostInterestRepository,
+)
+from app.modules.posts.infrastructure.database.models.post_interest_model import (
+    PostInterestModel,
+)
 
 
 class SQLAlchemyPostInterestRepository(PostInterestRepository):
@@ -53,7 +60,7 @@ class SQLAlchemyPostInterestRepository(PostInterestRepository):
         """
         post_uuid = UUID(post_id) if isinstance(post_id, str) else post_id
         user_uuid = UUID(user_id) if isinstance(user_id, str) else user_id
-        
+
         result = await self.session.execute(
             select(PostInterestModel).where(
                 and_(
@@ -77,7 +84,7 @@ class SQLAlchemyPostInterestRepository(PostInterestRepository):
         Optionally filtered by status
         """
         post_uuid = UUID(post_id) if isinstance(post_id, str) else post_id
-        
+
         query = select(PostInterestModel).where(PostInterestModel.post_id == post_uuid)
 
         if status:
@@ -102,7 +109,7 @@ class SQLAlchemyPostInterestRepository(PostInterestRepository):
         Optionally filtered by status
         """
         user_uuid = UUID(user_id) if isinstance(user_id, str) else user_id
-        
+
         query = select(PostInterestModel).where(PostInterestModel.user_id == user_uuid)
 
         if status:

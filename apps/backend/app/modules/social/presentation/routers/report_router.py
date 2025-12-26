@@ -8,10 +8,14 @@ from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.identity.presentation.dependencies.auth_deps import get_current_user_id
 from app.modules.social.application.use_cases.reports.report_user_use_case import (
     ReportUserUseCase,
+)
+from app.modules.social.infrastructure.repositories.report_repository_impl import (
+    ReportRepositoryImpl,
 )
 from app.modules.social.presentation.dependencies.use_cases import (
     get_report_user_use_case,
@@ -21,6 +25,7 @@ from app.modules.social.presentation.schemas.report_schemas import (
     ReportRequest,
     ReportResponse,
 )
+from app.shared.infrastructure.database.connection import get_db_session
 
 logger = logging.getLogger(__name__)
 

@@ -4,7 +4,6 @@ Following DDD principles: Immutable value object with validation logic
 """
 
 from dataclasses import dataclass
-from typing import Optional
 
 
 @dataclass(frozen=True)
@@ -59,7 +58,7 @@ class UploadQuota:
     def from_mb_gb(cls, daily_limit: int, max_file_mb: int, total_storage_gb: int) -> "UploadQuota":
         """
         Create quota from MB/GB values for convenience.
-        
+
         Args:
             daily_limit: Daily upload limit
             max_file_mb: Max file size in MB
@@ -94,7 +93,7 @@ class UploadQuota:
         return max(0, remaining)
 
 
-class QuotaExceeded(Exception):
+class QuotaExceeded(Exception):  # noqa: N818
     """Exception raised when upload quota is exceeded"""
 
     def __init__(self, reason: str, limit_type: str):

@@ -10,7 +10,7 @@ from uuid import UUID
 class Trade:
     """
     Trade entity representing a card exchange transaction.
-    
+
     State machine:
     - draft: Initial state when creating a trade (optional, can skip to proposed)
     - proposed: Trade has been proposed to the responder
@@ -18,7 +18,7 @@ class Trade:
     - completed: Both parties have confirmed completion
     - rejected: Responder has rejected the trade
     - canceled: Trade has been canceled (by user or timeout)
-    
+
     Attributes:
         id: Unique identifier
         initiator_id: User who initiated the trade
@@ -32,7 +32,7 @@ class Trade:
         created_at: Timestamp when trade was created
         updated_at: Timestamp when trade was last updated
     """
-    
+
     id: UUID
     initiator_id: UUID
     responder_id: UUID
@@ -44,7 +44,7 @@ class Trade:
     canceled_at: Optional[datetime] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
-    
+
     # Valid status values
     STATUS_DRAFT = "draft"
     STATUS_PROPOSED = "proposed"
@@ -52,7 +52,7 @@ class Trade:
     STATUS_COMPLETED = "completed"
     STATUS_REJECTED = "rejected"
     STATUS_CANCELED = "canceled"
-    
+
     VALID_STATUSES = {
         STATUS_DRAFT,
         STATUS_PROPOSED,
@@ -61,15 +61,15 @@ class Trade:
         STATUS_REJECTED,
         STATUS_CANCELED,
     }
-    
+
     def __post_init__(self):
         """Validate entity invariants."""
         if self.status not in self.VALID_STATUSES:
             raise ValueError(f"Invalid trade status: {self.status}")
-        
+
         if self.initiator_id == self.responder_id:
             raise ValueError("Initiator and responder must be different users")
-        
+
         # Validate completed state
         if self.status == self.STATUS_COMPLETED:
             if not self.completed_at:
@@ -78,15 +78,15 @@ class Trade:
                 raise ValueError(
                     "Completed trade must have both confirmations"
                 )
-    
+
     def can_accept(self) -> bool:
         """Check if trade can be accepted."""
         return self.status == self.STATUS_PROPOSED
-    
+
     def can_reject(self) -> bool:
         """Check if trade can be rejected."""
         return self.status in (self.STATUS_PROPOSED, self.STATUS_DRAFT)
-    
+
     def can_cancel(self) -> bool:
         """Check if trade can be canceled."""
         return self.status in (
@@ -94,18 +94,18 @@ class Trade:
             self.STATUS_PROPOSED,
             self.STATUS_ACCEPTED,
         )
-    
+
     def can_confirm(self) -> bool:
         """Check if trade can be confirmed by a party."""
         return self.status == self.STATUS_ACCEPTED
-    
+
     def is_completed(self) -> bool:
         """Check if both parties have confirmed completion."""
         return (
             self.initiator_confirmed_at is not None
             and self.responder_confirmed_at is not None
         )
-    
+
     def is_active(self) -> bool:
         """Check if trade is in an active state (not terminal)."""
         return self.status in (
@@ -113,7 +113,7 @@ class Trade:
             self.STATUS_PROPOSED,
             self.STATUS_ACCEPTED,
         )
-    
+
     def is_terminal(self) -> bool:
         """Check if trade is in a terminal state."""
         return self.status in (
@@ -121,15 +121,15 @@ class Trade:
             self.STATUS_REJECTED,
             self.STATUS_CANCELED,
         )
-    
+
     def has_user(self, user_id: UUID) -> bool:
         """Check if user is a participant in this trade."""
         return user_id in (self.initiator_id, self.responder_id)
-    
+
     def is_initiator(self, user_id: UUID) -> bool:
         """Check if user is the initiator."""
         return user_id == self.initiator_id
-    
+
     def is_responder(self, user_id: UUID) -> bool:
         """Check if user is the responder."""
         return user_id == self.responder_id

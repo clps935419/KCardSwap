@@ -4,12 +4,11 @@ Handles trade proposals, acceptance, rejection, cancellation, completion, and hi
 """
 
 import logging
-from typing import Annotated, List
+from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
-from app.config import settings
 from app.modules.identity.presentation.dependencies.auth_deps import get_current_user_id
 from app.modules.social.application.use_cases.trades.accept_trade_use_case import (
     AcceptTradeUseCase,
@@ -30,7 +29,7 @@ from app.modules.social.application.use_cases.trades.get_trade_history_use_case 
 from app.modules.social.application.use_cases.trades.reject_trade_use_case import (
     RejectTradeUseCase,
 )
-from app.modules.social.domain.repositories.trade_repository import TradeRepository
+from app.modules.social.domain.repositories.trade_repository import ITradeRepository
 from app.modules.social.presentation.dependencies.use_cases import (
     get_accept_trade_use_case,
     get_cancel_trade_use_case,
@@ -71,11 +70,11 @@ async def create_trade(
     request: CreateTradeRequest,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
     use_case: Annotated[CreateTradeProposalUseCase, Depends(get_create_trade_proposal_use_case)],
-    trade_repo: Annotated[TradeRepository, Depends(get_trade_repository)],
+    trade_repo: Annotated[ITradeRepository, Depends(get_trade_repository)],
 ) -> TradeResponse:
     """
     Create a new trade proposal.
-    
+
     Business rules:
     - Must be friends with responder
     - All cards must exist and be available
@@ -91,10 +90,10 @@ async def create_trade(
                 responder_card_ids=request.responder_card_ids,
             )
         )
-        
+
         # Get items for response
         items = await trade_repo.get_items_by_trade_id(trade.id)
-        
+
         return TradeResponse(
             id=trade.id,
             initiator_id=trade.initiator_id,
@@ -118,7 +117,7 @@ async def create_trade(
                 for item in items
             ],
         )
-        
+
     except ValueError as e:
         logger.warning(f"Trade creation validation failed: {e}")
         raise HTTPException(
@@ -150,13 +149,13 @@ async def accept_trade(
     trade_id: UUID,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
     use_case: Annotated[AcceptTradeUseCase, Depends(get_accept_trade_use_case)],
-    trade_repo: Annotated[TradeRepository, Depends(get_trade_repository)],
+    trade_repo: Annotated[ITradeRepository, Depends(get_trade_repository)],
 ) -> TradeResponse:
     """Accept a trade proposal."""
     try:
         trade = await use_case.execute(trade_id, current_user_id)
         items = await trade_repo.get_items_by_trade_id(trade.id)
-        
+
         return TradeResponse(
             id=trade.id,
             initiator_id=trade.initiator_id,
@@ -180,7 +179,7 @@ async def accept_trade(
                 for item in items
             ],
         )
-        
+
     except ValueError as e:
         if "not found" in str(e).lower():
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
@@ -207,13 +206,13 @@ async def reject_trade(
     trade_id: UUID,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
     use_case: Annotated[RejectTradeUseCase, Depends(get_reject_trade_use_case)],
-    trade_repo: Annotated[TradeRepository, Depends(get_trade_repository)],
+    trade_repo: Annotated[ITradeRepository, Depends(get_trade_repository)],
 ) -> TradeResponse:
     """Reject a trade proposal."""
     try:
         trade = await use_case.execute(trade_id, current_user_id)
         items = await trade_repo.get_items_by_trade_id(trade.id)
-        
+
         return TradeResponse(
             id=trade.id,
             initiator_id=trade.initiator_id,
@@ -237,7 +236,7 @@ async def reject_trade(
                 for item in items
             ],
         )
-        
+
     except ValueError as e:
         if "not found" in str(e).lower():
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
@@ -264,13 +263,13 @@ async def cancel_trade(
     trade_id: UUID,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
     use_case: Annotated[CancelTradeUseCase, Depends(get_cancel_trade_use_case)],
-    trade_repo: Annotated[TradeRepository, Depends(get_trade_repository)],
+    trade_repo: Annotated[ITradeRepository, Depends(get_trade_repository)],
 ) -> TradeResponse:
     """Cancel a trade."""
     try:
         trade = await use_case.execute(trade_id, current_user_id)
         items = await trade_repo.get_items_by_trade_id(trade.id)
-        
+
         return TradeResponse(
             id=trade.id,
             initiator_id=trade.initiator_id,
@@ -294,7 +293,7 @@ async def cancel_trade(
                 for item in items
             ],
         )
-        
+
     except ValueError as e:
         if "not found" in str(e).lower():
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
@@ -321,18 +320,18 @@ async def complete_trade(
     trade_id: UUID,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
     use_case: Annotated[CompleteTradeUseCase, Depends(get_complete_trade_use_case)],
-    trade_repo: Annotated[TradeRepository, Depends(get_trade_repository)],
+    trade_repo: Annotated[ITradeRepository, Depends(get_trade_repository)],
 ) -> TradeResponse:
     """
     Confirm trade completion.
-    
+
     Each party confirms independently. When both confirm, status becomes 'completed'.
     Enforces 48h timeout from acceptance.
     """
     try:
         trade = await use_case.execute(trade_id, current_user_id)
         items = await trade_repo.get_items_by_trade_id(trade.id)
-        
+
         return TradeResponse(
             id=trade.id,
             initiator_id=trade.initiator_id,
@@ -356,7 +355,7 @@ async def complete_trade(
                 for item in items
             ],
         )
-        
+
     except ValueError as e:
         if "not found" in str(e).lower():
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
@@ -382,7 +381,7 @@ async def complete_trade(
 async def get_trade_history(
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
     use_case: Annotated[GetTradeHistoryUseCase, Depends(get_trade_history_use_case)],
-    trade_repo: Annotated[TradeRepository, Depends(get_trade_repository)],
+    trade_repo: Annotated[ITradeRepository, Depends(get_trade_repository)],
     limit: int = Query(50, ge=1, le=100, description="Maximum number of results"),
     offset: int = Query(0, ge=0, description="Number of results to skip"),
 ) -> TradeHistoryResponse:
@@ -393,7 +392,7 @@ async def get_trade_history(
             limit=limit,
             offset=offset,
         )
-        
+
         # Get items for each trade
         trade_responses = []
         for trade in trades:
@@ -423,14 +422,14 @@ async def get_trade_history(
                     ],
                 )
             )
-        
+
         return TradeHistoryResponse(
             trades=trade_responses,
             total=len(trades),
             limit=limit,
             offset=offset,
         )
-        
+
     except ValueError as e:
         logger.warning(f"Trade history validation failed: {e}")
         raise HTTPException(

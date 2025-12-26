@@ -82,7 +82,7 @@ async def search_nearby_cards(
 ) -> SearchNearbyResponse:
     """
     Search for cards near a specific location.
-    
+
     Features:
     - Filters out stealth mode users
     - Sorts by distance (closest first)
@@ -158,7 +158,7 @@ async def update_user_location(
 ):
     """
     Update the user's current location.
-    
+
     This location will be used for nearby card searches.
     Users in stealth mode will not appear in search results.
     """

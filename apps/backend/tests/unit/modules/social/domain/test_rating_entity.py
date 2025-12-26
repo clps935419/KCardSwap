@@ -2,9 +2,10 @@
 Unit tests for Rating Entity (T126G)
 Tests updated for FR-SOCIAL-003A requirements
 """
-import pytest
 from datetime import datetime
 from uuid import uuid4
+
+import pytest
 
 from app.modules.social.domain.entities.rating import Rating
 
@@ -18,7 +19,7 @@ class TestRatingCreation:
         rated_user_id = str(uuid4())
         trade_id = str(uuid4())
         created_at = datetime.utcnow()
-        
+
         rating = Rating(
             id=str(uuid4()),
             rater_id=rater_id,
@@ -28,7 +29,7 @@ class TestRatingCreation:
             created_at=created_at,
             trade_id=trade_id
         )
-        
+
         assert rating.rater_id == rater_id
         assert rating.rated_user_id == rated_user_id
         assert rating.trade_id == trade_id
@@ -41,7 +42,7 @@ class TestRatingCreation:
         rater_id = str(uuid4())
         rated_user_id = str(uuid4())
         created_at = datetime.utcnow()
-        
+
         rating = Rating(
             id=str(uuid4()),
             rater_id=rater_id,
@@ -51,7 +52,7 @@ class TestRatingCreation:
             created_at=created_at,
             trade_id=None
         )
-        
+
         assert rating.rater_id == rater_id
         assert rating.rated_user_id == rated_user_id
         assert rating.trade_id is None
@@ -62,7 +63,7 @@ class TestRatingCreation:
         """Test rating creation with minimal required fields (no comment, no trade_id)"""
         rater_id = str(uuid4())
         rated_user_id = str(uuid4())
-        
+
         rating = Rating(
             id=str(uuid4()),
             rater_id=rater_id,
@@ -72,7 +73,7 @@ class TestRatingCreation:
             created_at=datetime.utcnow(),
             trade_id=None
         )
-        
+
         assert rating.rater_id == rater_id
         assert rating.rated_user_id == rated_user_id
         assert rating.score == 3
@@ -87,7 +88,7 @@ class TestRatingValidation:
         """Test that rating score must be 1-5"""
         rater_id = str(uuid4())
         rated_user_id = str(uuid4())
-        
+
         # Valid scores
         for score in [1, 2, 3, 4, 5]:
             rating = Rating(
@@ -127,7 +128,7 @@ class TestRatingValidation:
     def test_user_cannot_rate_themselves(self):
         """Test that user cannot rate themselves"""
         user_id = str(uuid4())
-        
+
         with pytest.raises(ValueError, match="User cannot rate themselves"):
             Rating(
                 id=str(uuid4()),
@@ -141,7 +142,7 @@ class TestRatingValidation:
     def test_comment_cannot_exceed_1000_characters(self):
         """Test that comment length is limited to 1000 characters"""
         long_comment = "x" * 1001
-        
+
         with pytest.raises(ValueError, match="Rating comment exceeds maximum length"):
             Rating(
                 id=str(uuid4()),
@@ -155,7 +156,7 @@ class TestRatingValidation:
     def test_comment_exactly_1000_characters_is_valid(self):
         """Test that comment with exactly 1000 characters is valid"""
         comment = "x" * 1000
-        
+
         rating = Rating(
             id=str(uuid4()),
             rater_id=str(uuid4()),
@@ -164,7 +165,7 @@ class TestRatingValidation:
             comment=comment,
             created_at=datetime.utcnow()
         )
-        
+
         assert len(rating.comment) == 1000
 
 

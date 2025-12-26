@@ -2,9 +2,10 @@
 Unit tests for Trade Entity (T162)
 Testing trade entity creation, validation, and business logic
 """
-import pytest
 from datetime import datetime
 from uuid import uuid4
+
+import pytest
 
 from app.modules.social.domain.entities.trade import Trade
 
@@ -178,7 +179,7 @@ class TestTradeStatusChecks:
     def test_is_completed_partial_confirmation(self):
         """Test is_completed returns False with partial confirmation"""
         now = datetime.utcnow()
-        
+
         trade = Trade(
             id=uuid4(),
             initiator_id=uuid4(),
@@ -207,7 +208,7 @@ class TestTradeStateQueries:
     def test_is_terminal(self):
         """Test is_terminal returns True for completed, rejected, canceled"""
         now = datetime.utcnow()
-        
+
         for status in [Trade.STATUS_COMPLETED, Trade.STATUS_REJECTED, Trade.STATUS_CANCELED]:
             if status == Trade.STATUS_COMPLETED:
                 trade = Trade(

@@ -2,8 +2,7 @@ import os
 import sys
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
+from sqlalchemy import engine_from_config, pool
 
 from alembic import context
 
@@ -12,15 +11,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 # Import Base from shared database connection
 # This is the declarative base that all ORM models inherit from
-from app.shared.infrastructure.database.connection import Base
-
 # Import all models to ensure they're registered with Base.metadata
 # This is required for Alembic autogenerate to work properly
-from app.modules.identity.infrastructure.database.models import (
-    UserModel,
-    ProfileModel,
-    RefreshTokenModel
-)
+from app.shared.infrastructure.database.connection import Base  # noqa: E402
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

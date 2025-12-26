@@ -10,10 +10,6 @@ from dependency_injector.wiring import Provide, inject
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from app.container import ApplicationContainer
 from app.modules.identity.application.use_cases.auth.admin_login import (
     AdminLoginUseCase,
 )
@@ -45,18 +41,17 @@ from app.modules.identity.application.use_cases.subscription.verify_receipt_use_
 from app.modules.identity.domain.repositories.profile_repository import (
     IProfileRepository,
 )
+from app.modules.identity.domain.repositories.purchase_token_repository import (
+    PurchaseTokenRepository,
+)
 from app.modules.identity.domain.repositories.refresh_token_repository import (
     RefreshTokenRepository,
 )
 from app.modules.identity.domain.repositories.subscription_repository import (
-    ISubscriptionRepository,
+    SubscriptionRepository,
 )
 from app.modules.identity.domain.repositories.user_repository import IUserRepository
-from app.modules.identity.domain.repositories.purchase_token_repository import (
-    IPurchaseTokenRepository,
-)
 from app.shared.infrastructure.database.connection import get_db_session
-
 
 # ========== Auth Use Cases ==========
 
@@ -68,7 +63,7 @@ def get_google_login_use_case(
     ],
 ) -> GoogleLoginUseCase:
     """Get GoogleLoginUseCase instance.
-    
+
     This use case doesn't need database session as it only redirects to Google OAuth.
     """
     return use_case_factory()
@@ -198,10 +193,10 @@ def get_update_profile_use_case(
 def get_verify_receipt_use_case(
     session: AsyncSession = Depends(get_db_session),
     subscription_repo_factory: Callable[
-        [AsyncSession], ISubscriptionRepository
+        [AsyncSession], SubscriptionRepository
     ] = Provide["identity.subscription_repository"],
     purchase_token_repo_factory: Callable[
-        [AsyncSession], IPurchaseTokenRepository
+        [AsyncSession], PurchaseTokenRepository
     ] = Provide["identity.purchase_token_repository"],
     use_case_factory: Callable[..., VerifyReceiptUseCase] = Provide[
         "identity.verify_receipt_use_case_factory"
@@ -220,7 +215,7 @@ def get_verify_receipt_use_case(
 def get_check_subscription_status_use_case(
     session: AsyncSession = Depends(get_db_session),
     subscription_repo_factory: Callable[
-        [AsyncSession], ISubscriptionRepository
+        [AsyncSession], SubscriptionRepository
     ] = Provide["identity.subscription_repository"],
     use_case_factory: Callable[..., CheckSubscriptionStatusUseCase] = Provide[
         "identity.check_subscription_status_use_case_factory"
@@ -235,7 +230,7 @@ def get_check_subscription_status_use_case(
 def get_expire_subscriptions_use_case(
     session: AsyncSession = Depends(get_db_session),
     subscription_repo_factory: Callable[
-        [AsyncSession], ISubscriptionRepository
+        [AsyncSession], SubscriptionRepository
     ] = Provide["identity.subscription_repository"],
     use_case_factory: Callable[..., ExpireSubscriptionsUseCase] = Provide[
         "identity.expire_subscriptions_use_case_factory"

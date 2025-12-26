@@ -11,7 +11,7 @@ from uuid import UUID
 class NearbyCardResult:
     """
     Result item for nearby card search.
-    
+
     Attributes:
         card_id: UUID of the card
         owner_id: UUID of the card owner
@@ -41,7 +41,7 @@ class NearbyCardResult:
 class SearchNearbyRequest:
     """
     Request for searching nearby cards.
-    
+
     Attributes:
         user_id: UUID of the requesting user
         lat: Latitude of search origin

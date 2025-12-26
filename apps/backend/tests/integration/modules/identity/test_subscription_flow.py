@@ -7,13 +7,13 @@ Tests the complete subscription management flow:
 3. Token binding and replay protection
 4. Subscription expiry
 """
-import pytest
-from unittest.mock import AsyncMock, Mock, patch
-from fastapi.testclient import TestClient
 from datetime import datetime, timedelta
+from unittest.mock import AsyncMock, Mock, patch
+
+import pytest
+from fastapi.testclient import TestClient
 
 from app.main import app
-
 
 client = TestClient(app)
 
@@ -69,7 +69,7 @@ class TestSubscriptionFlow:
                 "email": "test@example.com"
             }
 
-            response = client.post(
+            _ = client.post(
                 "/api/v1/subscriptions/verify-receipt",
                 json=request_data,
                 headers=auth_headers
@@ -98,7 +98,7 @@ class TestSubscriptionFlow:
                 "email": "test@example.com"
             }
 
-            response = client.get(
+            _ = client.get(
                 "/api/v1/subscriptions/status",
                 headers=auth_headers
             )
@@ -125,7 +125,7 @@ class TestSubscriptionFlow:
                 "email": "test@example.com"
             }
 
-            response = client.post(
+            _ = client.post(
                 "/api/v1/subscriptions/verify-receipt",
                 json=request_data,
                 headers=auth_headers
@@ -167,7 +167,7 @@ class TestSubscriptionFlow:
                 )
                 mock_repo.return_value = mock_instance
 
-                response = client.post(
+                _ = client.post(
                     "/api/v1/subscriptions/verify-receipt",
                     json=request_data,
                     headers=auth_headers
@@ -200,14 +200,14 @@ class TestSubscriptionFlow:
             }
 
             # First call - would verify with Google Play
-            response1 = client.post(
+            _response1 = client.post(
                 "/api/v1/subscriptions/verify-receipt",
                 json=request_data,
                 headers=auth_headers
             )
 
             # Second call - should be idempotent
-            response2 = client.post(
+            _response2 = client.post(
                 "/api/v1/subscriptions/verify-receipt",
                 json=request_data,
                 headers=auth_headers
@@ -227,7 +227,7 @@ class TestSubscriptionFlow:
         - Background job marks them as expired
         - Returns count of expired subscriptions
         """
-        response = client.post("/api/v1/subscriptions/expire-subscriptions")
+        _ = client.post("/api/v1/subscriptions/expire-subscriptions")
 
         # Note: This endpoint should be protected in production
         # Expected behavior when database configured:

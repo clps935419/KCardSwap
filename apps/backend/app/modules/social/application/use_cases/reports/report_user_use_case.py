@@ -10,17 +10,17 @@ from app.modules.social.domain.repositories.report_repository import ReportRepos
 class ReportUserUseCase:
     """
     Use case for reporting a user for violations
-    
+
     Business Rules:
     - User cannot report themselves
     - Report reason must be valid
     - Optional detailed explanation can be provided
     - Serious violations (fraud, fake cards, harassment) are flagged for priority review
     """
-    
+
     def __init__(self, report_repository: ReportRepository):
         self.report_repository = report_repository
-    
+
     async def execute(
         self,
         reporter_id: str,
@@ -30,16 +30,16 @@ class ReportUserUseCase:
     ) -> Report:
         """
         Create a report against a user
-        
+
         Args:
             reporter_id: ID of user filing the report
             reported_user_id: ID of user being reported
             reason: Reason for the report
             detail: Optional detailed explanation (max 2000 chars)
-            
+
         Returns:
             Created Report entity
-            
+
         Raises:
             ValueError: If validation fails
         """
@@ -53,5 +53,5 @@ class ReportUserUseCase:
             created_at=datetime.utcnow(),
             resolved=False
         )
-        
+
         return await self.report_repository.create(report)

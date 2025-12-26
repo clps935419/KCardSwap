@@ -2,11 +2,11 @@
 SQLAlchemy Card Repository Implementation
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import List, Optional, Tuple
 from uuid import UUID
 
-from sqlalchemy import select, func, and_
+from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.social.domain.entities.card import Card
@@ -146,7 +146,7 @@ class SQLAlchemyCardRepository(CardRepository):
     ) -> List[Tuple[Card, float, Optional[str]]]:
         """
         Find cards within a radius from a location.
-        
+
         This method:
         1. Joins cards with profiles to get owner location and nickname
         2. Filters out users in stealth mode (if requested)
@@ -154,7 +154,7 @@ class SQLAlchemyCardRepository(CardRepository):
         4. Calculates distance using Haversine formula
         5. Filters by radius
         6. Sorts by distance (closest first)
-        
+
         Returns list of (Card, distance_km, owner_nickname) tuples
         """
         from app.modules.identity.infrastructure.database.models.profile_model import (
@@ -177,7 +177,7 @@ class SQLAlchemyCardRepository(CardRepository):
 
         # Optionally exclude stealth mode users
         if exclude_stealth_users:
-            query = query.where(ProfileModel.stealth_mode == False)
+            query = query.where(ProfileModel.stealth_mode.is_(False))
 
         # Execute query
         result = await self.session.execute(query)

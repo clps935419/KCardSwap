@@ -1,10 +1,11 @@
 """
 Unit tests for AdminLoginUseCase
 """
-import pytest
 from datetime import datetime
-from uuid import uuid4
 from unittest.mock import AsyncMock, Mock
+from uuid import uuid4
+
+import pytest
 
 from app.modules.identity.application.use_cases.auth.admin_login import (
     AdminLoginUseCase,

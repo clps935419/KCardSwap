@@ -6,18 +6,21 @@ Note: These tests use TestClient and mock the database.
 For full E2E tests with real database, use pytest with testcontainers (see conftest.py).
 """
 
-import pytest
-from fastapi.testclient import TestClient
+from datetime import datetime, timedelta
 from unittest.mock import AsyncMock, Mock, patch
 from uuid import uuid4
-from datetime import datetime, timedelta
+
+import pytest
+from fastapi.testclient import TestClient
 
 from app.main import app
 from app.modules.posts.domain.entities.post import Post, PostStatus
-from app.modules.posts.domain.entities.post_interest import PostInterest, PostInterestStatus
-from app.modules.social.domain.entities.friendship import Friendship, FriendshipStatus
+from app.modules.posts.domain.entities.post_interest import (
+    PostInterest,
+    PostInterestStatus,
+)
 from app.modules.social.domain.entities.chat_room import ChatRoom
-
+from app.modules.social.domain.entities.friendship import Friendship, FriendshipStatus
 
 client = TestClient(app)
 
@@ -82,7 +85,7 @@ class TestPostsFlowIntegration:
             "app.modules.posts.infrastructure.repositories.post_repository_impl.PostRepositoryImpl"
         ) as mock:
             repo_instance = Mock()
-            
+
             # Create test post
             created_post = Post(
                 id=str(test_post_data["post_id"]),
@@ -97,13 +100,13 @@ class TestPostsFlowIntegration:
                 created_at=datetime.utcnow(),
                 updated_at=datetime.utcnow(),
             )
-            
+
             repo_instance.create = AsyncMock(return_value=created_post)
             repo_instance.get_by_id = AsyncMock(return_value=created_post)
             repo_instance.update = AsyncMock(side_effect=lambda post: post)
             repo_instance.list_by_city = AsyncMock(return_value=[created_post])
             repo_instance.count_user_posts_today = AsyncMock(return_value=1)
-            
+
             mock.return_value = repo_instance
             yield repo_instance
 
@@ -114,7 +117,7 @@ class TestPostsFlowIntegration:
             "app.modules.posts.infrastructure.repositories.post_interest_repository_impl.PostInterestRepositoryImpl"
         ) as mock:
             repo_instance = Mock()
-            
+
             interest_id = uuid4()
             created_interest = PostInterest(
                 id=str(interest_id),
@@ -124,13 +127,13 @@ class TestPostsFlowIntegration:
                 created_at=datetime.utcnow(),
                 updated_at=datetime.utcnow(),
             )
-            
+
             repo_instance.create = AsyncMock(return_value=created_interest)
             repo_instance.get_by_id = AsyncMock(return_value=created_interest)
             repo_instance.get_by_post_and_user = AsyncMock(return_value=None)
             repo_instance.update = AsyncMock(side_effect=lambda interest: interest)
             repo_instance.list_by_post_id = AsyncMock(return_value=[created_interest])
-            
+
             mock.return_value = repo_instance
             yield repo_instance
 
@@ -153,7 +156,7 @@ class TestPostsFlowIntegration:
         ) as mock:
             repo_instance = Mock()
             repo_instance.get_by_users = AsyncMock(return_value=None)  # Not friends yet
-            
+
             # Mock friendship creation
             friendship = Friendship(
                 id=str(uuid4()),
@@ -163,7 +166,7 @@ class TestPostsFlowIntegration:
                 created_at=datetime.utcnow(),
             )
             repo_instance.create = AsyncMock(return_value=friendship)
-            
+
             mock.return_value = repo_instance
             yield repo_instance
 
@@ -174,7 +177,7 @@ class TestPostsFlowIntegration:
             "app.modules.social.infrastructure.repositories.chat_room_repository_impl.ChatRoomRepositoryImpl"
         ) as mock:
             repo_instance = Mock()
-            
+
             # Mock finding or creating chat room
             chat_room = ChatRoom(
                 id=str(uuid4()),
@@ -183,7 +186,7 @@ class TestPostsFlowIntegration:
             )
             repo_instance.get_by_participants = AsyncMock(return_value=None)
             repo_instance.create = AsyncMock(return_value=chat_room)
-            
+
             mock.return_value = repo_instance
             yield repo_instance
 
@@ -277,7 +280,7 @@ class TestPostsFlowIntegration:
     ):
         """Test: Accepting interest creates friendship and chat room"""
         interest_id = uuid4()
-        
+
         response = client.post(
             f"/api/v1/posts/{uuid4()}/interests/{interest_id}/accept"
         )
@@ -296,7 +299,7 @@ class TestPostsFlowIntegration:
     ):
         """Test: Successfully reject interest"""
         interest_id = uuid4()
-        
+
         response = client.post(
             f"/api/v1/posts/{uuid4()}/interests/{interest_id}/reject"
         )
@@ -361,7 +364,7 @@ class TestPostsFlowIntegration:
             "app.modules.posts.infrastructure.repositories.post_interest_repository_impl.PostInterestRepositoryImpl"
         ) as mock:
             repo_instance = Mock()
-            
+
             # Mock that interest already exists
             existing_interest = PostInterest(
                 id=str(uuid4()),
@@ -372,7 +375,7 @@ class TestPostsFlowIntegration:
                 updated_at=datetime.utcnow(),
             )
             repo_instance.get_by_post_and_user = AsyncMock(return_value=existing_interest)
-            
+
             mock.return_value = repo_instance
 
             response = client.post(

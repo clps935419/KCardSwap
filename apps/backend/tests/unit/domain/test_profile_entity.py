@@ -1,8 +1,9 @@
 """
 Unit tests for Profile entity
 """
-import pytest
 from uuid import uuid4
+
+import pytest
 
 from app.modules.identity.domain.entities.profile import Profile
 
@@ -11,13 +12,13 @@ def test_profile_creation():
     """Test profile entity creation"""
     user_id = uuid4()
     profile = Profile(user_id=user_id)
-    
+
     assert profile.id is not None
     assert profile.user_id == user_id
     assert profile.nickname is None
-    assert profile.privacy_flags["nearby_visible"] == True
-    assert profile.privacy_flags["show_online"] == True
-    assert profile.privacy_flags["allow_stranger_chat"] == True
+    assert profile.privacy_flags["nearby_visible"] is True
+    assert profile.privacy_flags["show_online"] is True
+    assert profile.privacy_flags["allow_stranger_chat"] is True
 
 
 def test_profile_with_data():
@@ -29,7 +30,7 @@ def test_profile_with_data():
         bio="Test bio",
         region="Seoul"
     )
-    
+
     assert profile.id is not None
     assert profile.nickname == "TestUser"
     assert profile.bio == "Test bio"
@@ -54,13 +55,13 @@ def test_profile_update():
     """Test profile update"""
     user_id = uuid4()
     profile = Profile(user_id=user_id)
-    
+
     profile.update_profile(
         nickname="NewNick",
         bio="New bio",
         region="Busan"
     )
-    
+
     assert profile.nickname == "NewNick"
     assert profile.bio == "New bio"
     assert profile.region == "Busan"
@@ -70,12 +71,12 @@ def test_profile_privacy_settings():
     """Test privacy settings update"""
     user_id = uuid4()
     profile = Profile(user_id=user_id)
-    
+
     profile.update_privacy_settings({
         "nearby_visible": False,
         "show_online": False
     })
-    
-    assert profile.is_nearby_visible() == False
-    assert profile.shows_online_status() == False
-    assert profile.allows_stranger_chat() == True  # Not updated, should remain True
+
+    assert profile.is_nearby_visible() is False
+    assert profile.shows_online_status() is False
+    assert profile.allows_stranger_chat() is True  # Not updated, should remain True

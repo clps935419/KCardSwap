@@ -21,7 +21,7 @@ class DeleteCardUseCase:
     async def execute(self, card_id: UUID, owner_id: UUID) -> bool:
         """
         Delete a card by ID.
-        
+
         Only the owner can delete their own cards.
         Also deletes the associated image from GCS.
 
@@ -37,18 +37,18 @@ class DeleteCardUseCase:
         """
         # Find the card
         card = await self.card_repository.find_by_id(card_id)
-        
+
         if not card:
             return False
-        
+
         # Check ownership
         if card.owner_id != owner_id:
             return False
-        
+
         # Prevent deletion of cards in active trades
         if card.status == card.STATUS_TRADING:
             raise ValueError("Cannot delete card that is currently in a trade")
-        
+
         # Extract blob name from image URL
         if card.image_url:
             # URL format: https://storage.googleapis.com/{bucket}/{blob_name}
@@ -56,13 +56,13 @@ class DeleteCardUseCase:
             parts = card.image_url.split("/")
             if len(parts) >= 5:  # Ensure URL has expected structure
                 blob_name = "/".join(parts[4:])  # Get everything after bucket name
-                
+
                 # Try to delete from GCS (ignore errors if file doesn't exist)
                 try:
                     self.gcs_service.delete_blob(blob_name)
                 except Exception:
                     # Continue with card deletion even if GCS deletion fails
                     pass
-        
+
         # Delete card from database
         return await self.card_repository.delete(card_id)

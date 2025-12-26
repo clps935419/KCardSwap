@@ -4,9 +4,8 @@ Friendship ORM model for Social module
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Column, DateTime, String, Index
+from sqlalchemy import Column, DateTime, ForeignKey, Index, String
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy import ForeignKey
 
 from app.shared.infrastructure.database.connection import Base
 

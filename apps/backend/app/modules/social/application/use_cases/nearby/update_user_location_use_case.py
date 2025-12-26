@@ -12,7 +12,7 @@ from app.modules.identity.domain.repositories.profile_repository import (
 class UpdateUserLocationUseCase:
     """
     Use case for updating user's last known location.
-    
+
     This records the user's location in their profile for nearby search functionality.
     """
 

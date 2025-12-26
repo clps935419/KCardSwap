@@ -4,13 +4,13 @@ from app.modules.social.infrastructure.repositories.card_repository_impl import 
     CardRepositoryImpl,
     SQLAlchemyCardRepository,
 )
-from app.modules.social.infrastructure.repositories.friendship_repository_impl import (
-    FriendshipRepositoryImpl,
-    SQLAlchemyFriendshipRepository,
-)
 from app.modules.social.infrastructure.repositories.chat_room_repository_impl import (
     ChatRoomRepositoryImpl,
     SQLAlchemyChatRoomRepository,
+)
+from app.modules.social.infrastructure.repositories.friendship_repository_impl import (
+    FriendshipRepositoryImpl,
+    SQLAlchemyFriendshipRepository,
 )
 from app.modules.social.infrastructure.repositories.message_repository_impl import (
     MessageRepositoryImpl,

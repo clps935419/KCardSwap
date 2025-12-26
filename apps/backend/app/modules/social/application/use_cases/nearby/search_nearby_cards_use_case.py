@@ -3,7 +3,6 @@ Use case for searching nearby cards.
 """
 
 from typing import List
-from uuid import UUID
 
 from app.config import settings
 from app.modules.social.application.dtos.nearby_dtos import (
@@ -16,7 +15,7 @@ from app.modules.social.infrastructure.services.search_quota_service import (
 )
 
 
-class RateLimitExceededException(Exception):
+class RateLimitExceededException(Exception):  # noqa: N818
     """Exception raised when search rate limit is exceeded."""
 
     def __init__(self, current_count: int, limit: int):
@@ -30,7 +29,7 @@ class RateLimitExceededException(Exception):
 class SearchNearbyCardsUseCase:
     """
     Use case for searching nearby cards.
-    
+
     Features:
     - Calculate distance using Haversine formula
     - Filter out stealth mode users

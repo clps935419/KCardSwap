@@ -5,7 +5,7 @@ SQLAlchemy Report Repository Implementation
 from typing import List, Optional
 from uuid import UUID
 
-from sqlalchemy import select, and_, func
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.social.domain.entities.report import Report, ReportReason
@@ -51,14 +51,14 @@ class SQLAlchemyReportRepository(ReportRepository):
     ) -> List[Report]:
         """Get all reports for a specific user, optionally filtered by resolution status"""
         user_uuid = UUID(reported_user_id) if isinstance(reported_user_id, str) else reported_user_id
-        
+
         query = select(ReportModel).where(ReportModel.reported_user_id == user_uuid)
-        
+
         if resolved is not None:
             query = query.where(ReportModel.resolved == resolved)
-        
+
         query = query.order_by(ReportModel.created_at.desc())
-        
+
         result = await self.session.execute(query)
         models = result.scalars().all()
         return [self._to_entity(model) for model in models]
@@ -66,7 +66,7 @@ class SQLAlchemyReportRepository(ReportRepository):
     async def get_reports_by_reporter_id(self, reporter_id: str) -> List[Report]:
         """Get all reports filed by a specific user"""
         reporter_uuid = UUID(reporter_id) if isinstance(reporter_id, str) else reporter_id
-        
+
         result = await self.session.execute(
             select(ReportModel)
             .where(ReportModel.reporter_id == reporter_uuid)
@@ -79,7 +79,7 @@ class SQLAlchemyReportRepository(ReportRepository):
         """Get unresolved reports for admin review"""
         result = await self.session.execute(
             select(ReportModel)
-            .where(ReportModel.resolved == False)
+            .where(ReportModel.resolved.is_(False))
             .order_by(ReportModel.created_at.asc())
             .limit(limit)
         )
@@ -94,13 +94,13 @@ class SQLAlchemyReportRepository(ReportRepository):
             )
         )
         model = result.scalar_one_or_none()
-        
+
         if not model:
             raise ValueError(f"Report with id {report.id} not found")
-        
+
         model.resolved = report.resolved
         model.resolved_at = report.resolved_at
-        
+
         await self.session.flush()
         await self.session.refresh(model)
         return self._to_entity(model)
@@ -112,15 +112,15 @@ class SQLAlchemyReportRepository(ReportRepository):
     ) -> int:
         """Get count of reports against a user, optionally filtered by reason"""
         user_uuid = UUID(reported_user_id) if isinstance(reported_user_id, str) else reported_user_id
-        
+
         query = select(func.count(ReportModel.id)).where(
             ReportModel.reported_user_id == user_uuid
         )
-        
+
         if reason:
             reason_value = reason.value if isinstance(reason, ReportReason) else reason
             query = query.where(ReportModel.reason == reason_value)
-        
+
         result = await self.session.execute(query)
         count = result.scalar_one()
         return count or 0
@@ -131,7 +131,7 @@ class SQLAlchemyReportRepository(ReportRepository):
             select(ReportModel).where(ReportModel.id == UUID(report_id))
         )
         model = result.scalar_one_or_none()
-        
+
         if model:
             await self.session.delete(model)
             await self.session.flush()

@@ -6,13 +6,13 @@ Note: These tests use TestClient and mock the database and GCS.
 For full E2E tests with real database, use pytest with testcontainers (see conftest.py).
 """
 
-import pytest
-from fastapi.testclient import TestClient
 from unittest.mock import AsyncMock, Mock, patch
 from uuid import uuid4
 
-from app.main import app
+import pytest
+from fastapi.testclient import TestClient
 
+from app.main import app
 
 client = TestClient(app)
 

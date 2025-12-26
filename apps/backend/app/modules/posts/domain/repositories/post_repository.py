@@ -4,7 +4,6 @@ Post Repository Interface
 Domain layer repository interface - defines contract for post persistence
 """
 from abc import ABC, abstractmethod
-from datetime import datetime
 from typing import List, Optional
 
 from app.modules.posts.domain.entities.post import Post, PostStatus
@@ -12,17 +11,17 @@ from app.modules.posts.domain.entities.post import Post, PostStatus
 
 class PostRepository(ABC):
     """Repository interface for Post entity persistence"""
-    
+
     @abstractmethod
     async def create(self, post: Post) -> Post:
         """Create a new post"""
         pass
-    
+
     @abstractmethod
     async def get_by_id(self, post_id: str) -> Optional[Post]:
         """Get post by ID"""
         pass
-    
+
     @abstractmethod
     async def list_by_city(
         self,
@@ -35,7 +34,7 @@ class PostRepository(ABC):
     ) -> List[Post]:
         """
         List posts for a specific city with optional filters
-        
+
         Args:
             city_code: City code (required)
             status: Filter by post status
@@ -45,7 +44,7 @@ class PostRepository(ABC):
             offset: Pagination offset
         """
         pass
-    
+
     @abstractmethod
     async def count_user_posts_today(self, user_id: str) -> int:
         """
@@ -53,17 +52,17 @@ class PostRepository(ABC):
         Used for daily post limit checking
         """
         pass
-    
+
     @abstractmethod
     async def update(self, post: Post) -> Post:
         """Update an existing post"""
         pass
-    
+
     @abstractmethod
     async def delete(self, post_id: str) -> None:
         """Delete a post (hard delete)"""
         pass
-    
+
     @abstractmethod
     async def get_by_owner_id(
         self,
@@ -73,7 +72,7 @@ class PostRepository(ABC):
     ) -> List[Post]:
         """Get posts by owner ID"""
         pass
-    
+
     @abstractmethod
     async def mark_expired_posts(self) -> int:
         """

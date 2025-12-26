@@ -37,12 +37,12 @@ async def verify_receipt(
 ):
     """
     Verify Google Play purchase receipt and update subscription.
-    
+
     Features:
     - Idempotent: Same token + same user returns current status
-    - Token binding: Prevents cross-user replay attacks  
+    - Token binding: Prevents cross-user replay attacks
     - Auto-acknowledge: Acknowledges purchase after verification
-    
+
     Error codes:
     - 400_VALIDATION_FAILED: Invalid platform or missing fields
     - 401_UNAUTHORIZED: Not logged in
@@ -50,14 +50,14 @@ async def verify_receipt(
     - 503_SERVICE_UNAVAILABLE: Google Play API unavailable
     """
     user_id = current_user["id"]
-    
+
     result = await use_case.execute(
         user_id=user_id,
         platform=request.platform,
         purchase_token=request.purchase_token,
         product_id=request.product_id,
     )
-    
+
     return result
 
 
@@ -70,18 +70,18 @@ async def get_subscription_status(
 ):
     """
     Get current subscription status for authenticated user.
-    
+
     Returns server-side subscription state.
     Called by app when opening or returning to foreground.
-    
+
     Error codes:
     - 401_UNAUTHORIZED: Not logged in
     - 503_SERVICE_UNAVAILABLE: Database unavailable
     """
     user_id = current_user["id"]
-    
+
     result = await use_case.execute(user_id=user_id)
-    
+
     return result
 
 
@@ -93,17 +93,17 @@ async def expire_subscriptions(
 ):
     """
     Expire active subscriptions that have passed their expiry date.
-    
+
     This endpoint should be called by a scheduled background task (e.g., daily cron job).
     For POC, it's exposed as an HTTP endpoint for manual triggering.
-    
+
     In production, this should be:
     - Protected by admin authentication or internal-only access
     - Triggered by a scheduler (APScheduler, Celery Beat, Cloud Scheduler, etc.)
-    
+
     Returns:
         Number of subscriptions expired and processing timestamp
     """
     result = await use_case.execute()
-    
+
     return result

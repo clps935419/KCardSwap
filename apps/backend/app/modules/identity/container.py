@@ -6,47 +6,21 @@ Declares providers for repositories, services, and use cases.
 
 from dependency_injector import containers, providers
 
-# Import repositories
-from app.modules.identity.infrastructure.repositories.user_repository_impl import (
-    UserRepositoryImpl,
+from app.modules.identity.application.use_cases.auth.admin_login import (
+    AdminLoginUseCase,
 )
-from app.modules.identity.infrastructure.repositories.profile_repository_impl import (
-    ProfileRepositoryImpl,
-)
-from app.modules.identity.infrastructure.repositories.refresh_token_repository_impl import (
-    RefreshTokenRepositoryImpl,
-)
-from app.modules.identity.infrastructure.repositories.subscription_repository_impl import (
-    SubscriptionRepositoryImpl,
-)
-from app.modules.identity.infrastructure.repositories.purchase_token_repository_impl import (
-    PurchaseTokenRepositoryImpl,
-)
-
-# Import external services
-from app.modules.identity.infrastructure.external.google_oauth_service import (
-    GoogleOAuthService,
-)
-
-# Import security services
-from app.modules.identity.infrastructure.security.password_service import (
-    PasswordService,
+from app.modules.identity.application.use_cases.auth.google_callback import (
+    GoogleCallbackUseCase,
 )
 
 # Import use cases - Auth
 from app.modules.identity.application.use_cases.auth.login_with_google import (
     GoogleLoginUseCase,
 )
-from app.modules.identity.application.use_cases.auth.google_callback import (
-    GoogleCallbackUseCase,
-)
+from app.modules.identity.application.use_cases.auth.logout import LogoutUseCase
 from app.modules.identity.application.use_cases.auth.refresh_token import (
     RefreshTokenUseCase,
 )
-from app.modules.identity.application.use_cases.auth.admin_login import (
-    AdminLoginUseCase,
-)
-from app.modules.identity.application.use_cases.auth.logout import LogoutUseCase
 
 # Import use cases - Profile
 from app.modules.identity.application.use_cases.profile.get_profile import (
@@ -55,16 +29,43 @@ from app.modules.identity.application.use_cases.profile.get_profile import (
 from app.modules.identity.application.use_cases.profile.update_profile import (
     UpdateProfileUseCase,
 )
-
-# Import use cases - Subscription
-from app.modules.identity.application.use_cases.subscription.verify_receipt_use_case import (
-    VerifyReceiptUseCase,
-)
 from app.modules.identity.application.use_cases.subscription.check_subscription_status_use_case import (
     CheckSubscriptionStatusUseCase,
 )
 from app.modules.identity.application.use_cases.subscription.expire_subscriptions_use_case import (
     ExpireSubscriptionsUseCase,
+)
+
+# Import use cases - Subscription
+from app.modules.identity.application.use_cases.subscription.verify_receipt_use_case import (
+    VerifyReceiptUseCase,
+)
+
+# Import external services
+from app.modules.identity.infrastructure.external.google_oauth_service import (
+    GoogleOAuthService,
+)
+from app.modules.identity.infrastructure.repositories.profile_repository_impl import (
+    ProfileRepositoryImpl,
+)
+from app.modules.identity.infrastructure.repositories.purchase_token_repository_impl import (
+    PurchaseTokenRepositoryImpl,
+)
+from app.modules.identity.infrastructure.repositories.refresh_token_repository_impl import (
+    RefreshTokenRepositoryImpl,
+)
+from app.modules.identity.infrastructure.repositories.subscription_repository_impl import (
+    SubscriptionRepositoryImpl,
+)
+
+# Import repositories
+from app.modules.identity.infrastructure.repositories.user_repository_impl import (
+    UserRepositoryImpl,
+)
+
+# Import security services
+from app.modules.identity.infrastructure.security.password_service import (
+    PasswordService,
 )
 
 

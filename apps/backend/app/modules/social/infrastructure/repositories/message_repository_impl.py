@@ -5,7 +5,7 @@ SQLAlchemy Message Repository Implementation
 from typing import List, Optional
 from uuid import UUID
 
-from sqlalchemy import select, and_, func
+from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.social.domain.entities.message import Message, MessageStatus
@@ -51,30 +51,30 @@ class SQLAlchemyMessageRepository(MessageRepository):
     ) -> List[Message]:
         """
         Get messages for a chat room
-        
+
         Supports incremental polling using after_message_id cursor.
         Returns messages newer than after_message_id, ordered by created_at ASC.
-        
+
         Args:
             room_id: Chat room ID
             after_message_id: Optional cursor - return messages with ID > this
             limit: Maximum number of messages to return
-            
+
         Returns:
             List of messages ordered by created_at ascending
         """
         room_uuid = UUID(room_id) if isinstance(room_id, str) else room_id
-        
+
         query = select(MessageModel).where(MessageModel.room_id == room_uuid)
-        
+
         # Apply cursor-based pagination if after_message_id is provided
         if after_message_id:
             after_uuid = UUID(after_message_id) if isinstance(after_message_id, str) else after_message_id
             query = query.where(MessageModel.id > after_uuid)
-        
+
         # Order by created_at ASC for incremental polling
         query = query.order_by(MessageModel.created_at.asc()).limit(limit)
-        
+
         result = await self.session.execute(query)
         models = result.scalars().all()
         return [self._to_entity(model) for model in models]
@@ -87,14 +87,14 @@ class SQLAlchemyMessageRepository(MessageRepository):
             )
         )
         model = result.scalar_one_or_none()
-        
+
         if not model:
             raise ValueError(f"Message with id {message.id} not found")
-        
+
         model.content = message.content
         model.status = message.status.value if isinstance(message.status, MessageStatus) else message.status
         model.updated_at = message.updated_at
-        
+
         await self.session.flush()
         await self.session.refresh(model)
         return self._to_entity(model)
@@ -105,7 +105,7 @@ class SQLAlchemyMessageRepository(MessageRepository):
             select(MessageModel).where(MessageModel.id == UUID(message_id))
         )
         model = result.scalar_one_or_none()
-        
+
         if model:
             await self.session.delete(model)
             await self.session.flush()
@@ -114,7 +114,7 @@ class SQLAlchemyMessageRepository(MessageRepository):
         """Get count of unread messages in a room for a user"""
         room_uuid = UUID(room_id) if isinstance(room_id, str) else room_id
         user_uuid = UUID(user_id) if isinstance(user_id, str) else user_id
-        
+
         # Count messages that are not sent by user and not read
         result = await self.session.execute(
             select(func.count(MessageModel.id)).where(
@@ -131,13 +131,13 @@ class SQLAlchemyMessageRepository(MessageRepository):
     async def mark_messages_as_read(self, room_id: str, user_id: str) -> int:
         """
         Mark all messages in a room as read for a user
-        
+
         Returns:
             Number of messages marked as read
         """
         room_uuid = UUID(room_id) if isinstance(room_id, str) else room_id
         user_uuid = UUID(user_id) if isinstance(user_id, str) else user_id
-        
+
         # Find all unread messages not sent by user
         result = await self.session.execute(
             select(MessageModel).where(
@@ -149,16 +149,16 @@ class SQLAlchemyMessageRepository(MessageRepository):
             )
         )
         models = result.scalars().all()
-        
+
         # Mark them as read
         count = 0
         for model in models:
             model.status = MessageStatus.READ.value
             count += 1
-        
+
         if count > 0:
             await self.session.flush()
-        
+
         return count
 
     @staticmethod

@@ -2,10 +2,10 @@
 Unit tests for RateUserUseCase (T126G)
 Testing FR-SOCIAL-003A business rules with mocked dependencies
 """
-import pytest
-from datetime import datetime
 from unittest.mock import AsyncMock, Mock
 from uuid import uuid4
+
+import pytest
 
 from app.modules.social.application.use_cases.ratings.rate_user_use_case import (
     RateUserUseCase,

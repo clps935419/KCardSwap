@@ -6,32 +6,33 @@ Declares providers for repositories and use cases.
 
 from dependency_injector import containers, providers
 
-# Import repositories
-from app.modules.posts.infrastructure.repositories.post_repository_impl import (
-    PostRepositoryImpl,
+from app.modules.posts.application.use_cases.accept_interest_use_case import (
+    AcceptInterestUseCase,
 )
-from app.modules.posts.infrastructure.repositories.post_interest_repository_impl import (
-    PostInterestRepositoryImpl,
+from app.modules.posts.application.use_cases.close_post_use_case import (
+    ClosePostUseCase,
 )
 
 # Import use cases
 from app.modules.posts.application.use_cases.create_post_use_case import (
     CreatePostUseCase,
 )
-from app.modules.posts.application.use_cases.list_board_posts_use_case import (
-    ListBoardPostsUseCase,
-)
 from app.modules.posts.application.use_cases.express_interest_use_case import (
     ExpressInterestUseCase,
 )
-from app.modules.posts.application.use_cases.accept_interest_use_case import (
-    AcceptInterestUseCase,
+from app.modules.posts.application.use_cases.list_board_posts_use_case import (
+    ListBoardPostsUseCase,
 )
 from app.modules.posts.application.use_cases.reject_interest_use_case import (
     RejectInterestUseCase,
 )
-from app.modules.posts.application.use_cases.close_post_use_case import (
-    ClosePostUseCase,
+from app.modules.posts.infrastructure.repositories.post_interest_repository_impl import (
+    PostInterestRepositoryImpl,
+)
+
+# Import repositories
+from app.modules.posts.infrastructure.repositories.post_repository_impl import (
+    PostRepositoryImpl,
 )
 
 

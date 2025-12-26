@@ -22,8 +22,8 @@ from app.modules.social.domain.repositories.chat_room_repository import (
 from app.modules.social.domain.repositories.message_repository import MessageRepository
 from app.modules.social.presentation.dependencies.use_cases import (
     get_chat_room_repository,
-    get_messages_use_case,
     get_message_repository,
+    get_messages_use_case,
     get_send_message_use_case,
 )
 from app.modules.social.presentation.schemas.chat_schemas import (
@@ -241,12 +241,12 @@ async def send_message(
         # Send FCM push notification (non-blocking, failures are logged)
         try:
             fcm_service = get_fcm_service()
-            
+
             # Get chat room to find recipient
             chat_room = await chat_room_repo.get_by_id(str(room_id))
             if chat_room:
                 recipient_id = chat_room.get_other_participant(str(current_user_id))
-                
+
                 # Send notification
                 # Note: In production, we would fetch FCM token from user profile
                 await fcm_service.send_notification(

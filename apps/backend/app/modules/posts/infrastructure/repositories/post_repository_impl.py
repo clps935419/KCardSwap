@@ -2,11 +2,11 @@
 SQLAlchemy Post Repository Implementation
 """
 
+from datetime import datetime
 from typing import List, Optional
 from uuid import UUID
-from datetime import datetime, timedelta
 
-from sqlalchemy import select, and_, func
+from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.posts.domain.entities.post import Post, PostStatus
@@ -83,10 +83,10 @@ class SQLAlchemyPostRepository(PostRepository):
         Count how many posts a user has created today
         """
         user_uuid = UUID(user_id) if isinstance(user_id, str) else user_id
-        
+
         # Get start of day (UTC)
         today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
-        
+
         result = await self.session.execute(
             select(func.count(PostModel.id)).where(
                 and_(
@@ -142,7 +142,7 @@ class SQLAlchemyPostRepository(PostRepository):
     ) -> List[Post]:
         """Get posts by owner ID"""
         owner_uuid = UUID(owner_id) if isinstance(owner_id, str) else owner_id
-        
+
         query = (
             select(PostModel)
             .where(PostModel.owner_id == owner_uuid)
@@ -161,7 +161,7 @@ class SQLAlchemyPostRepository(PostRepository):
         Returns the number of posts marked as expired
         """
         now = datetime.utcnow()
-        
+
         # Find all open posts that have expired
         result = await self.session.execute(
             select(PostModel).where(
@@ -172,17 +172,17 @@ class SQLAlchemyPostRepository(PostRepository):
             )
         )
         expired_posts = result.scalars().all()
-        
+
         # Mark them as expired
         count = 0
         for model in expired_posts:
             model.status = PostStatus.EXPIRED.value
             model.updated_at = now
             count += 1
-        
+
         if count > 0:
             await self.session.flush()
-        
+
         return count
 
     @staticmethod
