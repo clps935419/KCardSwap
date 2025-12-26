@@ -20,6 +20,21 @@
 
 ## 專案約定（放哪裡、誰負責什麼）
 
+## 命名規範（介面/實作）
+
+為了降低 wiring / import / typing 錯誤率，本專案後端採用以下一致命名：
+
+- **Repository 介面（Domain）**：一律使用 `I` 前綴
+    - 例：`ICardRepository`, `ISubscriptionRepository`, `ITradeRepository`
+- **Repository 實作（Infrastructure）**：一律使用 `Impl` 後綴
+    - 例：`SQLAlchemyCardRepositoryImpl`, `SubscriptionRepositoryImpl`
+- **檔名**：
+    - Repository 介面放在 `app/modules/<module>/domain/repositories/i_<name>_repository.py`
+    - Repository 實作放在 `app/modules/<module>/infrastructure/repositories/<name>_repository_impl.py`
+
+> 備註：若同一個 repository 存在多種儲存後端（SQLAlchemy / Redis / External API），
+> 建議在類別名稱保留前綴（例如 `SQLAlchemy...`）以避免混淆，但仍需以 `Impl` 結尾。
+
 - `app/container.py`
   - 匯總 shared providers 與各模組 container。
   - 只宣告 providers，不在這裡做任何「啟動副作用」。
@@ -87,14 +102,16 @@ from dependency_injector import containers, providers
 
 from app.modules.social.application.use_cases.cards.upload_card import UploadCardUseCase
 from app.modules.social.domain.services.card_validation_service import CardValidationService
-from app.modules.social.infrastructure.repositories.card_repository_impl import CardRepositoryImpl
+from app.modules.social.infrastructure.repositories.card_repository_impl import (
+    SQLAlchemyCardRepositoryImpl,
+)
 
 
 class SocialModuleContainer(containers.DeclarativeContainer):
     shared = providers.DependenciesContainer()
 
     # repo 需要 request-scope session：用 Factory，session 由呼叫端傳入
-    card_repository = providers.Factory(CardRepositoryImpl)
+    card_repository = providers.Factory(SQLAlchemyCardRepositoryImpl)
 
     validation_service = providers.Factory(CardValidationService)
 
@@ -153,14 +170,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.container import container
 from app.modules.social.application.use_cases.cards.upload_card import UploadCardUseCase
-from app.modules.social.domain.repositories.card_repository import CardRepository
+from app.modules.social.domain.repositories.i_card_repository import ICardRepository
 from app.shared.infrastructure.database.connection import get_db_session
 
 
 @inject
 def get_upload_card_use_case(
     session: AsyncSession = Depends(get_db_session),
-    repo_factory: Callable[[AsyncSession], CardRepository] = Provide[
+    repo_factory: Callable[[AsyncSession], ICardRepository] = Provide[
         container.social.card_repository
     ],
     use_case_factory: Callable[..., UploadCardUseCase] = Provide[
