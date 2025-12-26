@@ -11,36 +11,29 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.identity.presentation.dependencies.auth_deps import get_current_user_id
+from app.modules.posts.application.use_cases.accept_interest_use_case import (
+    AcceptInterestUseCase,
+)
+from app.modules.posts.application.use_cases.close_post_use_case import ClosePostUseCase
 from app.modules.posts.application.use_cases.create_post_use_case import (
     CreatePostUseCase,
-)
-from app.modules.posts.application.use_cases.list_board_posts_use_case import (
-    ListBoardPostsUseCase,
 )
 from app.modules.posts.application.use_cases.express_interest_use_case import (
     ExpressInterestUseCase,
 )
-from app.modules.posts.application.use_cases.accept_interest_use_case import (
-    AcceptInterestUseCase,
+from app.modules.posts.application.use_cases.list_board_posts_use_case import (
+    ListBoardPostsUseCase,
 )
 from app.modules.posts.application.use_cases.reject_interest_use_case import (
     RejectInterestUseCase,
 )
-from app.modules.posts.application.use_cases.close_post_use_case import ClosePostUseCase
-from app.modules.posts.infrastructure.repositories.post_repository_impl import (
-    PostRepositoryImpl,
-)
-from app.modules.posts.infrastructure.repositories.post_interest_repository_impl import (
-    PostInterestRepositoryImpl,
-)
-from app.modules.identity.infrastructure.repositories.subscription_repository_impl import (
-    SubscriptionRepositoryImpl,
-)
-from app.modules.social.infrastructure.repositories.friendship_repository_impl import (
-    FriendshipRepositoryImpl,
-)
-from app.modules.social.infrastructure.repositories.chat_room_repository_impl import (
-    ChatRoomRepositoryImpl,
+from app.modules.posts.presentation.dependencies.use_case_deps import (
+    get_accept_interest_use_case,
+    get_close_post_use_case,
+    get_create_post_use_case,
+    get_express_interest_use_case,
+    get_list_board_posts_use_case,
+    get_reject_interest_use_case,
 )
 from app.modules.posts.presentation.schemas.post_schemas import (
     CreatePostRequest,
@@ -77,6 +70,7 @@ async def create_post(
     request: CreatePostRequest,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
+    use_case: Annotated[CreatePostUseCase, Depends(get_create_post_use_case)],
 ) -> PostResponse:
     """
     Create a new city board post.
@@ -87,11 +81,6 @@ async def create_post(
     - Posts expire after 14 days by default
     """
     try:
-        # Initialize repositories and use case
-        post_repo = PostRepositoryImpl(session)
-        subscription_repo = SubscriptionRepositoryImpl(session)
-        use_case = CreatePostUseCase(post_repo, subscription_repo)
-
         # Execute use case
         post = await use_case.execute(
             owner_id=str(current_user_id),
@@ -144,6 +133,7 @@ async def create_post(
 async def list_posts(
     city_code: Annotated[str, Query(description="City code (required)")],
     session: Annotated[AsyncSession, Depends(get_db_session)],
+    use_case: Annotated[ListBoardPostsUseCase, Depends(get_list_board_posts_use_case)],
     idol: Annotated[Optional[str], Query(description="Filter by idol name")] = None,
     idol_group: Annotated[
         Optional[str], Query(description="Filter by idol group")
@@ -158,10 +148,6 @@ async def list_posts(
     Results ordered by created_at DESC (newest first).
     """
     try:
-        # Initialize repository and use case
-        post_repo = PostRepositoryImpl(session)
-        use_case = ListBoardPostsUseCase(post_repo)
-
         # Execute use case
         posts = await use_case.execute(
             city_code=city_code,
@@ -219,6 +205,7 @@ async def express_interest(
     post_id: UUID,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
+    use_case: Annotated[ExpressInterestUseCase, Depends(get_express_interest_use_case)],
 ) -> PostInterestResponse:
     """
     Express interest in a post.
@@ -229,11 +216,6 @@ async def express_interest(
     - Post must be open and not expired
     """
     try:
-        # Initialize repositories and use case
-        post_repo = PostRepositoryImpl(session)
-        interest_repo = PostInterestRepositoryImpl(session)
-        use_case = ExpressInterestUseCase(post_repo, interest_repo)
-
         # Execute use case
         interest = await use_case.execute(
             post_id=str(post_id),
@@ -284,6 +266,7 @@ async def accept_interest(
     interest_id: UUID,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
+    use_case: Annotated[AcceptInterestUseCase, Depends(get_accept_interest_use_case)],
 ) -> AcceptInterestResponse:
     """
     Accept an interest.
@@ -295,15 +278,6 @@ async def accept_interest(
     - Creates or reuses existing chat room
     """
     try:
-        # Initialize repositories and use case
-        post_repo = PostRepositoryImpl(session)
-        interest_repo = PostInterestRepositoryImpl(session)
-        friendship_repo = FriendshipRepositoryImpl(session)
-        chat_room_repo = ChatRoomRepositoryImpl(session)
-        use_case = AcceptInterestUseCase(
-            post_repo, interest_repo, friendship_repo, chat_room_repo
-        )
-
         # Execute use case
         result = await use_case.execute(
             post_id=str(post_id),
@@ -354,6 +328,7 @@ async def reject_interest(
     interest_id: UUID,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
+    use_case: Annotated[RejectInterestUseCase, Depends(get_reject_interest_use_case)],
 ) -> None:
     """
     Reject an interest.
@@ -363,11 +338,6 @@ async def reject_interest(
     - Interest must be pending
     """
     try:
-        # Initialize repositories and use case
-        post_repo = PostRepositoryImpl(session)
-        interest_repo = PostInterestRepositoryImpl(session)
-        use_case = RejectInterestUseCase(post_repo, interest_repo)
-
         # Execute use case
         await use_case.execute(
             post_id=str(post_id),
@@ -411,6 +381,7 @@ async def close_post(
     post_id: UUID,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
+    use_case: Annotated[ClosePostUseCase, Depends(get_close_post_use_case)],
 ) -> None:
     """
     Close a post manually.
@@ -420,10 +391,6 @@ async def close_post(
     - Post must be open
     """
     try:
-        # Initialize repository and use case
-        post_repo = PostRepositoryImpl(session)
-        use_case = ClosePostUseCase(post_repo)
-
         # Execute use case
         await use_case.execute(
             post_id=str(post_id),
