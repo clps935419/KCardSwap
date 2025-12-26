@@ -13,14 +13,14 @@ from app.modules.posts.domain.entities.post_interest import (
     PostInterestStatus,
 )
 from app.modules.posts.domain.repositories.i_post_interest_repository import (
-    IIPostInterestRepository,
+    IPostInterestRepository,
 )
 from app.modules.posts.infrastructure.database.models.post_interest_model import (
     PostInterestModel,
 )
 
 
-class IPostInterestRepositoryImpl(IIPostInterestRepository):
+class PostInterestRepositoryImpl(IPostInterestRepository):
     """SQLAlchemy implementation of PostInterest repository"""
 
     def __init__(self, session: AsyncSession):
@@ -190,7 +190,3 @@ class IPostInterestRepositoryImpl(IIPostInterestRepository):
             created_at=model.created_at,
             updated_at=model.updated_at,
         )
-
-
-# Alias for consistency
-IPostInterestRepositoryImpl = SQLAlchemyIPostInterestRepository

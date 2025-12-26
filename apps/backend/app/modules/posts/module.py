@@ -28,7 +28,7 @@ from app.modules.posts.infrastructure.repositories.post_repository_impl import (
     PostRepositoryImpl,
 )
 from app.modules.posts.infrastructure.repositories.post_interest_repository_impl import (
-    IPostInterestRepositoryImpl,
+    PostInterestRepositoryImpl,
 )
 from app.modules.identity.infrastructure.repositories.subscription_repository_impl import (
     SubscriptionRepositoryImpl,
@@ -70,7 +70,7 @@ class PostsModule(Module):
     ) -> ExpressInterestUseCase:
         """Provide ExpressInterestUseCase with dependencies."""
         post_repo = PostRepositoryImpl(session)
-        post_interest_repo = IPostInterestRepositoryImpl(session)
+        post_interest_repo = PostInterestRepositoryImpl(session)
         return ExpressInterestUseCase(
             post_repository=post_repo, post_interest_repository=post_interest_repo
         )
@@ -81,7 +81,7 @@ class PostsModule(Module):
     ) -> AcceptInterestUseCase:
         """Provide AcceptInterestUseCase with dependencies."""
         post_repo = PostRepositoryImpl(session)
-        post_interest_repo = IPostInterestRepositoryImpl(session)
+        post_interest_repo = PostInterestRepositoryImpl(session)
         friendship_repo = FriendshipRepositoryImpl(session)
         chat_room_repo = ChatRoomRepositoryImpl(session)
         return AcceptInterestUseCase(
@@ -96,7 +96,7 @@ class PostsModule(Module):
         self, session: AsyncSession
     ) -> RejectInterestUseCase:
         """Provide RejectInterestUseCase with dependencies."""
-        post_interest_repo = IPostInterestRepositoryImpl(session)
+        post_interest_repo = PostInterestRepositoryImpl(session)
         return RejectInterestUseCase(post_interest_repository=post_interest_repo)
 
     @provider

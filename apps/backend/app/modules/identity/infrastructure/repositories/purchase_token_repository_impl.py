@@ -17,7 +17,7 @@ from app.modules.identity.infrastructure.database.models.purchase_token_model im
 from app.shared.presentation.exceptions.api_exceptions import ConflictException
 
 
-class IPurchaseTokenRepositoryImpl(IPurchaseTokenRepository):
+class PurchaseTokenRepositoryImpl(IPurchaseTokenRepository):
     """SQLAlchemy implementation of IPurchaseTokenRepository"""
 
     def __init__(self, session: AsyncSession):
