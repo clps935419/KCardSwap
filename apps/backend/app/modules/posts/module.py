@@ -48,9 +48,7 @@ class PostsModule(Module):
     """
 
     @provider
-    def provide_create_post_use_case(
-        self, session: AsyncSession
-    ) -> CreatePostUseCase:
+    def provide_create_post_use_case(self, session: AsyncSession) -> CreatePostUseCase:
         """Provide CreatePostUseCase with dependencies."""
         post_repo = PostRepositoryImpl(session)
         subscription_repo = SubscriptionRepositoryImpl(session)

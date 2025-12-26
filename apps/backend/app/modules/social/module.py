@@ -203,7 +203,9 @@ class SocialModule(Module):
         """Provide RateUserUseCase with dependencies."""
         rating_repo = RatingRepositoryImpl(session)
         trade_repo = TradeRepositoryImpl(session)
-        return RateUserUseCase(rating_repository=rating_repo, trade_repository=trade_repo)
+        return RateUserUseCase(
+            rating_repository=rating_repo, trade_repository=trade_repo
+        )
 
     # Report Use Cases
     @provider

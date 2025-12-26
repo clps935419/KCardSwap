@@ -6,7 +6,9 @@ Provides identity and authentication related use cases using python-injector.
 from injector import Module, provider
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.identity.application.use_cases.auth.admin_login import AdminLoginUseCase
+from app.modules.identity.application.use_cases.auth.admin_login import (
+    AdminLoginUseCase,
+)
 from app.modules.identity.application.use_cases.auth.google_callback import (
     GoogleCallbackUseCase,
 )

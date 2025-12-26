@@ -6,7 +6,10 @@ Provides shared services and infrastructure components using python-injector.
 from injector import Module, provider, singleton
 
 from app.config import Settings, settings
-from app.shared.infrastructure.database.connection import DatabaseConnection, db_connection
+from app.shared.infrastructure.database.connection import (
+    DatabaseConnection,
+    db_connection,
+)
 from app.shared.infrastructure.external.gcs_storage_service import (
     GCSStorageService,
     gcs_storage_service,

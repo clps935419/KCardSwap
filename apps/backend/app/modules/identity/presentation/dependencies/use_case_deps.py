@@ -7,7 +7,9 @@ from typing import Annotated
 from fastapi import Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.identity.application.use_cases.auth.admin_login import AdminLoginUseCase
+from app.modules.identity.application.use_cases.auth.admin_login import (
+    AdminLoginUseCase,
+)
 from app.modules.identity.application.use_cases.auth.google_callback import (
     GoogleCallbackUseCase,
 )
