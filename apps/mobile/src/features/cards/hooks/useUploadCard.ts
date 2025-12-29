@@ -9,7 +9,7 @@
 
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { getUploadUrl } from '@/src/features/cards/api/cardsApi';
+import { getUploadUrl, confirmCardUpload } from '@/src/features/cards/api/cardsApi';
 import {
   pickImageFromCamera,
   pickImageFromGallery,
@@ -24,7 +24,7 @@ import { cardsKeys } from '@/src/features/cards/hooks/useCards';
  * 上傳進度狀態
  */
 export interface UploadProgress {
-  step: 'picking' | 'requesting' | 'uploading' | 'thumbnail' | 'complete';
+  step: 'picking' | 'requesting' | 'uploading' | 'confirming' | 'thumbnail' | 'complete';
   progress: number; // 0-100
   message: string;
 }
@@ -42,7 +42,7 @@ export interface UploadCardOptions {
 
 /**
  * Hook: 上傳卡片
- * 整合 M201, M202, M203, M203A
+ * 整合 M201, M202, M203, M203A, M203B
  */
 export function useUploadCard() {
   const queryClient = useQueryClient();
@@ -104,13 +104,30 @@ export function useUploadCard() {
           onProgress: (progress) => {
             setUploadProgress({
               step: 'uploading',
-              progress: 40 + progress * 0.4, // 40-80%
+              progress: 40 + progress * 0.3, // 40-70%
               message: `上傳中... ${progress.toFixed(0)}%`,
             });
           },
         });
 
-        // Step 4: 產生縮圖並快取 (M203A)
+        // Step 4: 確認上傳 (M203B)
+        setUploadProgress({
+          step: 'confirming',
+          progress: 75,
+          message: '確認上傳...',
+        });
+
+        try {
+          await confirmCardUpload(uploadUrlResponse.card_id);
+        } catch (error) {
+          // 確認上傳失敗是致命錯誤，需要重新上傳
+          console.error('確認上傳失敗', error);
+          throw new Error(
+            `確認上傳失敗：${(error as Error).message}。請重新上傳。`
+          );
+        }
+
+        // Step 5: 產生縮圖並快取 (M203A)
         setUploadProgress({
           step: 'thumbnail',
           progress: 85,
@@ -129,7 +146,7 @@ export function useUploadCard() {
           console.error('縮圖產生失敗', error);
         }
 
-        // Step 5: 完成
+        // Step 6: 完成
         setUploadProgress({
           step: 'complete',
           progress: 100,

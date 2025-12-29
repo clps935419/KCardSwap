@@ -64,6 +64,18 @@ export interface UploadUrlResponse {
   required_headers: Record<string, string>;
   image_url: string;
   expires_at: string;
+  card_id: string;
+}
+
+/**
+ * Confirm upload response
+ * 
+ * **Note**: This type will be replaced by SDK-generated type once the endpoint is added to OpenAPI spec.
+ * TODO: Use SDK type when available: `ConfirmCardUploadResponse`
+ */
+export interface ConfirmUploadResponse {
+  message: string;
+  card_id: string;
 }
 
 /**
@@ -214,7 +226,7 @@ export async function uploadToSignedUrlWithRetry(
  * 
  * ```typescript
  * import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
- * import { getMyCardsOptions, getMyCardsQueryKey, uploadToSignedUrlWithRetry } from './cardsApi';
+ * import { getMyCardsOptions, getMyCardsQueryKey, uploadToSignedUrlWithRetry, confirmCardUpload } from './cardsApi';
  * 
  * function UploadCardScreen() {
  *   const queryClient = useQueryClient();
@@ -235,9 +247,101 @@ export async function uploadToSignedUrlWithRetry(
  *       uploadUrlResponse.required_headers
  *     );
  *     
- *     // Step 3: Refresh card list
+ *     // Step 3: Confirm upload (M203B)
+ *     await confirmCardUpload(uploadUrlResponse.card_id);
+ *     
+ *     // Step 4: Refresh card list
  *     queryClient.invalidateQueries({ queryKey: getMyCardsQueryKey() });
  *   };
  * }
  * ```
  */
+
+/**
+ * TODO M203B: Once `/cards/{id}/confirm-upload` is added to OpenAPI spec:
+ * 1. Regenerate SDK: `npm run sdk:generate`
+ * 2. Replace this implementation with SDK mutation:
+ *    ```
+ *    export { confirmCardUploadMutation, confirmCardUploadMutationKey } from '@/src/shared/api/sdk';
+ *    ```
+ */
+
+import { client } from '@/src/shared/api/sdk';
+
+/**
+ * Temporary implementation: Get upload URL (M202)
+ * Will be replaced by SDK-generated mutation once OpenAPI spec is updated
+ */
+export async function getUploadUrl(request: {
+  content_type: string;
+  file_size_bytes: number;
+  idol?: string;
+  idol_group?: string;
+  album?: string;
+  version?: string;
+  rarity?: string;
+}): Promise<UploadUrlResponse> {
+  const response = await client.POST('/api/v1/cards/upload-url', {
+    body: request,
+  });
+
+  if (response.error) {
+    throw new Error(response.error.message || 'Failed to get upload URL');
+  }
+
+  return response.data as unknown as UploadUrlResponse;
+}
+
+/**
+ * Confirm card upload (M203B)
+ * 
+ * Call this after successfully uploading the file to the signed URL.
+ * This prevents "ghost records" where cards are created but images are never uploaded.
+ * 
+ * @param cardId - The card ID returned from get upload URL response
+ * @returns Promise<ConfirmUploadResponse>
+ * @throws Error if confirmation fails
+ * 
+ * **Error Codes**:
+ * - 404: Card not found or image not found in storage
+ * - 403: Not authorized to confirm this card
+ * - 400: Invalid request (already confirmed, no image, etc.)
+ * 
+ * **Important**: Always call this after uploadToSignedUrlWithRetry succeeds.
+ * If this fails, the card will remain in "pending" status and won't appear in the user's card list.
+ */
+export async function confirmCardUpload(cardId: string): Promise<ConfirmUploadResponse> {
+  try {
+    const response = await client.POST('/api/v1/cards/{card_id}/confirm-upload', {
+      params: {
+        path: {
+          card_id: cardId,
+        },
+      },
+    });
+
+    if (response.error) {
+      // Handle specific error codes
+      if (response.error.code === 'IMAGE_NOT_FOUND') {
+        throw new Error('Image not found in storage. Please try uploading again.');
+      } else if (response.error.code === 'CARD_NOT_FOUND') {
+        throw new Error('Card not found. Please try uploading again.');
+      } else if (response.error.code === 'FORBIDDEN') {
+        throw new Error('Not authorized to confirm this card upload.');
+      } else if (response.error.code === 'VALIDATION_ERROR') {
+        throw new Error(response.error.message || 'Upload already confirmed or invalid.');
+      }
+      
+      throw new Error(response.error.message || 'Failed to confirm upload');
+    }
+
+    return response.data as unknown as ConfirmUploadResponse;
+  } catch (error: any) {
+    // Handle network errors
+    if (error.message?.includes('network') || error.message?.includes('timeout')) {
+      throw new Error('Network error. Please check your connection and try again.');
+    }
+    
+    throw error;
+  }
+}
