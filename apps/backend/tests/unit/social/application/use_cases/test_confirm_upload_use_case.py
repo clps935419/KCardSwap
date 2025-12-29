@@ -2,9 +2,10 @@
 Unit tests for ConfirmCardUploadUseCase
 """
 
-import pytest
-from uuid import uuid4
 from unittest.mock import AsyncMock, Mock
+from uuid import uuid4
+
+import pytest
 
 from app.modules.social.application.use_cases.cards.confirm_upload import (
     ConfirmCardUploadUseCase,
@@ -44,14 +45,14 @@ class TestConfirmCardUploadUseCase:
         card_id = uuid4()
         owner_id = uuid4()
         image_url = "https://storage.googleapis.com/bucket/cards/user123/card456.jpg"
-        
+
         card = Card(
             id=card_id,
             owner_id=owner_id,
             image_url=image_url,
             size_bytes=1024 * 500,
         )
-        
+
         mock_card_repository.find_by_id.return_value = card
         mock_gcs_service.blob_exists.return_value = True
         mock_card_repository.save.return_value = card
@@ -63,7 +64,9 @@ class TestConfirmCardUploadUseCase:
         assert result is True
         assert card.is_upload_confirmed()
         mock_card_repository.find_by_id.assert_called_once_with(card_id)
-        mock_gcs_service.blob_exists.assert_called_once_with("cards/user123/card456.jpg")
+        mock_gcs_service.blob_exists.assert_called_once_with(
+            "cards/user123/card456.jpg"
+        )
         mock_card_repository.save.assert_called_once()
 
     @pytest.mark.asyncio
@@ -89,13 +92,13 @@ class TestConfirmCardUploadUseCase:
         card_id = uuid4()
         owner_id = uuid4()
         different_user_id = uuid4()
-        
+
         card = Card(
             id=card_id,
             owner_id=owner_id,
             image_url="https://storage.googleapis.com/bucket/cards/user/card.jpg",
         )
-        
+
         mock_card_repository.find_by_id.return_value = card
 
         # Act & Assert
@@ -110,14 +113,14 @@ class TestConfirmCardUploadUseCase:
         # Arrange
         card_id = uuid4()
         owner_id = uuid4()
-        
+
         card = Card(
             id=card_id,
             owner_id=owner_id,
             image_url="https://storage.googleapis.com/bucket/cards/user/card.jpg",
         )
         card.confirm_upload()  # Already confirmed
-        
+
         mock_card_repository.find_by_id.return_value = card
 
         # Act & Assert
@@ -132,13 +135,13 @@ class TestConfirmCardUploadUseCase:
         # Arrange
         card_id = uuid4()
         owner_id = uuid4()
-        
+
         card = Card(
             id=card_id,
             owner_id=owner_id,
             image_url=None,
         )
-        
+
         mock_card_repository.find_by_id.return_value = card
 
         # Act & Assert
@@ -154,13 +157,13 @@ class TestConfirmCardUploadUseCase:
         card_id = uuid4()
         owner_id = uuid4()
         image_url = "https://storage.googleapis.com/bucket/cards/user/card.jpg"
-        
+
         card = Card(
             id=card_id,
             owner_id=owner_id,
             image_url=image_url,
         )
-        
+
         mock_card_repository.find_by_id.return_value = card
         mock_gcs_service.blob_exists.return_value = False
 

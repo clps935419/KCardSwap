@@ -6,6 +6,7 @@ Create Date: 2025-12-15 02:50:10.000000
 
 This migration creates all indexes from infra/db/init.sql for better query performance.
 """
+
 from typing import Sequence, Union
 
 from alembic import op

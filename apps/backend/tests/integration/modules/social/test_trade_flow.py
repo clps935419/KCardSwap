@@ -347,16 +347,21 @@ class TestTradeFlowTimeout:
             updated_at=old_time,
         )
 
-        with patch(
-            "app.modules.social.presentation.routers.trade_router.get_current_user_id",
-            return_value=initiator_id,
-        ), patch(
-            "app.modules.social.presentation.routers.trade_router.get_db_session"
-        ) as mock_session, patch(
-            "app.modules.social.infrastructure.repositories.trade_repository_impl.SQLAlchemyTradeRepository"
-        ) as mock_trade_repo, patch(
-            "app.modules.social.infrastructure.repositories.card_repository_impl.CardRepositoryImpl"
-        ) as mock_card_repo:
+        with (
+            patch(
+                "app.modules.social.presentation.routers.trade_router.get_current_user_id",
+                return_value=initiator_id,
+            ),
+            patch(
+                "app.modules.social.presentation.routers.trade_router.get_db_session"
+            ) as mock_session,
+            patch(
+                "app.modules.social.infrastructure.repositories.trade_repository_impl.SQLAlchemyTradeRepository"
+            ) as mock_trade_repo,
+            patch(
+                "app.modules.social.infrastructure.repositories.card_repository_impl.CardRepositoryImpl"
+            ) as mock_card_repo,
+        ):
             # Setup mocks
             mock_session.return_value = Mock()
 

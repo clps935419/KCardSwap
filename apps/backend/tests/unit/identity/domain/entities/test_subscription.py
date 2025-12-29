@@ -6,8 +6,6 @@ Testing subscription management and status transitions
 from datetime import datetime, timedelta
 from uuid import uuid4
 
-import pytest
-
 from app.modules.identity.domain.entities.subscription import Subscription
 
 

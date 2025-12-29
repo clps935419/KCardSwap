@@ -7,6 +7,7 @@ Tests the complete subscription management flow:
 3. Token binding and replay protection
 4. Subscription expiry
 """
+
 from datetime import datetime, timedelta
 from unittest.mock import AsyncMock, Mock, patch
 

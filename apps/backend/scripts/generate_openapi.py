@@ -13,10 +13,10 @@ Minimal dependencies (can run without Poetry):
 Usage:
     # Method 1: Direct execution (minimal dependencies)
     python3 scripts/generate_openapi.py
-    
+
     # Method 2: With Poetry (full environment)
     poetry run python scripts/generate_openapi.py
-    
+
     # Method 3: Using Makefile (from repo root)
     make generate-openapi
 

@@ -11,6 +11,7 @@ Add tables for Phase 6 User Story 4: Friend System and Chat
 - ratings: user ratings after trades
 - reports: user reports for violations
 """
+
 from typing import Sequence, Union
 
 import sqlalchemy as sa

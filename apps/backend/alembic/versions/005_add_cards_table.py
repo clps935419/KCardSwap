@@ -7,6 +7,7 @@ Create Date: 2025-12-19 04:32:00.000000
 Add cards table for card upload and management feature.
 Includes fields for owner, idol info, image URL, size, and status tracking.
 """
+
 from typing import Sequence, Union
 
 import sqlalchemy as sa

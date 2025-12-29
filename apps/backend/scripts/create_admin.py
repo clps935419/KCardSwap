@@ -7,6 +7,7 @@ Usage:
     python scripts/create_admin.py --email admin@example.com --password SecurePassword123 --role admin
     python scripts/create_admin.py --email superadmin@example.com --password SecurePassword123 --role super_admin
 """
+
 import argparse
 import asyncio
 import sys

@@ -222,8 +222,8 @@ class CardRepositoryImpl(ICardRepository):
             status=model.status,
             image_url=model.image_url,
             size_bytes=model.size_bytes,
-            upload_status=getattr(model, 'upload_status', 'pending'),
-            upload_confirmed_at=getattr(model, 'upload_confirmed_at', None),
+            upload_status=getattr(model, "upload_status", "pending"),
+            upload_confirmed_at=getattr(model, "upload_confirmed_at", None),
             created_at=model.created_at,
             updated_at=model.updated_at,
         )

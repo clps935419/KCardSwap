@@ -56,11 +56,13 @@ class ConfirmCardUploadUseCase:
         # Extract blob name from image URL
         # Format: https://storage.googleapis.com/{bucket}/{blob_name}
         blob_name = self._extract_blob_name(card.image_url)
-        
+
         # Check if blob exists in GCS
         exists = self.gcs_service.blob_exists(blob_name)
         if not exists:
-            raise ValueError("Image file not found in storage. Please upload the file first.")
+            raise ValueError(
+                "Image file not found in storage. Please upload the file first."
+            )
 
         # Mark as confirmed
         card.confirm_upload()
@@ -71,10 +73,10 @@ class ConfirmCardUploadUseCase:
     def _extract_blob_name(self, image_url: str) -> str:
         """
         Extract blob name from GCS public URL.
-        
+
         Args:
             image_url: Full GCS URL (e.g., https://storage.googleapis.com/bucket/path/file.jpg)
-            
+
         Returns:
             Blob name (e.g., path/file.jpg)
         """
@@ -84,6 +86,6 @@ class ConfirmCardUploadUseCase:
         if len(parts) >= 5 and "storage.googleapis.com" in image_url:
             # Join everything after the bucket name
             return "/".join(parts[4:])
-        
+
         # Fallback: assume the URL is already a blob name
         return image_url

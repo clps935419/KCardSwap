@@ -323,10 +323,13 @@ async def confirm_card_upload(
         }
     except ValueError as e:
         error_message = str(e)
-        
+
         # Determine appropriate HTTP status code
         if "not found" in error_message.lower():
-            if "image file" in error_message.lower() or "storage" in error_message.lower():
+            if (
+                "image file" in error_message.lower()
+                or "storage" in error_message.lower()
+            ):
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail={

@@ -2,9 +2,10 @@
 Unit tests for Card entity
 """
 
-import pytest
 from datetime import datetime
 from uuid import uuid4
+
+import pytest
 
 from app.modules.social.domain.entities.card import Card
 
@@ -99,7 +100,7 @@ class TestCardEntity:
         """Test marking card as trading"""
         owner_id = uuid4()
         card = Card(owner_id=owner_id)
-        
+
         card.mark_as_trading()
         assert card.status == Card.STATUS_TRADING
 
@@ -107,7 +108,7 @@ class TestCardEntity:
         """Test marking card as traded"""
         owner_id = uuid4()
         card = Card(owner_id=owner_id)
-        
+
         card.mark_as_traded()
         assert card.status == Card.STATUS_TRADED
 
@@ -115,7 +116,7 @@ class TestCardEntity:
         """Test marking card as available"""
         owner_id = uuid4()
         card = Card(owner_id=owner_id, status=Card.STATUS_TRADING)
-        
+
         card.mark_as_available()
         assert card.status == Card.STATUS_AVAILABLE
 
@@ -123,7 +124,7 @@ class TestCardEntity:
         """Test that marking a traded card as trading raises ValueError"""
         owner_id = uuid4()
         card = Card(owner_id=owner_id, status=Card.STATUS_TRADED)
-        
+
         with pytest.raises(ValueError, match="Cannot trade an already traded card"):
             card.mark_as_trading()
 
@@ -131,18 +132,20 @@ class TestCardEntity:
         """Test that marking a traded card as available raises ValueError"""
         owner_id = uuid4()
         card = Card(owner_id=owner_id, status=Card.STATUS_TRADED)
-        
-        with pytest.raises(ValueError, match="Cannot make a traded card available again"):
+
+        with pytest.raises(
+            ValueError, match="Cannot make a traded card available again"
+        ):
             card.mark_as_available()
 
     def test_update_image(self):
         """Test updating card image"""
         owner_id = uuid4()
         card = Card(owner_id=owner_id)
-        
+
         image_url = "https://storage.googleapis.com/bucket/path/new_image.jpg"
         size_bytes = 1024 * 300  # 300KB
-        
+
         card.update_image(image_url, size_bytes)
         assert card.image_url == image_url
         assert card.size_bytes == size_bytes
@@ -151,7 +154,7 @@ class TestCardEntity:
         """Test that updating image with negative size raises ValueError"""
         owner_id = uuid4()
         card = Card(owner_id=owner_id)
-        
+
         with pytest.raises(ValueError, match="size_bytes must be non-negative"):
             card.update_image("https://example.com/image.jpg", -1)
 
@@ -159,12 +162,12 @@ class TestCardEntity:
         """Test confirming card upload"""
         owner_id = uuid4()
         card = Card(owner_id=owner_id)
-        
+
         assert card.upload_status == Card.UPLOAD_STATUS_PENDING
         assert card.upload_confirmed_at is None
-        
+
         card.confirm_upload()
-        
+
         assert card.upload_status == Card.UPLOAD_STATUS_CONFIRMED
         assert card.upload_confirmed_at is not None
         assert card.is_upload_confirmed() is True
@@ -173,9 +176,9 @@ class TestCardEntity:
         """Test that confirming an already confirmed upload raises ValueError"""
         owner_id = uuid4()
         card = Card(owner_id=owner_id)
-        
+
         card.confirm_upload()
-        
+
         with pytest.raises(ValueError, match="Upload already confirmed"):
             card.confirm_upload()
 
@@ -183,9 +186,9 @@ class TestCardEntity:
         """Test is_upload_confirmed method"""
         owner_id = uuid4()
         card = Card(owner_id=owner_id)
-        
+
         assert card.is_upload_confirmed() is False
-        
+
         card.confirm_upload()
         assert card.is_upload_confirmed() is True
 
@@ -193,11 +196,11 @@ class TestCardEntity:
         """Test card equality based on ID"""
         card_id = uuid4()
         owner_id = uuid4()
-        
+
         card1 = Card(id=card_id, owner_id=owner_id)
         card2 = Card(id=card_id, owner_id=owner_id)
         card3 = Card(id=uuid4(), owner_id=owner_id)
-        
+
         assert card1 == card2
         assert card1 != card3
         assert card1 != "not a card"
@@ -206,12 +209,12 @@ class TestCardEntity:
         """Test card hashing based on ID"""
         card_id = uuid4()
         owner_id = uuid4()
-        
+
         card1 = Card(id=card_id, owner_id=owner_id)
         card2 = Card(id=card_id, owner_id=owner_id)
-        
+
         assert hash(card1) == hash(card2)
-        
+
         # Can use cards in sets
         card_set = {card1, card2}
         assert len(card_set) == 1
@@ -220,7 +223,7 @@ class TestCardEntity:
         """Test card string representation"""
         owner_id = uuid4()
         card = Card(owner_id=owner_id)
-        
+
         repr_str = repr(card)
         assert "Card" in repr_str
         assert str(card.id) in repr_str

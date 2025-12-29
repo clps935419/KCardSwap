@@ -8,6 +8,7 @@ Add tables for Phase 7 User Story 5: Trade System
 - trades: trade proposals and status tracking
 - trade_items: cards being exchanged in each trade
 """
+
 from typing import Sequence, Union
 
 import sqlalchemy as sa
