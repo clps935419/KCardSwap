@@ -5,19 +5,19 @@ SQLAlchemy Friendship Repository Implementation
 from typing import List, Optional
 from uuid import UUID
 
-from sqlalchemy import select, or_, and_
+from sqlalchemy import and_, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.social.domain.entities.friendship import Friendship, FriendshipStatus
-from app.modules.social.domain.repositories.friendship_repository import (
-    FriendshipRepository,
+from app.modules.social.domain.repositories.i_friendship_repository import (
+    IFriendshipRepository,
 )
 from app.modules.social.infrastructure.database.models.friendship_model import (
     FriendshipModel,
 )
 
 
-class SQLAlchemyFriendshipRepository(FriendshipRepository):
+class FriendshipRepositoryImpl(IFriendshipRepository):
     """SQLAlchemy implementation of Friendship repository"""
 
     def __init__(self, session: AsyncSession):
@@ -198,4 +198,4 @@ class SQLAlchemyFriendshipRepository(FriendshipRepository):
 
 
 # Alias for consistency
-FriendshipRepositoryImpl = SQLAlchemyFriendshipRepository
+FriendshipRepositoryImpl = FriendshipRepositoryImpl

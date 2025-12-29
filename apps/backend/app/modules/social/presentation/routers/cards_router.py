@@ -21,7 +21,7 @@ from app.modules.social.application.use_cases.cards.get_my_cards import (
 from app.modules.social.application.use_cases.cards.upload_card import (
     UploadCardUseCase,
 )
-from app.modules.social.domain.repositories.card_repository import CardRepository
+from app.modules.social.domain.repositories.i_card_repository import ICardRepository
 from app.modules.social.domain.services.card_validation_service import (
     CardValidationService,
 )
@@ -93,7 +93,7 @@ async def get_upload_url(
     2. Include the required Content-Type header
     """
     # Initialize dependencies
-    card_repo: CardRepository = CardRepositoryImpl(session)
+    card_repo: ICardRepository = CardRepositoryImpl(session)
     validation_service = CardValidationService()
     gcs_service = get_storage_service()
 
@@ -165,7 +165,7 @@ async def get_my_cards(
     Optionally filter by card status.
     """
     # Initialize dependencies
-    card_repo: CardRepository = CardRepositoryImpl(session)
+    card_repo: ICardRepository = CardRepositoryImpl(session)
 
     # Create and execute use case
     use_case = GetMyCardsUseCase(card_repository=card_repo)
@@ -215,7 +215,7 @@ async def delete_card(
     Cards in active trades cannot be deleted.
     """
     # Initialize dependencies
-    card_repo: CardRepository = CardRepositoryImpl(session)
+    card_repo: ICardRepository = CardRepositoryImpl(session)
     gcs_service = get_storage_service()
 
     # Create and execute use case
@@ -261,7 +261,7 @@ async def get_quota_status(
     - Remaining uploads and storage
     """
     # Initialize dependencies
-    card_repo: CardRepository = CardRepositoryImpl(session)
+    card_repo: ICardRepository = CardRepositoryImpl(session)
 
     # Create and execute use case
     use_case = CheckUploadQuotaUseCase(card_repository=card_repo)

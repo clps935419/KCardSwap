@@ -1,5 +1,5 @@
 """
-RefreshTokenRepository Implementation using SQLAlchemy
+IRefreshTokenRepository Implementation using SQLAlchemy
 """
 
 from typing import Optional
@@ -9,16 +9,16 @@ from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.identity.domain.entities.refresh_token import RefreshToken
-from app.modules.identity.domain.repositories.refresh_token_repository import (
-    RefreshTokenRepository,
+from app.modules.identity.domain.repositories.i_refresh_token_repository import (
+    IRefreshTokenRepository,
 )
 from app.modules.identity.infrastructure.database.models.refresh_token_model import (
     RefreshTokenModel,
 )
 
 
-class RefreshTokenRepositoryImpl(RefreshTokenRepository):
-    """SQLAlchemy implementation of RefreshTokenRepository."""
+class RefreshTokenRepositoryImpl(IRefreshTokenRepository):
+    """SQLAlchemy implementation of IRefreshTokenRepository."""
 
     def __init__(self, session: AsyncSession):
         """Initialize repository with database session.
@@ -108,6 +108,23 @@ class RefreshTokenRepositoryImpl(RefreshTokenRepository):
         await self._session.flush()
 
         return result.rowcount
+
+    async def revoke_token(self, user_id: UUID, token: str) -> bool:
+        """Revoke a specific refresh token for a user."""
+        stmt = select(RefreshTokenModel).where(
+            RefreshTokenModel.token == token,
+            RefreshTokenModel.user_id == user_id,
+            RefreshTokenModel.revoked == False,
+        )
+        result = await self._session.execute(stmt)
+        token_model = result.scalar_one_or_none()
+
+        if token_model:
+            token_model.revoked = True
+            await self._session.flush()
+            return True
+
+        return False
 
     @staticmethod
     def _model_to_entity(model: RefreshTokenModel) -> RefreshToken:

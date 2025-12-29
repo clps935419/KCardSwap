@@ -4,12 +4,13 @@ Handles trade proposals, acceptance, rejection, cancellation, completion, and hi
 """
 
 import logging
-from typing import Annotated, List
+from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.config import settings
 from app.modules.identity.presentation.dependencies.auth_deps import get_current_user_id
 from app.modules.social.application.use_cases.trades.accept_trade_use_case import (
     AcceptTradeUseCase,
@@ -37,10 +38,10 @@ from app.modules.social.infrastructure.repositories.card_repository_impl import 
     CardRepositoryImpl,
 )
 from app.modules.social.infrastructure.repositories.friendship_repository_impl import (
-    SQLAlchemyFriendshipRepository,
+    FriendshipRepositoryImpl,
 )
 from app.modules.social.infrastructure.repositories.trade_repository_impl import (
-    SQLAlchemyTradeRepository,
+    TradeRepositoryImpl,
 )
 from app.modules.social.presentation.schemas.trade_schemas import (
     CreateTradeRequest,
@@ -49,7 +50,6 @@ from app.modules.social.presentation.schemas.trade_schemas import (
     TradeResponse,
 )
 from app.shared.infrastructure.database.connection import get_db_session
-from app.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -86,9 +86,9 @@ async def create_trade(
     """
     try:
         # Initialize repositories and services
-        trade_repo = SQLAlchemyTradeRepository(session)
+        trade_repo = TradeRepositoryImpl(session)
         card_repo = CardRepositoryImpl(session)
-        friendship_repo = SQLAlchemyFriendshipRepository(session)
+        friendship_repo = FriendshipRepositoryImpl(session)
         validation_service = TradeValidationService()
 
         # Create use case
@@ -171,7 +171,7 @@ async def accept_trade(
 ) -> TradeResponse:
     """Accept a trade proposal."""
     try:
-        trade_repo = SQLAlchemyTradeRepository(session)
+        trade_repo = TradeRepositoryImpl(session)
         validation_service = TradeValidationService()
 
         use_case = AcceptTradeUseCase(
@@ -235,7 +235,7 @@ async def reject_trade(
 ) -> TradeResponse:
     """Reject a trade proposal."""
     try:
-        trade_repo = SQLAlchemyTradeRepository(session)
+        trade_repo = TradeRepositoryImpl(session)
         card_repo = CardRepositoryImpl(session)
         validation_service = TradeValidationService()
 
@@ -301,7 +301,7 @@ async def cancel_trade(
 ) -> TradeResponse:
     """Cancel a trade."""
     try:
-        trade_repo = SQLAlchemyTradeRepository(session)
+        trade_repo = TradeRepositoryImpl(session)
         card_repo = CardRepositoryImpl(session)
         validation_service = TradeValidationService()
 
@@ -372,7 +372,7 @@ async def complete_trade(
     Enforces 48h timeout from acceptance.
     """
     try:
-        trade_repo = SQLAlchemyTradeRepository(session)
+        trade_repo = TradeRepositoryImpl(session)
         card_repo = CardRepositoryImpl(session)
         validation_service = TradeValidationService()
 
@@ -443,7 +443,7 @@ async def get_trade_history(
 ) -> TradeHistoryResponse:
     """Get trade history for current user."""
     try:
-        trade_repo = SQLAlchemyTradeRepository(session)
+        trade_repo = TradeRepositoryImpl(session)
 
         use_case = GetTradeHistoryUseCase(trade_repository=trade_repo)
 

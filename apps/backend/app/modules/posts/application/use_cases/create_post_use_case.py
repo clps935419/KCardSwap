@@ -1,13 +1,14 @@
 """Create Post Use Case - Create a new city board post with daily limit check"""
+
 import uuid
 from datetime import datetime, timedelta
 from typing import Optional
 
-from app.modules.posts.domain.entities.post import Post, PostStatus
-from app.modules.posts.domain.repositories.post_repository import PostRepository
-from app.modules.identity.domain.repositories.subscription_repository import (
-    SubscriptionRepository,
+from app.modules.identity.domain.repositories.i_subscription_repository import (
+    ISubscriptionRepository,
 )
+from app.modules.posts.domain.entities.post import Post, PostStatus
+from app.modules.posts.domain.repositories.i_post_repository import IPostRepository
 
 
 class CreatePostUseCase:
@@ -28,8 +29,8 @@ class CreatePostUseCase:
 
     def __init__(
         self,
-        post_repository: PostRepository,
-        subscription_repository: SubscriptionRepository,
+        post_repository: IPostRepository,
+        subscription_repository: ISubscriptionRepository,
     ):
         self.post_repository = post_repository
         self.subscription_repository = subscription_repository

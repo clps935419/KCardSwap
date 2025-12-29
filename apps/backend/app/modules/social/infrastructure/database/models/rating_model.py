@@ -1,12 +1,12 @@
 """
 Rating ORM model for Social module
 """
+
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Column, DateTime, Integer, String, Text, Index
+from sqlalchemy import Column, DateTime, ForeignKey, Index, Integer, Text
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy import ForeignKey
 
 from app.shared.infrastructure.database.connection import Base
 

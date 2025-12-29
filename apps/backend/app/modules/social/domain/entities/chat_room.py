@@ -3,6 +3,7 @@ ChatRoom Entity - Represents a one-on-one chat room between two users
 
 Domain Entity following DDD principles - framework independent
 """
+
 from datetime import datetime
 from typing import List
 
@@ -35,4 +36,4 @@ class ChatRoom:
         return next(pid for pid in self.participant_ids if pid != user_id)
 
     def __repr__(self) -> str:
-        return f"ChatRoom(id={self.id}, " f"participants={self.participant_ids})"
+        return f"ChatRoom(id={self.id}, participants={self.participant_ids})"

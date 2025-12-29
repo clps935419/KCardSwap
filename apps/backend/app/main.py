@@ -11,7 +11,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .config import settings
-from .container import container
+from .injector import injector
 from .shared.presentation.middleware.error_handler import register_exception_handlers
 
 # Configure logging
@@ -36,14 +36,15 @@ async def lifespan(app: FastAPI):
     - In Docker: Migrations run automatically via Dockerfile entrypoint
     - In local dev: Run `poetry run alembic upgrade head` before starting the app
     """
-    # Initialize container wiring (will be expanded when modules add routers)
-    # container.wire() is called automatically via wiring_config in container
+    # Injector is already initialized in app/injector.py
+    # No wiring needed with python-injector
 
     yield
 
     # Shutdown: cleanup resources
-    container.unwire()
-    container.shared().db_connection_provider().close()
+    from .shared.infrastructure.database.connection import db_connection
+
+    db_connection.close()
 
 
 def create_application() -> FastAPI:
@@ -62,8 +63,8 @@ def create_application() -> FastAPI:
         lifespan=lifespan,
     )
 
-    # Store container reference in app state
-    app.container = container
+    # Store injector reference in app state
+    app.state.injector = injector
 
     # Register exception handlers
     register_exception_handlers(app)
@@ -129,10 +130,10 @@ def create_application() -> FastAPI:
     app.include_router(nearby_router, prefix=settings.API_PREFIX)
 
     # Phase 6: Social module (Friends, Chat, Ratings, Reports)
+    from .modules.social.presentation.routers.chat_router import router as chat_router
     from .modules.social.presentation.routers.friends_router import (
         router as friends_router,
     )
-    from .modules.social.presentation.routers.chat_router import router as chat_router
     from .modules.social.presentation.routers.rating_router import (
         router as rating_router,
     )

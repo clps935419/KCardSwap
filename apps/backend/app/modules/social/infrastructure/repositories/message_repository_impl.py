@@ -5,15 +5,17 @@ SQLAlchemy Message Repository Implementation
 from typing import List, Optional
 from uuid import UUID
 
-from sqlalchemy import select, and_, func
+from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.social.domain.entities.message import Message, MessageStatus
-from app.modules.social.domain.repositories.message_repository import MessageRepository
+from app.modules.social.domain.repositories.i_message_repository import (
+    IMessageRepository,
+)
 from app.modules.social.infrastructure.database.models.message_model import MessageModel
 
 
-class SQLAlchemyMessageRepository(MessageRepository):
+class MessageRepositoryImpl(IMessageRepository):
     """SQLAlchemy implementation of Message repository"""
 
     def __init__(self, session: AsyncSession):
@@ -188,4 +190,4 @@ class SQLAlchemyMessageRepository(MessageRepository):
 
 
 # Alias for consistency
-MessageRepositoryImpl = SQLAlchemyMessageRepository
+MessageRepositoryImpl = MessageRepositoryImpl

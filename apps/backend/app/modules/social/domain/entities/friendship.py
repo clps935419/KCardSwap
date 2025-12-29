@@ -3,6 +3,7 @@ Friendship Entity - Represents friend relationships between users
 
 Domain Entity following DDD principles - framework independent
 """
+
 from datetime import datetime
 from enum import Enum
 from typing import Optional

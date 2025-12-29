@@ -6,7 +6,7 @@ This module provides centralized configuration management using environment vari
 import os
 
 
-class Config:
+class Settings:
     """Application configuration class.
 
     Centralizes all configuration values from environment variables.
@@ -80,12 +80,12 @@ class Config:
 
 
 # Global configuration instance
-settings = Config()
+settings = Settings()
 
 # For backward compatibility
 config = settings
 
 
-def get_settings() -> Config:
+def get_settings() -> Settings:
     """Get the global settings instance."""
     return settings

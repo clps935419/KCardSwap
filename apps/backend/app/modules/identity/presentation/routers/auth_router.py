@@ -6,7 +6,6 @@ Handles Google login, token refresh, and logout
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
 from app.modules.identity.application.use_cases.auth.admin_login import (
@@ -21,27 +20,11 @@ from app.modules.identity.application.use_cases.auth.login_with_google import (
 from app.modules.identity.application.use_cases.auth.refresh_token import (
     RefreshTokenUseCase,
 )
-from app.modules.identity.domain.repositories.profile_repository import (
-    IProfileRepository,
-)
-from app.modules.identity.domain.repositories.refresh_token_repository import (
-    RefreshTokenRepository,
-)
-from app.modules.identity.domain.repositories.user_repository import IUserRepository
-from app.modules.identity.infrastructure.external.google_oauth_service import (
-    GoogleOAuthService,
-)
-from app.modules.identity.infrastructure.repositories.profile_repository_impl import (
-    ProfileRepositoryImpl,
-)
-from app.modules.identity.infrastructure.repositories.refresh_token_repository_impl import (
-    RefreshTokenRepositoryImpl,
-)
-from app.modules.identity.infrastructure.repositories.user_repository_impl import (
-    UserRepositoryImpl,
-)
-from app.modules.identity.infrastructure.security.password_service import (
-    PasswordService,
+from app.modules.identity.presentation.dependencies.use_case_deps import (
+    get_admin_login_use_case,
+    get_google_callback_use_case,
+    get_google_login_use_case,
+    get_refresh_token_use_case,
 )
 from app.modules.identity.presentation.schemas.auth_schemas import (
     AdminLoginRequest,
@@ -52,7 +35,6 @@ from app.modules.identity.presentation.schemas.auth_schemas import (
     RefreshTokenRequest,
     TokenResponse,
 )
-from app.shared.infrastructure.database.connection import get_db_session
 from app.shared.infrastructure.security.jwt_service import JWTService
 
 # Create router
@@ -77,7 +59,7 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 )
 async def admin_login(
     request: AdminLoginRequest,
-    session: Annotated[AsyncSession, Depends(get_db_session)],
+    use_case: Annotated[AdminLoginUseCase, Depends(get_admin_login_use_case)],
 ) -> LoginResponse:
     """
     Admin login with email/password.
@@ -89,20 +71,7 @@ async def admin_login(
     This endpoint is only for admin users with password-based authentication.
     Regular users should use Google OAuth login.
     """
-    # Initialize dependencies
-    user_repo: IUserRepository = UserRepositoryImpl(session)
-    refresh_token_repo: RefreshTokenRepository = RefreshTokenRepositoryImpl(session)
-    password_service = PasswordService()
-    jwt_service = JWTService()
-
-    # Create and execute use case
-    use_case = AdminLoginUseCase(
-        user_repo=user_repo,
-        refresh_token_repo=refresh_token_repo,
-        password_service=password_service,
-        jwt_service=jwt_service,
-    )
-
+    # Execute use case
     result = await use_case.execute(request.email, request.password)
 
     if result is None:
@@ -115,9 +84,6 @@ async def admin_login(
         )
 
     access_token, refresh_token, user = result
-
-    # Commit transaction
-    await session.commit()
 
     # Build response
     token_response = TokenResponse(
@@ -147,7 +113,7 @@ async def admin_login(
 )
 async def google_login(
     request: GoogleLoginRequest,
-    session: Annotated[AsyncSession, Depends(get_db_session)],
+    use_case: Annotated[GoogleLoginUseCase, Depends(get_google_login_use_case)],
 ) -> LoginResponse:
     """
     Login with Google OAuth.
@@ -156,22 +122,7 @@ async def google_login(
     - Creates user and profile if new user
     - Returns JWT access and refresh tokens
     """
-    # Initialize dependencies
-    user_repo: IUserRepository = UserRepositoryImpl(session)
-    profile_repo: IProfileRepository = ProfileRepositoryImpl(session)
-    refresh_token_repo: RefreshTokenRepository = RefreshTokenRepositoryImpl(session)
-    google_oauth_service = GoogleOAuthService()
-    jwt_service = JWTService()
-
-    # Create and execute use case
-    use_case = GoogleLoginUseCase(
-        user_repo=user_repo,
-        profile_repo=profile_repo,
-        refresh_token_repo=refresh_token_repo,
-        google_oauth_service=google_oauth_service,
-        jwt_service=jwt_service,
-    )
-
+    # Execute use case
     result = await use_case.execute(request.google_token)
 
     if result is None:
@@ -181,9 +132,6 @@ async def google_login(
         )
 
     access_token, refresh_token, user = result
-
-    # Commit transaction
-    await session.commit()
 
     # Build response
     token_response = TokenResponse(
@@ -216,7 +164,7 @@ async def google_login(
 )
 async def google_callback(
     request: GoogleCallbackRequest,
-    session: Annotated[AsyncSession, Depends(get_db_session)],
+    use_case: Annotated[GoogleCallbackUseCase, Depends(get_google_callback_use_case)],
 ) -> LoginResponse:
     """
     Google OAuth callback with PKCE (Recommended for Expo AuthSession).
@@ -229,22 +177,7 @@ async def google_callback(
     This endpoint implements Authorization Code Flow with PKCE,
     which is the recommended OAuth flow for mobile applications.
     """
-    # Initialize dependencies
-    user_repo: IUserRepository = UserRepositoryImpl(session)
-    profile_repo: IProfileRepository = ProfileRepositoryImpl(session)
-    refresh_token_repo: RefreshTokenRepository = RefreshTokenRepositoryImpl(session)
-    google_oauth_service = GoogleOAuthService()
-    jwt_service = JWTService()
-
-    # Create and execute use case
-    use_case = GoogleCallbackUseCase(
-        user_repo=user_repo,
-        profile_repo=profile_repo,
-        refresh_token_repo=refresh_token_repo,
-        google_oauth_service=google_oauth_service,
-        jwt_service=jwt_service,
-    )
-
+    # Execute use case
     result = await use_case.execute(
         code=request.code,
         code_verifier=request.code_verifier,
@@ -261,9 +194,6 @@ async def google_callback(
         )
 
     access_token, refresh_token, user = result
-
-    # Commit transaction
-    await session.commit()
 
     # Build response
     token_response = TokenResponse(
@@ -291,7 +221,8 @@ async def google_callback(
 )
 async def refresh_token(
     request: RefreshTokenRequest,
-    session: Annotated[AsyncSession, Depends(get_db_session)],
+    use_case: Annotated[RefreshTokenUseCase, Depends(get_refresh_token_use_case)],
+    jwt_service: JWTService = Depends(lambda: JWTService()),
 ) -> LoginResponse:
     """
     Refresh access token using refresh token.
@@ -300,15 +231,7 @@ async def refresh_token(
     - Revokes old refresh token
     - Issues new access and refresh tokens
     """
-    # Initialize dependencies
-    refresh_token_repo: RefreshTokenRepository = RefreshTokenRepositoryImpl(session)
-    jwt_service = JWTService()
-
-    # Create and execute use case
-    use_case = RefreshTokenUseCase(
-        refresh_token_repo=refresh_token_repo, jwt_service=jwt_service
-    )
-
+    # Execute use case
     result = await use_case.execute(request.refresh_token)
 
     if result is None:
@@ -321,9 +244,6 @@ async def refresh_token(
         )
 
     new_access_token, new_refresh_token = result
-
-    # Commit transaction
-    await session.commit()
 
     # Extract user info from new access token for response
     try:

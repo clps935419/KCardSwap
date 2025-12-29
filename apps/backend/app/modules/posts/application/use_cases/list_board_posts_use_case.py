@@ -1,8 +1,9 @@
 """List Board Posts Use Case - List posts for a specific city with filters"""
+
 from typing import List, Optional
 
 from app.modules.posts.domain.entities.post import Post, PostStatus
-from app.modules.posts.domain.repositories.post_repository import PostRepository
+from app.modules.posts.domain.repositories.i_post_repository import IPostRepository
 
 
 class ListBoardPostsUseCase:
@@ -16,7 +17,7 @@ class ListBoardPostsUseCase:
     - Results ordered by created_at DESC (newest first)
     """
 
-    def __init__(self, post_repository: PostRepository):
+    def __init__(self, post_repository: IPostRepository):
         self.post_repository = post_repository
 
     async def execute(

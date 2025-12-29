@@ -3,6 +3,7 @@ PostInterest Entity - Represents user interest in a city board post
 
 Domain Entity following DDD principles - framework independent
 """
+
 from datetime import datetime
 from enum import Enum
 from typing import Optional

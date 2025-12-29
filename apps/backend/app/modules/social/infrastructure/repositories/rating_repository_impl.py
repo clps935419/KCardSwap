@@ -5,15 +5,15 @@ SQLAlchemy Rating Repository Implementation
 from typing import List, Optional
 from uuid import UUID
 
-from sqlalchemy import select, and_, func
+from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.social.domain.entities.rating import Rating
-from app.modules.social.domain.repositories.rating_repository import RatingRepository
+from app.modules.social.domain.repositories.i_rating_repository import IRatingRepository
 from app.modules.social.infrastructure.database.models.rating_model import RatingModel
 
 
-class SQLAlchemyRatingRepository(RatingRepository):
+class RatingRepositoryImpl(IRatingRepository):
     """SQLAlchemy implementation of Rating repository"""
 
     def __init__(self, session: AsyncSession):
@@ -142,4 +142,4 @@ class SQLAlchemyRatingRepository(RatingRepository):
 
 
 # Alias for consistency
-RatingRepositoryImpl = SQLAlchemyRatingRepository
+RatingRepositoryImpl = RatingRepositoryImpl

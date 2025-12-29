@@ -2,19 +2,19 @@
 SQLAlchemy Post Repository Implementation
 """
 
+from datetime import datetime
 from typing import List, Optional
 from uuid import UUID
-from datetime import datetime, timedelta
 
-from sqlalchemy import select, and_, func
+from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.posts.domain.entities.post import Post, PostStatus
-from app.modules.posts.domain.repositories.post_repository import PostRepository
+from app.modules.posts.domain.repositories.i_post_repository import IPostRepository
 from app.modules.posts.infrastructure.database.models.post_model import PostModel
 
 
-class SQLAlchemyPostRepository(PostRepository):
+class PostRepositoryImpl(IPostRepository):
     """SQLAlchemy implementation of Post repository"""
 
     def __init__(self, session: AsyncSession):
@@ -24,17 +24,19 @@ class SQLAlchemyPostRepository(PostRepository):
         """Create a new post"""
         model = PostModel(
             id=UUID(post.id) if isinstance(post.id, str) else post.id,
-            owner_id=UUID(post.owner_id)
-            if isinstance(post.owner_id, str)
-            else post.owner_id,
+            owner_id=(
+                UUID(post.owner_id) if isinstance(post.owner_id, str) else post.owner_id
+            ),
             city_code=post.city_code,
             title=post.title,
             content=post.content,
             idol=post.idol,
             idol_group=post.idol_group,
-            status=post.status.value
-            if isinstance(post.status, PostStatus)
-            else post.status,
+            status=(
+                post.status.value
+                if isinstance(post.status, PostStatus)
+                else post.status
+            ),
             expires_at=post.expires_at,
             created_at=post.created_at,
             updated_at=post.updated_at,
@@ -209,4 +211,4 @@ class SQLAlchemyPostRepository(PostRepository):
 
 
 # Alias for consistency
-PostRepositoryImpl = SQLAlchemyPostRepository
+PostRepositoryImpl = PostRepositoryImpl

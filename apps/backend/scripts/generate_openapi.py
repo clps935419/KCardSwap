@@ -54,7 +54,7 @@ def generate_openapi_spec(output_path: str = "../../../openapi/openapi.json") ->
     with open(output_file, "w", encoding="utf-8") as f:
         json.dump(openapi_schema, f, indent=2, ensure_ascii=False)
 
-    print(f"✅ OpenAPI specification generated successfully!")
+    print("✅ OpenAPI specification generated successfully!")
     print(f"📄 Output: {output_file.resolve()}")
     print(f"📊 Endpoints: {len([r for r in app.routes if hasattr(r, 'methods')])}")
     print(f"🔖 Version: {app.version}")

@@ -5,22 +5,22 @@ SQLAlchemy PostInterest Repository Implementation
 from typing import List, Optional
 from uuid import UUID
 
-from sqlalchemy import select, and_
+from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.posts.domain.entities.post_interest import (
     PostInterest,
     PostInterestStatus,
 )
-from app.modules.posts.domain.repositories.post_interest_repository import (
-    PostInterestRepository,
+from app.modules.posts.domain.repositories.i_post_interest_repository import (
+    IPostInterestRepository,
 )
 from app.modules.posts.infrastructure.database.models.post_interest_model import (
     PostInterestModel,
 )
 
 
-class SQLAlchemyPostInterestRepository(PostInterestRepository):
+class PostInterestRepositoryImpl(IPostInterestRepository):
     """SQLAlchemy implementation of PostInterest repository"""
 
     def __init__(self, session: AsyncSession):
@@ -190,7 +190,3 @@ class SQLAlchemyPostInterestRepository(PostInterestRepository):
             created_at=model.created_at,
             updated_at=model.updated_at,
         )
-
-
-# Alias for consistency
-PostInterestRepositoryImpl = SQLAlchemyPostInterestRepository

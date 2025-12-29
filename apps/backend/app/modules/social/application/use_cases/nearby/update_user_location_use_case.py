@@ -4,7 +4,7 @@ Use case for updating user's location.
 
 from uuid import UUID
 
-from app.modules.identity.domain.repositories.profile_repository import (
+from app.modules.identity.domain.repositories.i_profile_repository import (
     IProfileRepository,
 )
 

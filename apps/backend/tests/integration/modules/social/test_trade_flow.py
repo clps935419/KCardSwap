@@ -6,17 +6,17 @@ Note: These tests use TestClient and mock the database.
 For full E2E tests with real database, use pytest with testcontainers (see conftest.py).
 """
 
-import pytest
-from fastapi.testclient import TestClient
+from datetime import datetime, timedelta
 from unittest.mock import AsyncMock, Mock, patch
 from uuid import uuid4
-from datetime import datetime, timedelta
+
+import pytest
+from fastapi.testclient import TestClient
 
 from app.main import app
-from app.modules.social.domain.entities.trade import Trade
 from app.modules.social.domain.entities.card import Card
 from app.modules.social.domain.entities.friendship import Friendship, FriendshipStatus
-
+from app.modules.social.domain.entities.trade import Trade
 
 client = TestClient(app)
 

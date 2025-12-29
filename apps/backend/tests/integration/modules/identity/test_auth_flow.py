@@ -7,12 +7,12 @@ Tests the complete PKCE authentication flow:
 3. User creation/retrieval
 4. JWT token generation
 """
-import pytest
 from unittest.mock import AsyncMock, Mock, patch
+
+import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
-
 
 client = TestClient(app)
 

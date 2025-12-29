@@ -1,10 +1,11 @@
 """Block User Use Case"""
+
 import uuid
 from datetime import datetime
 
 from app.modules.social.domain.entities.friendship import Friendship, FriendshipStatus
-from app.modules.social.domain.repositories.friendship_repository import (
-    FriendshipRepository,
+from app.modules.social.domain.repositories.i_friendship_repository import (
+    IFriendshipRepository,
 )
 
 
@@ -19,7 +20,7 @@ class BlockUserUseCase:
     - User cannot block themselves
     """
 
-    def __init__(self, friendship_repository: FriendshipRepository):
+    def __init__(self, friendship_repository: IFriendshipRepository):
         self.friendship_repository = friendship_repository
 
     async def execute(self, blocker_user_id: str, blocked_user_id: str) -> Friendship:

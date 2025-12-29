@@ -9,22 +9,22 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.identity.presentation.dependencies.auth_deps import get_current_user_id
-from app.modules.identity.domain.repositories.profile_repository import (
+from app.modules.identity.domain.repositories.i_profile_repository import (
     IProfileRepository,
 )
 from app.modules.identity.infrastructure.repositories.profile_repository_impl import (
     ProfileRepositoryImpl,
 )
+from app.modules.identity.presentation.dependencies.auth_deps import get_current_user_id
 from app.modules.social.application.dtos.nearby_dtos import (
     SearchNearbyRequest as SearchRequestDTO,
 )
 from app.modules.social.application.use_cases.nearby import (
+    RateLimitExceededException,
     SearchNearbyCardsUseCase,
     UpdateUserLocationUseCase,
-    RateLimitExceededException,
 )
-from app.modules.social.domain.repositories.card_repository import CardRepository
+from app.modules.social.domain.repositories.i_card_repository import ICardRepository
 from app.modules.social.infrastructure.repositories.card_repository_impl import (
     CardRepositoryImpl,
 )
@@ -32,9 +32,9 @@ from app.modules.social.infrastructure.services.search_quota_service import (
     SearchQuotaService,
 )
 from app.modules.social.presentation.schemas.nearby_schemas import (
+    NearbyCardResponse,
     SearchNearbyRequest,
     SearchNearbyResponse,
-    NearbyCardResponse,
     UpdateLocationRequest,
 )
 from app.shared.infrastructure.database.connection import get_db_session
@@ -45,7 +45,7 @@ router = APIRouter(prefix="/nearby", tags=["Nearby Search"])
 
 async def get_card_repository(
     session: Annotated[AsyncSession, Depends(get_db_session)],
-) -> CardRepository:
+) -> ICardRepository:
     """Dependency: Get card repository"""
     return CardRepositoryImpl(session)
 
@@ -110,7 +110,7 @@ async def get_search_quota_service(
 async def search_nearby_cards(
     request: SearchNearbyRequest,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
-    card_repository: Annotated[CardRepository, Depends(get_card_repository)],
+    card_repository: Annotated[ICardRepository, Depends(get_card_repository)],
     quota_service: Annotated[SearchQuotaService, Depends(get_search_quota_service)],
 ) -> SearchNearbyResponse:
     """

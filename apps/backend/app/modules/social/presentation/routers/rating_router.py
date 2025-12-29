@@ -14,11 +14,11 @@ from app.modules.identity.presentation.dependencies.auth_deps import get_current
 from app.modules.social.application.use_cases.ratings.rate_user_use_case import (
     RateUserUseCase,
 )
-from app.modules.social.infrastructure.repositories.rating_repository_impl import (
-    RatingRepositoryImpl,
-)
 from app.modules.social.infrastructure.repositories.friendship_repository_impl import (
     FriendshipRepositoryImpl,
+)
+from app.modules.social.infrastructure.repositories.rating_repository_impl import (
+    RatingRepositoryImpl,
 )
 from app.modules.social.presentation.schemas.rating_schemas import (
     AverageRatingResponse,

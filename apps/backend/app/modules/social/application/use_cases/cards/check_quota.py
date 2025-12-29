@@ -5,7 +5,7 @@ Check Upload Quota Use Case - Check user's upload quota status
 from typing import Dict
 from uuid import UUID
 
-from app.modules.social.domain.repositories.card_repository import CardRepository
+from app.modules.social.domain.repositories.i_card_repository import ICardRepository
 from app.modules.social.domain.value_objects.upload_quota import UploadQuota
 
 
@@ -48,7 +48,7 @@ class QuotaStatus:
 class CheckUploadQuotaUseCase:
     """Use case for checking user's upload quota"""
 
-    def __init__(self, card_repository: CardRepository):
+    def __init__(self, card_repository: ICardRepository):
         self.card_repository = card_repository
 
     async def execute(self, owner_id: UUID, quota: UploadQuota) -> QuotaStatus:

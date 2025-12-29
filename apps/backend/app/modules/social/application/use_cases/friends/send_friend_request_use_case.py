@@ -1,10 +1,11 @@
 """Send Friend Request Use Case"""
+
 import uuid
 from datetime import datetime
 
 from app.modules.social.domain.entities.friendship import Friendship, FriendshipStatus
-from app.modules.social.domain.repositories.friendship_repository import (
-    FriendshipRepository,
+from app.modules.social.domain.repositories.i_friendship_repository import (
+    IFriendshipRepository,
 )
 
 
@@ -18,7 +19,7 @@ class SendFriendRequestUseCase:
     - Cannot send request if user is blocked
     """
 
-    def __init__(self, friendship_repository: FriendshipRepository):
+    def __init__(self, friendship_repository: IFriendshipRepository):
         self.friendship_repository = friendship_repository
 
     async def execute(self, user_id: str, friend_id: str) -> Friendship:

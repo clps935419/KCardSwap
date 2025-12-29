@@ -9,9 +9,9 @@ Make google_id nullable to support both OAuth and password-based authentication.
 """
 from typing import Sequence, Union
 
-from alembic import op
 import sqlalchemy as sa
 
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = "003"
@@ -39,7 +39,7 @@ def upgrade() -> None:
     # Add check constraint to ensure either google_id or password_hash is set
     op.execute(
         """
-        ALTER TABLE users ADD CONSTRAINT check_auth_method 
+        ALTER TABLE users ADD CONSTRAINT check_auth_method
         CHECK (google_id IS NOT NULL OR password_hash IS NOT NULL)
     """
     )
@@ -47,7 +47,7 @@ def upgrade() -> None:
     # Add check constraint for valid role values
     op.execute(
         """
-        ALTER TABLE users ADD CONSTRAINT check_role_values 
+        ALTER TABLE users ADD CONSTRAINT check_role_values
         CHECK (role IN ('user', 'admin', 'super_admin'))
     """
     )
