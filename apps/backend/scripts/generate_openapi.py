@@ -7,10 +7,18 @@ running the server. The generated openapi.json can be used for:
 - API documentation
 - Schema alignment testing (verify implemented responses match the snapshot)
 
+Minimal dependencies (can run without Poetry):
+    pip3 install fastapi pydantic sqlalchemy injector asyncpg python-jose passlib bcrypt email-validator google-auth google-cloud-storage firebase-admin httpx python-multipart
+
 Usage:
+    # Method 1: Direct execution (minimal dependencies)
+    python3 scripts/generate_openapi.py
+
+    # Method 2: With Poetry (full environment)
     poetry run python scripts/generate_openapi.py
-    # or
-    python scripts/generate_openapi.py
+
+    # Method 3: Using Makefile (from repo root)
+    make generate-openapi
 
 Output:
     Creates/updates ../../../openapi/openapi.json (repo root)

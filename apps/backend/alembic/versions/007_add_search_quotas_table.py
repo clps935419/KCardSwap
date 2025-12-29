@@ -6,6 +6,7 @@ Create Date: 2025-12-19 10:35:00.000000
 
 Add search_quotas table to track daily search counts for rate limiting.
 """
+
 from typing import Sequence, Union
 
 import sqlalchemy as sa

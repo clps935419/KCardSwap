@@ -3,7 +3,7 @@ Unit tests for PasswordService
 Testing password hashing and verification
 """
 
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
 import pytest
 

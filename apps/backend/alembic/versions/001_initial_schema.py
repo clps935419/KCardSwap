@@ -6,6 +6,7 @@ Create Date: 2025-12-15 02:50:00.000000
 
 This migration creates all initial database tables from infra/db/init.sql.
 """
+
 from typing import Sequence, Union
 
 import sqlalchemy as sa

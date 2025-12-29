@@ -37,6 +37,14 @@ class CardModel(Base):
     )
     image_url = Column(Text, nullable=True)
     size_bytes = Column(Integer, nullable=True)
+    upload_status = Column(
+        String(50),
+        nullable=False,
+        default="pending",
+        server_default="pending",
+        index=True,
+    )
+    upload_confirmed_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
     updated_at = Column(
         DateTime(timezone=True),

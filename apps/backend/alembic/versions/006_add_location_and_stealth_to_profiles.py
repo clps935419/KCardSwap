@@ -7,6 +7,7 @@ Create Date: 2025-12-19 10:30:00.000000
 Add last_lat, last_lng, and stealth_mode fields to profiles table
 for nearby card search functionality.
 """
+
 from typing import Sequence, Union
 
 import sqlalchemy as sa

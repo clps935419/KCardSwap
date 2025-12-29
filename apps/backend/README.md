@@ -155,6 +155,21 @@ poetry run ruff check .
 poetry run ruff check --fix .
 ```
 
+### OpenAPI 規格
+```bash
+# 方法 1: 使用 Poetry（完整環境）
+poetry run python scripts/generate_openapi.py
+
+# 方法 2: 直接執行（最小依賴，不需要 Poetry）
+pip3 install fastapi pydantic sqlalchemy injector asyncpg python-jose passlib bcrypt email-validator google-auth google-cloud-storage firebase-admin httpx python-multipart
+python3 scripts/generate_openapi.py
+
+# 方法 3: 使用 Makefile
+make generate-openapi
+```
+
+產生的 `openapi/openapi.json` 位於專案根目錄的 `openapi/` 資料夾，用於前端 SDK 生成。
+
 ## API 文件
 
 - **Swagger UI**: http://localhost:8000/api/v1/docs

@@ -17,6 +17,7 @@ Phase 7 (FR-SOCIAL-003B): Will add validation for completed trades
 - When trade_id provided, must be completed trade
 - One rating per completed trade participant
 """
+
 from typing import Sequence, Union
 
 import sqlalchemy as sa

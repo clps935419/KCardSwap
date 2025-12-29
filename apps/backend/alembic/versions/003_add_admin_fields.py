@@ -7,6 +7,7 @@ Create Date: 2025-12-17 09:56:00.000000
 Add password_hash and role fields to users table for admin authentication.
 Make google_id nullable to support both OAuth and password-based authentication.
 """
+
 from typing import Sequence, Union
 
 import sqlalchemy as sa

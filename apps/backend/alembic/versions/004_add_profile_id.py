@@ -7,6 +7,7 @@ Create Date: 2025-12-18 07:00:00.000000
 Add id field as primary key to profiles table, making user_id a unique foreign key instead.
 This aligns with the project standard that all tables should have an id field.
 """
+
 from typing import Sequence, Union
 
 import sqlalchemy as sa
