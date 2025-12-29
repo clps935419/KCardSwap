@@ -14,6 +14,9 @@ from app.modules.identity.presentation.dependencies.auth_deps import get_current
 from app.modules.social.application.use_cases.cards.check_quota import (
     CheckUploadQuotaUseCase,
 )
+from app.modules.social.application.use_cases.cards.confirm_upload import (
+    ConfirmCardUploadUseCase,
+)
 from app.modules.social.application.use_cases.cards.delete_card import DeleteCardUseCase
 from app.modules.social.application.use_cases.cards.get_my_cards import (
     GetMyCardsUseCase,
@@ -268,3 +271,90 @@ async def get_quota_status(
     status_result = await use_case.execute(owner_id=current_user_id, quota=quota)
 
     return QuotaStatusResponse(**status_result.to_dict())
+
+
+@router.post(
+    "/{card_id}/confirm-upload",
+    status_code=status.HTTP_200_OK,
+    responses={
+        200: {"description": "Upload confirmed successfully"},
+        400: {"description": "Invalid request (already confirmed, no image, etc.)"},
+        401: {"description": "Unauthorized"},
+        403: {"description": "Not the card owner"},
+        404: {"description": "Card not found or image not found in storage"},
+    },
+    summary="Confirm card upload",
+    description="Confirm that the card image has been successfully uploaded to GCS after using the signed URL",
+)
+async def confirm_card_upload(
+    card_id: UUID,
+    current_user_id: Annotated[UUID, Depends(get_current_user_id)],
+    session: Annotated[AsyncSession, Depends(get_db_session)],
+) -> dict:
+    """
+    Confirm card upload after successful GCS upload.
+
+    This endpoint should be called after the client successfully uploads
+    the image file to the signed URL provided by /upload-url endpoint.
+
+    It will:
+    1. Verify that the card exists and belongs to the user
+    2. Check that the image file exists in GCS
+    3. Mark the card's upload status as "confirmed"
+
+    This prevents "ghost records" where cards are created but images
+    are never actually uploaded.
+    """
+    # Initialize dependencies
+    card_repo: ICardRepository = CardRepositoryImpl(session)
+    gcs_service = get_storage_service()
+
+    # Create and execute use case
+    use_case = ConfirmCardUploadUseCase(
+        card_repository=card_repo,
+        gcs_service=gcs_service,
+    )
+
+    try:
+        await use_case.execute(card_id=card_id, owner_id=current_user_id)
+        return {
+            "message": "Upload confirmed successfully",
+            "card_id": str(card_id),
+        }
+    except ValueError as e:
+        error_message = str(e)
+        
+        # Determine appropriate HTTP status code
+        if "not found" in error_message.lower():
+            if "image file" in error_message.lower() or "storage" in error_message.lower():
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail={
+                        "code": "IMAGE_NOT_FOUND",
+                        "message": error_message,
+                    },
+                )
+            else:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail={
+                        "code": "CARD_NOT_FOUND",
+                        "message": "Card not found",
+                    },
+                )
+        elif "not authorized" in error_message.lower():
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail={
+                    "code": "FORBIDDEN",
+                    "message": "Not authorized to confirm this card",
+                },
+            )
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail={
+                    "code": "VALIDATION_ERROR",
+                    "message": error_message,
+                },
+            )

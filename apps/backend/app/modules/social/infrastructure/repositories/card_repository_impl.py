@@ -40,6 +40,8 @@ class CardRepositoryImpl(ICardRepository):
             existing.status = card.status
             existing.image_url = card.image_url
             existing.size_bytes = card.size_bytes
+            existing.upload_status = card.upload_status
+            existing.upload_confirmed_at = card.upload_confirmed_at
             existing.updated_at = card.updated_at
             model = existing
         else:
@@ -55,6 +57,8 @@ class CardRepositoryImpl(ICardRepository):
                 status=card.status,
                 image_url=card.image_url,
                 size_bytes=card.size_bytes,
+                upload_status=card.upload_status,
+                upload_confirmed_at=card.upload_confirmed_at,
                 created_at=card.created_at,
                 updated_at=card.updated_at,
             )
@@ -218,6 +222,8 @@ class CardRepositoryImpl(ICardRepository):
             status=model.status,
             image_url=model.image_url,
             size_bytes=model.size_bytes,
+            upload_status=getattr(model, 'upload_status', 'pending'),
+            upload_confirmed_at=getattr(model, 'upload_confirmed_at', None),
             created_at=model.created_at,
             updated_at=model.updated_at,
         )

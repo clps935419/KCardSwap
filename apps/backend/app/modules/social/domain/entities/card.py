@@ -21,6 +21,12 @@ class Card:
 
     VALID_STATUSES = {STATUS_AVAILABLE, STATUS_TRADING, STATUS_TRADED}
 
+    # Valid upload statuses
+    UPLOAD_STATUS_PENDING = "pending"
+    UPLOAD_STATUS_CONFIRMED = "confirmed"
+
+    VALID_UPLOAD_STATUSES = {UPLOAD_STATUS_PENDING, UPLOAD_STATUS_CONFIRMED}
+
     # Valid rarities
     RARITY_COMMON = "common"
     RARITY_RARE = "rare"
@@ -40,6 +46,8 @@ class Card:
         status: str = STATUS_AVAILABLE,
         image_url: Optional[str] = None,
         size_bytes: Optional[int] = None,
+        upload_status: str = UPLOAD_STATUS_PENDING,
+        upload_confirmed_at: Optional[datetime] = None,
         id: Optional[UUID] = None,
         created_at: Optional[datetime] = None,
         updated_at: Optional[datetime] = None,
@@ -54,6 +62,8 @@ class Card:
         self._status = status
         self._image_url = image_url
         self._size_bytes = size_bytes
+        self._upload_status = upload_status
+        self._upload_confirmed_at = upload_confirmed_at
         self._created_at = created_at or datetime.utcnow()
         self._updated_at = updated_at or datetime.utcnow()
 
@@ -67,6 +77,11 @@ class Card:
         if self._status not in self.VALID_STATUSES:
             raise ValueError(
                 f"Invalid status. Must be one of: {', '.join(self.VALID_STATUSES)}"
+            )
+
+        if self._upload_status not in self.VALID_UPLOAD_STATUSES:
+            raise ValueError(
+                f"Invalid upload_status. Must be one of: {', '.join(self.VALID_UPLOAD_STATUSES)}"
             )
 
         if self._rarity is not None and self._rarity not in self.VALID_RARITIES:
@@ -125,6 +140,14 @@ class Card:
     def updated_at(self) -> datetime:
         return self._updated_at
 
+    @property
+    def upload_status(self) -> str:
+        return self._upload_status
+
+    @property
+    def upload_confirmed_at(self) -> Optional[datetime]:
+        return self._upload_confirmed_at
+
     def is_available(self) -> bool:
         """Check if card is available for trading"""
         return self._status == self.STATUS_AVAILABLE
@@ -155,6 +178,18 @@ class Card:
         self._image_url = image_url
         self._size_bytes = size_bytes
         self._updated_at = datetime.utcnow()
+
+    def confirm_upload(self):
+        """Confirm that the card image has been successfully uploaded to GCS"""
+        if self._upload_status == self.UPLOAD_STATUS_CONFIRMED:
+            raise ValueError("Upload already confirmed")
+        self._upload_status = self.UPLOAD_STATUS_CONFIRMED
+        self._upload_confirmed_at = datetime.utcnow()
+        self._updated_at = datetime.utcnow()
+
+    def is_upload_confirmed(self) -> bool:
+        """Check if upload has been confirmed"""
+        return self._upload_status == self.UPLOAD_STATUS_CONFIRMED
 
     def __eq__(self, other):
         if not isinstance(other, Card):
