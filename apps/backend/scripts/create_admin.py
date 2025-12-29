@@ -20,10 +20,10 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
 from app.config import settings
-from app.modules.identity.infrastructure.database.models.user_model import UserModel
 from app.modules.identity.infrastructure.database.models.profile_model import (
     ProfileModel,
 )
+from app.modules.identity.infrastructure.database.models.user_model import UserModel
 from app.shared.infrastructure.security.password_hasher import password_hasher
 
 
@@ -89,12 +89,12 @@ async def create_admin_user(email: str, password: str, role: str):
             session.add(admin_profile)
             await session.commit()
 
-            print(f"\n✅ Admin user created successfully!")
+            print("\n✅ Admin user created successfully!")
             print(f"   Email: {admin_user.email}")
             print(f"   Role: {admin_user.role}")
             print(f"   User ID: {admin_user.id}")
             print(f"   Profile created: {admin_profile.nickname}")
-            print(f"\nYou can now login at POST /api/v1/auth/admin-login with:")
+            print("\nYou can now login at POST /api/v1/auth/admin-login with:")
             print(
                 f'   {{\n     "email": "{email}",\n     "password": "[your-password]"\n   }}'
             )

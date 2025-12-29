@@ -4,12 +4,13 @@ Handles trade proposals, acceptance, rejection, cancellation, completion, and hi
 """
 
 import logging
-from typing import Annotated, List
+from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.config import settings
 from app.modules.identity.presentation.dependencies.auth_deps import get_current_user_id
 from app.modules.social.application.use_cases.trades.accept_trade_use_case import (
     AcceptTradeUseCase,
@@ -49,7 +50,6 @@ from app.modules.social.presentation.schemas.trade_schemas import (
     TradeResponse,
 )
 from app.shared.infrastructure.database.connection import get_db_session
-from app.config import settings
 
 logger = logging.getLogger(__name__)
 

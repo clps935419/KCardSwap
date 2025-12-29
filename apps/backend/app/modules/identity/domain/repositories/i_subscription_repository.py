@@ -3,8 +3,8 @@ Subscription Repository Interface
 """
 
 from abc import ABC, abstractmethod
-from typing import Optional
 from datetime import datetime
+from typing import Optional
 from uuid import UUID
 
 from ..entities.subscription import Subscription

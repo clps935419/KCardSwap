@@ -2,9 +2,10 @@
 Unit tests for Rating Entity (T126G)
 Tests updated for FR-SOCIAL-003A requirements
 """
-import pytest
 from datetime import datetime
 from uuid import uuid4
+
+import pytest
 
 from app.modules.social.domain.entities.rating import Rating
 

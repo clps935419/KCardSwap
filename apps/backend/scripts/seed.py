@@ -13,25 +13,24 @@ Options:
 Environment Variables:
     DATABASE_URL    Database connection string (required)
 """
-import asyncio
 import argparse
+import asyncio
 import os
 import sys
+import uuid
 from datetime import datetime, timedelta
 from typing import List
-import uuid
 
 from sqlalchemy import text
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 # Add parent directory to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from app.infrastructure.database.models import (
-    UserModel,
     ProfileModel,
     RefreshTokenModel,
-    Base,
+    UserModel,
 )
 
 

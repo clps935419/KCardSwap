@@ -3,17 +3,17 @@
 from typing import List, Optional
 from uuid import UUID
 
-from sqlalchemy import select, or_, and_, func
+from sqlalchemy import and_, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.modules.social.domain.entities.trade import Trade
 from app.modules.social.domain.entities.trade_item import TradeItem
 from app.modules.social.domain.repositories.i_trade_repository import ITradeRepository
-from app.modules.social.infrastructure.database.models.trade_model import TradeModel
 from app.modules.social.infrastructure.database.models.trade_item_model import (
     TradeItemModel,
 )
+from app.modules.social.infrastructure.database.models.trade_model import TradeModel
 
 
 class TradeRepositoryImpl(ITradeRepository):

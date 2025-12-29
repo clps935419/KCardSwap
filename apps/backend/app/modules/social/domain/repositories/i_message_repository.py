@@ -7,7 +7,7 @@ Domain layer repository interface - defines contract for message persistence
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
-from app.modules.social.domain.entities.message import Message, MessageStatus
+from app.modules.social.domain.entities.message import Message
 
 
 class IMessageRepository(ABC):

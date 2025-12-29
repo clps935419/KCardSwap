@@ -6,6 +6,9 @@ Provides social features related use cases using python-injector.
 from injector import Module, provider
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.modules.identity.infrastructure.repositories.subscription_repository_impl import (
+    SubscriptionRepositoryImpl,
+)
 from app.modules.social.application.use_cases.cards.check_quota import (
     CheckUploadQuotaUseCase,
 )
@@ -83,9 +86,6 @@ from app.modules.social.infrastructure.repositories.report_repository_impl impor
 )
 from app.modules.social.infrastructure.repositories.trade_repository_impl import (
     TradeRepositoryImpl,
-)
-from app.modules.identity.infrastructure.repositories.subscription_repository_impl import (
-    SubscriptionRepositoryImpl,
 )
 from app.shared.infrastructure.external.gcs_storage_service import GCSStorageService
 

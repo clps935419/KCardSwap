@@ -5,7 +5,7 @@ ChatRoom ORM model for Social module
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Column, DateTime, ARRAY, Index
+from sqlalchemy import ARRAY, Column, DateTime, Index
 from sqlalchemy.dialects.postgresql import UUID
 
 from app.shared.infrastructure.database.connection import Base

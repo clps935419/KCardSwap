@@ -1,5 +1,8 @@
 """Accept Friend Request Use Case"""
 
+import uuid
+from datetime import datetime
+
 from app.modules.social.domain.entities.chat_room import ChatRoom
 from app.modules.social.domain.repositories.i_chat_room_repository import (
     IChatRoomRepository,
@@ -7,8 +10,6 @@ from app.modules.social.domain.repositories.i_chat_room_repository import (
 from app.modules.social.domain.repositories.i_friendship_repository import (
     IFriendshipRepository,
 )
-import uuid
-from datetime import datetime
 
 
 class AcceptFriendRequestUseCase:

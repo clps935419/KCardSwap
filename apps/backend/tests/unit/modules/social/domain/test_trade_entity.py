@@ -2,9 +2,10 @@
 Unit tests for Trade Entity (T162)
 Testing trade entity creation, validation, and business logic
 """
-import pytest
 from datetime import datetime
 from uuid import uuid4
+
+import pytest
 
 from app.modules.social.domain.entities.trade import Trade
 

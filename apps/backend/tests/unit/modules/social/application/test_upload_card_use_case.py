@@ -2,19 +2,20 @@
 Unit tests for UploadCardUseCase (T085)
 Testing use case with mocked dependencies
 """
-import pytest
 from datetime import datetime, timedelta
 from unittest.mock import AsyncMock, Mock
 from uuid import uuid4
 
+import pytest
+
 from app.modules.social.application.use_cases.cards.upload_card import (
-    UploadCardUseCase,
     UploadCardResult,
+    UploadCardUseCase,
 )
 from app.modules.social.domain.entities.card import Card
 from app.modules.social.domain.value_objects.upload_quota import (
-    UploadQuota,
     QuotaExceeded,
+    UploadQuota,
 )
 
 

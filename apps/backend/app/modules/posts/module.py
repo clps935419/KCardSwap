@@ -6,6 +6,9 @@ Provides city board posts related use cases using python-injector.
 from injector import Module, provider
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.modules.identity.infrastructure.repositories.subscription_repository_impl import (
+    SubscriptionRepositoryImpl,
+)
 from app.modules.posts.application.use_cases.accept_interest_use_case import (
     AcceptInterestUseCase,
 )
@@ -24,20 +27,17 @@ from app.modules.posts.application.use_cases.list_board_posts_use_case import (
 from app.modules.posts.application.use_cases.reject_interest_use_case import (
     RejectInterestUseCase,
 )
-from app.modules.posts.infrastructure.repositories.post_repository_impl import (
-    PostRepositoryImpl,
-)
 from app.modules.posts.infrastructure.repositories.post_interest_repository_impl import (
     PostInterestRepositoryImpl,
 )
-from app.modules.identity.infrastructure.repositories.subscription_repository_impl import (
-    SubscriptionRepositoryImpl,
-)
-from app.modules.social.infrastructure.repositories.friendship_repository_impl import (
-    FriendshipRepositoryImpl,
+from app.modules.posts.infrastructure.repositories.post_repository_impl import (
+    PostRepositoryImpl,
 )
 from app.modules.social.infrastructure.repositories.chat_room_repository_impl import (
     ChatRoomRepositoryImpl,
+)
+from app.modules.social.infrastructure.repositories.friendship_repository_impl import (
+    FriendshipRepositoryImpl,
 )
 
 

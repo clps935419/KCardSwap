@@ -5,7 +5,7 @@ SQLAlchemy Report Repository Implementation
 from typing import List, Optional
 from uuid import UUID
 
-from sqlalchemy import select, and_, func
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.social.domain.entities.report import Report, ReportReason

@@ -1,9 +1,9 @@
 """
 Unit tests for User entity
 """
-import pytest
-from datetime import datetime
 from uuid import uuid4
+
+import pytest
 
 from app.modules.identity.domain.entities.user import User
 

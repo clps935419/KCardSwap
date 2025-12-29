@@ -1,8 +1,9 @@
 """
 Unit tests for Profile entity
 """
-import pytest
 from uuid import uuid4
+
+import pytest
 
 from app.modules.identity.domain.entities.profile import Profile
 

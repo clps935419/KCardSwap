@@ -4,22 +4,21 @@ Verify Receipt Use Case - Verify Google Play purchase and update subscription
 
 import logging
 from datetime import datetime
-from typing import Optional
 from uuid import UUID
 
-from app.modules.identity.domain.repositories.i_subscription_repository import (
-    ISubscriptionRepository,
-)
 from app.modules.identity.domain.repositories.i_purchase_token_repository import (
     IPurchaseTokenRepository,
+)
+from app.modules.identity.domain.repositories.i_subscription_repository import (
+    ISubscriptionRepository,
 )
 from app.modules.identity.infrastructure.external.google_play_billing_service import (
     GooglePlayBillingService,
 )
 from app.shared.presentation.exceptions.api_exceptions import (
-    ValidationException,
     ConflictException,
     ServiceUnavailableException,
+    ValidationException,
 )
 
 logger = logging.getLogger(__name__)

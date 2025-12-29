@@ -1,16 +1,17 @@
 """initial schema
 
 Revision ID: 001
-Revises: 
+Revises:
 Create Date: 2025-12-15 02:50:00.000000
 
 This migration creates all initial database tables from infra/db/init.sql.
 """
 from typing import Sequence, Union
 
-from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
+
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = "001"
@@ -202,7 +203,7 @@ def upgrade() -> None:
     # Create triggers for updated_at
     op.execute(
         """
-        CREATE TRIGGER update_users_updated_at 
+        CREATE TRIGGER update_users_updated_at
         BEFORE UPDATE ON users
         FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
     """
@@ -210,7 +211,7 @@ def upgrade() -> None:
 
     op.execute(
         """
-        CREATE TRIGGER update_profiles_updated_at 
+        CREATE TRIGGER update_profiles_updated_at
         BEFORE UPDATE ON profiles
         FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
     """
@@ -218,7 +219,7 @@ def upgrade() -> None:
 
     op.execute(
         """
-        CREATE TRIGGER update_cards_updated_at 
+        CREATE TRIGGER update_cards_updated_at
         BEFORE UPDATE ON cards
         FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
     """
@@ -226,7 +227,7 @@ def upgrade() -> None:
 
     op.execute(
         """
-        CREATE TRIGGER update_subscriptions_updated_at 
+        CREATE TRIGGER update_subscriptions_updated_at
         BEFORE UPDATE ON subscriptions
         FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
     """
@@ -234,7 +235,7 @@ def upgrade() -> None:
 
     op.execute(
         """
-        CREATE TRIGGER update_refresh_tokens_updated_at 
+        CREATE TRIGGER update_refresh_tokens_updated_at
         BEFORE UPDATE ON refresh_tokens
         FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
     """

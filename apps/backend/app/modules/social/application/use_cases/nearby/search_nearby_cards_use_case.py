@@ -3,7 +3,6 @@ Use case for searching nearby cards.
 """
 
 from typing import List
-from uuid import UUID
 
 from app.config import settings
 from app.modules.social.application.dtos.nearby_dtos import (

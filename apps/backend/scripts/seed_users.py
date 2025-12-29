@@ -12,8 +12,6 @@ from uuid import uuid4
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from app.config import settings
-from app.modules.identity.domain.entities.profile import Profile
-from app.modules.identity.domain.entities.user import User
 from app.modules.identity.infrastructure.database.models import ProfileModel, UserModel
 from app.shared.infrastructure.database.connection import db_connection
 
@@ -144,7 +142,7 @@ async def seed_users():
             # Commit all changes
             await session.commit()
 
-            print(f"\n🎉 Seed completed!")
+            print("\n🎉 Seed completed!")
             print(f"   Created: {created_count} users")
             print(f"   Skipped: {skipped_count} users (already exist)")
             print(f"   Total: {len(test_users)} users")

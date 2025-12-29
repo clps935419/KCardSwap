@@ -2,18 +2,18 @@
 Unit tests for SearchNearbyCardsUseCase
 """
 
-import pytest
-from unittest.mock import AsyncMock, Mock
+from unittest.mock import AsyncMock
 from uuid import uuid4
+
+import pytest
 
 from app.config import settings
 from app.modules.social.application.dtos.nearby_dtos import (
     SearchNearbyRequest,
-    NearbyCardResult,
 )
 from app.modules.social.application.use_cases.nearby import (
-    SearchNearbyCardsUseCase,
     RateLimitExceededException,
+    SearchNearbyCardsUseCase,
 )
 from app.modules.social.domain.entities.card import Card
 

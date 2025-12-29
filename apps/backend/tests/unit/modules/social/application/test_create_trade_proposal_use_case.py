@@ -2,18 +2,19 @@
 Unit tests for CreateTradeProposalUseCase (T164)
 Testing trade proposal creation business rules with mocked dependencies
 """
-import pytest
 from datetime import datetime
 from unittest.mock import AsyncMock, Mock
 from uuid import uuid4
 
+import pytest
+
 from app.modules.social.application.use_cases.trades.create_trade_proposal_use_case import (
-    CreateTradeProposalUseCase,
     CreateTradeProposalRequest,
+    CreateTradeProposalUseCase,
 )
-from app.modules.social.domain.entities.trade import Trade
 from app.modules.social.domain.entities.card import Card
 from app.modules.social.domain.entities.friendship import Friendship, FriendshipStatus
+from app.modules.social.domain.entities.trade import Trade
 
 
 class TestCreateTradeProposalUseCaseSuccess:

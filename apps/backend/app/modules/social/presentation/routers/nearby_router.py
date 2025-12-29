@@ -9,20 +9,20 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.identity.presentation.dependencies.auth_deps import get_current_user_id
 from app.modules.identity.domain.repositories.i_profile_repository import (
     IProfileRepository,
 )
 from app.modules.identity.infrastructure.repositories.profile_repository_impl import (
     ProfileRepositoryImpl,
 )
+from app.modules.identity.presentation.dependencies.auth_deps import get_current_user_id
 from app.modules.social.application.dtos.nearby_dtos import (
     SearchNearbyRequest as SearchRequestDTO,
 )
 from app.modules.social.application.use_cases.nearby import (
+    RateLimitExceededException,
     SearchNearbyCardsUseCase,
     UpdateUserLocationUseCase,
-    RateLimitExceededException,
 )
 from app.modules.social.domain.repositories.i_card_repository import ICardRepository
 from app.modules.social.infrastructure.repositories.card_repository_impl import (
@@ -32,9 +32,9 @@ from app.modules.social.infrastructure.services.search_quota_service import (
     SearchQuotaService,
 )
 from app.modules.social.presentation.schemas.nearby_schemas import (
+    NearbyCardResponse,
     SearchNearbyRequest,
     SearchNearbyResponse,
-    NearbyCardResponse,
     UpdateLocationRequest,
 )
 from app.shared.infrastructure.database.connection import get_db_session

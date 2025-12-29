@@ -36,11 +36,11 @@ from app.modules.posts.presentation.dependencies.use_case_deps import (
     get_reject_interest_use_case,
 )
 from app.modules.posts.presentation.schemas.post_schemas import (
-    CreatePostRequest,
-    PostResponse,
-    PostListResponse,
-    PostInterestResponse,
     AcceptInterestResponse,
+    CreatePostRequest,
+    PostInterestResponse,
+    PostListResponse,
+    PostResponse,
 )
 from app.shared.infrastructure.database.connection import get_db_session
 

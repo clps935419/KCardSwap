@@ -1,7 +1,6 @@
 """Complete Trade Use Case"""
 
 from datetime import datetime, timedelta
-from typing import Optional
 from uuid import UUID
 
 from app.modules.social.domain.entities.trade import Trade

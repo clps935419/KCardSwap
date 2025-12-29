@@ -7,13 +7,13 @@ from app.modules.posts.domain.repositories.i_post_interest_repository import (
     IPostInterestRepository,
 )
 from app.modules.posts.domain.repositories.i_post_repository import IPostRepository
-from app.modules.social.domain.entities.friendship import Friendship, FriendshipStatus
 from app.modules.social.domain.entities.chat_room import ChatRoom
-from app.modules.social.domain.repositories.i_friendship_repository import (
-    IFriendshipRepository,
-)
+from app.modules.social.domain.entities.friendship import Friendship, FriendshipStatus
 from app.modules.social.domain.repositories.i_chat_room_repository import (
     IChatRoomRepository,
+)
+from app.modules.social.domain.repositories.i_friendship_repository import (
+    IFriendshipRepository,
 )
 
 

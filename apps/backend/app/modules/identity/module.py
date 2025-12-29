@@ -6,6 +6,7 @@ Provides identity and authentication related use cases using python-injector.
 from injector import Module, provider, singleton
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.config import Settings
 from app.modules.identity.application.use_cases.auth.admin_login import (
     AdminLoginUseCase,
 )
@@ -37,6 +38,9 @@ from app.modules.identity.application.use_cases.subscription.verify_receipt_use_
 from app.modules.identity.infrastructure.external.google_oauth_service import (
     GoogleOAuthService,
 )
+from app.modules.identity.infrastructure.external.google_play_billing_service import (
+    GooglePlayBillingService,
+)
 from app.modules.identity.infrastructure.repositories.profile_repository_impl import (
     ProfileRepositoryImpl,
 )
@@ -55,11 +59,7 @@ from app.modules.identity.infrastructure.repositories.user_repository_impl impor
 from app.modules.identity.infrastructure.security.password_service import (
     PasswordService,
 )
-from app.modules.identity.infrastructure.external.google_play_billing_service import (
-    GooglePlayBillingService,
-)
 from app.shared.infrastructure.security.jwt_service import JWTService
-from app.config import Settings
 
 
 class IdentityModule(Module):

@@ -2,9 +2,10 @@
 Unit tests for Card Entity (T084)
 Following DDD principles and test patterns from test_user_entity.py
 """
-import pytest
 from datetime import datetime
-from uuid import uuid4, UUID
+from uuid import UUID, uuid4
+
+import pytest
 
 from app.modules.social.domain.entities.card import Card
 

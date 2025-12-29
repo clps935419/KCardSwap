@@ -4,7 +4,6 @@ Following DDD principles: Immutable value object with validation logic
 """
 
 from dataclasses import dataclass
-from typing import Optional
 
 
 @dataclass(frozen=True)

@@ -5,10 +5,10 @@ from datetime import datetime
 from typing import Optional
 
 from app.modules.social.domain.entities.rating import Rating
-from app.modules.social.domain.repositories.i_rating_repository import IRatingRepository
 from app.modules.social.domain.repositories.i_friendship_repository import (
     IFriendshipRepository,
 )
+from app.modules.social.domain.repositories.i_rating_repository import IRatingRepository
 
 
 class RateUserUseCase:

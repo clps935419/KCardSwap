@@ -5,8 +5,8 @@ Testing quota validation and business logic
 import pytest
 
 from app.modules.social.domain.value_objects.upload_quota import (
-    UploadQuota,
     QuotaExceeded,
+    UploadQuota,
 )
 
 

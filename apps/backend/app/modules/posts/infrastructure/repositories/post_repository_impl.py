@@ -2,11 +2,11 @@
 SQLAlchemy Post Repository Implementation
 """
 
+from datetime import datetime
 from typing import List, Optional
 from uuid import UUID
-from datetime import datetime, timedelta
 
-from sqlalchemy import select, and_, func
+from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.posts.domain.entities.post import Post, PostStatus

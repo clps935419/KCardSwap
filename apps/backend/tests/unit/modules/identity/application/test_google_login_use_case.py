@@ -9,17 +9,18 @@ Tests the Google OAuth login flow including:
 - Refresh token creation and storage
 - Error handling for invalid tokens
 """
-import pytest
 from datetime import datetime, timedelta
 from unittest.mock import AsyncMock, Mock
 from uuid import uuid4
 
+import pytest
+
 from app.modules.identity.application.use_cases.auth.login_with_google import (
     GoogleLoginUseCase,
 )
-from app.modules.identity.domain.entities.user import User
 from app.modules.identity.domain.entities.profile import Profile
 from app.modules.identity.domain.entities.refresh_token import RefreshToken
+from app.modules.identity.domain.entities.user import User
 
 
 @pytest.fixture

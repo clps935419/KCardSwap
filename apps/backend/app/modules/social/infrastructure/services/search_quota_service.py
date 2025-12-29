@@ -6,10 +6,9 @@ to enforce rate limits (e.g., 5 searches/day for free users).
 """
 
 from datetime import datetime, timezone
-from typing import Optional
 from uuid import UUID
 
-from sqlalchemy import Column, Date, Integer, select, func
+from sqlalchemy import Column, Date, Integer, select
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.ext.asyncio import AsyncSession
 

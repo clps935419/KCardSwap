@@ -2,7 +2,6 @@
 
 import uuid
 from datetime import datetime
-from typing import Optional
 
 from app.modules.social.domain.entities.message import Message, MessageStatus
 from app.modules.social.domain.repositories.i_chat_room_repository import (

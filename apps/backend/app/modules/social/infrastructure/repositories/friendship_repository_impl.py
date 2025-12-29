@@ -5,7 +5,7 @@ SQLAlchemy Friendship Repository Implementation
 from typing import List, Optional
 from uuid import UUID
 
-from sqlalchemy import select, or_, and_
+from sqlalchemy import and_, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.social.domain.entities.friendship import Friendship, FriendshipStatus

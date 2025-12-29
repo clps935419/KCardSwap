@@ -7,13 +7,13 @@ Tests the complete subscription management flow:
 3. Token binding and replay protection
 4. Subscription expiry
 """
-import pytest
-from unittest.mock import AsyncMock, Mock, patch
-from fastapi.testclient import TestClient
 from datetime import datetime, timedelta
+from unittest.mock import AsyncMock, Mock, patch
+
+import pytest
+from fastapi.testclient import TestClient
 
 from app.main import app
-
 
 client = TestClient(app)
 

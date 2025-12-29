@@ -2,11 +2,11 @@
 SQLAlchemy Card Repository Implementation
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import List, Optional, Tuple
 from uuid import UUID
 
-from sqlalchemy import select, func, and_
+from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.social.domain.entities.card import Card

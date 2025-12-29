@@ -4,7 +4,7 @@ Upload Card Use Case - Generate signed URL for card image upload
 
 from datetime import datetime, timedelta
 from typing import Dict
-from uuid import UUID, uuid4
+from uuid import UUID
 
 from app.modules.social.domain.entities.card import Card
 from app.modules.social.domain.repositories.i_card_repository import ICardRepository

@@ -5,8 +5,9 @@ Subscription Repository Implementation
 from datetime import datetime
 from typing import Optional
 from uuid import UUID
-from sqlalchemy.ext.asyncio import AsyncSession
+
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.identity.domain.entities.subscription import Subscription
 from app.modules.identity.domain.repositories.i_subscription_repository import (
