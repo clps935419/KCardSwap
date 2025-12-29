@@ -6,7 +6,6 @@ Handles Google login, token refresh, and logout
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
 from app.modules.identity.application.use_cases.auth.admin_login import (
@@ -36,7 +35,6 @@ from app.modules.identity.presentation.schemas.auth_schemas import (
     RefreshTokenRequest,
     TokenResponse,
 )
-from app.shared.infrastructure.database.connection import get_db_session
 from app.shared.infrastructure.security.jwt_service import JWTService
 
 # Create router
@@ -61,7 +59,6 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 )
 async def admin_login(
     request: AdminLoginRequest,
-    session: Annotated[AsyncSession, Depends(get_db_session)],
     use_case: Annotated[AdminLoginUseCase, Depends(get_admin_login_use_case)],
 ) -> LoginResponse:
     """
@@ -87,9 +84,6 @@ async def admin_login(
         )
 
     access_token, refresh_token, user = result
-
-    # Commit transaction
-    await session.commit()
 
     # Build response
     token_response = TokenResponse(
@@ -119,7 +113,6 @@ async def admin_login(
 )
 async def google_login(
     request: GoogleLoginRequest,
-    session: Annotated[AsyncSession, Depends(get_db_session)],
     use_case: Annotated[GoogleLoginUseCase, Depends(get_google_login_use_case)],
 ) -> LoginResponse:
     """
@@ -139,9 +132,6 @@ async def google_login(
         )
 
     access_token, refresh_token, user = result
-
-    # Commit transaction
-    await session.commit()
 
     # Build response
     token_response = TokenResponse(
@@ -174,7 +164,6 @@ async def google_login(
 )
 async def google_callback(
     request: GoogleCallbackRequest,
-    session: Annotated[AsyncSession, Depends(get_db_session)],
     use_case: Annotated[GoogleCallbackUseCase, Depends(get_google_callback_use_case)],
 ) -> LoginResponse:
     """
@@ -206,9 +195,6 @@ async def google_callback(
 
     access_token, refresh_token, user = result
 
-    # Commit transaction
-    await session.commit()
-
     # Build response
     token_response = TokenResponse(
         access_token=access_token,
@@ -235,7 +221,6 @@ async def google_callback(
 )
 async def refresh_token(
     request: RefreshTokenRequest,
-    session: Annotated[AsyncSession, Depends(get_db_session)],
     use_case: Annotated[RefreshTokenUseCase, Depends(get_refresh_token_use_case)],
     jwt_service: JWTService = Depends(lambda: JWTService()),
 ) -> LoginResponse:
@@ -259,9 +244,6 @@ async def refresh_token(
         )
 
     new_access_token, new_refresh_token = result
-
-    # Commit transaction
-    await session.commit()
 
     # Extract user info from new access token for response
     try:

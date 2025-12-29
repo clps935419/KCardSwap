@@ -7,7 +7,6 @@ from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.identity.application.use_cases.profile.get_profile import (
     GetProfileUseCase,
@@ -26,7 +25,6 @@ from app.modules.identity.presentation.schemas.profile_schemas import (
     ProfileResponseWrapper,
     UpdateProfileRequest,
 )
-from app.shared.infrastructure.database.connection import get_db_session
 
 # Create router
 router = APIRouter(prefix="/profile", tags=["Profile"])
@@ -46,7 +44,6 @@ router = APIRouter(prefix="/profile", tags=["Profile"])
 )
 async def get_my_profile(
     current_user_id: Annotated[UUID, Depends(get_current_user)],
-    session: Annotated[AsyncSession, Depends(get_db_session)],
     use_case: Annotated[GetProfileUseCase, Depends(get_get_profile_use_case)],
 ) -> ProfileResponseWrapper:
     """
@@ -96,7 +93,6 @@ async def get_my_profile(
 async def update_my_profile(
     request: UpdateProfileRequest,
     current_user_id: Annotated[UUID, Depends(get_current_user)],
-    session: Annotated[AsyncSession, Depends(get_db_session)],
     use_case: Annotated[UpdateProfileUseCase, Depends(get_update_profile_use_case)],
 ) -> ProfileResponseWrapper:
     """
@@ -121,9 +117,6 @@ async def update_my_profile(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={"code": "INTERNAL_ERROR", "message": "Failed to update profile"},
         )
-
-    # Commit transaction
-    await session.commit()
 
     # Build response
     profile_response = ProfileResponse(
