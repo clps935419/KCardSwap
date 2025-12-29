@@ -12,7 +12,7 @@ This can be run:
 
 Environment Variables:
     DATABASE_URL              Database connection string (required)
-    DEFAULT_ADMIN_EMAIL       Admin email (default: admin@kcardswap.local)
+    DEFAULT_ADMIN_EMAIL       Admin email (default: admin@kcardswap.com)
     DEFAULT_ADMIN_PASSWORD    Admin password (default: randomly generated)
     DEFAULT_ADMIN_ROLE        Admin role (default: admin)
 
@@ -165,8 +165,8 @@ async def main():
     )
     parser.add_argument(
         "--email",
-        default=os.getenv("DEFAULT_ADMIN_EMAIL", "admin@kcardswap.local"),
-        help="Admin email address (default: admin@kcardswap.local or DEFAULT_ADMIN_EMAIL env var)",
+        default=os.getenv("DEFAULT_ADMIN_EMAIL", "admin@kcardswap.com"),
+        help="Admin email address (default: admin@kcardswap.com or DEFAULT_ADMIN_EMAIL env var)",
     )
     parser.add_argument(
         "--password",
