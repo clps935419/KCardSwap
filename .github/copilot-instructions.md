@@ -38,4 +38,35 @@ AI 執行專案相關任務時，請先讀取 `apps` 目錄下各服務的 `READ
 - `@/` 路徑別名
 - Tailwind CSS className
 
+## 後端開發規範
+
+### OpenAPI 規格生成
+
+**重要**: `generate_openapi.py` 腳本可獨立執行，不需要完整的 Poetry 環境。
+
+```bash
+# 方法 1: 直接使用 Python 執行（推薦給 AI agent）
+cd apps/backend
+pip3 install fastapi pydantic sqlalchemy injector asyncpg python-jose passlib bcrypt email-validator google-auth google-cloud-storage firebase-admin httpx python-multipart
+python3 scripts/generate_openapi.py
+
+# 方法 2: 使用 Makefile（從專案根目錄）
+make generate-openapi
+
+# 方法 3: 使用 Poetry（完整環境）
+cd apps/backend
+poetry run python scripts/generate_openapi.py
+```
+
+生成後的 `openapi/openapi.json` 用於：
+- 前端 SDK 生成 (`cd apps/mobile && npm run sdk:generate`)
+- API 文件同步
+- 型別安全驗證
+
+**SDK 生成流程**:
+1. 後端修改 API → 執行 `python3 scripts/generate_openapi.py`
+2. 產生 `openapi/openapi.json`
+3. 前端執行 `npm run sdk:generate` 產生型別安全的 SDK
+4. 前端使用生成的 SDK，不要手動撰寫 API 呼叫
+
 <!-- MANUAL ADDITIONS END -->
