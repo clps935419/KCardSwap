@@ -2,6 +2,7 @@
 Unit tests for Subscription Entity
 Testing subscription management and status transitions
 """
+
 from datetime import datetime, timedelta
 from uuid import uuid4
 

@@ -2,6 +2,7 @@
 Unit tests for Profile Entity
 Testing profile management, privacy settings, and location features
 """
+
 from datetime import datetime
 from uuid import UUID, uuid4
 

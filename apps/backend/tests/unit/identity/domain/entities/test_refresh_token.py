@@ -2,6 +2,7 @@
 Unit tests for RefreshToken Entity
 Testing token lifecycle management and validation
 """
+
 from datetime import datetime, timedelta
 from uuid import UUID, uuid4
 

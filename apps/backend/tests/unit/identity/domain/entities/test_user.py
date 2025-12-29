@@ -2,6 +2,7 @@
 Unit tests for User Entity
 Testing core business logic and validation rules
 """
+
 from datetime import datetime
 from uuid import UUID, uuid4
 
