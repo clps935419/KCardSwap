@@ -134,6 +134,7 @@
 ## 3. 小卡管理（CARD）
 - API 規格：
 	- `POST /api/v1/cards/upload-url`：回傳 GCS signed URL（驗副檔名/大小上限）。
+	- `POST /api/v1/cards/{id}/confirm-upload`：確認檔案已成功上傳至 GCS，將該卡片標記為「已完成上傳」（避免幽靈紀錄）。
 	- `POST /api/v1/cards`：建立卡（包含圖片 URL、屬性）。
 	- `GET /api/v1/cards?owner=me&filters=...`：查詢+分頁。
 	- `PATCH /api/v1/cards/{id}` / `DELETE /api/v1/cards/{id}`。
@@ -142,7 +143,7 @@
 	- 付費：每日新增不限（其他限制由應用層配置與驗證；以環境變數為準）。
 	- 失敗訊息：明確指出是「當日數量」或「總容量」超限。
 - 資料表：
-	- `cards(id, owner_id, idol, group, album, version, rarity, status, image_url, size_bytes, created_at, updated_at)`
+	- `cards(id, owner_id, idol, group, album, version, rarity, status, image_url, size_bytes, upload_status, upload_confirmed_at, created_at, updated_at)`
 	- `card_upload_stats(user_id, date, created_count)`
 - 縮圖策略：Mobile 端本機產生 `200x200` WebP 並快取（後端不產生/不儲存/不回傳縮圖）。
 - Guardrails（硬性約束）：

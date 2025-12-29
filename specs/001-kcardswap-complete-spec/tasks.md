@@ -329,6 +329,7 @@
 
 **獨立測試標準**:
 - ✓ 使用者可以上傳小卡圖片並取得 GCS Signed URL
+- ✓ 使用者在成功 PUT 到 Signed URL 後可呼叫「確認上傳」API，避免幽靈紀錄
 - ✓ 系統正確驗證檔案類型（JPEG/PNG）和大小限制
 - ✓ 系統正確追蹤每日上傳次數和總容量
 - ✓ 達到限制時回傳正確錯誤訊息（422_LIMIT_EXCEEDED）
@@ -359,6 +360,12 @@
 
 - [x] T079 [P] [US2] 定義 Card Schema：apps/backend/app/modules/social/presentation/schemas/card_schemas.py（CreateCardRequest, CardResponse, UploadUrlResponse）
 - [x] T080 [US2] 建立 Cards Router：apps/backend/app/modules/social/presentation/routers/cards_router.py（POST /api/v1/cards/upload-url, GET /api/v1/cards/me, DELETE /api/v1/cards/{id}）
+
+### Confirm Upload (Design Update)
+
+- [ ] T094A [US2] 新增確認上傳 API：POST /api/v1/cards/{id}/confirm-upload（驗證 GCS 物件存在後將卡片標記為已完成上傳；並補齊最小錯誤碼/回應）
+  - 需同步更新 cards 資料模型（新增 upload_status / upload_confirmed_at 或等價欄位）與 migration
+  - 需更新 OpenAPI snapshot 與對應整合/單元測試
 
 ### Integration
 
@@ -408,6 +415,7 @@
   - 上傳至 Signed URL 不走既有 API client（避免自動注入 Authorization 等 header）；用 fetch 或獨立 HTTP client
   - Retry：僅針對網路錯誤/timeout/5xx 做有限次重試；對 4xx（含 403/400）不盲重試，需提示並必要時重新取得 Signed URL
   - 錯誤 UX：需區分「後端 422（配額/檔案過大/格式不符）」與「Signed URL 上傳失敗（403/過期/網路）」並給出對應提示與重試入口
+- [ ] M203B [US2] 上傳成功後呼叫確認上傳 API：apps/mobile/src/features/cards（呼叫 POST /api/v1/cards/{id}/confirm-upload；失敗時提示重試/重新取得 Signed URL）
 - [x] M203A [P] [US2] 產生 200x200 WebP 縮圖並本機快取：apps/mobile/src/features/cards（縮圖僅供列表快速載入，不上傳、不進後端 API 定義）✅
   - 縮圖快取需定義 key（建議以 card_id 或 image_url 雜湊），並提供失效策略：卡片刪除時移除縮圖；找不到縮圖時回退載入原圖
   - 若 WebP 在特定平台不可用，需定義 fallback（例如 JPEG），但仍維持 200x200 尺寸

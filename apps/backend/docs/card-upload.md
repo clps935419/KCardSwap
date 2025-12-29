@@ -1,15 +1,20 @@
-# Card Upload Flow Documentation
+# 小卡上傳流程文件
 
-## Overview
+## 概覽
 
-The card upload system allows users to upload photo card images to Google Cloud Storage (GCS) using signed URLs. This approach provides:
+小卡上傳系統透過 Signed URL 讓使用者將小卡圖片直接上傳到 Google Cloud Storage（GCS）。此設計具備：
 
-- **Secure uploads**: Backend generates time-limited signed URLs
-- **Direct-to-storage**: Files upload directly to GCS, reducing backend load
-- **Quota management**: Enforces daily upload limits and storage quotas
-- **Type validation**: Only JPEG and PNG images are allowed
+- **安全上傳**：後端產生具時效性的 Signed URL
+- **直傳儲存**：檔案直接上傳到 GCS，降低後端負載
+- **配額管理**：限制每日上傳張數與總儲存容量
+- **型別驗證**：僅允許 JPEG/PNG
 
-## Architecture
+**重要（目前實作）**：
+- 後端在 `POST /api/v1/cards/upload-url` 這一步就會建立小卡資料庫紀錄。
+- 目前程式碼尚未提供「確認上傳（confirm upload）」API。
+- 已規劃新增 `POST /api/v1/cards/{card_id}/confirm-upload`（尚未實作）；在此端點完成前，若取得 Signed URL 後沒有成功把檔案 PUT 到 GCS，資料庫仍可能存在一筆小卡紀錄，且會被納入配額計算。
+
+## 架構
 
 ```
 ┌─────────┐      1. Request      ┌─────────┐      2. Generate     ┌─────────┐
@@ -20,16 +25,16 @@ The card upload system allows users to upload photo card images to Google Cloud 
      │ 3. Upload file                  │                                │
      │    (PUT to signed URL)          │                                │
      └─────────────────────────────────────────────────────────────────┘
-     │                                 │
-     │ 4. Confirm (optional)           │
-     └─────────────────────────────────>
+    │
+    │ 注意：目前後端尚未提供「確認上傳」端點。
+    │ 小卡資料庫紀錄會在 Step 1（upload-url）建立。
 ```
 
-## Upload Process
+## 上傳流程
 
-### Step 1: Request Upload URL
+### Step 1：請求上傳 URL
 
-**Client → Backend**: POST `/api/v1/cards/upload-url`
+**Client → Backend**：POST `/api/v1/cards/upload-url`
 
 ```json
 {
@@ -43,13 +48,16 @@ The card upload system allows users to upload photo card images to Google Cloud 
 }
 ```
 
-**Backend validates**:
-- Content type (must be `image/jpeg` or `image/png`)
-- File size (must be ≤ 10MB by default)
-- Daily upload quota (free tier: 2 uploads/day)
-- Total storage quota (free tier: 1GB total)
+**後端驗證項目**：
+- Content-Type（必須是 `image/jpeg` 或 `image/png`）
+- 檔案大小（預設 ≤ 10MB）
+- 每日上傳配額（目前預設：2 張/天）
+- 總容量配額（目前預設：1GB）
 
-**Backend response** (on success):
+**重要行為（目前實作）**：
+- 後端在這一步就會建立小卡資料庫紀錄（因此會消耗每日張數、也會把 `file_size_bytes` 納入總容量計算）。
+
+**後端回應**（成功時）：
 
 ```json
 {
@@ -67,9 +75,9 @@ The card upload system allows users to upload photo card images to Google Cloud 
 }
 ```
 
-### Step 2: Upload File to GCS
+### Step 2：上傳檔案到 GCS
 
-**Client → GCS**: PUT to `upload_url`
+**Client → GCS**：PUT 到 `upload_url`
 
 ```bash
 curl -X PUT \
@@ -78,27 +86,37 @@ curl -X PUT \
   "https://storage.googleapis.com/kcardswap/cards/..."
 ```
 
-**Important**: 
-- Must use the exact `Content-Type` from `required_headers`
-- Upload must complete within 15 minutes (signed URL expiration)
-- Do NOT include `Authorization` header when uploading to signed URL
-- Upload fails if Content-Type doesn't match
+**重要**：
+- 必須使用回應中的 `required_headers.Content-Type`
+- 必須在 15 分鐘內完成上傳（Signed URL 過期）
+- 上傳 Signed URL 時不要附帶 `Authorization` header
+- Content-Type 不一致會導致上傳失敗（簽章不匹配）
 
-### Step 3: Verify Upload (Optional)
+### Step 3：確認上傳完成（規劃中 / 尚未實作）
 
-Client can verify the card was created:
+**Client → Backend**：POST `/api/v1/cards/{card_id}/confirm-upload`
+
+用途：在成功 PUT 到 Signed URL 後，由客戶端呼叫後端進行「物件存在性」驗證（例如 HEAD/metadata），並把該卡片標記為已完成上傳（避免幽靈紀錄）。
+
+**注意**：此端點目前尚未實作；本文件會在端點完成後更新為正式流程。
+
+### Step 4：確認小卡紀錄（可選）
+
+Client 可以確認小卡「資料庫紀錄」是否存在：
 
 ```bash
 GET /api/v1/cards/me
 ```
 
-Returns list of user's cards including the newly uploaded one.
+會回傳使用者的小卡清單，包含剛建立的那張。
 
-## Quota System
+**注意**：此步驟只代表資料庫紀錄存在，不保證對應的 GCS 檔案已成功上傳。
 
-### Free Tier Limits
+## 配額系統
 
-Default quotas for free users (configured via environment variables):
+### 免費方案限制
+
+免費方案的預設配額（可由環境變數調整）：
 
 | Limit | Default Value | Config Variable |
 |-------|---------------|-----------------|
@@ -106,15 +124,15 @@ Default quotas for free users (configured via environment variables):
 | Max file size | 10 MB | `MAX_FILE_SIZE_MB` |
 | Total storage | 1 GB | `TOTAL_STORAGE_GB_FREE` |
 
-### Quota Enforcement
+### 配額檢查時機
 
-Backend checks quotas **before** generating signed URL:
+後端會在產生 Signed URL 前先檢查配額：
 
-1. **Daily upload limit**: Counts uploads from current day (UTC)
+1. **每日張數**：計算「今天（UTC 00:00 起）建立的小卡資料庫紀錄數」（也就是成功呼叫 `POST /cards/upload-url` 的次數）
 2. **File size limit**: Validates `file_size_bytes` in request
-3. **Total storage limit**: Sums `size_bytes` of all user's cards
+3. **總容量**：把所有小卡的 `size_bytes` 加總（此值來自 upload-url 請求的 `file_size_bytes`）
 
-### Checking Quota Status
+### 查詢配額狀態
 
 ```bash
 GET /api/v1/cards/quota/status
@@ -197,7 +215,7 @@ If signed URL has expired (15 minutes), GCS returns 403:
 </Error>
 ```
 
-**Solution**: Request a new signed URL from backend.
+**解法**：重新向後端請求新的 Signed URL。
 
 ### Content-Type Mismatch
 
@@ -210,13 +228,13 @@ If upload uses wrong Content-Type, GCS returns 403:
 </Error>
 ```
 
-**Solution**: Use exact `Content-Type` from `required_headers`.
+**解法**：使用回應中的 `required_headers` 指定的 Content-Type。
 
 ## API Endpoints
 
 ### POST /api/v1/cards/upload-url
 
-Generate signed URL for uploading a card image.
+產生用於上傳小卡圖片的 Signed URL。
 
 **Authentication**: Required (JWT)
 
@@ -240,6 +258,14 @@ Generate signed URL for uploading a card image.
 - `400`: Validation error
 - `401`: Not authenticated
 - `422`: Quota exceeded
+
+### POST /api/v1/cards/{card_id}/confirm-upload（規劃中 / 尚未實作）
+
+確認指定小卡的原圖已成功上傳到 GCS，並將該卡片標記為「已完成上傳」。
+
+- 觸發時機：客戶端成功 PUT 到 Signed URL 之後
+- 後端行為：驗證 GCS 物件存在（例如 HEAD/metadata），成功才更新狀態
+- 失敗行為：若物件不存在，回傳可辨識錯誤以引導重取 Signed URL 並重傳（錯誤碼/狀態碼以實作為準）
 
 ### GET /api/v1/cards/me
 
@@ -444,6 +470,8 @@ pytest apps/backend/tests/integration/modules/social/
      -H "Authorization: Bearer YOUR_JWT_TOKEN"
    ```
 
+   注意：這只確認資料庫紀錄存在，不代表 GCS 檔案一定存在。
+
 ## Mobile App Integration
 
 Mobile app implementation: `apps/mobile/src/features/cards/`
@@ -474,8 +502,9 @@ const compressed = await ImageManipulator.manipulateAsync(
 1. Get file info (size, type)
 2. Request signed URL from backend
 3. Upload file to signed URL (use `fetch`, not API client)
-4. Generate thumbnail locally (200x200 WebP, cache only)
-5. Refresh card list
+4. Confirm upload with backend (planned: `POST /api/v1/cards/{card_id}/confirm-upload`)
+5. Generate thumbnail locally (200x200 WebP, cache only)
+6. Refresh card list
 
 ### Error Handling
 
@@ -514,12 +543,15 @@ const compressed = await ImageManipulator.manipulateAsync(
 
 **Causes**:
 1. Timezone mismatch (backend uses UTC)
-2. Quota tracked in database, not clearing
+2. 配額是依資料庫 `created_at` 計算
+3. 取得 Signed URL 後未完成上傳（仍會計入）
 
 **Solutions**:
 1. Check server time is UTC
 2. Verify `count_uploads_today` uses UTC date
 3. Check database query filters by date correctly
+
+若需要清理一筆未完成上傳的紀錄，可使用 `DELETE /api/v1/cards/{card_id}` 刪除（前提是該卡不在進行中交易內）。
 
 ### Problem: Images not loading
 
