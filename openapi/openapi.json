@@ -599,6 +599,69 @@
         ]
       }
     },
+    "/api/v1/cards/{card_id}/confirm-upload": {
+      "post": {
+        "tags": [
+          "Cards"
+        ],
+        "summary": "Confirm card upload",
+        "description": "Confirm that the card image has been successfully uploaded to GCS after using the signed URL",
+        "operationId": "confirm_card_upload_api_v1_cards__card_id__confirm_upload_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "card_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Card Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Upload confirmed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Confirm Card Upload Api V1 Cards  Card Id  Confirm Upload Post"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request (already confirmed, no image, etc.)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Not the card owner"
+          },
+          "404": {
+            "description": "Card not found or image not found in storage"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/nearby/search": {
       "post": {
         "tags": [
@@ -1773,7 +1836,7 @@
           "Subscriptions"
         ],
         "summary": "Verify Receipt",
-        "description": "Verify Google Play purchase receipt and update subscription.\n\nFeatures:\n- Idempotent: Same token + same user returns current status\n- Token binding: Prevents cross-user replay attacks  \n- Auto-acknowledge: Acknowledges purchase after verification\n\nError codes:\n- 400_VALIDATION_FAILED: Invalid platform or missing fields\n- 401_UNAUTHORIZED: Not logged in\n- 409_CONFLICT: Purchase token already used by another user\n- 503_SERVICE_UNAVAILABLE: Google Play API unavailable",
+        "description": "Verify Google Play purchase receipt and update subscription.\n\nFeatures:\n- Idempotent: Same token + same user returns current status\n- Token binding: Prevents cross-user replay attacks\n- Auto-acknowledge: Acknowledges purchase after verification\n\nError codes:\n- 400_VALIDATION_FAILED: Invalid platform or missing fields\n- 401_UNAUTHORIZED: Not logged in\n- 409_CONFLICT: Purchase token already used by another user\n- 503_SERVICE_UNAVAILABLE: Google Play API unavailable",
         "operationId": "verify_receipt_api_v1_subscriptions_verify_receipt_post",
         "requestBody": {
           "content": {
@@ -2765,6 +2828,40 @@
           "responder_id": "323e4567-e89b-12d3-a456-426614174000"
         }
       },
+      "ErrorResponse": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code",
+            "description": "Error code"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "description": "Error message"
+          },
+          "details": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Details",
+            "description": "Additional error details"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "title": "ErrorResponse",
+        "description": "Error response schema"
+      },
       "ErrorWrapper": {
         "properties": {
           "data": {
@@ -2772,7 +2869,7 @@
             "title": "Data"
           },
           "error": {
-            "$ref": "#/components/schemas/app__modules__identity__presentation__schemas__profile_schemas__ErrorResponse"
+            "$ref": "#/components/schemas/ErrorResponse"
           }
         },
         "type": "object",
@@ -3494,7 +3591,7 @@
             "title": "Data"
           },
           "error": {
-            "$ref": "#/components/schemas/app__modules__identity__presentation__schemas__profile_schemas__ErrorResponse"
+            "$ref": "#/components/schemas/ErrorResponse"
           }
         },
         "type": "object",
@@ -4938,40 +5035,6 @@
           "product_id": "premium_monthly",
           "purchase_token": "abc123xyz..."
         }
-      },
-      "app__modules__identity__presentation__schemas__profile_schemas__ErrorResponse": {
-        "properties": {
-          "code": {
-            "type": "string",
-            "title": "Code",
-            "description": "Error code"
-          },
-          "message": {
-            "type": "string",
-            "title": "Message",
-            "description": "Error message"
-          },
-          "details": {
-            "anyOf": [
-              {
-                "additionalProperties": true,
-                "type": "object"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Details",
-            "description": "Additional error details"
-          }
-        },
-        "type": "object",
-        "required": [
-          "code",
-          "message"
-        ],
-        "title": "ErrorResponse",
-        "description": "Error response schema"
       }
     },
     "securitySchemes": {

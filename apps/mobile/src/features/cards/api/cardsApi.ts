@@ -18,16 +18,24 @@
 import type {
   GetMyCardsResponse,
   GetMyCardsData,
+  GetUploadUrlApiV1CardsUploadUrlPostResponse,
+  ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostResponse,
 } from '@/src/shared/api/sdk';
 
 // Re-export SDK TanStack Query options
 export {
   getMyCardsOptions,
   getMyCardsQueryKey,
+  getUploadUrlApiV1CardsUploadUrlPostMutation,
+  confirmCardUploadApiV1CardsCardIdConfirmUploadPostMutation,
 } from '@/src/shared/api/sdk';
 
 // Re-export types
 export type { GetMyCardsResponse, GetMyCardsData };
+
+// Export SDK response types with simpler names
+export type UploadUrlResponse = GetUploadUrlApiV1CardsUploadUrlPostResponse;
+export type ConfirmUploadResponse = ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostResponse;
 
 /**
  * Card data structure
@@ -41,77 +49,12 @@ export type Card = NonNullable<CardsData['items']>[number];
 export type CardStatus = 'available' | 'in_trade' | 'traded';
 
 /**
- * Upload URL request
- * 
- * **Note**: This type will be replaced by SDK-generated type once the endpoint is added to OpenAPI spec.
- * TODO: Use SDK type when available: `GetUploadUrlData`
+ * Card rarity enum (for type safety)
  */
-export interface UploadUrlRequest {
-  file_name: string;
-  file_size: number;
-  content_type: 'image/jpeg' | 'image/png';
-}
+export type CardRarity = 'common' | 'rare' | 'epic' | 'legendary';
 
 /**
- * Upload URL response
- * 
- * **Note**: This type will be replaced by SDK-generated type once the endpoint is added to OpenAPI spec.
- * TODO: Use SDK type when available: `GetUploadUrlResponse`
- */
-export interface UploadUrlResponse {
-  upload_url: string;
-  method: 'PUT' | 'POST';
-  required_headers: Record<string, string>;
-  image_url: string;
-  expires_at: string;
-  card_id: string;
-}
-
-/**
- * Confirm upload response
- * 
- * **Note**: This type will be replaced by SDK-generated type once the endpoint is added to OpenAPI spec.
- * TODO: Use SDK type when available: `ConfirmCardUploadResponse`
- */
-export interface ConfirmUploadResponse {
-  message: string;
-  card_id: string;
-}
-
-/**
- * Quota status
- * 
- * **Note**: This type will be replaced by SDK-generated type once the endpoint is added to OpenAPI spec.
- */
-export interface QuotaStatus {
-  daily_uploads_used: number;
-  daily_uploads_limit: number;
-  total_storage_used: number;
-  total_storage_limit: number;
-}
-
-/**
- * TODO M202: Once `/cards/upload-url` is added to OpenAPI spec:
- * 1. Regenerate SDK: `npm run sdk:generate`
- * 2. Replace this comment with:
- *    ```
- *    export { getUploadUrlMutation, getUploadUrlMutationKey } from '@/src/shared/api/sdk';
- *    ```
- * 3. Update UploadUrlRequest and UploadUrlResponse types to use SDK types
- * 4. Remove the temporary implementation below
- */
-
-/**
- * TODO M205: Once `/cards/{id}` DELETE is added to OpenAPI spec:
- * 1. Regenerate SDK: `npm run sdk:generate`
- * 2. Replace this comment with:
- *    ```
- *    export { deleteCardMutation, deleteCardMutationKey } from '@/src/shared/api/sdk';
- *    ```
- */
-
-/**
- * Upload file to Signed URL (M203)
+ * Upload to Signed URL (M203)
  * 
  * **Important**: This must use independent `fetch()`, NOT the SDK client.
  * - Do not inject Authorization headers
@@ -222,11 +165,17 @@ export async function uploadToSignedUrlWithRetry(
 }
 
 /**
- * Example usage:
+ * Example usage with SDK:
  * 
  * ```typescript
  * import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
- * import { getMyCardsOptions, getMyCardsQueryKey, uploadToSignedUrlWithRetry, confirmCardUpload } from './cardsApi';
+ * import { 
+ *   getMyCardsOptions, 
+ *   getMyCardsQueryKey,
+ *   getUploadUrlApiV1CardsUploadUrlPostMutation,
+ *   confirmCardUploadApiV1CardsCardIdConfirmUploadPostMutation,
+ *   uploadToSignedUrlWithRetry 
+ * } from './cardsApi';
  * 
  * function UploadCardScreen() {
  *   const queryClient = useQueryClient();
@@ -234,10 +183,24 @@ export async function uploadToSignedUrlWithRetry(
  *   // 1. Get my cards
  *   const { data: cards } = useQuery(getMyCardsOptions());
  *   
- *   // 2. Upload process (TODO: Replace with SDK mutation when available)
- *   const handleUpload = async (file: Blob) => {
- *     // Step 1: Get signed URL from backend (TODO: Use SDK mutation)
- *     const uploadUrlResponse = await getUploadUrl(file);
+ *   // 2. Get upload URL mutation
+ *   const getUploadUrlMutation = useMutation(getUploadUrlApiV1CardsUploadUrlPostMutation());
+ *   
+ *   // 3. Confirm upload mutation
+ *   const confirmUploadMutation = useMutation(
+ *     confirmCardUploadApiV1CardsCardIdConfirmUploadPostMutation()
+ *   );
+ *   
+ *   // 4. Upload process
+ *   const handleUpload = async (file: Blob, metadata: any) => {
+ *     // Step 1: Get signed URL from backend
+ *     const uploadUrlResponse = await getUploadUrlMutation.mutateAsync({
+ *       body: {
+ *         content_type: 'image/jpeg',
+ *         file_size_bytes: file.size,
+ *         ...metadata,
+ *       },
+ *     });
  *     
  *     // Step 2: Upload to signed URL (independent fetch)
  *     await uploadToSignedUrlWithRetry(
@@ -247,8 +210,10 @@ export async function uploadToSignedUrlWithRetry(
  *       uploadUrlResponse.required_headers
  *     );
  *     
- *     // Step 3: Confirm upload (M203B)
- *     await confirmCardUpload(uploadUrlResponse.card_id);
+ *     // Step 3: Confirm upload
+ *     await confirmUploadMutation.mutateAsync({
+ *       path: { card_id: uploadUrlResponse.card_id },
+ *     });
  *     
  *     // Step 4: Refresh card list
  *     queryClient.invalidateQueries({ queryKey: getMyCardsQueryKey() });
@@ -256,92 +221,3 @@ export async function uploadToSignedUrlWithRetry(
  * }
  * ```
  */
-
-/**
- * TODO M203B: Once `/cards/{id}/confirm-upload` is added to OpenAPI spec:
- * 1. Regenerate SDK: `npm run sdk:generate`
- * 2. Replace this implementation with SDK mutation:
- *    ```
- *    export { confirmCardUploadMutation, confirmCardUploadMutationKey } from '@/src/shared/api/sdk';
- *    ```
- */
-
-import { client } from '@/src/shared/api/sdk';
-
-/**
- * Temporary implementation: Get upload URL (M202)
- * Will be replaced by SDK-generated mutation once OpenAPI spec is updated
- */
-export async function getUploadUrl(request: {
-  content_type: string;
-  file_size_bytes: number;
-  idol?: string;
-  idol_group?: string;
-  album?: string;
-  version?: string;
-  rarity?: string;
-}): Promise<UploadUrlResponse> {
-  const response = await client.POST('/api/v1/cards/upload-url', {
-    body: request,
-  });
-
-  if (response.error) {
-    throw new Error(response.error.message || 'Failed to get upload URL');
-  }
-
-  return response.data as unknown as UploadUrlResponse;
-}
-
-/**
- * Confirm card upload (M203B)
- * 
- * Call this after successfully uploading the file to the signed URL.
- * This prevents "ghost records" where cards are created but images are never uploaded.
- * 
- * @param cardId - The card ID returned from get upload URL response
- * @returns Promise<ConfirmUploadResponse>
- * @throws Error if confirmation fails
- * 
- * **Error Codes**:
- * - 404: Card not found or image not found in storage
- * - 403: Not authorized to confirm this card
- * - 400: Invalid request (already confirmed, no image, etc.)
- * 
- * **Important**: Always call this after uploadToSignedUrlWithRetry succeeds.
- * If this fails, the card will remain in "pending" status and won't appear in the user's card list.
- */
-export async function confirmCardUpload(cardId: string): Promise<ConfirmUploadResponse> {
-  try {
-    const response = await client.POST('/api/v1/cards/{card_id}/confirm-upload', {
-      params: {
-        path: {
-          card_id: cardId,
-        },
-      },
-    });
-
-    if (response.error) {
-      // Handle specific error codes
-      if (response.error.code === 'IMAGE_NOT_FOUND') {
-        throw new Error('Image not found in storage. Please try uploading again.');
-      } else if (response.error.code === 'CARD_NOT_FOUND') {
-        throw new Error('Card not found. Please try uploading again.');
-      } else if (response.error.code === 'FORBIDDEN') {
-        throw new Error('Not authorized to confirm this card upload.');
-      } else if (response.error.code === 'VALIDATION_ERROR') {
-        throw new Error(response.error.message || 'Upload already confirmed or invalid.');
-      }
-      
-      throw new Error(response.error.message || 'Failed to confirm upload');
-    }
-
-    return response.data as unknown as ConfirmUploadResponse;
-  } catch (error: any) {
-    // Handle network errors
-    if (error.message?.includes('network') || error.message?.includes('timeout')) {
-      throw new Error('Network error. Please check your connection and try again.');
-    }
-    
-    throw error;
-  }
-}

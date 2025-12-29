@@ -19,6 +19,7 @@ import {
   cancelTradeApiV1TradesTradeIdCancelPost,
   closePostApiV1PostsPostIdClosePost,
   completeTradeApiV1TradesTradeIdCompletePost,
+  confirmCardUploadApiV1CardsCardIdConfirmUploadPost,
   createPostApiV1PostsPost,
   createTradeApiV1TradesPost,
   deleteCardApiV1CardsCardIdDelete,
@@ -76,6 +77,9 @@ import type {
   CompleteTradeApiV1TradesTradeIdCompletePostData,
   CompleteTradeApiV1TradesTradeIdCompletePostError,
   CompleteTradeApiV1TradesTradeIdCompletePostResponse,
+  ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostData,
+  ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostError,
+  ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostResponse,
   CreatePostApiV1PostsPostData,
   CreatePostApiV1PostsPostResponse,
   CreateTradeApiV1TradesPostData,
@@ -567,6 +571,35 @@ export const getQuotaStatusApiV1CardsQuotaStatusGetOptions = (
     },
     queryKey: getQuotaStatusApiV1CardsQuotaStatusGetQueryKey(options),
   });
+
+/**
+ * Confirm card upload
+ *
+ * Confirm that the card image has been successfully uploaded to GCS after using the signed URL
+ */
+export const confirmCardUploadApiV1CardsCardIdConfirmUploadPostMutation = (
+  options?: Partial<Options<ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostData>>
+): UseMutationOptions<
+  ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostResponse,
+  ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostError,
+  Options<ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostResponse,
+    ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostError,
+    Options<ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await confirmCardUploadApiV1CardsCardIdConfirmUploadPost({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
 
 /**
  * Search for nearby cards

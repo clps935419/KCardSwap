@@ -9,7 +9,10 @@
 
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { getUploadUrl, confirmCardUpload } from '@/src/features/cards/api/cardsApi';
+import { 
+  getUploadUrlApiV1CardsUploadUrlPostMutation,
+  confirmCardUploadApiV1CardsCardIdConfirmUploadPostMutation,
+} from '@/src/features/cards/api/cardsApi';
 import {
   pickImageFromCamera,
   pickImageFromGallery,
@@ -52,6 +55,12 @@ export function useUploadCard() {
     message: '準備中...',
   });
 
+  // SDK mutations
+  const getUploadUrlMutation = useMutation(getUploadUrlApiV1CardsUploadUrlPostMutation());
+  const confirmUploadMutation = useMutation(
+    confirmCardUploadApiV1CardsCardIdConfirmUploadPostMutation()
+  );
+
   const mutation = useMutation({
     mutationFn: async ({
       imageResult,
@@ -67,21 +76,23 @@ export function useUploadCard() {
           throw new Error(sizeValidation.error);
         }
 
-        // Step 2: 取得 Signed URL (M202)
+        // Step 2: 取得 Signed URL (M202) - 使用 SDK mutation
         setUploadProgress({
           step: 'requesting',
           progress: 20,
           message: '取得上傳連結...',
         });
 
-        const uploadUrlResponse = await getUploadUrl({
-          content_type: imageResult.type,
-          file_size_bytes: imageResult.fileSize,
-          idol: options?.idol,
-          idol_group: options?.idol_group,
-          album: options?.album,
-          version: options?.version,
-          rarity: options?.rarity,
+        const uploadUrlResponse = await getUploadUrlMutation.mutateAsync({
+          body: {
+            content_type: imageResult.type,
+            file_size_bytes: imageResult.fileSize,
+            idol: options?.idol,
+            idol_group: options?.idol_group,
+            album: options?.album,
+            version: options?.version,
+            rarity: options?.rarity,
+          },
         });
 
         // 檢查 Signed URL 是否已過期
@@ -110,7 +121,7 @@ export function useUploadCard() {
           },
         });
 
-        // Step 4: 確認上傳 (M203B)
+        // Step 4: 確認上傳 (M203B) - 使用 SDK mutation
         setUploadProgress({
           step: 'confirming',
           progress: 75,
@@ -118,7 +129,11 @@ export function useUploadCard() {
         });
 
         try {
-          await confirmCardUpload(uploadUrlResponse.card_id);
+          await confirmUploadMutation.mutateAsync({
+            path: {
+              card_id: uploadUrlResponse.card_id,
+            },
+          });
         } catch (error) {
           // 確認上傳失敗是致命錯誤，需要重新上傳
           console.error('確認上傳失敗', error);

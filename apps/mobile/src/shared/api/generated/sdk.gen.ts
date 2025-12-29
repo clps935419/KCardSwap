@@ -29,6 +29,9 @@ import type {
   CompleteTradeApiV1TradesTradeIdCompletePostData,
   CompleteTradeApiV1TradesTradeIdCompletePostErrors,
   CompleteTradeApiV1TradesTradeIdCompletePostResponses,
+  ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostData,
+  ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostErrors,
+  ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostResponses,
   CreatePostApiV1PostsPostData,
   CreatePostApiV1PostsPostErrors,
   CreatePostApiV1PostsPostResponses,
@@ -382,6 +385,26 @@ export const getQuotaStatusApiV1CardsQuotaStatusGet = <ThrowOnError extends bool
   >({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/api/v1/cards/quota/status',
+    ...options,
+  });
+
+/**
+ * Confirm card upload
+ *
+ * Confirm that the card image has been successfully uploaded to GCS after using the signed URL
+ */
+export const confirmCardUploadApiV1CardsCardIdConfirmUploadPost = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostData, ThrowOnError>
+) =>
+  (options.client ?? client).post<
+    ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostResponses,
+    ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/cards/{card_id}/confirm-upload',
     ...options,
   });
 

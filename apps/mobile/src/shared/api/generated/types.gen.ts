@@ -303,6 +303,34 @@ export type CreateTradeRequest = {
 };
 
 /**
+ * ErrorResponse
+ *
+ * Error response schema
+ */
+export type ErrorResponse = {
+  /**
+   * Code
+   *
+   * Error code
+   */
+  code: string;
+  /**
+   * Message
+   *
+   * Error message
+   */
+  message: string;
+  /**
+   * Details
+   *
+   * Additional error details
+   */
+  details?: {
+    [key: string]: unknown;
+  } | null;
+};
+
+/**
  * ErrorWrapper
  *
  * Error wrapper response
@@ -312,7 +340,7 @@ export type ErrorWrapper = {
    * Data
    */
   data?: null;
-  error: AppModulesIdentityPresentationSchemasProfileSchemasErrorResponse;
+  error: ErrorResponse;
 };
 
 /**
@@ -780,7 +808,7 @@ export type ProfileErrorWrapper = {
    * Data
    */
   data?: null;
-  error: AppModulesIdentityPresentationSchemasProfileSchemasErrorResponse;
+  error: ErrorResponse;
 };
 
 /**
@@ -1662,34 +1690,6 @@ export type VerifyReceiptRequest = {
   product_id: string;
 };
 
-/**
- * ErrorResponse
- *
- * Error response schema
- */
-export type AppModulesIdentityPresentationSchemasProfileSchemasErrorResponse = {
-  /**
-   * Code
-   *
-   * Error code
-   */
-  code: string;
-  /**
-   * Message
-   *
-   * Error message
-   */
-  message: string;
-  /**
-   * Details
-   *
-   * Additional error details
-   */
-  details?: {
-    [key: string]: unknown;
-  } | null;
-};
-
 export type HealthCheckHealthGetData = {
   body?: never;
   path?: never;
@@ -2073,6 +2073,58 @@ export type GetQuotaStatusApiV1CardsQuotaStatusGetResponses = {
 
 export type GetQuotaStatusApiV1CardsQuotaStatusGetResponse =
   GetQuotaStatusApiV1CardsQuotaStatusGetResponses[keyof GetQuotaStatusApiV1CardsQuotaStatusGetResponses];
+
+export type ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostData = {
+  body?: never;
+  path: {
+    /**
+     * Card Id
+     */
+    card_id: string;
+  };
+  query?: never;
+  url: '/api/v1/cards/{card_id}/confirm-upload';
+};
+
+export type ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostErrors = {
+  /**
+   * Invalid request (already confirmed, no image, etc.)
+   */
+  400: unknown;
+  /**
+   * Unauthorized
+   */
+  401: unknown;
+  /**
+   * Not the card owner
+   */
+  403: unknown;
+  /**
+   * Card not found or image not found in storage
+   */
+  404: unknown;
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostError =
+  ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostErrors[keyof ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostErrors];
+
+export type ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostResponses = {
+  /**
+   * Response Confirm Card Upload Api V1 Cards  Card Id  Confirm Upload Post
+   *
+   * Upload confirmed successfully
+   */
+  200: {
+    [key: string]: unknown;
+  };
+};
+
+export type ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostResponse =
+  ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostResponses[keyof ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostResponses];
 
 export type SearchNearbyCardsApiV1NearbySearchPostData = {
   body: SearchNearbyRequest;
