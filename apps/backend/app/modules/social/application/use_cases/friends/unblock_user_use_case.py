@@ -1,8 +1,5 @@
 """Unblock User Use Case"""
 
-import uuid
-from datetime import datetime
-
 from app.modules.social.domain.entities.friendship import Friendship, FriendshipStatus
 from app.modules.social.domain.repositories.i_friendship_repository import (
     IFriendshipRepository,

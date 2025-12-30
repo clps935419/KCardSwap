@@ -36,8 +36,8 @@ export default function FriendsListScreen() {
     router.push('/friends/add');
   };
 
-  const handleFriendPress = (friendId: string) => {
-    router.push(`/friends/${friendId}`);
+  const handleFriendPress = (userId: string) => {
+    router.push(`/friends/${userId}`);
   };
 
   const handleUnblockUser = (userId: string, nickname?: string) => {
@@ -62,8 +62,11 @@ export default function FriendsListScreen() {
                 onSuccess: () => {
                   Alert.alert('已解除封鎖', '已成功解除封鎖該使用者');
                 },
-                onError: (error: any) => {
-                  const message = error?.message || '解除封鎖失敗，請稍後再試';
+                onError: (error: unknown) => {
+                  const message =
+                    error && typeof error === 'object' && 'message' in error
+                      ? String((error as { message: unknown }).message)
+                      : '解除封鎖失敗，請稍後再試';
                   Alert.alert('錯誤', message);
                 },
               }
@@ -104,6 +107,7 @@ export default function FriendsListScreen() {
         {/* Friend info */}
         <VStack className="flex-1">
           <Text className="font-semibold text-gray-900">
+            {/* Display nickname or fallback to User ID. user_id is used for blocked users, friend_id for others */}
             {item.nickname || `User ${item.user_id?.slice(0, 8) || item.friend_id?.slice(0, 8)}`}
           </Text>
           {item.bio && (
