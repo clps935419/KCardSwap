@@ -304,9 +304,9 @@ async def get_friends(
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
     status_filter: Optional[str] = Query(
-        "accepted",
+        None,
         alias="status",
-        description="Filter by friendship status (accepted, pending, blocked)",
+        description="Filter by friendship status (accepted, pending, blocked). If not provided, returns all friendships.",
     ),
 ) -> FriendListResponse:
     """
