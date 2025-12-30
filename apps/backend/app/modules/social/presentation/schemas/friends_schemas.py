@@ -13,16 +13,16 @@ from pydantic import BaseModel, Field
 class SendFriendRequestRequest(BaseModel):
     """Request schema for sending friend request"""
 
-    friend_id: UUID = Field(
+    target_user_id: UUID = Field(
         ...,
-        description="ID of user to send friend request to",
+        description="ID of the target user to send friend request to",
         examples=["123e4567-e89b-12d3-a456-426614174000"],
     )
 
     class Config:
         json_schema_extra = {
             "example": {
-                "friend_id": "123e4567-e89b-12d3-a456-426614174000",
+                "target_user_id": "123e4567-e89b-12d3-a456-426614174000",
             }
         }
 

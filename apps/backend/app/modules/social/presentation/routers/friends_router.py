@@ -81,7 +81,7 @@ async def send_friend_request(
 
         # Execute use case
         friendship = await use_case.execute(
-            user_id=str(current_user_id), friend_id=str(request.friend_id)
+            user_id=str(current_user_id), friend_id=str(request.target_user_id)
         )
 
         return FriendshipResponse(
