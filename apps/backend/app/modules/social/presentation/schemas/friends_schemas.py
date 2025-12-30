@@ -44,6 +44,23 @@ class BlockUserRequest(BaseModel):
         }
 
 
+class UnblockUserRequest(BaseModel):
+    """Request schema for unblocking a user"""
+
+    user_id: UUID = Field(
+        ...,
+        description="ID of user to unblock",
+        examples=["123e4567-e89b-12d3-a456-426614174000"],
+    )
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "user_id": "123e4567-e89b-12d3-a456-426614174000",
+            }
+        }
+
+
 class FriendshipResponse(BaseModel):
     """Response schema for friendship details"""
 

@@ -20,6 +20,9 @@ from app.modules.social.application.use_cases.friends.block_user_use_case import
 from app.modules.social.application.use_cases.friends.send_friend_request_use_case import (
     SendFriendRequestUseCase,
 )
+from app.modules.social.application.use_cases.friends.unblock_user_use_case import (
+    UnblockUserUseCase,
+)
 from app.modules.social.infrastructure.repositories.friendship_repository_impl import (
     FriendshipRepositoryImpl,
 )
@@ -28,6 +31,7 @@ from app.modules.social.presentation.schemas.friends_schemas import (
     FriendListResponse,
     FriendshipResponse,
     SendFriendRequestRequest,
+    UnblockUserRequest,
 )
 from app.shared.infrastructure.database.connection import get_db_session
 
@@ -216,6 +220,67 @@ async def block_user(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to block user",
+        )
+
+
+@router.post(
+    "/unblock",
+    status_code=status.HTTP_204_NO_CONTENT,
+    responses={
+        204: {"description": "User unblocked successfully (no content)"},
+        400: {"description": "Bad request (validation failed)"},
+        401: {"description": "Unauthorized (not logged in)"},
+        404: {"description": "No blocked relationship found"},
+        422: {"description": "Unprocessable entity (cannot unblock user)"},
+        500: {"description": "Internal server error"},
+    },
+    summary="Unblock user",
+    description="Unblock a previously blocked user (allows future interactions)",
+)
+async def unblock_user(
+    request: UnblockUserRequest,
+    current_user_id: Annotated[UUID, Depends(get_current_user_id)],
+    session: Annotated[AsyncSession, Depends(get_db_session)],
+) -> None:
+    """
+    Unblock a previously blocked user.
+
+    Business rules:
+    - Can only unblock if you were the one who blocked them
+    - Unblocking removes the blocked relationship entirely
+    - After unblocking, users can interact again (send friend requests, chat)
+    - Does not automatically make them friends
+    - Cannot unblock yourself
+    """
+    try:
+        # Initialize repository and use case
+        friendship_repo = FriendshipRepositoryImpl(session)
+        use_case = UnblockUserUseCase(friendship_repo)
+
+        # Execute use case
+        await use_case.execute(
+            unblocker_user_id=str(current_user_id), unblocked_user_id=str(request.user_id)
+        )
+
+        # Return 204 No Content (no response body for successful deletion)
+        return None
+
+    except ValueError as e:
+        error_msg = str(e).lower()
+        if "no relationship exists" in error_msg:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail=str(e)
+            )
+        else:
+            logger.warning(f"Unblock user validation failed: {e}")
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e)
+            )
+    except Exception as e:
+        logger.error(f"Error unblocking user: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to unblock user",
         )
 
 
