@@ -23,6 +23,9 @@ from app.modules.social.application.use_cases.friends.send_friend_request_use_ca
 from app.modules.social.application.use_cases.friends.unblock_user_use_case import (
     UnblockUserUseCase,
 )
+from app.modules.social.infrastructure.repositories.chat_room_repository_impl import (
+    ChatRoomRepositoryImpl,
+)
 from app.modules.social.infrastructure.repositories.friendship_repository_impl import (
     FriendshipRepositoryImpl,
 )
@@ -78,7 +81,7 @@ async def send_friend_request(
 
         # Execute use case
         friendship = await use_case.execute(
-            user_id=str(current_user_id), friend_id=str(request.friend_id)
+            user_id=str(current_user_id), friend_id=str(request.target_user_id)
         )
 
         return FriendshipResponse(
@@ -130,13 +133,14 @@ async def accept_friend_request(
     - Request must be in pending status
     """
     try:
-        # Initialize repository and use case
+        # Initialize repositories and use case
         friendship_repo = FriendshipRepositoryImpl(session)
-        use_case = AcceptFriendRequestUseCase(friendship_repo)
+        chat_room_repo = ChatRoomRepositoryImpl(session)
+        use_case = AcceptFriendRequestUseCase(friendship_repo, chat_room_repo)
 
         # Execute use case
-        friendship = await use_case.execute(
-            friendship_id=str(friendship_id), accepter_id=str(current_user_id)
+        friendship, chat_room = await use_case.execute(
+            friendship_id=str(friendship_id), accepting_user_id=str(current_user_id)
         )
 
         return FriendshipResponse(
@@ -199,7 +203,7 @@ async def block_user(
 
         # Execute use case
         friendship = await use_case.execute(
-            blocker_id=str(current_user_id), blocked_id=str(request.user_id)
+            blocker_user_id=str(current_user_id), blocked_user_id=str(request.user_id)
         )
 
         return FriendshipResponse(
@@ -300,9 +304,9 @@ async def get_friends(
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
     status_filter: Optional[str] = Query(
-        "accepted",
+        None,
         alias="status",
-        description="Filter by friendship status (accepted, pending, blocked)",
+        description="Filter by friendship status (accepted, pending, blocked). If not provided, returns all friendships.",
     ),
 ) -> FriendListResponse:
     """
@@ -331,6 +335,7 @@ async def get_friends(
 
         friends = [
             FriendListItemResponse(
+                id=UUID(f.id),
                 user_id=UUID(
                     f.friend_id if f.user_id == str(current_user_id) else f.user_id
                 ),
