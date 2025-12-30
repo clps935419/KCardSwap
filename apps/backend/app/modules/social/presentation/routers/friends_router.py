@@ -203,7 +203,7 @@ async def block_user(
 
         # Execute use case
         friendship = await use_case.execute(
-            blocker_id=str(current_user_id), blocked_id=str(request.user_id)
+            blocker_user_id=str(current_user_id), blocked_user_id=str(request.user_id)
         )
 
         return FriendshipResponse(
