@@ -52,6 +52,7 @@ import {
   sendMessageApiV1ChatsRoomIdMessagesPost,
   submitRatingApiV1RatingsPost,
   submitReportApiV1ReportsPost,
+  unblockUserApiV1FriendsUnblockPost,
   updateMyProfileApiV1ProfileMePut,
   updateUserLocationApiV1NearbyLocationPut,
   verifyReceiptApiV1SubscriptionsVerifyReceiptPost,
@@ -155,6 +156,8 @@ import type {
   SubmitRatingApiV1RatingsPostResponse,
   SubmitReportApiV1ReportsPostData,
   SubmitReportApiV1ReportsPostResponse,
+  UnblockUserApiV1FriendsUnblockPostData,
+  UnblockUserApiV1FriendsUnblockPostResponse,
   UpdateMyProfileApiV1ProfileMePutData,
   UpdateMyProfileApiV1ProfileMePutError,
   UpdateMyProfileApiV1ProfileMePutResponse,
@@ -736,6 +739,35 @@ export const blockUserApiV1FriendsBlockPostMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await blockUserApiV1FriendsBlockPost({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Unblock user
+ *
+ * Unblock a previously blocked user (allows future interactions)
+ */
+export const unblockUserApiV1FriendsUnblockPostMutation = (
+  options?: Partial<Options<UnblockUserApiV1FriendsUnblockPostData>>
+): UseMutationOptions<
+  UnblockUserApiV1FriendsUnblockPostResponse,
+  DefaultError,
+  Options<UnblockUserApiV1FriendsUnblockPostData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    UnblockUserApiV1FriendsUnblockPostResponse,
+    DefaultError,
+    Options<UnblockUserApiV1FriendsUnblockPostData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await unblockUserApiV1FriendsUnblockPost({
         ...options,
         ...fnOptions,
         throwOnError: true,

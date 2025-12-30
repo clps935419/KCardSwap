@@ -121,6 +121,9 @@ import type {
   SubmitReportApiV1ReportsPostData,
   SubmitReportApiV1ReportsPostErrors,
   SubmitReportApiV1ReportsPostResponses,
+  UnblockUserApiV1FriendsUnblockPostData,
+  UnblockUserApiV1FriendsUnblockPostErrors,
+  UnblockUserApiV1FriendsUnblockPostResponses,
   UpdateMyProfileApiV1ProfileMePutData,
   UpdateMyProfileApiV1ProfileMePutErrors,
   UpdateMyProfileApiV1ProfileMePutResponses,
@@ -509,6 +512,28 @@ export const blockUserApiV1FriendsBlockPost = <ThrowOnError extends boolean = fa
   >({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/api/v1/friends/block',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Unblock user
+ *
+ * Unblock a previously blocked user (allows future interactions)
+ */
+export const unblockUserApiV1FriendsUnblockPost = <ThrowOnError extends boolean = false>(
+  options: Options<UnblockUserApiV1FriendsUnblockPostData, ThrowOnError>
+) =>
+  (options.client ?? client).post<
+    UnblockUserApiV1FriendsUnblockPostResponses,
+    UnblockUserApiV1FriendsUnblockPostErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/friends/unblock',
     ...options,
     headers: {
       'Content-Type': 'application/json',

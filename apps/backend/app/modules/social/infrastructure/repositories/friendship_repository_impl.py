@@ -184,6 +184,16 @@ class FriendshipRepositoryImpl(IFriendshipRepository):
         )
         return result.scalar_one_or_none() is not None
 
+    async def find_by_user_and_status(
+        self, user_id: str, status: str
+    ) -> List[Friendship]:
+        """
+        Find friendships by user and status.
+        Alias method for get_friends_by_user_id for backward compatibility.
+        """
+        status_enum = FriendshipStatus(status) if status else None
+        return await self.get_friends_by_user_id(user_id, status_enum)
+
     @staticmethod
     def _to_entity(model: FriendshipModel) -> Friendship:
         """Convert ORM model to domain entity"""
