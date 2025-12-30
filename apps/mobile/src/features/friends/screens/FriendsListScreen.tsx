@@ -16,13 +16,15 @@ import { HStack } from '@/components/ui/hstack';
 import { VStack } from '@/components/ui/vstack';
 import { Button, ButtonText } from '@/components/ui/button';
 import { Heading } from '@/components/ui/heading';
-import { useFriendsList } from '../hooks/useFriends';
+import { useFriendsList, useUnblockUser } from '../hooks/useFriends';
 import type { FriendsTab, FriendshipStatus } from '../types';
 import { useRouter } from 'expo-router';
+import { Alert } from 'react-native';
 
 export default function FriendsListScreen() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<FriendsTab>('all');
+  const { mutate: unblockUser, isPending: isUnblocking } = useUnblockUser();
 
   // Map tab to API status filter
   const statusFilter: FriendshipStatus | undefined =
@@ -34,8 +36,45 @@ export default function FriendsListScreen() {
     router.push('/friends/add');
   };
 
-  const handleFriendPress = (friendId: string) => {
-    router.push(`/friends/${friendId}`);
+  const handleFriendPress = (userId: string) => {
+    router.push(`/friends/${userId}`);
+  };
+
+  const handleUnblockUser = (userId: string, nickname?: string) => {
+    Alert.alert(
+      '解除封鎖',
+      `確定要解除封鎖 ${nickname || '這位使用者'} 嗎？解除後你們將可以重新互動。`,
+      [
+        {
+          text: '取消',
+          style: 'cancel',
+        },
+        {
+          text: '解除封鎖',
+          onPress: () => {
+            unblockUser(
+              {
+                body: {
+                  user_id: userId,
+                },
+              },
+              {
+                onSuccess: () => {
+                  Alert.alert('已解除封鎖', '已成功解除封鎖該使用者');
+                },
+                onError: (error: unknown) => {
+                  const message =
+                    error && typeof error === 'object' && 'message' in error
+                      ? String((error as { message: unknown }).message)
+                      : '解除封鎖失敗，請稍後再試';
+                  Alert.alert('錯誤', message);
+                },
+              }
+            );
+          },
+        },
+      ]
+    );
   };
 
   const renderTabButton = (tab: FriendsTab, label: string) => (
@@ -56,38 +95,53 @@ export default function FriendsListScreen() {
   );
 
   const renderFriendItem = ({ item }: { item: any }) => (
-    <Pressable onPress={() => handleFriendPress(item.friend_id)}>
-      <Box className="bg-white p-4 mb-2 rounded-lg shadow-sm">
-        <HStack className="items-center space-x-3">
-          {/* Avatar placeholder */}
-          <Box className="w-12 h-12 bg-gray-300 rounded-full items-center justify-center">
-            <Text className="text-white font-bold text-lg">
-              {item.nickname?.[0]?.toUpperCase() || 'U'}
-            </Text>
-          </Box>
+    <Box className="bg-white p-4 mb-2 rounded-lg shadow-sm">
+      <HStack className="items-center space-x-3">
+        {/* Avatar placeholder */}
+        <Box className="w-12 h-12 bg-gray-300 rounded-full items-center justify-center">
+          <Text className="text-white font-bold text-lg">
+            {item.nickname?.[0]?.toUpperCase() || 'U'}
+          </Text>
+        </Box>
 
-          {/* Friend info */}
-          <VStack className="flex-1">
-            <Text className="font-semibold text-gray-900">
-              {item.nickname || `User ${item.friend_id.slice(0, 8)}`}
+        {/* Friend info */}
+        <VStack className="flex-1">
+          <Text className="font-semibold text-gray-900">
+            {/* Display nickname or fallback to User ID. user_id is used for blocked users, friend_id for others */}
+            {item.nickname || `User ${item.user_id?.slice(0, 8) || item.friend_id?.slice(0, 8)}`}
+          </Text>
+          {item.bio && (
+            <Text className="text-sm text-gray-600" numberOfLines={1}>
+              {item.bio}
             </Text>
-            {item.bio && (
-              <Text className="text-sm text-gray-600" numberOfLines={1}>
-                {item.bio}
-              </Text>
-            )}
-            {activeTab === 'pending' && (
-              <Text className="text-xs text-orange-500 mt-1">等待回應</Text>
-            )}
-          </VStack>
-
-          {/* Status indicator */}
-          {activeTab === 'all' && (
-            <Box className="w-3 h-3 bg-green-500 rounded-full" />
           )}
-        </HStack>
-      </Box>
-    </Pressable>
+          {activeTab === 'pending' && (
+            <Text className="text-xs text-orange-500 mt-1">等待回應</Text>
+          )}
+          {activeTab === 'blocked' && (
+            <Text className="text-xs text-red-500 mt-1">已封鎖</Text>
+          )}
+        </VStack>
+
+        {/* Action buttons */}
+        {activeTab === 'blocked' ? (
+          <Button
+            onPress={() => handleUnblockUser(item.user_id, item.nickname)}
+            size="sm"
+            variant="outline"
+            isDisabled={isUnblocking}
+          >
+            <ButtonText className="text-sm">
+              {isUnblocking ? '處理中...' : '解除封鎖'}
+            </ButtonText>
+          </Button>
+        ) : activeTab === 'all' ? (
+          <Pressable onPress={() => handleFriendPress(item.user_id)}>
+            <Box className="w-3 h-3 bg-green-500 rounded-full" />
+          </Pressable>
+        ) : null}
+      </HStack>
+    </Box>
   );
 
   const renderEmptyState = () => (
@@ -101,6 +155,11 @@ export default function FriendsListScreen() {
         <Button onPress={handleAddFriend} variant="solid">
           <ButtonText>新增好友</ButtonText>
         </Button>
+      )}
+      {activeTab === 'blocked' && (
+        <Text className="text-gray-400 text-sm text-center mt-2">
+          解除封鎖後，你們將可以重新互動
+        </Text>
       )}
     </Box>
   );

@@ -1483,6 +1483,20 @@ export type TradeResponse = {
 };
 
 /**
+ * UnblockUserRequest
+ *
+ * Request schema for unblocking a user
+ */
+export type UnblockUserRequest = {
+  /**
+   * User Id
+   *
+   * ID of user to unblock
+   */
+  user_id: string;
+};
+
+/**
  * UpdateLocationRequest
  *
  * Request schema for updating user location
@@ -2308,6 +2322,46 @@ export type BlockUserApiV1FriendsBlockPostResponses = {
 
 export type BlockUserApiV1FriendsBlockPostResponse =
   BlockUserApiV1FriendsBlockPostResponses[keyof BlockUserApiV1FriendsBlockPostResponses];
+
+export type UnblockUserApiV1FriendsUnblockPostData = {
+  body: UnblockUserRequest;
+  path?: never;
+  query?: never;
+  url: '/api/v1/friends/unblock';
+};
+
+export type UnblockUserApiV1FriendsUnblockPostErrors = {
+  /**
+   * Bad request (validation failed)
+   */
+  400: unknown;
+  /**
+   * Unauthorized (not logged in)
+   */
+  401: unknown;
+  /**
+   * No blocked relationship found
+   */
+  404: unknown;
+  /**
+   * Unprocessable entity (cannot unblock user)
+   */
+  422: unknown;
+  /**
+   * Internal server error
+   */
+  500: unknown;
+};
+
+export type UnblockUserApiV1FriendsUnblockPostResponses = {
+  /**
+   * User unblocked successfully (no content)
+   */
+  204: void;
+};
+
+export type UnblockUserApiV1FriendsUnblockPostResponse =
+  UnblockUserApiV1FriendsUnblockPostResponses[keyof UnblockUserApiV1FriendsUnblockPostResponses];
 
 export type GetFriendsApiV1FriendsGetData = {
   body?: never;

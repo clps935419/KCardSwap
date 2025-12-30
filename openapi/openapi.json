@@ -934,6 +934,51 @@
         ]
       }
     },
+    "/api/v1/friends/unblock": {
+      "post": {
+        "tags": [
+          "Friends"
+        ],
+        "summary": "Unblock user",
+        "description": "Unblock a previously blocked user (allows future interactions)",
+        "operationId": "unblock_user_api_v1_friends_unblock_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnblockUserRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "User unblocked successfully (no content)"
+          },
+          "400": {
+            "description": "Bad request (validation failed)"
+          },
+          "401": {
+            "description": "Unauthorized (not logged in)"
+          },
+          "404": {
+            "description": "No blocked relationship found"
+          },
+          "422": {
+            "description": "Unprocessable entity (cannot unblock user)"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/friends": {
       "get": {
         "tags": [
@@ -4679,6 +4724,28 @@
           "responder_id": "623e4567-e89b-12d3-a456-426614174000",
           "status": "proposed",
           "updated_at": "2025-01-01T00:00:00Z"
+        }
+      },
+      "UnblockUserRequest": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "User Id",
+            "description": "ID of user to unblock",
+            "examples": [
+              "123e4567-e89b-12d3-a456-426614174000"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id"
+        ],
+        "title": "UnblockUserRequest",
+        "description": "Request schema for unblocking a user",
+        "example": {
+          "user_id": "123e4567-e89b-12d3-a456-426614174000"
         }
       },
       "UpdateLocationRequest": {

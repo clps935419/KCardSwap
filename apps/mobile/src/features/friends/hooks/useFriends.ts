@@ -10,6 +10,7 @@ import {
   sendFriendRequestApiV1FriendsRequestPostMutation,
   acceptFriendRequestApiV1FriendsFriendshipIdAcceptPostMutation,
   blockUserApiV1FriendsBlockPostMutation,
+  unblockUserApiV1FriendsUnblockPostMutation,
 } from '@/src/shared/api/generated/@tanstack/react-query.gen';
 import type { FriendshipStatus } from '../types';
 
@@ -68,6 +69,23 @@ export const useBlockUser = () => {
 
   return useMutation({
     ...blockUserApiV1FriendsBlockPostMutation(),
+    onSuccess: () => {
+      // Invalidate friends list to refetch
+      queryClient.invalidateQueries({
+        queryKey: ['getFriendsApiV1FriendsGet'],
+      });
+    },
+  });
+};
+
+/**
+ * Hook to unblock user
+ */
+export const useUnblockUser = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    ...unblockUserApiV1FriendsUnblockPostMutation(),
     onSuccess: () => {
       // Invalidate friends list to refetch
       queryClient.invalidateQueries({
