@@ -335,6 +335,7 @@ async def get_friends(
 
         friends = [
             FriendListItemResponse(
+                friendship_id=UUID(f.id),
                 user_id=UUID(
                     f.friend_id if f.user_id == str(current_user_id) else f.user_id
                 ),

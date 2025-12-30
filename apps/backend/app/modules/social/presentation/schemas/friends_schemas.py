@@ -90,6 +90,7 @@ class FriendshipResponse(BaseModel):
 class FriendListItemResponse(BaseModel):
     """Response schema for a single friend in the list"""
 
+    friendship_id: UUID = Field(..., description="Friendship ID (needed for accept/reject operations)")
     user_id: UUID = Field(..., description="Friend's user ID")
     nickname: Optional[str] = Field(None, description="Friend's nickname")
     avatar_url: Optional[str] = Field(None, description="Friend's avatar URL")
@@ -100,6 +101,7 @@ class FriendListItemResponse(BaseModel):
         from_attributes = True
         json_schema_extra = {
             "example": {
+                "friendship_id": "789e0123-e45b-67d8-a901-234567890000",
                 "user_id": "456e7890-e12b-34d5-a678-901234567000",
                 "nickname": "John Doe",
                 "avatar_url": "https://example.com/avatar.jpg",
@@ -120,6 +122,7 @@ class FriendListResponse(BaseModel):
             "example": {
                 "friends": [
                     {
+                        "friendship_id": "789e0123-e45b-67d8-a901-234567890000",
                         "user_id": "456e7890-e12b-34d5-a678-901234567000",
                         "nickname": "John Doe",
                         "avatar_url": "https://example.com/avatar.jpg",
