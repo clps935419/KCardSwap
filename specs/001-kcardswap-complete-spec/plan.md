@@ -176,6 +176,7 @@
 ## 5. 社交與好友（SOCIAL）
 - API 規格：
 	- `POST /api/v1/friends/request`、`POST /api/v1/friends/accept`、`POST /api/v1/friends/block`。
+	- **[新增]** 提供解除封鎖 API（例如 `POST /api/v1/friends/unblock`）：解除封鎖後恢復互動資格（可再發好友邀請/聊天），但不自動成為好友。
 	- `GET /api/v1/friends`：好友列表（暱稱、頭像、評分平均、完成交換次數、線上狀態）。
 	- `POST /api/v1/reports`：檢舉。
 	- `POST /api/v1/ratings`：建立評分（1–5 星 + 可選文字回饋；需符合「好友」或「提供 trade_id」等規則）。

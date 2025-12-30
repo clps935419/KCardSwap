@@ -530,6 +530,7 @@
 - [X] T121 [P] [US4] 建立 SendFriendRequestUseCase：apps/backend/app/modules/social/application/use_cases/send_friend_request_use_case.py
 - [X] T122 [P] [US4] 建立 AcceptFriendRequestUseCase：apps/backend/app/modules/social/application/use_cases/accept_friend_request_use_case.py
 - [X] T123 [P] [US4] 建立 BlockUserUseCase：apps/backend/app/modules/social/application/use_cases/block_user_use_case.py
+- [ ] T123A [P] [US4] 建立 UnblockUserUseCase：apps/backend/app/modules/social/application/use_cases/unblock_user_use_case.py（解除封鎖，恢復互動資格但不自動成為好友）
 - [X] T124 [P] [US4] 建立 SendMessageUseCase：apps/backend/app/modules/social/application/use_cases/send_message_use_case.py（發送訊息 → 觸發 FCM 推播）
 - [X] T125 [P] [US4] 建立 GetMessagesUseCase：apps/backend/app/modules/social/application/use_cases/get_messages_use_case.py（輪詢機制：after_message_id）
 - [X] T126 [P] [US4] 建立 RateUserUseCase：apps/backend/app/modules/social/application/use_cases/ratings/rate_user_use_case.py（ratings 基礎能力：建立評分；基本驗證：不可自評、分數 1–5、封鎖禁止；權限規則：好友或提供 trade_id）
@@ -561,6 +562,7 @@
 ### Presentation Layer (Social Module - Friends & Chat)
 
 - [X] T139 [US4] 建立 Friends Router：apps/backend/app/modules/social/presentation/routers/friends_router.py（POST /api/v1/friends/request, POST /api/v1/friends/accept, POST /api/v1/friends/block）
+- [ ] T139A [US4] 更新 Friends Router：新增解除封鎖端點（例如 POST /api/v1/friends/unblock），串接 UnblockUserUseCase 並更新 OpenAPI 文件
 - [X] T140 [US4] 建立 Chat Router：apps/backend/app/modules/social/presentation/routers/chat_router.py（GET /api/v1/chats/{id}/messages, POST /api/v1/chats/{id}/messages）
 - [X] T141 [US4] 建立 Rating Router：apps/backend/app/modules/social/presentation/routers/rating_router.py（POST /api/v1/ratings, GET /api/v1/ratings/user/{user_id}, GET /api/v1/ratings/user/{user_id}/average）
 - [X] T142 [US4] 建立 Report Router：apps/backend/app/modules/social/presentation/routers/report_router.py（POST /api/v1/reports）
