@@ -9,6 +9,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
+from app.modules.social.domain.entities.report import ReportReason
+
 
 class ReportRequest(BaseModel):
     """Request schema for submitting a report"""
@@ -18,12 +20,10 @@ class ReportRequest(BaseModel):
         description="ID of user being reported",
         examples=["123e4567-e89b-12d3-a456-426614174000"],
     )
-    reason: str = Field(
+    reason: ReportReason = Field(
         ...,
-        description="Reason for report",
-        min_length=1,
-        max_length=100,
-        examples=["Inappropriate behavior", "Spam", "Scam", "Harassment"],
+        description="Reason for report (must be one of: fraud, fake_card, harassment, inappropriate_content, spam, other)",
+        examples=["harassment"],
     )
     detail: Optional[str] = Field(
         None,
@@ -36,7 +36,7 @@ class ReportRequest(BaseModel):
         json_schema_extra = {
             "example": {
                 "reported_user_id": "123e4567-e89b-12d3-a456-426614174000",
-                "reason": "Inappropriate behavior",
+                "reason": "harassment",
                 "detail": "User sent inappropriate messages and refused to complete trade.",
             }
         }
@@ -48,7 +48,7 @@ class ReportResponse(BaseModel):
     id: UUID = Field(..., description="Report ID")
     reporter_id: UUID = Field(..., description="User who filed the report")
     reported_user_id: UUID = Field(..., description="User who was reported")
-    reason: str = Field(..., description="Reason for report")
+    reason: ReportReason = Field(..., description="Reason for report")
     detail: Optional[str] = Field(None, description="Detailed description")
     status: str = Field(
         ...,
@@ -64,7 +64,7 @@ class ReportResponse(BaseModel):
                 "id": "456e7890-e12b-34d5-a678-901234567000",
                 "reporter_id": "789e0123-e45b-67d8-a901-234567890000",
                 "reported_user_id": "123e4567-e89b-12d3-a456-426614174000",
-                "reason": "Inappropriate behavior",
+                "reason": "harassment",
                 "detail": "User sent inappropriate messages.",
                 "status": "pending",
                 "created_at": "2024-01-01T00:00:00Z",
@@ -86,7 +86,7 @@ class ReportListResponse(BaseModel):
                         "id": "456e7890-e12b-34d5-a678-901234567000",
                         "reporter_id": "789e0123-e45b-67d8-a901-234567890000",
                         "reported_user_id": "123e4567-e89b-12d3-a456-426614174000",
-                        "reason": "Inappropriate behavior",
+                        "reason": "spam",
                         "detail": "User sent inappropriate messages.",
                         "status": "pending",
                         "created_at": "2024-01-01T00:00:00Z",
