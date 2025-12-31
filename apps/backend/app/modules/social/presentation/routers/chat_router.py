@@ -147,12 +147,13 @@ async def get_messages(
         # Initialize repositories and use case
         message_repo = MessageRepositoryImpl(session)
         chat_room_repo = ChatRoomRepositoryImpl(session)
-        use_case = GetMessagesUseCase(message_repo, chat_room_repo)
+        friendship_repo = FriendshipRepositoryImpl(session)
+        use_case = GetMessagesUseCase(message_repo, chat_room_repo, friendship_repo)
 
         # Execute use case
         messages = await use_case.execute(
             room_id=str(room_id),
-            user_id=str(current_user_id),
+            requesting_user_id=str(current_user_id),
             after_message_id=str(after_message_id) if after_message_id else None,
             limit=limit,
         )
