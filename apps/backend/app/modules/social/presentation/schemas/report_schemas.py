@@ -14,8 +14,6 @@ from app.modules.social.domain.entities.report import ReportReason
 
 class ReportRequest(BaseModel):
     """Request schema for submitting a report"""
-    
-    model_config = ConfigDict(use_enum_values=True)
 
     reported_user_id: UUID = Field(
         ...,
@@ -38,7 +36,7 @@ class ReportRequest(BaseModel):
 class ReportResponse(BaseModel):
     """Response schema for a report"""
     
-    model_config = ConfigDict(from_attributes=True, use_enum_values=True)
+    model_config = ConfigDict(from_attributes=True)
 
     id: UUID = Field(..., description="Report ID")
     reporter_id: UUID = Field(..., description="User who filed the report")
