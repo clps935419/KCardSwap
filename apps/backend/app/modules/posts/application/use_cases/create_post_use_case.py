@@ -1,7 +1,7 @@
 """Create Post Use Case - Create a new city board post with daily limit check"""
 
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 from app.modules.identity.domain.repositories.i_subscription_repository import (
@@ -85,10 +85,10 @@ class CreatePostUseCase:
 
         # Set default expiry if not provided
         if expires_at is None:
-            expires_at = datetime.utcnow() + timedelta(days=self.DEFAULT_EXPIRY_DAYS)
+            expires_at = datetime.now(timezone.utc) + timedelta(days=self.DEFAULT_EXPIRY_DAYS)
 
         # Validate expiry is in the future
-        if expires_at <= datetime.utcnow():
+        if expires_at <= datetime.now(timezone.utc):
             raise ValueError("Expiry date must be in the future")
 
         # Create post entity
@@ -102,7 +102,7 @@ class CreatePostUseCase:
             idol_group=idol_group,
             status=PostStatus.OPEN,
             expires_at=expires_at,
-            created_at=datetime.utcnow(),
+            created_at=datetime.now(timezone.utc),
         )
 
         return await self.post_repository.create(post)

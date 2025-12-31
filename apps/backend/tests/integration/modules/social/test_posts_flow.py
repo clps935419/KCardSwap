@@ -6,7 +6,7 @@ Note: These tests use TestClient and mock the database.
 For full E2E tests with real database, use pytest with testcontainers (see conftest.py).
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from unittest.mock import AsyncMock, Mock, patch
 from uuid import uuid4
 
@@ -47,7 +47,7 @@ class TestPostsFlowIntegration:
             "content": "I want to trade my IU photocard for Jungkook",
             "idol": "Jungkook",
             "idol_group": "BTS",
-            "expires_at": datetime.utcnow() + timedelta(days=14),
+            "expires_at": datetime.now(timezone.utc) + timedelta(days=14),
         }
 
     @pytest.fixture
@@ -97,8 +97,8 @@ class TestPostsFlowIntegration:
                 idol_group=test_post_data["idol_group"],
                 status=PostStatus.OPEN,
                 expires_at=test_post_data["expires_at"],
-                created_at=datetime.utcnow(),
-                updated_at=datetime.utcnow(),
+                created_at=datetime.now(timezone.utc),
+                updated_at=datetime.now(timezone.utc),
             )
 
             repo_instance.create = AsyncMock(return_value=created_post)
@@ -124,8 +124,8 @@ class TestPostsFlowIntegration:
                 post_id=str(test_post_data["post_id"]),
                 user_id=str(test_user_ids["interested_user"]),
                 status=PostInterestStatus.PENDING,
-                created_at=datetime.utcnow(),
-                updated_at=datetime.utcnow(),
+                created_at=datetime.now(timezone.utc),
+                updated_at=datetime.now(timezone.utc),
             )
 
             repo_instance.create = AsyncMock(return_value=created_interest)
@@ -163,7 +163,7 @@ class TestPostsFlowIntegration:
                 user_id=str(test_user_ids["owner"]),
                 friend_id=str(test_user_ids["interested_user"]),
                 status=FriendshipStatus.ACCEPTED,
-                created_at=datetime.utcnow(),
+                created_at=datetime.now(timezone.utc),
             )
             repo_instance.create = AsyncMock(return_value=friendship)
 
@@ -185,7 +185,7 @@ class TestPostsFlowIntegration:
                     str(test_user_ids["owner"]),
                     str(test_user_ids["interested_user"]),
                 ],
-                created_at=datetime.utcnow(),
+                created_at=datetime.now(timezone.utc),
             )
             repo_instance.get_by_participants = AsyncMock(return_value=None)
             repo_instance.create = AsyncMock(return_value=chat_room)
@@ -372,8 +372,8 @@ class TestPostsFlowIntegration:
                 post_id=str(test_post_data["post_id"]),
                 user_id=str(mock_auth_interested),
                 status=PostInterestStatus.PENDING,
-                created_at=datetime.utcnow(),
-                updated_at=datetime.utcnow(),
+                created_at=datetime.now(timezone.utc),
+                updated_at=datetime.now(timezone.utc),
             )
             repo_instance.get_by_post_and_user = AsyncMock(
                 return_value=existing_interest

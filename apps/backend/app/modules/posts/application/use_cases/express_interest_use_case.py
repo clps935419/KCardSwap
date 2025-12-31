@@ -1,7 +1,7 @@
 """Express Interest Use Case - Express interest in a post"""
 
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.modules.posts.domain.entities.post_interest import (
     PostInterest,
@@ -72,7 +72,7 @@ class ExpressInterestUseCase:
             post_id=post_id,
             user_id=user_id,
             status=PostInterestStatus.PENDING,
-            created_at=datetime.utcnow(),
+            created_at=datetime.now(timezone.utc),
         )
 
         return await self.post_interest_repository.create(interest)
