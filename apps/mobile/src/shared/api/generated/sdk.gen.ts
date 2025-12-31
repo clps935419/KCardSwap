@@ -69,6 +69,9 @@ import type {
   GetMyReportsApiV1ReportsGetData,
   GetMyReportsApiV1ReportsGetErrors,
   GetMyReportsApiV1ReportsGetResponses,
+  GetPostInterestApiV1PostsPostIdInterestsInterestIdGetData,
+  GetPostInterestApiV1PostsPostIdInterestsInterestIdGetErrors,
+  GetPostInterestApiV1PostsPostIdInterestsInterestIdGetResponses,
   GetQuotaStatusApiV1CardsQuotaStatusGetData,
   GetQuotaStatusApiV1CardsQuotaStatusGetErrors,
   GetQuotaStatusApiV1CardsQuotaStatusGetResponses,
@@ -91,6 +94,9 @@ import type {
   GoogleLoginApiV1AuthGoogleLoginPostResponses,
   HealthCheckHealthGetData,
   HealthCheckHealthGetResponses,
+  ListPostInterestsApiV1PostsPostIdInterestsGetData,
+  ListPostInterestsApiV1PostsPostIdInterestsGetErrors,
+  ListPostInterestsApiV1PostsPostIdInterestsGetResponses,
   ListPostsApiV1PostsGetData,
   ListPostsApiV1PostsGetErrors,
   ListPostsApiV1PostsGetResponses,
@@ -1048,6 +1054,44 @@ export const closePostApiV1PostsPostIdClosePost = <ThrowOnError extends boolean 
   >({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/api/v1/posts/{post_id}/close',
+    ...options,
+  });
+
+/**
+ * List interests for a post (owner only)
+ *
+ * List all interests for a specific post. Only post owner can view.
+ */
+export const listPostInterestsApiV1PostsPostIdInterestsGet = <ThrowOnError extends boolean = false>(
+  options: Options<ListPostInterestsApiV1PostsPostIdInterestsGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    ListPostInterestsApiV1PostsPostIdInterestsGetResponses,
+    ListPostInterestsApiV1PostsPostIdInterestsGetErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/posts/{post_id}/interests',
+    ...options,
+  });
+
+/**
+ * Get a specific interest (owner only)
+ *
+ * Get details of a specific interest. Only post owner can view.
+ */
+export const getPostInterestApiV1PostsPostIdInterestsInterestIdGet = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetPostInterestApiV1PostsPostIdInterestsInterestIdGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    GetPostInterestApiV1PostsPostIdInterestsInterestIdGetResponses,
+    GetPostInterestApiV1PostsPostIdInterestsInterestIdGetErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/posts/{post_id}/interests/{interest_id}',
     ...options,
   });
 

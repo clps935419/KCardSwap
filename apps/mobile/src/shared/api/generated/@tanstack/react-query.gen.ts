@@ -33,6 +33,7 @@ import {
   getMyCardsApiV1CardsMeGet,
   getMyProfileApiV1ProfileMeGet,
   getMyReportsApiV1ReportsGet,
+  getPostInterestApiV1PostsPostIdInterestsInterestIdGet,
   getQuotaStatusApiV1CardsQuotaStatusGet,
   getSubscriptionStatusApiV1SubscriptionsStatusGet,
   getTradeHistoryApiV1TradesHistoryGet,
@@ -41,6 +42,7 @@ import {
   googleCallbackApiV1AuthGoogleCallbackPost,
   googleLoginApiV1AuthGoogleLoginPost,
   healthCheckHealthGet,
+  listPostInterestsApiV1PostsPostIdInterestsGet,
   listPostsApiV1PostsGet,
   markMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPost,
   type Options,
@@ -114,6 +116,9 @@ import type {
   GetMyProfileApiV1ProfileMeGetResponse,
   GetMyReportsApiV1ReportsGetData,
   GetMyReportsApiV1ReportsGetResponse,
+  GetPostInterestApiV1PostsPostIdInterestsInterestIdGetData,
+  GetPostInterestApiV1PostsPostIdInterestsInterestIdGetError,
+  GetPostInterestApiV1PostsPostIdInterestsInterestIdGetResponse,
   GetQuotaStatusApiV1CardsQuotaStatusGetData,
   GetQuotaStatusApiV1CardsQuotaStatusGetResponse,
   GetSubscriptionStatusApiV1SubscriptionsStatusGetData,
@@ -133,6 +138,9 @@ import type {
   GoogleLoginApiV1AuthGoogleLoginPostError,
   GoogleLoginApiV1AuthGoogleLoginPostResponse,
   HealthCheckHealthGetData,
+  ListPostInterestsApiV1PostsPostIdInterestsGetData,
+  ListPostInterestsApiV1PostsPostIdInterestsGetError,
+  ListPostInterestsApiV1PostsPostIdInterestsGetResponse,
   ListPostsApiV1PostsGetData,
   ListPostsApiV1PostsGetError,
   ListPostsApiV1PostsGetResponse,
@@ -1674,6 +1682,118 @@ export const closePostApiV1PostsPostIdClosePostMutation = (
   };
   return mutationOptions;
 };
+
+export const listPostInterestsApiV1PostsPostIdInterestsGetQueryKey = (
+  options: Options<ListPostInterestsApiV1PostsPostIdInterestsGetData>
+) => createQueryKey('listPostInterestsApiV1PostsPostIdInterestsGet', options);
+
+/**
+ * List interests for a post (owner only)
+ *
+ * List all interests for a specific post. Only post owner can view.
+ */
+export const listPostInterestsApiV1PostsPostIdInterestsGetOptions = (
+  options: Options<ListPostInterestsApiV1PostsPostIdInterestsGetData>
+) =>
+  queryOptions<
+    ListPostInterestsApiV1PostsPostIdInterestsGetResponse,
+    ListPostInterestsApiV1PostsPostIdInterestsGetError,
+    ListPostInterestsApiV1PostsPostIdInterestsGetResponse,
+    ReturnType<typeof listPostInterestsApiV1PostsPostIdInterestsGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await listPostInterestsApiV1PostsPostIdInterestsGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: listPostInterestsApiV1PostsPostIdInterestsGetQueryKey(options),
+  });
+
+export const listPostInterestsApiV1PostsPostIdInterestsGetInfiniteQueryKey = (
+  options: Options<ListPostInterestsApiV1PostsPostIdInterestsGetData>
+): QueryKey<Options<ListPostInterestsApiV1PostsPostIdInterestsGetData>> =>
+  createQueryKey('listPostInterestsApiV1PostsPostIdInterestsGet', options, true);
+
+/**
+ * List interests for a post (owner only)
+ *
+ * List all interests for a specific post. Only post owner can view.
+ */
+export const listPostInterestsApiV1PostsPostIdInterestsGetInfiniteOptions = (
+  options: Options<ListPostInterestsApiV1PostsPostIdInterestsGetData>
+) =>
+  infiniteQueryOptions<
+    ListPostInterestsApiV1PostsPostIdInterestsGetResponse,
+    ListPostInterestsApiV1PostsPostIdInterestsGetError,
+    InfiniteData<ListPostInterestsApiV1PostsPostIdInterestsGetResponse>,
+    QueryKey<Options<ListPostInterestsApiV1PostsPostIdInterestsGetData>>,
+    | number
+    | Pick<
+        QueryKey<Options<ListPostInterestsApiV1PostsPostIdInterestsGetData>>[0],
+        'body' | 'headers' | 'path' | 'query'
+      >
+  >(
+    // @ts-ignore
+    {
+      queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<
+          QueryKey<Options<ListPostInterestsApiV1PostsPostIdInterestsGetData>>[0],
+          'body' | 'headers' | 'path' | 'query'
+        > =
+          typeof pageParam === 'object'
+            ? pageParam
+            : {
+                query: {
+                  offset: pageParam,
+                },
+              };
+        const params = createInfiniteParams(queryKey, page);
+        const { data } = await listPostInterestsApiV1PostsPostIdInterestsGet({
+          ...options,
+          ...params,
+          signal,
+          throwOnError: true,
+        });
+        return data;
+      },
+      queryKey: listPostInterestsApiV1PostsPostIdInterestsGetInfiniteQueryKey(options),
+    }
+  );
+
+export const getPostInterestApiV1PostsPostIdInterestsInterestIdGetQueryKey = (
+  options: Options<GetPostInterestApiV1PostsPostIdInterestsInterestIdGetData>
+) => createQueryKey('getPostInterestApiV1PostsPostIdInterestsInterestIdGet', options);
+
+/**
+ * Get a specific interest (owner only)
+ *
+ * Get details of a specific interest. Only post owner can view.
+ */
+export const getPostInterestApiV1PostsPostIdInterestsInterestIdGetOptions = (
+  options: Options<GetPostInterestApiV1PostsPostIdInterestsInterestIdGetData>
+) =>
+  queryOptions<
+    GetPostInterestApiV1PostsPostIdInterestsInterestIdGetResponse,
+    GetPostInterestApiV1PostsPostIdInterestsInterestIdGetError,
+    GetPostInterestApiV1PostsPostIdInterestsInterestIdGetResponse,
+    ReturnType<typeof getPostInterestApiV1PostsPostIdInterestsInterestIdGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getPostInterestApiV1PostsPostIdInterestsInterestIdGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getPostInterestApiV1PostsPostIdInterestsInterestIdGetQueryKey(options),
+  });
 
 export const getCitiesApiV1LocationsCitiesGetQueryKey = (
   options?: Options<GetCitiesApiV1LocationsCitiesGetData>

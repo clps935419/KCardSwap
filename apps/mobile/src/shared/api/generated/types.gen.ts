@@ -741,6 +741,26 @@ export type NearbyCardResponse = {
 };
 
 /**
+ * PostInterestListResponse
+ *
+ * Response schema for post interest list
+ */
+export type PostInterestListResponse = {
+  /**
+   * Interests
+   *
+   * List of interests
+   */
+  interests: PostInterestResponse[];
+  /**
+   * Total
+   *
+   * Total number of interests
+   */
+  total: number;
+};
+
+/**
  * PostInterestResponse
  *
  * Response schema for post interest details
@@ -3446,6 +3466,125 @@ export type ClosePostApiV1PostsPostIdClosePostResponses = {
 
 export type ClosePostApiV1PostsPostIdClosePostResponse =
   ClosePostApiV1PostsPostIdClosePostResponses[keyof ClosePostApiV1PostsPostIdClosePostResponses];
+
+export type ListPostInterestsApiV1PostsPostIdInterestsGetData = {
+  body?: never;
+  path: {
+    /**
+     * Post Id
+     */
+    post_id: string;
+  };
+  query?: {
+    /**
+     * Status
+     *
+     * Filter by status
+     */
+    status?: string | null;
+    /**
+     * Limit
+     *
+     * Maximum results
+     */
+    limit?: number;
+    /**
+     * Offset
+     *
+     * Pagination offset
+     */
+    offset?: number;
+  };
+  url: '/api/v1/posts/{post_id}/interests';
+};
+
+export type ListPostInterestsApiV1PostsPostIdInterestsGetErrors = {
+  /**
+   * Unauthorized (not logged in)
+   */
+  401: unknown;
+  /**
+   * Forbidden (not post owner)
+   */
+  403: unknown;
+  /**
+   * Post not found
+   */
+  404: unknown;
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+  /**
+   * Internal server error
+   */
+  500: unknown;
+};
+
+export type ListPostInterestsApiV1PostsPostIdInterestsGetError =
+  ListPostInterestsApiV1PostsPostIdInterestsGetErrors[keyof ListPostInterestsApiV1PostsPostIdInterestsGetErrors];
+
+export type ListPostInterestsApiV1PostsPostIdInterestsGetResponses = {
+  /**
+   * Interests retrieved successfully
+   */
+  200: PostInterestListResponse;
+};
+
+export type ListPostInterestsApiV1PostsPostIdInterestsGetResponse =
+  ListPostInterestsApiV1PostsPostIdInterestsGetResponses[keyof ListPostInterestsApiV1PostsPostIdInterestsGetResponses];
+
+export type GetPostInterestApiV1PostsPostIdInterestsInterestIdGetData = {
+  body?: never;
+  path: {
+    /**
+     * Post Id
+     */
+    post_id: string;
+    /**
+     * Interest Id
+     */
+    interest_id: string;
+  };
+  query?: never;
+  url: '/api/v1/posts/{post_id}/interests/{interest_id}';
+};
+
+export type GetPostInterestApiV1PostsPostIdInterestsInterestIdGetErrors = {
+  /**
+   * Unauthorized (not logged in)
+   */
+  401: unknown;
+  /**
+   * Forbidden (not post owner)
+   */
+  403: unknown;
+  /**
+   * Post or interest not found
+   */
+  404: unknown;
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+  /**
+   * Internal server error
+   */
+  500: unknown;
+};
+
+export type GetPostInterestApiV1PostsPostIdInterestsInterestIdGetError =
+  GetPostInterestApiV1PostsPostIdInterestsInterestIdGetErrors[keyof GetPostInterestApiV1PostsPostIdInterestsInterestIdGetErrors];
+
+export type GetPostInterestApiV1PostsPostIdInterestsInterestIdGetResponses = {
+  /**
+   * Interest retrieved successfully
+   */
+  200: PostInterestResponse;
+};
+
+export type GetPostInterestApiV1PostsPostIdInterestsInterestIdGetResponse =
+  GetPostInterestApiV1PostsPostIdInterestsInterestIdGetResponses[keyof GetPostInterestApiV1PostsPostIdInterestsInterestIdGetResponses];
 
 export type GetCitiesApiV1LocationsCitiesGetData = {
   body?: never;
