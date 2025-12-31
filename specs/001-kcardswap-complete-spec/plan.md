@@ -299,6 +299,7 @@ Phase -1 Gates（依憲法）
 - POSTS
 	- [ ] 城市看板貼文 CRUD（建立/列表/詳情/關閉/刪除）
 	- [ ] 興趣請求流程（送出/清單/接受→建立好友+聊天室/拒絕）
+	- [ ] 貼文興趣查詢 API（作者可查 pending/accepted/rejected，支援分頁/狀態篩選，權限=貼文作者）
 	- [ ] 到期策略與下架（expired）
 - LOCATIONS
 	- [ ] 城市列表 API（GET /api/v1/locations/cities）：提供所有台灣縣市代碼、英文名稱、中文名稱；無需認證；供前端動態獲取城市選項

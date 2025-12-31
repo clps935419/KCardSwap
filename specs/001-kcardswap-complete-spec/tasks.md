@@ -882,6 +882,13 @@
 - [X] T221 [P] [US7] 定義 Posts Schemas：apps/backend/app/modules/posts/presentation/schemas/post_schemas.py
 - [X] T222 [US7] 建立 Posts Router：apps/backend/app/modules/posts/presentation/routers/posts_router.py（POST /api/v1/posts, GET /api/v1/posts, POST /api/v1/posts/{id}/interest, POST /api/v1/posts/{id}/interests/{interest_id}/accept, POST /api/v1/posts/{id}/interests/{interest_id}/reject, POST /api/v1/posts/{id}/close）
 
+### Extension: Posts Interest Query (owner view)
+
+- [ ] T1301 [US7] 建立 ListPostInterestsUseCase：apps/backend/app/modules/posts/application/use_cases/list_post_interests_use_case.py（檢查 post owner，支援 status 篩選與分頁，回傳列表與總數）。
+- [ ] T1302 [US7] 更新 Posts Router：新增 `GET /api/v1/posts/{post_id}/interests` 與 `GET /api/v1/posts/{post_id}/interests/{interest_id}`（僅作者可查；使用 PostInterestListResponse/PostInterestResponse）。
+- [ ] T1303 [US7] 測試：加入 integration 覆蓋作者/非作者 403/404、status 篩選、分頁；必要時補 use case unit test。
+- [ ] T1304 [US7] 更新 OpenAPI Snapshot：執行 `make generate-openapi` 並提交 `openapi/openapi.json`，包含新增 GET interests 端點（可與 T227 合併處理）。
+
 ### Integration
 
 - [X] T223 [US7] 註冊 Posts Module 到 DI Container：apps/backend/app/container.py

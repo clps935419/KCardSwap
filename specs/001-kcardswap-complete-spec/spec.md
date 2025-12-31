@@ -244,13 +244,15 @@
   - `POST /api/v1/trades/{id}/cancel`（取消提案）
   - `POST /api/v1/trades/{id}/complete`（我方標記完成；雙方皆完成後轉 completed）
   - `GET /api/v1/trades/history`（交換歷史查詢，分頁）
-**FR-API-002-POSTS**：Posts（城市看板）相關端點至少必須包含：
-  - `POST /api/v1/posts`（建立貼文）
-  - `GET /api/v1/posts?city_code=...`（城市看板列表；city_code 必填）
-  - `POST /api/v1/posts/{id}/interest`（對貼文表達有興趣）
-  - `POST /api/v1/posts/{id}/close`（作者關閉貼文）
-  - `POST /api/v1/posts/{id}/interests/{interest_id}/accept`（作者接受興趣請求；接受後導流聊天/好友）
-  - `POST /api/v1/posts/{id}/interests/{interest_id}/reject`（作者拒絕興趣請求）
+  **FR-API-002-POSTS**：Posts（城市看板）相關端點至少必須包含：
+    - `POST /api/v1/posts`（建立貼文）  
+    - `GET /api/v1/posts?city_code=...`（城市看板列表；city_code 必填）                 
+    - `GET /api/v1/posts/{id}/interests?status=...&limit=&offset=`（作者查詢該貼文的興趣清單；支援 pending/accepted/rejected 篩選與分頁；需作者權限）
+    - `GET /api/v1/posts/{id}/interests/{interest_id}`（作者查看單一興趣詳情與狀態；需作者權限）
+    - `POST /api/v1/posts/{id}/interest`（對貼文表達有興趣）                             
+    - `POST /api/v1/posts/{id}/close`（作者關閉貼文）                                   
+    - `POST /api/v1/posts/{id}/interests/{interest_id}/accept`（作者接受興趣請求；接受後導流聊天/好友）                                
+    - `POST /api/v1/posts/{id}/interests/{interest_id}/reject`（作者拒絕興趣請求）       
 **FR-API-002-LOCATIONS**：Location（城市列表）相關端點至少必須包含：
   - `GET /api/v1/locations/cities`（取得所有可用的台灣城市代碼與名稱列表，供前端動態渲染下拉選單；回應格式包含 code, name, name_zh 欄位；此 API 無需認證，屬於公開資源）
   - **Why**: 前端需要動態取得有效城市列表以提供使用者友善的選擇介面，避免硬編碼城市資料，確保城市列表的一致性與可維護性。
@@ -279,7 +281,11 @@
 - **FR-POST-002A**：`city_code` 僅支援台灣縣市；允許值以專案內「縣市清單」為準（可先以靜態資料/設定檔提供），且不放入 `infra/db/init.sql`（init.sql 僅負責資料庫級設定；資料由 migration/seed 機制管理）。
 - **FR-POST-003**：貼文不得要求或顯示精確地址與精準座標；內容若包含疑似個資（電話、地址格式）應在前端提示並阻止送出，後端亦應進行基本驗證。
 - **FR-POST-004**：佈告欄列表必須支援至少以下篩選：偶像名稱、團體/團名、狀態（預設僅 open）。
-- **FR-POST-005**：非作者使用者必須能對 open 貼文表達「有興趣」；作者必須能檢視有興趣清單並接受/拒絕。
+  - **FR-POST-005**：非作者使用者必須能對 open 貼文表達「有興趣」；作者必須能檢視有興趣清單並接受/拒絕。
+  - **FR-POST-005A**：貼文作者必須能查詢該貼文的興趣狀態：
+    - `GET /api/v1/posts/{post_id}/interests` 支援 `status`（pending/accepted/rejected）、`limit`、`offset`；僅貼文作者可存取。
+    - `GET /api/v1/posts/{post_id}/interests/{interest_id}` 回傳單筆興趣詳情（interest id/post_id/user_id/status/created_at/updated_at）；僅貼文作者可存取。
+    - 未授權或資源不存在時回傳 403/404；需在 OpenAPI 中標示權限限制與回應範例。
 - **FR-POST-006**：當作者接受某個「有興趣」請求時，系統必須建立雙方好友關係並建立一對一聊天室，供後續協商交換；若雙方已是好友且聊天室存在，則直接導向該聊天室。
 - **FR-POST-007**：作者必須能手動關閉貼文（closed）；貼文到期後系統必須自動標記為 expired，且不應出現在預設列表中。
 - **FR-POST-008**：貼文建立必須套用會員等級的每日發文限制：免費 2 則/天、付費不限（對齊 FR-BIZ-001/FR-BIZ-002）；超額時回傳一致的錯誤格式與適當錯誤碼（建議 422_LIMIT_EXCEEDED）。
