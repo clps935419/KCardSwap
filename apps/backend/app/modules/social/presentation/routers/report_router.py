@@ -54,17 +54,17 @@ async def submit_report(
 
     Business rules:
     - Cannot report yourself
-    - Reason is required (e.g., "Spam", "Harassment", "Scam")
+    - Reason must be one of the valid report reasons (see ReportReason enum)
     - Optional detailed description
     - Reports are reviewed by moderators
 
-    Common report reasons:
-    - Inappropriate behavior
-    - Spam
-    - Scam
-    - Harassment
-    - Fake cards
-    - Other (please specify in detail)
+    Valid report reasons:
+    - fraud: Suspected fraud/scam
+    - fake_card: Fake card image
+    - harassment: Harassment or abusive behavior
+    - inappropriate_content: Inappropriate messages/images
+    - spam: Spam or repeated unwanted messages
+    - other: Other reasons (please specify in detail)
     """
     try:
         # Initialize repository and use case

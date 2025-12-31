@@ -39,7 +39,7 @@ class TestReportRepositoryImpl:
             reporter_id=str(uuid4()),
             reported_user_id=str(uuid4()),
             reason=ReportReason.INAPPROPRIATE_BEHAVIOR,
-            description="User was rude during trade",
+            detail="User was rude during trade",
             resolved=False,
             created_at=datetime.utcnow(),
         )
@@ -52,7 +52,7 @@ class TestReportRepositoryImpl:
             reporter_id=UUID(sample_report.reporter_id),
             reported_user_id=UUID(sample_report.reported_user_id),
             reason=sample_report.reason.value,
-            description=sample_report.description,
+            detail=sample_report.detail,
             resolved=sample_report.resolved,
             created_at=sample_report.created_at,
         )
@@ -149,6 +149,22 @@ class TestReportRepositoryImpl:
 
         # Act
         result = await repository.get_reports_by_reporter_id(reporter_id)
+
+        # Assert
+        assert isinstance(result, list)
+        mock_session.execute.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_find_by_reporter(self, repository, mock_session):
+        """Test finding reports by reporter (alias method)"""
+        # Arrange
+        reporter_id = str(uuid4())
+        mock_result = MagicMock()
+        mock_result.scalars.return_value.all.return_value = []
+        mock_session.execute = AsyncMock(return_value=mock_result)
+
+        # Act
+        result = await repository.find_by_reporter(reporter_id)
 
         # Assert
         assert isinstance(result, list)

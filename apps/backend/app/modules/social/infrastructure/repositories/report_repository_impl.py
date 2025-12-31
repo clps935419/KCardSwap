@@ -85,6 +85,14 @@ class ReportRepositoryImpl(IReportRepository):
         models = result.scalars().all()
         return [self._to_entity(model) for model in models]
 
+    async def find_by_reporter(self, reporter_id: str) -> List[Report]:
+        """
+        Get all reports filed by a specific user (alias for get_reports_by_reporter_id)
+        
+        This method provides compatibility with router expectations
+        """
+        return await self.get_reports_by_reporter_id(reporter_id)
+
     async def get_unresolved_reports(self, limit: int = 100) -> List[Report]:
         """Get unresolved reports for admin review"""
         result = await self.session.execute(

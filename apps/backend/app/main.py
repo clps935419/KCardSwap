@@ -167,6 +167,13 @@ def create_application() -> FastAPI:
 
     app.include_router(posts_router, prefix=settings.API_PREFIX)
 
+    # Phase 8.5: Locations module (City List API)
+    from .modules.locations.presentation.routers.location_router import (
+        router as location_router,
+    )
+
+    app.include_router(location_router, prefix=settings.API_PREFIX)
+
     return app
 
 

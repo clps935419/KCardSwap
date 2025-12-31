@@ -50,3 +50,14 @@ export interface AcceptInterestResponse {
   chat_room_id: string;
   message: string;
 }
+
+/**
+ * City Type
+ * Represents a Taiwan city/county with code and names
+ * M705: 城市資料型別定義
+ */
+export interface City {
+  code: string;
+  name: string;      // English name
+  name_zh: string;   // Chinese name
+}

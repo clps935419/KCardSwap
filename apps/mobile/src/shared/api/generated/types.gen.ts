@@ -233,17 +233,91 @@ export type ChatRoomResponse = {
 };
 
 /**
+ * CityCode
+ *
+ * Valid Taiwan city codes for post filtering
+ */
+export const CityCode = {
+  TPE: 'TPE',
+  NTP: 'NTP',
+  TAO: 'TAO',
+  TXG: 'TXG',
+  TNN: 'TNN',
+  KHH: 'KHH',
+  HSZ: 'HSZ',
+  CYI: 'CYI',
+  HSQ: 'HSQ',
+  MIA: 'MIA',
+  CHA: 'CHA',
+  NAN: 'NAN',
+  YUN: 'YUN',
+  CYQ: 'CYQ',
+  PIF: 'PIF',
+  ILA: 'ILA',
+  HUA: 'HUA',
+  TTT: 'TTT',
+  PEN: 'PEN',
+  KIN: 'KIN',
+  LIE: 'LIE',
+} as const;
+
+/**
+ * CityCode
+ *
+ * Valid Taiwan city codes for post filtering
+ */
+export type CityCode = (typeof CityCode)[keyof typeof CityCode];
+
+/**
+ * CityListResponse
+ *
+ * Response schema for list of all cities.
+ */
+export type CityListResponse = {
+  /**
+   * Cities
+   *
+   * List of all available Taiwan cities/counties
+   */
+  cities: CityResponse[];
+};
+
+/**
+ * CityResponse
+ *
+ * Response schema for a single city.
+ */
+export type CityResponse = {
+  /**
+   * Code
+   *
+   * City code (e.g., TPE, NTP, TAO)
+   */
+  code: string;
+  /**
+   * Name
+   *
+   * English name (e.g., Taipei City)
+   */
+  name: string;
+  /**
+   * Name Zh
+   *
+   * Chinese name (e.g., 台北市)
+   */
+  name_zh: string;
+};
+
+/**
  * CreatePostRequest
  *
  * Request schema for creating a post
  */
 export type CreatePostRequest = {
   /**
-   * City Code
-   *
-   * City code (e.g., 'TPE')
+   * City code - must be one of: TPE (Taipei), NTP (New Taipei), TAO (Taoyuan), TXG (Taichung), TNN (Tainan), KHH (Kaohsiung), HSZ (Hsinchu City), CYI (Chiayi City), and other Taiwan cities
    */
-  city_code: string;
+  city_code: CityCode;
   /**
    * Title
    *
@@ -369,6 +443,12 @@ export type ExpireSubscriptionsResponse = {
  * Response schema for a single friend in the list
  */
 export type FriendListItemResponse = {
+  /**
+   * Id
+   *
+   * Friendship ID (needed for accept/reject operations)
+   */
+  id: string;
   /**
    * User Id
    *
@@ -743,11 +823,9 @@ export type PostResponse = {
    */
   owner_id: string;
   /**
-   * City Code
-   *
    * City code
    */
-  city_code: string;
+  city_code: CityCode;
   /**
    * Title
    *
@@ -1095,6 +1173,27 @@ export type ReportListResponse = {
 };
 
 /**
+ * ReportReason
+ *
+ * Report reason enumeration
+ */
+export const ReportReason = {
+  FRAUD: 'fraud',
+  FAKE_CARD: 'fake_card',
+  HARASSMENT: 'harassment',
+  INAPPROPRIATE_CONTENT: 'inappropriate_content',
+  SPAM: 'spam',
+  OTHER: 'other',
+} as const;
+
+/**
+ * ReportReason
+ *
+ * Report reason enumeration
+ */
+export type ReportReason = (typeof ReportReason)[keyof typeof ReportReason];
+
+/**
  * ReportRequest
  *
  * Request schema for submitting a report
@@ -1107,11 +1206,9 @@ export type ReportRequest = {
    */
   reported_user_id: string;
   /**
-   * Reason
-   *
-   * Reason for report
+   * Reason for report (must be one of: fraud, fake_card, harassment, inappropriate_content, spam, other)
    */
-  reason: string;
+  reason: ReportReason;
   /**
    * Detail
    *
@@ -1145,11 +1242,9 @@ export type ReportResponse = {
    */
   reported_user_id: string;
   /**
-   * Reason
-   *
    * Reason for report
    */
-  reason: string;
+  reason: ReportReason;
   /**
    * Detail
    *
@@ -1223,11 +1318,11 @@ export type SearchNearbyResponse = {
  */
 export type SendFriendRequestRequest = {
   /**
-   * Friend Id
+   * Target User Id
    *
-   * ID of user to send friend request to
+   * ID of the target user to send friend request to
    */
-  friend_id: string;
+  target_user_id: string;
 };
 
 /**
@@ -2370,7 +2465,7 @@ export type GetFriendsApiV1FriendsGetData = {
     /**
      * Status
      *
-     * Filter by friendship status (accepted, pending, blocked)
+     * Filter by friendship status (accepted, pending, blocked). If not provided, returns all friendships.
      */
     status?: string | null;
   };
@@ -3351,3 +3446,20 @@ export type ClosePostApiV1PostsPostIdClosePostResponses = {
 
 export type ClosePostApiV1PostsPostIdClosePostResponse =
   ClosePostApiV1PostsPostIdClosePostResponses[keyof ClosePostApiV1PostsPostIdClosePostResponses];
+
+export type GetCitiesApiV1LocationsCitiesGetData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/v1/locations/cities';
+};
+
+export type GetCitiesApiV1LocationsCitiesGetResponses = {
+  /**
+   * List of all Taiwan cities retrieved successfully
+   */
+  200: CityListResponse;
+};
+
+export type GetCitiesApiV1LocationsCitiesGetResponse =
+  GetCitiesApiV1LocationsCitiesGetResponses[keyof GetCitiesApiV1LocationsCitiesGetResponses];

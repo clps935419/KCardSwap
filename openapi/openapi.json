@@ -1006,11 +1006,10 @@
                   "type": "null"
                 }
               ],
-              "description": "Filter by friendship status (accepted, pending, blocked)",
-              "default": "accepted",
+              "description": "Filter by friendship status (accepted, pending, blocked). If not provided, returns all friendships.",
               "title": "Status"
             },
-            "description": "Filter by friendship status (accepted, pending, blocked)"
+            "description": "Filter by friendship status (accepted, pending, blocked). If not provided, returns all friendships."
           }
         ],
         "responses": {
@@ -2350,6 +2349,47 @@
           }
         }
       }
+    },
+    "/api/v1/locations/cities": {
+      "get": {
+        "tags": [
+          "locations"
+        ],
+        "summary": "Get all Taiwan cities",
+        "description": "Get a list of all available Taiwan cities/counties.\n    \n    This endpoint provides the complete list of Taiwan's 22 cities/counties including:\n    - **Six Special Municipalities** (直轄市): Taipei, New Taipei, Taoyuan, Taichung, Tainan, Kaohsiung\n    - **Provincial Cities** (省轄市): Hsinchu City, Chiayi City  \n    - **Counties** (縣): Hsinchu County, Miaoli, Changhua, Nantou, Yunlin, Chiayi County, Pingtung, Yilan, Hualien, Taitung, Penghu, Kinmen, Lienchiang\n    \n    Each city includes:\n    - `code`: City code used in APIs (e.g., TPE, NTP, TAO)\n    - `name`: English name (e.g., Taipei City)\n    - `name_zh`: Chinese name (e.g., 台北市)\n    \n    This is a public endpoint that **does not require authentication**.\n    Frontend applications should use this to dynamically populate city selection dropdowns.",
+        "operationId": "get_cities_api_v1_locations_cities_get",
+        "responses": {
+          "200": {
+            "description": "List of all Taiwan cities retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CityListResponse"
+                },
+                "example": {
+                  "cities": [
+                    {
+                      "code": "TPE",
+                      "name": "Taipei City",
+                      "name_zh": "台北市"
+                    },
+                    {
+                      "code": "NTP",
+                      "name": "New Taipei City",
+                      "name_zh": "新北市"
+                    },
+                    {
+                      "code": "TAO",
+                      "name": "Taoyuan City",
+                      "name_zh": "桃園市"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2724,13 +2764,84 @@
           "unread_count": 0
         }
       },
+      "CityCode": {
+        "type": "string",
+        "enum": [
+          "TPE",
+          "NTP",
+          "TAO",
+          "TXG",
+          "TNN",
+          "KHH",
+          "HSZ",
+          "CYI",
+          "HSQ",
+          "MIA",
+          "CHA",
+          "NAN",
+          "YUN",
+          "CYQ",
+          "PIF",
+          "ILA",
+          "HUA",
+          "TTT",
+          "PEN",
+          "KIN",
+          "LIE"
+        ],
+        "title": "CityCode",
+        "description": "Valid Taiwan city codes for post filtering"
+      },
+      "CityListResponse": {
+        "properties": {
+          "cities": {
+            "items": {
+              "$ref": "#/components/schemas/CityResponse"
+            },
+            "type": "array",
+            "title": "Cities",
+            "description": "List of all available Taiwan cities/counties"
+          }
+        },
+        "type": "object",
+        "required": [
+          "cities"
+        ],
+        "title": "CityListResponse",
+        "description": "Response schema for list of all cities."
+      },
+      "CityResponse": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code",
+            "description": "City code (e.g., TPE, NTP, TAO)"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "English name (e.g., Taipei City)"
+          },
+          "name_zh": {
+            "type": "string",
+            "title": "Name Zh",
+            "description": "Chinese name (e.g., 台北市)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "name",
+          "name_zh"
+        ],
+        "title": "CityResponse",
+        "description": "Response schema for a single city."
+      },
       "CreatePostRequest": {
         "properties": {
           "city_code": {
-            "type": "string",
-            "maxLength": 20,
-            "title": "City Code",
-            "description": "City code (e.g., 'TPE')",
+            "$ref": "#/components/schemas/CityCode",
+            "description": "City code - must be one of: TPE (Taipei), NTP (New Taipei), TAO (Taoyuan), TXG (Taichung), TNN (Tainan), KHH (Kaohsiung), HSZ (Hsinchu City), CYI (Chiayi City), and other Taiwan cities",
             "examples": [
               "TPE"
             ]
@@ -2951,6 +3062,12 @@
       },
       "FriendListItemResponse": {
         "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id",
+            "description": "Friendship ID (needed for accept/reject operations)"
+          },
           "user_id": {
             "type": "string",
             "format": "uuid",
@@ -2995,6 +3112,7 @@
         },
         "type": "object",
         "required": [
+          "id",
           "user_id",
           "status",
           "created_at"
@@ -3004,6 +3122,7 @@
         "example": {
           "avatar_url": "https://example.com/avatar.jpg",
           "created_at": "2024-01-01T00:00:00Z",
+          "id": "789e0123-e45b-67d8-a901-234567890000",
           "nickname": "John Doe",
           "status": "accepted",
           "user_id": "456e7890-e12b-34d5-a678-901234567000"
@@ -3037,6 +3156,7 @@
             {
               "avatar_url": "https://example.com/avatar.jpg",
               "created_at": "2024-01-01T00:00:00Z",
+              "id": "789e0123-e45b-67d8-a901-234567890000",
               "nickname": "John Doe",
               "status": "accepted",
               "user_id": "456e7890-e12b-34d5-a678-901234567000"
@@ -3533,8 +3653,7 @@
             "description": "Owner user ID"
           },
           "city_code": {
-            "type": "string",
-            "title": "City Code",
+            "$ref": "#/components/schemas/CityCode",
             "description": "City code"
           },
           "title": {
@@ -4092,21 +4211,20 @@
           "total"
         ],
         "title": "ReportListResponse",
-        "description": "Response schema for list of reports",
-        "example": {
-          "reports": [
-            {
-              "created_at": "2024-01-01T00:00:00Z",
-              "detail": "User sent inappropriate messages.",
-              "id": "456e7890-e12b-34d5-a678-901234567000",
-              "reason": "Inappropriate behavior",
-              "reported_user_id": "123e4567-e89b-12d3-a456-426614174000",
-              "reporter_id": "789e0123-e45b-67d8-a901-234567890000",
-              "status": "pending"
-            }
-          ],
-          "total": 1
-        }
+        "description": "Response schema for list of reports"
+      },
+      "ReportReason": {
+        "type": "string",
+        "enum": [
+          "fraud",
+          "fake_card",
+          "harassment",
+          "inappropriate_content",
+          "spam",
+          "other"
+        ],
+        "title": "ReportReason",
+        "description": "Report reason enumeration"
       },
       "ReportRequest": {
         "properties": {
@@ -4120,16 +4238,10 @@
             ]
           },
           "reason": {
-            "type": "string",
-            "maxLength": 100,
-            "minLength": 1,
-            "title": "Reason",
-            "description": "Reason for report",
+            "$ref": "#/components/schemas/ReportReason",
+            "description": "Reason for report (must be one of: fraud, fake_card, harassment, inappropriate_content, spam, other)",
             "examples": [
-              "Inappropriate behavior",
-              "Spam",
-              "Scam",
-              "Harassment"
+              "harassment"
             ]
           },
           "detail": {
@@ -4155,12 +4267,7 @@
           "reason"
         ],
         "title": "ReportRequest",
-        "description": "Request schema for submitting a report",
-        "example": {
-          "detail": "User sent inappropriate messages and refused to complete trade.",
-          "reason": "Inappropriate behavior",
-          "reported_user_id": "123e4567-e89b-12d3-a456-426614174000"
-        }
+        "description": "Request schema for submitting a report"
       },
       "ReportResponse": {
         "properties": {
@@ -4183,8 +4290,7 @@
             "description": "User who was reported"
           },
           "reason": {
-            "type": "string",
-            "title": "Reason",
+            "$ref": "#/components/schemas/ReportReason",
             "description": "Reason for report"
           },
           "detail": {
@@ -4226,16 +4332,7 @@
           "created_at"
         ],
         "title": "ReportResponse",
-        "description": "Response schema for a report",
-        "example": {
-          "created_at": "2024-01-01T00:00:00Z",
-          "detail": "User sent inappropriate messages.",
-          "id": "456e7890-e12b-34d5-a678-901234567000",
-          "reason": "Inappropriate behavior",
-          "reported_user_id": "123e4567-e89b-12d3-a456-426614174000",
-          "reporter_id": "789e0123-e45b-67d8-a901-234567890000",
-          "status": "pending"
-        }
+        "description": "Response schema for a report"
       },
       "SearchNearbyRequest": {
         "properties": {
@@ -4319,11 +4416,11 @@
       },
       "SendFriendRequestRequest": {
         "properties": {
-          "friend_id": {
+          "target_user_id": {
             "type": "string",
             "format": "uuid",
-            "title": "Friend Id",
-            "description": "ID of user to send friend request to",
+            "title": "Target User Id",
+            "description": "ID of the target user to send friend request to",
             "examples": [
               "123e4567-e89b-12d3-a456-426614174000"
             ]
@@ -4331,12 +4428,12 @@
         },
         "type": "object",
         "required": [
-          "friend_id"
+          "target_user_id"
         ],
         "title": "SendFriendRequestRequest",
         "description": "Request schema for sending friend request",
         "example": {
-          "friend_id": "123e4567-e89b-12d3-a456-426614174000"
+          "target_user_id": "123e4567-e89b-12d3-a456-426614174000"
         }
       },
       "SendMessageRequest": {

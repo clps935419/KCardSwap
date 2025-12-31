@@ -39,8 +39,22 @@ class IRatingRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_average_rating(self, user_id: str) -> Optional[float]:
-        """Get average rating score for a user"""
+    async def get_average_rating(self, user_id: str) -> Optional[dict]:
+        """
+        Get average rating score and count for a user
+        
+        Returns:
+            dict with 'average' (float) and 'count' (int), or None if no ratings
+        """
+        pass
+    
+    @abstractmethod
+    async def find_by_rated_user(self, user_id: str, limit: int = 50) -> List[Rating]:
+        """
+        Get ratings received by a user (alias for get_ratings_for_user)
+        
+        This method provides compatibility with router expectations
+        """
         pass
 
     @abstractmethod

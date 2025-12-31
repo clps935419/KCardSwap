@@ -52,6 +52,8 @@ import type {
   GetChatRoomsApiV1ChatsGetData,
   GetChatRoomsApiV1ChatsGetErrors,
   GetChatRoomsApiV1ChatsGetResponses,
+  GetCitiesApiV1LocationsCitiesGetData,
+  GetCitiesApiV1LocationsCitiesGetResponses,
   GetFriendsApiV1FriendsGetData,
   GetFriendsApiV1FriendsGetErrors,
   GetFriendsApiV1FriendsGetResponses,
@@ -1048,3 +1050,28 @@ export const closePostApiV1PostsPostIdClosePost = <ThrowOnError extends boolean 
     url: '/api/v1/posts/{post_id}/close',
     ...options,
   });
+
+/**
+ * Get all Taiwan cities
+ *
+ * Get a list of all available Taiwan cities/counties.
+ *
+ * This endpoint provides the complete list of Taiwan's 22 cities/counties including:
+ * - **Six Special Municipalities** (直轄市): Taipei, New Taipei, Taoyuan, Taichung, Tainan, Kaohsiung
+ * - **Provincial Cities** (省轄市): Hsinchu City, Chiayi City
+ * - **Counties** (縣): Hsinchu County, Miaoli, Changhua, Nantou, Yunlin, Chiayi County, Pingtung, Yilan, Hualien, Taitung, Penghu, Kinmen, Lienchiang
+ *
+ * Each city includes:
+ * - `code`: City code used in APIs (e.g., TPE, NTP, TAO)
+ * - `name`: English name (e.g., Taipei City)
+ * - `name_zh`: Chinese name (e.g., 台北市)
+ *
+ * This is a public endpoint that **does not require authentication**.
+ * Frontend applications should use this to dynamically populate city selection dropdowns.
+ */
+export const getCitiesApiV1LocationsCitiesGet = <ThrowOnError extends boolean = false>(
+  options?: Options<GetCitiesApiV1LocationsCitiesGetData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<GetCitiesApiV1LocationsCitiesGetResponses, unknown, ThrowOnError>(
+    { url: '/api/v1/locations/cities', ...options }
+  );

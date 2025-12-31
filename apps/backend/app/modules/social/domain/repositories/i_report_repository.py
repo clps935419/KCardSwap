@@ -36,6 +36,15 @@ class IReportRepository(ABC):
         pass
 
     @abstractmethod
+    async def find_by_reporter(self, reporter_id: str) -> List[Report]:
+        """
+        Get all reports filed by a specific user (alias for get_reports_by_reporter_id)
+        
+        This method provides compatibility with router expectations
+        """
+        pass
+
+    @abstractmethod
     async def get_unresolved_reports(self, limit: int = 100) -> List[Report]:
         """Get unresolved reports for admin review"""
         pass

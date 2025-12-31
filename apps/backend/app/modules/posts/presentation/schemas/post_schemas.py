@@ -9,14 +9,15 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
+from app.modules.posts.domain.entities.city_code import CityCode
+
 
 class CreatePostRequest(BaseModel):
     """Request schema for creating a post"""
 
-    city_code: str = Field(
+    city_code: CityCode = Field(
         ...,
-        max_length=20,
-        description="City code (e.g., 'TPE')",
+        description="City code - must be one of: TPE (Taipei), NTP (New Taipei), TAO (Taoyuan), TXG (Taichung), TNN (Tainan), KHH (Kaohsiung), HSZ (Hsinchu City), CYI (Chiayi City), and other Taiwan cities",
         examples=["TPE"],
     )
     title: str = Field(
@@ -64,7 +65,7 @@ class PostResponse(BaseModel):
 
     id: UUID = Field(..., description="Post ID")
     owner_id: UUID = Field(..., description="Owner user ID")
-    city_code: str = Field(..., description="City code")
+    city_code: CityCode = Field(..., description="City code")
     title: str = Field(..., description="Post title")
     content: str = Field(..., description="Post content")
     idol: Optional[str] = Field(None, description="Idol name")
