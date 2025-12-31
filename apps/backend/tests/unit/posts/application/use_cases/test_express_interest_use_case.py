@@ -4,7 +4,7 @@ Unit tests for ExpressInterestUseCase
 Tests the express interest use case implementation with mocked repositories.
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from unittest.mock import AsyncMock
 from uuid import uuid4
 
@@ -47,8 +47,8 @@ class TestExpressInterestUseCase:
             title="Test Post",
             content="Test content",
             status=PostStatus.OPEN,
-            expires_at=datetime.utcnow() + timedelta(days=14),
-            created_at=datetime.utcnow(),
+            expires_at=datetime.now(timezone.utc) + timedelta(days=14),
+            created_at=datetime.now(timezone.utc),
         )
 
     @pytest.mark.asyncio
@@ -133,8 +133,8 @@ class TestExpressInterestUseCase:
             title="Test Post",
             content="Test content",
             status=PostStatus.CLOSED,
-            expires_at=datetime.utcnow() + timedelta(days=14),
-            created_at=datetime.utcnow(),
+            expires_at=datetime.now(timezone.utc) + timedelta(days=14),
+            created_at=datetime.now(timezone.utc),
         )
         user_id = str(uuid4())
 
@@ -159,8 +159,8 @@ class TestExpressInterestUseCase:
             title="Test Post",
             content="Test content",
             status=PostStatus.OPEN,
-            expires_at=datetime.utcnow() - timedelta(days=1),  # Expired
-            created_at=datetime.utcnow(),
+            expires_at=datetime.now(timezone.utc) - timedelta(days=1),  # Expired
+            created_at=datetime.now(timezone.utc),
         )
         user_id = str(uuid4())
 
