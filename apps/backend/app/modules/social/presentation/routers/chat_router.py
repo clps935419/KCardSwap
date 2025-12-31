@@ -17,6 +17,7 @@ from app.modules.social.application.use_cases.chat.get_messages_use_case import 
 from app.modules.social.application.use_cases.chat.send_message_use_case import (
     SendMessageUseCase,
 )
+from app.modules.social.domain.entities.message import MessageStatus
 from app.modules.social.infrastructure.repositories.chat_room_repository_impl import (
     ChatRoomRepositoryImpl,
 )
@@ -71,7 +72,7 @@ async def get_chat_rooms(
         chat_room_repo = ChatRoomRepositoryImpl(session)
 
         # Get chat rooms for user
-        chat_rooms = await chat_room_repo.find_by_user(str(current_user_id))
+        chat_rooms = await chat_room_repo.get_rooms_by_user_id(str(current_user_id))
 
         # Convert to response format
         # Note: In a real implementation, we would fetch:
@@ -90,7 +91,7 @@ async def get_chat_rooms(
                     nickname=None,  # TODO: Fetch from profile
                     avatar_url=None,  # TODO: Fetch from profile
                 )
-                for uid in [room.user_a_id, room.user_b_id]
+                for uid in room.participant_ids
             ]
 
             response.append(
@@ -147,12 +148,13 @@ async def get_messages(
         # Initialize repositories and use case
         message_repo = MessageRepositoryImpl(session)
         chat_room_repo = ChatRoomRepositoryImpl(session)
-        use_case = GetMessagesUseCase(message_repo, chat_room_repo)
+        friendship_repo = FriendshipRepositoryImpl(session)
+        use_case = GetMessagesUseCase(message_repo, chat_room_repo, friendship_repo)
 
         # Execute use case
         messages = await use_case.execute(
             room_id=str(room_id),
-            user_id=str(current_user_id),
+            requesting_user_id=str(current_user_id),
             after_message_id=str(after_message_id) if after_message_id else None,
             limit=limit,
         )
@@ -326,10 +328,8 @@ async def mark_message_read(
     Business rules:
     - User must be a participant in the room
     - User cannot mark their own messages as read
-    - Only unread messages can be marked as read
-
-    Note: This is a placeholder implementation.
-    Full implementation would update message status.
+    - Only unread messages (SENT or DELIVERED) will be marked as READ
+    - Already read messages return success without changes
     """
     try:
         # Initialize repositories
@@ -363,8 +363,17 @@ async def mark_message_read(
                 detail="Cannot mark your own message as read",
             )
 
-        # TODO: Implement message status update
-        # For now, just return success
+        # Only mark if message is not already read
+        if message.status == MessageStatus.READ:
+            # Already read, just return success
+            return
+
+        # Mark message as read using entity method
+        message.mark_read()
+
+        # Update message in database
+        await message_repo.update(message)
+        
         logger.info(f"Message {message_id} marked as read by {current_user_id}")
 
     except HTTPException:

@@ -5,7 +5,7 @@ SQLAlchemy ChatRoom Repository Implementation
 from typing import List, Optional
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import select, any_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.social.domain.entities.chat_room import ChatRoom
@@ -76,10 +76,10 @@ class ChatRoomRepositoryImpl(IChatRoomRepository):
         """Get all chat rooms for a user"""
         user_uuid = UUID(user_id) if isinstance(user_id, str) else user_id
 
-        # Use array contains operator to find rooms where user is a participant
+        # Use ANY operator to find rooms where user is a participant in the array
         result = await self.session.execute(
             select(ChatRoomModel)
-            .where(ChatRoomModel.participant_ids.contains([user_uuid]))
+            .where(user_uuid == any_(ChatRoomModel.participant_ids))
             .order_by(ChatRoomModel.created_at.desc())
         )
         models = result.scalars().all()
