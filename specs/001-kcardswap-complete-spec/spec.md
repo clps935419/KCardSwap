@@ -251,6 +251,10 @@
   - `POST /api/v1/posts/{id}/close`（作者關閉貼文）
   - `POST /api/v1/posts/{id}/interests/{interest_id}/accept`（作者接受興趣請求；接受後導流聊天/好友）
   - `POST /api/v1/posts/{id}/interests/{interest_id}/reject`（作者拒絕興趣請求）
+**FR-API-002-LOCATIONS**：Location（城市列表）相關端點至少必須包含：
+  - `GET /api/v1/locations/cities`（取得所有可用的台灣城市代碼與名稱列表，供前端動態渲染下拉選單；回應格式包含 code, name, name_zh 欄位；此 API 無需認證，屬於公開資源）
+  - **Why**: 前端需要動態取得有效城市列表以提供使用者友善的選擇介面，避免硬編碼城市資料，確保城市列表的一致性與可維護性。
+  - **Acceptance Scenarios**: (1) 當前端應用啟動或使用者開啟貼文發佈頁面時，呼叫此 API 取得完整城市列表並渲染為下拉選單。(2) API 回應包含所有台灣 22 個縣市的代碼（如 TPE, NTP, TAO）、英文名稱（如 Taipei City）與中文名稱（如 台北市）。(3) 此 API 無需 JWT 認證，允許匿名存取。
 - **FR-API-003**：所有 API 回應需採用一致格式（例如 `{ "data": ..., "error": null }` 或 `{ "data": null, "error": { code, message } }`）。
 - **FR-API-004**：系統必須定義標準錯誤碼集合（例如 400_xxx 驗證錯誤、401_xxx 未授權、403_xxx 權限不足、404_xxx 資源不存在、429_xxx 超出限流）。
 

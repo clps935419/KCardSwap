@@ -906,6 +906,53 @@
 
 ---
 
+## Phase 8.5: City Locations API（城市列表 API）
+
+**目的**: 提供前端動態獲取城市代碼列表的 API，避免前後端硬編碼城市資料，確保一致性與可維護性
+
+**相關 User Story**: US7 (Posts)
+
+### Domain Layer (Locations Module)
+
+- [ ] T229 [P] [US7] 建立 Locations 模組目錄結構：apps/backend/app/modules/locations/（domain/, application/, infrastructure/, presentation/）
+- [ ] T230 [P] [US7] 建立 City Value Object：apps/backend/app/modules/locations/domain/value_objects/city.py（code, name, name_zh；使用 CityCode enum）
+- [ ] T231 [P] [US7] 定義 CityRepository Interface：apps/backend/app/modules/locations/domain/repositories/city_repository.py（get_all_cities 方法）
+
+### Application Layer (Locations Module)
+
+- [ ] T232 [P] [US7] 建立 GetAllCitiesUseCase：apps/backend/app/modules/locations/application/use_cases/get_all_cities_use_case.py（返回所有台灣縣市列表）
+
+### Infrastructure Layer (Locations Module)
+
+- [ ] T233 [P] [US7] 實作 CityRepositoryImpl：apps/backend/app/modules/locations/infrastructure/repositories/city_repository_impl.py（使用靜態資料或配置檔，包含 22 個台灣縣市完整資料）
+
+### Presentation Layer (Locations Module)
+
+- [ ] T234 [P] [US7] 定義 City Schema：apps/backend/app/modules/locations/presentation/schemas/city_schemas.py（CityResponse: code, name, name_zh）
+- [ ] T235 [US7] 建立 Location Router：apps/backend/app/modules/locations/presentation/routers/location_router.py（GET /api/v1/locations/cities；無需認證；公開資源）
+
+### Integration
+
+- [ ] T236 [US7] 註冊 Locations Module 到 DI Container：apps/backend/app/container.py
+- [ ] T237 [US7] 註冊 Location Router 到 main.py：apps/backend/app/main.py（註冊路由並設定無需 JWT 認證）
+
+### Testing
+
+- [ ] T238 [P] [US7] 撰寫 City Repository Unit Tests：tests/unit/locations/infrastructure/repositories/test_city_repository_impl.py
+- [ ] T239 [P] [US7] 撰寫 GetAllCitiesUseCase Unit Tests：tests/unit/locations/application/use_cases/test_get_all_cities_use_case.py
+- [ ] T240 [P] [US7] 撰寫 Locations Integration Tests：tests/integration/modules/locations/test_city_list_flow.py（測試 GET /api/v1/locations/cities 回應格式與資料完整性）
+
+### OpenAPI/Swagger
+
+- [ ] T241 [P] [US7] 對齊 OpenAPI/Swagger：Locations 相關 endpoints（重新生成 openapi/openapi.json 以包含 /api/v1/locations/cities）**（需在有Poetry環境執行 make generate-openapi）**
+
+### Mobile Integration
+
+- [ ] M705 [P] [US7] 建立城市列表 Hook：apps/mobile/src/features/locations/hooks/useCities.ts（呼叫 GET /api/v1/locations/cities 並快取結果）
+- [ ] M706 [P] [US7] 更新建立貼文頁面：整合城市下拉選單（使用 useCities hook 動態載入選項，取代硬編碼）
+
+---
+
 ## Phase 9: Polish & Cross-Cutting Concerns (跨模組整合與優化)
 
 **目的**: 整合所有功能、優化效能、完善文件
