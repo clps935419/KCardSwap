@@ -2,7 +2,7 @@
 SQLAlchemy Post Repository Implementation
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Optional
 from uuid import UUID
 
@@ -91,7 +91,7 @@ class PostRepositoryImpl(IPostRepository):
         user_uuid = UUID(user_id) if isinstance(user_id, str) else user_id
 
         # Get start of day (UTC)
-        today_start = datetime.utcnow().replace(
+        today_start = datetime.now(timezone.utc).replace(
             hour=0, minute=0, second=0, microsecond=0
         )
 
@@ -167,7 +167,7 @@ class PostRepositoryImpl(IPostRepository):
         Mark all open posts that have passed their expiry time as expired
         Returns the number of posts marked as expired
         """
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
 
         # Find all open posts that have expired
         result = await self.session.execute(

@@ -1,7 +1,7 @@
 """Accept Interest Use Case - Accept an interest and create friendship + chat room"""
 
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.modules.posts.domain.repositories.i_post_interest_repository import (
     IPostInterestRepository,
@@ -109,7 +109,7 @@ class AcceptInterestUseCase:
                 user_id=post_owner_id,
                 friend_id=interested_user_id,
                 status=FriendshipStatus.ACCEPTED,
-                created_at=datetime.utcnow(),
+                created_at=datetime.now(timezone.utc),
             )
             await self.friendship_repository.create(friendship1)
 
@@ -119,7 +119,7 @@ class AcceptInterestUseCase:
                 user_id=interested_user_id,
                 friend_id=post_owner_id,
                 status=FriendshipStatus.ACCEPTED,
-                created_at=datetime.utcnow(),
+                created_at=datetime.now(timezone.utc),
             )
             await self.friendship_repository.create(friendship2)
 
@@ -139,7 +139,7 @@ class AcceptInterestUseCase:
             chat_room = ChatRoom(
                 id=str(uuid.uuid4()),
                 participant_ids=[post_owner_id, interested_user_id],
-                created_at=datetime.utcnow(),
+                created_at=datetime.now(timezone.utc),
             )
             chat_room = await self.chat_room_repository.create(chat_room)
 

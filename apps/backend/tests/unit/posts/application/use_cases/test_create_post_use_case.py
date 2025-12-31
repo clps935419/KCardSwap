@@ -4,7 +4,7 @@ Unit tests for CreatePostUseCase
 Tests the create post use case implementation with mocked repositories.
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from unittest.mock import AsyncMock
 from uuid import uuid4
 
@@ -208,7 +208,7 @@ class TestCreatePostUseCase:
         """Test post creation with custom expiry date"""
         # Arrange
         owner_id = str(uuid4())
-        custom_expiry = datetime.utcnow() + timedelta(days=7)
+        custom_expiry = datetime.now(timezone.utc) + timedelta(days=7)
 
         # Mock premium subscription
         mock_subscription = AsyncMock()
@@ -240,7 +240,7 @@ class TestCreatePostUseCase:
     ):
         """Test post creation fails when expiry is in the past"""
         # Arrange
-        past_expiry = datetime.utcnow() - timedelta(days=1)
+        past_expiry = datetime.now(timezone.utc) - timedelta(days=1)
 
         # Mock premium subscription
         mock_subscription = AsyncMock()

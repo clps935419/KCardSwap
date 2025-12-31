@@ -151,7 +151,7 @@ class TestPostRepositoryImpl:
         expected_count = 2
 
         mock_result = MagicMock()
-        mock_result.scalar_one.return_value = expected_count
+        mock_result.scalar.return_value = expected_count
         mock_session.execute = AsyncMock(return_value=mock_result)
 
         # Act
@@ -216,14 +216,22 @@ class TestPostRepositoryImpl:
         """Test marking expired posts"""
         # Arrange
         expected_count = 3
+        
+        # Create mock expired post models
+        mock_posts = []
+        for _ in range(expected_count):
+            mock_post = MagicMock()
+            mock_post.status = PostStatus.OPEN.value
+            mock_posts.append(mock_post)
 
         mock_result = MagicMock()
-        mock_result.rowcount = expected_count
+        mock_result.scalars.return_value.all.return_value = mock_posts
         mock_session.execute = AsyncMock(return_value=mock_result)
-        mock_session.commit = AsyncMock()
+        mock_session.flush = AsyncMock()
 
         # Act
         result = await repository.mark_expired_posts()
 
         # Assert
         assert result == expected_count
+        mock_session.flush.assert_called_once()
