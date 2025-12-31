@@ -24,6 +24,9 @@ from app.modules.posts.application.use_cases.express_interest_use_case import (
 from app.modules.posts.application.use_cases.list_board_posts_use_case import (
     ListBoardPostsUseCase,
 )
+from app.modules.posts.application.use_cases.list_post_interests_use_case import (
+    ListPostInterestsUseCase,
+)
 from app.modules.posts.application.use_cases.reject_interest_use_case import (
     RejectInterestUseCase,
 )
@@ -104,3 +107,14 @@ class PostsModule(Module):
         """Provide ClosePostUseCase with dependencies."""
         post_repo = PostRepositoryImpl(session)
         return ClosePostUseCase(post_repository=post_repo)
+
+    @provider
+    def provide_list_post_interests_use_case(
+        self, session: AsyncSession
+    ) -> ListPostInterestsUseCase:
+        """Provide ListPostInterestsUseCase with dependencies."""
+        post_repo = PostRepositoryImpl(session)
+        post_interest_repo = PostInterestRepositoryImpl(session)
+        return ListPostInterestsUseCase(
+            post_repository=post_repo, post_interest_repository=post_interest_repo
+        )
