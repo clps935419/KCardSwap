@@ -71,7 +71,7 @@ async def get_chat_rooms(
         chat_room_repo = ChatRoomRepositoryImpl(session)
 
         # Get chat rooms for user
-        chat_rooms = await chat_room_repo.find_by_user(str(current_user_id))
+        chat_rooms = await chat_room_repo.get_rooms_by_user_id(str(current_user_id))
 
         # Convert to response format
         # Note: In a real implementation, we would fetch:
@@ -90,7 +90,7 @@ async def get_chat_rooms(
                     nickname=None,  # TODO: Fetch from profile
                     avatar_url=None,  # TODO: Fetch from profile
                 )
-                for uid in [room.user_a_id, room.user_b_id]
+                for uid in room.participant_ids
             ]
 
             response.append(
