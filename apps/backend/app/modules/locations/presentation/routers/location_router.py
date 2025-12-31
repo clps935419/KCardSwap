@@ -3,9 +3,14 @@
 from fastapi import APIRouter, Depends
 from injector import Injector
 
-from app.container import get_container
+from app.injector import injector as global_container
 from app.modules.locations.application.use_cases.get_all_cities_use_case import GetAllCitiesUseCase
 from app.modules.locations.presentation.schemas.city_schemas import CityListResponse, CityResponse
+
+
+def get_container() -> Injector:
+    """Get the global injector container."""
+    return global_container
 
 
 router = APIRouter(prefix="/locations", tags=["locations"])

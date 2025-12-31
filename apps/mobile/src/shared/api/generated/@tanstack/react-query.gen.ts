@@ -27,6 +27,7 @@ import {
   expressInterestApiV1PostsPostIdInterestPost,
   getAverageRatingApiV1RatingsUserUserIdAverageGet,
   getChatRoomsApiV1ChatsGet,
+  getCitiesApiV1LocationsCitiesGet,
   getFriendsApiV1FriendsGet,
   getMessagesApiV1ChatsRoomIdMessagesGet,
   getMyCardsApiV1CardsMeGet,
@@ -97,6 +98,8 @@ import type {
   GetAverageRatingApiV1RatingsUserUserIdAverageGetResponse,
   GetChatRoomsApiV1ChatsGetData,
   GetChatRoomsApiV1ChatsGetResponse,
+  GetCitiesApiV1LocationsCitiesGetData,
+  GetCitiesApiV1LocationsCitiesGetResponse,
   GetFriendsApiV1FriendsGetData,
   GetFriendsApiV1FriendsGetError,
   GetFriendsApiV1FriendsGetResponse,
@@ -1671,3 +1674,46 @@ export const closePostApiV1PostsPostIdClosePostMutation = (
   };
   return mutationOptions;
 };
+
+export const getCitiesApiV1LocationsCitiesGetQueryKey = (
+  options?: Options<GetCitiesApiV1LocationsCitiesGetData>
+) => createQueryKey('getCitiesApiV1LocationsCitiesGet', options);
+
+/**
+ * Get all Taiwan cities
+ *
+ * Get a list of all available Taiwan cities/counties.
+ *
+ * This endpoint provides the complete list of Taiwan's 22 cities/counties including:
+ * - **Six Special Municipalities** (直轄市): Taipei, New Taipei, Taoyuan, Taichung, Tainan, Kaohsiung
+ * - **Provincial Cities** (省轄市): Hsinchu City, Chiayi City
+ * - **Counties** (縣): Hsinchu County, Miaoli, Changhua, Nantou, Yunlin, Chiayi County, Pingtung, Yilan, Hualien, Taitung, Penghu, Kinmen, Lienchiang
+ *
+ * Each city includes:
+ * - `code`: City code used in APIs (e.g., TPE, NTP, TAO)
+ * - `name`: English name (e.g., Taipei City)
+ * - `name_zh`: Chinese name (e.g., 台北市)
+ *
+ * This is a public endpoint that **does not require authentication**.
+ * Frontend applications should use this to dynamically populate city selection dropdowns.
+ */
+export const getCitiesApiV1LocationsCitiesGetOptions = (
+  options?: Options<GetCitiesApiV1LocationsCitiesGetData>
+) =>
+  queryOptions<
+    GetCitiesApiV1LocationsCitiesGetResponse,
+    DefaultError,
+    GetCitiesApiV1LocationsCitiesGetResponse,
+    ReturnType<typeof getCitiesApiV1LocationsCitiesGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getCitiesApiV1LocationsCitiesGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getCitiesApiV1LocationsCitiesGetQueryKey(options),
+  });
