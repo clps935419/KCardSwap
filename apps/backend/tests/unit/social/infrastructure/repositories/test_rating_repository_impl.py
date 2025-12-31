@@ -38,7 +38,7 @@ class TestRatingRepositoryImpl:
             id=str(uuid4()),
             trade_id=str(uuid4()),
             rater_id=str(uuid4()),
-            ratee_id=str(uuid4()),
+            rated_user_id=str(uuid4()),
             score=5,
             comment="Great trade!",
             created_at=datetime.utcnow(),
@@ -51,7 +51,7 @@ class TestRatingRepositoryImpl:
             id=UUID(sample_rating.id),
             trade_id=UUID(sample_rating.trade_id),
             rater_id=UUID(sample_rating.rater_id),
-            ratee_id=UUID(sample_rating.ratee_id),
+            rated_user_id=UUID(sample_rating.rated_user_id),
             score=sample_rating.score,
             comment=sample_rating.comment,
             created_at=sample_rating.created_at,
@@ -112,7 +112,7 @@ class TestRatingRepositoryImpl:
                 id=uuid4(),
                 trade_id=UUID(trade_id),
                 rater_id=uuid4(),
-                ratee_id=uuid4(),
+                rated_user_id=uuid4(),
                 score=i + 1,
                 comment=f"Comment {i}",
                 created_at=datetime.utcnow(),
@@ -165,21 +165,40 @@ class TestRatingRepositoryImpl:
         mock_session.execute.assert_called_once()
 
     @pytest.mark.asyncio
+    async def test_find_by_rated_user(self, repository, mock_session):
+        """Test finding ratings by rated user (alias method)"""
+        # Arrange
+        user_id = str(uuid4())
+        mock_result = MagicMock()
+        mock_result.scalars.return_value.all.return_value = []
+        mock_session.execute = AsyncMock(return_value=mock_result)
+
+        # Act
+        result = await repository.find_by_rated_user(user_id, limit=20)
+
+        # Assert
+        assert isinstance(result, list)
+        mock_session.execute.assert_called_once()
+
+    @pytest.mark.asyncio
     async def test_get_average_rating(self, repository, mock_session):
         """Test getting average rating for a user"""
         # Arrange
         user_id = str(uuid4())
         expected_avg = 4.5
+        expected_count = 10
 
         mock_result = MagicMock()
-        mock_result.scalar.return_value = expected_avg
+        mock_result.one.return_value = (expected_avg, expected_count)
         mock_session.execute = AsyncMock(return_value=mock_result)
 
         # Act
         result = await repository.get_average_rating(user_id)
 
         # Assert
-        assert result == expected_avg
+        assert result is not None
+        assert result["average"] == expected_avg
+        assert result["count"] == expected_count
 
     @pytest.mark.asyncio
     async def test_get_average_rating_no_ratings(self, repository, mock_session):
@@ -188,7 +207,7 @@ class TestRatingRepositoryImpl:
         user_id = str(uuid4())
 
         mock_result = MagicMock()
-        mock_result.scalar.return_value = None
+        mock_result.one.return_value = (None, 0)
         mock_session.execute = AsyncMock(return_value=mock_result)
 
         # Act

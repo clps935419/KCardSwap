@@ -87,19 +87,35 @@ class RatingRepositoryImpl(IRatingRepository):
         models = result.scalars().all()
         return [self._to_entity(model) for model in models]
 
-    async def get_average_rating(self, user_id: str) -> Optional[float]:
-        """Get average rating score for a user"""
+    async def get_average_rating(self, user_id: str) -> Optional[dict]:
+        """
+        Get average rating score and count for a user
+        
+        Returns:
+            dict with 'average' (float) and 'count' (int), or None if no ratings
+        """
         user_uuid = UUID(user_id) if isinstance(user_id, str) else user_id
 
         result = await self.session.execute(
-            select(func.avg(RatingModel.score)).where(
+            select(func.avg(RatingModel.score), func.count(RatingModel.id)).where(
                 RatingModel.rated_user_id == user_uuid
             )
         )
-        avg_score = result.scalar_one_or_none()
+        avg_score, count = result.one()
 
-        # Return None if user has no ratings, otherwise return float
-        return float(avg_score) if avg_score is not None else None
+        # Return None if user has no ratings, otherwise return dict
+        if avg_score is None or count == 0:
+            return None
+        
+        return {"average": float(avg_score), "count": int(count)}
+
+    async def find_by_rated_user(self, user_id: str, limit: int = 50) -> List[Rating]:
+        """
+        Get ratings received by a user (alias for get_ratings_for_user)
+        
+        This method provides compatibility with router expectations
+        """
+        return await self.get_ratings_for_user(user_id, limit)
 
     async def has_user_rated_trade(self, rater_id: str, trade_id: str) -> bool:
         """Check if user has already rated a specific trade"""
