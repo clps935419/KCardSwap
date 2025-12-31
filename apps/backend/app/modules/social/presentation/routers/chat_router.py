@@ -327,10 +327,8 @@ async def mark_message_read(
     Business rules:
     - User must be a participant in the room
     - User cannot mark their own messages as read
-    - Only unread messages can be marked as read
-
-    Note: This is a placeholder implementation.
-    Full implementation would update message status.
+    - Only unread messages (SENT or DELIVERED) will be marked as READ
+    - Already read messages return success without changes
     """
     try:
         # Initialize repositories
@@ -364,8 +362,17 @@ async def mark_message_read(
                 detail="Cannot mark your own message as read",
             )
 
-        # TODO: Implement message status update
-        # For now, just return success
+        # Only mark if message is not already read
+        if message.status == MessageStatus.READ:
+            # Already read, just return success
+            return
+
+        # Mark message as read using entity method
+        message.mark_read()
+
+        # Update message in database
+        await message_repo.update(message)
+        
         logger.info(f"Message {message_id} marked as read by {current_user_id}")
 
     except HTTPException:
