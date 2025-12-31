@@ -24,15 +24,29 @@ import {
   Spinner,
   Textarea,
   TextareaInput,
+  Select,
+  SelectTrigger,
+  SelectInput,
+  SelectIcon,
+  SelectPortal,
+  SelectBackdrop,
+  SelectContent,
+  SelectDragIndicatorWrapper,
+  SelectDragIndicator,
+  SelectItem,
 } from '@/src/shared/ui/components';
-import { useCreatePost } from '@/src/features/posts/hooks/usePosts';
+import { ChevronDownIcon } from '@/src/shared/ui/components';
+import { useCreatePost, useCities } from '@/src/features/posts/hooks';
 import type { CreatePostRequest } from '@/src/features/posts/types';
 
 export function CreatePostScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ city_code?: string }>();
   
-  const [cityCode] = useState<string>(params.city_code || 'TPE');
+  // M706: 使用 useCities hook 取得城市列表
+  const { data: cities, isLoading: citiesLoading } = useCities();
+  
+  const [cityCode, setCityCode] = useState<string>(params.city_code || 'TPE');
   const [title, setTitle] = useState<string>('');
   const [content, setContent] = useState<string>('');
   const [idol, setIdol] = useState<string>('');
@@ -108,6 +122,52 @@ export function CreatePostScreen() {
           </Text>
           <Text className="text-xs text-blue-700 mt-1">
             免費用戶每日限制: 2則貼文
+          </Text>
+        </Box>
+
+        {/* M706: 城市下拉選單 */}
+        <Box className="mb-4">
+          <Text className="text-sm font-bold text-gray-900 mb-2">
+            城市 <Text className="text-red-500">*</Text>
+          </Text>
+          {citiesLoading ? (
+            <Box className="flex-row items-center p-3 bg-gray-100 rounded-lg">
+              <Spinner size="small" />
+              <Text className="text-sm text-gray-600 ml-2">載入城市列表...</Text>
+            </Box>
+          ) : (
+            <Select
+              selectedValue={cityCode}
+              onValueChange={(value) => setCityCode(value)}
+            >
+              <SelectTrigger variant="outline" size="md">
+                <SelectInput 
+                  placeholder="選擇城市"
+                  value={cities?.find(c => c.code === cityCode)?.name_zh || '選擇城市'}
+                />
+                <SelectIcon className="mr-3">
+                  <ChevronDownIcon />
+                </SelectIcon>
+              </SelectTrigger>
+              <SelectPortal>
+                <SelectBackdrop />
+                <SelectContent>
+                  <SelectDragIndicatorWrapper>
+                    <SelectDragIndicator />
+                  </SelectDragIndicatorWrapper>
+                  {cities?.map((city) => (
+                    <SelectItem
+                      key={city.code}
+                      label={`${city.name_zh} (${city.code})`}
+                      value={city.code}
+                    />
+                  ))}
+                </SelectContent>
+              </SelectPortal>
+            </Select>
+          )}
+          <Text className="text-xs text-gray-500 mt-1">
+            貼文將發布至選定城市的看板
           </Text>
         </Box>
 

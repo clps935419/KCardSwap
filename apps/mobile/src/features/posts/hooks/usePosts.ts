@@ -1,6 +1,15 @@
 /**
  * Posts Hooks
  * React Query hooks for posts management using generated SDK
+ * 
+ * Exports:
+ * - useBoardPosts: 取得城市看板貼文列表
+ * - useCreatePost: 建立貼文
+ * - useExpressInterest: 表達興趣
+ * - useAcceptInterest: 接受興趣
+ * - useRejectInterest: 拒絕興趣
+ * - useClosePost: 關閉貼文
+ * - usePostInterests: 取得貼文的興趣清單
  */
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
