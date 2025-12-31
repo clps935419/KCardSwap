@@ -7,13 +7,15 @@ from datetime import datetime
 from typing import List, Optional
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.modules.social.domain.entities.report import ReportReason
 
 
 class ReportRequest(BaseModel):
     """Request schema for submitting a report"""
+    
+    model_config = ConfigDict(use_enum_values=True)
 
     reported_user_id: UUID = Field(
         ...,
@@ -32,18 +34,11 @@ class ReportRequest(BaseModel):
         examples=["User sent inappropriate messages and refused to complete trade."],
     )
 
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "reported_user_id": "123e4567-e89b-12d3-a456-426614174000",
-                "reason": "harassment",
-                "detail": "User sent inappropriate messages and refused to complete trade.",
-            }
-        }
-
 
 class ReportResponse(BaseModel):
     """Response schema for a report"""
+    
+    model_config = ConfigDict(from_attributes=True, use_enum_values=True)
 
     id: UUID = Field(..., description="Report ID")
     reporter_id: UUID = Field(..., description="User who filed the report")
@@ -57,41 +52,9 @@ class ReportResponse(BaseModel):
     )
     created_at: datetime = Field(..., description="Creation timestamp")
 
-    class Config:
-        from_attributes = True
-        json_schema_extra = {
-            "example": {
-                "id": "456e7890-e12b-34d5-a678-901234567000",
-                "reporter_id": "789e0123-e45b-67d8-a901-234567890000",
-                "reported_user_id": "123e4567-e89b-12d3-a456-426614174000",
-                "reason": "harassment",
-                "detail": "User sent inappropriate messages.",
-                "status": "pending",
-                "created_at": "2024-01-01T00:00:00Z",
-            }
-        }
-
 
 class ReportListResponse(BaseModel):
     """Response schema for list of reports"""
 
     reports: List[ReportResponse] = Field(..., description="List of reports")
     total: int = Field(..., description="Total number of reports")
-
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "reports": [
-                    {
-                        "id": "456e7890-e12b-34d5-a678-901234567000",
-                        "reporter_id": "789e0123-e45b-67d8-a901-234567890000",
-                        "reported_user_id": "123e4567-e89b-12d3-a456-426614174000",
-                        "reason": "spam",
-                        "detail": "User sent inappropriate messages.",
-                        "status": "pending",
-                        "created_at": "2024-01-01T00:00:00Z",
-                    }
-                ],
-                "total": 1,
-            }
-        }
