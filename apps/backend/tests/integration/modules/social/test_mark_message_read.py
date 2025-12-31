@@ -1,5 +1,5 @@
 """
-Unit tests for mark message as read functionality in chat router
+Integration tests for mark message as read functionality in chat router
 
 Tests the complete flow of marking a message as read including:
 - Business rule validation

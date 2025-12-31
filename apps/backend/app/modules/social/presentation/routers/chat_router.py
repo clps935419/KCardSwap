@@ -17,6 +17,7 @@ from app.modules.social.application.use_cases.chat.get_messages_use_case import 
 from app.modules.social.application.use_cases.chat.send_message_use_case import (
     SendMessageUseCase,
 )
+from app.modules.social.domain.entities.message import MessageStatus
 from app.modules.social.infrastructure.repositories.chat_room_repository_impl import (
     ChatRoomRepositoryImpl,
 )
