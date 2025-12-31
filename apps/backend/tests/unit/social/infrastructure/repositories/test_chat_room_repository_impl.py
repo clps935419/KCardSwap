@@ -72,23 +72,13 @@ class TestChatRoomRepositoryImpl:
 
     @pytest.mark.asyncio
     async def test_create_chat_room(
-        self, repository, mock_session, sample_chat_room, sample_chat_room_model
+        self, repository, mock_session, sample_chat_room
     ):
         """Test creating a chat room"""
         # Arrange
         mock_session.add = MagicMock()
         mock_session.flush = AsyncMock()
         mock_session.refresh = AsyncMock()
-
-        # Mock the refresh to set model attributes
-        async def mock_refresh(model):
-            model.id = UUID(sample_chat_room.id)
-            model.participant_ids = sorted(
-                [UUID(pid) for pid in sample_chat_room.participant_ids]
-            )
-            model.created_at = sample_chat_room.created_at
-
-        mock_session.refresh.side_effect = mock_refresh
 
         # Act
         result = await repository.create(sample_chat_room)
@@ -269,15 +259,23 @@ class TestChatRoomRepositoryImpl:
         # Delete should not be called for non-existing room
         mock_session.delete.assert_not_called()
 
-    def test_to_entity_conversion(self, sample_chat_room_model):
-        """Test conversion from model to entity"""
-        # Act
-        entity = ChatRoomRepositoryImpl._to_entity(sample_chat_room_model)
+    @pytest.mark.asyncio
+    async def test_entity_conversion_via_get_by_id(
+        self, repository, mock_session, sample_room_id, sample_chat_room_model
+    ):
+        """Test entity conversion indirectly through get_by_id"""
+        # Arrange
+        mock_result = MagicMock()
+        mock_result.scalar_one_or_none.return_value = sample_chat_room_model
+        mock_session.execute = AsyncMock(return_value=mock_result)
 
-        # Assert
+        # Act
+        entity = await repository.get_by_id(sample_room_id)
+
+        # Assert - verify conversion happened correctly
         assert entity is not None
         assert entity.id == str(sample_chat_room_model.id)
         assert len(entity.participant_ids) == 2
-        # All participant IDs should be strings
+        # All participant IDs should be strings (converted from UUID)
         for pid in entity.participant_ids:
             assert isinstance(pid, str)
