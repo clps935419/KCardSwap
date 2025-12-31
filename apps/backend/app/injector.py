@@ -7,6 +7,7 @@ Aggregates all module configurations.
 from injector import Injector
 
 from app.modules.identity.module import IdentityModule
+from app.modules.locations.module import LocationsModule
 from app.modules.posts.module import PostsModule
 from app.modules.social.module import SocialModule
 from app.shared.module import SharedModule
@@ -18,5 +19,6 @@ injector = Injector(
         IdentityModule(),
         SocialModule(),
         PostsModule(),
+        LocationsModule(),
     ]
 )
