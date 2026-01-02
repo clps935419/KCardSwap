@@ -133,3 +133,51 @@ class QuotaStatusResponse(BaseModel):
                 "remaining_storage_mb": 1019.0,
             }
         }
+
+
+# Envelope wrappers for standardized responses
+class UploadUrlResponseWrapper(BaseModel):
+    """Response wrapper for upload URL (standardized envelope)"""
+
+    data: UploadUrlResponse
+    meta: None = None
+    error: None = None
+
+
+class CardResponseWrapper(BaseModel):
+    """Response wrapper for single card (standardized envelope)"""
+
+    data: CardResponse
+    meta: None = None
+    error: None = None
+
+
+class CardListResponseWrapper(BaseModel):
+    """Response wrapper for card list (standardized envelope)"""
+
+    data: list[CardResponse]
+    meta: None = None
+    error: None = None
+
+
+class QuotaStatusResponseWrapper(BaseModel):
+    """Response wrapper for quota status (standardized envelope)"""
+
+    data: QuotaStatusResponse
+    meta: None = None
+    error: None = None
+
+
+class DeleteSuccessResponse(BaseModel):
+    """Success response for delete operations"""
+
+    success: bool = Field(True, description="Operation success status")
+    message: str = Field(..., description="Success message")
+
+
+class DeleteSuccessResponseWrapper(BaseModel):
+    """Response wrapper for delete success (standardized envelope)"""
+
+    data: DeleteSuccessResponse
+    meta: None = None
+    error: None = None
