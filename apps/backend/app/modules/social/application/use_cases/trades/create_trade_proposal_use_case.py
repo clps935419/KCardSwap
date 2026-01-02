@@ -1,6 +1,6 @@
 """Create Trade Proposal Use Case"""
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List
 from uuid import UUID, uuid4
 
@@ -133,7 +133,7 @@ class CreateTradeProposalUseCase:
 
         # Create trade entity
         trade_id = uuid4()
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
 
         trade = Trade(
             id=trade_id,

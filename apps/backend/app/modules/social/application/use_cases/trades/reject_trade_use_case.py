@@ -1,6 +1,6 @@
 """Reject Trade Use Case"""
 
-from datetime import datetime
+from datetime import datetime, timezone
 from uuid import UUID
 
 from app.modules.social.domain.entities.trade import Trade
@@ -64,7 +64,7 @@ class RejectTradeUseCase:
 
         # Update trade
         trade.status = Trade.STATUS_REJECTED
-        trade.updated_at = datetime.utcnow()
+        trade.updated_at = datetime.now(timezone.utc)
 
         # Save and return
         return await self.trade_repository.update(trade)

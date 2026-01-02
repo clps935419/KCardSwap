@@ -1,6 +1,6 @@
 """Cancel Trade Use Case"""
 
-from datetime import datetime
+from datetime import datetime, timezone
 from uuid import UUID
 
 from app.modules.social.domain.entities.trade import Trade
@@ -65,8 +65,8 @@ class CancelTradeUseCase:
 
         # Update trade
         trade.status = Trade.STATUS_CANCELED
-        trade.canceled_at = datetime.utcnow()
-        trade.updated_at = datetime.utcnow()
+        trade.canceled_at = datetime.now(timezone.utc)
+        trade.updated_at = datetime.now(timezone.utc)
 
         # Save and return
         return await self.trade_repository.update(trade)
