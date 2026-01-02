@@ -20,7 +20,6 @@ from app.modules.identity.presentation.dependencies.use_case_deps import (
     get_update_profile_use_case,
 )
 from app.modules.identity.presentation.schemas.profile_schemas import (
-    ProfileErrorWrapper,
     ProfileResponse,
     ProfileResponseWrapper,
     UpdateProfileRequest,
@@ -36,8 +35,8 @@ router = APIRouter(prefix="/profile", tags=["Profile"])
     status_code=status.HTTP_200_OK,
     responses={
         200: {"description": "Successfully retrieved profile"},
-        401: {"model": ProfileErrorWrapper, "description": "Unauthorized"},
-        404: {"model": ProfileErrorWrapper, "description": "Profile not found"},
+        401: {"description": "Unauthorized"},
+        404: {"description": "Profile not found"},
     },
     summary="Get my profile",
     description="Retrieve the authenticated user's profile information",
@@ -75,7 +74,7 @@ async def get_my_profile(
         updated_at=profile.updated_at,
     )
 
-    return ProfileResponseWrapper(data=profile_response, error=None)
+    return ProfileResponseWrapper(data=profile_response, meta=None, error=None)
 
 
 @router.put(
@@ -84,8 +83,8 @@ async def get_my_profile(
     status_code=status.HTTP_200_OK,
     responses={
         200: {"description": "Successfully updated profile"},
-        400: {"model": ProfileErrorWrapper, "description": "Validation error"},
-        401: {"model": ProfileErrorWrapper, "description": "Unauthorized"},
+        400: {"description": "Validation error"},
+        401: {"description": "Unauthorized"},
     },
     summary="Update my profile",
     description="Update the authenticated user's profile information",
@@ -133,4 +132,4 @@ async def update_my_profile(
         updated_at=profile.updated_at,
     )
 
-    return ProfileResponseWrapper(data=profile_response, error=None)
+    return ProfileResponseWrapper(data=profile_response, meta=None, error=None)

@@ -84,22 +84,8 @@ class UpdateProfileRequest(BaseModel):
 
 
 class ProfileResponseWrapper(BaseModel):
-    """Response wrapper for profile data"""
+    """Response wrapper for profile data (standardized envelope)"""
 
     data: ProfileResponse
+    meta: None = None
     error: None = None
-
-
-class ErrorResponse(BaseModel):
-    """Error response schema"""
-
-    code: str = Field(..., description="Error code")
-    message: str = Field(..., description="Error message")
-    details: Optional[dict] = Field(None, description="Additional error details")
-
-
-class ProfileErrorWrapper(BaseModel):
-    """Error wrapper for profile endpoints"""
-
-    data: None = None
-    error: ErrorResponse
