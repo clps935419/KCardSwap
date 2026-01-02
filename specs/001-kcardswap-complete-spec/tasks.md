@@ -973,7 +973,7 @@
 - [x] T1407 [BACKEND] Posts 模組對齊：apps/backend/app/modules/posts/presentation/routers/posts_router.py（列表/詳情/興趣操作回應統一包裝，並補 meta）✅
 - [x] T1407A [BACKEND] Locations 模組對齊：apps/backend/app/modules/locations/presentation/routers/location_router.py（統一回應格式）✅
 - [ ] T1408 [P] [TEST] 更新整合測試快照與斷言：tests/integration/** 對齊新的回應 envelope（含分頁 meta）
-- [ ] T1409 [P] [DOCS] 更新 OpenAPI snapshot：執行 make generate-openapi（apps/backend/scripts/generate_openapi.py），提交 openapi/openapi.json，並在 openapi/README.md 標註新格式
+- [x] T1409 [P] [DOCS] 更新 OpenAPI snapshot：執行 make generate-openapi（apps/backend/scripts/generate_openapi.py），提交 openapi/openapi.json，並在 openapi/README.md 標註新格式 ✅ (2026-01-02)
 - [ ] T1410 [P] [MOBILE] 重新生成 SDK 並更新使用說明：cd apps/mobile && npm run sdk:generate；更新 apps/mobile/README.md、apps/mobile/TECH_STACK.md 說明回應 envelope 與錯誤處理
 - [ ] T1411 [MOBILE] 調整行動端 API 呼叫：將現有 hook/query/mutation 解析新 envelope（以 data 為主、meta 為分頁，error 交由錯誤映射），排除 legacy client 殘留
 - [ ] T1412 [MOBILE] 更新行動端錯誤分流與 UI：apps/mobile/src/shared/api/errorMapper.ts 及各 feature（cards/posts/chat/trade/subscription）對齊 error 結構，確保 loading/error/empty 狀態顯示正常
