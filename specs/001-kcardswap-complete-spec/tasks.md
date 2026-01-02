@@ -960,6 +960,26 @@
 
 ---
 
+## Phase 8.6: API Response Standardization（跨模組回應格式統一）
+
+**目的**: 全域採用 `{data, meta, error}` envelope，統一成功/分頁/錯誤回應，並同步文件、OpenAPI、SDK。
+
+- [ ] T1401 [P] [DOCS] 建立回應格式規範：specs/001-kcardswap-complete-spec/response-format.md（定義 data/meta/error 結構，列出成功/分頁/錯誤範例；錯誤碼表後續補）
+- [ ] T1402 [P] [DOCS] 更新後端文件：apps/backend/README.md 與 apps/backend/docs/api/README.md（新增統一回應格式說明與範例）
+- [ ] T1403 [P] [BACKEND] 建立共用回應封裝：apps/backend/app/shared/presentation/schemas/response_envelope.py + apps/backend/app/shared/presentation/response.py（提供 success/paginated helper，確保 data/meta/error 一致）
+- [ ] T1404 [P] [BACKEND] 全域錯誤處理對齊 envelope：apps/backend/app/shared/presentation/middleware/error_handler.py（錯誤回應統一包成 data=null, meta=null, error；error.code 規則待後續決定）
+- [ ] T1405 [BACKEND] Identity 模組對齊：apps/backend/app/modules/identity/presentation/routers/*（auth/profile/subscriptions）改用共用 helper，移除直回 dict 或未包裝的回應；同步對應 schemas
+- [ ] T1406 [BACKEND] Social 模組對齊：apps/backend/app/modules/social/presentation/routers/cards_router.py、chat_router.py、friends_router.py、nearby_router.py、rating_router.py、report_router.py、trade_router.py 改用共用 helper；列表端點補 meta 分頁資訊
+- [ ] T1407 [BACKEND] Posts 模組對齊：apps/backend/app/modules/posts/presentation/routers/posts_router.py（列表/詳情/興趣操作回應統一包裝，並補 meta）
+- [ ] T1408 [P] [TEST] 更新整合測試快照與斷言：tests/integration/** 對齊新的回應 envelope（含分頁 meta）
+- [ ] T1409 [P] [DOCS] 更新 OpenAPI snapshot：執行 make generate-openapi（apps/backend/scripts/generate_openapi.py），提交 openapi/openapi.json，並在 openapi/README.md 標註新格式
+- [ ] T1410 [P] [MOBILE] 重新生成 SDK 並更新使用說明：cd apps/mobile && npm run sdk:generate；更新 apps/mobile/README.md、apps/mobile/TECH_STACK.md 說明回應 envelope 與錯誤處理
+- [ ] T1411 [MOBILE] 調整行動端 API 呼叫：將現有 hook/query/mutation 解析新 envelope（以 data 為主、meta 為分頁，error 交由錯誤映射），排除 legacy client 殘留
+- [ ] T1412 [MOBILE] 更新行動端錯誤分流與 UI：apps/mobile/src/shared/api/errorMapper.ts 及各 feature（cards/posts/chat/trade/subscription）對齊 error 結構，確保 loading/error/empty 狀態顯示正常
+- [ ] T1413 [MOBILE] 行動端驗證：跑 npm run test & npm run type-check，並針對受影響畫面（列表/詳情/分頁）做手動驗證清單
+
+---
+
 ## Phase 9: Polish & Cross-Cutting Concerns (跨模組整合與優化)
 
 **目的**: 整合所有功能、優化效能、完善文件
