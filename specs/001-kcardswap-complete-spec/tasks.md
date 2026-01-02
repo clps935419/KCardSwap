@@ -968,10 +968,10 @@
 - [ ] T1402 [P] [DOCS] 更新後端文件：apps/backend/README.md 與 apps/backend/docs/api/README.md（新增統一回應格式說明與範例）
 - [x] T1403 [P] [BACKEND] 建立共用回應封裝：apps/backend/app/shared/presentation/schemas/response_envelope.py + apps/backend/app/shared/presentation/response.py（提供 success/paginated helper，確保 data/meta/error 一致）✅
 - [x] T1404 [P] [BACKEND] 全域錯誤處理對齊 envelope：apps/backend/app/shared/presentation/middleware/error_handler.py（錯誤回應統一包成 data=null, meta=null, error；error.code 規則待後續決定）✅
-- [x] T1405 [BACKEND] Identity 模組對齊：apps/backend/app/modules/identity/presentation/routers/*（auth/profile/subscriptions）改用共用 helper，移除直回 dict 或未包裝的回應；同步對應 schemas ✅ (auth_router.py, profile_router.py; subscription_router.py 需單獨處理)
-- [ ] T1406 [BACKEND] Social 模組對齊：apps/backend/app/modules/social/presentation/routers/cards_router.py、chat_router.py、friends_router.py、nearby_router.py、rating_router.py、report_router.py、trade_router.py 改用共用 helper；列表端點補 meta 分頁資訊
-- [ ] T1407 [BACKEND] Posts 模組對齊：apps/backend/app/modules/posts/presentation/routers/posts_router.py（列表/詳情/興趣操作回應統一包裝，並補 meta）
-- [ ] T1407A [BACKEND] Locations 模組對齊：apps/backend/app/modules/locations/presentation/routers/location_router.py（統一回應格式）
+- [x] T1405 [BACKEND] Identity 模組對齊：apps/backend/app/modules/identity/presentation/routers/*（auth/profile/subscriptions）改用共用 helper，移除直回 dict 或未包裝的回應；同步對應 schemas ✅
+- [x] T1406 [BACKEND] Social 模組對齊：apps/backend/app/modules/social/presentation/routers/cards_router.py、chat_router.py、friends_router.py、nearby_router.py、rating_router.py、report_router.py、trade_router.py 改用共用 helper；列表端點補 meta 分頁資訊 ✅
+- [x] T1407 [BACKEND] Posts 模組對齊：apps/backend/app/modules/posts/presentation/routers/posts_router.py（列表/詳情/興趣操作回應統一包裝，並補 meta）✅
+- [x] T1407A [BACKEND] Locations 模組對齊：apps/backend/app/modules/locations/presentation/routers/location_router.py（統一回應格式）✅
 - [ ] T1408 [P] [TEST] 更新整合測試快照與斷言：tests/integration/** 對齊新的回應 envelope（含分頁 meta）
 - [ ] T1409 [P] [DOCS] 更新 OpenAPI snapshot：執行 make generate-openapi（apps/backend/scripts/generate_openapi.py），提交 openapi/openapi.json，並在 openapi/README.md 標註新格式
 - [ ] T1410 [P] [MOBILE] 重新生成 SDK 並更新使用說明：cd apps/mobile && npm run sdk:generate；更新 apps/mobile/README.md、apps/mobile/TECH_STACK.md 說明回應 envelope 與錯誤處理
@@ -979,15 +979,21 @@
 - [ ] T1412 [MOBILE] 更新行動端錯誤分流與 UI：apps/mobile/src/shared/api/errorMapper.ts 及各 feature（cards/posts/chat/trade/subscription）對齊 error 結構，確保 loading/error/empty 狀態顯示正常
 - [ ] T1413 [MOBILE] 行動端驗證：跑 npm run test & npm run type-check，並針對受影響畫面（列表/詳情/分頁）做手動驗證清單
 
-**進度**: 5/14 tasks 完成 (36%)
+**進度**: 🎉 **後端完成 100%** (8/8 backend tasks) | 總進度 8/14 tasks (57%)
 - ✅ 基礎設施已建立（規範文件、共用 schemas、helper functions、錯誤中介軟體）
-- ✅ Identity 模組 auth 與 profile routers 已更新
-- ⏳ 待完成：Identity subscription + Social 全模組 + Posts + Locations + Tests + OpenAPI + Mobile
+- ✅ Identity 模組 完成（auth_router.py, profile_router.py, subscription_router.py）- 9 endpoints
+- ✅ Social 模組 完成（cards, chat, friends, nearby, rating, report, trade routers）- 27 endpoints
+- ✅ Posts 模組 完成（posts_router.py）- 8 endpoints
+- ✅ Locations 模組 完成（location_router.py）- 1 endpoint
+- ✅ **所有 12 個 routers、45 個 endpoints 已完成標準化** 🎉
+- ⏳ 待完成：測試更新 + OpenAPI 生成 + Mobile SDK + Mobile 程式碼更新
 
 **重要提示**: 此為 breaking change，需要確保：
-1. 所有後端 routers 完成更新後再生成 OpenAPI
-2. OpenAPI 更新後立即重新生成 Mobile SDK
-3. Mobile 端更新需與後端部署同步
+1. ✅ 所有後端 routers 完成更新（已完成）
+2. ⏭️ 更新整合測試並確保通過
+3. ⏭️ 生成 OpenAPI snapshot
+4. ⏭️ 重新生成 Mobile SDK
+5. ⏭️ Mobile 端更新需與後端部署同步
 
 ---
 
