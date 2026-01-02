@@ -19,6 +19,7 @@ import {
   Box,
   Text,
   Input,
+  InputField,
   Pressable,
   Spinner,
   Button,
@@ -160,50 +161,50 @@ export function UploadCardScreen() {
         <Box className="bg-white rounded-xl p-4 mb-4">
           <Box className="mb-4">
             <Text className="text-sm font-semibold text-gray-900 mb-2">偶像名稱</Text>
-            <Input
-              value={idol}
-              onChangeText={setIdol}
-              placeholder="例：IU"
-              isDisabled={isUploading}
-              className="bg-white"
-            />
+            <Input disabled={isUploading} className="bg-white">
+              <InputField
+                value={idol}
+                onChangeText={setIdol}
+                placeholder="例：IU"
+              />
+            </Input>
           </Box>
 
           <Box className="mb-4">
             <Text className="text-sm font-semibold text-gray-900 mb-2">
               團體/公司（選填）
             </Text>
-            <Input
-              value={idolGroup}
-              onChangeText={setIdolGroup}
-              placeholder="例：EDAM Entertainment"
-              isDisabled={isUploading}
-              className="bg-white"
-            />
+            <Input disabled={isUploading} className="bg-white">
+              <InputField
+                value={idolGroup}
+                onChangeText={setIdolGroup}
+                placeholder="例：EDAM Entertainment"
+              />
+            </Input>
           </Box>
 
           <Box className="mb-4">
             <Text className="text-sm font-semibold text-gray-900 mb-2">
               專輯名稱（選填）
             </Text>
-            <Input
-              value={album}
-              onChangeText={setAlbum}
-              placeholder="例：Love Poem"
-              isDisabled={isUploading}
-              className="bg-white"
-            />
+            <Input disabled={isUploading} className="bg-white">
+              <InputField
+                value={album}
+                onChangeText={setAlbum}
+                placeholder="例：Love Poem"
+              />
+            </Input>
           </Box>
 
           <Box className="mb-4">
             <Text className="text-sm font-semibold text-gray-900 mb-2">版本（選填）</Text>
-            <Input
-              value={version}
-              onChangeText={setVersion}
-              placeholder="例：限定版"
-              isDisabled={isUploading}
-              className="bg-white"
-            />
+            <Input disabled={isUploading} className="bg-white">
+              <InputField
+                value={version}
+                onChangeText={setVersion}
+                placeholder="例：限定版"
+              />
+            </Input>
           </Box>
 
           <Box>
@@ -216,7 +217,7 @@ export function UploadCardScreen() {
                     rarity === option.value ? 'bg-blue-500' : 'bg-gray-100'
                   }`}
                   onPress={() => setRarity(option.value)}
-                  isDisabled={isUploading}
+                  disabled={isUploading}
                 >
                   <Text
                     className={`text-sm ${
@@ -266,7 +267,7 @@ export function UploadCardScreen() {
           {/* POC: 自訂相機 + 框線 */}
           <Button
             onPress={() => setShowCustomCamera(true)}
-            isDisabled={isUploading}
+            disabled={isUploading}
             className="bg-purple-500 mb-2"
           >
             <Text className="text-3xl mb-2">🎯</Text>
@@ -276,7 +277,7 @@ export function UploadCardScreen() {
           <Box className="flex-row gap-3">
             <Button
               onPress={() => handleUpload('camera')}
-              isDisabled={isUploading}
+              disabled={isUploading}
               className="flex-1 bg-green-500"
             >
               <Text className="text-3xl mb-2">📷</Text>
@@ -285,7 +286,7 @@ export function UploadCardScreen() {
 
           <Button
             onPress={() => handleUpload('gallery')}
-            isDisabled={isUploading}
+            disabled={isUploading}
             className="flex-1 bg-blue-500"
           >
             <Text className="text-3xl mb-2">🖼️</Text>

@@ -129,7 +129,7 @@ export default function FriendsListScreen() {
             onPress={() => handleUnblockUser(item.user_id, item.nickname)}
             size="sm"
             variant="outline"
-            isDisabled={isUnblocking}
+            disabled={isUnblocking}
           >
             <ButtonText className="text-sm">
               {isUnblocking ? '處理中...' : '解除封鎖'}

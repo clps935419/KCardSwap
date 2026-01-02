@@ -78,7 +78,7 @@ export default function SendRequestScreen() {
 
         <Button
           onPress={handleSendRequest}
-          isDisabled={isPending || !friendId.trim()}
+          disabled={isPending || !friendId.trim()}
           variant="solid"
           className="mt-6"
         >

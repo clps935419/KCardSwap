@@ -198,7 +198,7 @@ export function PostDetailScreen() {
             action="primary"
             className="w-full mb-3"
             onPress={handleExpressInterest}
-            isDisabled={expressInterestMutation.isPending}
+            disabled={expressInterestMutation.isPending}
           >
             {expressInterestMutation.isPending ? (
               <Spinner color="white" />

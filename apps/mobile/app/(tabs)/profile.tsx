@@ -211,7 +211,7 @@ export default function ProfileScreen() {
             <Text size="sm" className="font-semibold text-gray-700 mb-2">
               Nickname
             </Text>
-            <Input isDisabled={!isEditing}>
+            <Input disabled={!isEditing}>
               <InputField
                 value={nickname}
                 onChangeText={setNickname}
@@ -229,7 +229,7 @@ export default function ProfileScreen() {
             <Text size="sm" className="font-semibold text-gray-700 mb-2">
               Bio
             </Text>
-            <Input isDisabled={!isEditing}>
+            <Input disabled={!isEditing}>
               <InputField
                 value={bio}
                 onChangeText={setBio}
@@ -256,7 +256,7 @@ export default function ProfileScreen() {
               <Switch
                 value={nearbyVisible}
                 onValueChange={setNearbyVisible}
-                isDisabled={!isEditing}
+                disabled={!isEditing}
               />
             </Box>
 
@@ -265,7 +265,7 @@ export default function ProfileScreen() {
               <Switch
                 value={showOnline}
                 onValueChange={setShowOnline}
-                isDisabled={!isEditing}
+                disabled={!isEditing}
               />
             </Box>
 
@@ -274,7 +274,7 @@ export default function ProfileScreen() {
               <Switch
                 value={allowStrangerChat}
                 onValueChange={setAllowStrangerChat}
-                isDisabled={!isEditing}
+                disabled={!isEditing}
               />
             </Box>
           </Box>

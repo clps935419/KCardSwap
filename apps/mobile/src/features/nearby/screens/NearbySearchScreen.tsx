@@ -183,7 +183,7 @@ export function NearbySearchScreen() {
         {/* Search Button */}
         <Button
           onPress={handleSearchNearby}
-          isDisabled={!location || isSearching}
+          disabled={!location || isSearching}
           className="w-full"
         >
           {isSearching ? (

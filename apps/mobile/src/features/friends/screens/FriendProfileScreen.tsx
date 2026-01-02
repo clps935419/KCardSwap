@@ -153,7 +153,7 @@ export default function FriendProfileScreen() {
             <Button
               onPress={handleBlockUser}
               variant="outline"
-              isDisabled={isBlocking}
+              disabled={isBlocking}
               className="border-red-500"
             >
               <ButtonText className="text-red-500">
