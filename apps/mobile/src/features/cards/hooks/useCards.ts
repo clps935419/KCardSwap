@@ -3,13 +3,15 @@
  * 使用 TanStack Query 管理卡片相關的資料狀態
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tantml:function_calls>
-<invoke name="getMyCardsOptions">
-  <parameter name="getMyCardsQueryKey">getMyCardsQueryKey,
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  getMyCardsOptions,
+  getMyCardsQueryKey,
   deleteCardApiV1CardsCardIdDeleteMutation,
   getQuotaStatusApiV1CardsQuotaStatusGetOptions,
   getQuotaStatusApiV1CardsQuotaStatusGetQueryKey,
 } from '@/src/features/cards/api/cardsApi';
+import { deleteCardApiV1CardsCardIdDelete } from '@/src/shared/api/sdk';
 import { removeThumbnailFromCache } from '@/src/features/cards/services/thumbnailService';
 import type { Card, CardStatus, QuotaStatus } from '@/src/features/cards/types';
 
@@ -32,9 +34,10 @@ export function useMyCards(status?: CardStatus) {
   });
 
   // Extract cards from envelope format
+  // Note: CardListResponseWrapper.data is already CardResponse[]
   return {
     ...result,
-    data: result.data?.data?.cards || [],
+    data: result.data?.data || [],
   };
 }
 
@@ -46,20 +49,18 @@ export function useDeleteCard() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    ...deleteCardApiV1CardsCardIdDeleteMutation(),
-    onMutate: async (cardId: string) => {
-      // Get card info for thumbnail cleanup (before deletion)
-      const cardsData = queryClient.getQueryData(getMyCardsQueryKey());
-      const card = (cardsData as any)?.data?.cards?.find((c: Card) => c.id === cardId);
-      
-      return { card };
-    },
-    onSuccess: async (_, cardId, context) => {
-      // Clean up thumbnail cache
-      if (context?.card) {
-        await removeThumbnailFromCache(context.card.id, context.card.image_url);
-      }
+    mutationFn: async (card: Card) => {
+      // Call delete API via SDK
+      const response = await deleteCardApiV1CardsCardIdDelete({
+        path: { card_id: card.id },
+      });
 
+      // Clean up thumbnail cache
+      await removeThumbnailFromCache(card.id, card.image_url);
+
+      return response;
+    },
+    onSuccess: () => {
       // Refresh card list
       queryClient.invalidateQueries({ queryKey: cardsKeys.lists() });
       // Refresh quota status

@@ -116,7 +116,7 @@ export function useUploadCard() {
         await uploadWithRetry({
           uri: imageResult.uri,
           uploadUrl: uploadData.upload_url,
-          method: uploadData.method,
+          method: uploadData.method as 'PUT' | 'POST',
           headers: uploadData.required_headers,
           onProgress: (progress) => {
             setUploadProgress({
