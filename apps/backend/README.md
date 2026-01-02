@@ -17,7 +17,9 @@ FastAPI + PostgreSQL + Alembic + Poetry
 - [查詢優化](docs/query-optimization.md) - 資料庫查詢最佳化
 
 ### 📖 API 文件
+- [**API Overview & Response Format**](docs/api/README.md) - API 概覽與統一回應格式 ⭐
 - [Identity Module API](docs/api/identity-module.md) - 身份驗證與個人檔案 API
+- [Response Format Specification](../../specs/001-kcardswap-complete-spec/response-format.md) - 完整回應格式規範
 
 ### 🔧 開發指南
 - [初始化資料設計](docs/setup/init-data-design.md) - Init data 與 seed 策略
@@ -172,10 +174,82 @@ make generate-openapi
 
 ## API 文件
 
+### 互動式文件
+
 - **Swagger UI**: http://localhost:8000/api/v1/docs
 - **ReDoc**: http://localhost:8000/api/v1/redoc
 - **OpenAPI JSON**: http://localhost:8000/api/v1/openapi.json
 - **Kong Gateway**: http://localhost:8080/api/v1
+
+### 統一回應格式
+
+自 2026-01-02 起，所有 API 端點採用統一的 envelope 回應格式：
+
+```json
+{
+  "data": <response_data> | null,
+  "meta": <metadata> | null,
+  "error": <error_object> | null
+}
+```
+
+**成功回應範例**:
+```json
+{
+  "data": {
+    "id": "uuid",
+    "nickname": "CardMaster"
+  },
+  "meta": null,
+  "error": null
+}
+```
+
+**分頁回應範例**:
+```json
+{
+  "data": [...],
+  "meta": {
+    "total": 100,
+    "page": 1,
+    "page_size": 20,
+    "total_pages": 5
+  },
+  "error": null
+}
+```
+
+**錯誤回應範例**:
+```json
+{
+  "data": null,
+  "meta": null,
+  "error": {
+    "code": "404_NOT_FOUND",
+    "message": "Resource not found",
+    "details": {}
+  }
+}
+```
+
+**詳細說明**: 請參閱 [API Overview](docs/api/README.md) 與 [Response Format Specification](../../specs/001-kcardswap-complete-spec/response-format.md)
+
+### API 模組
+
+所有 45 個端點已標準化：
+
+- **Identity Module** (9 endpoints): 認證、個人檔案、訂閱
+- **Social Module - Cards** (5 endpoints): 小卡上傳與管理
+- **Social Module - Nearby** (2 endpoints): 附近搜尋
+- **Social Module - Friends** (5 endpoints): 好友系統
+- **Social Module - Chat** (3 endpoints): 聊天室
+- **Social Module - Trade** (6 endpoints): 交換系統
+- **Social Module - Rating** (3 endpoints): 評分系統
+- **Social Module - Report** (2 endpoints): 檢舉系統
+- **Posts Module** (8 endpoints): 城市看板貼文
+- **Locations Module** (1 endpoint): 城市列表
+
+完整端點列表請參閱 [API Overview](docs/api/README.md)
 
 ## 架構原則
 
@@ -199,7 +273,22 @@ make generate-openapi
 - [Poetry 官方文件](https://python-poetry.org/docs/)
 - [Alembic 官方文件](https://alembic.sqlalchemy.org/)
 
+## 變更紀錄
+
+### 2026-01-02 - API Response Standardization (Phase 8.6)
+
+- ✅ 實作統一 envelope 回應格式 (`{data, meta, error}`)
+- ✅ 標準化所有 12 個 routers、45 個 API 端點
+- ✅ 更新錯誤處理機制，統一錯誤碼格式
+- ✅ 新增分頁支援 (meta 包含 total, page, page_size, total_pages)
+- ✅ 更新 OpenAPI 3.0 規格檔案
+- ⚠️ **Breaking Change**: 前端需要更新以解析新的回應格式
+
+詳細資訊請參閱:
+- [Phase 8.6 Backend Complete Report](/PHASE86_BACKEND_COMPLETE.md)
+- [Response Format Specification](../../specs/001-kcardswap-complete-spec/response-format.md)
+
 ---
 
-**最後更新**: 2025-12-18  
+**最後更新**: 2026-01-02  
 **維護者**: KCardSwap Team
