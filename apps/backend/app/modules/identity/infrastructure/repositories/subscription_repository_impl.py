@@ -56,7 +56,7 @@ class SubscriptionRepositoryImpl(ISubscriptionRepository):
         await self.session.refresh(model)
         return self._to_entity(model)
 
-    async def get_by_id(self, subscription_id: int) -> Optional[Subscription]:
+    async def get_by_id(self, subscription_id: UUID) -> Optional[Subscription]:
         """Get subscription by ID"""
         result = await self.session.execute(
             select(SubscriptionModel).where(SubscriptionModel.id == subscription_id)

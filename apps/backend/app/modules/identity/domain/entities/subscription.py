@@ -20,7 +20,7 @@ class Subscription:
 
     def __init__(
         self,
-        id: Optional[int],
+        id: Optional[UUID],
         user_id: UUID,
         plan: str,  # "free" or "premium"
         status: str,  # "active", "inactive", "expired", "pending"

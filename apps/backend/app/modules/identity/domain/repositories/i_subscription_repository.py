@@ -19,7 +19,7 @@ class ISubscriptionRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_by_id(self, subscription_id: int) -> Optional[Subscription]:
+    async def get_by_id(self, subscription_id: UUID) -> Optional[Subscription]:
         """Get subscription by ID"""
         pass
 
