@@ -29,7 +29,7 @@ export default function SendRequestScreen() {
     sendRequest(
       {
         body: {
-          friend_id: friendId.trim(),
+          target_user_id: friendId.trim(),
         },
       },
       {

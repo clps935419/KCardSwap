@@ -15,9 +15,15 @@ import {
  * Hook to fetch all chat rooms
  */
 export const useChatRooms = () => {
-  return useQuery({
+  const result = useQuery({
     ...getChatRoomsApiV1ChatsGetOptions(),
   });
+
+  // Transform the response to extract rooms array from envelope
+  return {
+    ...result,
+    data: result.data?.data?.rooms || [],
+  };
 };
 
 /**
@@ -44,10 +50,10 @@ export const useMessages = (
     refetchInterval: options?.refetchInterval,
   });
 
-  // Transform the response to extract messages array
+  // Transform the response to extract messages array from envelope
   return {
     ...result,
-    data: result.data?.messages || [],
+    data: result.data?.data?.messages || [],
   };
 };
 

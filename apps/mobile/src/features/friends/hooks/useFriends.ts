@@ -20,11 +20,17 @@ import type { FriendshipStatus } from '../types';
  * @param status - Optional filter by friendship status
  */
 export const useFriendsList = (status?: FriendshipStatus) => {
-  return useQuery({
+  const result = useQuery({
     ...getFriendsApiV1FriendsGetOptions({
       query: status ? { status } : undefined,
     }),
   });
+
+  // Transform the response to extract friends array from envelope
+  return {
+    ...result,
+    data: result.data?.data?.friends || [],
+  };
 };
 
 /**

@@ -41,7 +41,8 @@ export function useCities() {
     queryKey: citiesKeys.all,
     queryFn: async () => {
       const response = await getCitiesApiV1LocationsCitiesGet();
-      return (response.data?.cities || []) as City[];
+      // Extract data from envelope format
+      return (response.data?.data?.cities || []) as City[];
     },
     staleTime: 1000 * 60 * 60 * 24, // 24 小時內不重新請求（城市列表不常變動）
     gcTime: 1000 * 60 * 60 * 24 * 7, // 7 天後清除快取

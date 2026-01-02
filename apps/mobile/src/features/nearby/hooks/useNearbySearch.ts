@@ -9,7 +9,10 @@
  */
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { apiClient } from '@/src/shared/api/client';
+import {
+  searchNearbyApiV1NearbySearchPost,
+  updateLocationApiV1NearbyLocationPut,
+} from '@/src/shared/api/sdk';
 import { SEARCH_LIMITS } from '@/src/shared/config/constants';
 import type { LocationCoords } from './useLocation';
 
@@ -74,11 +77,11 @@ export function useNearbySearch(request: SearchNearbyRequest | null, enabled = f
       }
 
       try {
-        const response = await apiClient.post<SearchNearbyResponse>(
-          '/nearby/search',
-          request
-        );
-        return response.data;
+        const response = await searchNearbyApiV1NearbySearchPost({
+          body: request,
+        });
+        // Extract data from envelope format
+        return response.data?.data as SearchNearbyResponse;
       } catch (error: any) {
         // Enhanced error handling for 429 rate limit
         if (error.response?.status === 429) {
@@ -134,11 +137,14 @@ export function useUpdateLocation() {
 
   return useMutation({
     mutationFn: async (coords: LocationCoords) => {
-      const response = await apiClient.put('/nearby/location', {
-        lat: coords.latitude,
-        lng: coords.longitude,
+      const response = await updateLocationApiV1NearbyLocationPut({
+        body: {
+          lat: coords.latitude,
+          lng: coords.longitude,
+        },
       });
-      return response.data;
+      // Extract data from envelope format
+      return response.data?.data;
     },
     onSuccess: () => {
       // Invalidate nearby searches to reflect new location
