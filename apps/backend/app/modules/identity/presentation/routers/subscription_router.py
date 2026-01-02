@@ -24,7 +24,9 @@ from app.modules.identity.presentation.dependencies.use_case_deps import (
     get_verify_receipt_use_case,
 )
 from app.modules.identity.presentation.schemas.subscription_schemas import (
+    ExpireSubscriptionsData,
     ExpireSubscriptionsResponse,
+    SubscriptionStatusData,
     SubscriptionStatusResponse,
     VerifyReceiptRequest,
 )
@@ -55,7 +57,7 @@ async def verify_receipt(
     - 503_SERVICE_UNAVAILABLE: Google Play API unavailable
     """
     # Execute use case
-    result = await use_case.execute(
+    result_dict = await use_case.execute(
         user_id=current_user_id,
         platform=request.platform,
         purchase_token=request.purchase_token,
@@ -63,7 +65,10 @@ async def verify_receipt(
     )
 
     await session.commit()
-    return result
+    
+    # Wrap in envelope format
+    data = SubscriptionStatusData(**result_dict)
+    return SubscriptionStatusResponse(data=data, meta=None, error=None)
 
 
 @router.get("/status", response_model=SubscriptionStatusResponse)
@@ -85,10 +90,13 @@ async def get_subscription_status(
     - 503_SERVICE_UNAVAILABLE: Database unavailable
     """
     # Execute use case
-    result = await use_case.execute(user_id=current_user_id)
+    result_dict = await use_case.execute(user_id=current_user_id)
 
     await session.commit()
-    return result
+    
+    # Wrap in envelope format
+    data = SubscriptionStatusData(**result_dict)
+    return SubscriptionStatusResponse(data=data, meta=None, error=None)
 
 
 @router.post("/expire-subscriptions", response_model=ExpireSubscriptionsResponse)
@@ -112,7 +120,10 @@ async def expire_subscriptions(
         Number of subscriptions expired and processing timestamp
     """
     # Execute use case
-    result = await use_case.execute()
+    result_dict = await use_case.execute()
 
     await session.commit()
-    return result
+    
+    # Wrap in envelope format
+    data = ExpireSubscriptionsData(**result_dict)
+    return ExpireSubscriptionsResponse(data=data, meta=None, error=None)

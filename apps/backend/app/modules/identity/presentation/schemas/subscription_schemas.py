@@ -24,8 +24,8 @@ class VerifyReceiptRequest(BaseModel):
         }
 
 
-class SubscriptionStatusResponse(BaseModel):
-    """Response schema for subscription status"""
+class SubscriptionStatusData(BaseModel):
+    """Data schema for subscription status"""
 
     plan: str = Field(..., description="Subscription plan: 'free' or 'premium'")
     status: str = Field(
@@ -50,8 +50,16 @@ class SubscriptionStatusResponse(BaseModel):
         }
 
 
-class ExpireSubscriptionsResponse(BaseModel):
-    """Response schema for expire subscriptions job"""
+class SubscriptionStatusResponse(BaseModel):
+    """Response wrapper for subscription status (standardized envelope)"""
+
+    data: SubscriptionStatusData
+    meta: None = None
+    error: None = None
+
+
+class ExpireSubscriptionsData(BaseModel):
+    """Data schema for expire subscriptions job"""
 
     expired_count: int = Field(..., description="Number of subscriptions expired")
     processed_at: str = Field(..., description="Processing timestamp (ISO format)")
@@ -60,3 +68,11 @@ class ExpireSubscriptionsResponse(BaseModel):
         json_schema_extra = {
             "example": {"expired_count": 5, "processed_at": "2025-12-23T00:00:00"}
         }
+
+
+class ExpireSubscriptionsResponse(BaseModel):
+    """Response wrapper for expire subscriptions (standardized envelope)"""
+
+    data: ExpireSubscriptionsData
+    meta: None = None
+    error: None = None
