@@ -56,3 +56,20 @@ class ReportListResponse(BaseModel):
 
     reports: List[ReportResponse] = Field(..., description="List of reports")
     total: int = Field(..., description="Total number of reports")
+
+
+# Envelope wrappers for standardized responses
+class ReportResponseWrapper(BaseModel):
+    """Response wrapper for single report (standardized envelope)"""
+
+    data: ReportResponse
+    meta: None = None
+    error: None = None
+
+
+class ReportListResponseWrapper(BaseModel):
+    """Response wrapper for report list (standardized envelope)"""
+
+    data: ReportListResponse
+    meta: None = None
+    error: None = None
