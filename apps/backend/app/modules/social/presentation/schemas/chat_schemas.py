@@ -165,6 +165,13 @@ class MessagesListResponse(BaseModel):
         }
 
 
+class ChatRoomListResponse(BaseModel):
+    """Response schema for list of chat rooms"""
+
+    rooms: List[ChatRoomResponse] = Field(..., description="List of chat rooms")
+    total: int = Field(..., description="Total number of chat rooms")
+
+
 # Envelope wrappers for standardized responses
 class ChatRoomResponseWrapper(BaseModel):
     """Response wrapper for chat room (standardized envelope)"""
