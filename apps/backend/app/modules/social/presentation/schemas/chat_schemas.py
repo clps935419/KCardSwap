@@ -163,3 +163,36 @@ class MessagesListResponse(BaseModel):
                 "has_more": False,
             }
         }
+
+
+# Envelope wrappers for standardized responses
+class ChatRoomResponseWrapper(BaseModel):
+    """Response wrapper for chat room (standardized envelope)"""
+
+    data: ChatRoomResponse
+    meta: None = None
+    error: None = None
+
+
+class ChatRoomListResponseWrapper(BaseModel):
+    """Response wrapper for chat room list (standardized envelope)"""
+
+    data: ChatRoomListResponse
+    meta: None = None
+    error: None = None
+
+
+class MessageResponseWrapper(BaseModel):
+    """Response wrapper for single message (standardized envelope)"""
+
+    data: MessageResponse
+    meta: None = None
+    error: None = None
+
+
+class MessagesListResponseWrapper(BaseModel):
+    """Response wrapper for message list (standardized envelope)"""
+
+    data: MessagesListResponse
+    meta: None = None
+    error: None = None
