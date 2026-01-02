@@ -10,8 +10,8 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
-  searchNearbyApiV1NearbySearchPost,
-  updateLocationApiV1NearbyLocationPut,
+  searchNearbyCardsApiV1NearbySearchPost,
+  updateUserLocationApiV1NearbyLocationPut,
 } from '@/src/shared/api/sdk';
 import { SEARCH_LIMITS } from '@/src/shared/config/constants';
 import type { LocationCoords } from './useLocation';
@@ -77,7 +77,7 @@ export function useNearbySearch(request: SearchNearbyRequest | null, enabled = f
       }
 
       try {
-        const response = await searchNearbyApiV1NearbySearchPost({
+        const response = await searchNearbyCardsApiV1NearbySearchPost({
           body: request,
         });
         // Extract data from envelope format
@@ -137,7 +137,7 @@ export function useUpdateLocation() {
 
   return useMutation({
     mutationFn: async (coords: LocationCoords) => {
-      const response = await updateLocationApiV1NearbyLocationPut({
+      const response = await updateUserLocationApiV1NearbyLocationPut({
         body: {
           lat: coords.latitude,
           lng: coords.longitude,

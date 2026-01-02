@@ -3,17 +3,22 @@
  * 使用 TanStack Query 管理卡片相關的資料狀態
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getMyCards, deleteCard, getQuotaStatus } from '@/src/features/cards/api/cardsApi';
+import { useQuery, useMutation, useQueryClient } from '@tantml:function_calls>
+<invoke name="getMyCardsOptions">
+  <parameter name="getMyCardsQueryKey">getMyCardsQueryKey,
+  deleteCardApiV1CardsCardIdDeleteMutation,
+  getQuotaStatusApiV1CardsQuotaStatusGetOptions,
+  getQuotaStatusApiV1CardsQuotaStatusGetQueryKey,
+} from '@/src/features/cards/api/cardsApi';
 import { removeThumbnailFromCache } from '@/src/features/cards/services/thumbnailService';
 import type { Card, CardStatus, QuotaStatus } from '@/src/features/cards/types';
 
-// Query keys
+// Query keys (using SDK generated keys)
 export const cardsKeys = {
   all: ['cards'] as const,
   lists: () => [...cardsKeys.all, 'list'] as const,
   list: (status?: CardStatus) => [...cardsKeys.lists(), { status }] as const,
-  quota: () => [...cardsKeys.all, 'quota'] as const,
+  quota: () => getQuotaStatusApiV1CardsQuotaStatusGetQueryKey(),
 };
 
 /**
@@ -21,11 +26,16 @@ export const cardsKeys = {
  * M204: 實作卡冊列表
  */
 export function useMyCards(status?: CardStatus) {
-  return useQuery({
+  const result = useQuery({
+    ...getMyCardsOptions(),
     queryKey: cardsKeys.list(status),
-    queryFn: () => getMyCards(status),
-    staleTime: 30000, // 30 秒內資料視為新鮮
   });
+
+  // Extract cards from envelope format
+  return {
+    ...result,
+    data: result.data?.data?.cards || [],
+  };
 }
 
 /**
@@ -36,17 +46,23 @@ export function useDeleteCard() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (card: Card) => {
-      // 刪除卡片
-      await deleteCard(card.id);
-
-      // 清除縮圖快取
-      await removeThumbnailFromCache(card.id, card.image_url);
+    ...deleteCardApiV1CardsCardIdDeleteMutation(),
+    onMutate: async (cardId: string) => {
+      // Get card info for thumbnail cleanup (before deletion)
+      const cardsData = queryClient.getQueryData(getMyCardsQueryKey());
+      const card = (cardsData as any)?.data?.cards?.find((c: Card) => c.id === cardId);
+      
+      return { card };
     },
-    onSuccess: () => {
-      // 刷新卡片列表
+    onSuccess: async (_, cardId, context) => {
+      // Clean up thumbnail cache
+      if (context?.card) {
+        await removeThumbnailFromCache(context.card.id, context.card.image_url);
+      }
+
+      // Refresh card list
       queryClient.invalidateQueries({ queryKey: cardsKeys.lists() });
-      // 刷新配額狀態
+      // Refresh quota status
       queryClient.invalidateQueries({ queryKey: cardsKeys.quota() });
     },
   });
@@ -55,12 +71,18 @@ export function useDeleteCard() {
 /**
  * Hook: 查詢配額狀態
  */
-export function useQuotaStatus(): ReturnType<typeof useQuery<QuotaStatus>> {
-  return useQuery({
+export function useQuotaStatus() {
+  const result = useQuery({
+    ...getQuotaStatusApiV1CardsQuotaStatusGetOptions(),
     queryKey: cardsKeys.quota(),
-    queryFn: getQuotaStatus,
     staleTime: 60000, // 1 分鐘內資料視為新鮮
   });
+
+  // Extract quota from envelope format
+  return {
+    ...result,
+    data: result.data?.data as QuotaStatus | undefined,
+  };
 }
 
 /**

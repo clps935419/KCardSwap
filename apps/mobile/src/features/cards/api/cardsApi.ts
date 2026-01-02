@@ -16,22 +16,29 @@
  */
 
 import type {
-  GetMyCardsResponse,
-  GetMyCardsData,
+  CardListResponseWrapper,
+  CardResponse,
   GetUploadUrlApiV1CardsUploadUrlPostResponse,
   ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostResponse,
 } from '@/src/shared/api/sdk';
 
 // Re-export SDK TanStack Query options
 export {
-  getMyCardsOptions,
-  getMyCardsQueryKey,
+  getMyCardsApiV1CardsMeGetOptions,
+  getMyCardsApiV1CardsMeGetQueryKey,
   getUploadUrlApiV1CardsUploadUrlPostMutation,
   confirmCardUploadApiV1CardsCardIdConfirmUploadPostMutation,
+  deleteCardApiV1CardsCardIdDeleteMutation,
+  getQuotaStatusApiV1CardsQuotaStatusGetOptions,
+  getQuotaStatusApiV1CardsQuotaStatusGetQueryKey,
 } from '@/src/shared/api/sdk';
 
+// Simpler aliases for commonly used exports
+export { getMyCardsApiV1CardsMeGetOptions as getMyCardsOptions } from '@/src/shared/api/sdk';
+export { getMyCardsApiV1CardsMeGetQueryKey as getMyCardsQueryKey } from '@/src/shared/api/sdk';
+
 // Re-export types
-export type { GetMyCardsResponse, GetMyCardsData };
+export type { CardListResponseWrapper, CardResponse };
 
 // Export SDK response types with simpler names
 export type UploadUrlResponse = GetUploadUrlApiV1CardsUploadUrlPostResponse;
@@ -40,8 +47,7 @@ export type ConfirmUploadResponse = ConfirmCardUploadApiV1CardsCardIdConfirmUplo
 /**
  * Card data structure
  */
-export type CardsData = NonNullable<GetMyCardsResponse['data']>;
-export type Card = NonNullable<CardsData['items']>[number];
+export type Card = CardResponse;
 
 /**
  * Card status enum
