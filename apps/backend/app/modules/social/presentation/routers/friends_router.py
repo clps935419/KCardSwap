@@ -32,7 +32,9 @@ from app.modules.social.infrastructure.repositories.friendship_repository_impl i
 from app.modules.social.presentation.schemas.friends_schemas import (
     BlockUserRequest,
     FriendListResponse,
+    FriendListResponseWrapper,
     FriendshipResponse,
+    FriendshipResponseWrapper,
     SendFriendRequestRequest,
     UnblockUserRequest,
 )
@@ -46,7 +48,7 @@ router = APIRouter(prefix="/friends", tags=["Friends"])
 
 @router.post(
     "/request",
-    response_model=FriendshipResponse,
+    response_model=FriendshipResponseWrapper,
     status_code=status.HTTP_201_CREATED,
     responses={
         201: {"description": "Friend request sent successfully"},
@@ -64,7 +66,7 @@ async def send_friend_request(
     request: SendFriendRequestRequest,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
-) -> FriendshipResponse:
+) -> FriendshipResponseWrapper:
     """
     Send a friend request to another user.
 
@@ -84,13 +86,15 @@ async def send_friend_request(
             user_id=str(current_user_id), friend_id=str(request.target_user_id)
         )
 
-        return FriendshipResponse(
+        data = FriendshipResponse(
             id=UUID(friendship.id),
             user_id=UUID(friendship.user_id),
             friend_id=UUID(friendship.friend_id),
             status=friendship.status.value,
             created_at=friendship.created_at,
         )
+        
+        return FriendshipResponseWrapper(data=data, meta=None, error=None)
 
     except ValueError as e:
         logger.warning(f"Friend request validation failed: {e}")
@@ -107,7 +111,7 @@ async def send_friend_request(
 
 @router.post(
     "/{friendship_id}/accept",
-    response_model=FriendshipResponse,
+    response_model=FriendshipResponseWrapper,
     status_code=status.HTTP_200_OK,
     responses={
         200: {"description": "Friend request accepted successfully"},
@@ -124,7 +128,7 @@ async def accept_friend_request(
     friendship_id: UUID,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
-) -> FriendshipResponse:
+) -> FriendshipResponseWrapper:
     """
     Accept a pending friend request.
 
@@ -143,13 +147,15 @@ async def accept_friend_request(
             friendship_id=str(friendship_id), accepting_user_id=str(current_user_id)
         )
 
-        return FriendshipResponse(
+        data = FriendshipResponse(
             id=UUID(friendship.id),
             user_id=UUID(friendship.user_id),
             friend_id=UUID(friendship.friend_id),
             status=friendship.status.value,
             created_at=friendship.created_at,
         )
+        
+        return FriendshipResponseWrapper(data=data, meta=None, error=None)
 
     except ValueError as e:
         error_msg = str(e).lower()
@@ -171,7 +177,7 @@ async def accept_friend_request(
 
 @router.post(
     "/block",
-    response_model=FriendshipResponse,
+    response_model=FriendshipResponseWrapper,
     status_code=status.HTTP_200_OK,
     responses={
         200: {"description": "User blocked successfully"},
@@ -187,7 +193,7 @@ async def block_user(
     request: BlockUserRequest,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
-) -> FriendshipResponse:
+) -> FriendshipResponseWrapper:
     """
     Block another user.
 
@@ -206,13 +212,15 @@ async def block_user(
             blocker_user_id=str(current_user_id), blocked_user_id=str(request.user_id)
         )
 
-        return FriendshipResponse(
+        data = FriendshipResponse(
             id=UUID(friendship.id),
             user_id=UUID(friendship.user_id),
             friend_id=UUID(friendship.friend_id),
             status=friendship.status.value,
             created_at=friendship.created_at,
         )
+        
+        return FriendshipResponseWrapper(data=data, meta=None, error=None)
 
     except ValueError as e:
         logger.warning(f"Block user validation failed: {e}")
@@ -229,9 +237,10 @@ async def block_user(
 
 @router.post(
     "/unblock",
-    status_code=status.HTTP_204_NO_CONTENT,
+    response_model=FriendshipResponseWrapper,
+    status_code=status.HTTP_200_OK,
     responses={
-        204: {"description": "User unblocked successfully (no content)"},
+        200: {"description": "User unblocked successfully"},
         400: {"description": "Bad request (validation failed)"},
         401: {"description": "Unauthorized (not logged in)"},
         404: {"description": "No blocked relationship found"},
@@ -245,7 +254,7 @@ async def unblock_user(
     request: UnblockUserRequest,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
-) -> None:
+) -> FriendshipResponseWrapper:
     """
     Unblock a previously blocked user.
 
@@ -266,8 +275,16 @@ async def unblock_user(
             unblocker_user_id=str(current_user_id), unblocked_user_id=str(request.user_id)
         )
 
-        # Return 204 No Content (no response body for successful deletion)
-        return None
+        # Return success response
+        data = FriendshipResponse(
+            id=UUID("00000000-0000-0000-0000-000000000000"),  # Placeholder since relationship is deleted
+            user_id=current_user_id,
+            friend_id=request.user_id,
+            status="unblocked",
+            created_at=None,
+        )
+        
+        return FriendshipResponseWrapper(data=data, meta=None, error=None)
 
     except ValueError as e:
         error_msg = str(e).lower()
@@ -290,7 +307,7 @@ async def unblock_user(
 
 @router.get(
     "",
-    response_model=FriendListResponse,
+    response_model=FriendListResponseWrapper,
     status_code=status.HTTP_200_OK,
     responses={
         200: {"description": "Friend list retrieved successfully"},
@@ -308,7 +325,7 @@ async def get_friends(
         alias="status",
         description="Filter by friendship status (accepted, pending, blocked). If not provided, returns all friendships.",
     ),
-) -> FriendListResponse:
+) -> FriendListResponseWrapper:
     """
     Get list of friends for the current user.
 
@@ -347,7 +364,8 @@ async def get_friends(
             for f in friendships
         ]
 
-        return FriendListResponse(friends=friends, total=len(friends))
+        data = FriendListResponse(friends=friends, total=len(friends))
+        return FriendListResponseWrapper(data=data, meta=None, error=None)
 
     except Exception as e:
         logger.error(f"Error getting friend list: {e}", exc_info=True)
