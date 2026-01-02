@@ -3,6 +3,7 @@ Subscription Router - API endpoints for subscription management
 """
 
 from typing import Annotated
+from uuid import UUID
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -16,7 +17,7 @@ from app.modules.identity.application.use_cases.subscription.expire_subscription
 from app.modules.identity.application.use_cases.subscription.verify_receipt_use_case import (
     VerifyReceiptUseCase,
 )
-from app.modules.identity.presentation.dependencies.auth_deps import get_current_user
+from app.modules.identity.presentation.dependencies.auth_deps import get_current_user_id
 from app.modules.identity.presentation.dependencies.use_case_deps import (
     get_check_subscription_status_use_case,
     get_expire_subscriptions_use_case,
@@ -37,7 +38,7 @@ async def verify_receipt(
     request: VerifyReceiptRequest,
     session: Annotated[AsyncSession, Depends(get_db_session)],
     use_case: Annotated[VerifyReceiptUseCase, Depends(get_verify_receipt_use_case)],
-    current_user: dict = Depends(get_current_user),
+    current_user_id: UUID = Depends(get_current_user_id),
 ):
     """
     Verify Google Play purchase receipt and update subscription.
@@ -53,11 +54,9 @@ async def verify_receipt(
     - 409_CONFLICT: Purchase token already used by another user
     - 503_SERVICE_UNAVAILABLE: Google Play API unavailable
     """
-    user_id = current_user["id"]
-
     # Execute use case
     result = await use_case.execute(
-        user_id=user_id,
+        user_id=current_user_id,
         platform=request.platform,
         purchase_token=request.purchase_token,
         product_id=request.product_id,
@@ -73,7 +72,7 @@ async def get_subscription_status(
     use_case: Annotated[
         CheckSubscriptionStatusUseCase, Depends(get_check_subscription_status_use_case)
     ],
-    current_user: dict = Depends(get_current_user),
+    current_user_id: UUID = Depends(get_current_user_id),
 ):
     """
     Get current subscription status for authenticated user.
@@ -85,10 +84,8 @@ async def get_subscription_status(
     - 401_UNAUTHORIZED: Not logged in
     - 503_SERVICE_UNAVAILABLE: Database unavailable
     """
-    user_id = current_user["id"]
-
     # Execute use case
-    result = await use_case.execute(user_id=user_id)
+    result = await use_case.execute(user_id=current_user_id)
 
     await session.commit()
     return result
