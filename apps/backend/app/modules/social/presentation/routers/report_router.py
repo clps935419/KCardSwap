@@ -19,8 +19,10 @@ from app.modules.social.infrastructure.repositories.report_repository_impl impor
 )
 from app.modules.social.presentation.schemas.report_schemas import (
     ReportListResponse,
+    ReportListResponseWrapper,
     ReportRequest,
     ReportResponse,
+    ReportResponseWrapper,
 )
 from app.shared.infrastructure.database.connection import get_db_session
 
@@ -32,7 +34,7 @@ router = APIRouter(prefix="/reports", tags=["Reports"])
 
 @router.post(
     "",
-    response_model=ReportResponse,
+    response_model=ReportResponseWrapper,
     status_code=status.HTTP_201_CREATED,
     responses={
         201: {"description": "Report submitted successfully"},
@@ -48,7 +50,7 @@ async def submit_report(
     request: ReportRequest,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
-) -> ReportResponse:
+) -> ReportResponseWrapper:
     """
     Submit a report for another user.
 
@@ -79,7 +81,7 @@ async def submit_report(
             detail=request.detail,
         )
 
-        return ReportResponse(
+        data = ReportResponse(
             id=UUID(report.id),
             reporter_id=UUID(report.reporter_id),
             reported_user_id=UUID(report.reported_user_id),
@@ -88,6 +90,8 @@ async def submit_report(
             status="pending",  # Reports start as pending
             created_at=report.created_at,
         )
+        
+        return ReportResponseWrapper(data=data, meta=None, error=None)
 
     except ValueError as e:
         logger.warning(f"Report validation failed: {e}")
@@ -104,7 +108,7 @@ async def submit_report(
 
 @router.get(
     "",
-    response_model=ReportListResponse,
+    response_model=ReportListResponseWrapper,
     status_code=status.HTTP_200_OK,
     responses={
         200: {"description": "Reports retrieved successfully"},
@@ -117,7 +121,7 @@ async def submit_report(
 async def get_my_reports(
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
-) -> ReportListResponse:
+) -> ReportListResponseWrapper:
     """
     Get reports submitted by the current user.
 
@@ -150,7 +154,8 @@ async def get_my_reports(
             for report in reports
         ]
 
-        return ReportListResponse(reports=report_responses, total=len(report_responses))
+        data = ReportListResponse(reports=report_responses, total=len(report_responses))
+        return ReportListResponseWrapper(data=data, meta=None, error=None)
 
     except Exception as e:
         logger.error(f"Error getting reports: {e}", exc_info=True)
