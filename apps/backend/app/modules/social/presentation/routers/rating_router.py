@@ -22,9 +22,12 @@ from app.modules.social.infrastructure.repositories.rating_repository_impl impor
 )
 from app.modules.social.presentation.schemas.rating_schemas import (
     AverageRatingResponse,
+    AverageRatingResponseWrapper,
     RatingListResponse,
+    RatingListResponseWrapper,
     RatingRequest,
     RatingResponse,
+    RatingResponseWrapper,
 )
 from app.shared.infrastructure.database.connection import get_db_session
 
@@ -36,7 +39,7 @@ router = APIRouter(prefix="/ratings", tags=["Ratings"])
 
 @router.post(
     "",
-    response_model=RatingResponse,
+    response_model=RatingResponseWrapper,
     status_code=status.HTTP_201_CREATED,
     responses={
         201: {"description": "Rating submitted successfully"},
@@ -52,7 +55,7 @@ async def submit_rating(
     request: RatingRequest,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
-) -> RatingResponse:
+) -> RatingResponseWrapper:
     """
     Submit a rating for another user.
 
@@ -80,7 +83,7 @@ async def submit_rating(
             trade_id=str(request.trade_id) if request.trade_id else None,
         )
 
-        return RatingResponse(
+        data = RatingResponse(
             id=UUID(rating.id),
             rater_id=UUID(rating.rater_id),
             rated_user_id=UUID(rating.rated_user_id),
@@ -89,6 +92,8 @@ async def submit_rating(
             comment=rating.comment,
             created_at=rating.created_at,
         )
+        
+        return RatingResponseWrapper(data=data, meta=None, error=None)
 
     except ValueError as e:
         logger.warning(f"Rating validation failed: {e}")
@@ -105,7 +110,7 @@ async def submit_rating(
 
 @router.get(
     "/user/{user_id}",
-    response_model=RatingListResponse,
+    response_model=RatingListResponseWrapper,
     status_code=status.HTTP_200_OK,
     responses={
         200: {"description": "Ratings retrieved successfully"},
@@ -121,7 +126,7 @@ async def get_user_ratings(
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
     limit: int = Query(50, ge=1, le=100, description="Maximum number of ratings"),
-) -> RatingListResponse:
+) -> RatingListResponseWrapper:
     """
     Get ratings received by a specific user.
 
@@ -152,7 +157,8 @@ async def get_user_ratings(
             for rating in ratings
         ]
 
-        return RatingListResponse(ratings=rating_responses, total=len(rating_responses))
+        data = RatingListResponse(ratings=rating_responses, total=len(rating_responses))
+        return RatingListResponseWrapper(data=data, meta=None, error=None)
 
     except Exception as e:
         logger.error(f"Error getting user ratings: {e}", exc_info=True)
@@ -164,7 +170,7 @@ async def get_user_ratings(
 
 @router.get(
     "/user/{user_id}/average",
-    response_model=AverageRatingResponse,
+    response_model=AverageRatingResponseWrapper,
     status_code=status.HTTP_200_OK,
     responses={
         200: {"description": "Average rating retrieved successfully"},
@@ -179,7 +185,7 @@ async def get_average_rating(
     user_id: UUID,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
-) -> AverageRatingResponse:
+) -> AverageRatingResponseWrapper:
     """
     Get average rating for a specific user.
 
@@ -198,15 +204,17 @@ async def get_average_rating(
 
         if average_data is None:
             # User has no ratings yet
-            return AverageRatingResponse(
+            data = AverageRatingResponse(
                 user_id=user_id, average_score=0.0, total_ratings=0
             )
-
-        return AverageRatingResponse(
-            user_id=user_id,
-            average_score=average_data["average"],
-            total_ratings=average_data["count"],
-        )
+        else:
+            data = AverageRatingResponse(
+                user_id=user_id,
+                average_score=average_data["average"],
+                total_ratings=average_data["count"],
+            )
+        
+        return AverageRatingResponseWrapper(data=data, meta=None, error=None)
 
     except Exception as e:
         logger.error(f"Error getting average rating: {e}", exc_info=True)

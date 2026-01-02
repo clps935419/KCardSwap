@@ -133,3 +133,20 @@ class FriendListResponse(BaseModel):
                 "total": 1,
             }
         }
+
+
+# Envelope wrappers for standardized responses
+class FriendshipResponseWrapper(BaseModel):
+    """Response wrapper for friendship (standardized envelope)"""
+
+    data: FriendshipResponse
+    meta: None = None
+    error: None = None
+
+
+class FriendListResponseWrapper(BaseModel):
+    """Response wrapper for friend list (standardized envelope)"""
+
+    data: FriendListResponse
+    meta: None = None
+    error: None = None

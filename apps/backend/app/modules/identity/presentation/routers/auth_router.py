@@ -28,7 +28,6 @@ from app.modules.identity.presentation.dependencies.use_case_deps import (
 )
 from app.modules.identity.presentation.schemas.auth_schemas import (
     AdminLoginRequest,
-    ErrorWrapper,
     GoogleCallbackRequest,
     GoogleLoginRequest,
     LoginResponse,
@@ -36,6 +35,7 @@ from app.modules.identity.presentation.schemas.auth_schemas import (
     TokenResponse,
 )
 from app.shared.infrastructure.security.jwt_service import JWTService
+from app.shared.presentation.response import success
 
 # Create router
 router = APIRouter(prefix="/auth", tags=["Authentication"])
@@ -47,11 +47,8 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
     status_code=status.HTTP_200_OK,
     responses={
         200: {"description": "Successfully authenticated as admin"},
-        400: {"model": ErrorWrapper, "description": "Validation error"},
-        401: {
-            "model": ErrorWrapper,
-            "description": "Invalid credentials or not an admin",
-        },
+        400: {"description": "Validation error"},
+        401: {"description": "Invalid credentials or not an admin"},
     },
     tags=["Admin"],
     summary="Admin login with email/password",
@@ -96,7 +93,7 @@ async def admin_login(
         role=user.role,
     )
 
-    return LoginResponse(data=token_response, error=None)
+    return LoginResponse(data=token_response, meta=None, error=None)
 
 
 @router.post(
@@ -105,8 +102,8 @@ async def admin_login(
     status_code=status.HTTP_200_OK,
     responses={
         200: {"description": "Successfully authenticated"},
-        400: {"model": ErrorWrapper, "description": "Validation error"},
-        401: {"model": ErrorWrapper, "description": "Invalid Google token"},
+        400: {"description": "Validation error"},
+        401: {"description": "Invalid Google token"},
     },
     summary="Login with Google",
     description="Authenticate user with Google OAuth token and receive JWT tokens",
@@ -143,7 +140,7 @@ async def google_login(
         email=user.email,
     )
 
-    return LoginResponse(data=token_response, error=None)
+    return LoginResponse(data=token_response, meta=None, error=None)
 
 
 @router.post(
@@ -152,12 +149,9 @@ async def google_login(
     status_code=status.HTTP_200_OK,
     responses={
         200: {"description": "Successfully authenticated"},
-        400: {"model": ErrorWrapper, "description": "Validation error"},
-        401: {
-            "model": ErrorWrapper,
-            "description": "Invalid authorization code or code_verifier",
-        },
-        422: {"model": ErrorWrapper, "description": "Token exchange failed"},
+        400: {"description": "Validation error"},
+        401: {"description": "Invalid authorization code or code_verifier"},
+        422: {"description": "Token exchange failed"},
     },
     summary="Google OAuth Callback with PKCE",
     description="Authenticate user with Google OAuth authorization code and PKCE code_verifier (Expo AuthSession)",
@@ -205,7 +199,7 @@ async def google_callback(
         email=user.email,
     )
 
-    return LoginResponse(data=token_response, error=None)
+    return LoginResponse(data=token_response, meta=None, error=None)
 
 
 @router.post(
@@ -214,7 +208,7 @@ async def google_callback(
     status_code=status.HTTP_200_OK,
     responses={
         200: {"description": "Successfully refreshed tokens"},
-        401: {"model": ErrorWrapper, "description": "Invalid or expired refresh token"},
+        401: {"description": "Invalid or expired refresh token"},
     },
     summary="Refresh access token",
     description="Use refresh token to obtain new access and refresh tokens",
@@ -266,4 +260,4 @@ async def refresh_token(
         email=email,
     )
 
-    return LoginResponse(data=token_response, error=None)
+    return LoginResponse(data=token_response, meta=None, error=None)

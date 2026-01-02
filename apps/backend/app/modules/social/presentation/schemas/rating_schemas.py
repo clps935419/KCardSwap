@@ -116,3 +116,28 @@ class AverageRatingResponse(BaseModel):
                 "total_ratings": 15,
             }
         }
+
+
+# Envelope wrappers for standardized responses
+class RatingResponseWrapper(BaseModel):
+    """Response wrapper for single rating (standardized envelope)"""
+
+    data: RatingResponse
+    meta: None = None
+    error: None = None
+
+
+class RatingListResponseWrapper(BaseModel):
+    """Response wrapper for rating list (standardized envelope)"""
+
+    data: RatingListResponse
+    meta: None = None
+    error: None = None
+
+
+class AverageRatingResponseWrapper(BaseModel):
+    """Response wrapper for average rating (standardized envelope)"""
+
+    data: AverageRatingResponse
+    meta: None = None
+    error: None = None

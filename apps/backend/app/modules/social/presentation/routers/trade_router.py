@@ -46,8 +46,10 @@ from app.modules.social.infrastructure.repositories.trade_repository_impl import
 from app.modules.social.presentation.schemas.trade_schemas import (
     CreateTradeRequest,
     TradeHistoryResponse,
+    TradeHistoryResponseWrapper,
     TradeItemResponse,
     TradeResponse,
+    TradeResponseWrapper,
 )
 from app.shared.infrastructure.database.connection import get_db_session
 
@@ -59,7 +61,7 @@ router = APIRouter(prefix="/trades", tags=["Trades"])
 
 @router.post(
     "",
-    response_model=TradeResponse,
+    response_model=TradeResponseWrapper,
     status_code=status.HTTP_201_CREATED,
     responses={
         201: {"description": "Trade proposal created successfully"},
@@ -75,7 +77,7 @@ async def create_trade(
     request: CreateTradeRequest,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
-) -> TradeResponse:
+) -> TradeResponseWrapper:
     """
     Create a new trade proposal.
 
@@ -113,7 +115,7 @@ async def create_trade(
         # Get items for response
         items = await trade_repo.get_items_by_trade_id(trade.id)
 
-        return TradeResponse(
+        data = TradeResponse(
             id=trade.id,
             initiator_id=trade.initiator_id,
             responder_id=trade.responder_id,
@@ -136,6 +138,7 @@ async def create_trade(
                 for item in items
             ],
         )
+        return TradeResponseWrapper(data=data, meta=None, error=None)
 
     except ValueError as e:
         logger.warning(f"Trade creation validation failed: {e}")
@@ -152,7 +155,7 @@ async def create_trade(
 
 @router.post(
     "/{trade_id}/accept",
-    response_model=TradeResponse,
+    response_model=TradeResponseWrapper,
     status_code=status.HTTP_200_OK,
     responses={
         200: {"description": "Trade accepted successfully"},
@@ -168,7 +171,7 @@ async def accept_trade(
     trade_id: UUID,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
-) -> TradeResponse:
+) -> TradeResponseWrapper:
     """Accept a trade proposal."""
     try:
         trade_repo = TradeRepositoryImpl(session)
@@ -182,7 +185,7 @@ async def accept_trade(
         trade = await use_case.execute(trade_id, current_user_id)
         items = await trade_repo.get_items_by_trade_id(trade.id)
 
-        return TradeResponse(
+        data = TradeResponse(
             id=trade.id,
             initiator_id=trade.initiator_id,
             responder_id=trade.responder_id,
@@ -205,6 +208,7 @@ async def accept_trade(
                 for item in items
             ],
         )
+        return TradeResponseWrapper(data=data, meta=None, error=None)
 
     except ValueError as e:
         if "not found" in str(e).lower():
@@ -223,7 +227,7 @@ async def accept_trade(
 
 @router.post(
     "/{trade_id}/reject",
-    response_model=TradeResponse,
+    response_model=TradeResponseWrapper,
     status_code=status.HTTP_200_OK,
     summary="Reject trade proposal",
     description="Reject a trade proposal (responder only)",
@@ -232,7 +236,7 @@ async def reject_trade(
     trade_id: UUID,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
-) -> TradeResponse:
+) -> TradeResponseWrapper:
     """Reject a trade proposal."""
     try:
         trade_repo = TradeRepositoryImpl(session)
@@ -248,7 +252,7 @@ async def reject_trade(
         trade = await use_case.execute(trade_id, current_user_id)
         items = await trade_repo.get_items_by_trade_id(trade.id)
 
-        return TradeResponse(
+        data = TradeResponse(
             id=trade.id,
             initiator_id=trade.initiator_id,
             responder_id=trade.responder_id,
@@ -271,6 +275,7 @@ async def reject_trade(
                 for item in items
             ],
         )
+        return TradeResponseWrapper(data=data, meta=None, error=None)
 
     except ValueError as e:
         if "not found" in str(e).lower():
@@ -289,7 +294,7 @@ async def reject_trade(
 
 @router.post(
     "/{trade_id}/cancel",
-    response_model=TradeResponse,
+    response_model=TradeResponseWrapper,
     status_code=status.HTTP_200_OK,
     summary="Cancel trade",
     description="Cancel a trade (either party can cancel)",
@@ -298,7 +303,7 @@ async def cancel_trade(
     trade_id: UUID,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
-) -> TradeResponse:
+) -> TradeResponseWrapper:
     """Cancel a trade."""
     try:
         trade_repo = TradeRepositoryImpl(session)
@@ -314,7 +319,7 @@ async def cancel_trade(
         trade = await use_case.execute(trade_id, current_user_id)
         items = await trade_repo.get_items_by_trade_id(trade.id)
 
-        return TradeResponse(
+        data = TradeResponse(
             id=trade.id,
             initiator_id=trade.initiator_id,
             responder_id=trade.responder_id,
@@ -337,6 +342,7 @@ async def cancel_trade(
                 for item in items
             ],
         )
+        return TradeResponseWrapper(data=data, meta=None, error=None)
 
     except ValueError as e:
         if "not found" in str(e).lower():
@@ -355,7 +361,7 @@ async def cancel_trade(
 
 @router.post(
     "/{trade_id}/complete",
-    response_model=TradeResponse,
+    response_model=TradeResponseWrapper,
     status_code=status.HTTP_200_OK,
     summary="Confirm trade completion",
     description="Confirm trade completion (each party confirms independently)",
@@ -364,7 +370,7 @@ async def complete_trade(
     trade_id: UUID,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
-) -> TradeResponse:
+) -> TradeResponseWrapper:
     """
     Confirm trade completion.
 
@@ -389,7 +395,7 @@ async def complete_trade(
         trade = await use_case.execute(trade_id, current_user_id)
         items = await trade_repo.get_items_by_trade_id(trade.id)
 
-        return TradeResponse(
+        data = TradeResponse(
             id=trade.id,
             initiator_id=trade.initiator_id,
             responder_id=trade.responder_id,
@@ -412,6 +418,7 @@ async def complete_trade(
                 for item in items
             ],
         )
+        return TradeResponseWrapper(data=data, meta=None, error=None)
 
     except ValueError as e:
         if "not found" in str(e).lower():
@@ -430,7 +437,7 @@ async def complete_trade(
 
 @router.get(
     "/history",
-    response_model=TradeHistoryResponse,
+    response_model=TradeHistoryResponseWrapper,
     status_code=status.HTTP_200_OK,
     summary="Get trade history",
     description="Get all trades for current user (as initiator or responder)",
@@ -440,7 +447,7 @@ async def get_trade_history(
     session: Annotated[AsyncSession, Depends(get_db_session)],
     limit: int = Query(50, ge=1, le=100, description="Maximum number of results"),
     offset: int = Query(0, ge=0, description="Number of results to skip"),
-) -> TradeHistoryResponse:
+) -> TradeHistoryResponseWrapper:
     """Get trade history for current user."""
     try:
         trade_repo = TradeRepositoryImpl(session)
@@ -483,12 +490,13 @@ async def get_trade_history(
                 )
             )
 
-        return TradeHistoryResponse(
+        data = TradeHistoryResponse(
             trades=trade_responses,
             total=len(trades),
             limit=limit,
             offset=offset,
         )
+        return TradeHistoryResponseWrapper(data=data, meta=None, error=None)
 
     except ValueError as e:
         logger.warning(f"Trade history validation failed: {e}")

@@ -35,7 +35,10 @@ from app.modules.social.presentation.schemas.nearby_schemas import (
     NearbyCardResponse,
     SearchNearbyRequest,
     SearchNearbyResponse,
+    SearchNearbyResponseWrapper,
     UpdateLocationRequest,
+    UpdateLocationResponseWrapper,
+    UpdateLocationSuccess,
 )
 from app.shared.infrastructure.database.connection import get_db_session
 
@@ -66,45 +69,13 @@ async def get_search_quota_service(
 
 @router.post(
     "/search",
-    response_model=SearchNearbyResponse,
+    response_model=SearchNearbyResponseWrapper,
     status_code=status.HTTP_200_OK,
     summary="Search for nearby cards",
     description="Search for cards near a specific location. Free users: 5 searches/day. Premium users: unlimited.",
     responses={
-        200: {
-            "description": "Search successful",
-            "content": {
-                "application/json": {
-                    "example": {
-                        "results": [
-                            {
-                                "card_id": "123e4567-e89b-12d3-a456-426614174000",
-                                "owner_id": "987e6543-e21b-12d3-a456-426614174000",
-                                "distance_km": 2.5,
-                                "idol": "IU",
-                                "idol_group": "Solo",
-                                "album": "Lilac",
-                                "version": "Standard",
-                                "rarity": "rare",
-                                "image_url": "https://storage.googleapis.com/kcardswap/cards/...",
-                                "owner_nickname": "CardCollector123",
-                            }
-                        ],
-                        "count": 1,
-                    }
-                }
-            },
-        },
-        429: {
-            "description": "Rate limit exceeded",
-            "content": {
-                "application/json": {
-                    "example": {
-                        "detail": "Daily search limit exceeded: 5/5 searches used"
-                    }
-                }
-            },
-        },
+        200: {"description": "Search successful"},
+        429: {"description": "Rate limit exceeded"},
     },
 )
 async def search_nearby_cards(
@@ -112,7 +83,7 @@ async def search_nearby_cards(
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
     card_repository: Annotated[ICardRepository, Depends(get_card_repository)],
     quota_service: Annotated[SearchQuotaService, Depends(get_search_quota_service)],
-) -> SearchNearbyResponse:
+) -> SearchNearbyResponseWrapper:
     """
     Search for cards near a specific location.
 
@@ -160,9 +131,10 @@ async def search_nearby_cards(
             for r in results
         ]
 
-        return SearchNearbyResponse(
+        data = SearchNearbyResponse(
             results=response_results, count=len(response_results)
         )
+        return SearchNearbyResponseWrapper(data=data, meta=None, error=None)
 
     except RateLimitExceededException as e:
         raise HTTPException(
@@ -183,11 +155,12 @@ async def search_nearby_cards(
 
 @router.put(
     "/location",
-    status_code=status.HTTP_204_NO_CONTENT,
+    response_model=UpdateLocationResponseWrapper,
+    status_code=status.HTTP_200_OK,
     summary="Update user location",
     description="Update the user's current location for nearby search visibility",
     responses={
-        204: {"description": "Location updated successfully"},
+        200: {"description": "Location updated successfully"},
         400: {"description": "Invalid coordinates"},
         404: {"description": "User profile not found"},
     },
@@ -196,7 +169,7 @@ async def update_user_location(
     request: UpdateLocationRequest,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
     profile_repository: Annotated[IProfileRepository, Depends(get_profile_repository)],
-):
+) -> UpdateLocationResponseWrapper:
     """
     Update the user's current location.
 
@@ -212,7 +185,8 @@ async def update_user_location(
             user_id=current_user_id, lat=request.lat, lng=request.lng
         )
 
-        return None
+        data = UpdateLocationSuccess(success=True, message="Location updated successfully")
+        return UpdateLocationResponseWrapper(data=data, meta=None, error=None)
 
     except ValueError as e:
         raise HTTPException(

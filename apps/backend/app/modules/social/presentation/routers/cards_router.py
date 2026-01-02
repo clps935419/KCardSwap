@@ -36,10 +36,16 @@ from app.modules.social.infrastructure.repositories.card_repository_impl import 
     CardRepositoryImpl,
 )
 from app.modules.social.presentation.schemas.card_schemas import (
+    CardListResponseWrapper,
     CardResponse,
+    CardResponseWrapper,
+    DeleteSuccessResponse,
+    DeleteSuccessResponseWrapper,
     QuotaStatusResponse,
+    QuotaStatusResponseWrapper,
     UploadCardRequest,
     UploadUrlResponse,
+    UploadUrlResponseWrapper,
 )
 from app.shared.infrastructure.database.connection import get_db_session
 from app.shared.infrastructure.external.storage_service_factory import (
@@ -65,7 +71,7 @@ def get_user_quota() -> UploadQuota:
 
 @router.post(
     "/upload-url",
-    response_model=UploadUrlResponse,
+    response_model=UploadUrlResponseWrapper,
     status_code=status.HTTP_200_OK,
     responses={
         200: {"description": "Upload URL generated successfully"},
@@ -81,7 +87,7 @@ async def get_upload_url(
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
     quota: Annotated[UploadQuota, Depends(get_user_quota)],
-) -> UploadUrlResponse:
+) -> UploadUrlResponseWrapper:
     """
     Get a signed URL for uploading a card image.
 
@@ -120,7 +126,7 @@ async def get_upload_url(
             rarity=request.rarity,
         )
 
-        return UploadUrlResponse(
+        data = UploadUrlResponse(
             upload_url=result.upload_url,
             method=result.method,
             required_headers=result.required_headers,
@@ -128,6 +134,7 @@ async def get_upload_url(
             expires_at=result.expires_at,
             card_id=result.card_id,
         )
+        return UploadUrlResponseWrapper(data=data, meta=None, error=None)
     except QuotaExceeded as e:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -146,7 +153,7 @@ async def get_upload_url(
 
 @router.get(
     "/me",
-    response_model=List[CardResponse],
+    response_model=CardListResponseWrapper,
     status_code=status.HTTP_200_OK,
     responses={
         200: {"description": "Cards retrieved successfully"},
@@ -161,7 +168,7 @@ async def get_my_cards(
     status_filter: Optional[str] = Query(
         None, description="Filter by status (available/trading/traded)"
     ),
-) -> List[CardResponse]:
+) -> CardListResponseWrapper:
     """
     Get all cards owned by the current user.
 
@@ -175,7 +182,7 @@ async def get_my_cards(
     cards = await use_case.execute(owner_id=current_user_id, status=status_filter)
 
     # Convert to response
-    return [
+    data = [
         CardResponse(
             id=card.id,
             owner_id=card.owner_id,
@@ -192,13 +199,16 @@ async def get_my_cards(
         )
         for card in cards
     ]
+    
+    return CardListResponseWrapper(data=data, meta=None, error=None)
 
 
 @router.delete(
     "/{card_id}",
-    status_code=status.HTTP_204_NO_CONTENT,
+    response_model=DeleteSuccessResponseWrapper,
+    status_code=status.HTTP_200_OK,
     responses={
-        204: {"description": "Card deleted successfully"},
+        200: {"description": "Card deleted successfully"},
         401: {"description": "Unauthorized"},
         403: {"description": "Not the card owner"},
         404: {"description": "Card not found"},
@@ -210,7 +220,7 @@ async def delete_card(
     card_id: UUID,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
-) -> None:
+) -> DeleteSuccessResponseWrapper:
     """
     Delete a card.
 
@@ -232,6 +242,9 @@ async def delete_card(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail={"code": "NOT_FOUND", "message": "Card not found or not owner"},
             )
+        
+        data = DeleteSuccessResponse(success=True, message="Card deleted successfully")
+        return DeleteSuccessResponseWrapper(data=data, meta=None, error=None)
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -241,7 +254,7 @@ async def delete_card(
 
 @router.get(
     "/quota/status",
-    response_model=QuotaStatusResponse,
+    response_model=QuotaStatusResponseWrapper,
     status_code=status.HTTP_200_OK,
     responses={
         200: {"description": "Quota status retrieved successfully"},
@@ -254,7 +267,7 @@ async def get_quota_status(
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
     quota: Annotated[UploadQuota, Depends(get_user_quota)],
-) -> QuotaStatusResponse:
+) -> QuotaStatusResponseWrapper:
     """
     Get current quota status for the user.
 
@@ -270,11 +283,13 @@ async def get_quota_status(
     use_case = CheckUploadQuotaUseCase(card_repository=card_repo)
     status_result = await use_case.execute(owner_id=current_user_id, quota=quota)
 
-    return QuotaStatusResponse(**status_result.to_dict())
+    data = QuotaStatusResponse(**status_result.to_dict())
+    return QuotaStatusResponseWrapper(data=data, meta=None, error=None)
 
 
 @router.post(
     "/{card_id}/confirm-upload",
+    response_model=DeleteSuccessResponseWrapper,
     status_code=status.HTTP_200_OK,
     responses={
         200: {"description": "Upload confirmed successfully"},
@@ -290,7 +305,7 @@ async def confirm_card_upload(
     card_id: UUID,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
-) -> dict:
+) -> DeleteSuccessResponseWrapper:
     """
     Confirm card upload after successful GCS upload.
 
@@ -317,10 +332,8 @@ async def confirm_card_upload(
 
     try:
         await use_case.execute(card_id=card_id, owner_id=current_user_id)
-        return {
-            "message": "Upload confirmed successfully",
-            "card_id": str(card_id),
-        }
+        data = DeleteSuccessResponse(success=True, message="Upload confirmed successfully")
+        return DeleteSuccessResponseWrapper(data=data, meta=None, error=None)
     except ValueError as e:
         error_message = str(e)
 

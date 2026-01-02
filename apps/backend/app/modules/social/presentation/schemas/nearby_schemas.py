@@ -112,3 +112,27 @@ class UpdateLocationRequest(BaseModel):
         if not -180 <= v <= 180:
             raise ValueError("Longitude must be between -180 and 180")
         return v
+
+
+# Envelope wrappers for standardized responses
+class SearchNearbyResponseWrapper(BaseModel):
+    """Response wrapper for nearby search (standardized envelope)"""
+
+    data: SearchNearbyResponse
+    meta: None = None
+    error: None = None
+
+
+class UpdateLocationSuccess(BaseModel):
+    """Success response for location update"""
+
+    success: bool = Field(True, description="Operation success")
+    message: str = Field(..., description="Success message")
+
+
+class UpdateLocationResponseWrapper(BaseModel):
+    """Response wrapper for location update (standardized envelope)"""
+
+    data: UpdateLocationSuccess
+    meta: None = None
+    error: None = None

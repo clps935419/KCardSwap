@@ -82,22 +82,8 @@ class LogoutRequest(BaseModel):
 
 
 class LoginResponse(BaseModel):
-    """Response wrapper for successful login"""
+    """Response wrapper for successful login (standardized envelope)"""
 
     data: TokenResponse
+    meta: None = None
     error: None = None
-
-
-class ErrorResponse(BaseModel):
-    """Error response schema"""
-
-    code: str = Field(..., description="Error code")
-    message: str = Field(..., description="Error message")
-    details: Optional[dict] = Field(None, description="Additional error details")
-
-
-class ErrorWrapper(BaseModel):
-    """Error wrapper response"""
-
-    data: None = None
-    error: ErrorResponse

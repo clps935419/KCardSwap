@@ -31,6 +31,23 @@ export type AcceptInterestResponse = {
 };
 
 /**
+ * AcceptInterestResponseWrapper
+ *
+ * Response wrapper for accept interest response (standardized envelope)
+ */
+export type AcceptInterestResponseWrapper = {
+  data: AcceptInterestResponse;
+  /**
+   * Meta
+   */
+  meta?: null;
+  /**
+   * Error
+   */
+  error?: null;
+};
+
+/**
  * AdminLoginRequest
  *
  * Request schema for admin login with email/password
@@ -77,6 +94,23 @@ export type AverageRatingResponse = {
 };
 
 /**
+ * AverageRatingResponseWrapper
+ *
+ * Response wrapper for average rating (standardized envelope)
+ */
+export type AverageRatingResponseWrapper = {
+  data: AverageRatingResponse;
+  /**
+   * Meta
+   */
+  meta?: null;
+  /**
+   * Error
+   */
+  error?: null;
+};
+
+/**
  * BlockUserRequest
  *
  * Request schema for blocking a user
@@ -88,6 +122,26 @@ export type BlockUserRequest = {
    * ID of user to block
    */
   user_id: string;
+};
+
+/**
+ * CardListResponseWrapper
+ *
+ * Response wrapper for card list (standardized envelope)
+ */
+export type CardListResponseWrapper = {
+  /**
+   * Data
+   */
+  data: CardResponse[];
+  /**
+   * Meta
+   */
+  meta?: null;
+  /**
+   * Error
+   */
+  error?: null;
 };
 
 /**
@@ -168,6 +222,43 @@ export type CardResponse = {
    * Last update timestamp
    */
   updated_at: string;
+};
+
+/**
+ * ChatRoomListResponse
+ *
+ * Response schema for list of chat rooms
+ */
+export type ChatRoomListResponse = {
+  /**
+   * Rooms
+   *
+   * List of chat rooms
+   */
+  rooms: ChatRoomResponse[];
+  /**
+   * Total
+   *
+   * Total number of chat rooms
+   */
+  total: number;
+};
+
+/**
+ * ChatRoomListResponseWrapper
+ *
+ * Response wrapper for chat room list (standardized envelope)
+ */
+export type ChatRoomListResponseWrapper = {
+  data: ChatRoomListResponse;
+  /**
+   * Meta
+   */
+  meta?: null;
+  /**
+   * Error
+   */
+  error?: null;
 };
 
 /**
@@ -283,6 +374,23 @@ export type CityListResponse = {
 };
 
 /**
+ * CityListResponseWrapper
+ *
+ * Response wrapper for city list (standardized envelope)
+ */
+export type CityListResponseWrapper = {
+  data: CityListResponse;
+  /**
+   * Meta
+   */
+  meta?: null;
+  /**
+   * Error
+   */
+  error?: null;
+};
+
+/**
  * CityResponse
  *
  * Response schema for a single city.
@@ -377,52 +485,48 @@ export type CreateTradeRequest = {
 };
 
 /**
- * ErrorResponse
+ * DeleteSuccessResponse
  *
- * Error response schema
+ * Success response for delete operations
  */
-export type ErrorResponse = {
+export type DeleteSuccessResponse = {
   /**
-   * Code
+   * Success
    *
-   * Error code
+   * Operation success status
    */
-  code: string;
+  success?: boolean;
   /**
    * Message
    *
-   * Error message
+   * Success message
    */
   message: string;
-  /**
-   * Details
-   *
-   * Additional error details
-   */
-  details?: {
-    [key: string]: unknown;
-  } | null;
 };
 
 /**
- * ErrorWrapper
+ * DeleteSuccessResponseWrapper
  *
- * Error wrapper response
+ * Response wrapper for delete success (standardized envelope)
  */
-export type ErrorWrapper = {
+export type DeleteSuccessResponseWrapper = {
+  data: DeleteSuccessResponse;
   /**
-   * Data
+   * Meta
    */
-  data?: null;
-  error: ErrorResponse;
+  meta?: null;
+  /**
+   * Error
+   */
+  error?: null;
 };
 
 /**
- * ExpireSubscriptionsResponse
+ * ExpireSubscriptionsData
  *
- * Response schema for expire subscriptions job
+ * Data schema for expire subscriptions job
  */
-export type ExpireSubscriptionsResponse = {
+export type ExpireSubscriptionsData = {
   /**
    * Expired Count
    *
@@ -435,6 +539,23 @@ export type ExpireSubscriptionsResponse = {
    * Processing timestamp (ISO format)
    */
   processed_at: string;
+};
+
+/**
+ * ExpireSubscriptionsResponse
+ *
+ * Response wrapper for expire subscriptions (standardized envelope)
+ */
+export type ExpireSubscriptionsResponse = {
+  data: ExpireSubscriptionsData;
+  /**
+   * Meta
+   */
+  meta?: null;
+  /**
+   * Error
+   */
+  error?: null;
 };
 
 /**
@@ -502,6 +623,23 @@ export type FriendListResponse = {
 };
 
 /**
+ * FriendListResponseWrapper
+ *
+ * Response wrapper for friend list (standardized envelope)
+ */
+export type FriendListResponseWrapper = {
+  data: FriendListResponse;
+  /**
+   * Meta
+   */
+  meta?: null;
+  /**
+   * Error
+   */
+  error?: null;
+};
+
+/**
  * FriendshipResponse
  *
  * Response schema for friendship details
@@ -537,6 +675,23 @@ export type FriendshipResponse = {
    * Creation timestamp
    */
   created_at: string;
+};
+
+/**
+ * FriendshipResponseWrapper
+ *
+ * Response wrapper for friendship (standardized envelope)
+ */
+export type FriendshipResponseWrapper = {
+  data: FriendshipResponse;
+  /**
+   * Meta
+   */
+  meta?: null;
+  /**
+   * Error
+   */
+  error?: null;
 };
 
 /**
@@ -592,10 +747,14 @@ export type HttpValidationError = {
 /**
  * LoginResponse
  *
- * Response wrapper for successful login
+ * Response wrapper for successful login (standardized envelope)
  */
 export type LoginResponse = {
   data: TokenResponse;
+  /**
+   * Meta
+   */
+  meta?: null;
   /**
    * Error
    */
@@ -647,6 +806,23 @@ export type MessageResponse = {
 };
 
 /**
+ * MessageResponseWrapper
+ *
+ * Response wrapper for single message (standardized envelope)
+ */
+export type MessageResponseWrapper = {
+  data: MessageResponse;
+  /**
+   * Meta
+   */
+  meta?: null;
+  /**
+   * Error
+   */
+  error?: null;
+};
+
+/**
  * MessagesListResponse
  *
  * Response schema for list of messages
@@ -670,6 +846,23 @@ export type MessagesListResponse = {
    * Whether there are more messages to fetch
    */
   has_more: boolean;
+};
+
+/**
+ * MessagesListResponseWrapper
+ *
+ * Response wrapper for message list (standardized envelope)
+ */
+export type MessagesListResponseWrapper = {
+  data: MessagesListResponse;
+  /**
+   * Meta
+   */
+  meta?: null;
+  /**
+   * Error
+   */
+  error?: null;
 };
 
 /**
@@ -761,6 +954,23 @@ export type PostInterestListResponse = {
 };
 
 /**
+ * PostInterestListResponseWrapper
+ *
+ * Response wrapper for post interest list (standardized envelope)
+ */
+export type PostInterestListResponseWrapper = {
+  data: PostInterestListResponse;
+  /**
+   * Meta
+   */
+  meta?: null;
+  /**
+   * Error
+   */
+  error?: null;
+};
+
+/**
  * PostInterestResponse
  *
  * Response schema for post interest details
@@ -805,6 +1015,23 @@ export type PostInterestResponse = {
 };
 
 /**
+ * PostInterestResponseWrapper
+ *
+ * Response wrapper for single post interest (standardized envelope)
+ */
+export type PostInterestResponseWrapper = {
+  data: PostInterestResponse;
+  /**
+   * Meta
+   */
+  meta?: null;
+  /**
+   * Error
+   */
+  error?: null;
+};
+
+/**
  * PostListResponse
  *
  * Response schema for post list
@@ -822,6 +1049,23 @@ export type PostListResponse = {
    * Total number of posts
    */
   total: number;
+};
+
+/**
+ * PostListResponseWrapper
+ *
+ * Response wrapper for post list (standardized envelope)
+ */
+export type PostListResponseWrapper = {
+  data: PostListResponse;
+  /**
+   * Meta
+   */
+  meta?: null;
+  /**
+   * Error
+   */
+  error?: null;
 };
 
 /**
@@ -897,16 +1141,20 @@ export type PostResponse = {
 };
 
 /**
- * ProfileErrorWrapper
+ * PostResponseWrapper
  *
- * Error wrapper for profile endpoints
+ * Response wrapper for single post (standardized envelope)
  */
-export type ProfileErrorWrapper = {
+export type PostResponseWrapper = {
+  data: PostResponse;
   /**
-   * Data
+   * Meta
    */
-  data?: null;
-  error: ErrorResponse;
+  meta?: null;
+  /**
+   * Error
+   */
+  error?: null;
 };
 
 /**
@@ -984,10 +1232,14 @@ export type ProfileResponse = {
 /**
  * ProfileResponseWrapper
  *
- * Response wrapper for profile data
+ * Response wrapper for profile data (standardized envelope)
  */
 export type ProfileResponseWrapper = {
   data: ProfileResponse;
+  /**
+   * Meta
+   */
+  meta?: null;
   /**
    * Error
    */
@@ -1057,6 +1309,23 @@ export type QuotaStatusResponse = {
 };
 
 /**
+ * QuotaStatusResponseWrapper
+ *
+ * Response wrapper for quota status (standardized envelope)
+ */
+export type QuotaStatusResponseWrapper = {
+  data: QuotaStatusResponse;
+  /**
+   * Meta
+   */
+  meta?: null;
+  /**
+   * Error
+   */
+  error?: null;
+};
+
+/**
  * RatingListResponse
  *
  * Response schema for list of ratings
@@ -1074,6 +1343,23 @@ export type RatingListResponse = {
    * Total number of ratings
    */
   total: number;
+};
+
+/**
+ * RatingListResponseWrapper
+ *
+ * Response wrapper for rating list (standardized envelope)
+ */
+export type RatingListResponseWrapper = {
+  data: RatingListResponse;
+  /**
+   * Meta
+   */
+  meta?: null;
+  /**
+   * Error
+   */
+  error?: null;
 };
 
 /**
@@ -1159,6 +1445,23 @@ export type RatingResponse = {
 };
 
 /**
+ * RatingResponseWrapper
+ *
+ * Response wrapper for single rating (standardized envelope)
+ */
+export type RatingResponseWrapper = {
+  data: RatingResponse;
+  /**
+   * Meta
+   */
+  meta?: null;
+  /**
+   * Error
+   */
+  error?: null;
+};
+
+/**
  * RefreshTokenRequest
  *
  * Request schema for refreshing access token
@@ -1190,6 +1493,23 @@ export type ReportListResponse = {
    * Total number of reports
    */
   total: number;
+};
+
+/**
+ * ReportListResponseWrapper
+ *
+ * Response wrapper for report list (standardized envelope)
+ */
+export type ReportListResponseWrapper = {
+  data: ReportListResponse;
+  /**
+   * Meta
+   */
+  meta?: null;
+  /**
+   * Error
+   */
+  error?: null;
 };
 
 /**
@@ -1286,6 +1606,23 @@ export type ReportResponse = {
 };
 
 /**
+ * ReportResponseWrapper
+ *
+ * Response wrapper for single report (standardized envelope)
+ */
+export type ReportResponseWrapper = {
+  data: ReportResponse;
+  /**
+   * Meta
+   */
+  meta?: null;
+  /**
+   * Error
+   */
+  error?: null;
+};
+
+/**
  * SearchNearbyRequest
  *
  * Request schema for nearby card search
@@ -1332,6 +1669,23 @@ export type SearchNearbyResponse = {
 };
 
 /**
+ * SearchNearbyResponseWrapper
+ *
+ * Response wrapper for nearby search (standardized envelope)
+ */
+export type SearchNearbyResponseWrapper = {
+  data: SearchNearbyResponse;
+  /**
+   * Meta
+   */
+  meta?: null;
+  /**
+   * Error
+   */
+  error?: null;
+};
+
+/**
  * SendFriendRequestRequest
  *
  * Request schema for sending friend request
@@ -1360,11 +1714,11 @@ export type SendMessageRequest = {
 };
 
 /**
- * SubscriptionStatusResponse
+ * SubscriptionStatusData
  *
- * Response schema for subscription status
+ * Data schema for subscription status
  */
-export type SubscriptionStatusResponse = {
+export type SubscriptionStatusData = {
   /**
    * Plan
    *
@@ -1395,6 +1749,23 @@ export type SubscriptionStatusResponse = {
    * Subscription source: 'google_play'
    */
   source: string;
+};
+
+/**
+ * SubscriptionStatusResponse
+ *
+ * Response wrapper for subscription status (standardized envelope)
+ */
+export type SubscriptionStatusResponse = {
+  data: SubscriptionStatusData;
+  /**
+   * Meta
+   */
+  meta?: null;
+  /**
+   * Error
+   */
+  error?: null;
 };
 
 /**
@@ -1477,6 +1848,23 @@ export type TradeHistoryResponse = {
    * Offset used
    */
   offset: number;
+};
+
+/**
+ * TradeHistoryResponseWrapper
+ *
+ * Response wrapper for trade history (standardized envelope)
+ */
+export type TradeHistoryResponseWrapper = {
+  data: TradeHistoryResponse;
+  /**
+   * Meta
+   */
+  meta?: null;
+  /**
+   * Error
+   */
+  error?: null;
 };
 
 /**
@@ -1598,6 +1986,23 @@ export type TradeResponse = {
 };
 
 /**
+ * TradeResponseWrapper
+ *
+ * Response wrapper for single trade (standardized envelope)
+ */
+export type TradeResponseWrapper = {
+  data: TradeResponse;
+  /**
+   * Meta
+   */
+  meta?: null;
+  /**
+   * Error
+   */
+  error?: null;
+};
+
+/**
  * UnblockUserRequest
  *
  * Request schema for unblocking a user
@@ -1629,6 +2034,43 @@ export type UpdateLocationRequest = {
    * Longitude (-180 to 180)
    */
   lng: number;
+};
+
+/**
+ * UpdateLocationResponseWrapper
+ *
+ * Response wrapper for location update (standardized envelope)
+ */
+export type UpdateLocationResponseWrapper = {
+  data: UpdateLocationSuccess;
+  /**
+   * Meta
+   */
+  meta?: null;
+  /**
+   * Error
+   */
+  error?: null;
+};
+
+/**
+ * UpdateLocationSuccess
+ *
+ * Success response for location update
+ */
+export type UpdateLocationSuccess = {
+  /**
+   * Success
+   *
+   * Operation success
+   */
+  success?: boolean;
+  /**
+   * Message
+   *
+   * Success message
+   */
+  message: string;
 };
 
 /**
@@ -1776,6 +2218,23 @@ export type UploadUrlResponse = {
 };
 
 /**
+ * UploadUrlResponseWrapper
+ *
+ * Response wrapper for upload URL (standardized envelope)
+ */
+export type UploadUrlResponseWrapper = {
+  data: UploadUrlResponse;
+  /**
+   * Meta
+   */
+  meta?: null;
+  /**
+   * Error
+   */
+  error?: null;
+};
+
+/**
  * ValidationError
  */
 export type ValidationError = {
@@ -1872,11 +2331,11 @@ export type AdminLoginApiV1AuthAdminLoginPostErrors = {
   /**
    * Validation error
    */
-  400: ErrorWrapper;
+  400: unknown;
   /**
    * Invalid credentials or not an admin
    */
-  401: ErrorWrapper;
+  401: unknown;
   /**
    * Validation Error
    */
@@ -1907,11 +2366,11 @@ export type GoogleLoginApiV1AuthGoogleLoginPostErrors = {
   /**
    * Validation error
    */
-  400: ErrorWrapper;
+  400: unknown;
   /**
    * Invalid Google token
    */
-  401: ErrorWrapper;
+  401: unknown;
   /**
    * Validation Error
    */
@@ -1942,19 +2401,16 @@ export type GoogleCallbackApiV1AuthGoogleCallbackPostErrors = {
   /**
    * Validation error
    */
-  400: ErrorWrapper;
+  400: unknown;
   /**
    * Invalid authorization code or code_verifier
    */
-  401: ErrorWrapper;
+  401: unknown;
   /**
    * Token exchange failed
    */
-  422: ErrorWrapper;
+  422: unknown;
 };
-
-export type GoogleCallbackApiV1AuthGoogleCallbackPostError =
-  GoogleCallbackApiV1AuthGoogleCallbackPostErrors[keyof GoogleCallbackApiV1AuthGoogleCallbackPostErrors];
 
 export type GoogleCallbackApiV1AuthGoogleCallbackPostResponses = {
   /**
@@ -1977,7 +2433,7 @@ export type RefreshTokenApiV1AuthRefreshPostErrors = {
   /**
    * Invalid or expired refresh token
    */
-  401: ErrorWrapper;
+  401: unknown;
   /**
    * Validation Error
    */
@@ -2008,15 +2464,12 @@ export type GetMyProfileApiV1ProfileMeGetErrors = {
   /**
    * Unauthorized
    */
-  401: ProfileErrorWrapper;
+  401: unknown;
   /**
    * Profile not found
    */
-  404: ProfileErrorWrapper;
+  404: unknown;
 };
-
-export type GetMyProfileApiV1ProfileMeGetError =
-  GetMyProfileApiV1ProfileMeGetErrors[keyof GetMyProfileApiV1ProfileMeGetErrors];
 
 export type GetMyProfileApiV1ProfileMeGetResponses = {
   /**
@@ -2039,11 +2492,11 @@ export type UpdateMyProfileApiV1ProfileMePutErrors = {
   /**
    * Validation error
    */
-  400: ProfileErrorWrapper;
+  400: unknown;
   /**
    * Unauthorized
    */
-  401: ProfileErrorWrapper;
+  401: unknown;
   /**
    * Validation Error
    */
@@ -2089,7 +2542,7 @@ export type GetUploadUrlApiV1CardsUploadUrlPostResponses = {
   /**
    * Upload URL generated successfully
    */
-  200: UploadUrlResponse;
+  200: UploadUrlResponseWrapper;
 };
 
 export type GetUploadUrlApiV1CardsUploadUrlPostResponse =
@@ -2125,11 +2578,9 @@ export type GetMyCardsApiV1CardsMeGetError =
 
 export type GetMyCardsApiV1CardsMeGetResponses = {
   /**
-   * Response Get My Cards Api V1 Cards Me Get
-   *
    * Cards retrieved successfully
    */
-  200: CardResponse[];
+  200: CardListResponseWrapper;
 };
 
 export type GetMyCardsApiV1CardsMeGetResponse =
@@ -2173,7 +2624,7 @@ export type DeleteCardApiV1CardsCardIdDeleteResponses = {
   /**
    * Card deleted successfully
    */
-  204: void;
+  200: DeleteSuccessResponseWrapper;
 };
 
 export type DeleteCardApiV1CardsCardIdDeleteResponse =
@@ -2197,7 +2648,7 @@ export type GetQuotaStatusApiV1CardsQuotaStatusGetResponses = {
   /**
    * Quota status retrieved successfully
    */
-  200: QuotaStatusResponse;
+  200: QuotaStatusResponseWrapper;
 };
 
 export type GetQuotaStatusApiV1CardsQuotaStatusGetResponse =
@@ -2243,13 +2694,9 @@ export type ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostError =
 
 export type ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostResponses = {
   /**
-   * Response Confirm Card Upload Api V1 Cards  Card Id  Confirm Upload Post
-   *
    * Upload confirmed successfully
    */
-  200: {
-    [key: string]: unknown;
-  };
+  200: DeleteSuccessResponseWrapper;
 };
 
 export type ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostResponse =
@@ -2280,7 +2727,7 @@ export type SearchNearbyCardsApiV1NearbySearchPostResponses = {
   /**
    * Search successful
    */
-  200: SearchNearbyResponse;
+  200: SearchNearbyResponseWrapper;
 };
 
 export type SearchNearbyCardsApiV1NearbySearchPostResponse =
@@ -2315,7 +2762,7 @@ export type UpdateUserLocationApiV1NearbyLocationPutResponses = {
   /**
    * Location updated successfully
    */
-  204: void;
+  200: UpdateLocationResponseWrapper;
 };
 
 export type UpdateUserLocationApiV1NearbyLocationPutResponse =
@@ -2351,7 +2798,7 @@ export type SendFriendRequestApiV1FriendsRequestPostResponses = {
   /**
    * Friend request sent successfully
    */
-  201: FriendshipResponse;
+  201: FriendshipResponseWrapper;
 };
 
 export type SendFriendRequestApiV1FriendsRequestPostResponse =
@@ -2396,7 +2843,7 @@ export type AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostResponses = {
   /**
    * Friend request accepted successfully
    */
-  200: FriendshipResponse;
+  200: FriendshipResponseWrapper;
 };
 
 export type AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostResponse =
@@ -2432,7 +2879,7 @@ export type BlockUserApiV1FriendsBlockPostResponses = {
   /**
    * User blocked successfully
    */
-  200: FriendshipResponse;
+  200: FriendshipResponseWrapper;
 };
 
 export type BlockUserApiV1FriendsBlockPostResponse =
@@ -2470,9 +2917,9 @@ export type UnblockUserApiV1FriendsUnblockPostErrors = {
 
 export type UnblockUserApiV1FriendsUnblockPostResponses = {
   /**
-   * User unblocked successfully (no content)
+   * User unblocked successfully
    */
-  204: void;
+  200: FriendshipResponseWrapper;
 };
 
 export type UnblockUserApiV1FriendsUnblockPostResponse =
@@ -2514,7 +2961,7 @@ export type GetFriendsApiV1FriendsGetResponses = {
   /**
    * Friend list retrieved successfully
    */
-  200: FriendListResponse;
+  200: FriendListResponseWrapper;
 };
 
 export type GetFriendsApiV1FriendsGetResponse =
@@ -2540,11 +2987,9 @@ export type GetChatRoomsApiV1ChatsGetErrors = {
 
 export type GetChatRoomsApiV1ChatsGetResponses = {
   /**
-   * Response Get Chat Rooms Api V1 Chats Get
-   *
    * Chat rooms retrieved successfully
    */
-  200: ChatRoomResponse[];
+  200: ChatRoomListResponseWrapper;
 };
 
 export type GetChatRoomsApiV1ChatsGetResponse =
@@ -2605,7 +3050,7 @@ export type GetMessagesApiV1ChatsRoomIdMessagesGetResponses = {
   /**
    * Messages retrieved successfully
    */
-  200: MessagesListResponse;
+  200: MessagesListResponseWrapper;
 };
 
 export type GetMessagesApiV1ChatsRoomIdMessagesGetResponse =
@@ -2654,7 +3099,7 @@ export type SendMessageApiV1ChatsRoomIdMessagesPostResponses = {
   /**
    * Message sent successfully
    */
-  201: MessageResponse;
+  201: MessageResponseWrapper;
 };
 
 export type SendMessageApiV1ChatsRoomIdMessagesPostResponse =
@@ -2742,7 +3187,7 @@ export type SubmitRatingApiV1RatingsPostResponses = {
   /**
    * Rating submitted successfully
    */
-  201: RatingResponse;
+  201: RatingResponseWrapper;
 };
 
 export type SubmitRatingApiV1RatingsPostResponse =
@@ -2793,7 +3238,7 @@ export type GetUserRatingsApiV1RatingsUserUserIdGetResponses = {
   /**
    * Ratings retrieved successfully
    */
-  200: RatingListResponse;
+  200: RatingListResponseWrapper;
 };
 
 export type GetUserRatingsApiV1RatingsUserUserIdGetResponse =
@@ -2837,7 +3282,7 @@ export type GetAverageRatingApiV1RatingsUserUserIdAverageGetResponses = {
   /**
    * Average rating retrieved successfully
    */
-  200: AverageRatingResponse;
+  200: AverageRatingResponseWrapper;
 };
 
 export type GetAverageRatingApiV1RatingsUserUserIdAverageGetResponse =
@@ -2865,7 +3310,7 @@ export type GetMyReportsApiV1ReportsGetResponses = {
   /**
    * Reports retrieved successfully
    */
-  200: ReportListResponse;
+  200: ReportListResponseWrapper;
 };
 
 export type GetMyReportsApiV1ReportsGetResponse =
@@ -2901,7 +3346,7 @@ export type SubmitReportApiV1ReportsPostResponses = {
   /**
    * Report submitted successfully
    */
-  201: ReportResponse;
+  201: ReportResponseWrapper;
 };
 
 export type SubmitReportApiV1ReportsPostResponse =
@@ -2937,7 +3382,7 @@ export type CreateTradeApiV1TradesPostResponses = {
   /**
    * Trade proposal created successfully
    */
-  201: TradeResponse;
+  201: TradeResponseWrapper;
 };
 
 export type CreateTradeApiV1TradesPostResponse =
@@ -2978,7 +3423,7 @@ export type AcceptTradeApiV1TradesTradeIdAcceptPostResponses = {
   /**
    * Trade accepted successfully
    */
-  200: TradeResponse;
+  200: TradeResponseWrapper;
 };
 
 export type AcceptTradeApiV1TradesTradeIdAcceptPostResponse =
@@ -3010,7 +3455,7 @@ export type RejectTradeApiV1TradesTradeIdRejectPostResponses = {
   /**
    * Successful Response
    */
-  200: TradeResponse;
+  200: TradeResponseWrapper;
 };
 
 export type RejectTradeApiV1TradesTradeIdRejectPostResponse =
@@ -3042,7 +3487,7 @@ export type CancelTradeApiV1TradesTradeIdCancelPostResponses = {
   /**
    * Successful Response
    */
-  200: TradeResponse;
+  200: TradeResponseWrapper;
 };
 
 export type CancelTradeApiV1TradesTradeIdCancelPostResponse =
@@ -3074,7 +3519,7 @@ export type CompleteTradeApiV1TradesTradeIdCompletePostResponses = {
   /**
    * Successful Response
    */
-  200: TradeResponse;
+  200: TradeResponseWrapper;
 };
 
 export type CompleteTradeApiV1TradesTradeIdCompletePostResponse =
@@ -3114,7 +3559,7 @@ export type GetTradeHistoryApiV1TradesHistoryGetResponses = {
   /**
    * Successful Response
    */
-  200: TradeHistoryResponse;
+  200: TradeHistoryResponseWrapper;
 };
 
 export type GetTradeHistoryApiV1TradesHistoryGetResponse =
@@ -3241,7 +3686,7 @@ export type ListPostsApiV1PostsGetResponses = {
   /**
    * Posts retrieved successfully
    */
-  200: PostListResponse;
+  200: PostListResponseWrapper;
 };
 
 export type ListPostsApiV1PostsGetResponse =
@@ -3277,7 +3722,7 @@ export type CreatePostApiV1PostsPostResponses = {
   /**
    * Post created successfully
    */
-  201: PostResponse;
+  201: PostResponseWrapper;
 };
 
 export type CreatePostApiV1PostsPostResponse =
@@ -3318,7 +3763,7 @@ export type ExpressInterestApiV1PostsPostIdInterestPostResponses = {
   /**
    * Interest expressed successfully
    */
-  201: PostInterestResponse;
+  201: PostInterestResponseWrapper;
 };
 
 export type ExpressInterestApiV1PostsPostIdInterestPostResponse =
@@ -3367,7 +3812,7 @@ export type AcceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostResponses
   /**
    * Interest accepted successfully
    */
-  200: AcceptInterestResponse;
+  200: AcceptInterestResponseWrapper;
 };
 
 export type AcceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostResponse =
@@ -3528,7 +3973,7 @@ export type ListPostInterestsApiV1PostsPostIdInterestsGetResponses = {
   /**
    * Interests retrieved successfully
    */
-  200: PostInterestListResponse;
+  200: PostInterestListResponseWrapper;
 };
 
 export type ListPostInterestsApiV1PostsPostIdInterestsGetResponse =
@@ -3580,7 +4025,7 @@ export type GetPostInterestApiV1PostsPostIdInterestsInterestIdGetResponses = {
   /**
    * Interest retrieved successfully
    */
-  200: PostInterestResponse;
+  200: PostInterestResponseWrapper;
 };
 
 export type GetPostInterestApiV1PostsPostIdInterestsInterestIdGetResponse =
@@ -3597,7 +4042,7 @@ export type GetCitiesApiV1LocationsCitiesGetResponses = {
   /**
    * List of all Taiwan cities retrieved successfully
    */
-  200: CityListResponse;
+  200: CityListResponseWrapper;
 };
 
 export type GetCitiesApiV1LocationsCitiesGetResponse =

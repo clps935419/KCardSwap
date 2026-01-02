@@ -138,3 +138,20 @@ class TradeHistoryResponse(BaseModel):
                 "offset": 0,
             }
         }
+
+
+# Envelope wrappers for standardized responses
+class TradeResponseWrapper(BaseModel):
+    """Response wrapper for single trade (standardized envelope)"""
+
+    data: TradeResponse
+    meta: None = None
+    error: None = None
+
+
+class TradeHistoryResponseWrapper(BaseModel):
+    """Response wrapper for trade history (standardized envelope)"""
+
+    data: TradeHistoryResponse
+    meta: None = None
+    error: None = None

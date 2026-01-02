@@ -1,6 +1,16 @@
 """Error handling middleware.
 
 This module provides global error handling for the FastAPI application.
+All errors are returned in standardized envelope format:
+{
+    "data": null,
+    "meta": null,
+    "error": {
+        "code": "ERROR_CODE",
+        "message": "Error message",
+        "details": {}
+    }
+}
 """
 
 from typing import Any
@@ -11,6 +21,7 @@ from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from ..exceptions.api_exceptions import APIException
+from ..response import error_response
 
 
 async def api_exception_handler(request: Request, exc: APIException) -> JSONResponse:
@@ -21,17 +32,15 @@ async def api_exception_handler(request: Request, exc: APIException) -> JSONResp
         exc: API exception
 
     Returns:
-        JSON error response
+        JSON error response in envelope format
     """
     return JSONResponse(
         status_code=exc.status_code,
-        content={
-            "error": {
-                "code": exc.error_code,
-                "message": exc.message,
-                "details": exc.details,
-            }
-        },
+        content=error_response(
+            code=exc.error_code,
+            message=exc.message,
+            details=exc.details,
+        ),
     )
 
 
@@ -45,17 +54,15 @@ async def http_exception_handler(
         exc: HTTP exception
 
     Returns:
-        JSON error response
+        JSON error response in envelope format
     """
     return JSONResponse(
         status_code=exc.status_code,
-        content={
-            "error": {
-                "code": f"{exc.status_code}_HTTP_ERROR",
-                "message": exc.detail,
-                "details": {},
-            }
-        },
+        content=error_response(
+            code=f"{exc.status_code}_HTTP_ERROR",
+            message=str(exc.detail) if exc.detail else "HTTP error occurred",
+            details={},
+        ),
     )
 
 
@@ -69,7 +76,7 @@ async def validation_exception_handler(
         exc: Validation error
 
     Returns:
-        JSON error response
+        JSON error response in envelope format
     """
     errors = []
     for error in exc.errors():
@@ -83,13 +90,11 @@ async def validation_exception_handler(
 
     return JSONResponse(
         status_code=status.HTTP_400_BAD_REQUEST,
-        content={
-            "error": {
-                "code": "400_VALIDATION_FAILED",
-                "message": "Request validation failed",
-                "details": {"errors": errors},
-            }
-        },
+        content=error_response(
+            code="400_VALIDATION_FAILED",
+            message="Request validation failed",
+            details={"errors": errors},
+        ),
     )
 
 
@@ -101,18 +106,16 @@ async def general_exception_handler(request: Request, exc: Exception) -> JSONRes
         exc: Exception
 
     Returns:
-        JSON error response
+        JSON error response in envelope format
     """
     # Log the exception here (add logging later)
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        content={
-            "error": {
-                "code": "500_INTERNAL_ERROR",
-                "message": "An unexpected error occurred",
-                "details": {},
-            }
-        },
+        content=error_response(
+            code="500_INTERNAL_ERROR",
+            message="An unexpected error occurred",
+            details={},
+        ),
     )
 
 

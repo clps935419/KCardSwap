@@ -196,3 +196,44 @@ class AcceptInterestResponse(BaseModel):
                 "chat_room_id": "987e6543-e21b-12d3-a456-426614174000",
             }
         }
+
+
+# Envelope wrappers for standardized responses
+class PostResponseWrapper(BaseModel):
+    """Response wrapper for single post (standardized envelope)"""
+
+    data: PostResponse
+    meta: None = None
+    error: None = None
+
+
+class PostListResponseWrapper(BaseModel):
+    """Response wrapper for post list (standardized envelope)"""
+
+    data: PostListResponse
+    meta: None = None
+    error: None = None
+
+
+class PostInterestResponseWrapper(BaseModel):
+    """Response wrapper for single post interest (standardized envelope)"""
+
+    data: PostInterestResponse
+    meta: None = None
+    error: None = None
+
+
+class PostInterestListResponseWrapper(BaseModel):
+    """Response wrapper for post interest list (standardized envelope)"""
+
+    data: PostInterestListResponse
+    meta: None = None
+    error: None = None
+
+
+class AcceptInterestResponseWrapper(BaseModel):
+    """Response wrapper for accept interest response (standardized envelope)"""
+
+    data: AcceptInterestResponse
+    meta: None = None
+    error: None = None
