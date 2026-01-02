@@ -5,7 +5,7 @@ from injector import Injector
 
 from app.injector import injector as global_container
 from app.modules.locations.application.use_cases.get_all_cities_use_case import GetAllCitiesUseCase
-from app.modules.locations.presentation.schemas.city_schemas import CityListResponse, CityResponse
+from app.modules.locations.presentation.schemas.city_schemas import CityListResponse, CityListResponseWrapper, CityResponse
 
 
 def get_container() -> Injector:
@@ -18,7 +18,7 @@ router = APIRouter(prefix="/locations", tags=["locations"])
 
 @router.get(
     "/cities",
-    response_model=CityListResponse,
+    response_model=CityListResponseWrapper,
     summary="Get all Taiwan cities",
     description="""
     Get a list of all available Taiwan cities/counties.
@@ -55,7 +55,7 @@ router = APIRouter(prefix="/locations", tags=["locations"])
 )
 async def get_cities(
     container: Injector = Depends(get_container),
-) -> CityListResponse:
+) -> CityListResponseWrapper:
     """Get all available Taiwan cities/counties.
     
     Args:
@@ -76,4 +76,5 @@ async def get_cities(
         for city in cities
     ]
     
-    return CityListResponse(cities=city_responses)
+    data = CityListResponse(cities=city_responses)
+    return CityListResponseWrapper(data=data, meta=None, error=None)

@@ -17,3 +17,12 @@ class CityListResponse(BaseModel):
     """Response schema for list of all cities."""
     
     cities: list[CityResponse] = Field(..., description="List of all available Taiwan cities/counties")
+
+
+# Envelope wrapper for standardized response
+class CityListResponseWrapper(BaseModel):
+    """Response wrapper for city list (standardized envelope)"""
+    
+    data: CityListResponse
+    meta: None = None
+    error: None = None

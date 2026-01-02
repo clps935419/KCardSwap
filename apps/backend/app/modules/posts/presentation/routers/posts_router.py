@@ -41,11 +41,16 @@ from app.modules.posts.presentation.dependencies.use_case_deps import (
 )
 from app.modules.posts.presentation.schemas.post_schemas import (
     AcceptInterestResponse,
+    AcceptInterestResponseWrapper,
     CreatePostRequest,
     PostInterestResponse,
+    PostInterestResponseWrapper,
     PostInterestListResponse,
+    PostInterestListResponseWrapper,
     PostListResponse,
+    PostListResponseWrapper,
     PostResponse,
+    PostResponseWrapper,
 )
 from app.shared.infrastructure.database.connection import get_db_session
 
@@ -57,7 +62,7 @@ router = APIRouter(prefix="/posts", tags=["Posts"])
 
 @router.post(
     "",
-    response_model=PostResponse,
+    response_model=PostResponseWrapper,
     status_code=status.HTTP_201_CREATED,
     responses={
         201: {"description": "Post created successfully"},
@@ -76,7 +81,7 @@ async def create_post(
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
     use_case: Annotated[CreatePostUseCase, Depends(get_create_post_use_case)],
-) -> PostResponse:
+) -> PostResponseWrapper:
     """
     Create a new city board post.
 
@@ -97,19 +102,8 @@ async def create_post(
             expires_at=request.expires_at,
         )
 
-        return PostResponse(
-            id=UUID(post.id),
-            owner_id=UUID(post.owner_id),
-            city_code=post.city_code,
-            title=post.title,
-            content=post.content,
-            idol=post.idol,
-            idol_group=post.idol_group,
-            status=post.status.value,
-            expires_at=post.expires_at,
-            created_at=post.created_at,
-            updated_at=post.updated_at,
-        )
+        data = PostResponse(            id=UUID(post.id),            owner_id=UUID(post.owner_id),            city_code=post.city_code,            title=post.title,            content=post.content,            idol=post.idol,            idol_group=post.idol_group,            status=post.status.value,            expires_at=post.expires_at,            created_at=post.created_at,            updated_at=post.updated_at,        )
+        return PostResponseWrapper(data=data, meta=None, error=None)
 
     except ValueError as e:
         logger.warning(f"Post creation validation failed: {e}")
@@ -126,7 +120,7 @@ async def create_post(
 
 @router.get(
     "",
-    response_model=PostListResponse,
+    response_model=PostListResponseWrapper,
     responses={
         200: {"description": "Posts retrieved successfully"},
         400: {"description": "Bad request (city_code required)"},
@@ -145,7 +139,7 @@ async def list_posts(
     ] = None,
     limit: Annotated[int, Query(ge=1, le=100, description="Maximum results")] = 50,
     offset: Annotated[int, Query(ge=0, description="Pagination offset")] = 0,
-) -> PostListResponse:
+) -> PostListResponseWrapper:
     """
     List posts for a city board.
 
@@ -179,7 +173,8 @@ async def list_posts(
             for post in posts
         ]
 
-        return PostListResponse(posts=post_responses, total=len(post_responses))
+        data = PostListResponse(posts=post_responses, total=len(post_responses))
+        return PostListResponseWrapper(data=data, meta=None, error=None)
 
     except ValueError as e:
         logger.warning(f"Post list validation failed: {e}")
@@ -194,7 +189,7 @@ async def list_posts(
 
 @router.post(
     "/{post_id}/interest",
-    response_model=PostInterestResponse,
+    response_model=PostInterestResponseWrapper,
     status_code=status.HTTP_201_CREATED,
     responses={
         201: {"description": "Interest expressed successfully"},
@@ -211,7 +206,7 @@ async def express_interest(
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
     use_case: Annotated[ExpressInterestUseCase, Depends(get_express_interest_use_case)],
-) -> PostInterestResponse:
+) -> PostInterestResponseWrapper:
     """
     Express interest in a post.
 
@@ -227,14 +222,8 @@ async def express_interest(
             user_id=str(current_user_id),
         )
 
-        return PostInterestResponse(
-            id=UUID(interest.id),
-            post_id=UUID(interest.post_id),
-            user_id=UUID(interest.user_id),
-            status=interest.status.value,
-            created_at=interest.created_at,
-            updated_at=interest.updated_at,
-        )
+        data = PostInterestResponse(            id=UUID(interest.id),            post_id=UUID(interest.post_id),            user_id=UUID(interest.user_id),            status=interest.status.value,            created_at=interest.created_at,            updated_at=interest.updated_at,        )
+        return PostInterestResponseWrapper(data=data, meta=None, error=None)
 
     except ValueError as e:
         error_msg = str(e).lower()
@@ -254,7 +243,7 @@ async def express_interest(
 
 @router.post(
     "/{post_id}/interests/{interest_id}/accept",
-    response_model=AcceptInterestResponse,
+    response_model=AcceptInterestResponseWrapper,
     responses={
         200: {"description": "Interest accepted successfully"},
         401: {"description": "Unauthorized (not logged in)"},
@@ -272,7 +261,7 @@ async def accept_interest(
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
     use_case: Annotated[AcceptInterestUseCase, Depends(get_accept_interest_use_case)],
-) -> AcceptInterestResponse:
+) -> AcceptInterestResponseWrapper:
     """
     Accept an interest.
 
@@ -290,11 +279,8 @@ async def accept_interest(
             current_user_id=str(current_user_id),
         )
 
-        return AcceptInterestResponse(
-            interest_id=UUID(result.interest_id),
-            friendship_created=result.friendship_created,
-            chat_room_id=UUID(result.chat_room_id),
-        )
+        data = AcceptInterestResponse(            interest_id=UUID(result.interest_id),            friendship_created=result.friendship_created,            chat_room_id=UUID(result.chat_room_id),        )
+        return AcceptInterestResponseWrapper(data=data, meta=None, error=None)
 
     except ValueError as e:
         error_msg = str(e).lower()
@@ -422,7 +408,7 @@ async def close_post(
 
 @router.get(
     "/{post_id}/interests",
-    response_model=PostInterestListResponse,
+    response_model=PostInterestListResponseWrapper,
     responses={
         200: {"description": "Interests retrieved successfully"},
         401: {"description": "Unauthorized (not logged in)"},
@@ -445,7 +431,7 @@ async def list_post_interests(
     ] = None,
     limit: Annotated[int, Query(ge=1, le=100, description="Maximum results")] = 50,
     offset: Annotated[int, Query(ge=0, description="Pagination offset")] = 0,
-) -> PostInterestListResponse:
+) -> PostInterestListResponseWrapper:
     """
     List interests for a post.
 
@@ -488,7 +474,8 @@ async def list_post_interests(
             for interest in interests
         ]
 
-        return PostInterestListResponse(interests=interest_responses, total=total)
+        data = PostInterestListResponse(interests=interest_responses, total=total)
+        return PostInterestListResponseWrapper(data=data, meta=None, error=None)
 
     except ValueError as e:
         error_msg = str(e).lower()
@@ -508,7 +495,7 @@ async def list_post_interests(
 
 @router.get(
     "/{post_id}/interests/{interest_id}",
-    response_model=PostInterestResponse,
+    response_model=PostInterestResponseWrapper,
     responses={
         200: {"description": "Interest retrieved successfully"},
         401: {"description": "Unauthorized (not logged in)"},
@@ -527,7 +514,7 @@ async def get_post_interest(
     use_case: Annotated[
         ListPostInterestsUseCase, Depends(get_list_post_interests_use_case)
     ],
-) -> PostInterestResponse:
+) -> PostInterestResponseWrapper:
     """
     Get a specific interest.
 
@@ -551,14 +538,8 @@ async def get_post_interest(
         if not interest:
             raise ValueError("Interest not found")
 
-        return PostInterestResponse(
-            id=UUID(interest.id),
-            post_id=UUID(interest.post_id),
-            user_id=UUID(interest.user_id),
-            status=interest.status.value,
-            created_at=interest.created_at,
-            updated_at=interest.updated_at,
-        )
+        data = PostInterestResponse(            id=UUID(interest.id),            post_id=UUID(interest.post_id),            user_id=UUID(interest.user_id),            status=interest.status.value,            created_at=interest.created_at,            updated_at=interest.updated_at,        )
+        return PostInterestResponseWrapper(data=data, meta=None, error=None)
 
     except ValueError as e:
         error_msg = str(e).lower()
