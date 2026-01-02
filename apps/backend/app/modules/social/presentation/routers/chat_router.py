@@ -28,9 +28,13 @@ from app.modules.social.infrastructure.repositories.message_repository_impl impo
     MessageRepositoryImpl,
 )
 from app.modules.social.presentation.schemas.chat_schemas import (
+    ChatRoomListResponseWrapper,
     ChatRoomResponse,
+    ChatRoomResponseWrapper,
     MessageResponse,
+    MessageResponseWrapper,
     MessagesListResponse,
+    MessagesListResponseWrapper,
     SendMessageRequest,
 )
 from app.shared.infrastructure.database.connection import get_db_session
