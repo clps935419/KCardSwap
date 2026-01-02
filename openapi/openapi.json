@@ -88,24 +88,10 @@
             }
           },
           "400": {
-            "description": "Validation error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorWrapper"
-                }
-              }
-            }
+            "description": "Validation error"
           },
           "401": {
-            "description": "Invalid credentials or not an admin",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorWrapper"
-                }
-              }
-            }
+            "description": "Invalid credentials or not an admin"
           },
           "422": {
             "description": "Validation Error",
@@ -150,24 +136,10 @@
             }
           },
           "400": {
-            "description": "Validation error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorWrapper"
-                }
-              }
-            }
+            "description": "Validation error"
           },
           "401": {
-            "description": "Invalid Google token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorWrapper"
-                }
-              }
-            }
+            "description": "Invalid Google token"
           },
           "422": {
             "description": "Validation Error",
@@ -212,34 +184,13 @@
             }
           },
           "400": {
-            "description": "Validation error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorWrapper"
-                }
-              }
-            }
+            "description": "Validation error"
           },
           "401": {
-            "description": "Invalid authorization code or code_verifier",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorWrapper"
-                }
-              }
-            }
+            "description": "Invalid authorization code or code_verifier"
           },
           "422": {
-            "description": "Token exchange failed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorWrapper"
-                }
-              }
-            }
+            "description": "Token exchange failed"
           }
         }
       }
@@ -274,14 +225,7 @@
             }
           },
           "401": {
-            "description": "Invalid or expired refresh token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorWrapper"
-                }
-              }
-            }
+            "description": "Invalid or expired refresh token"
           },
           "422": {
             "description": "Validation Error",
@@ -316,24 +260,10 @@
             }
           },
           "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProfileErrorWrapper"
-                }
-              }
-            }
+            "description": "Unauthorized"
           },
           "404": {
-            "description": "Profile not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProfileErrorWrapper"
-                }
-              }
-            }
+            "description": "Profile not found"
           }
         },
         "security": [
@@ -371,24 +301,10 @@
             }
           },
           "400": {
-            "description": "Validation error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProfileErrorWrapper"
-                }
-              }
-            }
+            "description": "Validation error"
           },
           "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProfileErrorWrapper"
-                }
-              }
-            }
+            "description": "Unauthorized"
           },
           "422": {
             "description": "Validation Error",
@@ -432,7 +348,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UploadUrlResponse"
+                  "$ref": "#/components/schemas/UploadUrlResponseWrapper"
                 }
               }
             }
@@ -493,11 +409,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CardResponse"
-                  },
-                  "title": "Response Get My Cards Api V1 Cards Me Get"
+                  "$ref": "#/components/schemas/CardListResponseWrapper"
                 }
               }
             }
@@ -544,8 +456,15 @@
           }
         ],
         "responses": {
-          "204": {
-            "description": "Card deleted successfully"
+          "200": {
+            "description": "Card deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteSuccessResponseWrapper"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized"
@@ -583,7 +502,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/QuotaStatusResponse"
+                  "$ref": "#/components/schemas/QuotaStatusResponseWrapper"
                 }
               }
             }
@@ -630,9 +549,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "additionalProperties": true,
-                  "title": "Response Confirm Card Upload Api V1 Cards  Card Id  Confirm Upload Post"
+                  "$ref": "#/components/schemas/DeleteSuccessResponseWrapper"
                 }
               }
             }
@@ -686,37 +603,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SearchNearbyResponse"
-                },
-                "example": {
-                  "results": [
-                    {
-                      "card_id": "123e4567-e89b-12d3-a456-426614174000",
-                      "owner_id": "987e6543-e21b-12d3-a456-426614174000",
-                      "distance_km": 2.5,
-                      "idol": "IU",
-                      "idol_group": "Solo",
-                      "album": "Lilac",
-                      "version": "Standard",
-                      "rarity": "rare",
-                      "image_url": "https://storage.googleapis.com/kcardswap/cards/...",
-                      "owner_nickname": "CardCollector123"
-                    }
-                  ],
-                  "count": 1
+                  "$ref": "#/components/schemas/SearchNearbyResponseWrapper"
                 }
               }
             }
           },
           "429": {
-            "description": "Rate limit exceeded",
-            "content": {
-              "application/json": {
-                "example": {
-                  "detail": "Daily search limit exceeded: 5/5 searches used"
-                }
-              }
-            }
+            "description": "Rate limit exceeded"
           },
           "422": {
             "description": "Validation Error",
@@ -755,8 +648,15 @@
           "required": true
         },
         "responses": {
-          "204": {
-            "description": "Location updated successfully"
+          "200": {
+            "description": "Location updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateLocationResponseWrapper"
+                }
+              }
+            }
           },
           "400": {
             "description": "Invalid coordinates"
@@ -806,7 +706,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/FriendshipResponse"
+                  "$ref": "#/components/schemas/FriendshipResponseWrapper"
                 }
               }
             }
@@ -862,7 +762,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/FriendshipResponse"
+                  "$ref": "#/components/schemas/FriendshipResponseWrapper"
                 }
               }
             }
@@ -909,7 +809,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/FriendshipResponse"
+                  "$ref": "#/components/schemas/FriendshipResponseWrapper"
                 }
               }
             }
@@ -953,8 +853,15 @@
           "required": true
         },
         "responses": {
-          "204": {
-            "description": "User unblocked successfully (no content)"
+          "200": {
+            "description": "User unblocked successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FriendshipResponseWrapper"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad request (validation failed)"
@@ -1018,7 +925,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/FriendListResponse"
+                  "$ref": "#/components/schemas/FriendListResponseWrapper"
                 }
               }
             }
@@ -1056,11 +963,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/ChatRoomResponse"
-                  },
-                  "type": "array",
-                  "title": "Response Get Chat Rooms Api V1 Chats Get"
+                  "$ref": "#/components/schemas/ChatRoomListResponseWrapper"
                 }
               }
             }
@@ -1143,7 +1046,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/MessagesListResponse"
+                  "$ref": "#/components/schemas/MessagesListResponseWrapper"
                 }
               }
             }
@@ -1212,7 +1115,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/MessageResponse"
+                  "$ref": "#/components/schemas/MessageResponseWrapper"
                 }
               }
             }
@@ -1326,7 +1229,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RatingResponse"
+                  "$ref": "#/components/schemas/RatingResponseWrapper"
                 }
               }
             }
@@ -1396,7 +1299,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RatingListResponse"
+                  "$ref": "#/components/schemas/RatingListResponseWrapper"
                 }
               }
             }
@@ -1454,7 +1357,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AverageRatingResponse"
+                  "$ref": "#/components/schemas/AverageRatingResponseWrapper"
                 }
               }
             }
@@ -1495,7 +1398,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ReportListResponse"
+                  "$ref": "#/components/schemas/ReportListResponseWrapper"
                 }
               }
             }
@@ -1536,7 +1439,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ReportResponse"
+                  "$ref": "#/components/schemas/ReportResponseWrapper"
                 }
               }
             }
@@ -1585,7 +1488,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TradeResponse"
+                  "$ref": "#/components/schemas/TradeResponseWrapper"
                 }
               }
             }
@@ -1641,7 +1544,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TradeResponse"
+                  "$ref": "#/components/schemas/TradeResponseWrapper"
                 }
               }
             }
@@ -1692,7 +1595,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TradeResponse"
+                  "$ref": "#/components/schemas/TradeResponseWrapper"
                 }
               }
             }
@@ -1741,7 +1644,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TradeResponse"
+                  "$ref": "#/components/schemas/TradeResponseWrapper"
                 }
               }
             }
@@ -1790,7 +1693,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TradeResponse"
+                  "$ref": "#/components/schemas/TradeResponseWrapper"
                 }
               }
             }
@@ -1856,7 +1759,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TradeHistoryResponse"
+                  "$ref": "#/components/schemas/TradeHistoryResponseWrapper"
                 }
               }
             }
@@ -1999,7 +1902,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PostResponse"
+                  "$ref": "#/components/schemas/PostResponseWrapper"
                 }
               }
             }
@@ -2107,7 +2010,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PostListResponse"
+                  "$ref": "#/components/schemas/PostListResponseWrapper"
                 }
               }
             }
@@ -2162,7 +2065,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PostInterestResponse"
+                  "$ref": "#/components/schemas/PostInterestResponseWrapper"
                 }
               }
             }
@@ -2223,7 +2126,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AcceptInterestResponse"
+                  "$ref": "#/components/schemas/AcceptInterestResponseWrapper"
                 }
               }
             }
@@ -2426,7 +2329,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PostInterestListResponse"
+                  "$ref": "#/components/schemas/PostInterestListResponseWrapper"
                 }
               }
             }
@@ -2497,7 +2400,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PostInterestResponse"
+                  "$ref": "#/components/schemas/PostInterestResponseWrapper"
                 }
               }
             }
@@ -2541,7 +2444,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CityListResponse"
+                  "$ref": "#/components/schemas/CityListResponseWrapper"
                 },
                 "example": {
                   "cities": [
@@ -2605,6 +2508,27 @@
           "interest_id": "123e4567-e89b-12d3-a456-426614174000"
         }
       },
+      "AcceptInterestResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/AcceptInterestResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "AcceptInterestResponseWrapper",
+        "description": "Response wrapper for accept interest response (standardized envelope)"
+      },
       "AdminLoginRequest": {
         "properties": {
           "email": {
@@ -2664,6 +2588,27 @@
           "user_id": "123e4567-e89b-12d3-a456-426614174000"
         }
       },
+      "AverageRatingResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/AverageRatingResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "AverageRatingResponseWrapper",
+        "description": "Response wrapper for average rating (standardized envelope)"
+      },
       "BlockUserRequest": {
         "properties": {
           "user_id": {
@@ -2685,6 +2630,31 @@
         "example": {
           "user_id": "123e4567-e89b-12d3-a456-426614174000"
         }
+      },
+      "CardListResponseWrapper": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/CardResponse"
+            },
+            "type": "array",
+            "title": "Data"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "CardListResponseWrapper",
+        "description": "Response wrapper for card list (standardized envelope)"
       },
       "CardResponse": {
         "properties": {
@@ -2826,6 +2796,51 @@
           "updated_at": "2024-01-01T00:00:00Z",
           "version": "Version A"
         }
+      },
+      "ChatRoomListResponse": {
+        "properties": {
+          "rooms": {
+            "items": {
+              "$ref": "#/components/schemas/ChatRoomResponse"
+            },
+            "type": "array",
+            "title": "Rooms",
+            "description": "List of chat rooms"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total",
+            "description": "Total number of chat rooms"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rooms",
+          "total"
+        ],
+        "title": "ChatRoomListResponse",
+        "description": "Response schema for list of chat rooms"
+      },
+      "ChatRoomListResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ChatRoomListResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "ChatRoomListResponseWrapper",
+        "description": "Response wrapper for chat room list (standardized envelope)"
       },
       "ChatRoomParticipantResponse": {
         "properties": {
@@ -2986,6 +3001,27 @@
         ],
         "title": "CityListResponse",
         "description": "Response schema for list of all cities."
+      },
+      "CityListResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/CityListResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "CityListResponseWrapper",
+        "description": "Response wrapper for city list (standardized envelope)"
       },
       "CityResponse": {
         "properties": {
@@ -3161,58 +3197,49 @@
           "responder_id": "323e4567-e89b-12d3-a456-426614174000"
         }
       },
-      "ErrorResponse": {
+      "DeleteSuccessResponse": {
         "properties": {
-          "code": {
-            "type": "string",
-            "title": "Code",
-            "description": "Error code"
+          "success": {
+            "type": "boolean",
+            "title": "Success",
+            "description": "Operation success status",
+            "default": true
           },
           "message": {
             "type": "string",
             "title": "Message",
-            "description": "Error message"
-          },
-          "details": {
-            "anyOf": [
-              {
-                "additionalProperties": true,
-                "type": "object"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Details",
-            "description": "Additional error details"
+            "description": "Success message"
           }
         },
         "type": "object",
         "required": [
-          "code",
           "message"
         ],
-        "title": "ErrorResponse",
-        "description": "Error response schema"
+        "title": "DeleteSuccessResponse",
+        "description": "Success response for delete operations"
       },
-      "ErrorWrapper": {
+      "DeleteSuccessResponseWrapper": {
         "properties": {
           "data": {
+            "$ref": "#/components/schemas/DeleteSuccessResponse"
+          },
+          "meta": {
             "type": "null",
-            "title": "Data"
+            "title": "Meta"
           },
           "error": {
-            "$ref": "#/components/schemas/ErrorResponse"
+            "type": "null",
+            "title": "Error"
           }
         },
         "type": "object",
         "required": [
-          "error"
+          "data"
         ],
-        "title": "ErrorWrapper",
-        "description": "Error wrapper response"
+        "title": "DeleteSuccessResponseWrapper",
+        "description": "Response wrapper for delete success (standardized envelope)"
       },
-      "ExpireSubscriptionsResponse": {
+      "ExpireSubscriptionsData": {
         "properties": {
           "expired_count": {
             "type": "integer",
@@ -3230,12 +3257,33 @@
           "expired_count",
           "processed_at"
         ],
-        "title": "ExpireSubscriptionsResponse",
-        "description": "Response schema for expire subscriptions job",
+        "title": "ExpireSubscriptionsData",
+        "description": "Data schema for expire subscriptions job",
         "example": {
           "expired_count": 5,
           "processed_at": "2025-12-23T00:00:00"
         }
+      },
+      "ExpireSubscriptionsResponse": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ExpireSubscriptionsData"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "ExpireSubscriptionsResponse",
+        "description": "Response wrapper for expire subscriptions (standardized envelope)"
       },
       "FriendListItemResponse": {
         "properties": {
@@ -3342,6 +3390,27 @@
           "total": 1
         }
       },
+      "FriendListResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/FriendListResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "FriendListResponseWrapper",
+        "description": "Response wrapper for friend list (standardized envelope)"
+      },
       "FriendshipResponse": {
         "properties": {
           "id": {
@@ -3396,6 +3465,27 @@
           "status": "accepted",
           "user_id": "987e6543-e21b-12d3-a456-426614174000"
         }
+      },
+      "FriendshipResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/FriendshipResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "FriendshipResponseWrapper",
+        "description": "Response wrapper for friendship (standardized envelope)"
       },
       "GoogleCallbackRequest": {
         "properties": {
@@ -3467,6 +3557,10 @@
           "data": {
             "$ref": "#/components/schemas/TokenResponse"
           },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
           "error": {
             "type": "null",
             "title": "Error"
@@ -3477,7 +3571,7 @@
           "data"
         ],
         "title": "LoginResponse",
-        "description": "Response wrapper for successful login"
+        "description": "Response wrapper for successful login (standardized envelope)"
       },
       "MessageResponse": {
         "properties": {
@@ -3541,6 +3635,27 @@
           "status": "sent"
         }
       },
+      "MessageResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/MessageResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "MessageResponseWrapper",
+        "description": "Response wrapper for single message (standardized envelope)"
+      },
       "MessagesListResponse": {
         "properties": {
           "messages": {
@@ -3584,6 +3699,27 @@
           ],
           "total": 1
         }
+      },
+      "MessagesListResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/MessagesListResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "MessagesListResponseWrapper",
+        "description": "Response wrapper for message list (standardized envelope)"
       },
       "NearbyCardResponse": {
         "properties": {
@@ -3747,6 +3883,27 @@
           "total": 1
         }
       },
+      "PostInterestListResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/PostInterestListResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "PostInterestListResponseWrapper",
+        "description": "Response wrapper for post interest list (standardized envelope)"
+      },
       "PostInterestResponse": {
         "properties": {
           "id": {
@@ -3810,6 +3967,27 @@
           "user_id": "456e7890-e12b-34d5-a678-901234567000"
         }
       },
+      "PostInterestResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/PostInterestResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "PostInterestResponseWrapper",
+        "description": "Response wrapper for single post interest (standardized envelope)"
+      },
       "PostListResponse": {
         "properties": {
           "posts": {
@@ -3851,6 +4029,27 @@
           ],
           "total": 1
         }
+      },
+      "PostListResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/PostListResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "PostListResponseWrapper",
+        "description": "Response wrapper for post list (standardized envelope)"
       },
       "PostResponse": {
         "properties": {
@@ -3962,22 +4161,26 @@
           "updated_at": "2024-01-01T00:00:00Z"
         }
       },
-      "ProfileErrorWrapper": {
+      "PostResponseWrapper": {
         "properties": {
           "data": {
+            "$ref": "#/components/schemas/PostResponse"
+          },
+          "meta": {
             "type": "null",
-            "title": "Data"
+            "title": "Meta"
           },
           "error": {
-            "$ref": "#/components/schemas/ErrorResponse"
+            "type": "null",
+            "title": "Error"
           }
         },
         "type": "object",
         "required": [
-          "error"
+          "data"
         ],
-        "title": "ProfileErrorWrapper",
-        "description": "Error wrapper for profile endpoints"
+        "title": "PostResponseWrapper",
+        "description": "Response wrapper for single post (standardized envelope)"
       },
       "ProfileResponse": {
         "properties": {
@@ -4118,6 +4321,10 @@
           "data": {
             "$ref": "#/components/schemas/ProfileResponse"
           },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
           "error": {
             "type": "null",
             "title": "Error"
@@ -4128,7 +4335,7 @@
           "data"
         ],
         "title": "ProfileResponseWrapper",
-        "description": "Response wrapper for profile data"
+        "description": "Response wrapper for profile data (standardized envelope)"
       },
       "QuotaStatusResponse": {
         "properties": {
@@ -4204,6 +4411,27 @@
           "uploads_today": 1
         }
       },
+      "QuotaStatusResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/QuotaStatusResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "QuotaStatusResponseWrapper",
+        "description": "Response wrapper for quota status (standardized envelope)"
+      },
       "RatingListResponse": {
         "properties": {
           "ratings": {
@@ -4241,6 +4469,27 @@
           ],
           "total": 1
         }
+      },
+      "RatingListResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/RatingListResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "RatingListResponseWrapper",
+        "description": "Response wrapper for rating list (standardized envelope)"
       },
       "RatingRequest": {
         "properties": {
@@ -4387,6 +4636,27 @@
           "trade_id": "987e6543-e21b-12d3-a456-426614174000"
         }
       },
+      "RatingResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/RatingResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "RatingResponseWrapper",
+        "description": "Response wrapper for single rating (standardized envelope)"
+      },
       "RefreshTokenRequest": {
         "properties": {
           "refresh_token": {
@@ -4426,6 +4696,27 @@
         ],
         "title": "ReportListResponse",
         "description": "Response schema for list of reports"
+      },
+      "ReportListResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ReportListResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "ReportListResponseWrapper",
+        "description": "Response wrapper for report list (standardized envelope)"
       },
       "ReportReason": {
         "type": "string",
@@ -4548,6 +4839,27 @@
         "title": "ReportResponse",
         "description": "Response schema for a report"
       },
+      "ReportResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ReportResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "ReportResponseWrapper",
+        "description": "Response wrapper for single report (standardized envelope)"
+      },
       "SearchNearbyRequest": {
         "properties": {
           "lat": {
@@ -4628,6 +4940,27 @@
           ]
         }
       },
+      "SearchNearbyResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/SearchNearbyResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "SearchNearbyResponseWrapper",
+        "description": "Response wrapper for nearby search (standardized envelope)"
+      },
       "SendFriendRequestRequest": {
         "properties": {
           "target_user_id": {
@@ -4673,7 +5006,7 @@
           "content": "Hello! I'm interested in trading cards."
         }
       },
-      "SubscriptionStatusResponse": {
+      "SubscriptionStatusData": {
         "properties": {
           "plan": {
             "type": "string",
@@ -4715,8 +5048,8 @@
           "entitlement_active",
           "source"
         ],
-        "title": "SubscriptionStatusResponse",
-        "description": "Response schema for subscription status",
+        "title": "SubscriptionStatusData",
+        "description": "Data schema for subscription status",
         "example": {
           "entitlement_active": true,
           "expires_at": "2025-12-31T23:59:59",
@@ -4724,6 +5057,27 @@
           "source": "google_play",
           "status": "active"
         }
+      },
+      "SubscriptionStatusResponse": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/SubscriptionStatusData"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "SubscriptionStatusResponse",
+        "description": "Response wrapper for subscription status (standardized envelope)"
       },
       "TokenResponse": {
         "properties": {
@@ -4834,6 +5188,27 @@
           "total": 5,
           "trades": []
         }
+      },
+      "TradeHistoryResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/TradeHistoryResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "TradeHistoryResponseWrapper",
+        "description": "Response wrapper for trade history (standardized envelope)"
       },
       "TradeItemResponse": {
         "properties": {
@@ -5037,6 +5412,27 @@
           "updated_at": "2025-01-01T00:00:00Z"
         }
       },
+      "TradeResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/TradeResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "TradeResponseWrapper",
+        "description": "Response wrapper for single trade (standardized envelope)"
+      },
       "UnblockUserRequest": {
         "properties": {
           "user_id": {
@@ -5083,6 +5479,48 @@
         ],
         "title": "UpdateLocationRequest",
         "description": "Request schema for updating user location"
+      },
+      "UpdateLocationResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/UpdateLocationSuccess"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "UpdateLocationResponseWrapper",
+        "description": "Response wrapper for location update (standardized envelope)"
+      },
+      "UpdateLocationSuccess": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success",
+            "description": "Operation success",
+            "default": true
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "description": "Success message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "title": "UpdateLocationSuccess",
+        "description": "Success response for location update"
       },
       "UpdateProfileRequest": {
         "properties": {
@@ -5348,6 +5786,27 @@
           },
           "upload_url": "https://storage.googleapis.com/bucket/path?signature=..."
         }
+      },
+      "UploadUrlResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/UploadUrlResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "UploadUrlResponseWrapper",
+        "description": "Response wrapper for upload URL (standardized envelope)"
       },
       "ValidationError": {
         "properties": {
