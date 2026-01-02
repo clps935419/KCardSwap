@@ -1,6 +1,6 @@
 """Complete Trade Use Case"""
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from uuid import UUID
 
 from app.modules.social.domain.entities.trade import Trade
@@ -60,18 +60,18 @@ class CompleteTradeUseCase:
         # Check for timeout (48h rule)
         if trade.status == Trade.STATUS_ACCEPTED and trade.accepted_at:
             timeout = timedelta(hours=self.confirmation_timeout_hours)
-            if datetime.utcnow() > trade.accepted_at + timeout:
+            if datetime.now(timezone.utc) > trade.accepted_at + timeout:
                 # Auto-cancel due to timeout
                 trade.status = Trade.STATUS_CANCELED
-                trade.canceled_at = datetime.utcnow()
-                trade.updated_at = datetime.utcnow()
+                trade.canceled_at = datetime.now(timezone.utc)
+                trade.updated_at = datetime.now(timezone.utc)
 
                 # Release cards
                 items = await self.trade_repository.get_items_by_trade_id(trade_id)
                 for item in items:
                     card = await self.card_repository.find_by_id(item.card_id)
                     if card and card.status == "trading":
-                        card.set_status("available")
+                        card.mark_as_available()
                         await self.card_repository.save(card)
 
                 await self.trade_repository.update(trade)
@@ -83,7 +83,7 @@ class CompleteTradeUseCase:
         # Validate user can confirm
         self.validation_service.validate_user_can_confirm(trade, user_id)
 
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
 
         # Mark confirmation for this user
         if trade.is_initiator(user_id):
@@ -108,7 +108,7 @@ class CompleteTradeUseCase:
             for item in items:
                 card = await self.card_repository.find_by_id(item.card_id)
                 if card:
-                    card.set_status("traded")
+                    card.mark_as_traded()
                     await self.card_repository.save(card)
 
         # Save and return
