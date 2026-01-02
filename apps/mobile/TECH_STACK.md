@@ -449,31 +449,49 @@ function ProfileScreen() {
 
 **已配置:** `app/_layout.tsx` - QueryClientProvider
 
-**使用範例:**
+**API Response Envelope Format (Phase 8.6+):**
+
+All backend APIs return standardized envelope format:
+
+```typescript
+{
+  data: T | T[] | null,     // Actual data
+  meta: { ... } | null,     // Pagination (list endpoints)
+  error: { ... } | null     // Error details
+}
+```
+
+**使用範例 (with Envelope):**
 
 ```typescript
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getMyCardsOptions } from '@/src/shared/api/sdk';
 
-// 查詢資料
+// 查詢資料 - 從 envelope 提取
 function MyCardsScreen() {
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['cards'],
-    queryFn: () => apiClient.get('/cards/me').then((res) => res.data),
+  const result = useQuery({
+    ...getMyCardsOptions(),
   });
 
-  if (isLoading) return <Loading />;
-  if (error) return <Error />;
+  // Extract data from envelope
+  const cards = result.data?.data || []; // CardListResponseWrapper.data is CardResponse[]
+  
+  if (result.isLoading) return <Loading />;
+  if (result.error) return <Error />;
 
-  return <CardList cards={data} />;
+  return <CardList cards={cards} />;
 }
 
-// 修改資料
+// 修改資料 - mutation 也返回 envelope
 function UploadCard() {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: (cardData) => apiClient.post('/cards/upload-url', cardData),
-    onSuccess: () => {
+    ...uploadCardMutation(),
+    onSuccess: (response) => {
+      // response 是 UploadResponseWrapper
+      const uploadData = response?.data;
+      
       // 重新請求卡片列表
       queryClient.invalidateQueries({ queryKey: ['cards'] });
     },
@@ -482,6 +500,8 @@ function UploadCard() {
   return <UploadButton onPress={() => mutation.mutate(cardData)} />;
 }
 ```
+
+詳見：`apps/mobile/OPENAPI_SDK_GUIDE.md` - API Response Envelope Format 章節
 
 ---
 
