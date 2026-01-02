@@ -112,7 +112,6 @@ import type {
   GetMyCardsApiV1CardsMeGetError,
   GetMyCardsApiV1CardsMeGetResponse,
   GetMyProfileApiV1ProfileMeGetData,
-  GetMyProfileApiV1ProfileMeGetError,
   GetMyProfileApiV1ProfileMeGetResponse,
   GetMyReportsApiV1ReportsGetData,
   GetMyReportsApiV1ReportsGetResponse,
@@ -132,7 +131,6 @@ import type {
   GetUserRatingsApiV1RatingsUserUserIdGetError,
   GetUserRatingsApiV1RatingsUserUserIdGetResponse,
   GoogleCallbackApiV1AuthGoogleCallbackPostData,
-  GoogleCallbackApiV1AuthGoogleCallbackPostError,
   GoogleCallbackApiV1AuthGoogleCallbackPostResponse,
   GoogleLoginApiV1AuthGoogleLoginPostData,
   GoogleLoginApiV1AuthGoogleLoginPostError,
@@ -360,12 +358,12 @@ export const googleCallbackApiV1AuthGoogleCallbackPostMutation = (
   options?: Partial<Options<GoogleCallbackApiV1AuthGoogleCallbackPostData>>
 ): UseMutationOptions<
   GoogleCallbackApiV1AuthGoogleCallbackPostResponse,
-  GoogleCallbackApiV1AuthGoogleCallbackPostError,
+  DefaultError,
   Options<GoogleCallbackApiV1AuthGoogleCallbackPostData>
 > => {
   const mutationOptions: UseMutationOptions<
     GoogleCallbackApiV1AuthGoogleCallbackPostResponse,
-    GoogleCallbackApiV1AuthGoogleCallbackPostError,
+    DefaultError,
     Options<GoogleCallbackApiV1AuthGoogleCallbackPostData>
   > = {
     mutationFn: async (fnOptions) => {
@@ -423,7 +421,7 @@ export const getMyProfileApiV1ProfileMeGetOptions = (
 ) =>
   queryOptions<
     GetMyProfileApiV1ProfileMeGetResponse,
-    GetMyProfileApiV1ProfileMeGetError,
+    DefaultError,
     GetMyProfileApiV1ProfileMeGetResponse,
     ReturnType<typeof getMyProfileApiV1ProfileMeGetQueryKey>
   >({
