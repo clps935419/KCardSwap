@@ -35,12 +35,18 @@ export const tradeKeys = {
  * M503: 實作交換歷史列表
  */
 export function useTradeHistory(limit: number = 50, offset: number = 0) {
-  return useQuery({
+  const result = useQuery({
     ...getTradeHistoryApiV1TradesHistoryGetOptions({
       query: { limit, offset },
     }),
     queryKey: tradeKeys.history(limit, offset),
   });
+
+  // Extract trade history from envelope format
+  return {
+    ...result,
+    data: result.data?.data as TradeHistoryResponse | undefined,
+  };
 }
 
 /**
@@ -69,11 +75,13 @@ export function useAcceptTrade() {
   return useMutation({
     mutationFn: async (tradeId: string) => {
       const result = await acceptTradeApiV1TradesTradeIdAcceptPostMutation();
-      return result.mutationFn({ path: { trade_id: tradeId } });
+      const response = await result.mutationFn({ path: { trade_id: tradeId } });
+      // Extract data from envelope format
+      return response?.data as TradeResponse;
     },
     onSuccess: (data) => {
       // 刷新交換詳情
-      if (data.id) {
+      if (data?.id) {
         queryClient.invalidateQueries({ queryKey: tradeKeys.detail(data.id) });
       }
       // 刷新交換列表
@@ -92,11 +100,13 @@ export function useRejectTrade() {
   return useMutation({
     mutationFn: async (tradeId: string) => {
       const result = await rejectTradeApiV1TradesTradeIdRejectPostMutation();
-      return result.mutationFn({ path: { trade_id: tradeId } });
+      const response = await result.mutationFn({ path: { trade_id: tradeId } });
+      // Extract data from envelope format
+      return response?.data as TradeResponse;
     },
     onSuccess: (data) => {
       // 刷新交換詳情
-      if (data.id) {
+      if (data?.id) {
         queryClient.invalidateQueries({ queryKey: tradeKeys.detail(data.id) });
       }
       // 刷新交換列表
@@ -115,11 +125,13 @@ export function useCancelTrade() {
   return useMutation({
     mutationFn: async (tradeId: string) => {
       const result = await cancelTradeApiV1TradesTradeIdCancelPostMutation();
-      return result.mutationFn({ path: { trade_id: tradeId } });
+      const response = await result.mutationFn({ path: { trade_id: tradeId } });
+      // Extract data from envelope format
+      return response?.data as TradeResponse;
     },
     onSuccess: (data) => {
       // 刷新交換詳情
-      if (data.id) {
+      if (data?.id) {
         queryClient.invalidateQueries({ queryKey: tradeKeys.detail(data.id) });
       }
       // 刷新交換列表
@@ -138,11 +150,13 @@ export function useCompleteTrade() {
   return useMutation({
     mutationFn: async (tradeId: string) => {
       const result = await completeTradeApiV1TradesTradeIdCompletePostMutation();
-      return result.mutationFn({ path: { trade_id: tradeId } });
+      const response = await result.mutationFn({ path: { trade_id: tradeId } });
+      // Extract data from envelope format
+      return response?.data as TradeResponse;
     },
     onSuccess: (data) => {
       // 刷新交換詳情
-      if (data.id) {
+      if (data?.id) {
         queryClient.invalidateQueries({ queryKey: tradeKeys.detail(data.id) });
       }
       // 刷新交換列表

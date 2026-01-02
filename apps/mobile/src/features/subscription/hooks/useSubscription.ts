@@ -28,7 +28,8 @@ export function useSubscriptionStatus() {
     queryKey: ['subscription', 'status'],
     queryFn: async () => {
       const response = await getSubscriptionStatusApiV1SubscriptionsStatusGet();
-      return response.data as SubscriptionInfo;
+      // Extract data from envelope format
+      return response.data?.data as SubscriptionInfo;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 2,
@@ -66,8 +67,9 @@ export function useVerifyReceipt() {
   
   const mutation = useMutation({
     ...verifyReceiptApiV1SubscriptionsVerifyReceiptPostMutation(),
-    onSuccess: (data) => {
-      // Update subscription status cache
+    onSuccess: (response) => {
+      // Extract data from envelope and update subscription status cache
+      const data = response?.data;
       queryClient.setQueryData(['subscription', 'status'], data);
     },
   });
@@ -79,7 +81,7 @@ export function useVerifyReceipt() {
     isSuccess: mutation.isSuccess,
     isError: mutation.isError,
     error: mutation.error,
-    data: mutation.data as SubscriptionInfo | undefined,
+    data: mutation.data?.data as SubscriptionInfo | undefined,
   };
 }
 
