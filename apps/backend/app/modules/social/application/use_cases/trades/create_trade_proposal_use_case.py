@@ -178,7 +178,7 @@ class CreateTradeProposalUseCase:
 
         # Mark cards as trading
         for card in initiator_cards + responder_cards:
-            card.set_status("trading")
+            card.mark_as_trading()
             await self.card_repository.save(card)
 
         # Save trade with items

@@ -59,7 +59,7 @@ class RejectTradeUseCase:
         for item in items:
             card = await self.card_repository.find_by_id(item.card_id)
             if card and card.status == "trading":
-                card.set_status("available")
+                card.mark_as_available()
                 await self.card_repository.save(card)
 
         # Update trade
