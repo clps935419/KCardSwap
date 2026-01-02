@@ -4,7 +4,7 @@ Unit tests for AdminLoginUseCase
 Tests the admin login use case with mocked dependencies.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from unittest.mock import AsyncMock, MagicMock
 from uuid import uuid4
 
@@ -63,8 +63,8 @@ class TestAdminLoginUseCase:
             email="admin@example.com",
             password_hash="$2b$12$hashedpassword",
             role="admin",
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow(),
+            created_at=datetime.now(timezone.utc),
+            updated_at=datetime.now(timezone.utc),
         )
 
     @pytest.mark.asyncio
@@ -129,8 +129,8 @@ class TestAdminLoginUseCase:
             email="oauth@example.com",
             password_hash=None,  # OAuth user
             role="admin",
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow(),
+            created_at=datetime.now(timezone.utc),
+            updated_at=datetime.now(timezone.utc),
         )
         mock_user_repo.get_by_email.return_value = oauth_user
 
@@ -168,8 +168,8 @@ class TestAdminLoginUseCase:
             email="user@example.com",
             password_hash="$2b$12$hashedpassword",
             role="user",  # Not admin
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow(),
+            created_at=datetime.now(timezone.utc),
+            updated_at=datetime.now(timezone.utc),
         )
         mock_user_repo.get_by_email.return_value = regular_user
         mock_password_service.verify_password.return_value = True

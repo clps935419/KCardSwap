@@ -32,13 +32,11 @@ class TestTradeValidationService:
         return Card(
             id=uuid4(),
             owner_id=uuid4(),
-            idol_name="IU",
+            idol="IU",
             idol_group="Solo",
-            card_name="Love Poem",
-            image_url="https://example.com/image.jpg",
+            album="Love Poem",
             status="available",
-            latitude=25.033,
-            longitude=121.564,
+            image_url="https://example.com/image.jpg",
             created_at=datetime.now(timezone.utc),
             updated_at=datetime.now(timezone.utc),
         )
@@ -82,13 +80,11 @@ class TestTradeValidationService:
             Card(
                 id=uuid4(),
                 owner_id=owner_id,
-                idol_name=f"Idol {i}",
+                idol=f"Idol {i}",
                 idol_group="Group",
-                card_name=f"Card {i}",
-                image_url=f"https://example.com/image{i}.jpg",
+                album=f"Album {i}",
                 status="available",
-                latitude=25.033,
-                longitude=121.564,
+                image_url=f"https://example.com/image{i}.jpg",
                 created_at=datetime.now(timezone.utc),
                 updated_at=datetime.now(timezone.utc),
             )

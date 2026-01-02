@@ -59,7 +59,6 @@ class TestRejectInterestUseCase:
             id=str(uuid4()),
             post_id=sample_post.id,
             user_id=str(uuid4()),
-            message="Interested!",
             status="pending",
             created_at=datetime.now(timezone.utc),
         )

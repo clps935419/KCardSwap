@@ -33,10 +33,10 @@ class TestGetProfileUseCase:
         """Create sample profile"""
         return Profile(
             user_id=uuid4(),
-            display_name="Test User",
+            nickname="Test User",
             avatar_url="https://example.com/avatar.jpg",
             bio="Test bio",
-            city_code="TPE",
+            region="TPE",
         )
 
     @pytest.mark.asyncio
@@ -54,7 +54,7 @@ class TestGetProfileUseCase:
         # Assert
         assert result is not None
         assert result.user_id == user_id
-        assert result.display_name == "Test User"
+        assert result.nickname == "Test User"
         mock_profile_repo.get_by_user_id.assert_called_once_with(user_id)
 
     @pytest.mark.asyncio
