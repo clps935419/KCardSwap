@@ -24,6 +24,9 @@ from app.modules.posts.application.use_cases.express_interest_use_case import (
 from app.modules.posts.application.use_cases.list_board_posts_use_case import (
     ListBoardPostsUseCase,
 )
+from app.modules.posts.application.use_cases.list_post_interests_use_case import (
+    ListPostInterestsUseCase,
+)
 from app.modules.posts.application.use_cases.reject_interest_use_case import (
     RejectInterestUseCase,
 )
@@ -33,12 +36,14 @@ from app.modules.posts.presentation.dependencies.use_case_deps import (
     get_create_post_use_case,
     get_express_interest_use_case,
     get_list_board_posts_use_case,
+    get_list_post_interests_use_case,
     get_reject_interest_use_case,
 )
 from app.modules.posts.presentation.schemas.post_schemas import (
     AcceptInterestResponse,
     CreatePostRequest,
     PostInterestResponse,
+    PostInterestListResponse,
     PostListResponse,
     PostResponse,
 )
@@ -412,4 +417,160 @@ async def close_post(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to close post",
+        )
+
+
+@router.get(
+    "/{post_id}/interests",
+    response_model=PostInterestListResponse,
+    responses={
+        200: {"description": "Interests retrieved successfully"},
+        401: {"description": "Unauthorized (not logged in)"},
+        403: {"description": "Forbidden (not post owner)"},
+        404: {"description": "Post not found"},
+        500: {"description": "Internal server error"},
+    },
+    summary="List interests for a post (owner only)",
+    description="List all interests for a specific post. Only post owner can view.",
+)
+async def list_post_interests(
+    post_id: UUID,
+    current_user_id: Annotated[UUID, Depends(get_current_user_id)],
+    session: Annotated[AsyncSession, Depends(get_db_session)],
+    use_case: Annotated[
+        ListPostInterestsUseCase, Depends(get_list_post_interests_use_case)
+    ],
+    status_filter: Annotated[
+        Optional[str], Query(alias="status", description="Filter by status")
+    ] = None,
+    limit: Annotated[int, Query(ge=1, le=100, description="Maximum results")] = 50,
+    offset: Annotated[int, Query(ge=0, description="Pagination offset")] = 0,
+) -> PostInterestListResponse:
+    """
+    List interests for a post.
+
+    Business rules:
+    - Only post owner can list interests
+    - Supports status filtering (pending, accepted, rejected)
+    - Supports pagination
+    """
+    try:
+        # Parse status filter if provided
+        from app.modules.posts.domain.entities.post_interest import PostInterestStatus
+
+        status_enum = None
+        if status_filter:
+            try:
+                status_enum = PostInterestStatus(status_filter)
+            except ValueError:
+                raise ValueError(
+                    f"Invalid status filter. Must be one of: {', '.join([s.value for s in PostInterestStatus])}"
+                )
+
+        # Execute use case
+        interests, total = await use_case.execute(
+            post_id=str(post_id),
+            current_user_id=str(current_user_id),
+            status=status_enum,
+            limit=limit,
+            offset=offset,
+        )
+
+        interest_responses = [
+            PostInterestResponse(
+                id=UUID(interest.id),
+                post_id=UUID(interest.post_id),
+                user_id=UUID(interest.user_id),
+                status=interest.status.value,
+                created_at=interest.created_at,
+                updated_at=interest.updated_at,
+            )
+            for interest in interests
+        ]
+
+        return PostInterestListResponse(interests=interest_responses, total=total)
+
+    except ValueError as e:
+        error_msg = str(e).lower()
+        if "not found" in error_msg:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+        elif "only post owner" in error_msg:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
+        logger.warning(f"List interests validation failed: {e}")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    except Exception as e:
+        logger.error(f"Error listing interests: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to list interests",
+        )
+
+
+@router.get(
+    "/{post_id}/interests/{interest_id}",
+    response_model=PostInterestResponse,
+    responses={
+        200: {"description": "Interest retrieved successfully"},
+        401: {"description": "Unauthorized (not logged in)"},
+        403: {"description": "Forbidden (not post owner)"},
+        404: {"description": "Post or interest not found"},
+        500: {"description": "Internal server error"},
+    },
+    summary="Get a specific interest (owner only)",
+    description="Get details of a specific interest. Only post owner can view.",
+)
+async def get_post_interest(
+    post_id: UUID,
+    interest_id: UUID,
+    current_user_id: Annotated[UUID, Depends(get_current_user_id)],
+    session: Annotated[AsyncSession, Depends(get_db_session)],
+    use_case: Annotated[
+        ListPostInterestsUseCase, Depends(get_list_post_interests_use_case)
+    ],
+) -> PostInterestResponse:
+    """
+    Get a specific interest.
+
+    Business rules:
+    - Only post owner can view interests
+    - Interest must belong to the specified post
+    """
+    try:
+        # First verify ownership by listing (which checks ownership)
+        # This is a simple approach - we could optimize with a dedicated use case
+        interests, _ = await use_case.execute(
+            post_id=str(post_id),
+            current_user_id=str(current_user_id),
+            status=None,
+            limit=100,  # Reasonable limit
+            offset=0,
+        )
+
+        # Find the specific interest
+        interest = next((i for i in interests if i.id == str(interest_id)), None)
+        if not interest:
+            raise ValueError("Interest not found")
+
+        return PostInterestResponse(
+            id=UUID(interest.id),
+            post_id=UUID(interest.post_id),
+            user_id=UUID(interest.user_id),
+            status=interest.status.value,
+            created_at=interest.created_at,
+            updated_at=interest.updated_at,
+        )
+
+    except ValueError as e:
+        error_msg = str(e).lower()
+        if "not found" in error_msg:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+        elif "only post owner" in error_msg:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
+        logger.warning(f"Get interest validation failed: {e}")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    except Exception as e:
+        logger.error(f"Error getting interest: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to get interest",
         )

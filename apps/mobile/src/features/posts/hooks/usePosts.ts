@@ -20,6 +20,8 @@ import {
   acceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPost,
   rejectInterestApiV1PostsPostIdInterestsInterestIdRejectPost,
   closePostApiV1PostsPostIdClosePost,
+  listPostInterestsApiV1PostsPostIdInterestsGet,
+  getPostInterestApiV1PostsPostIdInterestsInterestIdGet,
 } from '@/src/shared/api/sdk';
 import type {
   Post,
@@ -191,24 +193,57 @@ export function useClosePost() {
 /**
  * Hook: 取得貼文的興趣清單
  * M704: 作者端興趣清單與接受導流
+ * T1301-T1304: 實作後端 API endpoint 並整合到前端
  * 
- * Note: 這個功能需要後端新增對應的 API endpoint
- * GET /api/v1/posts/{id}/interests
+ * 功能：
+ * - 僅貼文作者可查看
+ * - 支援 status 篩選 (pending, accepted, rejected)
+ * - 支援分頁
  */
-export function usePostInterests(postId: string) {
+export function usePostInterests(
+  postId: string,
+  filters?: {
+    status?: 'pending' | 'accepted' | 'rejected';
+    limit?: number;
+    offset?: number;
+  }
+) {
   return useQuery({
     queryKey: postsKeys.interests(postId),
     queryFn: async () => {
-      // TODO: 等待後端實作 GET /api/v1/posts/{id}/interests endpoint
-      // const response = await fetchPostInterestsApiV1PostsPostIdInterestsGet({
-      //   path: { post_id: postId },
-      // });
-      // return response.data as PostInterest[];
-      
-      // 暫時返回空陣列
-      return [] as PostInterest[];
+      const response = await listPostInterestsApiV1PostsPostIdInterestsGet({
+        path: { post_id: postId },
+        query: {
+          status: filters?.status,
+          limit: filters?.limit || 50,
+          offset: filters?.offset || 0,
+        },
+      });
+      return response.data?.interests || [];
     },
     enabled: !!postId,
     staleTime: 1000 * 60, // 1 分鐘內不重新請求
+  });
+}
+
+/**
+ * Hook: 取得單一貼文興趣詳情
+ * T1301-T1304: 新增功能
+ * 
+ * 功能：
+ * - 僅貼文作者可查看
+ * - 取得特定興趣的詳細資訊
+ */
+export function usePostInterest(postId: string, interestId: string) {
+  return useQuery({
+    queryKey: [...postsKeys.interests(postId), interestId] as const,
+    queryFn: async () => {
+      const response = await getPostInterestApiV1PostsPostIdInterestsInterestIdGet({
+        path: { post_id: postId, interest_id: interestId },
+      });
+      return response.data as PostInterest;
+    },
+    enabled: !!postId && !!interestId,
+    staleTime: 1000 * 60 * 5, // 5 分鐘內不重新請求
   });
 }
