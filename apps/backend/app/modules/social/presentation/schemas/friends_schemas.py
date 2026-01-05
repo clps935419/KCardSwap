@@ -70,9 +70,9 @@ class FriendshipResponse(BaseModel):
     status: str = Field(
         ...,
         description="Friendship status",
-        examples=["pending", "accepted", "blocked"],
+        examples=["pending", "accepted", "blocked", "unblocked"],
     )
-    created_at: datetime = Field(..., description="Creation timestamp")
+    created_at: Optional[datetime] = Field(None, description="Creation timestamp (None for unblocked status)")
 
     class Config:
         from_attributes = True

@@ -73,7 +73,7 @@ class TestFriendshipFlowIntegration:
     def mock_auth_user1(self, test_user_ids):
         """Mock authentication for user1"""
         with patch(
-            "app.modules.social.presentation.routers.friend_router.get_current_user_id",
+            "app.modules.social.presentation.routers.friends_router.get_current_user_id",
             return_value=test_user_ids["user1"],
         ):
             yield test_user_ids["user1"]
@@ -82,7 +82,7 @@ class TestFriendshipFlowIntegration:
     def mock_auth_user2(self, test_user_ids):
         """Mock authentication for user2"""
         with patch(
-            "app.modules.social.presentation.routers.friend_router.get_current_user_id",
+            "app.modules.social.presentation.routers.friends_router.get_current_user_id",
             return_value=test_user_ids["user2"],
         ):
             yield test_user_ids["user2"]
@@ -91,7 +91,7 @@ class TestFriendshipFlowIntegration:
     def mock_db_session(self):
         """Mock database session"""
         with patch(
-            "app.modules.social.presentation.routers.friend_router.get_db_session"
+            "app.modules.social.presentation.routers.friends_router.get_db_session"
         ) as mock:
             session = Mock()
             mock.return_value = session
