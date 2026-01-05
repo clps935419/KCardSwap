@@ -95,8 +95,14 @@ export function useUploadCard() {
           },
         });
 
+        // Extract data from envelope format
+        const uploadData = uploadUrlResponse?.data;
+        if (!uploadData) {
+          throw new Error('上傳連結取得失敗');
+        }
+
         // 檢查 Signed URL 是否已過期
-        if (isSignedUrlExpired(uploadUrlResponse.expires_at)) {
+        if (isSignedUrlExpired(uploadData.expires_at)) {
           throw new Error('上傳連結已過期，請重試');
         }
 
@@ -109,9 +115,9 @@ export function useUploadCard() {
 
         await uploadWithRetry({
           uri: imageResult.uri,
-          uploadUrl: uploadUrlResponse.upload_url,
-          method: uploadUrlResponse.method,
-          headers: uploadUrlResponse.required_headers,
+          uploadUrl: uploadData.upload_url,
+          method: uploadData.method as 'PUT' | 'POST',
+          headers: uploadData.required_headers,
           onProgress: (progress) => {
             setUploadProgress({
               step: 'uploading',
@@ -131,7 +137,7 @@ export function useUploadCard() {
         try {
           await confirmUploadMutation.mutateAsync({
             path: {
-              card_id: uploadUrlResponse.card_id,
+              card_id: uploadData.card_id,
             },
           });
         } catch (error) {
@@ -152,8 +158,8 @@ export function useUploadCard() {
         try {
           const thumbnailUri = await generateThumbnail(imageResult.uri);
           await saveThumbnailToCache(
-            uploadUrlResponse.card_id,
-            uploadUrlResponse.image_url,
+            uploadData.card_id,
+            uploadData.image_url,
             thumbnailUri
           );
         } catch (error) {

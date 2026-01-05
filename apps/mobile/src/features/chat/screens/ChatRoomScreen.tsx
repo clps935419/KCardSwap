@@ -150,7 +150,7 @@ export default function ChatRoomScreen() {
 
           <Button
             onPress={handleSendMessage}
-            isDisabled={!messageText.trim() || isSending}
+            disabled={!messageText.trim() || isSending}
             size="md"
             variant="solid"
           >

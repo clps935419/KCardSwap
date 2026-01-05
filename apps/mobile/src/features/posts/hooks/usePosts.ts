@@ -61,7 +61,8 @@ export function useBoardPosts(params: {
           idol_group: params.idol_group,
         },
       });
-      return response.data as PostListResponse;
+      // Extract data from envelope format
+      return response.data?.data as PostListResponse;
     },
     enabled: !!params.city_code,
     staleTime: 1000 * 60 * 2, // 2 分鐘內不重新請求
@@ -80,7 +81,8 @@ export function useCreatePost() {
       const response = await createPostApiV1PostsPost({
         body: data,
       });
-      return response.data as Post;
+      // Extract data from envelope format
+      return response.data?.data as Post;
     },
     onSuccess: (newPost) => {
       // 使該城市的看板列表失效，強制重新載入
@@ -103,7 +105,8 @@ export function useExpressInterest() {
       const response = await expressInterestApiV1PostsPostIdInterestPost({
         path: { post_id: postId },
       });
-      return response.data as PostInterest;
+      // Extract data from envelope format
+      return response.data?.data as PostInterest;
     },
     onSuccess: (_, postId) => {
       // 使該貼文的興趣清單失效
@@ -126,7 +129,8 @@ export function useAcceptInterest() {
       const response = await acceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPost({
         path: { post_id: postId, interest_id: interestId },
       });
-      return response.data as AcceptInterestResponse;
+      // Extract data from envelope format
+      return response.data?.data as AcceptInterestResponse;
     },
     onSuccess: (_, { postId }) => {
       // 使該貼文的興趣清單失效
@@ -219,7 +223,8 @@ export function usePostInterests(
           offset: filters?.offset || 0,
         },
       });
-      return response.data?.interests || [];
+      // Extract data from envelope format
+      return response.data?.data?.interests || [];
     },
     enabled: !!postId,
     staleTime: 1000 * 60, // 1 分鐘內不重新請求
@@ -241,7 +246,8 @@ export function usePostInterest(postId: string, interestId: string) {
       const response = await getPostInterestApiV1PostsPostIdInterestsInterestIdGet({
         path: { post_id: postId, interest_id: interestId },
       });
-      return response.data as PostInterest;
+      // Extract data from envelope format
+      return response.data?.data as PostInterest;
     },
     enabled: !!postId && !!interestId,
     staleTime: 1000 * 60 * 5, // 5 分鐘內不重新請求

@@ -137,8 +137,8 @@ export default function FriendProfileScreen() {
             <Text className="font-semibold text-gray-700 mb-3">使用者評分</Text>
             {isLoadingRating ? (
               <ActivityIndicator size="small" />
-            ) : ratingData && ratingData.average_score > 0 ? (
-              renderRatingStars(ratingData.average_score, ratingData.total_ratings)
+            ) : ratingData?.data && ratingData.data.average_score > 0 ? (
+              renderRatingStars(ratingData.data.average_score, ratingData.data.total_ratings)
             ) : (
               <Text className="text-gray-500 text-sm">尚無評分</Text>
             )}
@@ -153,7 +153,7 @@ export default function FriendProfileScreen() {
             <Button
               onPress={handleBlockUser}
               variant="outline"
-              isDisabled={isBlocking}
+              disabled={isBlocking}
               className="border-red-500"
             >
               <ButtonText className="text-red-500">

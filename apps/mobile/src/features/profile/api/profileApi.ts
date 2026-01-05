@@ -21,9 +21,9 @@
  */
 
 import type {
-  GetMyProfileResponse,
+  ProfileResponse,
   UpdateMyProfileData,
-  UpdateMyProfileResponse,
+  ProfileResponseWrapper,
 } from '@/src/shared/api/sdk';
 
 // Re-export SDK TanStack Query options and mutations
@@ -34,12 +34,12 @@ export {
 } from '@/src/shared/api/sdk';
 
 // Re-export types for convenience
-export type { GetMyProfileResponse, UpdateMyProfileData, UpdateMyProfileResponse };
+export type { ProfileResponse, UpdateMyProfileData, ProfileResponseWrapper };
 
 /**
  * Profile data structure (extracted from response type)
  */
-export type Profile = NonNullable<GetMyProfileResponse['data']>;
+export type Profile = ProfileResponse;
 
 /**
  * Profile update request (all fields optional)
@@ -120,6 +120,7 @@ export function validateBio(bio: string): string | null {
  *   
  *   if (isLoading) return <Spinner />;
  *   
+ *   // Extract profile from envelope format
  *   const profile = data?.data;
  *   return <EditForm initialValues={profile} onSubmit={handleSubmit} />;
  * }

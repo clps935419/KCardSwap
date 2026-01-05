@@ -118,9 +118,12 @@ function ProfileScreen() {
   if (isLoading) return <Spinner />;
   if (error) return <Text>載入失敗</Text>;
 
+  // Phase 8.6+: 從 envelope 提取資料
+  const profile = data?.data; // data 是 ProfileResponseWrapper，data.data 是 ProfileResponse
+
   return (
     <Box>
-      <Text>{data?.data?.nickname}</Text>
+      <Text>{profile?.nickname}</Text>
       <Button onPress={handleUpdate}>
         <ButtonText>Update</ButtonText>
       </Button>
@@ -156,18 +159,137 @@ async function uploadToSignedUrl(url: string, file: Blob, headers: Record<string
     throw new Error(`Upload failed: ${response.status}`);
   }
 }
+```
+
+## API Response Envelope Format (Phase 8.6+)
+
+### Overview
+
+All backend APIs now return responses in a standardized **envelope format**:
+
+```typescript
+{
+  data: T | T[] | null,     // The actual data payload
+  meta: {                   // Pagination metadata (for list endpoints only)
+    total: number,
+    page: number,
+    page_size: number,
+    total_pages: number
+  } | null,
+  error: {                  // Error details (when request fails)
+    code: string,
+    message: string,
+    details: object
+  } | null
+}
+```
+
+### Generated Wrapper Types
+
+The SDK automatically generates `*ResponseWrapper` types for all endpoints:
+
+- `ProfileResponseWrapper` - wraps `ProfileResponse`
+- `CardListResponseWrapper` - wraps `CardResponse[]`
+- `TradeHistoryResponseWrapper` - wraps `TradeHistoryResponse`
+- etc.
+
+### Extracting Data from Envelopes
+
+#### In Query Hooks
+
+```typescript
+// Example: Profile query
+const result = useQuery({
+  ...getMyProfileOptions(),
+});
+
+// Extract the actual profile from envelope
+const profile = result.data?.data; // Type: ProfileResponse | undefined
+
+// In a transformed hook
+export function useMyProfile() {
+  const result = useQuery(getMyProfileOptions());
+  
+  return {
+    ...result,
+    data: result.data?.data, // Extract ProfileResponse from ProfileResponseWrapper
+  };
+}
+```
+
+#### In Mutation Hooks
+
+```typescript
+// Example: Trade mutation
+export function useAcceptTrade() {
+  return useMutation({
+    mutationFn: async (tradeId: string) => {
+      const response = await acceptTradeMutation().mutationFn({ 
+        path: { trade_id: tradeId } 
+      });
+      
+      // Extract data from envelope
+      return response?.data as TradeResponse;
+    },
+  });
+}
+```
+
+#### With List Endpoints
+
+```typescript
+// List endpoints return array directly in data
+const result = useQuery(getMyCardsOptions());
+
+// CardListResponseWrapper.data is already CardResponse[]
+const cards = result.data?.data || [];
+
+// Pagination metadata is in meta (if backend provides it)
+const totalCards = result.data?.meta?.total;
+```
+
+### Error Handling with Envelopes
+
+Success responses have `data` populated and `error = null`:
+```typescript
+{
+  data: { /* actual data */ },
+  meta: null,
+  error: null
+}
+```
+
+Error responses have `error` populated and `data = null`:
+```typescript
+{
+  data: null,
+  meta: null,
+  error: {
+    code: "VALIDATION_ERROR",
+    message: "Invalid input",
+    details: { field: "nickname" }
+  }
+}
+```
+
+TanStack Query handles HTTP errors automatically. For envelope-level errors, check `response.data.error` if needed.
 
 ### 4. Using TypeScript Types
 
 ```typescript
-import type { GetMyProfileResponse, UpdateMyProfileData } from '@/src/shared/api/sdk';
+import type { 
+  ProfileResponseWrapper, 
+  ProfileResponse, 
+  UpdateMyProfileData 
+} from '@/src/shared/api/sdk';
 
-// Type-safe function parameters
-function displayProfile(profile: GetMyProfileResponse['data']) {
+// Working with envelope wrapper
+function handleProfileResponse(wrapper: ProfileResponseWrapper) {
+  const profile = wrapper.data; // Type: ProfileResponse
   console.log(profile?.nickname);
 }
 
-// Type-safe request payload (as Options<UpdateMyProfileData> variables)
+// Type-safe request payload
 const updatePayload: UpdateMyProfileData = {
   body: {
     nickname: 'John',

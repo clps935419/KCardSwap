@@ -198,7 +198,7 @@ export default function TradeDetailScreen() {
               <Button
                 onPress={handleAccept}
                 className="bg-green-600"
-                isDisabled={acceptTrade.isPending}
+                disabled={acceptTrade.isPending}
               >
                 <ButtonText>接受提案</ButtonText>
               </Button>
@@ -208,7 +208,7 @@ export default function TradeDetailScreen() {
               <Button
                 onPress={handleReject}
                 className="bg-red-600"
-                isDisabled={rejectTrade.isPending}
+                disabled={rejectTrade.isPending}
               >
                 <ButtonText>拒絕提案</ButtonText>
               </Button>
@@ -218,7 +218,7 @@ export default function TradeDetailScreen() {
               <Button
                 onPress={handleComplete}
                 className="bg-blue-600"
-                isDisabled={completeTrade.isPending}
+                disabled={completeTrade.isPending}
               >
                 <ButtonText>
                   {uiState.otherConfirmed ? '確認完成交換' : '我已完成交換'}
@@ -230,7 +230,7 @@ export default function TradeDetailScreen() {
               <Button
                 onPress={handleCancel}
                 variant="outline"
-                isDisabled={cancelTrade.isPending}
+                disabled={cancelTrade.isPending}
               >
                 <ButtonText>取消交換</ButtonText>
               </Button>

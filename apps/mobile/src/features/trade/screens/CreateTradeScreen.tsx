@@ -133,7 +133,7 @@ export default function CreateTradeScreen() {
             <Button
               onPress={handleCreateTrade}
               className="bg-blue-600"
-              isDisabled={createTrade.isPending}
+              disabled={createTrade.isPending}
             >
               {createTrade.isPending ? (
                 <Spinner color="white" />

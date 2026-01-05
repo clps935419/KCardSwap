@@ -249,7 +249,7 @@ export function CreatePostScreen() {
           action="primary"
           className="w-full"
           onPress={handleSubmit}
-          isDisabled={!isFormValid || createPostMutation.isPending}
+          disabled={!isFormValid || createPostMutation.isPending}
         >
           {createPostMutation.isPending ? (
             <Spinner color="white" />
@@ -265,7 +265,7 @@ export function CreatePostScreen() {
           action="secondary"
           className="w-full mt-3"
           onPress={() => router.back()}
-          isDisabled={createPostMutation.isPending}
+          disabled={createPostMutation.isPending}
         >
           <ButtonText>取消</ButtonText>
         </Button>

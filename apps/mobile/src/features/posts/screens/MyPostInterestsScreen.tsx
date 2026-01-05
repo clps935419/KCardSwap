@@ -159,7 +159,7 @@ export function MyPostInterestsScreen() {
               action="positive"
               className="flex-1"
               onPress={() => handleAccept(interest)}
-              isDisabled={acceptMutation.isPending || rejectMutation.isPending}
+              disabled={acceptMutation.isPending || rejectMutation.isPending}
             >
               {acceptMutation.isPending && acceptMutation.variables?.interestId === interest.id ? (
                 <Spinner size="small" color="white" />
@@ -174,7 +174,7 @@ export function MyPostInterestsScreen() {
               action="negative"
               className="flex-1"
               onPress={() => handleReject(interest)}
-              isDisabled={acceptMutation.isPending || rejectMutation.isPending}
+              disabled={acceptMutation.isPending || rejectMutation.isPending}
             >
               {rejectMutation.isPending && rejectMutation.variables?.interestId === interest.id ? (
                 <Spinner size="small" />

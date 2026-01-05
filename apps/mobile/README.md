@@ -172,6 +172,49 @@ Signed URL 上傳的目標通常不是後端網域，因此：
 3. 以 snapshot 作為 input 產生 SDK（生成輸出可 commit，但視為 dependency：禁止手改；修改 OpenAPI 後必須 regenerate）
 4. 驗證：`npm run type-check`、相關單元測試（如有）
 
+### API Response Envelope Format (Phase 8.6+)
+
+自 Phase 8.6 起，所有後端 API 回應統一使用 envelope 格式：
+
+```typescript
+{
+  data: T | T[] | null,     // 實際資料
+  meta: {                   // 分頁資訊（僅列表端點）
+    total: number,
+    page: number,
+    page_size: number,
+    total_pages: number
+  } | null,
+  error: {                  // 錯誤資訊
+    code: string,
+    message: string,
+    details: object
+  } | null
+}
+```
+
+**使用方式：**
+
+SDK 生成的型別已包含 `*ResponseWrapper`，例如 `ProfileResponseWrapper`, `CardListResponseWrapper` 等。
+
+在 hooks 中提取資料：
+
+```typescript
+// Query
+const result = useQuery({
+  ...getMyProfileOptions(),
+});
+// 提取: result.data?.data 為 ProfileResponse
+
+// Mutation
+mutationFn: async (id) => {
+  const response = await mutationFn({ path: { id } });
+  return response?.data as Type;
+}
+```
+
+所有 feature hooks 已更新以正確處理 envelope 格式。詳見各 feature 的 hooks 檔案。
+
 
 ### Running the App
 
