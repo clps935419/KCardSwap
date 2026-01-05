@@ -10,7 +10,6 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
-from app.modules.identity.presentation.dependencies.auth_deps import get_current_user_id
 from app.modules.social.application.use_cases.cards.check_quota import (
     CheckUploadQuotaUseCase,
 )
@@ -51,6 +50,7 @@ from app.shared.infrastructure.database.connection import get_db_session
 from app.shared.infrastructure.external.storage_service_factory import (
     get_storage_service,
 )
+from app.shared.presentation.dependencies.auth import get_current_user_id
 
 # Create router
 router = APIRouter(prefix="/cards", tags=["Cards"])

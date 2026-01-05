@@ -3,12 +3,13 @@
 import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Optional
+from uuid import UUID
 
-from app.modules.identity.domain.repositories.i_subscription_repository import (
-    ISubscriptionRepository,
-)
 from app.modules.posts.domain.entities.post import Post, PostStatus
 from app.modules.posts.domain.repositories.i_post_repository import IPostRepository
+from app.shared.domain.contracts.i_subscription_query_service import (
+    ISubscriptionQueryService,
+)
 
 
 class CreatePostUseCase:
@@ -30,7 +31,7 @@ class CreatePostUseCase:
     def __init__(
         self,
         post_repository: IPostRepository,
-        subscription_repository: ISubscriptionRepository,
+        subscription_repository: ISubscriptionQueryService,
     ):
         self.post_repository = post_repository
         self.subscription_repository = subscription_repository
@@ -72,8 +73,16 @@ class CreatePostUseCase:
             raise ValueError("Content is required")
 
         # Check daily post limit for free users
-        subscription = await self.subscription_repository.get_by_user_id(owner_id)
-        is_premium = subscription and subscription.is_premium()
+        # Convert owner_id string to UUID for the service call
+        user_uuid = UUID(owner_id) if isinstance(owner_id, str) else owner_id
+        subscription_info = await self.subscription_repository.get_subscription_info(
+            user_uuid
+        )
+        is_premium = (
+            subscription_info
+            and subscription_info.is_active
+            and subscription_info.plan_type == "premium"
+        )
 
         if not is_premium:
             posts_today = await self.post_repository.count_user_posts_today(owner_id)

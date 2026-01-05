@@ -10,7 +10,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.identity.presentation.dependencies.auth_deps import get_current_user_id
+from app.shared.presentation.dependencies.auth import get_current_user_id
 from app.modules.posts.application.use_cases.accept_interest_use_case import (
     AcceptInterestUseCase,
 )

@@ -9,13 +9,6 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.identity.domain.repositories.i_profile_repository import (
-    IProfileRepository,
-)
-from app.modules.identity.infrastructure.repositories.profile_repository_impl import (
-    ProfileRepositoryImpl,
-)
-from app.modules.identity.presentation.dependencies.auth_deps import get_current_user_id
 from app.modules.social.application.dtos.nearby_dtos import (
     SearchNearbyRequest as SearchRequestDTO,
 )
@@ -40,7 +33,9 @@ from app.modules.social.presentation.schemas.nearby_schemas import (
     UpdateLocationResponseWrapper,
     UpdateLocationSuccess,
 )
+from app.shared.domain.contracts.i_profile_query_service import IProfileQueryService
 from app.shared.infrastructure.database.connection import get_db_session
+from app.shared.presentation.dependencies.auth import get_current_user_id
 
 # Create router
 router = APIRouter(prefix="/nearby", tags=["Nearby Search"])
@@ -53,11 +48,20 @@ async def get_card_repository(
     return CardRepositoryImpl(session)
 
 
-async def get_profile_repository(
+async def get_profile_service(
     session: Annotated[AsyncSession, Depends(get_db_session)],
-) -> IProfileRepository:
-    """Dependency: Get profile repository"""
-    return ProfileRepositoryImpl(session)
+) -> IProfileQueryService:
+    """Dependency: Get profile query service"""
+    # Import here to avoid circular dependency
+    from app.modules.identity.application.services.profile_query_service_impl import (
+        ProfileQueryServiceImpl,
+    )
+    from app.modules.identity.infrastructure.repositories.profile_repository_impl import (
+        ProfileRepositoryImpl,
+    )
+
+    profile_repo = ProfileRepositoryImpl(session)
+    return ProfileQueryServiceImpl(profile_repository=profile_repo)
 
 
 async def get_search_quota_service(
@@ -168,7 +172,7 @@ async def search_nearby_cards(
 async def update_user_location(
     request: UpdateLocationRequest,
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
-    profile_repository: Annotated[IProfileRepository, Depends(get_profile_repository)],
+    profile_service: Annotated[IProfileQueryService, Depends(get_profile_service)],
 ) -> UpdateLocationResponseWrapper:
     """
     Update the user's current location.
@@ -178,7 +182,7 @@ async def update_user_location(
     """
     try:
         # Create use case
-        use_case = UpdateUserLocationUseCase(profile_repository=profile_repository)
+        use_case = UpdateUserLocationUseCase(profile_service=profile_service)
 
         # Execute update
         await use_case.execute(

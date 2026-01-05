@@ -11,7 +11,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
-from app.modules.identity.presentation.dependencies.auth_deps import get_current_user_id
+from app.shared.presentation.dependencies.auth import get_current_user_id
 from app.modules.social.application.use_cases.trades.accept_trade_use_case import (
     AcceptTradeUseCase,
 )

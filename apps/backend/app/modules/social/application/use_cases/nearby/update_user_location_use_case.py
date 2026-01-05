@@ -4,9 +4,7 @@ Use case for updating user's location.
 
 from uuid import UUID
 
-from app.modules.identity.domain.repositories.i_profile_repository import (
-    IProfileRepository,
-)
+from app.shared.domain.contracts.i_profile_query_service import IProfileQueryService
 
 
 class UpdateUserLocationUseCase:
@@ -16,14 +14,14 @@ class UpdateUserLocationUseCase:
     This records the user's location in their profile for nearby search functionality.
     """
 
-    def __init__(self, profile_repository: IProfileRepository):
+    def __init__(self, profile_service: IProfileQueryService):
         """
         Initialize the use case.
 
         Args:
-            profile_repository: Profile repository for data access
+            profile_service: Profile query service for data access
         """
-        self.profile_repository = profile_repository
+        self.profile_service = profile_service
 
     async def execute(self, user_id: UUID, lat: float, lng: float) -> None:
         """
@@ -36,7 +34,7 @@ class UpdateUserLocationUseCase:
 
         Raises:
             ValueError: If coordinates are invalid
-            Exception: If profile not found
+            Exception: If profile not found or update fails
         """
         # Validate coordinates
         if not -90 <= lat <= 90:
@@ -44,13 +42,7 @@ class UpdateUserLocationUseCase:
         if not -180 <= lng <= 180:
             raise ValueError("Longitude must be between -180 and 180")
 
-        # Get user's profile
-        profile = await self.profile_repository.get_by_user_id(user_id)
-        if not profile:
-            raise Exception(f"Profile not found for user {user_id}")
-
-        # Update location
-        profile.update_location(lat, lng)
-
-        # Save profile
-        await self.profile_repository.save(profile)
+        # Update location using the service
+        success = await self.profile_service.update_user_location(user_id, lat, lng)
+        if not success:
+            raise Exception(f"Failed to update location for user {user_id}")
