@@ -238,7 +238,7 @@ class TestFriendshipRepositoryImpl:
         blocker_id = str(uuid4())
 
         mock_result = MagicMock()
-        mock_result.scalar.return_value = 1  # Found a blocking record
+        mock_result.scalar_one_or_none.return_value = MagicMock()  # Found a blocking record
         mock_session.execute = AsyncMock(return_value=mock_result)
 
         # Act
@@ -255,7 +255,7 @@ class TestFriendshipRepositoryImpl:
         blocker_id = str(uuid4())
 
         mock_result = MagicMock()
-        mock_result.scalar.return_value = 0  # No blocking record
+        mock_result.scalar_one_or_none.return_value = None  # No blocking record
         mock_session.execute = AsyncMock(return_value=mock_result)
 
         # Act
@@ -272,7 +272,7 @@ class TestFriendshipRepositoryImpl:
         friend_id = str(uuid4())
 
         mock_result = MagicMock()
-        mock_result.scalar.return_value = 1  # Found an accepted friendship
+        mock_result.scalar_one_or_none.return_value = MagicMock()  # Found an accepted friendship
         mock_session.execute = AsyncMock(return_value=mock_result)
 
         # Act
@@ -289,7 +289,7 @@ class TestFriendshipRepositoryImpl:
         friend_id = str(uuid4())
 
         mock_result = MagicMock()
-        mock_result.scalar.return_value = 0  # No accepted friendship
+        mock_result.scalar_one_or_none.return_value = None  # No accepted friendship
         mock_session.execute = AsyncMock(return_value=mock_result)
 
         # Act

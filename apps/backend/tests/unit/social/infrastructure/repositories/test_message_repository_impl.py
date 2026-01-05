@@ -205,7 +205,7 @@ class TestMessageRepositoryImpl:
         expected_count = 5
 
         mock_result = MagicMock()
-        mock_result.scalar.return_value = expected_count
+        mock_result.scalar_one.return_value = expected_count
         mock_session.execute = AsyncMock(return_value=mock_result)
 
         # Act
@@ -222,8 +222,10 @@ class TestMessageRepositoryImpl:
         user_id = str(uuid4())
         expected_count = 3
 
+        # Mock the select query to return messages
+        mock_messages = [MagicMock() for _ in range(expected_count)]
         mock_result = MagicMock()
-        mock_result.rowcount = expected_count
+        mock_result.scalars.return_value.all.return_value = mock_messages
         mock_session.execute = AsyncMock(return_value=mock_result)
         mock_session.flush = AsyncMock()
 

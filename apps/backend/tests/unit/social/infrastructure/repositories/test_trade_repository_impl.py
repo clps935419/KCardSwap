@@ -71,7 +71,7 @@ class TestTradeRepositoryImpl:
             id=sample_trade.id,
             initiator_id=sample_trade.initiator_id,
             responder_id=sample_trade.responder_id,
-            status=sample_trade.status.value,
+            status=sample_trade.status,  # status is already a string
             created_at=sample_trade.created_at,
             updated_at=sample_trade.updated_at,
         )
@@ -203,7 +203,7 @@ class TestTradeRepositoryImpl:
         expected_count = 3
 
         mock_result = MagicMock()
-        mock_result.scalar.return_value = expected_count
+        mock_result.scalar_one.return_value = expected_count
         mock_session.execute = AsyncMock(return_value=mock_result)
 
         # Act

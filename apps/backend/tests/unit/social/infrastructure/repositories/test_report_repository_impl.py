@@ -231,7 +231,7 @@ class TestReportRepositoryImpl:
         expected_count = 1
 
         mock_result = MagicMock()
-        mock_result.scalar.return_value = expected_count
+        mock_result.scalar_one.return_value = expected_count
         mock_session.execute = AsyncMock(return_value=mock_result)
 
         # Act

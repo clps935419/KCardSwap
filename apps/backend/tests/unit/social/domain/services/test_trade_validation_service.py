@@ -103,11 +103,23 @@ class TestTradeValidationService:
         # Should not raise exception
         service.validate_card_availability([sample_card])
 
-    def test_validate_card_availability_failure(self, service, sample_card):
+    def test_validate_card_availability_failure(self, service):
         """Test card availability validation fails for unavailable card"""
-        sample_card.status = "traded"
+        # Create a new card with traded status
+        traded_card = Card(
+            id=uuid4(),
+            owner_id=uuid4(),
+            idol="Test Idol",
+            idol_group="Test Group",
+            album="Test Album",
+            image_url="https://example.com/test.jpg",
+            status="traded",
+            upload_status="confirmed",
+            created_at=datetime.utcnow(),
+            updated_at=datetime.utcnow(),
+        )
         with pytest.raises(ValueError, match="is not available for trading"):
-            service.validate_card_availability([sample_card])
+            service.validate_card_availability([traded_card])
 
     def test_validate_status_transition_valid(self, service):
         """Test valid status transitions"""
@@ -194,18 +206,16 @@ class TestTradeValidationService:
             service.validate_trade_items(items, uuid4(), uuid4())
 
     def test_validate_trade_items_invalid_owner_side(self, service):
-        """Test validation fails for invalid owner_side"""
-        items = [
+        """Test validation fails for invalid owner_side during entity creation"""
+        # The domain entity itself validates owner_side in __post_init__
+        # This test verifies that invalid owner_side is caught at entity creation
+        with pytest.raises(ValueError, match="Invalid owner_side"):
             TradeItem(
                 id=str(uuid4()),
                 trade_id=str(uuid4()),
                 card_id=uuid4(),
                 owner_side="invalid_side",
-            ),
-        ]
-
-        with pytest.raises(ValueError, match="Invalid owner_side"):
-            service.validate_trade_items(items, uuid4(), uuid4())
+            )
 
     def test_validate_user_can_accept_success(self, service, sample_trade):
         """Test successful validation for accepting trade"""

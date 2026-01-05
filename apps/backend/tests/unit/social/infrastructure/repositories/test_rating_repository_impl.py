@@ -224,7 +224,7 @@ class TestRatingRepositoryImpl:
         trade_id = str(uuid4())
 
         mock_result = MagicMock()
-        mock_result.scalar.return_value = 1
+        mock_result.scalar_one_or_none.return_value = MagicMock()  # Found a rating
         mock_session.execute = AsyncMock(return_value=mock_result)
 
         # Act
@@ -241,7 +241,7 @@ class TestRatingRepositoryImpl:
         trade_id = str(uuid4())
 
         mock_result = MagicMock()
-        mock_result.scalar.return_value = 0
+        mock_result.scalar_one_or_none.return_value = None  # No rating
         mock_session.execute = AsyncMock(return_value=mock_result)
 
         # Act
