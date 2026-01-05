@@ -62,20 +62,23 @@ KCardSwap/
 │   └── backend/          # FastAPI backend application
 │       ├── app/
 │       │   ├── main.py   # Application entry point
-│       │   ├── routers/  # API route handlers
-│       │   ├── services/ # Business logic
-│       │   └── domain/   # Domain entities (DDD)
+│       │   ├── config.py # Settings / env config
+│       │   ├── injector.py # IoC container setup
+│       │   ├── modules/  # Feature modules (e.g. identity, social, posts)
+│       │   └── shared/   # Shared infrastructure / cross-cutting concerns
 │       ├── alembic/      # Database migrations
 │       ├── tests/        # Test files
 │       ├── pyproject.toml # Poetry dependencies
 │       ├── poetry.lock   # Locked dependencies
 │       └── Dockerfile    # Multi-stage build
+│   └── mobile/           # Expo (React Native) mobile app
 ├── gateway/
 │   └── kong/             # Kong API Gateway configuration
 │       └── kong.yaml     # Declarative config
 ├── infra/
 │   └── db/               # Database scripts
 │       └── init.sql      # Database-level setup only
+├── openapi/               # OpenAPI snapshot (used for SDK generation)
 ├── specs/                # Feature specifications
 ├── .github/
 │   └── workflows/        # CI/CD workflows
@@ -86,6 +89,8 @@ KCardSwap/
 ```
 
 ## 🛠️ Development
+
+Backend routes are registered in `apps/backend/app/main.py`; individual routers live under each module’s `presentation/routers/`.
 
 ### Available Commands
 
@@ -108,14 +113,22 @@ make logs-backend
 
 # Run tests
 cd apps/backend
-pytest -v
+poetry run pytest -v
 
 # Run linter
 cd apps/backend
-flake8 .
+poetry run ruff check .
 
 # Access backend shell
 make shell-backend
+```
+
+### Mobile Development
+
+```bash
+cd apps/mobile
+npm install --legacy-peer-deps
+npm start
 ```
 
 ### Database
@@ -133,7 +146,7 @@ make init-db
 Run all tests:
 ```bash
 cd apps/backend
-pytest -v --cov=app
+poetry run pytest -v --cov=app
 ```
 
 Run specific test file:
@@ -211,8 +224,8 @@ See [specs/001-kcardswap-complete-spec/tasks.md](specs/001-kcardswap-complete-sp
 4. Submit a pull request
 
 CI will automatically run:
-- Code linting (flake8, black, isort)
-- Unit tests
+- Python linting (ruff)
+- Unit tests (pytest)
 - Build verification
 - PR validation checks
 
@@ -223,6 +236,8 @@ CI will automatically run:
 - [Tasks](specs/001-kcardswap-complete-spec/tasks.md) - Implementation roadmap
 - [Secrets Management](SECRETS.md) - Security and secrets guide
 - [Backend README](apps/backend/README.md) - Backend-specific documentation
+- [Mobile README](apps/mobile/README.md) - Mobile app documentation
+- [OpenAPI Snapshot Guide](openapi/README.md) - How to generate/update OpenAPI snapshot
 
 ## 🐛 Troubleshooting
 
