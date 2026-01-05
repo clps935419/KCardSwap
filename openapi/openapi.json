@@ -3438,14 +3438,22 @@
             "examples": [
               "pending",
               "accepted",
-              "blocked"
+              "blocked",
+              "unblocked"
             ]
           },
           "created_at": {
-            "type": "string",
-            "format": "date-time",
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Created At",
-            "description": "Creation timestamp"
+            "description": "Creation timestamp (None for unblocked status)"
           }
         },
         "type": "object",
@@ -3453,8 +3461,7 @@
           "id",
           "user_id",
           "friend_id",
-          "status",
-          "created_at"
+          "status"
         ],
         "title": "FriendshipResponse",
         "description": "Response schema for friendship details",
