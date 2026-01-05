@@ -94,12 +94,14 @@ class TestChatRouterIntegration:
 
             # Assert
             assert response.status_code == status.HTTP_200_OK
-            data = response.json()
-            assert isinstance(data, list)
-            assert len(data) == 2
+            response_data = response.json()
+            assert "data" in response_data
+            data = response_data["data"]
+            assert "rooms" in data
+            assert len(data["rooms"]) == 2
 
             # Verify each room has correct structure
-            for room_data in data:
+            for room_data in data["rooms"]:
                 assert "id" in room_data
                 assert "participants" in room_data
                 assert "created_at" in room_data
@@ -128,9 +130,11 @@ class TestChatRouterIntegration:
 
             # Assert
             assert response.status_code == status.HTTP_200_OK
-            data = response.json()
-            assert isinstance(data, list)
-            assert len(data) == 0
+            response_data = response.json()
+            assert "data" in response_data
+            data = response_data["data"]
+            assert "rooms" in data
+            assert len(data["rooms"]) == 0
 
     @pytest.mark.asyncio
     async def test_get_chat_rooms_participant_ids_iteration(
@@ -159,11 +163,14 @@ class TestChatRouterIntegration:
 
             # Assert
             assert response.status_code == status.HTTP_200_OK
-            data = response.json()
-            assert len(data) == 1
+            response_data = response.json()
+            assert "data" in response_data
+            data = response_data["data"]
+            assert "rooms" in data
+            assert len(data["rooms"]) == 1
 
             # Verify participants are extracted from participant_ids
-            room_data = data[0]
+            room_data = data["rooms"][0]
             participant_ids = [p["user_id"] for p in room_data["participants"]]
             assert user_a in participant_ids
             assert user_b in participant_ids
@@ -250,7 +257,9 @@ class TestChatRouterIntegration:
 
             # Assert
             assert response.status_code == status.HTTP_200_OK
-            data = response.json()
+            response_data = response.json()
+            assert "data" in response_data
+            data = response_data["data"]
             assert "messages" in data
             assert len(data["messages"]) == 1
             assert data["messages"][0]["content"] == "Hello!"
@@ -296,7 +305,9 @@ class TestChatRouterIntegration:
 
             # Assert
             assert response.status_code == status.HTTP_201_CREATED
-            data = response.json()
+            response_data = response.json()
+            assert "data" in response_data
+            data = response_data["data"]
             assert data["content"] == message_content
             assert data["room_id"] == room.id
             mock_create_message.assert_called_once()
