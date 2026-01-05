@@ -47,10 +47,22 @@ class TestCreatePostUseCase:
         title = "Looking for IU photocard"
         content = "Want to exchange IU photocard"
 
-        # Mock premium subscription
-        mock_subscription = AsyncMock()
-        mock_subscription.is_premium.return_value = True
-        mock_subscription_repository.get_by_user_id.return_value = mock_subscription
+        # Mock premium subscription info from the service
+        from app.shared.domain.contracts.i_subscription_query_service import (
+            SubscriptionInfo,
+        )
+        from uuid import UUID
+        from datetime import datetime
+
+        mock_subscription_info = SubscriptionInfo(
+            user_id=UUID(owner_id),
+            is_active=True,
+            expires_at=datetime.now() + timedelta(days=30),
+            plan_type="premium",
+        )
+        mock_subscription_repository.get_subscription_info.return_value = (
+            mock_subscription_info
+        )
 
         # Mock post creation
         def create_side_effect(post):
@@ -84,8 +96,8 @@ class TestCreatePostUseCase:
         # Arrange
         owner_id = str(uuid4())
 
-        # Mock no subscription (free user)
-        mock_subscription_repository.get_by_user_id.return_value = None
+        # Mock no subscription (free user) - service returns None
+        mock_subscription_repository.get_subscription_info.return_value = None
 
         # Mock user has posted once today (under limit of 2)
         mock_post_repository.count_user_posts_today.return_value = 1
@@ -118,7 +130,7 @@ class TestCreatePostUseCase:
         owner_id = str(uuid4())
 
         # Mock no subscription (free user)
-        mock_subscription_repository.get_by_user_id.return_value = None
+        mock_subscription_repository.get_subscription_info.return_value = None
 
         # Mock user has reached daily limit
         mock_post_repository.count_user_posts_today.return_value = 2
@@ -210,10 +222,21 @@ class TestCreatePostUseCase:
         owner_id = str(uuid4())
         custom_expiry = datetime.now(timezone.utc) + timedelta(days=7)
 
-        # Mock premium subscription
-        mock_subscription = AsyncMock()
-        mock_subscription.is_premium.return_value = True
-        mock_subscription_repository.get_by_user_id.return_value = mock_subscription
+        # Mock premium subscription info
+        from app.shared.domain.contracts.i_subscription_query_service import (
+            SubscriptionInfo,
+        )
+        from uuid import UUID
+
+        mock_subscription_info = SubscriptionInfo(
+            user_id=UUID(owner_id),
+            is_active=True,
+            expires_at=datetime.now() + timedelta(days=30),
+            plan_type="premium",
+        )
+        mock_subscription_repository.get_subscription_info.return_value = (
+            mock_subscription_info
+        )
 
         # Mock post creation
         def create_side_effect(post):
@@ -242,15 +265,27 @@ class TestCreatePostUseCase:
         # Arrange
         past_expiry = datetime.now(timezone.utc) - timedelta(days=1)
 
-        # Mock premium subscription
-        mock_subscription = AsyncMock()
-        mock_subscription.is_premium.return_value = True
-        mock_subscription_repository.get_by_user_id.return_value = mock_subscription
+        # Mock premium subscription info
+        from app.shared.domain.contracts.i_subscription_query_service import (
+            SubscriptionInfo,
+        )
+        from uuid import UUID
+
+        owner_id = str(uuid4())
+        mock_subscription_info = SubscriptionInfo(
+            user_id=UUID(owner_id),
+            is_active=True,
+            expires_at=datetime.now() + timedelta(days=30),
+            plan_type="premium",
+        )
+        mock_subscription_repository.get_subscription_info.return_value = (
+            mock_subscription_info
+        )
 
         # Act & Assert
         with pytest.raises(ValueError, match="Expiry date must be in the future"):
             await use_case.execute(
-                owner_id=str(uuid4()),
+                owner_id=owner_id,
                 city_code="TPE",
                 title="Test Post",
                 content="Test content",
@@ -269,10 +304,21 @@ class TestCreatePostUseCase:
         idol = "IU"
         idol_group = "Solo"
 
-        # Mock premium subscription
-        mock_subscription = AsyncMock()
-        mock_subscription.is_premium.return_value = True
-        mock_subscription_repository.get_by_user_id.return_value = mock_subscription
+        # Mock premium subscription info
+        from app.shared.domain.contracts.i_subscription_query_service import (
+            SubscriptionInfo,
+        )
+        from uuid import UUID
+
+        mock_subscription_info = SubscriptionInfo(
+            user_id=UUID(owner_id),
+            is_active=True,
+            expires_at=datetime.now() + timedelta(days=30),
+            plan_type="premium",
+        )
+        mock_subscription_repository.get_subscription_info.return_value = (
+            mock_subscription_info
+        )
 
         # Mock post creation
         def create_side_effect(post):
