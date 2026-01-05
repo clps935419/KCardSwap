@@ -238,6 +238,7 @@ CI will automatically run:
 - [Backend README](apps/backend/README.md) - Backend-specific documentation
 - [Mobile README](apps/mobile/README.md) - Mobile app documentation
 - [OpenAPI Snapshot Guide](openapi/README.md) - How to generate/update OpenAPI snapshot
+- [PR Merge Reports Index](reports/README.md) - Consolidated completion reports and verification notes
 
 ## 🐛 Troubleshooting
 

@@ -24,7 +24,7 @@
    - 沒有提到 `init_admin.py`
 
 3. **實作文件提到兩個**：
-   - `PHASE-2.5-COMPLETE.md` 提到兩個腳本
+   - `phase-2.5-complete.md` 提到兩個腳本
    - `INIT-DATA-DESIGN.md` 詳細說明了設計
 
 ### 初步判斷
@@ -156,7 +156,7 @@ python scripts/init_admin.py --email admin@example.com --password pass123
 - ✅ 添加 Checkpoint 說明區塊
 - ✅ 標記所有任務為完成 [X]
 
-### 2. PHASE-2.5-COMPLETE.md
+### 2. phase-2.5-complete.md
 - ✅ 添加 "⚠️ 重要說明" 區塊（開頭）
 - ✅ 詳細解釋兩個腳本的差異
 - ✅ 列出使用情境和範例
@@ -244,7 +244,7 @@ python scripts/init_admin.py --email admin@example.com --password pass123
 
 ## 📚 相關文件
 
-1. **`PHASE-2.5-COMPLETE.md`**  
+1. **`phase-2.5-complete.md`**  
    Phase 2.5 完成報告，列出所有已完成的任務
 
 2. **`PHASE-2.5-ADMIN-SCRIPTS-CLARIFICATION.md`**  

@@ -366,7 +366,7 @@ export DEFAULT_ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
 
 ## 相關文件
 
-- `PHASE-2.5-COMPLETE.md` - Phase 2.5 完成報告
+- `phase-2.5-complete.md` - Phase 2.5 完成報告
 - `PHASE-2.5-ADMIN-SCRIPTS-CLARIFICATION.md` - 腳本設計說明
 - `INIT-DATA-DESIGN.md` - 資料初始化設計文件
 - `specs/001-kcardswap-complete-spec/tasks.md` - 任務清單

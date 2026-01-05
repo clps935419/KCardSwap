@@ -124,7 +124,7 @@ Manual Data Management (create_admin.py) ← Explicit, Fail-fast
 - ✅ 添加說明區塊解釋兩者差異
 - ✅ 標記所有 Phase 2.5 任務為已完成 [X]
 
-### 2. 更新 `PHASE-2.5-COMPLETE.md`
+### 2. 更新 `phase-2.5-complete.md`
 
 - ✅ 在開頭添加 "⚠️ 重要說明" 區塊
 - ✅ 詳細解釋兩個腳本的用途和差異
@@ -133,7 +133,7 @@ Manual Data Management (create_admin.py) ← Explicit, Fail-fast
 ### 3. 參考文件
 
 - ✅ `INIT-DATA-DESIGN.md`：完整的設計文件
-- ✅ `PHASE-2.5-COMPLETE.md`：實作完成報告
+- ✅ `phase-2.5-complete.md`：實作完成報告
 - ✅ 本文件：澄清說明
 
 ## 驗證
@@ -171,7 +171,7 @@ Manual Data Management (create_admin.py) ← Explicit, Fail-fast
 ## 參考資料
 
 - `INIT-DATA-DESIGN.md` - 完整的設計文件
-- `PHASE-2.5-COMPLETE.md` - Phase 2.5 完成報告
+- `phase-2.5-complete.md` - Phase 2.5 完成報告
 - `specs/001-kcardswap-complete-spec/tasks.md` - 任務清單
 - https://12factor.net/config
 - https://docs.djangoproject.com/en/stable/howto/initial-data/

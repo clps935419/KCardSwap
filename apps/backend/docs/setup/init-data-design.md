@@ -342,11 +342,11 @@ curl -X POST http://localhost:8000/api/v1/auth/admin-login \
 2. ✅ 在 Docker Compose 中設定 `INIT_DEFAULT_ADMIN=true`
 3. ✅ 將管理員密碼儲存在 Secret Manager 中
 4. ✅ 更新 CI/CD pipeline 以自動初始化管理員
-5. ✅ 查看 `PHASE-2.5-COMPLETE.md` 了解完整的 Admin 系統功能
+5. ✅ 查看 [Phase 2.5 完成報告](../../../../reports/phase-2.5-complete.md) 了解完整的 Admin 系統功能
 
 ## 相關文件
 
-- `PHASE-2.5-COMPLETE.md` - Phase 2.5 完整說明
+- [reports/phase-2.5-complete.md](../../../../reports/phase-2.5-complete.md) - Phase 2.5 完整說明
 - `scripts/create_admin.py` - 手動建立任意管理員帳號
 - OpenAPI/Swagger - API 規格（以更新後的 openapi/openapi.json snapshot 作為驗證/對齊基準）
 - `apps/backend/docs/authentication.md` - 認證系統文件
