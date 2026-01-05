@@ -19,6 +19,8 @@ from fastapi.testclient import TestClient
 from app.main import app
 from app.modules.social.domain.entities.chat_room import ChatRoom
 from app.modules.social.domain.entities.message import Message, MessageStatus
+from app.shared.presentation.dependencies.auth import get_current_user_id
+from app.shared.infrastructure.database.connection import get_db_session
 
 client = TestClient(app)
 
@@ -55,22 +57,25 @@ class TestChatRouterIntegration:
 
     @pytest.fixture
     def mock_auth(self, test_user_ids):
-        """Mock authentication"""
-        with patch(
-            "app.modules.social.presentation.routers.chat_router.get_current_user_id",
-            return_value=test_user_ids["current_user"],
-        ):
-            yield test_user_ids["current_user"]
+        """Mock authentication using dependency override"""
+        async def override_get_current_user_id() -> UUID:
+            return test_user_ids["current_user"]
+        
+        app.dependency_overrides[get_current_user_id] = override_get_current_user_id
+        yield test_user_ids["current_user"]
+        app.dependency_overrides.clear()
 
     @pytest.fixture
     def mock_db_session(self):
-        """Mock database session"""
-        with patch(
-            "app.modules.social.presentation.routers.chat_router.get_db_session"
-        ) as mock:
-            session = Mock()
-            mock.return_value = session
-            yield session
+        """Mock database session using dependency override"""
+        mock_session = Mock()
+        
+        async def override_get_db_session():
+            return mock_session
+        
+        app.dependency_overrides[get_db_session] = override_get_db_session
+        yield mock_session
+        app.dependency_overrides.clear()
 
     @pytest.mark.asyncio
     async def test_get_chat_rooms_success(
