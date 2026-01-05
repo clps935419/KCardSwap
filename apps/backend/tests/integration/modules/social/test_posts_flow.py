@@ -8,7 +8,7 @@ For full E2E tests with real database, use pytest with testcontainers (see conft
 
 from datetime import datetime, timedelta, timezone
 from unittest.mock import AsyncMock, Mock, patch
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 import pytest
 from fastapi.testclient import TestClient
@@ -21,6 +21,8 @@ from app.modules.posts.domain.entities.post_interest import (
 )
 from app.modules.social.domain.entities.chat_room import ChatRoom
 from app.modules.social.domain.entities.friendship import Friendship, FriendshipStatus
+from app.shared.presentation.dependencies.auth import get_current_user_id
+from app.shared.infrastructure.database.connection import get_db_session
 
 client = TestClient(app)
 
@@ -52,31 +54,35 @@ class TestPostsFlowIntegration:
 
     @pytest.fixture
     def mock_auth_owner(self, test_user_ids):
-        """Mock authentication for post owner"""
-        with patch(
-            "app.modules.posts.presentation.routers.posts_router.get_current_user_id",
-            return_value=test_user_ids["owner"],
-        ):
-            yield test_user_ids["owner"]
+        """Mock authentication for post owner using dependency override"""
+        async def override_get_current_user_id() -> UUID:
+            return test_user_ids["owner"]
+        
+        app.dependency_overrides[get_current_user_id] = override_get_current_user_id
+        yield test_user_ids["owner"]
+        app.dependency_overrides.clear()
 
     @pytest.fixture
     def mock_auth_interested(self, test_user_ids):
-        """Mock authentication for interested user"""
-        with patch(
-            "app.modules.posts.presentation.routers.posts_router.get_current_user_id",
-            return_value=test_user_ids["interested_user"],
-        ):
-            yield test_user_ids["interested_user"]
+        """Mock authentication for interested user using dependency override"""
+        async def override_get_current_user_id() -> UUID:
+            return test_user_ids["interested_user"]
+        
+        app.dependency_overrides[get_current_user_id] = override_get_current_user_id
+        yield test_user_ids["interested_user"]
+        app.dependency_overrides.clear()
 
     @pytest.fixture
     def mock_db_session(self):
-        """Mock database session"""
-        with patch(
-            "app.modules.posts.presentation.routers.posts_router.get_db_session"
-        ) as mock:
-            session = Mock()
-            mock.return_value = session
-            yield session
+        """Mock database session using dependency override"""
+        mock_session = Mock()
+        
+        async def override_get_db_session():
+            return mock_session
+        
+        app.dependency_overrides[get_db_session] = override_get_db_session
+        yield mock_session
+        app.dependency_overrides.clear()
 
     @pytest.fixture
     def mock_post_repository(self, test_post_data):
