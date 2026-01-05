@@ -52,14 +52,14 @@ class TestTradeRepositoryImpl:
                 id=uuid4(),
                 trade_id=sample_trade.id,
                 card_id=uuid4(),
-                owner_id=sample_trade.initiator_id,
+                owner_side="initiator",
                 created_at=datetime.utcnow(),
             ),
             TradeItem(
                 id=uuid4(),
                 trade_id=sample_trade.id,
                 card_id=uuid4(),
-                owner_id=sample_trade.responder_id,
+                owner_side="responder",
                 created_at=datetime.utcnow(),
             ),
         ]

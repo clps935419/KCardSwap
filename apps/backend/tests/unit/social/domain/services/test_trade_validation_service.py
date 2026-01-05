@@ -50,7 +50,7 @@ class TestTradeValidationService:
             id=str(uuid4()),
             initiator_id=initiator_id,
             responder_id=responder_id,
-            status=TradeStatus.PENDING.value,
+            status="proposed",
             created_at=datetime.now(timezone.utc),
         )
 
@@ -113,20 +113,20 @@ class TestTradeValidationService:
         """Test valid status transitions"""
         # Pending -> Accepted
         service.validate_status_transition(
-            TradeStatus.PENDING.value,
-            TradeStatus.ACCEPTED.value,
+            "proposed",
+            "accepted",
         )
 
         # Pending -> Rejected
         service.validate_status_transition(
-            TradeStatus.PENDING.value,
-            TradeStatus.REJECTED.value,
+            "proposed",
+            "rejected",
         )
 
         # Accepted -> Completed
         service.validate_status_transition(
-            TradeStatus.ACCEPTED.value,
-            TradeStatus.COMPLETED.value,
+            "accepted",
+            "completed",
         )
 
     def test_validate_status_transition_invalid(self, service):
@@ -134,15 +134,15 @@ class TestTradeValidationService:
         # Cannot go from Rejected to Accepted
         with pytest.raises(ValueError, match="Cannot transition"):
             service.validate_status_transition(
-                TradeStatus.REJECTED.value,
-                TradeStatus.ACCEPTED.value,
+                "rejected",
+                "accepted",
             )
 
         # Cannot go from Completed to Pending
         with pytest.raises(ValueError, match="Cannot transition"):
             service.validate_status_transition(
-                TradeStatus.COMPLETED.value,
-                TradeStatus.PENDING.value,
+                "completed",
+                "proposed",
             )
 
     def test_validate_trade_items_success(self, service):
@@ -219,7 +219,7 @@ class TestTradeValidationService:
 
     def test_validate_user_can_accept_wrong_status(self, service, sample_trade):
         """Test validation fails for wrong trade status"""
-        sample_trade.status = TradeStatus.COMPLETED.value
+        sample_trade.status = "completed"
         with pytest.raises(ValueError, match="cannot be accepted"):
             service.validate_user_can_accept(sample_trade, sample_trade.responder_id)
 
@@ -235,7 +235,7 @@ class TestTradeValidationService:
 
     def test_validate_user_can_reject_wrong_status(self, service, sample_trade):
         """Test validation fails for wrong trade status"""
-        sample_trade.status = TradeStatus.COMPLETED.value
+        sample_trade.status = "completed"
         with pytest.raises(ValueError, match="cannot be rejected"):
             service.validate_user_can_reject(sample_trade, sample_trade.responder_id)
 
@@ -252,25 +252,25 @@ class TestTradeValidationService:
 
     def test_validate_user_can_cancel_wrong_status(self, service, sample_trade):
         """Test validation fails for wrong trade status"""
-        sample_trade.status = TradeStatus.COMPLETED.value
+        sample_trade.status = "completed"
         with pytest.raises(ValueError, match="cannot be canceled"):
             service.validate_user_can_cancel(sample_trade, sample_trade.initiator_id)
 
     def test_validate_user_can_confirm_success(self, service, sample_trade):
         """Test successful validation for confirming trade"""
-        sample_trade.status = TradeStatus.ACCEPTED.value
+        sample_trade.status = "accepted"
         # Both participants should be able to confirm
         service.validate_user_can_confirm(sample_trade, sample_trade.initiator_id)
         service.validate_user_can_confirm(sample_trade, sample_trade.responder_id)
 
     def test_validate_user_can_confirm_wrong_user(self, service, sample_trade):
         """Test validation fails when non-participant tries to confirm"""
-        sample_trade.status = TradeStatus.ACCEPTED.value
+        sample_trade.status = "accepted"
         with pytest.raises(ValueError, match="Only trade participants can confirm"):
             service.validate_user_can_confirm(sample_trade, uuid4())
 
     def test_validate_user_can_confirm_wrong_status(self, service, sample_trade):
         """Test validation fails for wrong trade status"""
-        sample_trade.status = TradeStatus.PENDING.value
+        sample_trade.status = "proposed"
         with pytest.raises(ValueError, match="cannot be confirmed"):
             service.validate_user_can_confirm(sample_trade, sample_trade.initiator_id)
