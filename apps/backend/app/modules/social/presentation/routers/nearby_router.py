@@ -36,6 +36,7 @@ from app.modules.social.presentation.schemas.nearby_schemas import (
 from app.shared.domain.contracts.i_profile_query_service import IProfileQueryService
 from app.shared.infrastructure.database.connection import get_db_session
 from app.shared.presentation.dependencies.auth import get_current_user_id
+from app.shared.presentation.dependencies.services import get_profile_service
 
 # Create router
 router = APIRouter(prefix="/nearby", tags=["Nearby Search"])
@@ -46,22 +47,6 @@ async def get_card_repository(
 ) -> ICardRepository:
     """Dependency: Get card repository"""
     return CardRepositoryImpl(session)
-
-
-async def get_profile_service(
-    session: Annotated[AsyncSession, Depends(get_db_session)],
-) -> IProfileQueryService:
-    """Dependency: Get profile query service"""
-    # Import here to avoid circular dependency
-    from app.modules.identity.application.services.profile_query_service_impl import (
-        ProfileQueryServiceImpl,
-    )
-    from app.modules.identity.infrastructure.repositories.profile_repository_impl import (
-        ProfileRepositoryImpl,
-    )
-
-    profile_repo = ProfileRepositoryImpl(session)
-    return ProfileQueryServiceImpl(profile_repository=profile_repo)
 
 
 async def get_search_quota_service(

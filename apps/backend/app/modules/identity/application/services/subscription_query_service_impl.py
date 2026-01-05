@@ -45,3 +45,14 @@ class SubscriptionQueryServiceImpl(ISubscriptionQueryService):
             expires_at=subscription.expires_at,
             plan_type=subscription.plan,
         )
+
+    async def get_or_create_subscription_info(self, user_id: UUID) -> SubscriptionInfo:
+        """Get subscription information for a user, creating default if not exists."""
+        subscription = await self.subscription_repository.get_or_create_by_user_id(user_id)
+        
+        return SubscriptionInfo(
+            user_id=subscription.user_id,
+            is_active=subscription.is_active(),
+            expires_at=subscription.expires_at,
+            plan_type=subscription.plan,
+        )

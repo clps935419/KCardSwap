@@ -6,13 +6,12 @@ Checks user's subscription status and applies restrictions based on plan.
 """
 
 from typing import Callable
+from uuid import UUID
 
 from fastapi import HTTPException, Request, Response
 
-from app.modules.identity.infrastructure.repositories.subscription_repository_impl import (
-    SubscriptionRepositoryImpl,
-)
 from app.shared.infrastructure.database.connection import get_db_session
+from app.shared.presentation.dependencies.services import get_subscription_service
 
 
 async def check_subscription_permission(
@@ -39,16 +38,21 @@ async def check_subscription_permission(
     # Get database session
     async for session in get_db_session():
         try:
-            # Get user's subscription
-            subscription_repo = SubscriptionRepositoryImpl(session)
-            subscription = await subscription_repo.get_or_create_by_user_id(user["id"])
+            # Get subscription service via shared dependency
+            subscription_service = await get_subscription_service(session)
+            
+            # Get or create user's subscription info
+            user_id = UUID(user["id"]) if isinstance(user["id"], str) else user["id"]
+            subscription_info = await subscription_service.get_or_create_subscription_info(
+                user_id
+            )
 
             # Inject subscription info into request state
             request.state.subscription = {
-                "plan": subscription.plan,
-                "status": subscription.status,
-                "is_premium": subscription.is_premium(),
-                "entitlement_active": subscription.is_premium(),
+                "plan": subscription_info.plan_type,
+                "status": "active" if subscription_info.is_active else "inactive",
+                "is_premium": subscription_info.is_active and subscription_info.plan_type == "premium",
+                "entitlement_active": subscription_info.is_active and subscription_info.plan_type == "premium",
             }
 
             # Continue to next middleware/endpoint

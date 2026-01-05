@@ -59,3 +59,18 @@ class ISubscriptionQueryService(ABC):
             SubscriptionInfo if user has subscription, None otherwise
         """
         pass
+
+    @abstractmethod
+    async def get_or_create_subscription_info(self, user_id: UUID) -> SubscriptionInfo:
+        """
+        Get subscription information for a user, creating default subscription if not exists.
+        
+        This is used for ensuring every user has a subscription record (defaulting to free plan).
+        
+        Args:
+            user_id: User UUID
+            
+        Returns:
+            SubscriptionInfo (always returns a value, creating free plan if needed)
+        """
+        pass
