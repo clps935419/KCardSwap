@@ -96,17 +96,36 @@ class TestAcceptInterestUseCase:
     ):
         """Test successful interest acceptance with friendship and chat room creation"""
         # Arrange
+        from app.shared.domain.contracts.i_chat_room_service import ChatRoomDTO
+        from uuid import UUID
+
         mock_post_repository.get_by_id.return_value = sample_post
         mock_post_interest_repository.get_by_id.return_value = sample_interest
-        mock_friendship_repository.get_by_users.return_value = None  # No existing friendship
-        mock_chat_room_repository.get_by_participants.return_value = None  # No existing chat room
-
-        new_chat_room = ChatRoom(
-            id=str(uuid4()),
-            participant_ids=[sample_post.owner_id, sample_interest.user_id],
+        
+        # Service returns None for no existing friendship
+        mock_friendship_repository.get_friendship.return_value = None
+        
+        # Service creates friendship
+        from app.shared.domain.contracts.i_friendship_service import (
+            FriendshipDTO,
+            FriendshipStatusDTO,
+        )
+        new_friendship = FriendshipDTO(
+            id=UUID(str(uuid4())),
+            user_id=UUID(sample_post.owner_id),
+            friend_id=UUID(sample_interest.user_id),
+            status=FriendshipStatusDTO.ACCEPTED,
             created_at=datetime.now(timezone.utc),
         )
-        mock_chat_room_repository.create.return_value = new_chat_room
+        mock_friendship_repository.create_friendship.return_value = new_friendship
+
+        # Service creates/returns chat room
+        new_chat_room_dto = ChatRoomDTO(
+            id=UUID(str(uuid4())),
+            participant1_id=UUID(sample_post.owner_id),
+            participant2_id=UUID(sample_interest.user_id),
+        )
+        mock_chat_room_repository.get_or_create_chat_room.return_value = new_chat_room_dto
 
         # Act
         result = await use_case.execute(
@@ -119,10 +138,10 @@ class TestAcceptInterestUseCase:
         assert result is not None
         assert result.interest_id == sample_interest.id
         assert result.friendship_created is True
-        assert result.chat_room_id == new_chat_room.id
+        assert result.chat_room_id == str(new_chat_room_dto.id)
         mock_post_interest_repository.update.assert_called_once()
-        assert mock_friendship_repository.create.call_count == 2  # Bidirectional
-        mock_chat_room_repository.create.assert_called_once()
+        mock_friendship_repository.create_friendship.assert_called_once()
+        mock_chat_room_repository.get_or_create_chat_room.assert_called_once()
 
     @pytest.mark.asyncio
     async def test_accept_interest_reuses_existing_chat_room(
@@ -137,16 +156,37 @@ class TestAcceptInterestUseCase:
     ):
         """Test that existing chat room is reused"""
         # Arrange
+        from app.shared.domain.contracts.i_chat_room_service import ChatRoomDTO
+        from app.shared.domain.contracts.i_friendship_service import (
+            FriendshipDTO,
+            FriendshipStatusDTO,
+        )
+        from uuid import UUID
+
         mock_post_repository.get_by_id.return_value = sample_post
         mock_post_interest_repository.get_by_id.return_value = sample_interest
-        mock_friendship_repository.get_by_users.return_value = None
+        mock_friendship_repository.get_friendship.return_value = None
 
-        existing_chat_room = ChatRoom(
-            id=str(uuid4()),
-            participant_ids=[sample_post.owner_id, sample_interest.user_id],
+        # Service creates friendship
+        new_friendship = FriendshipDTO(
+            id=UUID(str(uuid4())),
+            user_id=UUID(sample_post.owner_id),
+            friend_id=UUID(sample_interest.user_id),
+            status=FriendshipStatusDTO.ACCEPTED,
             created_at=datetime.now(timezone.utc),
         )
-        mock_chat_room_repository.get_by_participants.return_value = existing_chat_room
+        mock_friendship_repository.create_friendship.return_value = new_friendship
+
+        # Service returns existing chat room
+        existing_chat_room_id = uuid4()
+        existing_chat_room_dto = ChatRoomDTO(
+            id=existing_chat_room_id,
+            participant1_id=UUID(sample_post.owner_id),
+            participant2_id=UUID(sample_interest.user_id),
+        )
+        mock_chat_room_repository.get_or_create_chat_room.return_value = (
+            existing_chat_room_dto
+        )
 
         # Act
         result = await use_case.execute(
@@ -156,8 +196,8 @@ class TestAcceptInterestUseCase:
         )
 
         # Assert
-        assert result.chat_room_id == existing_chat_room.id
-        mock_chat_room_repository.create.assert_not_called()
+        assert result.chat_room_id == str(existing_chat_room_id)
+        mock_chat_room_repository.get_or_create_chat_room.assert_called_once()
 
     @pytest.mark.asyncio
     async def test_accept_interest_with_existing_friendship(

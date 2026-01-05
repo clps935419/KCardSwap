@@ -6,8 +6,11 @@ Provides social features related use cases using python-injector.
 from injector import Module, provider
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.identity.infrastructure.repositories.subscription_repository_impl import (
-    SubscriptionRepositoryImpl,
+from app.modules.social.application.services.chat_room_service_impl import (
+    ChatRoomServiceImpl,
+)
+from app.modules.social.application.services.friendship_service_impl import (
+    FriendshipServiceImpl,
 )
 from app.modules.social.application.use_cases.cards.check_quota import (
     CheckUploadQuotaUseCase,
@@ -87,6 +90,11 @@ from app.modules.social.infrastructure.repositories.report_repository_impl impor
 from app.modules.social.infrastructure.repositories.trade_repository_impl import (
     TradeRepositoryImpl,
 )
+from app.shared.domain.contracts.i_chat_room_service import IChatRoomService
+from app.shared.domain.contracts.i_friendship_service import IFriendshipService
+from app.shared.domain.contracts.i_subscription_query_service import (
+    ISubscriptionQueryService,
+)
 from app.shared.infrastructure.external.gcs_storage_service import GCSStorageService
 
 
@@ -102,14 +110,14 @@ class SocialModule(Module):
         self,
         session: AsyncSession,
         gcs_storage: GCSStorageService,
+        subscription_query_service: ISubscriptionQueryService,
     ) -> UploadCardUseCase:
         """Provide UploadCardUseCase with dependencies."""
         card_repo = CardRepositoryImpl(session)
-        subscription_repo = SubscriptionRepositoryImpl(session)
         card_validation_service = CardValidationService()
         return UploadCardUseCase(
             card_repository=card_repo,
-            subscription_repository=subscription_repo,
+            subscription_repository=subscription_query_service,
             storage_service=gcs_storage,
             validation_service=card_validation_service,
         )
@@ -130,13 +138,12 @@ class SocialModule(Module):
 
     @provider
     def provide_check_quota_use_case(
-        self, session: AsyncSession
+        self, session: AsyncSession, subscription_query_service: ISubscriptionQueryService
     ) -> CheckUploadQuotaUseCase:
         """Provide CheckUploadQuotaUseCase with dependencies."""
         card_repo = CardRepositoryImpl(session)
-        subscription_repo = SubscriptionRepositoryImpl(session)
         return CheckUploadQuotaUseCase(
-            card_repository=card_repo, subscription_repository=subscription_repo
+            card_repository=card_repo, subscription_repository=subscription_query_service
         )
 
     # Nearby Use Cases
@@ -273,3 +280,16 @@ class SocialModule(Module):
         """Provide GetTradeHistoryUseCase with dependencies."""
         trade_repo = TradeRepositoryImpl(session)
         return GetTradeHistoryUseCase(trade_repository=trade_repo)
+
+    # Shared Contract Services - For cross-bounded-context communication
+    @provider
+    def provide_friendship_service(self, session: AsyncSession) -> IFriendshipService:
+        """Provide IFriendshipService implementation."""
+        friendship_repo = FriendshipRepositoryImpl(session)
+        return FriendshipServiceImpl(friendship_repository=friendship_repo)
+
+    @provider
+    def provide_chat_room_service(self, session: AsyncSession) -> IChatRoomService:
+        """Provide IChatRoomService implementation."""
+        chat_room_repo = ChatRoomRepositoryImpl(session)
+        return ChatRoomServiceImpl(chat_room_repository=chat_room_repo)

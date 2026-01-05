@@ -37,13 +37,11 @@ class TestCardRepositoryImpl:
         return Card(
             id=uuid4(),
             owner_id=uuid4(),
-            idol_name="IU",
+            idol="IU",
             idol_group="Solo",
-            card_name="Love Poem",
+            album="Love Poem",
             image_url="https://example.com/image.jpg",
             status="available",
-            latitude=25.033,
-            longitude=121.564,
             created_at=datetime.utcnow(),
             updated_at=datetime.utcnow(),
         )
@@ -54,13 +52,12 @@ class TestCardRepositoryImpl:
         return CardModel(
             id=sample_card.id,
             owner_id=sample_card.owner_id,
-            idol_name=sample_card.idol_name,
+            idol=sample_card.idol,
             idol_group=sample_card.idol_group,
-            card_name=sample_card.card_name,
+            album=sample_card.album,
             image_url=sample_card.image_url,
             status=sample_card.status,
-            latitude=sample_card.latitude,
-            longitude=sample_card.longitude,
+            upload_status=sample_card.upload_status,
             created_at=sample_card.created_at,
             updated_at=sample_card.updated_at,
         )
@@ -69,7 +66,10 @@ class TestCardRepositoryImpl:
     async def test_save_card(self, repository, mock_session, sample_card):
         """Test saving a card"""
         # Arrange
-        mock_session.merge = AsyncMock(return_value=sample_card)
+        mock_result = MagicMock()
+        mock_result.scalar_one_or_none.return_value = None  # No existing card
+        mock_session.execute = AsyncMock(return_value=mock_result)
+        mock_session.add = MagicMock()
         mock_session.flush = AsyncMock()
         mock_session.refresh = AsyncMock()
 
@@ -78,7 +78,9 @@ class TestCardRepositoryImpl:
 
         # Assert
         assert result is not None
-        mock_session.merge.assert_called_once()
+        mock_session.add.assert_called_once()
+        mock_session.flush.assert_called_once()
+        mock_session.refresh.assert_called_once()
 
     @pytest.mark.asyncio
     async def test_find_by_id_found(self, repository, mock_session, sample_card_model):
@@ -118,13 +120,12 @@ class TestCardRepositoryImpl:
             CardModel(
                 id=uuid4(),
                 owner_id=owner_id,
-                idol_name=f"Idol {i}",
+                idol=f"Idol {i}",
                 idol_group="Group",
-                card_name=f"Card {i}",
+                album=f"Album {i}",
                 image_url=f"https://example.com/image{i}.jpg",
                 status="available",
-                latitude=25.033,
-                longitude=121.564,
+                upload_status="confirmed",
                 created_at=datetime.utcnow(),
                 updated_at=datetime.utcnow(),
             )
@@ -182,7 +183,7 @@ class TestCardRepositoryImpl:
         expected_count = 5
 
         mock_result = MagicMock()
-        mock_result.scalar.return_value = expected_count
+        mock_result.scalar_one.return_value = expected_count
         mock_session.execute = AsyncMock(return_value=mock_result)
 
         # Act
@@ -199,7 +200,7 @@ class TestCardRepositoryImpl:
         expected_bytes = 1024000
 
         mock_result = MagicMock()
-        mock_result.scalar.return_value = expected_bytes
+        mock_result.scalar_one.return_value = expected_bytes
         mock_session.execute = AsyncMock(return_value=mock_result)
 
         # Act

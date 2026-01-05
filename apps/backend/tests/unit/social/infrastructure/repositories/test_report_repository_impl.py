@@ -38,7 +38,7 @@ class TestReportRepositoryImpl:
             id=str(uuid4()),
             reporter_id=str(uuid4()),
             reported_user_id=str(uuid4()),
-            reason=ReportReason.INAPPROPRIATE_BEHAVIOR,
+            reason=ReportReason.HARASSMENT,
             detail="User was rude during trade",
             resolved=False,
             created_at=datetime.utcnow(),
@@ -214,7 +214,7 @@ class TestReportRepositoryImpl:
         expected_count = 3
 
         mock_result = MagicMock()
-        mock_result.scalar.return_value = expected_count
+        mock_result.scalar_one.return_value = expected_count
         mock_session.execute = AsyncMock(return_value=mock_result)
 
         # Act
@@ -231,12 +231,12 @@ class TestReportRepositoryImpl:
         expected_count = 1
 
         mock_result = MagicMock()
-        mock_result.scalar.return_value = expected_count
+        mock_result.scalar_one.return_value = expected_count
         mock_session.execute = AsyncMock(return_value=mock_result)
 
         # Act
         result = await repository.get_report_count_by_user(
-            reported_user_id, reason=ReportReason.INAPPROPRIATE_BEHAVIOR
+            reported_user_id, reason=ReportReason.HARASSMENT
         )
 
         # Assert

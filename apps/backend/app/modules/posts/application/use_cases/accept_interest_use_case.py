@@ -1,20 +1,13 @@
 """Accept Interest Use Case - Accept an interest and create friendship + chat room"""
 
-import uuid
-from datetime import datetime, timezone
+from uuid import UUID
 
 from app.modules.posts.domain.repositories.i_post_interest_repository import (
     IPostInterestRepository,
 )
 from app.modules.posts.domain.repositories.i_post_repository import IPostRepository
-from app.modules.social.domain.entities.chat_room import ChatRoom
-from app.modules.social.domain.entities.friendship import Friendship, FriendshipStatus
-from app.modules.social.domain.repositories.i_chat_room_repository import (
-    IChatRoomRepository,
-)
-from app.modules.social.domain.repositories.i_friendship_repository import (
-    IFriendshipRepository,
-)
+from app.shared.domain.contracts.i_chat_room_service import IChatRoomService
+from app.shared.domain.contracts.i_friendship_service import IFriendshipService
 
 
 class AcceptInterestResult:
@@ -41,13 +34,13 @@ class AcceptInterestUseCase:
         self,
         post_repository: IPostRepository,
         post_interest_repository: IPostInterestRepository,
-        friendship_repository: IFriendshipRepository,
-        chat_room_repository: IChatRoomRepository,
+        friendship_repository: IFriendshipService,
+        chat_room_repository: IChatRoomService,
     ):
         self.post_repository = post_repository
         self.post_interest_repository = post_interest_repository
-        self.friendship_repository = friendship_repository
-        self.chat_room_repository = chat_room_repository
+        self.friendship_service = friendship_repository
+        self.chat_room_service = chat_room_repository
 
     async def execute(
         self, post_id: str, interest_id: str, current_user_id: str
@@ -96,55 +89,29 @@ class AcceptInterestUseCase:
         interested_user_id = interest.user_id
         post_owner_id = post.owner_id
 
+        # Convert string IDs to UUIDs
+        interested_uuid = UUID(interested_user_id)
+        owner_uuid = UUID(post_owner_id)
+
         friendship_created = False
-        existing_friendship = await self.friendship_repository.get_by_users(
-            post_owner_id, interested_user_id
+        existing_friendship = await self.friendship_service.get_friendship(
+            owner_uuid, interested_uuid
         )
 
         if not existing_friendship:
-            # Create bidirectional friendship (both directions)
-            # Create friendship from owner to interested user
-            friendship1 = Friendship(
-                id=str(uuid.uuid4()),
-                user_id=post_owner_id,
-                friend_id=interested_user_id,
-                status=FriendshipStatus.ACCEPTED,
-                created_at=datetime.now(timezone.utc),
+            # Create friendship (service handles it automatically as accepted)
+            await self.friendship_service.create_friendship(
+                owner_uuid, interested_uuid, auto_accept=True
             )
-            await self.friendship_repository.create(friendship1)
-
-            # Create friendship from interested user to owner
-            friendship2 = Friendship(
-                id=str(uuid.uuid4()),
-                user_id=interested_user_id,
-                friend_id=post_owner_id,
-                status=FriendshipStatus.ACCEPTED,
-                created_at=datetime.now(timezone.utc),
-            )
-            await self.friendship_repository.create(friendship2)
-
-            friendship_created = True
-        elif existing_friendship.status == FriendshipStatus.PENDING:
-            # Auto-accept pending friendship
-            existing_friendship.accept()
-            await self.friendship_repository.update(existing_friendship)
             friendship_created = True
 
-        # Get or create chat room
-        chat_room = await self.chat_room_repository.get_by_participants(
-            post_owner_id, interested_user_id
+        # Get or create chat room using the service
+        chat_room_dto = await self.chat_room_service.get_or_create_chat_room(
+            owner_uuid, interested_uuid
         )
-
-        if not chat_room:
-            chat_room = ChatRoom(
-                id=str(uuid.uuid4()),
-                participant_ids=[post_owner_id, interested_user_id],
-                created_at=datetime.now(timezone.utc),
-            )
-            chat_room = await self.chat_room_repository.create(chat_room)
 
         return AcceptInterestResult(
             interest_id=interest_id,
             friendship_created=friendship_created,
-            chat_room_id=chat_room.id,
+            chat_room_id=str(chat_room_dto.id),
         )

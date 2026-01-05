@@ -11,7 +11,7 @@ from uuid import UUID, uuid4
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.social.domain.entities.trade import Trade, TradeStatus
+from app.modules.social.domain.entities.trade import Trade
 from app.modules.social.domain.entities.trade_item import TradeItem
 from app.modules.social.infrastructure.database.models.trade_model import TradeModel
 from app.modules.social.infrastructure.repositories.trade_repository_impl import (
@@ -39,7 +39,7 @@ class TestTradeRepositoryImpl:
             id=uuid4(),
             initiator_id=uuid4(),
             responder_id=uuid4(),
-            status=TradeStatus.PROPOSED,
+            status="proposed",
             created_at=datetime.utcnow(),
             updated_at=datetime.utcnow(),
         )
@@ -52,14 +52,14 @@ class TestTradeRepositoryImpl:
                 id=uuid4(),
                 trade_id=sample_trade.id,
                 card_id=uuid4(),
-                owner_id=sample_trade.initiator_id,
+                owner_side="initiator",
                 created_at=datetime.utcnow(),
             ),
             TradeItem(
                 id=uuid4(),
                 trade_id=sample_trade.id,
                 card_id=uuid4(),
-                owner_id=sample_trade.responder_id,
+                owner_side="responder",
                 created_at=datetime.utcnow(),
             ),
         ]
@@ -71,7 +71,7 @@ class TestTradeRepositoryImpl:
             id=sample_trade.id,
             initiator_id=sample_trade.initiator_id,
             responder_id=sample_trade.responder_id,
-            status=sample_trade.status.value,
+            status=sample_trade.status,  # status is already a string
             created_at=sample_trade.created_at,
             updated_at=sample_trade.updated_at,
         )
@@ -152,7 +152,7 @@ class TestTradeRepositoryImpl:
         mock_session.flush = AsyncMock()
 
         # Modify the trade
-        sample_trade.status = TradeStatus.ACCEPTED
+        sample_trade.status = "accepted"
 
         # Act
         result = await repository.update(sample_trade)
@@ -203,7 +203,7 @@ class TestTradeRepositoryImpl:
         expected_count = 3
 
         mock_result = MagicMock()
-        mock_result.scalar.return_value = expected_count
+        mock_result.scalar_one.return_value = expected_count
         mock_session.execute = AsyncMock(return_value=mock_result)
 
         # Act

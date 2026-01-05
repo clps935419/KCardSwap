@@ -59,6 +59,20 @@ from app.modules.identity.infrastructure.repositories.user_repository_impl impor
 from app.modules.identity.infrastructure.security.password_service import (
     PasswordService,
 )
+from app.modules.identity.application.services.profile_query_service_impl import (
+    ProfileQueryServiceImpl,
+)
+from app.modules.identity.application.services.subscription_query_service_impl import (
+    SubscriptionQueryServiceImpl,
+)
+from app.modules.identity.application.services.user_basic_info_service_impl import (
+    UserBasicInfoServiceImpl,
+)
+from app.shared.domain.contracts.i_profile_query_service import IProfileQueryService
+from app.shared.domain.contracts.i_subscription_query_service import (
+    ISubscriptionQueryService,
+)
+from app.shared.domain.contracts.i_user_basic_info_service import IUserBasicInfoService
 from app.shared.infrastructure.security.jwt_service import JWTService
 
 
@@ -193,3 +207,28 @@ class IdentityModule(Module):
         """Provide ExpireSubscriptionsUseCase with dependencies."""
         subscription_repo = SubscriptionRepositoryImpl(session)
         return ExpireSubscriptionsUseCase(subscription_repository=subscription_repo)
+
+    # Shared Contract Services - For cross-bounded-context communication
+    @provider
+    def provide_subscription_query_service(
+        self, session: AsyncSession
+    ) -> ISubscriptionQueryService:
+        """Provide ISubscriptionQueryService implementation."""
+        subscription_repo = SubscriptionRepositoryImpl(session)
+        return SubscriptionQueryServiceImpl(subscription_repository=subscription_repo)
+
+    @provider
+    def provide_profile_query_service(
+        self, session: AsyncSession
+    ) -> IProfileQueryService:
+        """Provide IProfileQueryService implementation."""
+        profile_repo = ProfileRepositoryImpl(session)
+        return ProfileQueryServiceImpl(profile_repository=profile_repo)
+
+    @provider
+    def provide_user_basic_info_service(
+        self, session: AsyncSession
+    ) -> IUserBasicInfoService:
+        """Provide IUserBasicInfoService implementation."""
+        profile_repo = ProfileRepositoryImpl(session)
+        return UserBasicInfoServiceImpl(profile_repository=profile_repo)

@@ -6,9 +6,6 @@ Provides city board posts related use cases using python-injector.
 from injector import Module, provider
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.identity.infrastructure.repositories.subscription_repository_impl import (
-    SubscriptionRepositoryImpl,
-)
 from app.modules.posts.application.use_cases.accept_interest_use_case import (
     AcceptInterestUseCase,
 )
@@ -36,11 +33,10 @@ from app.modules.posts.infrastructure.repositories.post_interest_repository_impl
 from app.modules.posts.infrastructure.repositories.post_repository_impl import (
     PostRepositoryImpl,
 )
-from app.modules.social.infrastructure.repositories.chat_room_repository_impl import (
-    ChatRoomRepositoryImpl,
-)
-from app.modules.social.infrastructure.repositories.friendship_repository_impl import (
-    FriendshipRepositoryImpl,
+from app.shared.domain.contracts.i_chat_room_service import IChatRoomService
+from app.shared.domain.contracts.i_friendship_service import IFriendshipService
+from app.shared.domain.contracts.i_subscription_query_service import (
+    ISubscriptionQueryService,
 )
 
 
@@ -51,12 +47,13 @@ class PostsModule(Module):
     """
 
     @provider
-    def provide_create_post_use_case(self, session: AsyncSession) -> CreatePostUseCase:
+    def provide_create_post_use_case(
+        self, session: AsyncSession, subscription_query_service: ISubscriptionQueryService
+    ) -> CreatePostUseCase:
         """Provide CreatePostUseCase with dependencies."""
         post_repo = PostRepositoryImpl(session)
-        subscription_repo = SubscriptionRepositoryImpl(session)
         return CreatePostUseCase(
-            post_repository=post_repo, subscription_repository=subscription_repo
+            post_repository=post_repo, subscription_repository=subscription_query_service
         )
 
     @provider
@@ -80,18 +77,19 @@ class PostsModule(Module):
 
     @provider
     def provide_accept_interest_use_case(
-        self, session: AsyncSession
+        self,
+        session: AsyncSession,
+        friendship_service: IFriendshipService,
+        chat_room_service: IChatRoomService,
     ) -> AcceptInterestUseCase:
         """Provide AcceptInterestUseCase with dependencies."""
         post_repo = PostRepositoryImpl(session)
         post_interest_repo = PostInterestRepositoryImpl(session)
-        friendship_repo = FriendshipRepositoryImpl(session)
-        chat_room_repo = ChatRoomRepositoryImpl(session)
         return AcceptInterestUseCase(
             post_repository=post_repo,
             post_interest_repository=post_interest_repo,
-            friendship_repository=friendship_repo,
-            chat_room_repository=chat_room_repo,
+            friendship_repository=friendship_service,
+            chat_room_repository=chat_room_service,
         )
 
     @provider

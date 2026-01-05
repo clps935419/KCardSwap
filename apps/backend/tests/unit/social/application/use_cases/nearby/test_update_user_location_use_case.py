@@ -16,15 +16,15 @@ class TestUpdateUserLocationUseCase:
     """Test UpdateUserLocationUseCase"""
 
     @pytest.fixture
-    def mock_profile_repository(self):
+    def mock_profile_service(self):
         """Create mock profile repository"""
         repo = AsyncMock()
         return repo
 
     @pytest.fixture
-    def use_case(self, mock_profile_repository):
+    def use_case(self, mock_profile_service):
         """Create use case instance"""
-        return UpdateUserLocationUseCase(profile_repository=mock_profile_repository)
+        return UpdateUserLocationUseCase(profile_service=mock_profile_service)
 
     @pytest.fixture
     def mock_profile(self):
@@ -39,7 +39,7 @@ class TestUpdateUserLocationUseCase:
 
     @pytest.mark.asyncio
     async def test_update_user_location_success(
-        self, use_case, mock_profile_repository, mock_profile
+        self, use_case, mock_profile_service, mock_profile
     ):
         """Test successful location update"""
         # Arrange
@@ -47,27 +47,26 @@ class TestUpdateUserLocationUseCase:
         lat = 25.0330
         lng = 121.5654
 
-        mock_profile_repository.get_by_user_id.return_value = mock_profile
-        mock_profile_repository.save.return_value = mock_profile
+        # Service returns True for successful update
+        mock_profile_service.update_user_location.return_value = True
 
         # Act
         result = await use_case.execute(user_id=user_id, lat=lat, lng=lng)
 
         # Assert
-        assert result is None  # execute() returns None
-        mock_profile_repository.get_by_user_id.assert_called_once_with(user_id)
-        mock_profile.update_location.assert_called_once_with(lat, lng)
-        mock_profile_repository.save.assert_called_once_with(mock_profile)
+        assert result is None  # execute() returns None on success
+        mock_profile_service.update_user_location.assert_called_once_with(
+            user_id, lat, lng
+        )
 
     @pytest.mark.asyncio
     async def test_update_user_location_valid_coordinates(
-        self, use_case, mock_profile_repository, mock_profile
+        self, use_case, mock_profile_service, mock_profile
     ):
         """Test with various valid coordinates"""
         # Arrange
         user_id = uuid4()
-        mock_profile_repository.get_by_user_id.return_value = mock_profile
-        mock_profile_repository.save.return_value = mock_profile
+        mock_profile_service.update_user_location.return_value = True
 
         # Test cases: (lat, lng)
         test_cases = [
@@ -80,13 +79,15 @@ class TestUpdateUserLocationUseCase:
         ]
 
         for lat, lng in test_cases:
-            mock_profile.update_location.reset_mock()
+            mock_profile_service.update_user_location.reset_mock()
 
             # Act
             await use_case.execute(user_id=user_id, lat=lat, lng=lng)
 
-            # Assert
-            mock_profile.update_location.assert_called_once_with(lat, lng)
+            # Assert - verify service was called with correct parameters
+            mock_profile_service.update_user_location.assert_called_once_with(
+                user_id, lat, lng
+            )
 
     @pytest.mark.asyncio
     async def test_update_user_location_invalid_latitude_too_low(self, use_case):
@@ -146,7 +147,7 @@ class TestUpdateUserLocationUseCase:
 
     @pytest.mark.asyncio
     async def test_update_user_location_profile_not_found(
-        self, use_case, mock_profile_repository
+        self, use_case, mock_profile_service
     ):
         """Test exception when profile not found"""
         # Arrange
@@ -154,18 +155,19 @@ class TestUpdateUserLocationUseCase:
         lat = 25.0330
         lng = 121.5654
 
-        mock_profile_repository.get_by_user_id.return_value = None
+        # Service returns False for failed update
+        mock_profile_service.update_user_location.return_value = False
 
         # Act & Assert
         with pytest.raises(Exception) as exc_info:
             await use_case.execute(user_id=user_id, lat=lat, lng=lng)
 
-        assert "Profile not found" in str(exc_info.value)
+        assert "Failed to update location" in str(exc_info.value)
         assert str(user_id) in str(exc_info.value)
 
     @pytest.mark.asyncio
     async def test_update_user_location_validation_before_repository_call(
-        self, use_case, mock_profile_repository
+        self, use_case, mock_profile_service
     ):
         """Test that validation happens before repository is accessed"""
         # Arrange
@@ -177,46 +179,37 @@ class TestUpdateUserLocationUseCase:
         with pytest.raises(ValueError):
             await use_case.execute(user_id=user_id, lat=lat, lng=lng)
 
-        # Repository should NOT be called when validation fails
-        mock_profile_repository.get_by_user_id.assert_not_called()
+        # Service should NOT be called when validation fails
+        mock_profile_service.update_user_location.assert_not_called()
 
     @pytest.mark.asyncio
     async def test_update_user_location_save_called_after_update(
-        self, use_case, mock_profile_repository, mock_profile
+        self, use_case, mock_profile_service, mock_profile
     ):
-        """Test that save is called after update_location"""
+        """Test that service is called successfully"""
         # Arrange
         user_id = uuid4()
         lat = 25.0330
         lng = 121.5654
 
-        mock_profile_repository.get_by_user_id.return_value = mock_profile
-        mock_profile_repository.save.return_value = mock_profile
-
-        # Track call order
-        call_order = []
-        mock_profile.update_location.side_effect = lambda *args: call_order.append(
-            "update"
-        )
-        mock_profile_repository.save.side_effect = lambda *args: call_order.append(
-            "save"
-        )
+        mock_profile_service.update_user_location.return_value = True
 
         # Act
         await use_case.execute(user_id=user_id, lat=lat, lng=lng)
 
-        # Assert - update_location should be called before save
-        assert call_order == ["update", "save"]
+        # Assert - service should be called once
+        mock_profile_service.update_user_location.assert_called_once_with(
+            user_id, lat, lng
+        )
 
     @pytest.mark.asyncio
     async def test_update_user_location_multiple_updates_same_user(
-        self, use_case, mock_profile_repository, mock_profile
+        self, use_case, mock_profile_service, mock_profile
     ):
         """Test multiple location updates for the same user"""
         # Arrange
         user_id = uuid4()
-        mock_profile_repository.get_by_user_id.return_value = mock_profile
-        mock_profile_repository.save.return_value = mock_profile
+        mock_profile_service.update_user_location.return_value = True
 
         locations = [
             (25.0330, 121.5654),  # Taipei
@@ -227,21 +220,19 @@ class TestUpdateUserLocationUseCase:
         # Act & Assert
         for lat, lng in locations:
             await use_case.execute(user_id=user_id, lat=lat, lng=lng)
-            mock_profile.update_location.assert_called_with(lat, lng)
 
-        # Verify repository was called for each update
-        assert mock_profile_repository.get_by_user_id.call_count == 3
-        assert mock_profile_repository.save.call_count == 3
+        # Verify service was called for each update
+        assert mock_profile_service.update_user_location.call_count == 3
 
     @pytest.mark.asyncio
     async def test_update_user_location_edge_cases(
-        self, use_case, mock_profile_repository, mock_profile
+        self, use_case, mock_profile_service, mock_profile
     ):
         """Test edge cases for coordinate boundaries"""
         # Arrange
         user_id = uuid4()
-        mock_profile_repository.get_by_user_id.return_value = mock_profile
-        mock_profile_repository.save.return_value = mock_profile
+        mock_profile_service.update_user_location.return_value = True
+        # Removed
 
         # Test exact boundary values
         boundary_cases = [
@@ -252,17 +243,17 @@ class TestUpdateUserLocationUseCase:
         ]
 
         for lat, lng in boundary_cases:
-            mock_profile.update_location.reset_mock()
+            mock_profile_service.update_user_location.reset_mock()
 
             # Act
             await use_case.execute(user_id=user_id, lat=lat, lng=lng)
 
             # Assert
-            mock_profile.update_location.assert_called_once_with(lat, lng)
+            mock_profile_service.update_user_location.assert_called_once_with(user_id, lat, lng)
 
     @pytest.mark.asyncio
     async def test_update_user_location_profile_with_existing_location(
-        self, use_case, mock_profile_repository
+        self, use_case, mock_profile_service
     ):
         """Test updating location when profile already has a location"""
         # Arrange
@@ -271,45 +262,44 @@ class TestUpdateUserLocationUseCase:
         profile.user_id = user_id
         profile.last_lat = 24.0
         profile.last_lng = 120.0
-        profile.update_location = Mock()
 
-        mock_profile_repository.get_by_user_id.return_value = profile
-        mock_profile_repository.save.return_value = profile
+        mock_profile_service.update_user_location.return_value = True
 
         # Act
         new_lat = 25.0330
         new_lng = 121.5654
         await use_case.execute(user_id=user_id, lat=new_lat, lng=new_lng)
 
-        # Assert - should update to new location
-        profile.update_location.assert_called_once_with(new_lat, new_lng)
-        mock_profile_repository.save.assert_called_once_with(profile)
+        # Assert - should call service with new location
+        mock_profile_service.update_user_location.assert_called_once_with(
+            user_id, new_lat, new_lng
+        )
 
     @pytest.mark.asyncio
     async def test_update_user_location_zero_coordinates(
-        self, use_case, mock_profile_repository, mock_profile
+        self, use_case, mock_profile_service, mock_profile
     ):
         """Test updating with zero coordinates (valid case: Null Island)"""
         # Arrange
         user_id = uuid4()
-        mock_profile_repository.get_by_user_id.return_value = mock_profile
-        mock_profile_repository.save.return_value = mock_profile
+        mock_profile_service.update_user_location.return_value = True
+        # Removed
 
         # Act
         await use_case.execute(user_id=user_id, lat=0.0, lng=0.0)
 
         # Assert
-        mock_profile.update_location.assert_called_once_with(0.0, 0.0)
+        mock_profile_service.update_user_location.assert_called_once_with(user_id, 0.0, 0.0)
 
     @pytest.mark.asyncio
     async def test_update_user_location_float_precision(
-        self, use_case, mock_profile_repository, mock_profile
+        self, use_case, mock_profile_service, mock_profile
     ):
         """Test with high-precision floating point coordinates"""
         # Arrange
         user_id = uuid4()
-        mock_profile_repository.get_by_user_id.return_value = mock_profile
-        mock_profile_repository.save.return_value = mock_profile
+        mock_profile_service.update_user_location.return_value = True
+        # Removed
 
         # High precision coordinates
         lat = 25.033012345678
@@ -319,7 +309,7 @@ class TestUpdateUserLocationUseCase:
         await use_case.execute(user_id=user_id, lat=lat, lng=lng)
 
         # Assert - should preserve precision
-        mock_profile.update_location.assert_called_once_with(lat, lng)
+        mock_profile_service.update_user_location.assert_called_once_with(user_id, lat, lng)
 
     @pytest.mark.asyncio
     async def test_update_user_location_both_coordinates_invalid(self, use_case):
