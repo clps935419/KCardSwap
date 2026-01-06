@@ -357,7 +357,7 @@ class TestPostsFlowIntegration:
         response = client.get("/api/v1/posts")
 
         # Should require city_code parameter
-        assert response.status_code == 422
+        assert response.status_code == 400
 
     def test_express_duplicate_interest_fails(
         self,
