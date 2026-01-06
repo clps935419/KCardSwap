@@ -191,7 +191,9 @@ class TestMarkMessageAsRead:
 
             # Assert
             assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-            assert "Cannot mark your own message" in response.json()["detail"]
+            response_data = response.json()
+            assert "error" in response_data
+            assert "Cannot mark your own message" in response_data["error"]["message"]
 
     @pytest.mark.asyncio
     async def test_mark_message_room_not_found(
@@ -214,7 +216,9 @@ class TestMarkMessageAsRead:
 
             # Assert
             assert response.status_code == status.HTTP_404_NOT_FOUND
-            assert "Chat room not found" in response.json()["detail"]
+            response_data = response.json()
+            assert "error" in response_data
+            assert "Chat room not found" in response_data["error"]["message"]
 
     @pytest.mark.asyncio
     async def test_mark_message_not_participant(
@@ -241,7 +245,9 @@ class TestMarkMessageAsRead:
 
             # Assert
             assert response.status_code == status.HTTP_403_FORBIDDEN
-            assert "Not authorized" in response.json()["detail"]
+            response_data = response.json()
+            assert "error" in response_data
+            assert "Not authorized" in response_data["error"]["message"]
 
     @pytest.mark.asyncio
     async def test_mark_message_not_found(
@@ -268,7 +274,9 @@ class TestMarkMessageAsRead:
 
             # Assert
             assert response.status_code == status.HTTP_404_NOT_FOUND
-            assert "Message not found" in response.json()["detail"]
+            response_data = response.json()
+            assert "error" in response_data
+            assert "Message not found" in response_data["error"]["message"]
 
     @pytest.mark.asyncio
     async def test_mark_delivered_message_as_read(

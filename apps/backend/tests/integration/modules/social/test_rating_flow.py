@@ -51,12 +51,16 @@ class TestRatingFlowIntegration:
     @pytest.fixture
     def test_trade(self, test_user_ids):
         """Generate test trade"""
+        now = datetime.utcnow()
         return Trade(
             id=uuid4(),
             initiator_id=test_user_ids["rater"],
             responder_id=test_user_ids["rated"],
             status=Trade.STATUS_COMPLETED,
-            created_at=datetime.utcnow(),
+            created_at=now,
+            completed_at=now,
+            initiator_confirmed_at=now,
+            responder_confirmed_at=now,
         )
 
     @pytest.fixture
