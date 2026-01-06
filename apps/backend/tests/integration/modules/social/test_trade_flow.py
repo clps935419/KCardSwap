@@ -80,7 +80,7 @@ class TestTradeFlowIntegration:
     def mock_trade_repository(self, test_trade_data):
         """Mock trade repository"""
         with patch(
-            "app.modules.social.infrastructure.repositories.trade_repository_impl.SQLAlchemyTradeRepository"
+            "app.modules.social.infrastructure.repositories.trade_repository_impl.TradeRepositoryImpl"
         ) as mock:
             repo_instance = Mock()
 
@@ -141,7 +141,7 @@ class TestTradeFlowIntegration:
     def mock_friendship_repository(self, test_user_ids):
         """Mock friendship repository"""
         with patch(
-            "app.modules.social.infrastructure.repositories.friendship_repository_impl.SQLAlchemyFriendshipRepository"
+            "app.modules.social.infrastructure.repositories.friendship_repository_impl.FriendshipRepositoryImpl"
         ) as mock:
             repo_instance = Mock()
 
@@ -362,7 +362,7 @@ class TestTradeFlowTimeout:
                 "app.modules.social.presentation.routers.trade_router.get_db_session"
             ) as mock_session,
             patch(
-                "app.modules.social.infrastructure.repositories.trade_repository_impl.SQLAlchemyTradeRepository"
+                "app.modules.social.infrastructure.repositories.trade_repository_impl.TradeRepositoryImpl"
             ) as mock_trade_repo,
             patch(
                 "app.modules.social.infrastructure.repositories.card_repository_impl.CardRepositoryImpl"
