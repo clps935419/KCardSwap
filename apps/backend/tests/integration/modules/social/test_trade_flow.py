@@ -353,14 +353,20 @@ class TestTradeFlowTimeout:
             updated_at=old_time,
         )
 
+        # Setup auth override
+        async def override_get_current_user_id():
+            return initiator_id
+        
+        app.dependency_overrides[get_current_user_id] = override_get_current_user_id
+        
+        # Setup db session override
+        mock_session = Mock()
+        async def override_get_db_session():
+            return mock_session
+        
+        app.dependency_overrides[get_db_session] = override_get_db_session
+
         with (
-            patch(
-                "app.modules.social.presentation.routers.trade_router.get_current_user_id",
-                return_value=initiator_id,
-            ),
-            patch(
-                "app.modules.social.presentation.routers.trade_router.get_db_session"
-            ) as mock_session,
             patch(
                 "app.modules.social.infrastructure.repositories.trade_repository_impl.TradeRepositoryImpl"
             ) as mock_trade_repo,
@@ -369,8 +375,6 @@ class TestTradeFlowTimeout:
             ) as mock_card_repo,
         ):
             # Setup mocks
-            mock_session.return_value = Mock()
-
             repo_instance = Mock()
             repo_instance.get_by_id = AsyncMock(return_value=accepted_trade)
             repo_instance.update = AsyncMock(side_effect=lambda trade: trade)
@@ -391,3 +395,6 @@ class TestTradeFlowTimeout:
                 "timeout" in response.json()["detail"].lower()
                 or "cancel" in response.json()["detail"].lower()
             )
+        
+        # Clean up override
+        app.dependency_overrides.clear()
