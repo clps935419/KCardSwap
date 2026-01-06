@@ -256,7 +256,6 @@ class TestRatingFlowIntegration:
             assert len(data["ratings"]) == 1
             assert data["ratings"][0]["score"] == 5
 
-    @pytest.mark.skip(reason="Repository method 'get_average_rating' not implemented yet")
     @pytest.mark.asyncio
     async def test_get_average_rating_success(
         self, mock_auth_rater, mock_db_session, test_user_ids
@@ -282,10 +281,9 @@ class TestRatingFlowIntegration:
             response_data = response.json()
             assert "data" in response_data
             data = response_data["data"]
-            assert data["average"] == 4.5
-            assert data["count"] == 10
+            assert data["average_score"] == 4.5  # Router returns average_score
+            assert data["total_ratings"] == 10  # Router returns total_ratings
 
-    @pytest.mark.skip(reason="Repository method 'get_average_rating' not implemented yet")
     @pytest.mark.asyncio
     async def test_get_average_rating_no_ratings(
         self, mock_auth_rater, mock_db_session, test_user_ids
@@ -311,5 +309,5 @@ class TestRatingFlowIntegration:
             response_data = response.json()
             assert "data" in response_data
             data = response_data["data"]
-            assert data["average"] == 0.0
-            assert data["count"] == 0
+            assert data["average_score"] == 0.0  # Router returns average_score
+            assert data["total_ratings"] == 0  # Router returns total_ratings
