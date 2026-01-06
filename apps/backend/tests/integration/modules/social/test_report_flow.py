@@ -10,7 +10,7 @@ Tests the complete report flow end-to-end including:
 
 from datetime import datetime
 from unittest.mock import AsyncMock, Mock, patch
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 import pytest
 from fastapi import status
@@ -18,6 +18,8 @@ from fastapi.testclient import TestClient
 
 from app.main import app
 from app.modules.social.domain.entities.report import Report, ReportReason
+from app.shared.presentation.dependencies.auth import get_current_user_id
+from app.shared.infrastructure.database.connection import get_db_session
 
 client = TestClient(app)
 
@@ -72,22 +74,25 @@ class TestReportFlowIntegration:
 
     @pytest.fixture
     def mock_auth_reporter(self, test_user_ids):
-        """Mock authentication for reporter"""
-        with patch(
-            "app.modules.social.presentation.routers.report_router.get_current_user_id",
-            return_value=test_user_ids["reporter"],
-        ):
-            yield test_user_ids["reporter"]
+        """Mock authentication for reporter using dependency override"""
+        async def override_get_current_user_id() -> UUID:
+            return test_user_ids["reporter"]
+        
+        app.dependency_overrides[get_current_user_id] = override_get_current_user_id
+        yield test_user_ids["reporter"]
+        app.dependency_overrides.clear()
 
     @pytest.fixture
     def mock_db_session(self):
-        """Mock database session"""
-        with patch(
-            "app.modules.social.presentation.routers.report_router.get_db_session"
-        ) as mock:
-            session = Mock()
-            mock.return_value = session
-            yield session
+        """Mock database session using dependency override"""
+        mock_session = Mock()
+        
+        async def override_get_db_session():
+            return mock_session
+        
+        app.dependency_overrides[get_db_session] = override_get_db_session
+        yield mock_session
+        app.dependency_overrides.clear()
 
     @pytest.mark.asyncio
     async def test_submit_report_harassment_success(
@@ -120,7 +125,9 @@ class TestReportFlowIntegration:
 
             # Assert
             assert response.status_code == status.HTTP_201_CREATED
-            data = response.json()
+            response_data = response.json()
+            assert "data" in response_data
+            data = response_data["data"]
             assert data["reported_user_id"] == str(test_user_ids["reported"])
             assert data["reason"] == "harassment"
             assert data["detail"] == "User sent threatening messages"
@@ -169,7 +176,9 @@ class TestReportFlowIntegration:
                 assert (
                     response.status_code == status.HTTP_201_CREATED
                 ), f"Failed for reason: {reason}"
-                data = response.json()
+                response_data = response.json()
+                assert "data" in response_data
+                data = response_data["data"]
                 assert data["reason"] == reason
 
     @pytest.mark.asyncio
@@ -202,7 +211,9 @@ class TestReportFlowIntegration:
 
             # Assert
             assert response.status_code == status.HTTP_201_CREATED
-            data = response.json()
+            response_data = response.json()
+            assert "data" in response_data
+            data = response_data["data"]
             assert data["detail"] is None or data["detail"] == ""
 
     @pytest.mark.asyncio
@@ -221,7 +232,7 @@ class TestReportFlowIntegration:
         )
 
         # Assert
-        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @pytest.mark.asyncio
     async def test_submit_report_self_report_fails(
@@ -239,7 +250,7 @@ class TestReportFlowIntegration:
         )
 
         # Assert
-        assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
     @pytest.mark.asyncio
     async def test_get_my_reports_success(
@@ -261,7 +272,9 @@ class TestReportFlowIntegration:
 
             # Assert
             assert response.status_code == status.HTTP_200_OK
-            data = response.json()
+            response_data = response.json()
+            assert "data" in response_data
+            data = response_data["data"]
             assert "reports" in data
             assert len(data["reports"]) == 2
             assert data["reports"][0]["reason"] in ["harassment", "spam"]
@@ -286,7 +299,9 @@ class TestReportFlowIntegration:
 
             # Assert
             assert response.status_code == status.HTTP_200_OK
-            data = response.json()
+            response_data = response.json()
+            assert "data" in response_data
+            data = response_data["data"]
             assert data["reports"] == []
             assert data["total"] == 0
 
@@ -309,8 +324,9 @@ class TestReportFlowIntegration:
         )
 
         # Assert
-        # Should fail validation either at schema level (422) or use case level (500)
+        # Should fail validation either at schema level (400) or use case level (422/500)
         assert response.status_code in [
+            status.HTTP_400_BAD_REQUEST,
             status.HTTP_422_UNPROCESSABLE_ENTITY,
             status.HTTP_500_INTERNAL_SERVER_ERROR,
         ]
@@ -348,5 +364,7 @@ class TestReportFlowIntegration:
 
             # Assert
             assert response.status_code == status.HTTP_201_CREATED
-            data = response.json()
+            response_data = response.json()
+            assert "data" in response_data
+            data = response_data["data"]
             assert len(data["detail"]) == 1000
