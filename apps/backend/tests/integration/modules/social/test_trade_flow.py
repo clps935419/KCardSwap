@@ -67,7 +67,13 @@ class TestTradeFlowIntegration:
     @pytest.fixture
     def mock_db_session(self):
         """Mock database session using dependency override"""
+        # Create a mock that supports async operations
         mock_session = Mock()
+        # Make execute() return an AsyncMock so it can be awaited
+        mock_session.execute = AsyncMock()
+        mock_session.commit = AsyncMock()
+        mock_session.rollback = AsyncMock()
+        mock_session.close = AsyncMock()
         
         async def override_get_db_session():
             return mock_session
@@ -360,7 +366,13 @@ class TestTradeFlowTimeout:
         app.dependency_overrides[get_current_user_id] = override_get_current_user_id
         
         # Setup db session override
+        # Create a mock that supports async operations
         mock_session = Mock()
+        mock_session.execute = AsyncMock()
+        mock_session.commit = AsyncMock()
+        mock_session.rollback = AsyncMock()
+        mock_session.close = AsyncMock()
+        
         async def override_get_db_session():
             return mock_session
         

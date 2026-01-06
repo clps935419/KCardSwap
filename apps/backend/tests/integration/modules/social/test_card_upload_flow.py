@@ -37,7 +37,13 @@ class TestCardUploadIntegration:
     @pytest.fixture
     def mock_db_session(self):
         """Mock database session using dependency override"""
+        # Create a mock that supports async operations
         mock_session = Mock()
+        # Make execute() return an AsyncMock so it can be awaited
+        mock_session.execute = AsyncMock()
+        mock_session.commit = AsyncMock()
+        mock_session.rollback = AsyncMock()
+        mock_session.close = AsyncMock()
         
         async def override_get_db_session():
             return mock_session
