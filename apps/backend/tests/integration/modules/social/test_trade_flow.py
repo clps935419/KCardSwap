@@ -8,7 +8,7 @@ For full E2E tests with real database, use pytest with testcontainers (see conft
 
 from datetime import datetime, timedelta
 from unittest.mock import AsyncMock, Mock, patch
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 import pytest
 from fastapi.testclient import TestClient
@@ -17,6 +17,8 @@ from app.main import app
 from app.modules.social.domain.entities.card import Card
 from app.modules.social.domain.entities.friendship import Friendship, FriendshipStatus
 from app.modules.social.domain.entities.trade import Trade
+from app.shared.presentation.dependencies.auth import get_current_user_id
+from app.shared.infrastructure.database.connection import get_db_session
 
 client = TestClient(app)
 
@@ -44,37 +46,47 @@ class TestTradeFlowIntegration:
 
     @pytest.fixture
     def mock_auth_initiator(self, test_user_ids):
-        """Mock authentication for initiator"""
-        with patch(
-            "app.modules.social.presentation.routers.trade_router.get_current_user_id",
-            return_value=test_user_ids["initiator"],
-        ):
-            yield test_user_ids["initiator"]
+        """Mock authentication for initiator using dependency override"""
+        async def override_get_current_user_id() -> UUID:
+            return test_user_ids["initiator"]
+        
+        app.dependency_overrides[get_current_user_id] = override_get_current_user_id
+        yield test_user_ids["initiator"]
+        app.dependency_overrides.clear()
 
     @pytest.fixture
     def mock_auth_responder(self, test_user_ids):
-        """Mock authentication for responder"""
-        with patch(
-            "app.modules.social.presentation.routers.trade_router.get_current_user_id",
-            return_value=test_user_ids["responder"],
-        ):
-            yield test_user_ids["responder"]
+        """Mock authentication for responder using dependency override"""
+        async def override_get_current_user_id() -> UUID:
+            return test_user_ids["responder"]
+        
+        app.dependency_overrides[get_current_user_id] = override_get_current_user_id
+        yield test_user_ids["responder"]
+        app.dependency_overrides.clear()
 
     @pytest.fixture
     def mock_db_session(self):
-        """Mock database session"""
-        with patch(
-            "app.modules.social.presentation.routers.trade_router.get_db_session"
-        ) as mock:
-            session = Mock()
-            mock.return_value = session
-            yield session
+        """Mock database session using dependency override"""
+        # Create a mock that supports async operations
+        mock_session = Mock()
+        # Make execute() return an AsyncMock so it can be awaited
+        mock_session.execute = AsyncMock()
+        mock_session.commit = AsyncMock()
+        mock_session.rollback = AsyncMock()
+        mock_session.close = AsyncMock()
+        
+        async def override_get_db_session():
+            return mock_session
+        
+        app.dependency_overrides[get_db_session] = override_get_db_session
+        yield mock_session
+        app.dependency_overrides.clear()
 
     @pytest.fixture
     def mock_trade_repository(self, test_trade_data):
         """Mock trade repository"""
         with patch(
-            "app.modules.social.infrastructure.repositories.trade_repository_impl.SQLAlchemyTradeRepository"
+            "app.modules.social.infrastructure.repositories.trade_repository_impl.TradeRepositoryImpl"
         ) as mock:
             repo_instance = Mock()
 
@@ -135,7 +147,7 @@ class TestTradeFlowIntegration:
     def mock_friendship_repository(self, test_user_ids):
         """Mock friendship repository"""
         with patch(
-            "app.modules.social.infrastructure.repositories.friendship_repository_impl.SQLAlchemyFriendshipRepository"
+            "app.modules.social.infrastructure.repositories.friendship_repository_impl.FriendshipRepositoryImpl"
         ) as mock:
             repo_instance = Mock()
 
@@ -347,24 +359,34 @@ class TestTradeFlowTimeout:
             updated_at=old_time,
         )
 
+        # Setup auth override
+        async def override_get_current_user_id():
+            return initiator_id
+        
+        app.dependency_overrides[get_current_user_id] = override_get_current_user_id
+        
+        # Setup db session override
+        # Create a mock that supports async operations
+        mock_session = Mock()
+        mock_session.execute = AsyncMock()
+        mock_session.commit = AsyncMock()
+        mock_session.rollback = AsyncMock()
+        mock_session.close = AsyncMock()
+        
+        async def override_get_db_session():
+            return mock_session
+        
+        app.dependency_overrides[get_db_session] = override_get_db_session
+
         with (
             patch(
-                "app.modules.social.presentation.routers.trade_router.get_current_user_id",
-                return_value=initiator_id,
-            ),
-            patch(
-                "app.modules.social.presentation.routers.trade_router.get_db_session"
-            ) as mock_session,
-            patch(
-                "app.modules.social.infrastructure.repositories.trade_repository_impl.SQLAlchemyTradeRepository"
+                "app.modules.social.infrastructure.repositories.trade_repository_impl.TradeRepositoryImpl"
             ) as mock_trade_repo,
             patch(
                 "app.modules.social.infrastructure.repositories.card_repository_impl.CardRepositoryImpl"
             ) as mock_card_repo,
         ):
             # Setup mocks
-            mock_session.return_value = Mock()
-
             repo_instance = Mock()
             repo_instance.get_by_id = AsyncMock(return_value=accepted_trade)
             repo_instance.update = AsyncMock(side_effect=lambda trade: trade)
@@ -385,3 +407,6 @@ class TestTradeFlowTimeout:
                 "timeout" in response.json()["detail"].lower()
                 or "cancel" in response.json()["detail"].lower()
             )
+        
+        # Clean up override
+        app.dependency_overrides.clear()

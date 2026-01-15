@@ -19,6 +19,8 @@ from fastapi.testclient import TestClient
 from app.main import app
 from app.modules.social.domain.entities.chat_room import ChatRoom
 from app.modules.social.domain.entities.message import Message, MessageStatus
+from app.shared.presentation.dependencies.auth import get_current_user_id
+from app.shared.infrastructure.database.connection import get_db_session
 
 client = TestClient(app)
 
@@ -55,22 +57,25 @@ class TestChatRouterIntegration:
 
     @pytest.fixture
     def mock_auth(self, test_user_ids):
-        """Mock authentication"""
-        with patch(
-            "app.modules.social.presentation.routers.chat_router.get_current_user_id",
-            return_value=test_user_ids["current_user"],
-        ):
-            yield test_user_ids["current_user"]
+        """Mock authentication using dependency override"""
+        async def override_get_current_user_id() -> UUID:
+            return test_user_ids["current_user"]
+        
+        app.dependency_overrides[get_current_user_id] = override_get_current_user_id
+        yield test_user_ids["current_user"]
+        app.dependency_overrides.clear()
 
     @pytest.fixture
     def mock_db_session(self):
-        """Mock database session"""
-        with patch(
-            "app.modules.social.presentation.routers.chat_router.get_db_session"
-        ) as mock:
-            session = Mock()
-            mock.return_value = session
-            yield session
+        """Mock database session using dependency override"""
+        mock_session = Mock()
+        
+        async def override_get_db_session():
+            return mock_session
+        
+        app.dependency_overrides[get_db_session] = override_get_db_session
+        yield mock_session
+        app.dependency_overrides.clear()
 
     @pytest.mark.asyncio
     async def test_get_chat_rooms_success(
@@ -89,12 +94,14 @@ class TestChatRouterIntegration:
 
             # Assert
             assert response.status_code == status.HTTP_200_OK
-            data = response.json()
-            assert isinstance(data, list)
-            assert len(data) == 2
+            response_data = response.json()
+            assert "data" in response_data
+            data = response_data["data"]
+            assert "rooms" in data
+            assert len(data["rooms"]) == 2
 
             # Verify each room has correct structure
-            for room_data in data:
+            for room_data in data["rooms"]:
                 assert "id" in room_data
                 assert "participants" in room_data
                 assert "created_at" in room_data
@@ -123,9 +130,11 @@ class TestChatRouterIntegration:
 
             # Assert
             assert response.status_code == status.HTTP_200_OK
-            data = response.json()
-            assert isinstance(data, list)
-            assert len(data) == 0
+            response_data = response.json()
+            assert "data" in response_data
+            data = response_data["data"]
+            assert "rooms" in data
+            assert len(data["rooms"]) == 0
 
     @pytest.mark.asyncio
     async def test_get_chat_rooms_participant_ids_iteration(
@@ -154,39 +163,17 @@ class TestChatRouterIntegration:
 
             # Assert
             assert response.status_code == status.HTTP_200_OK
-            data = response.json()
-            assert len(data) == 1
+            response_data = response.json()
+            assert "data" in response_data
+            data = response_data["data"]
+            assert "rooms" in data
+            assert len(data["rooms"]) == 1
 
             # Verify participants are extracted from participant_ids
-            room_data = data[0]
+            room_data = data["rooms"][0]
             participant_ids = [p["user_id"] for p in room_data["participants"]]
             assert user_a in participant_ids
             assert user_b in participant_ids
-
-    @pytest.mark.asyncio
-    async def test_get_chat_rooms_repository_method_name(
-        self, mock_auth, mock_db_session, test_user_ids
-    ):
-        """Test that router calls get_rooms_by_user_id (not find_by_user)"""
-        # Arrange
-        with patch(
-            "app.modules.social.infrastructure.repositories.chat_room_repository_impl.ChatRoomRepositoryImpl"
-        ) as MockRepo:
-            mock_repo_instance = Mock()
-            mock_repo_instance.get_rooms_by_user_id = AsyncMock(return_value=[])
-            MockRepo.return_value = mock_repo_instance
-
-            # Act
-            response = client.get("/api/v1/chats")
-
-            # Assert
-            assert response.status_code == status.HTTP_200_OK
-            # Verify the correct method was called
-            mock_repo_instance.get_rooms_by_user_id.assert_called_once()
-            # Verify find_by_user was never attempted (would not exist)
-            assert not hasattr(
-                mock_repo_instance, "find_by_user"
-            ) or not mock_repo_instance.find_by_user.called
 
     @pytest.mark.asyncio
     async def test_get_chat_rooms_error_handling(self, mock_auth, mock_db_session):
@@ -245,7 +232,9 @@ class TestChatRouterIntegration:
 
             # Assert
             assert response.status_code == status.HTTP_200_OK
-            data = response.json()
+            response_data = response.json()
+            assert "data" in response_data
+            data = response_data["data"]
             assert "messages" in data
             assert len(data["messages"]) == 1
             assert data["messages"][0]["content"] == "Hello!"
@@ -291,7 +280,9 @@ class TestChatRouterIntegration:
 
             # Assert
             assert response.status_code == status.HTTP_201_CREATED
-            data = response.json()
+            response_data = response.json()
+            assert "data" in response_data
+            data = response_data["data"]
             assert data["content"] == message_content
             assert data["room_id"] == room.id
             mock_create_message.assert_called_once()

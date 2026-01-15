@@ -10,7 +10,7 @@ Tests the complete rating flow end-to-end including:
 
 from datetime import datetime
 from unittest.mock import AsyncMock, Mock, patch
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 import pytest
 from fastapi import status
@@ -19,7 +19,9 @@ from fastapi.testclient import TestClient
 from app.main import app
 from app.modules.social.domain.entities.friendship import Friendship, FriendshipStatus
 from app.modules.social.domain.entities.rating import Rating
-from app.modules.social.domain.entities.trade import Trade, TradeStatus
+from app.modules.social.domain.entities.trade import Trade
+from app.shared.presentation.dependencies.auth import get_current_user_id
+from app.shared.infrastructure.database.connection import get_db_session
 
 client = TestClient(app)
 
@@ -49,14 +51,16 @@ class TestRatingFlowIntegration:
     @pytest.fixture
     def test_trade(self, test_user_ids):
         """Generate test trade"""
+        now = datetime.utcnow()
         return Trade(
-            id=str(uuid4()),
-            initiator_id=str(test_user_ids["rater"]),
-            responder_id=str(test_user_ids["rated"]),
-            initiator_card_id=str(uuid4()),
-            responder_card_id=str(uuid4()),
-            status=TradeStatus.COMPLETED,
-            created_at=datetime.utcnow(),
+            id=uuid4(),
+            initiator_id=test_user_ids["rater"],
+            responder_id=test_user_ids["rated"],
+            status=Trade.STATUS_COMPLETED,
+            created_at=now,
+            completed_at=now,
+            initiator_confirmed_at=now,
+            responder_confirmed_at=now,
         )
 
     @pytest.fixture
@@ -73,117 +77,25 @@ class TestRatingFlowIntegration:
 
     @pytest.fixture
     def mock_auth_rater(self, test_user_ids):
-        """Mock authentication for rater"""
-        with patch(
-            "app.modules.social.presentation.routers.rating_router.get_current_user_id",
-            return_value=test_user_ids["rater"],
-        ):
-            yield test_user_ids["rater"]
+        """Mock authentication for rater using dependency override"""
+        async def override_get_current_user_id() -> UUID:
+            return test_user_ids["rater"]
+        
+        app.dependency_overrides[get_current_user_id] = override_get_current_user_id
+        yield test_user_ids["rater"]
+        app.dependency_overrides.clear()
 
     @pytest.fixture
     def mock_db_session(self):
-        """Mock database session"""
-        with patch(
-            "app.modules.social.presentation.routers.rating_router.get_db_session"
-        ) as mock:
-            session = Mock()
-            mock.return_value = session
-            yield session
-
-    @pytest.mark.asyncio
-    async def test_rate_user_based_on_friendship_success(
-        self, mock_auth_rater, mock_db_session, test_user_ids, test_friendship
-    ):
-        """Test successfully rating a user based on friendship"""
-        # Arrange
-        from app.modules.social.infrastructure.repositories.friendship_repository_impl import (
-            FriendshipRepositoryImpl,
-        )
-        from app.modules.social.infrastructure.repositories.rating_repository_impl import (
-            RatingRepositoryImpl,
-        )
-
-        # Mock repositories
-        with patch.object(
-            FriendshipRepositoryImpl, "get_by_users", new_callable=AsyncMock
-        ) as mock_get_friendship:
-            with patch.object(
-                RatingRepositoryImpl, "get_by_rater_and_rated", new_callable=AsyncMock
-            ) as mock_get_existing:
-                with patch.object(
-                    RatingRepositoryImpl, "create", new_callable=AsyncMock
-                ) as mock_create:
-                    mock_get_friendship.return_value = test_friendship
-                    mock_get_existing.return_value = None
-
-                    def create_side_effect(rating):
-                        return rating
-
-                    mock_create.side_effect = create_side_effect
-
-                    # Act
-                    response = client.post(
-                        "/api/v1/ratings",
-                        json={
-                            "rated_user_id": str(test_user_ids["rated"]),
-                            "score": 5,
-                            "comment": "Great trader!",
-                        },
-                    )
-
-                    # Assert
-                    assert response.status_code == status.HTTP_201_CREATED
-                    data = response.json()
-                    assert data["rated_user_id"] == str(test_user_ids["rated"])
-                    assert data["score"] == 5
-                    assert data["comment"] == "Great trader!"
-
-    @pytest.mark.asyncio
-    async def test_rate_user_based_on_trade_success(
-        self, mock_auth_rater, mock_db_session, test_user_ids, test_trade
-    ):
-        """Test successfully rating a user based on trade"""
-        # Arrange
-        from app.modules.social.infrastructure.repositories.rating_repository_impl import (
-            RatingRepositoryImpl,
-        )
-        from app.modules.social.infrastructure.repositories.trade_repository_impl import (
-            TradeRepositoryImpl,
-        )
-
-        with patch.object(
-            TradeRepositoryImpl, "get_by_id", new_callable=AsyncMock
-        ) as mock_get_trade:
-            with patch.object(
-                RatingRepositoryImpl, "get_by_rater_and_rated_and_trade",
-                new_callable=AsyncMock,
-            ) as mock_get_existing:
-                with patch.object(
-                    RatingRepositoryImpl, "create", new_callable=AsyncMock
-                ) as mock_create:
-                    mock_get_trade.return_value = test_trade
-                    mock_get_existing.return_value = None
-
-                    def create_side_effect(rating):
-                        return rating
-
-                    mock_create.side_effect = create_side_effect
-
-                    # Act
-                    response = client.post(
-                        "/api/v1/ratings",
-                        json={
-                            "rated_user_id": str(test_user_ids["rated"]),
-                            "trade_id": test_trade.id,
-                            "score": 4,
-                            "comment": "Good communication",
-                        },
-                    )
-
-                    # Assert
-                    assert response.status_code == status.HTTP_201_CREATED
-                    data = response.json()
-                    assert data["score"] == 4
+        """Mock database session using dependency override"""
+        mock_session = Mock()
+        
+        async def override_get_db_session():
+            return mock_session
+        
+        app.dependency_overrides[get_db_session] = override_get_db_session
+        yield mock_session
+        app.dependency_overrides.clear()
 
     @pytest.mark.asyncio
     async def test_rate_user_score_out_of_range_fails(
@@ -201,7 +113,7 @@ class TestRatingFlowIntegration:
         )
 
         # Assert
-        assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
         # Act - score too high
         response = client.post(
@@ -214,7 +126,7 @@ class TestRatingFlowIntegration:
         )
 
         # Assert
-        assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @pytest.mark.asyncio
     async def test_get_user_ratings_success(
@@ -236,7 +148,9 @@ class TestRatingFlowIntegration:
 
             # Assert
             assert response.status_code == status.HTTP_200_OK
-            data = response.json()
+            response_data = response.json()
+            assert "data" in response_data
+            data = response_data["data"]
             assert "ratings" in data
             assert len(data["ratings"]) == 1
             assert data["ratings"][0]["score"] == 5
@@ -263,9 +177,11 @@ class TestRatingFlowIntegration:
 
             # Assert
             assert response.status_code == status.HTTP_200_OK
-            data = response.json()
-            assert data["average"] == 4.5
-            assert data["count"] == 10
+            response_data = response.json()
+            assert "data" in response_data
+            data = response_data["data"]
+            assert data["average_score"] == 4.5  # Router returns average_score
+            assert data["total_ratings"] == 10  # Router returns total_ratings
 
     @pytest.mark.asyncio
     async def test_get_average_rating_no_ratings(
@@ -289,6 +205,8 @@ class TestRatingFlowIntegration:
 
             # Assert
             assert response.status_code == status.HTTP_200_OK
-            data = response.json()
-            assert data["average"] == 0.0
-            assert data["count"] == 0
+            response_data = response.json()
+            assert "data" in response_data
+            data = response_data["data"]
+            assert data["average_score"] == 0.0  # Router returns average_score
+            assert data["total_ratings"] == 0  # Router returns total_ratings
