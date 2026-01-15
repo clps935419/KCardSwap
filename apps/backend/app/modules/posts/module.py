@@ -97,8 +97,12 @@ class PostsModule(Module):
         self, session: AsyncSession
     ) -> RejectInterestUseCase:
         """Provide RejectInterestUseCase with dependencies."""
+        post_repo = PostRepositoryImpl(session)
         post_interest_repo = PostInterestRepositoryImpl(session)
-        return RejectInterestUseCase(post_interest_repository=post_interest_repo)
+        return RejectInterestUseCase(
+            post_repository=post_repo,
+            post_interest_repository=post_interest_repo
+        )
 
     @provider
     def provide_close_post_use_case(self, session: AsyncSession) -> ClosePostUseCase:
