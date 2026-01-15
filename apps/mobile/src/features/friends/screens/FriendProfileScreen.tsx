@@ -9,12 +9,12 @@
 
 import React from 'react';
 import { Alert, ScrollView, ActivityIndicator } from 'react-native';
-import { Box } from '@/components/ui/box';
-import { Text } from '@/components/ui/text';
-import { VStack } from '@/components/ui/vstack';
-import { HStack } from '@/components/ui/hstack';
-import { Button, ButtonText } from '@/components/ui/button';
-import { Heading } from '@/components/ui/heading';
+import { Box } from '@/src/shared/ui/components/box';
+import { Text } from '@/src/shared/ui/components/text';
+import { VStack } from '@/src/shared/ui/components/vstack';
+import { HStack } from '@/src/shared/ui/components/hstack';
+import { Button, ButtonText } from '@/src/shared/ui/components/button';
+import { Heading } from '@/src/shared/ui/components/heading';
 import { useBlockUser } from '../hooks/useFriends';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';

@@ -1,13 +1,13 @@
 import { ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuthStore } from '@/src/shared/state/authStore';
-import { Box } from '@/components/ui/box';
-import { Text } from '@/components/ui/text';
-import { Heading } from '@/components/ui/heading';
-import { Pressable } from '@/components/ui/pressable';
-import { HStack } from '@/components/ui/hstack';
-import { VStack } from '@/components/ui/vstack';
-import { Card } from '@/components/ui/card';
+import { Box } from '@/src/shared/ui/components/box';
+import { Text } from '@/src/shared/ui/components/text';
+import { Heading } from '@/src/shared/ui/components/heading';
+import { Pressable } from '@/src/shared/ui/components/pressable';
+import { HStack } from '@/src/shared/ui/components/hstack';
+import { VStack } from '@/src/shared/ui/components/vstack';
+import { Card } from '@/src/shared/ui/components/card';
 
 export default function HomeScreen() {
   const { user } = useAuthStore();

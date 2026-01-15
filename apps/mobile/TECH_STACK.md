@@ -536,7 +536,7 @@ npx gluestack-ui@latest add toast
 **Provider 配置：**
 ```typescript
 // app/_layout.tsx
-import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider';
+import { GluestackUIProvider } from '@/src/shared/ui/components/gluestack-ui-provider';
 
 <GluestackUIProvider mode="light">
   {/* app content */}

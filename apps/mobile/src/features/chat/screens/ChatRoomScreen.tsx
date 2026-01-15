@@ -10,12 +10,12 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { FlatList, KeyboardAvoidingView, Platform, Alert } from 'react-native';
-import { Box } from '@/components/ui/box';
-import { Text } from '@/components/ui/text';
-import { HStack } from '@/components/ui/hstack';
-import { VStack } from '@/components/ui/vstack';
-import { Input, InputField } from '@/components/ui/input';
-import { Button, ButtonText } from '@/components/ui/button';
+import { Box } from '@/src/shared/ui/components/box';
+import { Text } from '@/src/shared/ui/components/text';
+import { HStack } from '@/src/shared/ui/components/hstack';
+import { VStack } from '@/src/shared/ui/components/vstack';
+import { Input, InputField } from '@/src/shared/ui/components/input';
+import { Button, ButtonText } from '@/src/shared/ui/components/button';
 import { useSendMessage } from '../hooks/useChat';
 import { useMessagePolling } from '../services/polling';
 import { useLocalSearchParams } from 'expo-router';

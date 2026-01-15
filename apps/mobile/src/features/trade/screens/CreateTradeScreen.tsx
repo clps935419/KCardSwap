@@ -22,7 +22,7 @@ import {
   Button,
   ButtonText,
   Spinner,
-} from '@/components/ui';
+} from '@/src/shared/ui/components';
 import { useCreateTrade } from '@/src/features/trade/hooks/useTrade';
 
 export default function CreateTradeScreen() {

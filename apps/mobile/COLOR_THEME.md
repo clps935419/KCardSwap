@@ -222,7 +222,7 @@ Subtle: background-100 背景 + typography-800 文字
 ## 維護與更新 (Maintenance)
 
 ### 色彩定義檔案
-- **主要配置**: `components/ui/gluestack-ui-provider/config.ts`
+- **主要配置**: `src/shared/ui/components/gluestack-ui-provider/config.ts`
 - **代幣文件**: `src/shared/ui/theme/tokens.ts`
 
 ### 更新原則
