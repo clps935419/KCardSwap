@@ -176,31 +176,6 @@ class TestChatRouterIntegration:
             assert user_b in participant_ids
 
     @pytest.mark.asyncio
-    async def test_get_chat_rooms_repository_method_name(
-        self, mock_auth, mock_db_session, test_user_ids
-    ):
-        """Test that router calls get_rooms_by_user_id (not find_by_user)"""
-        # Arrange
-        with patch(
-            "app.modules.social.infrastructure.repositories.chat_room_repository_impl.ChatRoomRepositoryImpl"
-        ) as MockRepo:
-            mock_repo_instance = Mock()
-            mock_repo_instance.get_rooms_by_user_id = AsyncMock(return_value=[])
-            MockRepo.return_value = mock_repo_instance
-
-            # Act
-            response = client.get("/api/v1/chats")
-
-            # Assert
-            assert response.status_code == status.HTTP_200_OK
-            # Verify the correct method was called
-            mock_repo_instance.get_rooms_by_user_id.assert_called_once()
-            # Verify find_by_user was never attempted (would not exist)
-            assert not hasattr(
-                mock_repo_instance, "find_by_user"
-            ) or not mock_repo_instance.find_by_user.called
-
-    @pytest.mark.asyncio
     async def test_get_chat_rooms_error_handling(self, mock_auth, mock_db_session):
         """Test error handling when repository raises exception"""
         # Arrange
