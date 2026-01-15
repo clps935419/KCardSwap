@@ -6,12 +6,12 @@
 
 import React, { useState } from 'react';
 import { Alert } from 'react-native';
-import { Box } from '@/components/ui/box';
-import { Text } from '@/components/ui/text';
-import { VStack } from '@/components/ui/vstack';
-import { Button, ButtonText } from '@/components/ui/button';
-import { Input, InputField } from '@/components/ui/input';
-import { Heading } from '@/components/ui/heading';
+import { Box } from '@/src/shared/ui/components/box';
+import { Text } from '@/src/shared/ui/components/text';
+import { VStack } from '@/src/shared/ui/components/vstack';
+import { Button, ButtonText } from '@/src/shared/ui/components/button';
+import { Input, InputField } from '@/src/shared/ui/components/input';
+import { Heading } from '@/src/shared/ui/components/heading';
 import { useSendFriendRequest } from '../hooks/useFriends';
 import { useRouter } from 'expo-router';
 

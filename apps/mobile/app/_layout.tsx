@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Slot, useRouter, useSegments } from 'expo-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAuthStore } from '@/src/shared/state/authStore';
-import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider';
+import { GluestackUIProvider } from '@/src/shared/ui/components/gluestack-ui-provider';
 import { useNotifications } from '@/src/features/notifications/hooks/useNotifications';
 import '@/global.css';
 

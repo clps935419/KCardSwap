@@ -9,13 +9,13 @@
 
 import React from 'react';
 import { FlatList, RefreshControl, ActivityIndicator } from 'react-native';
-import { Box } from '@/components/ui/box';
-import { Text } from '@/components/ui/text';
-import { Pressable } from '@/components/ui/pressable';
-import { HStack } from '@/components/ui/hstack';
-import { VStack } from '@/components/ui/vstack';
-import { Heading } from '@/components/ui/heading';
-import { Badge, BadgeText } from '@/components/ui/badge';
+import { Box } from '@/src/shared/ui/components/box';
+import { Text } from '@/src/shared/ui/components/text';
+import { Pressable } from '@/src/shared/ui/components/pressable';
+import { HStack } from '@/src/shared/ui/components/hstack';
+import { VStack } from '@/src/shared/ui/components/vstack';
+import { Heading } from '@/src/shared/ui/components/heading';
+import { Badge, BadgeText } from '@/src/shared/ui/components/badge';
 import { useChatRooms } from '../hooks/useChat';
 import { useRouter } from 'expo-router';
 

@@ -9,13 +9,13 @@
 
 import React, { useState } from 'react';
 import { FlatList, RefreshControl, ActivityIndicator } from 'react-native';
-import { Box } from '@/components/ui/box';
-import { Text } from '@/components/ui/text';
-import { Pressable } from '@/components/ui/pressable';
-import { HStack } from '@/components/ui/hstack';
-import { VStack } from '@/components/ui/vstack';
-import { Button, ButtonText } from '@/components/ui/button';
-import { Heading } from '@/components/ui/heading';
+import { Box } from '@/src/shared/ui/components/box';
+import { Text } from '@/src/shared/ui/components/text';
+import { Pressable } from '@/src/shared/ui/components/pressable';
+import { HStack } from '@/src/shared/ui/components/hstack';
+import { VStack } from '@/src/shared/ui/components/vstack';
+import { Button, ButtonText } from '@/src/shared/ui/components/button';
+import { Heading } from '@/src/shared/ui/components/heading';
 import { useFriendsList, useUnblockUser } from '../hooks/useFriends';
 import type { FriendsTab, FriendshipStatus } from '../types';
 import { useRouter } from 'expo-router';
