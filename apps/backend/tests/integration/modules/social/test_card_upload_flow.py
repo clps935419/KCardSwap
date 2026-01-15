@@ -56,7 +56,7 @@ class TestCardUploadIntegration:
     def mock_card_repository_empty(self):
         """Mock card repository with no existing uploads"""
         with patch(
-            "app.modules.social.infrastructure.repositories.card_repository_impl.CardRepositoryImpl"
+            "app.modules.social.presentation.routers.cards_router.CardRepositoryImpl"
         ) as mock:
             repo_instance = Mock()
             repo_instance.count_uploads_today = AsyncMock(return_value=0)
@@ -162,7 +162,7 @@ class TestCardUploadIntegration:
     def mock_card_repository_daily_limit_reached(self):
         """Mock card repository showing daily limit reached"""
         with patch(
-            "app.modules.social.infrastructure.repositories.card_repository_impl.CardRepositoryImpl"
+            "app.modules.social.presentation.routers.cards_router.CardRepositoryImpl"
         ) as mock:
             repo_instance = Mock()
             repo_instance.count_uploads_today = AsyncMock(return_value=2)  # At limit
@@ -208,7 +208,7 @@ class TestCardUploadIntegration:
     def mock_card_repository_storage_limit_reached(self):
         """Mock card repository showing storage limit near max"""
         with patch(
-            "app.modules.social.infrastructure.repositories.card_repository_impl.CardRepositoryImpl"
+            "app.modules.social.presentation.routers.cards_router.CardRepositoryImpl"
         ) as mock:
             repo_instance = Mock()
             repo_instance.count_uploads_today = AsyncMock(return_value=0)
@@ -287,7 +287,7 @@ class TestCardUploadIntegration:
         """
         # Mock repository for delete operation
         with patch(
-            "app.modules.social.infrastructure.repositories.card_repository_impl.CardRepositoryImpl"
+            "app.modules.social.presentation.routers.cards_router.CardRepositoryImpl"
         ) as mock_repo_class:
             repo_instance = Mock()
             repo_instance.find_by_id = AsyncMock(return_value=None)  # Card not found
@@ -388,7 +388,7 @@ class TestCardUploadContractCompliance:
                 "app.modules.social.presentation.routers.cards_router.get_db_session"
             ),
             patch(
-                "app.modules.social.infrastructure.repositories.card_repository_impl.CardRepositoryImpl"
+                "app.modules.social.presentation.routers.cards_router.CardRepositoryImpl"
             ) as mock_repo_class,
             patch(
                 "app.shared.infrastructure.external.storage_service_factory.get_storage_service"
