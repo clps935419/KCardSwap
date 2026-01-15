@@ -205,84 +205,187 @@ class TestPostsFlowIntegration:
             mock.return_value = repo_instance
             yield repo_instance
 
-    @pytest.mark.skip(reason="Requires proper repository mocking - see TEST_STATUS_REPORT.md")
-    def test_create_post_success(
+    @pytest.mark.asyncio
+    async def test_create_post_success(
         self,
         mock_auth_owner,
         mock_db_session,
-        mock_post_repository,
-        mock_subscription_repository,
         test_post_data,
+        test_user_ids,
     ):
         """Test: Successfully create a city board post"""
-        response = client.post(
-            "/api/v1/posts",
-            json={
-                "city_code": test_post_data["city_code"],
-                "title": test_post_data["title"],
-                "content": test_post_data["content"],
-                "idol": test_post_data["idol"],
-                "idol_group": test_post_data["idol_group"],
-                "expires_at": test_post_data["expires_at"].isoformat(),
-            },
+        from app.modules.posts.infrastructure.repositories.post_repository_impl import PostRepositoryImpl
+        from app.modules.identity.infrastructure.repositories.subscription_repository_impl import SubscriptionRepositoryImpl
+        
+        # Create expected post
+        created_post = Post(
+            id=str(test_post_data["post_id"]),
+            owner_id=str(test_post_data["owner_id"]),
+            city_code=test_post_data["city_code"],
+            title=test_post_data["title"],
+            content=test_post_data["content"],
+            idol=test_post_data["idol"],
+            idol_group=test_post_data["idol_group"],
+            status=PostStatus.OPEN,
+            expires_at=test_post_data["expires_at"],
+            created_at=datetime.now(timezone.utc),
+            updated_at=datetime.now(timezone.utc),
         )
+        
+        with patch.object(PostRepositoryImpl, "create", new_callable=AsyncMock) as mock_create:
+            with patch.object(SubscriptionRepositoryImpl, "get_by_user_id", new_callable=AsyncMock) as mock_sub:
+                with patch.object(PostRepositoryImpl, "count_user_posts_today", new_callable=AsyncMock) as mock_count:
+                    mock_create.return_value = created_post
+                    mock_sub.return_value = None  # Free user
+                    mock_count.return_value = 0  # First post today
+                    
+                    response = client.post(
+                        "/api/v1/posts",
+                        json={
+                            "city_code": test_post_data["city_code"],
+                            "title": test_post_data["title"],
+                            "content": test_post_data["content"],
+                            "idol": test_post_data["idol"],
+                            "idol_group": test_post_data["idol_group"],
+                            "expires_at": test_post_data["expires_at"].isoformat(),
+                        },
+                    )
 
-        assert response.status_code == 201
-        data = response.json()
-        assert data["city_code"] == test_post_data["city_code"]
-        assert data["title"] == test_post_data["title"]
-        assert data["status"] == "open"
+                    assert response.status_code == 201
+                    response_data = response.json()
+                    assert "data" in response_data
+                    data = response_data["data"]
+                    assert data["city_code"] == test_post_data["city_code"]
+                    assert data["title"] == test_post_data["title"]
+                    assert data["status"] == "open"
 
-    @pytest.mark.skip(reason="Requires proper repository mocking - see TEST_STATUS_REPORT.md")
-    def test_list_board_posts_by_city(
+    @pytest.mark.asyncio
+    async def test_list_board_posts_by_city(
         self,
         mock_auth_owner,
         mock_db_session,
-        mock_post_repository,
         test_post_data,
     ):
         """Test: List posts by city code"""
-        response = client.get(f"/api/v1/posts?city_code={test_post_data['city_code']}")
+        from app.modules.posts.infrastructure.repositories.post_repository_impl import PostRepositoryImpl
+        
+        # Create test posts
+        test_post = Post(
+            id=str(test_post_data["post_id"]),
+            owner_id=str(test_post_data["owner_id"]),
+            city_code=test_post_data["city_code"],
+            title=test_post_data["title"],
+            content=test_post_data["content"],
+            idol=test_post_data["idol"],
+            idol_group=test_post_data["idol_group"],
+            status=PostStatus.OPEN,
+            expires_at=test_post_data["expires_at"],
+            created_at=datetime.now(timezone.utc),
+            updated_at=datetime.now(timezone.utc),
+        )
+        
+        with patch.object(PostRepositoryImpl, "list_by_city", new_callable=AsyncMock) as mock_find:
+            mock_find.return_value = [test_post]
+            
+            response = client.get(f"/api/v1/posts?city_code={test_post_data['city_code']}")
 
-        assert response.status_code == 200
-        data = response.json()
-        assert "posts" in data
-        assert len(data["posts"]) > 0
-        assert data["posts"][0]["city_code"] == test_post_data["city_code"]
+            assert response.status_code == 200
+            response_data = response.json()
+            assert "data" in response_data
+            data = response_data["data"]
+            assert "posts" in data
+            assert len(data["posts"]) > 0
+            assert data["posts"][0]["city_code"] == test_post_data["city_code"]
 
-    @pytest.mark.skip(reason="Requires proper repository mocking - see TEST_STATUS_REPORT.md")
-    def test_list_board_posts_with_idol_filter(
+    @pytest.mark.asyncio
+    async def test_list_board_posts_with_idol_filter(
         self,
         mock_auth_owner,
         mock_db_session,
-        mock_post_repository,
         test_post_data,
     ):
         """Test: List posts with idol filter"""
-        response = client.get(
-            f"/api/v1/posts?city_code={test_post_data['city_code']}&idol={test_post_data['idol']}"
+        from app.modules.posts.infrastructure.repositories.post_repository_impl import PostRepositoryImpl
+        
+        # Create test posts
+        test_post = Post(
+            id=str(test_post_data["post_id"]),
+            owner_id=str(test_post_data["owner_id"]),
+            city_code=test_post_data["city_code"],
+            title=test_post_data["title"],
+            content=test_post_data["content"],
+            idol=test_post_data["idol"],
+            idol_group=test_post_data["idol_group"],
+            status=PostStatus.OPEN,
+            expires_at=test_post_data["expires_at"],
+            created_at=datetime.now(timezone.utc),
+            updated_at=datetime.now(timezone.utc),
         )
+        
+        with patch.object(PostRepositoryImpl, "list_by_city", new_callable=AsyncMock) as mock_find:
+            mock_find.return_value = [test_post]
+            
+            response = client.get(
+                f"/api/v1/posts?city_code={test_post_data['city_code']}&idol={test_post_data['idol']}"
+            )
 
-        assert response.status_code == 200
-        data = response.json()
-        assert "posts" in data
+            assert response.status_code == 200
+            response_data = response.json()
+            assert "data" in response_data
+            data = response_data["data"]
+            assert "posts" in data
 
-    @pytest.mark.skip(reason="Requires proper repository mocking - see TEST_STATUS_REPORT.md")
-    def test_express_interest_success(
+    @pytest.mark.asyncio
+    async def test_express_interest_success(
         self,
         mock_auth_interested,
         mock_db_session,
-        mock_post_repository,
-        mock_post_interest_repository,
         test_post_data,
+        test_user_ids,
     ):
         """Test: Successfully express interest in a post"""
-        response = client.post(f"/api/v1/posts/{test_post_data['post_id']}/interest")
+        from app.modules.posts.infrastructure.repositories.post_repository_impl import PostRepositoryImpl
+        from app.modules.posts.infrastructure.repositories.post_interest_repository_impl import PostInterestRepositoryImpl
+        
+        # Create test post and interest
+        test_post = Post(
+            id=str(test_post_data["post_id"]),
+            owner_id=str(test_post_data["owner_id"]),
+            city_code=test_post_data["city_code"],
+            title=test_post_data["title"],
+            content=test_post_data["content"],
+            idol=test_post_data["idol"],
+            idol_group=test_post_data["idol_group"],
+            status=PostStatus.OPEN,
+            expires_at=test_post_data["expires_at"],
+            created_at=datetime.now(timezone.utc),
+            updated_at=datetime.now(timezone.utc),
+        )
+        
+        interest_id = uuid4()
+        created_interest = PostInterest(
+            id=str(interest_id),
+            post_id=str(test_post_data["post_id"]),
+            user_id=str(test_user_ids["interested_user"]),
+            status=PostInterestStatus.PENDING,
+            created_at=datetime.now(timezone.utc),
+        )
+        
+        with patch.object(PostRepositoryImpl, "get_by_id", new_callable=AsyncMock) as mock_get:
+            with patch.object(PostInterestRepositoryImpl, "get_by_post_and_user", new_callable=AsyncMock) as mock_get_interest:
+                with patch.object(PostInterestRepositoryImpl, "create", new_callable=AsyncMock) as mock_create:
+                    mock_get.return_value = test_post
+                    mock_get_interest.return_value = None  # No existing interest
+                    mock_create.return_value = created_interest
+                    
+                    response = client.post(f"/api/v1/posts/{test_post_data['post_id']}/interest")
 
-        assert response.status_code == 201
-        data = response.json()
-        assert data["post_id"] == str(test_post_data["post_id"])
-        assert data["status"] == "pending"
+                    assert response.status_code == 201
+                    response_data = response.json()
+                    assert "data" in response_data
+                    data = response_data["data"]
+                    assert data["post_id"] == str(test_post_data["post_id"])
+                    assert data["status"] == "pending"
 
     def test_accept_interest_creates_friendship_and_chat(
         self,
