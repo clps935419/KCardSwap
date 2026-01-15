@@ -23,7 +23,7 @@ import {
   Button,
   ButtonText,
   Spinner,
-} from '@/components/ui';
+} from '@/src/shared/ui/components';
 import {
   useAcceptTrade,
   useRejectTrade,

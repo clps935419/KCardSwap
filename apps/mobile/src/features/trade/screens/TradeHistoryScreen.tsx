@@ -21,7 +21,7 @@ import {
   HStack,
   Pressable,
   Spinner,
-} from '@/components/ui';
+} from '@/src/shared/ui/components';
 import { useTradeHistory } from '@/src/features/trade/hooks/useTrade';
 import { useAuthStore } from '@/src/shared/state/authStore';
 import type { TradeResponse } from '@/src/features/trade/types';
