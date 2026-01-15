@@ -1,21 +1,20 @@
 """
-Test configuration and fixtures for integration tests with testcontainers.
+Test configuration and fixtures for integration tests.
 
 This module provides fixtures for:
-- PostgreSQL database container
+- PostgreSQL test database (separate from main database)
 - Automatic Alembic migration execution
-- Database session management
+- Database session management with transaction rollback
 - GCS mock service for testing
 """
 
+import os
 from typing import AsyncGenerator
 
 import pytest
-
-# Uncomment when testcontainers-postgres is installed
-# from testcontainers.postgres import PostgresContainer
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
+from app.config import settings
 from app.shared.infrastructure.external.mock_gcs_storage_service import (
     MockGCSStorageService,
 )
@@ -44,47 +43,41 @@ def mock_gcs_service():
 
 
 @pytest.fixture(scope="session")
-def postgres_container():
+def test_database_url() -> str:
+    """Get the test database URL from environment or settings.
+    
+    Returns:
+        str: Test database URL for pytest session
     """
-    Start a PostgreSQL container for testing.
-
-    To use this fixture, install testcontainers:
-    poetry add --group dev testcontainers[postgres]
-    """
-    # Uncomment when testcontainers-postgres is installed
-    # with PostgresContainer("postgres:15-alpine") as postgres:
-    #     # Set environment variable for Alembic
-    #     database_url = postgres.get_connection_url()
-    #     os.environ["DATABASE_URL"] = database_url
-    #
-    #     # Run Alembic migrations
-    #     alembic_cfg = Config("alembic.ini")
-    #     alembic_cfg.set_main_option("sqlalchemy.url", database_url)
-    #     command.upgrade(alembic_cfg, "head")
-    #
-    #     yield postgres
-
-    # Temporary: Skip testcontainers for now
-    pytest.skip("Testcontainers not yet configured")
-
-
-@pytest.fixture(scope="session")
-def test_database_url(postgres_container) -> str:
-    """Get the database URL for testing."""
-    return postgres_container.get_connection_url().replace("psycopg2", "asyncpg")
+    # Use TEST_DATABASE_URL if available, otherwise use the one from settings
+    return os.getenv("TEST_DATABASE_URL", settings.TEST_DATABASE_URL)
 
 
 @pytest.fixture(scope="session")
 async def test_engine(test_database_url: str):
-    """Create a test database engine."""
-    engine = create_async_engine(test_database_url, echo=True)
+    """Create a test database engine for the entire test session.
+    
+    Args:
+        test_database_url: Database URL for testing
+        
+    Yields:
+        AsyncEngine: SQLAlchemy async engine for testing
+    """
+    engine = create_async_engine(test_database_url, echo=False, pool_pre_ping=True)
     yield engine
     await engine.dispose()
 
 
 @pytest.fixture(scope="session")
 async def test_session_factory(test_engine) -> async_sessionmaker:
-    """Create a test session factory."""
+    """Create a test session factory for the entire test session.
+    
+    Args:
+        test_engine: Test database engine
+        
+    Returns:
+        async_sessionmaker: Session factory for creating test sessions
+    """
     return async_sessionmaker(
         test_engine,
         class_=AsyncSession,
@@ -99,14 +92,26 @@ async def db_session(test_session_factory) -> AsyncGenerator[AsyncSession, None]
     """
     Provide a transactional database session for each test.
 
-    Each test gets a clean database state through transaction rollback.
+    Each test runs in its own transaction that is automatically rolled back
+    after the test completes, ensuring test isolation and clean database state.
+    
+    This approach:
+    - Maintains test isolation (each test starts with clean state)
+    - Avoids manual cleanup (automatic rollback)
+    - Faster than recreating database (uses transactions)
+    - Works with the test database (kcardswap_test)
+    
+    Args:
+        test_session_factory: Session factory from the session-scoped fixture
+        
+    Yields:
+        AsyncSession: Database session for the test
     """
     async with test_session_factory() as session:
-        try:
-            yield session
-            await session.commit()
-        except Exception:
-            await session.rollback()
-            raise
-        finally:
-            await session.close()
+        async with session.begin():
+            try:
+                yield session
+            finally:
+                # Rollback is automatic when exiting the begin() context
+                # This ensures all changes made during the test are discarded
+                await session.rollback()

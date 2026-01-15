@@ -16,6 +16,9 @@ class Settings:
     DATABASE_URL: str = os.getenv(
         "DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/kcardswap"
     )
+    TEST_DATABASE_URL: str = os.getenv(
+        "TEST_DATABASE_URL", "postgresql+asyncpg://kcardswap:kcardswap@localhost:5432/kcardswap_test"
+    )
 
     # JWT
     JWT_SECRET_KEY: str = os.getenv(
