@@ -91,12 +91,15 @@ npm install --legacy-peer-deps
 The project uses Gluestack UI v3 as the primary UI component system. The setup includes:
 
 1. **Provider Configuration**: `GluestackUIProvider` is configured in `app/_layout.tsx`
-2. **Components**: Available in `components/ui/` directory
+2. **Components**: Available in `src/shared/ui/components/` directory
    - `button` - Button components with variants (solid, outline, etc.)
    - `card` - Card component for content containers
    - `input` - Input components for forms
+   - `box`, `text`, `heading` - Basic layout and typography components
+   - `hstack`, `vstack` - Stack layout components
+   - `badge`, `spinner`, `pressable`, `switch` - Additional UI components
 3. **Theme Tokens**: Centralized in `src/shared/ui/theme/tokens.ts`
-4. **Shared Components**: Re-exported in `src/shared/ui/components/` for easy imports
+4. **Import Path**: Use `@/src/shared/ui/components` for all UI component imports
 
 **Adding More Components:**
 

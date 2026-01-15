@@ -10,7 +10,7 @@
  * 
  * Keywords: 韓系 (Korean style), 女孩 (girl), 卡片 (card), 簡約 (minimalist)
  * 
- * @see components/ui/gluestack-ui-provider/config.ts for full configuration
+ * @see src/shared/ui/components/gluestack-ui-provider/config.ts for full configuration
  */
 
 /**
