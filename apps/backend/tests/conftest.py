@@ -12,6 +12,7 @@ import os
 from typing import AsyncGenerator
 
 import pytest
+import pytest_asyncio
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from app.config import settings
@@ -53,9 +54,9 @@ def test_database_url() -> str:
     return os.getenv("TEST_DATABASE_URL", settings.TEST_DATABASE_URL)
 
 
-@pytest.fixture(scope="session")
+@pytest_asyncio.fixture(scope="function")
 async def test_engine(test_database_url: str):
-    """Create a test database engine for the entire test session.
+    """Create a test database engine for each test function.
     
     Args:
         test_database_url: Database URL for testing
@@ -68,9 +69,9 @@ async def test_engine(test_database_url: str):
     await engine.dispose()
 
 
-@pytest.fixture(scope="session")
+@pytest_asyncio.fixture(scope="function")
 async def test_session_factory(test_engine) -> async_sessionmaker:
-    """Create a test session factory for the entire test session.
+    """Create a test session factory for each test function.
     
     Args:
         test_engine: Test database engine
@@ -87,7 +88,7 @@ async def test_session_factory(test_engine) -> async_sessionmaker:
     )
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def db_session(test_session_factory) -> AsyncGenerator[AsyncSession, None]:
     """
     Provide a transactional database session for each test.
