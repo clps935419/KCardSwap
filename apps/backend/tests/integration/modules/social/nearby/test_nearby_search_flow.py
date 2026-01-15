@@ -53,133 +53,122 @@ class TestNearbySearchIntegration:
         yield mock_session
         app.dependency_overrides.clear()
 
-    @pytest.fixture
-    def mock_card_repository_with_results(self):
-        """Mock card repository with nearby cards"""
-        from app.modules.social.domain.entities.card import Card
+    # Fixtures for mocking removed - tests now use patch.object() inside test methods
+    # This ensures patches remain active during test execution
 
-        with patch(
-            "app.modules.social.infrastructure.repositories.card_repository_impl.CardRepositoryImpl"
-        ) as mock:
-            repo_instance = Mock()
-
-            # Create mock cards
-            card1_id = uuid4()
-            owner1_id = uuid4()
-            mock_card1 = Card(
-                id=card1_id,
-                owner_id=owner1_id,
-                idol="IU",
-                idol_group="Solo",
-                album="Lilac",
-                status=Card.STATUS_AVAILABLE,
-            )
-
-            card2_id = uuid4()
-            owner2_id = uuid4()
-            mock_card2 = Card(
-                id=card2_id,
-                owner_id=owner2_id,
-                idol="Jennie",
-                idol_group="BLACKPINK",
-                album="SOLO",
-                rarity=Card.RARITY_RARE,
-                status=Card.STATUS_AVAILABLE,
-            )
-
-            # Mock find_nearby_cards to return these cards
-            repo_instance.find_nearby_cards = AsyncMock(
-                return_value=[
-                    (mock_card1, 2.5, "User1"),
-                    (mock_card2, 5.8, "User2"),
-                ]
-            )
-
-            mock.return_value = repo_instance
-            yield repo_instance
-
-    @pytest.fixture
-    def mock_quota_service_available(self):
-        """Mock quota service with quota available"""
-        with patch(
-            "app.modules.social.infrastructure.services.search_quota_service.SearchQuotaService"
-        ) as mock:
-            service = Mock()
-            service.check_quota_available = AsyncMock(return_value=(True, 2))
-            service.increment_count = AsyncMock(return_value=3)
-            mock.return_value = service
-            yield service
-
-    @pytest.fixture
-    def mock_quota_service_exhausted(self):
-        """Mock quota service with quota exhausted"""
-        with patch(
-            "app.modules.social.infrastructure.services.search_quota_service.SearchQuotaService"
-        ) as mock:
-            service = Mock()
-            service.check_quota_available = AsyncMock(
-                return_value=(False, settings.DAILY_SEARCH_LIMIT_FREE)
-            )
-            mock.return_value = service
-            yield service
-
-    def test_search_nearby_success(
+    @pytest.mark.asyncio
+    async def test_search_nearby_success(
         self,
         mock_auth_dependency,
         mock_db_session,
-        mock_card_repository_with_results,
-        mock_quota_service_available,
     ):
         """Test successful nearby search"""
         # Arrange
-        search_payload = {"lat": 25.0330, "lng": 121.5654, "radius_km": 10.0}
+        from app.modules.social.domain.entities.card import Card
+        from app.modules.social.infrastructure.repositories.card_repository_impl import CardRepositoryImpl
+        from app.modules.social.infrastructure.services.search_quota_service import SearchQuotaService
 
-        # Act
-        response = client.post(
-            f"{settings.API_PREFIX}/nearby/search", json=search_payload
+        # Create mock cards
+        card1_id = uuid4()
+        owner1_id = uuid4()
+        mock_card1 = Card(
+            id=card1_id,
+            owner_id=owner1_id,
+            idol="IU",
+            idol_group="Solo",
+            album="Lilac",
+            status=Card.STATUS_AVAILABLE,
         )
 
-        # Assert
-        assert response.status_code == 200
-        data = response.json()
-        assert "results" in data
-        assert "count" in data
-        assert data["count"] == 2
-        assert len(data["results"]) == 2
+        card2_id = uuid4()
+        owner2_id = uuid4()
+        mock_card2 = Card(
+            id=card2_id,
+            owner_id=owner2_id,
+            idol="Jennie",
+            idol_group="BLACKPINK",
+            album="SOLO",
+            rarity=Card.RARITY_RARE,
+            status=Card.STATUS_AVAILABLE,
+        )
 
-        # Check first result
-        result1 = data["results"][0]
-        assert result1["distance_km"] == 2.5
-        assert result1["idol"] == "IU"
-        assert result1["owner_nickname"] == "User1"
+        search_payload = {"lat": 25.0330, "lng": 121.5654, "radius_km": 10.0}
 
-        # Check second result
-        result2 = data["results"][1]
-        assert result2["distance_km"] == 5.8
-        assert result2["idol"] == "Jennie"
-        assert result2["idol_group"] == "BLACKPINK"
+        # Act & Assert with patches active during request
+        with patch.object(
+            CardRepositoryImpl, "find_nearby_cards", new_callable=AsyncMock
+        ) as mock_find_nearby:
+            with patch.object(
+                SearchQuotaService, "check_quota_available", new_callable=AsyncMock
+            ) as mock_check_quota:
+                with patch.object(
+                    SearchQuotaService, "increment_count", new_callable=AsyncMock
+                ) as mock_increment:
+                    # Setup mocks
+                    mock_find_nearby.return_value = [
+                        (mock_card1, 2.5, "User1"),
+                        (mock_card2, 5.8, "User2"),
+                    ]
+                    mock_check_quota.return_value = (True, 2)
+                    mock_increment.return_value = 3
 
-    def test_search_nearby_rate_limit_exceeded(
+                    # Execute request
+                    response = client.post(
+                        f"{settings.API_PREFIX}/nearby/search", json=search_payload
+                    )
+
+                    # Assert
+                    assert response.status_code == 200
+                    response_data = response.json()
+                    assert "data" in response_data
+                    data = response_data["data"]
+                    assert "results" in data
+                    assert "count" in data
+                    assert data["count"] == 2
+                    assert len(data["results"]) == 2
+
+                    # Check first result
+                    result1 = data["results"][0]
+                    assert result1["distance_km"] == 2.5
+                    assert result1["idol"] == "IU"
+                    assert result1["owner_nickname"] == "User1"
+
+                    # Check second result
+                    result2 = data["results"][1]
+                    assert result2["distance_km"] == 5.8
+                    assert result2["idol"] == "Jennie"
+                    assert result2["idol_group"] == "BLACKPINK"
+
+    @pytest.mark.asyncio
+    async def test_search_nearby_rate_limit_exceeded(
         self,
         mock_auth_dependency,
         mock_db_session,
-        mock_card_repository_with_results,
-        mock_quota_service_exhausted,
     ):
         """Test rate limit exceeded returns 429"""
         # Arrange
+        from app.modules.social.infrastructure.repositories.card_repository_impl import CardRepositoryImpl
+        from app.modules.social.infrastructure.services.search_quota_service import SearchQuotaService
+
         search_payload = {"lat": 25.0330, "lng": 121.5654, "radius_km": 10.0}
 
-        # Act
-        response = client.post(
-            f"{settings.API_PREFIX}/nearby/search", json=search_payload
-        )
+        # Act & Assert with patches active during request
+        with patch.object(
+            SearchQuotaService, "check_quota_available", new_callable=AsyncMock
+        ) as mock_check_quota:
+            # Setup mock - quota exhausted
+            mock_check_quota.return_value = (False, settings.DAILY_SEARCH_LIMIT_FREE)
 
-        # Assert
-        assert response.status_code == 429
-        data = response.json()
-        assert "detail" in data
-        assert "Daily search limit exceeded" in data["detail"]
+            # Execute request
+            response = client.post(
+                f"{settings.API_PREFIX}/nearby/search", json=search_payload
+            )
+
+            # Assert
+            assert response.status_code == 429
+            response_data = response.json()
+            assert "error" in response_data
+            assert "Daily search limit exceeded" in response_data["error"]["message"]
 
     def test_search_nearby_invalid_latitude(
         self,
@@ -228,26 +217,73 @@ class TestNearbySearchIntegration:
         # Assert
         assert response.status_code == 400  # FastAPI returns 400 for validation errors
 
-    def test_search_nearby_optional_radius(
+    @pytest.mark.asyncio
+    async def test_search_nearby_optional_radius(
         self,
         mock_auth_dependency,
         mock_db_session,
-        mock_card_repository_with_results,
-        mock_quota_service_available,
     ):
         """Test search with optional radius parameter"""
         # Arrange
-        search_payload = {"lat": 25.0330, "lng": 121.5654}  # No radius
+        from app.modules.social.domain.entities.card import Card
+        from app.modules.social.infrastructure.repositories.card_repository_impl import CardRepositoryImpl
+        from app.modules.social.infrastructure.services.search_quota_service import SearchQuotaService
 
-        # Act
-        response = client.post(
-            f"{settings.API_PREFIX}/nearby/search", json=search_payload
+        # Create mock cards
+        card1_id = uuid4()
+        owner1_id = uuid4()
+        mock_card1 = Card(
+            id=card1_id,
+            owner_id=owner1_id,
+            idol="IU",
+            idol_group="Solo",
+            album="Lilac",
+            status=Card.STATUS_AVAILABLE,
         )
 
-        # Assert
-        assert response.status_code == 200
-        data = response.json()
-        assert data["count"] == 2
+        card2_id = uuid4()
+        owner2_id = uuid4()
+        mock_card2 = Card(
+            id=card2_id,
+            owner_id=owner2_id,
+            idol="Jennie",
+            idol_group="BLACKPINK",
+            album="SOLO",
+            rarity=Card.RARITY_RARE,
+            status=Card.STATUS_AVAILABLE,
+        )
+
+        search_payload = {"lat": 25.0330, "lng": 121.5654}  # No radius
+
+        # Act & Assert with patches active during request
+        with patch.object(
+            CardRepositoryImpl, "find_nearby_cards", new_callable=AsyncMock
+        ) as mock_find_nearby:
+            with patch.object(
+                SearchQuotaService, "check_quota_available", new_callable=AsyncMock
+            ) as mock_check_quota:
+                with patch.object(
+                    SearchQuotaService, "increment_count", new_callable=AsyncMock
+                ) as mock_increment:
+                    # Setup mocks
+                    mock_find_nearby.return_value = [
+                        (mock_card1, 2.5, "User1"),
+                        (mock_card2, 5.8, "User2"),
+                    ]
+                    mock_check_quota.return_value = (True, 2)
+                    mock_increment.return_value = 3
+
+                    # Execute request
+                    response = client.post(
+                        f"{settings.API_PREFIX}/nearby/search", json=search_payload
+                    )
+
+                    # Assert
+                    assert response.status_code == 200
+                    response_data = response.json()
+                    assert "data" in response_data
+                    data = response_data["data"]
+                    assert data["count"] == 2
 
 
 class TestUpdateLocationIntegration:

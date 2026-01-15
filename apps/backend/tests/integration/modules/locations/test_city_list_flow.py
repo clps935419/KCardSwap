@@ -23,15 +23,16 @@ class TestCityListAPI:
         assert response.status_code == 200
         data = response.json()
         
-        # Check response structure
-        assert "cities" in data
-        assert isinstance(data["cities"], list)
+        # Check response structure (using standardized envelope)
+        assert "data" in data
+        assert "cities" in data["data"]
+        assert isinstance(data["data"]["cities"], list)
         
         # Check we have all 22 Taiwan cities
-        assert len(data["cities"]) == 22
+        assert len(data["data"]["cities"]) == 22
         
         # Check first city structure
-        first_city = data["cities"][0]
+        first_city = data["data"]["cities"][0]
         assert "code" in first_city
         assert "name" in first_city
         assert "name_zh" in first_city
@@ -43,7 +44,7 @@ class TestCityListAPI:
         
         # Assert
         assert response.status_code == 200
-        cities = response.json()["cities"]
+        cities = response.json()["data"]["cities"]
         
         # Six special municipalities
         municipality_codes = ["TPE", "NTP", "TAO", "TXG", "TNN", "KHH"]
@@ -59,7 +60,7 @@ class TestCityListAPI:
         
         # Assert
         assert response.status_code == 200
-        cities = response.json()["cities"]
+        cities = response.json()["data"]["cities"]
         
         for city in cities:
             assert isinstance(city["code"], str), f"City code should be string"
@@ -74,7 +75,7 @@ class TestCityListAPI:
         
         # Assert
         assert response.status_code == 200
-        cities = response.json()["cities"]
+        cities = response.json()["data"]["cities"]
         
         taipei = next((c for c in cities if c["code"] == "TPE"), None)
         assert taipei is not None, "Taipei not found in cities"
@@ -88,4 +89,5 @@ class TestCityListAPI:
         
         # Assert - should succeed without authentication
         assert response.status_code == 200
-        assert "cities" in response.json()
+        assert "data" in response.json()
+        assert "cities" in response.json()["data"]

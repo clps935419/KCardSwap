@@ -19,6 +19,7 @@ class CityCode(str, Enum):
     KHH = "KHH"  # Kaohsiung City (高雄市)
 
     # Provincial cities (省轄市)
+    KEE = "KEE"  # Keelung City (基隆市)
     HSZ = "HSZ"  # Hsinchu City (新竹市)
     CYI = "CYI"  # Chiayi City (嘉義市)
 
