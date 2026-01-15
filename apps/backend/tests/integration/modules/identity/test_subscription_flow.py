@@ -26,7 +26,7 @@ class TestSubscriptionFlow:
     def mock_google_billing_service(self):
         """Mock GooglePlayBillingService for testing"""
         with patch(
-            "app.modules.identity.presentation.routers.subscription_router.GooglePlayBillingService"
+            "app.modules.identity.application.use_cases.subscription.verify_receipt_use_case.GooglePlayBillingService"
         ) as mock:
             service = Mock()
             # Mock successful subscription verification

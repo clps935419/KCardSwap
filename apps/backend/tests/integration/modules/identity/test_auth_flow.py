@@ -25,7 +25,7 @@ class TestGoogleCallbackPKCE:
     def mock_google_oauth_service(self):
         """Mock GoogleOAuthService for testing"""
         with patch(
-            "app.modules.identity.presentation.routers.auth_router.GoogleOAuthService"
+            "app.modules.identity.application.use_cases.auth.google_callback.GoogleOAuthService"
         ) as mock:
             service = Mock()
             # Mock successful token exchange
@@ -235,7 +235,7 @@ class TestGoogleCallbackPKCETimeout:
     def mock_google_oauth_timeout(self):
         """Mock GoogleOAuthService with timeout"""
         with patch(
-            "app.modules.identity.presentation.routers.auth_router.GoogleOAuthService"
+            "app.modules.identity.application.use_cases.auth.google_callback.GoogleOAuthService"
         ) as mock:
             service = Mock()
             # Mock timeout during token exchange
