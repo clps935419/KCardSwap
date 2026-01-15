@@ -7,8 +7,14 @@ poetry config virtualenvs.create false
 echo "Installing dependencies..."
 poetry install --no-root --only main
 
-echo "Running database migrations..."
+echo "Running database migrations on main database..."
 alembic upgrade head
+
+# Run migrations on test database if TEST_DATABASE_URL is set
+if [ -n "${TEST_DATABASE_URL:-}" ]; then
+  echo "Running database migrations on test database..."
+  DATABASE_URL="$TEST_DATABASE_URL" alembic upgrade head
+fi
 
 # Initialize default admin user if configured
 if [ "${INIT_DEFAULT_ADMIN:-}" = "true" ]; then

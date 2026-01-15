@@ -27,7 +27,13 @@ logs-db: ## View database logs only
 	docker compose logs -f db
 
 test: ## Run backend tests
-	cd apps/backend && pytest -v
+	cd apps/backend && poetry run pytest -v
+
+test-docker: ## Run backend tests in Docker container
+	docker compose exec backend pytest -v
+
+init-test-db: ## Initialize test database schema
+	cd apps/backend && TEST_DATABASE_URL=$${TEST_DATABASE_URL:-postgresql://kcardswap:kcardswap@localhost:5432/kcardswap_test} poetry run alembic upgrade head
 
 lint: ## Run linter on backend code
 	cd apps/backend && flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
