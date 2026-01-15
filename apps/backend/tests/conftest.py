@@ -54,9 +54,14 @@ def test_database_url() -> str:
     return os.getenv("TEST_DATABASE_URL", settings.TEST_DATABASE_URL)
 
 
-@pytest_asyncio.fixture(scope="function")
+@pytest_asyncio.fixture
 async def test_engine(test_database_url: str):
-    """Create a test database engine for each test function.
+    """Create a test database engine for each test.
+    
+    Note: Using function scope to avoid event loop issues with pytest-asyncio.
+    While this creates a new engine for each test, the performance impact is
+    acceptable for small to medium test suites. For larger suites, consider
+    using session scope with proper event loop management.
     
     Args:
         test_database_url: Database URL for testing
@@ -69,9 +74,9 @@ async def test_engine(test_database_url: str):
     await engine.dispose()
 
 
-@pytest_asyncio.fixture(scope="function")
+@pytest_asyncio.fixture
 async def test_session_factory(test_engine) -> async_sessionmaker:
-    """Create a test session factory for each test function.
+    """Create a test session factory for each test.
     
     Args:
         test_engine: Test database engine
@@ -102,17 +107,17 @@ async def db_session(test_session_factory) -> AsyncGenerator[AsyncSession, None]
     - Faster than recreating database (uses transactions)
     - Works with the test database (kcardswap_test)
     
+    The transaction is always rolled back after the test, even if it succeeds.
+    This ensures test data doesn't persist in the database.
+    
     Args:
-        test_session_factory: Session factory from the session-scoped fixture
+        test_session_factory: Session factory from the fixture
         
     Yields:
         AsyncSession: Database session for the test
     """
     async with test_session_factory() as session:
-        async with session.begin():
-            try:
-                yield session
-            finally:
-                # Rollback is automatic when exiting the begin() context
-                # This ensures all changes made during the test are discarded
-                await session.rollback()
+        async with session.begin() as transaction:
+            yield session
+            # Always rollback the transaction to ensure test data doesn't persist
+            await transaction.rollback()
