@@ -38,7 +38,7 @@ export function useFormInput<TFieldValues extends FieldValues = FieldValues>({
   maxLength,
   secureTextEntry,
 }: UseFormInputProps<TFieldValues>) {
-  return () => (
+  const FormInputComponent = () => (
     <Controller
       control={control}
       name={name}
@@ -59,4 +59,8 @@ export function useFormInput<TFieldValues extends FieldValues = FieldValues>({
       )}
     />
   );
+  
+  FormInputComponent.displayName = `FormInput(${String(name)})`;
+  
+  return FormInputComponent;
 }
