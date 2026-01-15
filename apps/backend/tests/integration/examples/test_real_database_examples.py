@@ -11,6 +11,7 @@
 
 from uuid import UUID
 import pytest
+import pytest_asyncio
 from fastapi.testclient import TestClient
 from sqlalchemy import text
 
@@ -24,7 +25,7 @@ client = TestClient(app)
 class TestProfileFlowWithRealDatabase:
     """個人檔案流程整合測試 - 使用真實資料庫"""
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def test_user(self, db_session) -> UUID:
         """建立測試用戶並返回用戶 ID
         
@@ -47,7 +48,7 @@ class TestProfileFlowWithRealDatabase:
         await db_session.flush()
         return user_id
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def test_user_with_profile(self, db_session) -> tuple[UUID, UUID]:
         """建立有個人檔案的測試用戶
         
