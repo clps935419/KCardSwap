@@ -127,7 +127,8 @@ class TestAdminLoginUseCase:
         oauth_user = User(
             id=uuid4(),
             email="oauth@example.com",
-            password_hash=None,  # OAuth user
+            google_id="oauth_google_id_123",  # OAuth user must have google_id
+            password_hash=None,  # OAuth user without password
             role="admin",
             created_at=datetime.now(timezone.utc),
             updated_at=datetime.now(timezone.utc),
