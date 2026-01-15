@@ -19,6 +19,7 @@ class CityRepositoryImpl(ICityRepository):
         City(CityCode.KHH, "Kaohsiung City", "高雄市"),
         
         # Provincial Cities (省轄市)
+        City(CityCode.KEE, "Keelung City", "基隆市"),
         City(CityCode.HSZ, "Hsinchu City", "新竹市"),
         City(CityCode.CYI, "Chiayi City", "嘉義市"),
         

@@ -71,6 +71,7 @@ class TestCityRepositoryImpl:
 
         # Assert
         provincial_cities = [
+            CityCode.KEE,  # Keelung City
             CityCode.HSZ,  # Hsinchu City
             CityCode.CYI,  # Chiayi City
         ]
