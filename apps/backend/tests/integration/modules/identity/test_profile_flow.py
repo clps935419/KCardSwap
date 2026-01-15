@@ -31,7 +31,7 @@ class TestProfileRetrievalFlow:
         assert response.status_code in [401, 403]
 
     @pytest.mark.skip(
-        reason="Requires database setup - test ready for when DB is configured"
+        reason="需要 Profile API endpoint 完整實作 - 目前只有佔位符測試碼。詳見 TEST_DATABASE_ENABLEMENT_ANALYSIS.md"
     )
     def test_get_profile_success_with_valid_token(self):
         """
@@ -62,7 +62,7 @@ class TestProfileRetrievalFlow:
         # assert data["error"] is None
         pass
 
-    @pytest.mark.skip(reason="Requires database setup")
+    @pytest.mark.skip(reason="需要 Profile API endpoint 完整實作。詳見 TEST_DATABASE_ENABLEMENT_ANALYSIS.md")
     def test_get_profile_not_found(self):
         """
         Test profile retrieval when profile doesn't exist
@@ -90,7 +90,7 @@ class TestProfileUpdateFlow:
         # Should return 401 or 403
         assert response.status_code in [401, 403]
 
-    @pytest.mark.skip(reason="Requires database setup")
+    @pytest.mark.skip(reason="需要 Profile API endpoint 完整實作。詳見 TEST_DATABASE_ENABLEMENT_ANALYSIS.md")
     def test_update_profile_success_full_update(self):
         """
         Test successful full profile update
@@ -124,7 +124,7 @@ class TestProfileUpdateFlow:
         # assert data["error"] is None
         pass
 
-    @pytest.mark.skip(reason="Requires database setup")
+    @pytest.mark.skip(reason="需要 Profile API endpoint 完整實作。詳見 TEST_DATABASE_ENABLEMENT_ANALYSIS.md")
     def test_update_profile_success_partial_update(self):
         """
         Test successful partial profile update
@@ -153,7 +153,7 @@ class TestProfileUpdateFlow:
         # assert data["data"]["region"] == original["data"]["region"]
         pass
 
-    @pytest.mark.skip(reason="Requires database setup")
+    @pytest.mark.skip(reason="需要 Profile API endpoint 完整實作。詳見 TEST_DATABASE_ENABLEMENT_ANALYSIS.md")
     def test_update_profile_nickname_only(self):
         """Test updating only nickname"""
         # headers = {"Authorization": "Bearer valid_jwt_token"}
@@ -166,7 +166,7 @@ class TestProfileUpdateFlow:
         # assert data["data"]["nickname"] == "CoolNickname"
         pass
 
-    @pytest.mark.skip(reason="Requires database setup")
+    @pytest.mark.skip(reason="需要 Profile API endpoint 完整實作。詳見 TEST_DATABASE_ENABLEMENT_ANALYSIS.md")
     def test_update_profile_privacy_flags(self):
         """Test updating privacy flags"""
         # headers = {"Authorization": "Bearer valid_jwt_token"}
@@ -201,7 +201,7 @@ class TestProfileFlowValidation:
         # Current implementation allows all fields to be optional
         pass
 
-    @pytest.mark.skip(reason="Requires database setup")
+    @pytest.mark.skip(reason="需要 Profile API endpoint 完整實作。詳見 TEST_DATABASE_ENABLEMENT_ANALYSIS.md")
     def test_update_profile_invalid_avatar_url(self):
         """Test validation of avatar_url format"""
         # headers = {"Authorization": "Bearer valid_jwt_token"}
@@ -219,7 +219,7 @@ class TestProfileFlowValidation:
 class TestProfileCompleteFlow:
     """Test complete profile management flow"""
 
-    @pytest.mark.skip(reason="Requires database setup")
+    @pytest.mark.skip(reason="需要 Profile API endpoint 完整實作。詳見 TEST_DATABASE_ENABLEMENT_ANALYSIS.md")
     def test_complete_profile_lifecycle(self):
         """
         Test complete profile lifecycle:
@@ -265,7 +265,7 @@ class TestProfileCompleteFlow:
 class TestProfileResponseFormat:
     """Test profile response format matches expected schema"""
 
-    @pytest.mark.skip(reason="Requires database setup")
+    @pytest.mark.skip(reason="需要 Profile API endpoint 完整實作。詳見 TEST_DATABASE_ENABLEMENT_ANALYSIS.md")
     def test_profile_response_structure(self):
         """
         Test that profile response matches the expected schema structure
@@ -329,7 +329,7 @@ class TestProfileErrorHandling:
         # Should not return 404 (endpoint exists)
         assert response.status_code != 404
 
-    @pytest.mark.skip(reason="Requires database setup")
+    @pytest.mark.skip(reason="需要 Profile API endpoint 完整實作。詳見 TEST_DATABASE_ENABLEMENT_ANALYSIS.md")
     def test_profile_handles_database_errors_gracefully(self):
         """Test that database errors are handled gracefully"""
         # This would test error handling when database is unavailable

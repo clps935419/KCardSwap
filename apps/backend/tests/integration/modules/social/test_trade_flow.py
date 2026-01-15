@@ -165,7 +165,7 @@ class TestTradeFlowIntegration:
             mock.return_value = repo_instance
             yield repo_instance
 
-    @pytest.mark.skip(reason="Trade flow tests require more complex mocking - card ownership validation and async side effects need refinement. See TEST_STATUS_REPORT.md for details.")
+    @pytest.mark.skip(reason="需要重構 mocking 模式或使用真實資料庫。詳見 TEST_STATUS_REPORT.md 和 TEST_DATABASE_ENABLEMENT_ANALYSIS.md")
     @pytest.mark.asyncio
     async def test_create_trade_proposal(
         self,
@@ -246,7 +246,7 @@ class TestTradeFlowIntegration:
                         assert data["initiator_id"] == str(test_trade_data["initiator"])
                         assert data["responder_id"] == str(test_trade_data["responder"])
 
-    @pytest.mark.skip(reason="Trade flow tests require more complex mocking - card ownership validation and async side effects need refinement. See TEST_STATUS_REPORT.md for details.")
+    @pytest.mark.skip(reason="需要重構 mocking 模式或使用真實資料庫。詳見 TEST_STATUS_REPORT.md 和 TEST_DATABASE_ENABLEMENT_ANALYSIS.md")
     @pytest.mark.asyncio
     async def test_get_trade_history(
         self,
@@ -279,7 +279,7 @@ class TestTradeFlowIntegration:
             assert "trades" in data
             assert isinstance(data["trades"], list)
 
-    @pytest.mark.skip(reason="Trade flow tests require more complex mocking - card ownership validation and async side effects need refinement. See TEST_STATUS_REPORT.md for details.")
+    @pytest.mark.skip(reason="需要重構 mocking 模式或使用真實資料庫。詳見 TEST_STATUS_REPORT.md 和 TEST_DATABASE_ENABLEMENT_ANALYSIS.md")
     @pytest.mark.asyncio
     async def test_accept_trade(
         self,
@@ -322,7 +322,7 @@ class TestTradeFlowIntegration:
                 response_data = response.json()
                 assert "data" in response_data
 
-    @pytest.mark.skip(reason="Trade flow tests require more complex mocking - card ownership validation and async side effects need refinement. See TEST_STATUS_REPORT.md for details.")
+    @pytest.mark.skip(reason="需要重構 mocking 模式或使用真實資料庫。詳見 TEST_STATUS_REPORT.md 和 TEST_DATABASE_ENABLEMENT_ANALYSIS.md")
     @pytest.mark.asyncio
     async def test_reject_trade(
         self,
@@ -367,7 +367,7 @@ class TestTradeFlowIntegration:
 
                         assert response.status_code == 200
 
-    @pytest.mark.skip(reason="Trade flow tests require more complex mocking - card ownership validation and async side effects need refinement. See TEST_STATUS_REPORT.md for details.")
+    @pytest.mark.skip(reason="需要重構 mocking 模式或使用真實資料庫。詳見 TEST_STATUS_REPORT.md 和 TEST_DATABASE_ENABLEMENT_ANALYSIS.md")
     @pytest.mark.asyncio
     async def test_cancel_trade(
         self,
@@ -413,7 +413,7 @@ class TestTradeFlowIntegration:
 
                         assert response.status_code == 200
 
-    @pytest.mark.skip(reason="Trade flow tests require more complex mocking - card ownership validation and async side effects need refinement. See TEST_STATUS_REPORT.md for details.")
+    @pytest.mark.skip(reason="需要重構 mocking 模式或使用真實資料庫。詳見 TEST_STATUS_REPORT.md 和 TEST_DATABASE_ENABLEMENT_ANALYSIS.md")
     @pytest.mark.asyncio
     async def test_complete_trade_flow(
         self,
@@ -479,7 +479,7 @@ class TestTradeFlowIntegration:
 class TestTradeFlowTimeout:
     """Test trade timeout scenarios"""
 
-    @pytest.mark.skip(reason="Trade flow tests require more complex mocking - card ownership validation and async side effects need refinement. See TEST_STATUS_REPORT.md for details.")
+    @pytest.mark.skip(reason="需要重構 mocking 模式或使用真實資料庫。詳見 TEST_STATUS_REPORT.md 和 TEST_DATABASE_ENABLEMENT_ANALYSIS.md")
     @pytest.mark.asyncio
     async def test_complete_trade_after_timeout(self):
         """Test trade is auto-canceled after 48h timeout"""

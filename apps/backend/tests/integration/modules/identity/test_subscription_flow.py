@@ -246,7 +246,7 @@ class TestSubscriptionFlow:
             # assert response2.status_code == 200
             # assert response1.json() == response2.json()
 
-    @pytest.mark.skip(reason="Requires database connection - see TEST_STATUS_REPORT.md")
+    @pytest.mark.skip(reason="需要 Firebase 配置和資料庫連接。詳見 TEST_STATUS_REPORT.md 和 TEST_DATABASE_ENABLEMENT_ANALYSIS.md")
     def test_expire_subscriptions_job(self):
         """
         Test subscription expiry background job
