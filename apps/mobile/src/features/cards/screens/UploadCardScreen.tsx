@@ -15,6 +15,8 @@
 import React, { useState } from 'react';
 import { ScrollView, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Box,
   Text,
@@ -28,6 +30,7 @@ import {
 } from '@/src/shared/ui/components';
 import { CameraWithOverlay } from '@/src/features/cards/components';
 import { useUploadCard } from '@/src/features/cards/hooks/useUploadCard';
+import { cardUploadFormSchema, type CardUploadFormData } from '@/src/shared/forms';
 import type { CardRarity, LimitExceededError } from '@/src/features/cards/types';
 
 const RARITY_OPTIONS: { label: string; value: CardRarity }[] = [
@@ -42,13 +45,27 @@ export function UploadCardScreen() {
   const { uploadFromCamera, uploadFromGallery, uploadProgress, isUploading, error } =
     useUploadCard();
 
-  const [idol, setIdol] = useState('');
-  const [idolGroup, setIdolGroup] = useState('');
-  const [album, setAlbum] = useState('');
-  const [version, setVersion] = useState('');
-  const [rarity, setRarity] = useState<CardRarity>('common');
   const [lastUploadSource, setLastUploadSource] = useState<'camera' | 'gallery' | null>(null);
   const [showCustomCamera, setShowCustomCamera] = useState(false);
+
+  // React Hook Form setup with Zod validation
+  const {
+    control,
+    handleSubmit,
+    watch,
+    getValues,
+  } = useForm<CardUploadFormData>({
+    resolver: zodResolver(cardUploadFormSchema),
+    defaultValues: {
+      idol: '',
+      idolGroup: '',
+      album: '',
+      version: '',
+      rarity: 'common',
+    },
+  });
+
+  const rarity = watch('rarity');
 
   // POC: 自訂相機模式
   if (showCustomCamera) {
@@ -73,15 +90,17 @@ export function UploadCardScreen() {
   const handleUpload = async (source: 'camera' | 'gallery') => {
     setLastUploadSource(source);
     
+    const formData = getValues();
+    
     try {
       const uploadFn = source === 'camera' ? uploadFromCamera : uploadFromGallery;
 
       const result = await uploadFn({
-        idol: idol || undefined,
-        idol_group: idolGroup || undefined,
-        album: album || undefined,
-        version: version || undefined,
-        rarity,
+        idol: formData.idol || undefined,
+        idol_group: formData.idolGroup || undefined,
+        album: formData.album || undefined,
+        version: formData.version || undefined,
+        rarity: formData.rarity,
       });
 
       if (result) {
@@ -161,76 +180,110 @@ export function UploadCardScreen() {
         <Box className="bg-white rounded-xl p-4 mb-4">
           <Box className="mb-4">
             <Text className="text-sm font-semibold text-gray-900 mb-2">偶像名稱</Text>
-            <Input disabled={isUploading} className="bg-white">
-              <InputField
-                value={idol}
-                onChangeText={setIdol}
-                placeholder="例：IU"
-              />
-            </Input>
+            <Controller
+              control={control}
+              name="idol"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input isDisabled={isUploading} className="bg-white">
+                  <InputField
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    placeholder="例：IU"
+                  />
+                </Input>
+              )}
+            />
           </Box>
 
           <Box className="mb-4">
             <Text className="text-sm font-semibold text-gray-900 mb-2">
               團體/公司（選填）
             </Text>
-            <Input disabled={isUploading} className="bg-white">
-              <InputField
-                value={idolGroup}
-                onChangeText={setIdolGroup}
-                placeholder="例：EDAM Entertainment"
-              />
-            </Input>
+            <Controller
+              control={control}
+              name="idolGroup"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input isDisabled={isUploading} className="bg-white">
+                  <InputField
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    placeholder="例：EDAM Entertainment"
+                  />
+                </Input>
+              )}
+            />
           </Box>
 
           <Box className="mb-4">
             <Text className="text-sm font-semibold text-gray-900 mb-2">
               專輯名稱（選填）
             </Text>
-            <Input disabled={isUploading} className="bg-white">
-              <InputField
-                value={album}
-                onChangeText={setAlbum}
-                placeholder="例：Love Poem"
-              />
-            </Input>
+            <Controller
+              control={control}
+              name="album"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input isDisabled={isUploading} className="bg-white">
+                  <InputField
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    placeholder="例：Love Poem"
+                  />
+                </Input>
+              )}
+            />
           </Box>
 
           <Box className="mb-4">
             <Text className="text-sm font-semibold text-gray-900 mb-2">版本（選填）</Text>
-            <Input disabled={isUploading} className="bg-white">
-              <InputField
-                value={version}
-                onChangeText={setVersion}
-                placeholder="例：限定版"
-              />
-            </Input>
+            <Controller
+              control={control}
+              name="version"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input isDisabled={isUploading} className="bg-white">
+                  <InputField
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    placeholder="例：限定版"
+                  />
+                </Input>
+              )}
+            />
           </Box>
 
           <Box>
             <Text className="text-sm font-semibold text-gray-900 mb-2">稀有度</Text>
-            <Box className="flex-row gap-2">
-              {RARITY_OPTIONS.map((option) => (
-                <Pressable
-                  key={option.value}
-                  className={`flex-1 py-3 rounded-lg items-center ${
-                    rarity === option.value ? 'bg-blue-500' : 'bg-gray-100'
-                  }`}
-                  onPress={() => setRarity(option.value)}
-                  disabled={isUploading}
-                >
-                  <Text
-                    className={`text-sm ${
-                      rarity === option.value
-                        ? 'text-white font-semibold'
-                        : 'text-gray-700'
-                    }`}
-                  >
-                    {option.label}
-                  </Text>
-                </Pressable>
-              ))}
-            </Box>
+            <Controller
+              control={control}
+              name="rarity"
+              render={({ field: { onChange, value } }) => (
+                <Box className="flex-row gap-2">
+                  {RARITY_OPTIONS.map((option) => (
+                    <Pressable
+                      key={option.value}
+                      className={`flex-1 py-3 rounded-lg items-center ${
+                        value === option.value ? 'bg-blue-500' : 'bg-gray-100'
+                      }`}
+                      onPress={() => onChange(option.value)}
+                      disabled={isUploading}
+                    >
+                      <Text
+                        className={`text-sm ${
+                          value === option.value
+                            ? 'text-white font-semibold'
+                            : 'text-gray-700'
+                        }`}
+                      >
+                        {option.label}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </Box>
+              )}
+            />
           </Box>
         </Box>
 

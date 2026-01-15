@@ -1,5 +1,7 @@
 import { ScrollView, Alert } from 'react-native';
 import { useState, useEffect } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { useAuthStore } from '@/src/shared/state/authStore';
@@ -7,8 +9,6 @@ import {
   getMyProfileOptions,
   getMyProfileQueryKey,
   updateMyProfileMutation,
-  validateNickname,
-  validateBio,
   type Profile,
 } from '@/src/features/profile/api/profileApi';
 import {
@@ -24,6 +24,7 @@ import {
   Pressable,
 } from '@/src/shared/ui/components';
 import { useSubscriptionStatus } from '@/src/features/subscription';
+import { profileFormSchema, type ProfileFormData } from '@/src/shared/forms';
 
 export default function ProfileScreen() {
   const queryClient = useQueryClient();
@@ -37,6 +38,30 @@ export default function ProfileScreen() {
   // Get subscription status
   const { subscription, isPremium } = useSubscriptionStatus();
   
+  const [isEditing, setIsEditing] = useState(false);
+
+  // React Hook Form setup with Zod validation
+  const {
+    control,
+    handleSubmit,
+    reset,
+    watch,
+    formState: { errors, isDirty },
+  } = useForm<ProfileFormData>({
+    resolver: zodResolver(profileFormSchema),
+    defaultValues: {
+      nickname: '',
+      bio: '',
+      nearbyVisible: true,
+      showOnline: true,
+      allowStrangerChat: true,
+    },
+  });
+
+  // Watch form values for character count display
+  const nickname = watch('nickname');
+  const bio = watch('bio');
+  
   // Use TanStack Query mutation for updating profile
   const updateProfile = useMutation({
     ...updateMyProfileMutation(),
@@ -44,86 +69,76 @@ export default function ProfileScreen() {
       // Invalidate and refetch profile data
       queryClient.invalidateQueries({ queryKey: getMyProfileQueryKey() });
       setIsEditing(false);
-      Alert.alert('Success', 'Profile updated successfully!');
+      Alert.alert('成功', '個人資料已更新！');
     },
     onError: (error: any) => {
       console.error('Failed to update profile:', error);
-      Alert.alert('Error', error.message || 'Failed to update profile');
+      Alert.alert('錯誤', error.message || '更新個人資料失敗');
     },
   });
-
-  const [isEditing, setIsEditing] = useState(false);
-
-  // Form fields
-  const [nickname, setNickname] = useState('');
-  const [bio, setBio] = useState('');
-  const [nearbyVisible, setNearbyVisible] = useState(true);
-  const [showOnline, setShowOnline] = useState(true);
-  const [allowStrangerChat, setAllowStrangerChat] = useState(true);
 
   // Initialize form fields when profile loads
   useEffect(() => {
     if (profile) {
-      setNickname(profile.nickname || '');
-      setBio(profile.bio || '');
-      setNearbyVisible(profile.privacy_flags.nearby_visible);
-      setShowOnline(profile.privacy_flags.show_online);
-      setAllowStrangerChat(profile.privacy_flags.allow_stranger_chat);
-    }
-  }, [profile]);
-
-  const handleSave = async () => {
-    try {
-      // Validate inputs
-      const nicknameError = validateNickname(nickname);
-      if (nicknameError) {
-        Alert.alert('Validation Error', nicknameError);
-        return;
-      }
-
-      const bioError = validateBio(bio);
-      if (bioError) {
-        Alert.alert('Validation Error', bioError);
-        return;
-      }
-
-      // Update profile using mutation
-      await updateProfile.mutateAsync({
-        body: {
-          nickname: nickname.trim(),
-          bio: bio.trim() || undefined,
-          privacy_flags: {
-            nearby_visible: nearbyVisible,
-            show_online: showOnline,
-            allow_stranger_chat: allowStrangerChat,
-          },
-        },
+      reset({
+        nickname: profile.nickname || '',
+        bio: profile.bio || '',
+        nearbyVisible: profile.privacy_flags?.nearby_visible ?? true,
+        showOnline: profile.privacy_flags?.show_online ?? true,
+        allowStrangerChat: profile.privacy_flags?.allow_stranger_chat ?? true,
       });
-    } catch (error) {
-      // Error handling is done in mutation onError
+    }
+  }, [profile, reset]);
+
+  const onSubmit = async (data: ProfileFormData) => {
+    try {
+      const mutation = updateMyProfileMutation();
+      if (mutation.mutationFn) {
+        // Update profile using mutation
+        await mutation.mutationFn({
+          body: {
+            nickname: data.nickname.trim(),
+            bio: data.bio?.trim() || undefined,
+            privacy_flags: {
+              nearby_visible: data.nearbyVisible,
+              show_online: data.showOnline,
+              allow_stranger_chat: data.allowStrangerChat,
+            },
+          },
+        });
+        // Invalidate and refetch profile data
+        queryClient.invalidateQueries({ queryKey: getMyProfileQueryKey() });
+        setIsEditing(false);
+        Alert.alert('成功', '個人資料已更新！');
+      }
+    } catch (error: any) {
+      console.error('Failed to update profile:', error);
+      Alert.alert('錯誤', error?.message || '更新個人資料失敗');
     }
   };
 
   const handleCancel = () => {
     // Reset form to current profile values
     if (profile) {
-      setNickname(profile.nickname || '');
-      setBio(profile.bio || '');
-      setNearbyVisible(profile.privacy_flags.nearby_visible);
-      setShowOnline(profile.privacy_flags.show_online);
-      setAllowStrangerChat(profile.privacy_flags.allow_stranger_chat);
+      reset({
+        nickname: profile.nickname || '',
+        bio: profile.bio || '',
+        nearbyVisible: profile.privacy_flags?.nearby_visible ?? true,
+        showOnline: profile.privacy_flags?.show_online ?? true,
+        allowStrangerChat: profile.privacy_flags?.allow_stranger_chat ?? true,
+      });
     }
     setIsEditing(false);
   };
 
   const handleLogout = async () => {
     Alert.alert(
-      'Logout',
-      'Are you sure you want to logout?',
+      '登出',
+      '確定要登出嗎？',
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: '取消', style: 'cancel' },
         {
-          text: 'Logout',
+          text: '登出',
           style: 'destructive',
           onPress: async () => {
             await logout();
@@ -138,7 +153,7 @@ export default function ProfileScreen() {
     return (
       <Box className="flex-1 bg-white items-center justify-center">
         <Spinner size="large" />
-        <Text className="mt-4 text-gray-600">Loading profile...</Text>
+        <Text className="mt-4 text-gray-600">載入個人資料中...</Text>
       </Box>
     );
   }
@@ -148,10 +163,10 @@ export default function ProfileScreen() {
     return (
       <Box className="flex-1 bg-white items-center justify-center p-4">
         <Text className="text-red-500 text-center mb-4">
-          Failed to load profile
+          載入個人資料失敗
         </Text>
         <Button onPress={() => queryClient.invalidateQueries({ queryKey: getMyProfileQueryKey() })}>
-          <ButtonText>Retry</ButtonText>
+          <ButtonText>重試</ButtonText>
         </Button>
       </Box>
     );
@@ -209,72 +224,114 @@ export default function ProfileScreen() {
           {/* Nickname */}
           <Box className="mb-4">
             <Text size="sm" className="font-semibold text-gray-700 mb-2">
-              Nickname
+              暱稱
             </Text>
-            <Input disabled={!isEditing}>
-              <InputField
-                value={nickname}
-                onChangeText={setNickname}
-                placeholder="Enter your nickname"
-                maxLength={50}
-              />
-            </Input>
+            <Controller
+              control={control}
+              name="nickname"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input isDisabled={!isEditing}>
+                  <InputField
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    placeholder="請輸入您的暱稱"
+                    maxLength={50}
+                  />
+                </Input>
+              )}
+            />
+            {errors.nickname && (
+              <Text size="xs" className="text-red-500 mt-1">
+                {errors.nickname.message}
+              </Text>
+            )}
             <Text size="xs" className="text-gray-500 mt-1">
-              {nickname.length}/50 characters
+              {(nickname?.length || 0)}/50 字元
             </Text>
           </Box>
 
           {/* Bio */}
           <Box className="mb-4">
             <Text size="sm" className="font-semibold text-gray-700 mb-2">
-              Bio
+              個人簡介
             </Text>
-            <Input disabled={!isEditing}>
-              <InputField
-                value={bio}
-                onChangeText={setBio}
-                placeholder="Tell us about yourself..."
-                multiline
-                numberOfLines={4}
-                textAlignVertical="top"
-                maxLength={500}
-              />
-            </Input>
+            <Controller
+              control={control}
+              name="bio"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input isDisabled={!isEditing}>
+                  <InputField
+                    value={value || ''}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    placeholder="介紹一下自己..."
+                    multiline
+                    numberOfLines={4}
+                    textAlignVertical="top"
+                    maxLength={500}
+                  />
+                </Input>
+              )}
+            />
+            {errors.bio && (
+              <Text size="xs" className="text-red-500 mt-1">
+                {errors.bio.message}
+              </Text>
+            )}
             <Text size="xs" className="text-gray-500 mt-1">
-              {bio.length}/500 characters
+              {(bio?.length || 0)}/500 字元
             </Text>
           </Box>
 
           {/* Privacy Settings */}
           <Box className="mb-4">
             <Text size="sm" className="font-semibold text-gray-700 mb-3">
-              Privacy Settings
+              隱私設定
             </Text>
 
             <Box className="flex-row justify-between items-center mb-3">
-              <Text size="md" className="text-gray-700">Visible in Nearby Search</Text>
-              <Switch
-                value={nearbyVisible}
-                onValueChange={setNearbyVisible}
-                disabled={!isEditing}
+              <Text size="md" className="text-gray-700">在附近搜尋中顯示</Text>
+              <Controller
+                control={control}
+                name="nearbyVisible"
+                render={({ field: { onChange, value } }) => (
+                  <Switch
+                    value={value}
+                    onValueChange={onChange}
+                    disabled={!isEditing}
+                  />
+                )}
               />
             </Box>
 
             <Box className="flex-row justify-between items-center mb-3">
-              <Text size="md" className="text-gray-700">Show Online Status</Text>
-              <Switch
-                value={showOnline}
-                onValueChange={setShowOnline}
-                disabled={!isEditing}
+              <Text size="md" className="text-gray-700">顯示在線狀態</Text>
+              <Controller
+                control={control}
+                name="showOnline"
+                render={({ field: { onChange, value } }) => (
+                  <Switch
+                    value={value}
+                    onValueChange={onChange}
+                    disabled={!isEditing}
+                  />
+                )}
               />
             </Box>
 
             <Box className="flex-row justify-between items-center">
-              <Text size="md" className="text-gray-700">Allow Stranger Chat</Text>
-              <Switch
-                value={allowStrangerChat}
-                onValueChange={setAllowStrangerChat}
-                disabled={!isEditing}
+              <Text size="md" className="text-gray-700">允許陌生人聊天</Text>
+              <Controller
+                control={control}
+                name="allowStrangerChat"
+                render={({ field: { onChange, value } }) => (
+                  <Switch
+                    value={value}
+                    onValueChange={onChange}
+                    disabled={!isEditing}
+                  />
+                )}
               />
             </Box>
           </Box>
@@ -285,24 +342,19 @@ export default function ProfileScreen() {
           <Box className="flex-row gap-3 mb-4">
             <Button
               onPress={handleCancel}
-              isDisabled={updateProfile.isPending}
               variant="outline"
               className="flex-1"
             >
-              <ButtonText>Cancel</ButtonText>
+              <ButtonText>取消</ButtonText>
             </Button>
 
             <Button
-              onPress={handleSave}
-              isDisabled={updateProfile.isPending}
+              onPress={handleSubmit(onSubmit)}
+              isDisabled={!isDirty}
               variant="solid"
               className="flex-1 bg-blue-500"
             >
-              {updateProfile.isPending ? (
-                <Spinner color="white" size="small" />
-              ) : (
-                <ButtonText>Save</ButtonText>
-              )}
+              <ButtonText>儲存</ButtonText>
             </Button>
           </Box>
         ) : (
@@ -311,7 +363,7 @@ export default function ProfileScreen() {
             variant="solid"
             className="bg-blue-500 mb-4"
           >
-            <ButtonText>Edit Profile</ButtonText>
+            <ButtonText>編輯個人資料</ButtonText>
           </Button>
         )}
 
@@ -321,17 +373,17 @@ export default function ProfileScreen() {
           variant="solid"
           className="bg-red-500"
         >
-          <ButtonText>Logout</ButtonText>
+          <ButtonText>登出</ButtonText>
         </Button>
 
         {/* Profile Info */}
         {profile && (
           <Box className="mt-6 p-4 bg-gray-50 rounded-lg">
             <Text size="xs" className="text-gray-500 mb-1">
-              Profile ID: {profile.id.substring(0, 8)}...
+              個人資料 ID: {profile.id.substring(0, 8)}...
             </Text>
             <Text size="xs" className="text-gray-500">
-              Last updated: {new Date(profile.updated_at).toLocaleDateString()}
+              最後更新: {new Date(profile.updated_at).toLocaleDateString('zh-TW')}
             </Text>
           </Box>
         )}
