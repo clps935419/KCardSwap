@@ -43,9 +43,9 @@ export function useFormInput<TFieldValues extends FieldValues = FieldValues>({
       control={control}
       name={name}
       render={({ field: { onChange, onBlur, value } }) => (
-        <Input disabled={disabled}>
+        <Input isDisabled={disabled}>
           <InputField
-            value={value as string}
+            value={String(value || '')}
             onChangeText={onChange}
             onBlur={onBlur}
             placeholder={placeholder}
