@@ -14,7 +14,7 @@ class Settings:
 
     # Database
     DATABASE_URL: str = os.getenv(
-        "DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/kcardswap"
+        "DATABASE_URL", "postgresql+asyncpg://postgres:postgres@localhost:5432/kcardswap"
     )
     TEST_DATABASE_URL: str = os.getenv(
         "TEST_DATABASE_URL", "postgresql+asyncpg://kcardswap:kcardswap@localhost:5432/kcardswap_test"

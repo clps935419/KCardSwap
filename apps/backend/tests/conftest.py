@@ -107,8 +107,8 @@ async def db_session(test_session_factory) -> AsyncGenerator[AsyncSession, None]
     - Faster than recreating database (uses transactions)
     - Works with the test database (kcardswap_test)
     
-    The transaction is always rolled back after the test, even if it succeeds.
-    This ensures test data doesn't persist in the database.
+    Uses nested transactions (savepoints) to ensure rollback even if the test
+    tries to commit. The outer transaction is never committed.
     
     Args:
         test_session_factory: Session factory from the fixture
@@ -117,7 +117,13 @@ async def db_session(test_session_factory) -> AsyncGenerator[AsyncSession, None]
         AsyncSession: Database session for the test
     """
     async with test_session_factory() as session:
-        async with session.begin() as transaction:
+        # Start an outer transaction that will be rolled back
+        await session.begin()
+        try:
+            # Create a savepoint that tests can commit/rollback
+            await session.begin_nested()
             yield session
-            # Always rollback the transaction to ensure test data doesn't persist
-            await transaction.rollback()
+        finally:
+            # Roll back the outer transaction, discarding all changes
+            await session.rollback()
+            await session.close()
