@@ -260,7 +260,7 @@ class TestCardUploadIntegration:
             "app.modules.social.presentation.routers.cards_router.CardRepositoryImpl"
         ) as mock_repo_class:
             repo_instance = Mock()
-            repo_instance.get_cards_by_user_id = AsyncMock(return_value=[])
+            repo_instance.find_by_owner = AsyncMock(return_value=[])
             mock_repo_class.return_value = repo_instance
             
             response = client.get("/api/v1/cards/me")
@@ -282,7 +282,7 @@ class TestCardUploadIntegration:
             "app.modules.social.presentation.routers.cards_router.CardRepositoryImpl"
         ) as mock_repo_class:
             repo_instance = Mock()
-            repo_instance.get_cards_by_user_id = AsyncMock(return_value=[])
+            repo_instance.find_by_status = AsyncMock(return_value=[])
             mock_repo_class.return_value = repo_instance
             
             response = client.get("/api/v1/cards/me?status=available")
