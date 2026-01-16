@@ -249,34 +249,49 @@ class TestCardUploadIntegration:
             # May fail with 500 if DB not fully set up
             assert response.status_code == 500
 
-    @pytest.mark.skip(reason="Requires database connection - see TEST_STATUS_REPORT.md")
-    def test_get_my_cards(self, mock_auth_dependency):
+    def test_get_my_cards(self, mock_auth_dependency, mock_db_session):
         """
         Test retrieving user's cards (T087.6)
 
         Expected: 200 OK with list of cards (may be empty)
         """
-        response = client.get("/api/v1/cards/me")
+        # Mock CardRepositoryImpl to return empty list
+        with patch(
+            "app.modules.social.presentation.routers.cards_router.CardRepositoryImpl"
+        ) as mock_repo_class:
+            repo_instance = Mock()
+            repo_instance.find_by_owner = AsyncMock(return_value=[])
+            mock_repo_class.return_value = repo_instance
+            
+            response = client.get("/api/v1/cards/me")
 
-        # Should succeed or fail with DB issue
-        assert response.status_code in [200, 500]
-
-        if response.status_code == 200:
+            # Should succeed with empty list
+            assert response.status_code == 200
             data = response.json()
             assert "data" in data
             assert isinstance(data["data"], list)
 
-    @pytest.mark.skip(reason="Requires database connection - see TEST_STATUS_REPORT.md")
-    def test_get_my_cards_with_status_filter(self, mock_auth_dependency):
+    def test_get_my_cards_with_status_filter(self, mock_auth_dependency, mock_db_session):
         """
         Test retrieving user's cards with status filter (T087.7)
 
         Expected: 200 OK with filtered list
         """
-        response = client.get("/api/v1/cards/me?status=available")
+        # Mock CardRepositoryImpl to return empty list (filtering handled by repository)
+        with patch(
+            "app.modules.social.presentation.routers.cards_router.CardRepositoryImpl"
+        ) as mock_repo_class:
+            repo_instance = Mock()
+            repo_instance.find_by_status = AsyncMock(return_value=[])
+            mock_repo_class.return_value = repo_instance
+            
+            response = client.get("/api/v1/cards/me?status=available")
 
-        # Should succeed or fail with DB issue
-        assert response.status_code in [200, 500]
+            # Should succeed with empty filtered list
+            assert response.status_code == 200
+            data = response.json()
+            assert "data" in data
+            assert isinstance(data["data"], list)
 
     def test_delete_card(self, mock_auth_dependency, mock_db_session):
         """

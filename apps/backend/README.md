@@ -80,6 +80,7 @@ docker compose logs -f backend
 ```bash
 # 資料庫
 DATABASE_URL=postgresql+asyncpg://kcardswap:kcardswap@localhost:5432/kcardswap
+TEST_DATABASE_URL=postgresql+asyncpg://kcardswap:kcardswap@localhost:5432/kcardswap_test
 
 # JWT
 JWT_SECRET=your-secret-key
@@ -145,8 +146,36 @@ poetry run python scripts/create_admin.py --email admin@example.com --password p
 
 ### 測試
 ```bash
+# 執行所有測試
 poetry run pytest
+
+# 執行測試並顯示覆蓋率
 poetry run pytest --cov=app
+
+# 使用 Makefile 執行測試
+make test
+
+# 在 Docker 容器中執行測試
+make test-docker
+```
+
+#### 測試資料庫設置
+
+本專案使用獨立的測試資料庫 `kcardswap_test`，提供以下優勢：
+
+- **資料隔離**：測試資料與開發資料完全分離
+- **自動回滾**：每個測試在獨立事務中執行，測試完成後自動回滾
+- **快速清理**：無需手動清理測試資料，事務回滾自動處理
+- **並行安全**：多個測試可以安全地並行執行
+
+測試資料庫在 Docker 啟動時會自動建立並執行 migrations。如需手動初始化：
+
+```bash
+# 初始化測試資料庫 schema
+make init-test-db
+
+# 或直接使用 alembic
+DATABASE_URL=postgresql://kcardswap:kcardswap@localhost:5432/kcardswap_test alembic upgrade head
 ```
 
 ### Linting

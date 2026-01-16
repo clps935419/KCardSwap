@@ -1,21 +1,21 @@
 """
-Test configuration and fixtures for integration tests with testcontainers.
+Test configuration and fixtures for integration tests.
 
 This module provides fixtures for:
-- PostgreSQL database container
+- PostgreSQL test database (separate from main database)
 - Automatic Alembic migration execution
-- Database session management
+- Database session management with transaction rollback
 - GCS mock service for testing
 """
 
+import os
 from typing import AsyncGenerator
 
 import pytest
-
-# Uncomment when testcontainers-postgres is installed
-# from testcontainers.postgres import PostgresContainer
+import pytest_asyncio
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
+from app.config import settings
 from app.shared.infrastructure.external.mock_gcs_storage_service import (
     MockGCSStorageService,
 )
@@ -44,47 +44,46 @@ def mock_gcs_service():
 
 
 @pytest.fixture(scope="session")
-def postgres_container():
+def test_database_url() -> str:
+    """Get the test database URL from environment or settings.
+    
+    Returns:
+        str: Test database URL for pytest session
     """
-    Start a PostgreSQL container for testing.
-
-    To use this fixture, install testcontainers:
-    poetry add --group dev testcontainers[postgres]
-    """
-    # Uncomment when testcontainers-postgres is installed
-    # with PostgresContainer("postgres:15-alpine") as postgres:
-    #     # Set environment variable for Alembic
-    #     database_url = postgres.get_connection_url()
-    #     os.environ["DATABASE_URL"] = database_url
-    #
-    #     # Run Alembic migrations
-    #     alembic_cfg = Config("alembic.ini")
-    #     alembic_cfg.set_main_option("sqlalchemy.url", database_url)
-    #     command.upgrade(alembic_cfg, "head")
-    #
-    #     yield postgres
-
-    # Temporary: Skip testcontainers for now
-    pytest.skip("Testcontainers not yet configured")
+    # Use TEST_DATABASE_URL if available, otherwise use the one from settings
+    return os.getenv("TEST_DATABASE_URL", settings.TEST_DATABASE_URL)
 
 
-@pytest.fixture(scope="session")
-def test_database_url(postgres_container) -> str:
-    """Get the database URL for testing."""
-    return postgres_container.get_connection_url().replace("psycopg2", "asyncpg")
-
-
-@pytest.fixture(scope="session")
+@pytest_asyncio.fixture
 async def test_engine(test_database_url: str):
-    """Create a test database engine."""
-    engine = create_async_engine(test_database_url, echo=True)
+    """Create a test database engine for each test.
+    
+    Note: Using function scope to avoid event loop issues with pytest-asyncio.
+    While this creates a new engine for each test, the performance impact is
+    acceptable for small to medium test suites. For larger suites, consider
+    using session scope with proper event loop management.
+    
+    Args:
+        test_database_url: Database URL for testing
+        
+    Yields:
+        AsyncEngine: SQLAlchemy async engine for testing
+    """
+    engine = create_async_engine(test_database_url, echo=False, pool_pre_ping=True)
     yield engine
     await engine.dispose()
 
 
-@pytest.fixture(scope="session")
+@pytest_asyncio.fixture
 async def test_session_factory(test_engine) -> async_sessionmaker:
-    """Create a test session factory."""
+    """Create a test session factory for each test.
+    
+    Args:
+        test_engine: Test database engine
+        
+    Returns:
+        async_sessionmaker: Session factory for creating test sessions
+    """
     return async_sessionmaker(
         test_engine,
         class_=AsyncSession,
@@ -94,19 +93,37 @@ async def test_session_factory(test_engine) -> async_sessionmaker:
     )
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def db_session(test_session_factory) -> AsyncGenerator[AsyncSession, None]:
     """
     Provide a transactional database session for each test.
 
-    Each test gets a clean database state through transaction rollback.
+    Each test runs in its own transaction that is automatically rolled back
+    after the test completes, ensuring test isolation and clean database state.
+    
+    This approach:
+    - Maintains test isolation (each test starts with clean state)
+    - Avoids manual cleanup (automatic rollback)
+    - Faster than recreating database (uses transactions)
+    - Works with the test database (kcardswap_test)
+    
+    Uses nested transactions (savepoints) to ensure rollback even if the test
+    tries to commit. The outer transaction is never committed.
+    
+    Args:
+        test_session_factory: Session factory from the fixture
+        
+    Yields:
+        AsyncSession: Database session for the test
     """
     async with test_session_factory() as session:
+        # Start an outer transaction that will be rolled back
+        await session.begin()
         try:
+            # Create a savepoint that tests can commit/rollback
+            await session.begin_nested()
             yield session
-            await session.commit()
-        except Exception:
-            await session.rollback()
-            raise
         finally:
+            # Roll back the outer transaction, discarding all changes
+            await session.rollback()
             await session.close()
