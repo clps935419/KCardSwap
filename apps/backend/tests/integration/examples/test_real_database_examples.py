@@ -189,58 +189,7 @@ class TestProfileFlowWithRealDatabase:
         assert row[3] == "TPE"            # region
         assert row[4] == "withprofile@test.com"  # email
 
-    @pytest.mark.skip(reason="此測試需要完整的 API endpoint 實作")
-    def test_get_profile_api_endpoint(self, authenticated_client, test_user_with_profile):
-        """測試取得個人檔案 API endpoint
-        
-        此測試示範如何測試完整的 API 流程：
-        1. 使用 authenticated_client (已設定認證與資料庫)
-        2. 呼叫 API endpoint
-        3. 驗證回應
-        
-        當 API endpoint 實作完成後，移除 @pytest.mark.skip 即可啟用測試。
-        """
-        user_id, profile_id = test_user_with_profile
-        
-        # 呼叫 GET /api/v1/profile/me API
-        response = authenticated_client.get("/api/v1/profile/me")
-        
-        # 驗證回應
-        assert response.status_code == 200
-        data = response.json()
-        assert "data" in data
-        assert data["data"]["nickname"] == "TestNickname"
-        assert data["data"]["bio"] == "Test bio"
-        assert data["data"]["region"] == "TPE"
 
-    @pytest.mark.skip(reason="此測試需要完整的 API endpoint 實作")
-    def test_update_profile_api_endpoint(self, authenticated_client, test_user_with_profile):
-        """測試更新個人檔案 API endpoint
-        
-        此測試示範完整的更新流程：
-        1. 準備更新資料
-        2. 呼叫 PUT API
-        3. 驗證更新成功
-        4. 查詢資料庫確認資料已更新
-        """
-        user_id, profile_id = test_user_with_profile
-        
-        # 準備更新資料
-        update_data = {
-            "nickname": "UpdatedNickname",
-            "bio": "Updated bio",
-            "region": "NYC"
-        }
-        
-        # 呼叫 PUT /api/v1/profile/me API
-        response = authenticated_client.put("/api/v1/profile/me", json=update_data)
-        
-        # 驗證回應
-        assert response.status_code == 200
-        data = response.json()
-        assert data["data"]["nickname"] == "UpdatedNickname"
-        assert data["data"]["bio"] == "Updated bio"
-        assert data["data"]["region"] == "NYC"
 
 
 class TestAuthenticationFlowWithRealDatabase:
