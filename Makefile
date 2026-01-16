@@ -26,14 +26,44 @@ logs-kong: ## View Kong logs only
 logs-db: ## View database logs only
 	docker compose logs -f db
 
-test: ## Run backend tests
+test: ## Run all backend tests
 	cd apps/backend && poetry run pytest -v
 
-test-docker: ## Run backend tests in Docker container
+test-unit: ## Run unit tests only
+	cd apps/backend && poetry run pytest -v tests/unit
+
+test-integration: ## Run integration tests only (needs Docker)
+	cd apps/backend && TEST_DATABASE_URL=$${TEST_DATABASE_URL:-postgresql+asyncpg://kcardswap:kcardswap@localhost:5432/kcardswap_test} poetry run pytest -v tests/integration
+
+test-integration-docker: ## Run integration tests in Docker container
+	docker compose exec backend pytest -v tests/integration
+
+test-integration-fast: ## Run integration tests with mocks (no DB needed)
+	cd apps/backend && poetry run pytest -v tests/integration -k "not real_database_examples"
+
+test-docker: ## Run all backend tests in Docker container
 	docker compose exec backend pytest -v
 
 init-test-db: ## Initialize test database schema
 	cd apps/backend && TEST_DATABASE_URL=$${TEST_DATABASE_URL:-postgresql://kcardswap:kcardswap@localhost:5432/kcardswap_test} poetry run alembic upgrade head
+
+test-coverage: ## Run tests with coverage report
+	cd apps/backend && poetry run pytest -v --cov=app --cov-report=term-missing --cov-report=html
+
+test-coverage-integration: ## Run integration tests with coverage
+	cd apps/backend && TEST_DATABASE_URL=$${TEST_DATABASE_URL:-postgresql+asyncpg://kcardswap:kcardswap@localhost:5432/kcardswap_test} poetry run pytest -v tests/integration --cov=app --cov-report=term-missing
+
+test-integration-identity: ## Run Identity module integration tests
+	cd apps/backend && TEST_DATABASE_URL=$${TEST_DATABASE_URL:-postgresql+asyncpg://kcardswap:kcardswap@localhost:5432/kcardswap_test} poetry run pytest -v tests/integration/modules/identity
+
+test-integration-social: ## Run Social module integration tests
+	cd apps/backend && TEST_DATABASE_URL=$${TEST_DATABASE_URL:-postgresql+asyncpg://kcardswap:kcardswap@localhost:5432/kcardswap_test} poetry run pytest -v tests/integration/modules/social
+
+test-integration-locations: ## Run Locations module integration tests
+	cd apps/backend && TEST_DATABASE_URL=$${TEST_DATABASE_URL:-postgresql+asyncpg://kcardswap:kcardswap@localhost:5432/kcardswap_test} poetry run pytest -v tests/integration/modules/locations
+
+test-integration-examples: ## Run integration test examples (needs DB)
+	cd apps/backend && TEST_DATABASE_URL=$${TEST_DATABASE_URL:-postgresql+asyncpg://kcardswap:kcardswap@localhost:5432/kcardswap_test} poetry run pytest -v tests/integration/examples
 
 lint: ## Run linter on backend code
 	cd apps/backend && flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
