@@ -5,7 +5,11 @@ set -e
 poetry config virtualenvs.create false
 
 echo "Installing dependencies..."
-poetry install --no-root --only main
+if [ "${POETRY_INSTALL_DEV:-}" = "true" ]; then
+  poetry install --no-root --with dev
+else
+  poetry install --no-root --only main
+fi
 
 echo "Running database migrations on main database..."
 alembic upgrade head

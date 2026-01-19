@@ -2,11 +2,32 @@
 # Development helpers: mount source, persist site-packages, and auto-install deps on first start
 
 services:
+  db-init:
+    image: postgres:15-alpine
+    container_name: kcardswap-db-init
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      POSTGRES_USER: kcardswap
+      POSTGRES_PASSWORD: kcardswap
+    volumes:
+      - ./infra/db/ensure-test-db.sh:/scripts/ensure-test-db.sh:ro
+    command: ["sh", "/scripts/ensure-test-db.sh"]
+    restart: "no"
+
   backend:
+    environment:
+      - POETRY_INSTALL_DEV=true
+      - POETRY_VIRTUALENVS_CREATE=false
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
     volumes:
       - ./apps/backend/app:/app/app
       - ./apps/backend/alembic:/app/alembic
       - ./apps/backend/scripts:/app/scripts
+      - ./apps/backend/tests:/app/tests
       # Note: do not bind-mount start.sh to avoid exec format / permission issues on Windows
       # - ./apps/backend/start.sh:/app/start.sh:ro
       - ./apps/backend/pyproject.toml:/app/pyproject.toml:ro

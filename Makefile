@@ -36,13 +36,13 @@ test-integration: ## Run integration tests only (needs Docker)
 	cd apps/backend && TEST_DATABASE_URL=$${TEST_DATABASE_URL:-postgresql+asyncpg://kcardswap:kcardswap@localhost:5432/kcardswap_test} poetry run pytest -v tests/integration
 
 test-integration-docker: ## Run integration tests in Docker container
-	docker compose exec backend pytest -v tests/integration
+	docker compose exec backend python -m pytest -v tests/integration
 
 test-integration-fast: ## Run integration tests with mocks (no DB needed)
 	cd apps/backend && poetry run pytest -v tests/integration -k "not real_database_examples"
 
 test-docker: ## Run all backend tests in Docker container
-	docker compose exec backend pytest -v
+	docker compose exec backend python -m pytest -v
 
 init-test-db: ## Initialize test database schema
 	cd apps/backend && TEST_DATABASE_URL=$${TEST_DATABASE_URL:-postgresql://kcardswap:kcardswap@localhost:5432/kcardswap_test} poetry run alembic upgrade head

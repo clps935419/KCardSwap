@@ -1,0 +1,3 @@
+# Normalize line endings for shell scripts.
+# Prevents CRLF ("^M") from breaking scripts in Linux containers.
+*.sh text eol=lf

@@ -166,7 +166,9 @@ async def get_my_cards(
     current_user_id: Annotated[UUID, Depends(get_current_user_id)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
     status_filter: Optional[str] = Query(
-        None, description="Filter by status (available/trading/traded)"
+        None,
+        alias="status",
+        description="Filter by status (available/trading/traded)",
     ),
 ) -> CardListResponseWrapper:
     """

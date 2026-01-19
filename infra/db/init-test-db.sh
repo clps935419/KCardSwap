@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # Initialize test database with UUID extension
 # This script is run after init.sql by Docker's entrypoint
 
