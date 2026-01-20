@@ -51,10 +51,11 @@ def downgrade() -> None:
     """
 
     # Drop in reverse order
-    op.drop_index("idx_refresh_tokens_token", table_name="refresh_tokens")
-    op.drop_index("idx_refresh_tokens_user_id", table_name="refresh_tokens")
-    op.drop_index("idx_subscriptions_user_id", table_name="subscriptions")
-    op.drop_index("idx_cards_status", table_name="cards")
-    op.drop_index("idx_cards_owner_id", table_name="cards")
-    op.drop_index("idx_users_email", table_name="users")
-    op.drop_index("idx_users_google_id", table_name="users")
+    # Use IF EXISTS to make downgrades idempotent in CI / fresh DBs
+    op.execute("DROP INDEX IF EXISTS idx_refresh_tokens_token")
+    op.execute("DROP INDEX IF EXISTS idx_refresh_tokens_user_id")
+    op.execute("DROP INDEX IF EXISTS idx_subscriptions_user_id")
+    op.execute("DROP INDEX IF EXISTS idx_cards_status")
+    op.execute("DROP INDEX IF EXISTS idx_cards_owner_id")
+    op.execute("DROP INDEX IF EXISTS idx_users_email")
+    op.execute("DROP INDEX IF EXISTS idx_users_google_id")
