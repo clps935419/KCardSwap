@@ -1,6 +1,7 @@
 name: Backend CI
 
 on:
+  workflow_dispatch:
   push:
     branches: [ main, master, develop ]
     paths:
@@ -129,12 +130,19 @@ jobs:
         echo "Re-running migrations for tests..."
         poetry run alembic upgrade head
     
-    - name: Run tests with coverage
+    - name: Run backend unit tests
       env:
         DATABASE_URL: postgresql+asyncpg://kcardswap:kcardswap@localhost:5432/kcardswap_test
         JWT_SECRET: test-secret-key
         GCS_BUCKET: test-bucket
-      run: poetry run pytest --cov=app --cov-report=xml --cov-report=term-missing
+      run: poetry run pytest tests/unit --cov=app --cov-report=xml --cov-report=term-missing
+
+    - name: Run backend integration tests
+      env:
+        DATABASE_URL: postgresql+asyncpg://kcardswap:kcardswap@localhost:5432/kcardswap_test
+        JWT_SECRET: test-secret-key
+        GCS_BUCKET: test-bucket
+      run: poetry run pytest tests/integration --cov=app --cov-append --cov-report=term-missing
 
   build:
     name: Build Check
