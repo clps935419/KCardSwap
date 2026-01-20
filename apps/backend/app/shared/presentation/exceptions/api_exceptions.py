@@ -171,6 +171,5 @@ class ServiceUnavailableException(APIError):  # noqa: N818
         )
 
 
-# Aliases for compatibility
+# Alias for compatibility
 ValidationException = BadRequestException
-APIException = APIError  # Backward compatibility alias
