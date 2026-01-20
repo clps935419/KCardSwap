@@ -40,7 +40,7 @@ class FriendshipDTO:
 class IFriendshipService(ABC):
     """
     Interface for managing friendships.
-    
+
     This service provides friendship management functionality
     without exposing the Social bounded context's internal implementation.
     """
@@ -51,11 +51,11 @@ class IFriendshipService(ABC):
     ) -> Optional[FriendshipDTO]:
         """
         Get friendship between two users.
-        
+
         Args:
             user_id: First user UUID
             friend_id: Second user UUID
-            
+
         Returns:
             FriendshipDTO if friendship exists, None otherwise
         """
@@ -65,11 +65,11 @@ class IFriendshipService(ABC):
     async def are_friends(self, user_id: UUID, friend_id: UUID) -> bool:
         """
         Check if two users are friends (accepted status).
-        
+
         Args:
             user_id: First user UUID
             friend_id: Second user UUID
-            
+
         Returns:
             True if users are friends, False otherwise
         """
@@ -81,12 +81,12 @@ class IFriendshipService(ABC):
     ) -> FriendshipDTO:
         """
         Create a new friendship or friend request.
-        
+
         Args:
             user_id: Requesting user UUID
             friend_id: Target user UUID
             auto_accept: If True, automatically accept the friendship
-            
+
         Returns:
             Created FriendshipDTO
         """

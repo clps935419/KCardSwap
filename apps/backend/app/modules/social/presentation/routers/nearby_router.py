@@ -13,7 +13,7 @@ from app.modules.social.application.dtos.nearby_dtos import (
     SearchNearbyRequest as SearchRequestDTO,
 )
 from app.modules.social.application.use_cases.nearby import (
-    RateLimitExceededException,
+    RateLimitExceededError,
     SearchNearbyCardsUseCase,
     UpdateUserLocationUseCase,
 )
@@ -125,7 +125,7 @@ async def search_nearby_cards(
         )
         return SearchNearbyResponseWrapper(data=data, meta=None, error=None)
 
-    except RateLimitExceededException as e:
+    except RateLimitExceededError as e:
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
             detail=str(e),

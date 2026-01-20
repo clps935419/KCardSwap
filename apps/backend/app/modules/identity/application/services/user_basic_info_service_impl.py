@@ -19,7 +19,7 @@ from app.shared.domain.contracts.i_user_basic_info_service import (
 class UserBasicInfoServiceImpl(IUserBasicInfoService):
     """
     Implementation of user basic info service.
-    
+
     Provides minimal user information for display purposes
     across bounded contexts.
     """

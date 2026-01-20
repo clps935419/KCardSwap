@@ -96,15 +96,16 @@ class TestAcceptInterestUseCase:
     ):
         """Test successful interest acceptance with friendship and chat room creation"""
         # Arrange
-        from app.shared.domain.contracts.i_chat_room_service import ChatRoomDTO
         from uuid import UUID
+
+        from app.shared.domain.contracts.i_chat_room_service import ChatRoomDTO
 
         mock_post_repository.get_by_id.return_value = sample_post
         mock_post_interest_repository.get_by_id.return_value = sample_interest
-        
+
         # Service returns None for no existing friendship
         mock_friendship_repository.get_friendship.return_value = None
-        
+
         # Service creates friendship
         from app.shared.domain.contracts.i_friendship_service import (
             FriendshipDTO,
@@ -156,12 +157,13 @@ class TestAcceptInterestUseCase:
     ):
         """Test that existing chat room is reused"""
         # Arrange
+        from uuid import UUID
+
         from app.shared.domain.contracts.i_chat_room_service import ChatRoomDTO
         from app.shared.domain.contracts.i_friendship_service import (
             FriendshipDTO,
             FriendshipStatusDTO,
         )
-        from uuid import UUID
 
         mock_post_repository.get_by_id.return_value = sample_post
         mock_post_interest_repository.get_by_id.return_value = sample_interest

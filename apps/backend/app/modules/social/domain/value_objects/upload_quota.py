@@ -95,7 +95,7 @@ class UploadQuota:
         return max(0, remaining)
 
 
-class QuotaExceeded(Exception):
+class QuotaExceededError(Exception):
     """Exception raised when upload quota is exceeded"""
 
     def __init__(self, reason: str, limit_type: str):

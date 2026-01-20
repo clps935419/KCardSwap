@@ -10,7 +10,6 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.shared.presentation.dependencies.auth import get_current_user_id
 from app.modules.posts.application.use_cases.accept_interest_use_case import (
     AcceptInterestUseCase,
 )
@@ -43,16 +42,17 @@ from app.modules.posts.presentation.schemas.post_schemas import (
     AcceptInterestResponse,
     AcceptInterestResponseWrapper,
     CreatePostRequest,
-    PostInterestResponse,
-    PostInterestResponseWrapper,
     PostInterestListResponse,
     PostInterestListResponseWrapper,
+    PostInterestResponse,
+    PostInterestResponseWrapper,
     PostListResponse,
     PostListResponseWrapper,
     PostResponse,
     PostResponseWrapper,
 )
 from app.shared.infrastructure.database.connection import get_db_session
+from app.shared.presentation.dependencies.auth import get_current_user_id
 
 logger = logging.getLogger(__name__)
 

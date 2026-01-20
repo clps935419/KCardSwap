@@ -3,7 +3,7 @@ Cards Router for Social Module
 Handles card upload, retrieval, and deletion
 """
 
-from typing import Annotated, List, Optional
+from typing import Annotated, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -28,7 +28,7 @@ from app.modules.social.domain.services.card_validation_service import (
     CardValidationService,
 )
 from app.modules.social.domain.value_objects.upload_quota import (
-    QuotaExceeded,
+    QuotaExceededError,
     UploadQuota,
 )
 from app.modules.social.infrastructure.repositories.card_repository_impl import (
@@ -37,7 +37,6 @@ from app.modules.social.infrastructure.repositories.card_repository_impl import 
 from app.modules.social.presentation.schemas.card_schemas import (
     CardListResponseWrapper,
     CardResponse,
-    CardResponseWrapper,
     DeleteSuccessResponse,
     DeleteSuccessResponseWrapper,
     QuotaStatusResponse,
@@ -135,7 +134,7 @@ async def get_upload_url(
             card_id=result.card_id,
         )
         return UploadUrlResponseWrapper(data=data, meta=None, error=None)
-    except QuotaExceeded as e:
+    except QuotaExceededError as e:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail={
@@ -201,7 +200,7 @@ async def get_my_cards(
         )
         for card in cards
     ]
-    
+
     return CardListResponseWrapper(data=data, meta=None, error=None)
 
 
@@ -244,7 +243,7 @@ async def delete_card(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail={"code": "NOT_FOUND", "message": "Card not found or not owner"},
             )
-        
+
         data = DeleteSuccessResponse(success=True, message="Card deleted successfully")
         return DeleteSuccessResponseWrapper(data=data, meta=None, error=None)
     except ValueError as e:

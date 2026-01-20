@@ -13,8 +13,8 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
-from app.shared.presentation.dependencies.auth import get_current_user_id
 from app.shared.infrastructure.database.connection import get_db_session
+from app.shared.presentation.dependencies.auth import get_current_user_id
 
 client = TestClient(app)
 
@@ -44,10 +44,10 @@ class TestCardUploadIntegration:
         mock_session.commit = AsyncMock()
         mock_session.rollback = AsyncMock()
         mock_session.close = AsyncMock()
-        
+
         async def override_get_db_session():
             return mock_session
-        
+
         app.dependency_overrides[get_db_session] = override_get_db_session
         yield mock_session
         app.dependency_overrides.clear()
@@ -242,7 +242,7 @@ class TestCardUploadIntegration:
         if response.status_code in [400, 422]:
             data = response.json()
             # Check for error in either detail or error field
-            error_msg = data.get("detail") or data.get("error", {}).get("message", "")
+            _error_msg = data.get("detail") or data.get("error", {}).get("message", "")
             # Accept any error response for this edge case
             assert response.status_code in [400, 422]
         else:
@@ -262,7 +262,7 @@ class TestCardUploadIntegration:
             repo_instance = Mock()
             repo_instance.find_by_owner = AsyncMock(return_value=[])
             mock_repo_class.return_value = repo_instance
-            
+
             response = client.get("/api/v1/cards/me")
 
             # Should succeed with empty list
@@ -284,7 +284,7 @@ class TestCardUploadIntegration:
             repo_instance = Mock()
             repo_instance.find_by_status = AsyncMock(return_value=[])
             mock_repo_class.return_value = repo_instance
-            
+
             response = client.get("/api/v1/cards/me?status=available")
 
             # Should succeed with empty filtered list

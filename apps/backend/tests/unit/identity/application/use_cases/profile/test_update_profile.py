@@ -69,7 +69,7 @@ class TestUpdateProfileUseCase:
         # Arrange
         user_id = uuid4()
         mock_profile_repo.get_by_user_id.return_value = None
-        
+
         new_profile = Profile(user_id=user_id, nickname="New User")
         mock_profile_repo.save.return_value = new_profile
 

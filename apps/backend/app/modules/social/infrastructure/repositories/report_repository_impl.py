@@ -88,7 +88,7 @@ class ReportRepositoryImpl(IReportRepository):
     async def find_by_reporter(self, reporter_id: str) -> List[Report]:
         """
         Get all reports filed by a specific user (alias for get_reports_by_reporter_id)
-        
+
         This method provides compatibility with router expectations
         """
         return await self.get_reports_by_reporter_id(reporter_id)
@@ -97,7 +97,7 @@ class ReportRepositoryImpl(IReportRepository):
         """Get unresolved reports for admin review"""
         result = await self.session.execute(
             select(ReportModel)
-            .where(ReportModel.resolved == False)
+            .where(ReportModel.resolved.is_(False))
             .order_by(ReportModel.created_at.asc())
             .limit(limit)
         )

@@ -20,7 +20,7 @@ from app.shared.domain.contracts.i_profile_query_service import (
 class ProfileQueryServiceImpl(IProfileQueryService):
     """
     Implementation of profile query service.
-    
+
     Provides read-only and limited write access to profile information
     for other bounded contexts.
     """

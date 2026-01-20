@@ -40,7 +40,7 @@ async def check_subscription_permission(
         try:
             # Get subscription service via shared dependency
             subscription_service = await get_subscription_service(session)
-            
+
             # Get or create user's subscription info
             user_id = UUID(user["id"]) if isinstance(user["id"], str) else user["id"]
             subscription_info = await subscription_service.get_or_create_subscription_info(

@@ -22,7 +22,7 @@ from app.shared.domain.contracts.i_chat_room_service import (
 class ChatRoomServiceImpl(IChatRoomService):
     """
     Implementation of chat room service.
-    
+
     Provides chat room management functionality for other bounded contexts.
     """
 

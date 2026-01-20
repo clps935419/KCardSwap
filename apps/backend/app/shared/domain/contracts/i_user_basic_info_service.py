@@ -21,7 +21,7 @@ class UserBasicInfo:
 class IUserBasicInfoService(ABC):
     """
     Interface for querying basic user information.
-    
+
     This service provides minimal user data for display purposes
     without exposing the Identity bounded context's internal implementation.
     """
@@ -30,10 +30,10 @@ class IUserBasicInfoService(ABC):
     async def get_user_basic_info(self, user_id: UUID) -> Optional[UserBasicInfo]:
         """
         Get basic user information.
-        
+
         Args:
             user_id: User UUID
-            
+
         Returns:
             UserBasicInfo if user exists, None otherwise
         """

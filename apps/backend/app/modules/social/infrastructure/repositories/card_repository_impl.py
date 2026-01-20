@@ -183,7 +183,7 @@ class CardRepositoryImpl(ICardRepository):
 
         # Optionally exclude stealth mode users
         if exclude_stealth_users:
-            query = query.where(ProfileModel.stealth_mode == False)
+            query = query.where(ProfileModel.stealth_mode.is_(False))
 
         # Execute query
         result = await self.session.execute(query)

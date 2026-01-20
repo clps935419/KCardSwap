@@ -7,6 +7,15 @@ from injector import Module, provider, singleton
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import Settings
+from app.modules.identity.application.services.profile_query_service_impl import (
+    ProfileQueryServiceImpl,
+)
+from app.modules.identity.application.services.subscription_query_service_impl import (
+    SubscriptionQueryServiceImpl,
+)
+from app.modules.identity.application.services.user_basic_info_service_impl import (
+    UserBasicInfoServiceImpl,
+)
 from app.modules.identity.application.use_cases.auth.admin_login import (
     AdminLoginUseCase,
 )
@@ -58,15 +67,6 @@ from app.modules.identity.infrastructure.repositories.user_repository_impl impor
 )
 from app.modules.identity.infrastructure.security.password_service import (
     PasswordService,
-)
-from app.modules.identity.application.services.profile_query_service_impl import (
-    ProfileQueryServiceImpl,
-)
-from app.modules.identity.application.services.subscription_query_service_impl import (
-    SubscriptionQueryServiceImpl,
-)
-from app.modules.identity.application.services.user_basic_info_service_impl import (
-    UserBasicInfoServiceImpl,
 )
 from app.shared.domain.contracts.i_profile_query_service import IProfileQueryService
 from app.shared.domain.contracts.i_subscription_query_service import (
@@ -180,14 +180,14 @@ class IdentityModule(Module):
         self, session: AsyncSession, settings: Settings
     ) -> VerifyReceiptUseCase:
         """Provide VerifyReceiptUseCase with dependencies.
-        
+
         Note: Billing service initialization is optional. If credentials are not
         provided, the service will raise an error only when actually used, not
         during module initialization. This allows tests to mock the service.
         """
         subscription_repo = SubscriptionRepositoryImpl(session)
         purchase_token_repo = PurchaseTokenRepositoryImpl(session)
-        
+
         # Initialize billing service with optional credentials
         # This allows tests to mock without needing real credentials
         try:
@@ -199,7 +199,7 @@ class IdentityModule(Module):
             # If no credentials provided, create a placeholder that will be mocked in tests
             # In production, this will fail at use-time, not initialization-time
             billing_service = None  # type: ignore
-        
+
         return VerifyReceiptUseCase(
             subscription_repository=subscription_repo,
             purchase_token_repository=purchase_token_repo,

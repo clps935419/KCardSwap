@@ -23,7 +23,7 @@ from app.shared.domain.contracts.i_friendship_service import (
 class FriendshipServiceImpl(IFriendshipService):
     """
     Implementation of friendship service.
-    
+
     Provides friendship management functionality for other bounded contexts.
     """
 

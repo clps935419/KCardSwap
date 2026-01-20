@@ -245,7 +245,7 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     """
-    Drop all tables and triggers created in upgrade
+    Drop all tables and triggers created in upgrade (idempotent with IF EXISTS)
     """
 
     # Drop triggers
@@ -260,11 +260,11 @@ def downgrade() -> None:
     op.execute("DROP TRIGGER IF EXISTS update_users_updated_at ON users")
 
     # Drop function
-    op.execute("DROP FUNCTION IF EXISTS update_updated_at_column()")
+    op.execute("DROP FUNCTION IF EXISTS update_updated_at_column() CASCADE")
 
     # Drop tables (in reverse order of creation, respecting foreign keys)
-    op.drop_table("cards")
-    op.drop_table("refresh_tokens")
-    op.drop_table("subscriptions")
-    op.drop_table("profiles")
-    op.drop_table("users")
+    op.execute("DROP TABLE IF EXISTS cards CASCADE")
+    op.execute("DROP TABLE IF EXISTS refresh_tokens CASCADE")
+    op.execute("DROP TABLE IF EXISTS subscriptions CASCADE")
+    op.execute("DROP TABLE IF EXISTS profiles CASCADE")
+    op.execute("DROP TABLE IF EXISTS users CASCADE")

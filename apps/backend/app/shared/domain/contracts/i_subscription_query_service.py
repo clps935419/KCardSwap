@@ -29,7 +29,7 @@ class SubscriptionInfo:
 class ISubscriptionQueryService(ABC):
     """
     Interface for querying user subscription status.
-    
+
     This service provides read-only access to subscription information
     without exposing the Identity bounded context's internal implementation.
     """
@@ -38,10 +38,10 @@ class ISubscriptionQueryService(ABC):
     async def is_user_subscribed(self, user_id: UUID) -> bool:
         """
         Check if a user has an active subscription.
-        
+
         Args:
             user_id: User UUID
-            
+
         Returns:
             True if user has active subscription, False otherwise
         """
@@ -51,10 +51,10 @@ class ISubscriptionQueryService(ABC):
     async def get_subscription_info(self, user_id: UUID) -> Optional[SubscriptionInfo]:
         """
         Get detailed subscription information for a user.
-        
+
         Args:
             user_id: User UUID
-            
+
         Returns:
             SubscriptionInfo if user has subscription, None otherwise
         """
@@ -64,12 +64,12 @@ class ISubscriptionQueryService(ABC):
     async def get_or_create_subscription_info(self, user_id: UUID) -> SubscriptionInfo:
         """
         Get subscription information for a user, creating default subscription if not exists.
-        
+
         This is used for ensuring every user has a subscription record (defaulting to free plan).
-        
+
         Args:
             user_id: User UUID
-            
+
         Returns:
             SubscriptionInfo (always returns a value, creating free plan if needed)
         """

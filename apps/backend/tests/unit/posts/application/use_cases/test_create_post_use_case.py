@@ -48,11 +48,12 @@ class TestCreatePostUseCase:
         content = "Want to exchange IU photocard"
 
         # Mock premium subscription info from the service
+        from datetime import datetime
+        from uuid import UUID
+
         from app.shared.domain.contracts.i_subscription_query_service import (
             SubscriptionInfo,
         )
-        from uuid import UUID
-        from datetime import datetime
 
         mock_subscription_info = SubscriptionInfo(
             user_id=UUID(owner_id),
@@ -223,10 +224,11 @@ class TestCreatePostUseCase:
         custom_expiry = datetime.now(timezone.utc) + timedelta(days=7)
 
         # Mock premium subscription info
+        from uuid import UUID
+
         from app.shared.domain.contracts.i_subscription_query_service import (
             SubscriptionInfo,
         )
-        from uuid import UUID
 
         mock_subscription_info = SubscriptionInfo(
             user_id=UUID(owner_id),
@@ -266,10 +268,11 @@ class TestCreatePostUseCase:
         past_expiry = datetime.now(timezone.utc) - timedelta(days=1)
 
         # Mock premium subscription info
+        from uuid import UUID
+
         from app.shared.domain.contracts.i_subscription_query_service import (
             SubscriptionInfo,
         )
-        from uuid import UUID
 
         owner_id = str(uuid4())
         mock_subscription_info = SubscriptionInfo(
@@ -305,10 +308,11 @@ class TestCreatePostUseCase:
         idol_group = "Solo"
 
         # Mock premium subscription info
+        from uuid import UUID
+
         from app.shared.domain.contracts.i_subscription_query_service import (
             SubscriptionInfo,
         )
-        from uuid import UUID
 
         mock_subscription_info = SubscriptionInfo(
             user_id=UUID(owner_id),

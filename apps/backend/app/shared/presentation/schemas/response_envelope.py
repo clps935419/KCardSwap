@@ -39,7 +39,7 @@ class PaginationMeta(BaseModel):
 class ResponseEnvelope(BaseModel, Generic[T]):
     """
     Generic response envelope for all API responses.
-    
+
     Success responses have data and error=None.
     Error responses have data=None and error with details.
     Paginated responses have data, meta with pagination, and error=None.

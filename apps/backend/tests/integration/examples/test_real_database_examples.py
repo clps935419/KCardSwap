@@ -10,14 +10,15 @@
 """
 
 from uuid import UUID
+
 import pytest
 import pytest_asyncio
 from fastapi.testclient import TestClient
 from sqlalchemy import text
 
 from app.main import app
-from app.shared.presentation.dependencies.auth import get_current_user_id
 from app.shared.infrastructure.database.connection import get_db_session
+from app.shared.presentation.dependencies.auth import get_current_user_id
 
 client = TestClient(app)
 
@@ -28,7 +29,7 @@ class TestProfileFlowWithRealDatabase:
     @pytest_asyncio.fixture
     async def test_user(self, db_session) -> UUID:
         """建立測試用戶並返回用戶 ID
-        
+
         這個 fixture 示範如何在測試資料庫中建立測試資料。
         測試結束後，這些資料會自動回滾。
         """
@@ -51,7 +52,7 @@ class TestProfileFlowWithRealDatabase:
     @pytest_asyncio.fixture
     async def test_user_with_profile(self, db_session) -> tuple[UUID, UUID]:
         """建立有個人檔案的測試用戶
-        
+
         Returns:
             tuple: (user_id, profile_id)
         """
@@ -70,7 +71,7 @@ class TestProfileFlowWithRealDatabase:
         )
         user_id = result.scalar()
         await db_session.flush()
-        
+
         # 建立個人檔案
         result = await db_session.execute(
             text("""
@@ -87,35 +88,35 @@ class TestProfileFlowWithRealDatabase:
         )
         profile_id = result.scalar()
         await db_session.flush()
-        
+
         return user_id, profile_id
 
     @pytest.fixture
     def authenticated_client(self, test_user, db_session):
         """提供已認證的測試客戶端
-        
+
         此 fixture 示範如何 override FastAPI dependencies:
         1. 模擬已認證的用戶 (get_current_user_id)
         2. 注入真實的資料庫 session (get_db_session)
         """
         async def override_get_current_user_id():
             return test_user
-        
+
         async def override_get_db_session():
             return db_session
-        
+
         app.dependency_overrides[get_current_user_id] = override_get_current_user_id
         app.dependency_overrides[get_db_session] = override_get_db_session
-        
+
         yield client
-        
+
         # 清理 dependency overrides
         app.dependency_overrides.clear()
 
     @pytest.mark.asyncio
     async def test_verify_database_rollback(self, db_session):
         """驗證資料庫事務回滾功能
-        
+
         此測試示範：
         1. 插入資料到測試資料庫
         2. 在同一測試中可以查詢到資料
@@ -136,7 +137,7 @@ class TestProfileFlowWithRealDatabase:
         )
         user_id = result.scalar()
         await db_session.flush()
-        
+
         # 驗證資料存在
         result = await db_session.execute(
             text("SELECT COUNT(*) FROM users WHERE id = :user_id"),
@@ -144,13 +145,13 @@ class TestProfileFlowWithRealDatabase:
         )
         count = result.scalar()
         assert count == 1
-        
+
         # 測試結束後，此資料會自動回滾
 
     @pytest.mark.asyncio
     async def test_verify_previous_test_data_rolled_back(self, db_session):
         """驗證前一個測試的資料已經回滾
-        
+
         此測試確認 test_verify_database_rollback 中插入的資料
         已經被回滾，不會影響這個測試。
         """
@@ -161,16 +162,16 @@ class TestProfileFlowWithRealDatabase:
         count = result.scalar()
         assert count == 0, "前一個測試的資料應該已被回滾"
 
-    @pytest.mark.asyncio  
+    @pytest.mark.asyncio
     async def test_query_user_profile_from_database(self, test_user_with_profile, db_session):
         """測試直接從資料庫查詢用戶個人檔案
-        
+
         此測試示範如何：
         1. 使用 fixture 建立測試資料
         2. 直接查詢資料庫驗證資料正確性
         """
         user_id, profile_id = test_user_with_profile
-        
+
         # 查詢個人檔案
         result = await db_session.execute(
             text("""
@@ -182,7 +183,7 @@ class TestProfileFlowWithRealDatabase:
             {"profile_id": profile_id}
         )
         row = result.fetchone()
-        
+
         assert row is not None
         assert row[1] == "TestNickname"  # nickname
         assert row[2] == "Test bio"       # bio
@@ -198,7 +199,7 @@ class TestAuthenticationFlowWithRealDatabase:
     @pytest.mark.asyncio
     async def test_user_creation_in_database(self, db_session):
         """測試在資料庫中建立用戶
-        
+
         此測試驗證：
         1. 可以成功插入新用戶
         2. 資料庫 constraints 正常運作
@@ -218,7 +219,7 @@ class TestAuthenticationFlowWithRealDatabase:
             }
         )
         await db_session.flush()
-        
+
         # 驗證插入結果
         row = result.fetchone()
         assert row is not None
@@ -230,7 +231,7 @@ class TestAuthenticationFlowWithRealDatabase:
     @pytest.mark.asyncio
     async def test_duplicate_email_constraint(self, db_session):
         """測試 email 唯一性約束
-        
+
         此測試驗證資料庫 constraint 正常運作：
         嘗試插入重複的 email 應該失敗
         """
@@ -247,7 +248,7 @@ class TestAuthenticationFlowWithRealDatabase:
             }
         )
         await db_session.flush()
-        
+
         # 嘗試插入相同 email 的第二個用戶（應該失敗）
         with pytest.raises(Exception) as exc_info:
             await db_session.execute(
@@ -262,7 +263,7 @@ class TestAuthenticationFlowWithRealDatabase:
                 }
             )
             await db_session.flush()
-        
+
         # 驗證錯誤訊息包含 unique constraint
         assert "unique" in str(exc_info.value).lower() or "duplicate" in str(exc_info.value).lower()
 
@@ -273,7 +274,7 @@ class TestDataRelationshipsWithRealDatabase:
     @pytest.mark.asyncio
     async def test_user_profile_relationship(self, db_session):
         """測試 User 與 Profile 的關聯
-        
+
         此測試驗證：
         1. Foreign key constraint 正常運作
         2. 可以建立關聯資料
@@ -294,7 +295,7 @@ class TestDataRelationshipsWithRealDatabase:
         )
         user_id = result.scalar()
         await db_session.flush()
-        
+
         # 建立個人檔案
         result = await db_session.execute(
             text("""
@@ -307,9 +308,9 @@ class TestDataRelationshipsWithRealDatabase:
                 "nickname": "RelationTest"
             }
         )
-        profile_id = result.scalar()
+        _profile_id = result.scalar()
         await db_session.flush()
-        
+
         # 透過 JOIN 查詢驗證關聯
         result = await db_session.execute(
             text("""
@@ -321,7 +322,7 @@ class TestDataRelationshipsWithRealDatabase:
             {"user_id": user_id}
         )
         row = result.fetchone()
-        
+
         assert row is not None
         assert row[0] == "relation@test.com"
         assert row[1] == "RelationTest"
@@ -329,7 +330,7 @@ class TestDataRelationshipsWithRealDatabase:
     @pytest.mark.asyncio
     async def test_cascade_delete(self, db_session):
         """測試級聯刪除 (如果有設定的話)
-        
+
         此測試驗證當刪除父記錄時，子記錄是否會被自動刪除
         (取決於資料庫 schema 中的 ON DELETE CASCADE 設定)
         """
@@ -348,7 +349,7 @@ class TestDataRelationshipsWithRealDatabase:
         )
         user_id = result.scalar()
         await db_session.flush()
-        
+
         await db_session.execute(
             text("""
                 INSERT INTO profiles (user_id, nickname)
@@ -360,21 +361,21 @@ class TestDataRelationshipsWithRealDatabase:
             }
         )
         await db_session.flush()
-        
+
         # 刪除用戶
         await db_session.execute(
             text("DELETE FROM users WHERE id = :user_id"),
             {"user_id": user_id}
         )
         await db_session.flush()
-        
+
         # 檢查個人檔案是否也被刪除
         result = await db_session.execute(
             text("SELECT COUNT(*) FROM profiles WHERE user_id = :user_id"),
             {"user_id": user_id}
         )
         count = result.scalar()
-        
+
         # 如果設定了 CASCADE，count 應該是 0
         # 如果沒有設定，上面的 DELETE 會失敗（foreign key constraint）
         assert count == 0, "Profile 應該因為 CASCADE 被刪除"

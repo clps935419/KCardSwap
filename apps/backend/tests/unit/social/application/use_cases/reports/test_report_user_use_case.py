@@ -4,7 +4,6 @@ Unit tests for ReportUserUseCase
 Tests the report use case implementation with mocked repositories.
 """
 
-from datetime import datetime
 from unittest.mock import AsyncMock
 from uuid import uuid4
 

@@ -10,7 +10,6 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.shared.presentation.dependencies.auth import get_current_user_id
 from app.modules.social.application.use_cases.ratings.rate_user_use_case import (
     RateUserUseCase,
 )
@@ -30,6 +29,7 @@ from app.modules.social.presentation.schemas.rating_schemas import (
     RatingResponseWrapper,
 )
 from app.shared.infrastructure.database.connection import get_db_session
+from app.shared.presentation.dependencies.auth import get_current_user_id
 
 logger = logging.getLogger(__name__)
 
@@ -92,7 +92,7 @@ async def submit_rating(
             comment=rating.comment,
             created_at=rating.created_at,
         )
-        
+
         return RatingResponseWrapper(data=data, meta=None, error=None)
 
     except ValueError as e:
@@ -213,7 +213,7 @@ async def get_average_rating(
                 average_score=average_data["average"],
                 total_ratings=average_data["count"],
             )
-        
+
         return AverageRatingResponseWrapper(data=data, meta=None, error=None)
 
     except Exception as e:

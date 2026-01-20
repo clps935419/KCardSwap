@@ -21,8 +21,8 @@ from fastapi.testclient import TestClient
 
 from app.main import app
 from app.modules.social.domain.entities.friendship import Friendship, FriendshipStatus
-from app.shared.presentation.dependencies.auth import get_current_user_id
 from app.shared.infrastructure.database.connection import get_db_session
+from app.shared.presentation.dependencies.auth import get_current_user_id
 
 client = TestClient(app)
 
@@ -77,7 +77,7 @@ class TestFriendshipFlowIntegration:
         """Mock authentication for user1 using dependency override"""
         async def override_get_current_user_id() -> UUID:
             return test_user_ids["user1"]
-        
+
         app.dependency_overrides[get_current_user_id] = override_get_current_user_id
         yield test_user_ids["user1"]
         app.dependency_overrides.clear()
@@ -87,7 +87,7 @@ class TestFriendshipFlowIntegration:
         """Mock authentication for user2 using dependency override"""
         async def override_get_current_user_id() -> UUID:
             return test_user_ids["user2"]
-        
+
         app.dependency_overrides[get_current_user_id] = override_get_current_user_id
         yield test_user_ids["user2"]
         app.dependency_overrides.clear()
@@ -96,10 +96,10 @@ class TestFriendshipFlowIntegration:
     def mock_db_session(self):
         """Mock database session using dependency override"""
         mock_session = Mock()
-        
+
         async def override_get_db_session():
             return mock_session
-        
+
         app.dependency_overrides[get_db_session] = override_get_db_session
         yield mock_session
         # Clear this specific override only if it's still set
@@ -107,7 +107,7 @@ class TestFriendshipFlowIntegration:
             del app.dependency_overrides[get_db_session]
 
     # ==================== Send Friend Request Tests ====================
-    
+
     @pytest.mark.asyncio
     async def test_send_friend_request_success(
         self, mock_auth_user1, mock_db_session, test_user_ids
@@ -253,11 +253,11 @@ class TestFriendshipFlowIntegration:
     ):
         """Test successfully accepting a friend request"""
         # Arrange
-        from app.modules.social.infrastructure.repositories.friendship_repository_impl import (
-            FriendshipRepositoryImpl,
-        )
         from app.modules.social.infrastructure.repositories.chat_room_repository_impl import (
             ChatRoomRepositoryImpl,
+        )
+        from app.modules.social.infrastructure.repositories.friendship_repository_impl import (
+            FriendshipRepositoryImpl,
         )
 
         with patch.object(
@@ -271,7 +271,7 @@ class TestFriendshipFlowIntegration:
                 ) as mock_get_room:
                     with patch.object(
                         ChatRoomRepositoryImpl, "create", new_callable=AsyncMock
-                    ) as mock_create_room:
+                    ) as _mock_create_room:
                         mock_get.return_value = test_pending_friendship
                         mock_get_room.return_value = None  # No existing chat room
 

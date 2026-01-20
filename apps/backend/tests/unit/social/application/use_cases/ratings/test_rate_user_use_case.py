@@ -4,7 +4,6 @@ Unit tests for RateUserUseCase
 Tests the rating use case implementation with mocked repositories.
 """
 
-from datetime import datetime
 from unittest.mock import AsyncMock
 from uuid import uuid4
 
@@ -13,7 +12,6 @@ import pytest
 from app.modules.social.application.use_cases.ratings.rate_user_use_case import (
     RateUserUseCase,
 )
-from app.modules.social.domain.entities.rating import Rating
 
 
 class TestRateUserUseCase:

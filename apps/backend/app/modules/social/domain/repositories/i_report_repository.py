@@ -39,7 +39,7 @@ class IReportRepository(ABC):
     async def find_by_reporter(self, reporter_id: str) -> List[Report]:
         """
         Get all reports filed by a specific user (alias for get_reports_by_reporter_id)
-        
+
         This method provides compatibility with router expectations
         """
         pass

@@ -50,19 +50,33 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    """Revert profiles table to use user_id as primary key."""
+    """Revert profiles table to use user_id as primary key (idempotent)."""
 
-    # Step 1: Drop the index on user_id
-    op.drop_index("idx_profiles_user_id", "profiles")
+    connection = op.get_bind()
+    inspector = sa.inspect(connection)
+    tables = inspector.get_table_names()
 
-    # Step 2: Drop the unique constraint on user_id
-    op.drop_constraint("uq_profiles_user_id", "profiles", type_="unique")
+    if "profiles" not in tables:
+        return  # Nothing to downgrade
 
-    # Step 3: Drop the primary key constraint on id
-    op.drop_constraint("profiles_pkey", "profiles", type_="primary")
+    columns = [col["name"] for col in inspector.get_columns("profiles")]
+    indexes = [idx["name"] for idx in inspector.get_indexes("profiles")]
 
-    # Step 4: Drop the id column
-    op.drop_column("profiles", "id")
+    # Step 1: Drop the index on user_id if it exists
+    if "idx_profiles_user_id" in indexes:
+        op.drop_index("idx_profiles_user_id", "profiles")
+
+    # Step 2: Drop the unique constraint on user_id if it exists
+    op.execute("ALTER TABLE profiles DROP CONSTRAINT IF EXISTS uq_profiles_user_id")
+
+    # Step 3: Drop the primary key constraint on id if it exists
+    op.execute("ALTER TABLE profiles DROP CONSTRAINT IF EXISTS profiles_pkey CASCADE")
+
+    # Step 4: Drop the id column if it exists
+    if "id" in columns:
+        op.drop_column("profiles", "id")
 
     # Step 5: Recreate primary key constraint on user_id
-    op.create_primary_key("profiles_pkey", "profiles", ["user_id"])
+    op.execute(
+        "ALTER TABLE profiles ADD CONSTRAINT profiles_pkey PRIMARY KEY (user_id)"
+    )

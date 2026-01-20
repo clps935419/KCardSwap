@@ -13,18 +13,18 @@ from app.modules.social.application.dtos.nearby_dtos import (
     SearchNearbyRequest,
 )
 from app.modules.social.application.use_cases.nearby.search_nearby_cards_use_case import (
-    RateLimitExceededException,
+    RateLimitExceededError,
     SearchNearbyCardsUseCase,
 )
 
 
-class TestRateLimitExceededException:
-    """Test RateLimitExceededException"""
+class TestRateLimitExceededError:
+    """Test RateLimitExceededError"""
 
     def test_rate_limit_exception_creation(self):
-        """Test creating RateLimitExceededException"""
+        """Test creating RateLimitExceededError"""
         # Arrange & Act
-        exception = RateLimitExceededException(current_count=5, limit=5)
+        exception = RateLimitExceededError(current_count=5, limit=5)
 
         # Assert
         assert exception.current_count == 5
@@ -35,7 +35,7 @@ class TestRateLimitExceededException:
     def test_rate_limit_exception_message(self):
         """Test exception message format"""
         # Arrange & Act
-        exception = RateLimitExceededException(current_count=3, limit=5)
+        exception = RateLimitExceededError(current_count=3, limit=5)
 
         # Assert
         assert str(exception) == "Daily search limit exceeded: 3/5 searches used"
@@ -192,7 +192,7 @@ class TestSearchNearbyCardsUseCase:
         )
 
         # Act & Assert
-        with pytest.raises(RateLimitExceededException) as exc_info:
+        with pytest.raises(RateLimitExceededError) as exc_info:
             await use_case.execute(search_request, is_premium=False)
 
         # Verify exception details

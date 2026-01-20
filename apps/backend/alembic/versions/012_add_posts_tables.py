@@ -165,7 +165,13 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    """Drop posts and post_interests tables"""
-    # Drop in reverse order (child tables first)
-    op.drop_table("post_interests")
-    op.drop_table("posts")
+    """Drop posts and post_interests tables (idempotent with IF EXISTS)"""
+    connection = op.get_bind()
+    inspector = sa.inspect(connection)
+    tables = inspector.get_table_names()
+
+    # Drop in reverse order (child tables first) with CASCADE
+    if "post_interests" in tables:
+        op.execute("DROP TABLE IF EXISTS post_interests CASCADE")
+    if "posts" in tables:
+        op.execute("DROP TABLE IF EXISTS posts CASCADE")

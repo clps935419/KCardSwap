@@ -16,7 +16,7 @@ from app.modules.social.domain.services.card_validation_service import (
     CardValidationService,
 )
 from app.modules.social.domain.value_objects.upload_quota import (
-    QuotaExceeded,
+    QuotaExceededError,
     UploadQuota,
 )
 
@@ -174,7 +174,7 @@ class TestUploadCardUseCase:
         mock_card_repository.count_uploads_today.return_value = 2
 
         # Act & Assert
-        with pytest.raises(QuotaExceeded, match="Daily upload limit"):
+        with pytest.raises(QuotaExceededError, match="Daily upload limit"):
             await use_case.execute(
                 owner_id=owner_id,
                 content_type=content_type,
@@ -201,7 +201,7 @@ class TestUploadCardUseCase:
         )
 
         # Act & Assert
-        with pytest.raises(QuotaExceeded, match="storage limit"):
+        with pytest.raises(QuotaExceededError, match="storage limit"):
             await use_case.execute(
                 owner_id=owner_id,
                 content_type=content_type,

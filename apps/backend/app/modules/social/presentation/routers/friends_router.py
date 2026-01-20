@@ -10,7 +10,6 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.shared.presentation.dependencies.auth import get_current_user_id
 from app.modules.social.application.use_cases.friends.accept_friend_request_use_case import (
     AcceptFriendRequestUseCase,
 )
@@ -39,6 +38,7 @@ from app.modules.social.presentation.schemas.friends_schemas import (
     UnblockUserRequest,
 )
 from app.shared.infrastructure.database.connection import get_db_session
+from app.shared.presentation.dependencies.auth import get_current_user_id
 
 logger = logging.getLogger(__name__)
 
@@ -93,7 +93,7 @@ async def send_friend_request(
             status=friendship.status.value,
             created_at=friendship.created_at,
         )
-        
+
         return FriendshipResponseWrapper(data=data, meta=None, error=None)
 
     except ValueError as e:
@@ -154,7 +154,7 @@ async def accept_friend_request(
             status=friendship.status.value,
             created_at=friendship.created_at,
         )
-        
+
         return FriendshipResponseWrapper(data=data, meta=None, error=None)
 
     except ValueError as e:
@@ -219,7 +219,7 @@ async def block_user(
             status=friendship.status.value,
             created_at=friendship.created_at,
         )
-        
+
         return FriendshipResponseWrapper(data=data, meta=None, error=None)
 
     except ValueError as e:
@@ -283,7 +283,7 @@ async def unblock_user(
             status="unblocked",
             created_at=None,
         )
-        
+
         return FriendshipResponseWrapper(data=data, meta=None, error=None)
 
     except ValueError as e:

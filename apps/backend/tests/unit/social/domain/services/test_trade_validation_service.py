@@ -15,7 +15,6 @@ from app.modules.social.domain.entities.trade_item import TradeItem
 from app.modules.social.domain.services.trade_validation_service import (
     TradeValidationService,
 )
-from app.modules.social.domain.value_objects.trade_status import TradeStatus
 
 
 class TestTradeValidationService:

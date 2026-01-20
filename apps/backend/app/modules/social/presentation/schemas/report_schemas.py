@@ -35,7 +35,7 @@ class ReportRequest(BaseModel):
 
 class ReportResponse(BaseModel):
     """Response schema for a report"""
-    
+
     model_config = ConfigDict(from_attributes=True)
 
     id: UUID = Field(..., description="Report ID")

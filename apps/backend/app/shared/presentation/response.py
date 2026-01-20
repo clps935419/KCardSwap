@@ -14,9 +14,8 @@ from typing import Any, Dict, List, Optional, TypeVar
 
 from .schemas.response_envelope import (
     ErrorDetail,
-    PaginationMeta,
     PaginatedResponse,
-    ResponseEnvelope,
+    PaginationMeta,
     SuccessResponse,
 )
 
@@ -89,7 +88,7 @@ def error_response(
     Create an error response.
 
     Note: This is typically used by error handlers/middleware.
-    In application code, raise APIException instead.
+    In application code, raise APIError instead.
 
     Args:
         code: Error code (e.g., "404_NOT_FOUND")

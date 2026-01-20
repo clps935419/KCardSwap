@@ -35,7 +35,6 @@ from app.modules.identity.presentation.schemas.auth_schemas import (
     TokenResponse,
 )
 from app.shared.infrastructure.security.jwt_service import JWTService
-from app.shared.presentation.response import success
 
 # Create router
 router = APIRouter(prefix="/auth", tags=["Authentication"])

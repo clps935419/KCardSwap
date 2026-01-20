@@ -19,7 +19,7 @@ from app.shared.domain.contracts.i_subscription_query_service import (
 class SubscriptionQueryServiceImpl(ISubscriptionQueryService):
     """
     Implementation of subscription query service.
-    
+
     Provides read-only access to subscription information for other bounded contexts.
     """
 
@@ -49,7 +49,7 @@ class SubscriptionQueryServiceImpl(ISubscriptionQueryService):
     async def get_or_create_subscription_info(self, user_id: UUID) -> SubscriptionInfo:
         """Get subscription information for a user, creating default if not exists."""
         subscription = await self.subscription_repository.get_or_create_by_user_id(user_id)
-        
+
         return SubscriptionInfo(
             user_id=subscription.user_id,
             is_active=subscription.is_active(),

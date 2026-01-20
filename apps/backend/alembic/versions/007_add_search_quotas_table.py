@@ -39,8 +39,20 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    """Drop search_quotas table."""
+    """Drop search_quotas table (idempotent with IF EXISTS)."""
 
-    op.drop_index("idx_search_quotas_date", table_name="search_quotas")
-    op.drop_index("idx_search_quotas_user_id", table_name="search_quotas")
-    op.drop_table("search_quotas")
+    connection = op.get_bind()
+    inspector = sa.inspect(connection)
+    tables = inspector.get_table_names()
+
+    if "search_quotas" not in tables:
+        return  # Nothing to downgrade
+
+    indexes = [idx["name"] for idx in inspector.get_indexes("search_quotas")]
+
+    if "idx_search_quotas_date" in indexes:
+        op.drop_index("idx_search_quotas_date", table_name="search_quotas")
+    if "idx_search_quotas_user_id" in indexes:
+        op.drop_index("idx_search_quotas_user_id", table_name="search_quotas")
+
+    op.execute("DROP TABLE IF EXISTS search_quotas CASCADE")

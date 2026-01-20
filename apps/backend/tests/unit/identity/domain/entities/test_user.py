@@ -232,7 +232,7 @@ class TestUserEquality:
 
         assert user != "not a user"
         assert user != 123
-        assert user != None
+        assert user is not None
 
     def test_user_hash(self):
         """Test that user can be hashed (for use in sets/dicts)"""
