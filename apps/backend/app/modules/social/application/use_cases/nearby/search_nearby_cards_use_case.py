@@ -15,7 +15,7 @@ from app.modules.social.infrastructure.services.search_quota_service import (
 )
 
 
-class RateLimitExceededException(Exception):
+class RateLimitExceededError(Exception):
     """Exception raised when search rate limit is exceeded."""
 
     def __init__(self, current_count: int, limit: int):
@@ -67,7 +67,7 @@ class SearchNearbyCardsUseCase:
             List of nearby cards with distance information, sorted by distance
 
         Raises:
-            RateLimitExceededException: If daily quota exceeded (free users only)
+            RateLimitExceededError: If daily quota exceeded (free users only)
             ValueError: If coordinates or radius are invalid
         """
         # Validate coordinates
@@ -90,7 +90,7 @@ class SearchNearbyCardsUseCase:
                 request.user_id, settings.DAILY_SEARCH_LIMIT_FREE, is_premium=False
             )
             if not quota_available:
-                raise RateLimitExceededException(
+                raise RateLimitExceededError(
                     current_count, settings.DAILY_SEARCH_LIMIT_FREE
                 )
 

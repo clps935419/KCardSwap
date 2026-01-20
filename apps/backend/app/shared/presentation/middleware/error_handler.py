@@ -20,11 +20,11 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from ..exceptions.api_exceptions import APIException
+from ..exceptions.api_exceptions import APIError
 from ..response import error_response
 
 
-async def api_exception_handler(request: Request, exc: APIException) -> JSONResponse:
+async def api_exception_handler(request: Request, exc: APIError) -> JSONResponse:
     """Handle custom API exceptions.
 
     Args:
@@ -125,7 +125,7 @@ def register_exception_handlers(app: Any) -> None:
     Args:
         app: FastAPI application instance
     """
-    app.add_exception_handler(APIException, api_exception_handler)
+    app.add_exception_handler(APIError, api_exception_handler)
     app.add_exception_handler(StarletteHTTPException, http_exception_handler)
     app.add_exception_handler(RequestValidationError, validation_exception_handler)
     app.add_exception_handler(Exception, general_exception_handler)

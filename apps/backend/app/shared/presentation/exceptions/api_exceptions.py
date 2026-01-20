@@ -6,7 +6,7 @@ This module provides custom exception classes for API error responses.
 from typing import Any, Dict, Optional
 
 
-class APIException(Exception):
+class APIError(Exception):
     """Base API exception class.
 
     All API exceptions should inherit from this class.
@@ -34,7 +34,7 @@ class APIException(Exception):
         self.details = details or {}
 
 
-class BadRequestException(APIException):
+class BadRequestException(APIError):  # noqa: N818
     """400 Bad Request - Invalid request data."""
 
     def __init__(
@@ -48,7 +48,7 @@ class BadRequestException(APIException):
         )
 
 
-class UnauthorizedException(APIException):
+class UnauthorizedException(APIError):  # noqa: N818
     """401 Unauthorized - Authentication required."""
 
     def __init__(
@@ -64,7 +64,7 @@ class UnauthorizedException(APIException):
         )
 
 
-class ForbiddenException(APIException):
+class ForbiddenException(APIError):  # noqa: N818
     """403 Forbidden - Insufficient permissions."""
 
     def __init__(
@@ -78,7 +78,7 @@ class ForbiddenException(APIException):
         )
 
 
-class NotFoundException(APIException):
+class NotFoundException(APIError):  # noqa: N818
     """404 Not Found - Resource not found."""
 
     def __init__(
@@ -94,7 +94,7 @@ class NotFoundException(APIException):
         )
 
 
-class UnprocessableEntityException(APIException):
+class UnprocessableEntityException(APIError):  # noqa: N818
     """422 Unprocessable Entity - Request validation failed or limit exceeded."""
 
     def __init__(
@@ -108,7 +108,7 @@ class UnprocessableEntityException(APIException):
         )
 
 
-class RateLimitException(APIException):
+class RateLimitException(APIError):  # noqa: N818
     """429 Too Many Requests - Rate limit exceeded."""
 
     def __init__(
@@ -124,7 +124,7 @@ class RateLimitException(APIException):
         )
 
 
-class ConflictException(APIException):
+class ConflictException(APIError):  # noqa: N818
     """409 Conflict - Resource conflict."""
 
     def __init__(
@@ -138,7 +138,7 @@ class ConflictException(APIException):
         )
 
 
-class InternalServerException(APIException):
+class InternalServerException(APIError):  # noqa: N818
     """500 Internal Server Error - Server error."""
 
     def __init__(
@@ -154,7 +154,7 @@ class InternalServerException(APIException):
         )
 
 
-class ServiceUnavailableException(APIException):
+class ServiceUnavailableException(APIError):  # noqa: N818
     """503 Service Unavailable - External service unavailable."""
 
     def __init__(
@@ -171,5 +171,6 @@ class ServiceUnavailableException(APIException):
         )
 
 
-# Alias for compatibility
+# Aliases for compatibility
 ValidationException = BadRequestException
+APIException = APIError  # Backward compatibility alias

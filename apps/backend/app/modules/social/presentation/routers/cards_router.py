@@ -28,7 +28,7 @@ from app.modules.social.domain.services.card_validation_service import (
     CardValidationService,
 )
 from app.modules.social.domain.value_objects.upload_quota import (
-    QuotaExceeded,
+    QuotaExceededError,
     UploadQuota,
 )
 from app.modules.social.infrastructure.repositories.card_repository_impl import (
@@ -134,7 +134,7 @@ async def get_upload_url(
             card_id=result.card_id,
         )
         return UploadUrlResponseWrapper(data=data, meta=None, error=None)
-    except QuotaExceeded as e:
+    except QuotaExceededError as e:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail={

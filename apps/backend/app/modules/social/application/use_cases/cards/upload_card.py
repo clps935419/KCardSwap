@@ -12,7 +12,7 @@ from app.modules.social.domain.services.card_validation_service import (
     CardValidationService,
 )
 from app.modules.social.domain.value_objects.upload_quota import (
-    QuotaExceeded,
+    QuotaExceededError,
     UploadQuota,
 )
 
@@ -83,7 +83,7 @@ class UploadCardUseCase:
             UploadCardResult with signed URL and card info
 
         Raises:
-            QuotaExceeded: If any quota limit is exceeded
+            QuotaExceededError: If any quota limit is exceeded
             ValueError: If validation fails
         """
         # Validate content type and file size
@@ -96,7 +96,7 @@ class UploadCardUseCase:
         # Check daily upload limit
         uploads_today = await self.card_repository.count_uploads_today(owner_id)
         if not quota.can_upload_today(uploads_today):
-            raise QuotaExceeded(
+            raise QuotaExceededError(
                 f"Daily upload limit of {quota.daily_limit} reached",
                 limit_type="daily",
             )
@@ -105,7 +105,7 @@ class UploadCardUseCase:
         current_storage = await self.card_repository.get_total_storage_used(owner_id)
         if not quota.has_storage_space(current_storage, file_size_bytes):
             total_gb = quota.total_storage_bytes / (1024 * 1024 * 1024)
-            raise QuotaExceeded(
+            raise QuotaExceededError(
                 f"Total storage limit of {total_gb:.1f}GB exceeded",
                 limit_type="storage",
             )
