@@ -114,7 +114,7 @@ class RefreshTokenRepositoryImpl(IRefreshTokenRepository):
         stmt = select(RefreshTokenModel).where(
             RefreshTokenModel.token == token,
             RefreshTokenModel.user_id == user_id,
-            RefreshTokenModel.revoked == False,
+            RefreshTokenModel.revoked.is_(False),
         )
         result = await self._session.execute(stmt)
         token_model = result.scalar_one_or_none()

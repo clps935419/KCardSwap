@@ -55,14 +55,30 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    """Remove admin fields from users table."""
+    """Remove admin fields from users table (idempotent with IF EXISTS)."""
+    connection = op.get_bind()
+    inspector = sa.inspect(connection)
+    tables = inspector.get_table_names()
+
+    if "users" not in tables:
+        return  # Nothing to downgrade
+
+    columns = [col["name"] for col in inspector.get_columns("users")]
+
     # Drop constraints
     op.execute("ALTER TABLE users DROP CONSTRAINT IF EXISTS check_role_values")
     op.execute("ALTER TABLE users DROP CONSTRAINT IF EXISTS check_auth_method")
 
-    # Make google_id not nullable again
-    op.alter_column("users", "google_id", nullable=False)
+    # Make google_id not nullable again only if we have data
+    if "google_id" in columns:
+        # First set NULL google_id to empty string for non-admin users
+        op.execute(
+            "UPDATE users SET google_id = '' WHERE google_id IS NULL AND role = 'user'"
+        )
+        op.alter_column("users", "google_id", nullable=False)
 
-    # Drop columns
-    op.drop_column("users", "role")
-    op.drop_column("users", "password_hash")
+    # Drop columns if they exist
+    if "role" in columns:
+        op.drop_column("users", "role")
+    if "password_hash" in columns:
+        op.drop_column("users", "password_hash")

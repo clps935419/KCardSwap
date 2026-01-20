@@ -11,8 +11,8 @@ from fastapi.testclient import TestClient
 
 from app.config import settings
 from app.main import app
-from app.shared.presentation.dependencies.auth import get_current_user_id
 from app.shared.infrastructure.database.connection import get_db_session
+from app.shared.presentation.dependencies.auth import get_current_user_id
 
 client = TestClient(app)
 
@@ -30,7 +30,7 @@ class TestNearbySearchIntegration:
         """Mock authentication to return a test user ID using dependency override"""
         async def override_get_current_user_id() -> UUID:
             return test_user_id
-        
+
         app.dependency_overrides[get_current_user_id] = override_get_current_user_id
         yield test_user_id
         app.dependency_overrides.clear()
@@ -45,10 +45,10 @@ class TestNearbySearchIntegration:
         mock_session.commit = AsyncMock()
         mock_session.rollback = AsyncMock()
         mock_session.close = AsyncMock()
-        
+
         async def override_get_db_session():
             return mock_session
-        
+
         app.dependency_overrides[get_db_session] = override_get_db_session
         yield mock_session
         app.dependency_overrides.clear()
@@ -65,8 +65,12 @@ class TestNearbySearchIntegration:
         """Test successful nearby search"""
         # Arrange
         from app.modules.social.domain.entities.card import Card
-        from app.modules.social.infrastructure.repositories.card_repository_impl import CardRepositoryImpl
-        from app.modules.social.infrastructure.services.search_quota_service import SearchQuotaService
+        from app.modules.social.infrastructure.repositories.card_repository_impl import (
+            CardRepositoryImpl,
+        )
+        from app.modules.social.infrastructure.services.search_quota_service import (
+            SearchQuotaService,
+        )
 
         # Create mock cards
         card1_id = uuid4()
@@ -147,8 +151,9 @@ class TestNearbySearchIntegration:
     ):
         """Test rate limit exceeded returns 429"""
         # Arrange
-        from app.modules.social.infrastructure.repositories.card_repository_impl import CardRepositoryImpl
-        from app.modules.social.infrastructure.services.search_quota_service import SearchQuotaService
+        from app.modules.social.infrastructure.services.search_quota_service import (
+            SearchQuotaService,
+        )
 
         search_payload = {"lat": 25.0330, "lng": 121.5654, "radius_km": 10.0}
 
@@ -226,8 +231,12 @@ class TestNearbySearchIntegration:
         """Test search with optional radius parameter"""
         # Arrange
         from app.modules.social.domain.entities.card import Card
-        from app.modules.social.infrastructure.repositories.card_repository_impl import CardRepositoryImpl
-        from app.modules.social.infrastructure.services.search_quota_service import SearchQuotaService
+        from app.modules.social.infrastructure.repositories.card_repository_impl import (
+            CardRepositoryImpl,
+        )
+        from app.modules.social.infrastructure.services.search_quota_service import (
+            SearchQuotaService,
+        )
 
         # Create mock cards
         card1_id = uuid4()
@@ -299,7 +308,7 @@ class TestUpdateLocationIntegration:
         """Mock authentication using dependency override"""
         async def override_get_current_user_id() -> UUID:
             return test_user_id
-        
+
         app.dependency_overrides[get_current_user_id] = override_get_current_user_id
         yield test_user_id
         app.dependency_overrides.clear()
@@ -314,10 +323,10 @@ class TestUpdateLocationIntegration:
         mock_session.commit = AsyncMock()
         mock_session.rollback = AsyncMock()
         mock_session.close = AsyncMock()
-        
+
         async def override_get_db_session():
             return mock_session
-        
+
         app.dependency_overrides[get_db_session] = override_get_db_session
         yield mock_session
         app.dependency_overrides.clear()

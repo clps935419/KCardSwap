@@ -65,7 +65,7 @@ async def verify_receipt(
     )
 
     await session.commit()
-    
+
     # Wrap in envelope format
     data = SubscriptionStatusData(**result_dict)
     return SubscriptionStatusResponse(data=data, meta=None, error=None)
@@ -93,7 +93,7 @@ async def get_subscription_status(
     result_dict = await use_case.execute(user_id=current_user_id)
 
     await session.commit()
-    
+
     # Wrap in envelope format
     data = SubscriptionStatusData(**result_dict)
     return SubscriptionStatusResponse(data=data, meta=None, error=None)
@@ -123,7 +123,7 @@ async def expire_subscriptions(
     result_dict = await use_case.execute()
 
     await session.commit()
-    
+
     # Wrap in envelope format
     data = ExpireSubscriptionsData(**result_dict)
     return ExpireSubscriptionsResponse(data=data, meta=None, error=None)

@@ -16,16 +16,20 @@ from pathlib import Path
 # Add the app directory to the Python path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import select  # noqa: E402
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine  # noqa: E402
+from sqlalchemy.orm import sessionmaker  # noqa: E402
 
-from app.config import settings
-from app.modules.identity.infrastructure.database.models.profile_model import (
+from app.config import settings  # noqa: E402
+from app.modules.identity.infrastructure.database.models.profile_model import (  # noqa: E402
     ProfileModel,
 )
-from app.modules.identity.infrastructure.database.models.user_model import UserModel
-from app.shared.infrastructure.security.password_hasher import password_hasher
+from app.modules.identity.infrastructure.database.models.user_model import (  # noqa: E402
+    UserModel,
+)
+from app.shared.infrastructure.security.password_hasher import (  # noqa: E402
+    password_hasher,
+)
 
 
 async def create_admin_user(email: str, password: str, role: str):

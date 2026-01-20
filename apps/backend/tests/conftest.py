@@ -46,7 +46,7 @@ def mock_gcs_service():
 @pytest.fixture(scope="session")
 def test_database_url() -> str:
     """Get the test database URL from environment or settings.
-    
+
     Returns:
         str: Test database URL for pytest session
     """
@@ -57,15 +57,15 @@ def test_database_url() -> str:
 @pytest_asyncio.fixture
 async def test_engine(test_database_url: str):
     """Create a test database engine for each test.
-    
+
     Note: Using function scope to avoid event loop issues with pytest-asyncio.
     While this creates a new engine for each test, the performance impact is
     acceptable for small to medium test suites. For larger suites, consider
     using session scope with proper event loop management.
-    
+
     Args:
         test_database_url: Database URL for testing
-        
+
     Yields:
         AsyncEngine: SQLAlchemy async engine for testing
     """
@@ -77,10 +77,10 @@ async def test_engine(test_database_url: str):
 @pytest_asyncio.fixture
 async def test_session_factory(test_engine) -> async_sessionmaker:
     """Create a test session factory for each test.
-    
+
     Args:
         test_engine: Test database engine
-        
+
     Returns:
         async_sessionmaker: Session factory for creating test sessions
     """
@@ -100,19 +100,19 @@ async def db_session(test_session_factory) -> AsyncGenerator[AsyncSession, None]
 
     Each test runs in its own transaction that is automatically rolled back
     after the test completes, ensuring test isolation and clean database state.
-    
+
     This approach:
     - Maintains test isolation (each test starts with clean state)
     - Avoids manual cleanup (automatic rollback)
     - Faster than recreating database (uses transactions)
     - Works with the test database (kcardswap_test)
-    
+
     Uses nested transactions (savepoints) to ensure rollback even if the test
     tries to commit. The outer transaction is never committed.
-    
+
     Args:
         test_session_factory: Session factory from the fixture
-        
+
     Yields:
         AsyncSession: Database session for the test
     """

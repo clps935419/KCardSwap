@@ -5,7 +5,7 @@ SQLAlchemy ChatRoom Repository Implementation
 from typing import List, Optional
 from uuid import UUID
 
-from sqlalchemy import select, any_
+from sqlalchemy import any_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.social.domain.entities.chat_room import ChatRoom

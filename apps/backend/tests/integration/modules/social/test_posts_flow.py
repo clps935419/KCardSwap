@@ -21,8 +21,8 @@ from app.modules.posts.domain.entities.post_interest import (
 )
 from app.modules.social.domain.entities.chat_room import ChatRoom
 from app.modules.social.domain.entities.friendship import Friendship, FriendshipStatus
-from app.shared.presentation.dependencies.auth import get_current_user_id
 from app.shared.infrastructure.database.connection import get_db_session
+from app.shared.presentation.dependencies.auth import get_current_user_id
 
 client = TestClient(app)
 
@@ -57,7 +57,7 @@ class TestPostsFlowIntegration:
         """Mock authentication for post owner using dependency override"""
         async def override_get_current_user_id() -> UUID:
             return test_user_ids["owner"]
-        
+
         app.dependency_overrides[get_current_user_id] = override_get_current_user_id
         yield test_user_ids["owner"]
         app.dependency_overrides.clear()
@@ -67,7 +67,7 @@ class TestPostsFlowIntegration:
         """Mock authentication for interested user using dependency override"""
         async def override_get_current_user_id() -> UUID:
             return test_user_ids["interested_user"]
-        
+
         app.dependency_overrides[get_current_user_id] = override_get_current_user_id
         yield test_user_ids["interested_user"]
         app.dependency_overrides.clear()
@@ -82,10 +82,10 @@ class TestPostsFlowIntegration:
         mock_session.commit = AsyncMock()
         mock_session.rollback = AsyncMock()
         mock_session.close = AsyncMock()
-        
+
         async def override_get_db_session():
             return mock_session
-        
+
         app.dependency_overrides[get_db_session] = override_get_db_session
         yield mock_session
         app.dependency_overrides.clear()
@@ -214,9 +214,13 @@ class TestPostsFlowIntegration:
         test_user_ids,
     ):
         """Test: Successfully create a city board post"""
-        from app.modules.posts.infrastructure.repositories.post_repository_impl import PostRepositoryImpl
-        from app.modules.identity.infrastructure.repositories.subscription_repository_impl import SubscriptionRepositoryImpl
-        
+        from app.modules.identity.infrastructure.repositories.subscription_repository_impl import (
+            SubscriptionRepositoryImpl,
+        )
+        from app.modules.posts.infrastructure.repositories.post_repository_impl import (
+            PostRepositoryImpl,
+        )
+
         # Create expected post
         created_post = Post(
             id=str(test_post_data["post_id"]),
@@ -231,14 +235,14 @@ class TestPostsFlowIntegration:
             created_at=datetime.now(timezone.utc),
             updated_at=datetime.now(timezone.utc),
         )
-        
+
         with patch.object(PostRepositoryImpl, "create", new_callable=AsyncMock) as mock_create:
             with patch.object(SubscriptionRepositoryImpl, "get_by_user_id", new_callable=AsyncMock) as mock_sub:
                 with patch.object(PostRepositoryImpl, "count_user_posts_today", new_callable=AsyncMock) as mock_count:
                     mock_create.return_value = created_post
                     mock_sub.return_value = None  # Free user
                     mock_count.return_value = 0  # First post today
-                    
+
                     response = client.post(
                         "/api/v1/posts",
                         json={
@@ -267,8 +271,10 @@ class TestPostsFlowIntegration:
         test_post_data,
     ):
         """Test: List posts by city code"""
-        from app.modules.posts.infrastructure.repositories.post_repository_impl import PostRepositoryImpl
-        
+        from app.modules.posts.infrastructure.repositories.post_repository_impl import (
+            PostRepositoryImpl,
+        )
+
         # Create test posts
         test_post = Post(
             id=str(test_post_data["post_id"]),
@@ -283,10 +289,10 @@ class TestPostsFlowIntegration:
             created_at=datetime.now(timezone.utc),
             updated_at=datetime.now(timezone.utc),
         )
-        
+
         with patch.object(PostRepositoryImpl, "list_by_city", new_callable=AsyncMock) as mock_find:
             mock_find.return_value = [test_post]
-            
+
             response = client.get(f"/api/v1/posts?city_code={test_post_data['city_code']}")
 
             assert response.status_code == 200
@@ -305,8 +311,10 @@ class TestPostsFlowIntegration:
         test_post_data,
     ):
         """Test: List posts with idol filter"""
-        from app.modules.posts.infrastructure.repositories.post_repository_impl import PostRepositoryImpl
-        
+        from app.modules.posts.infrastructure.repositories.post_repository_impl import (
+            PostRepositoryImpl,
+        )
+
         # Create test posts
         test_post = Post(
             id=str(test_post_data["post_id"]),
@@ -321,10 +329,10 @@ class TestPostsFlowIntegration:
             created_at=datetime.now(timezone.utc),
             updated_at=datetime.now(timezone.utc),
         )
-        
+
         with patch.object(PostRepositoryImpl, "list_by_city", new_callable=AsyncMock) as mock_find:
             mock_find.return_value = [test_post]
-            
+
             response = client.get(
                 f"/api/v1/posts?city_code={test_post_data['city_code']}&idol={test_post_data['idol']}"
             )
@@ -344,9 +352,13 @@ class TestPostsFlowIntegration:
         test_user_ids,
     ):
         """Test: Successfully express interest in a post"""
-        from app.modules.posts.infrastructure.repositories.post_repository_impl import PostRepositoryImpl
-        from app.modules.posts.infrastructure.repositories.post_interest_repository_impl import PostInterestRepositoryImpl
-        
+        from app.modules.posts.infrastructure.repositories.post_interest_repository_impl import (
+            PostInterestRepositoryImpl,
+        )
+        from app.modules.posts.infrastructure.repositories.post_repository_impl import (
+            PostRepositoryImpl,
+        )
+
         # Create test post and interest
         test_post = Post(
             id=str(test_post_data["post_id"]),
@@ -361,7 +373,7 @@ class TestPostsFlowIntegration:
             created_at=datetime.now(timezone.utc),
             updated_at=datetime.now(timezone.utc),
         )
-        
+
         interest_id = uuid4()
         created_interest = PostInterest(
             id=str(interest_id),
@@ -370,14 +382,14 @@ class TestPostsFlowIntegration:
             status=PostInterestStatus.PENDING,
             created_at=datetime.now(timezone.utc),
         )
-        
+
         with patch.object(PostRepositoryImpl, "get_by_id", new_callable=AsyncMock) as mock_get:
             with patch.object(PostInterestRepositoryImpl, "get_by_post_and_user", new_callable=AsyncMock) as mock_get_interest:
                 with patch.object(PostInterestRepositoryImpl, "create", new_callable=AsyncMock) as mock_create:
                     mock_get.return_value = test_post
                     mock_get_interest.return_value = None  # No existing interest
                     mock_create.return_value = created_interest
-                    
+
                     response = client.post(f"/api/v1/posts/{test_post_data['post_id']}/interest")
 
                     assert response.status_code == 201

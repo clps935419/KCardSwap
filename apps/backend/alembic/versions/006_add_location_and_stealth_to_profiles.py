@@ -53,9 +53,26 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    """Remove location and stealth mode fields from profiles."""
+    """Remove location and stealth mode fields from profiles (idempotent)."""
 
-    op.drop_index("idx_profiles_stealth_mode", table_name="profiles")
-    op.drop_column("profiles", "stealth_mode")
-    op.drop_column("profiles", "last_lng")
-    op.drop_column("profiles", "last_lat")
+    connection = op.get_bind()
+    inspector = sa.inspect(connection)
+    tables = inspector.get_table_names()
+
+    if "profiles" not in tables:
+        return  # Nothing to downgrade
+
+    indexes = [idx["name"] for idx in inspector.get_indexes("profiles")]
+    columns = [col["name"] for col in inspector.get_columns("profiles")]
+
+    # Drop index if it exists
+    if "idx_profiles_stealth_mode" in indexes:
+        op.drop_index("idx_profiles_stealth_mode", table_name="profiles")
+
+    # Drop columns if they exist
+    if "stealth_mode" in columns:
+        op.drop_column("profiles", "stealth_mode")
+    if "last_lng" in columns:
+        op.drop_column("profiles", "last_lng")
+    if "last_lat" in columns:
+        op.drop_column("profiles", "last_lat")

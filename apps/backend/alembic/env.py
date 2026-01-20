@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 # This is the declarative base that all ORM models inherit from
 # Import all models to ensure they're registered with Base.metadata
 # This is required for Alembic autogenerate to work properly
-from app.shared.infrastructure.database.connection import Base
+from app.shared.infrastructure.database.connection import Base  # noqa: E402
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

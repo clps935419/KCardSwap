@@ -4,13 +4,12 @@ Handles chat rooms, messages, and FCM push notifications
 """
 
 import logging
-from typing import Annotated, List, Optional
+from typing import Annotated, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.shared.presentation.dependencies.auth import get_current_user_id
 from app.modules.social.application.use_cases.chat.get_messages_use_case import (
     GetMessagesUseCase,
 )
@@ -31,7 +30,6 @@ from app.modules.social.presentation.schemas.chat_schemas import (
     ChatRoomListResponse,
     ChatRoomListResponseWrapper,
     ChatRoomResponse,
-    ChatRoomResponseWrapper,
     MessageResponse,
     MessageResponseWrapper,
     MessagesListResponse,
@@ -40,6 +38,7 @@ from app.modules.social.presentation.schemas.chat_schemas import (
 )
 from app.shared.infrastructure.database.connection import get_db_session
 from app.shared.infrastructure.external.fcm_service import get_fcm_service
+from app.shared.presentation.dependencies.auth import get_current_user_id
 
 logger = logging.getLogger(__name__)
 
@@ -184,7 +183,7 @@ async def get_messages(
             has_more=len(messages)
             == limit,  # If we got exactly limit, there might be more
         )
-        
+
         return MessagesListResponseWrapper(data=data, meta=None, error=None)
 
     except ValueError as e:
@@ -381,7 +380,7 @@ async def mark_message_read(
 
         # Update message in database
         await message_repo.update(message)
-        
+
         logger.info(f"Message {message_id} marked as read by {current_user_id}")
 
     except HTTPException:

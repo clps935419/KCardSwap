@@ -3,7 +3,7 @@ Cards Router for Social Module
 Handles card upload, retrieval, and deletion
 """
 
-from typing import Annotated, List, Optional
+from typing import Annotated, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -37,7 +37,6 @@ from app.modules.social.infrastructure.repositories.card_repository_impl import 
 from app.modules.social.presentation.schemas.card_schemas import (
     CardListResponseWrapper,
     CardResponse,
-    CardResponseWrapper,
     DeleteSuccessResponse,
     DeleteSuccessResponseWrapper,
     QuotaStatusResponse,
@@ -201,7 +200,7 @@ async def get_my_cards(
         )
         for card in cards
     ]
-    
+
     return CardListResponseWrapper(data=data, meta=None, error=None)
 
 
@@ -244,7 +243,7 @@ async def delete_card(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail={"code": "NOT_FOUND", "message": "Card not found or not owner"},
             )
-        
+
         data = DeleteSuccessResponse(success=True, message="Card deleted successfully")
         return DeleteSuccessResponseWrapper(data=data, meta=None, error=None)
     except ValueError as e:

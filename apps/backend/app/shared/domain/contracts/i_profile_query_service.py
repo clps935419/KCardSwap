@@ -52,7 +52,7 @@ class UserProfileInfo:
 class IProfileQueryService(ABC):
     """
     Interface for querying user profile information.
-    
+
     This service provides read-only access to profile data
     without exposing the Identity bounded context's internal implementation.
     """
@@ -61,10 +61,10 @@ class IProfileQueryService(ABC):
     async def get_user_location(self, user_id: UUID) -> Optional[UserLocationInfo]:
         """
         Get user location and basic info.
-        
+
         Args:
             user_id: User UUID
-            
+
         Returns:
             UserLocationInfo if profile exists, None otherwise
         """
@@ -74,10 +74,10 @@ class IProfileQueryService(ABC):
     async def get_user_profile(self, user_id: UUID) -> Optional[UserProfileInfo]:
         """
         Get full user profile information.
-        
+
         Args:
             user_id: User UUID
-            
+
         Returns:
             UserProfileInfo if profile exists, None otherwise
         """
@@ -89,12 +89,12 @@ class IProfileQueryService(ABC):
     ) -> bool:
         """
         Update user's last known location.
-        
+
         Args:
             user_id: User UUID
             latitude: Latitude coordinate
             longitude: Longitude coordinate
-            
+
         Returns:
             True if update successful, False otherwise
         """

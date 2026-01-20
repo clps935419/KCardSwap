@@ -402,7 +402,7 @@ class TestProfileEquality:
 
         assert profile != "not a profile"
         assert profile != 123
-        assert profile != None
+        assert profile is not None
 
     def test_profile_hash(self):
         """Test that profile can be hashed"""

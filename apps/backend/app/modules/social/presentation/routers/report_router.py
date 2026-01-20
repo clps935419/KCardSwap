@@ -10,7 +10,6 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.shared.presentation.dependencies.auth import get_current_user_id
 from app.modules.social.application.use_cases.reports.report_user_use_case import (
     ReportUserUseCase,
 )
@@ -25,6 +24,7 @@ from app.modules.social.presentation.schemas.report_schemas import (
     ReportResponseWrapper,
 )
 from app.shared.infrastructure.database.connection import get_db_session
+from app.shared.presentation.dependencies.auth import get_current_user_id
 
 logger = logging.getLogger(__name__)
 
@@ -90,7 +90,7 @@ async def submit_report(
             status="pending",  # Reports start as pending
             created_at=report.created_at,
         )
-        
+
         return ReportResponseWrapper(data=data, meta=None, error=None)
 
     except ValueError as e:

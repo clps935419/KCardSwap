@@ -170,7 +170,7 @@ class TestRefreshTokenBusinessLogic:
         expires_at = now + timedelta(seconds=1)
         created_at = now - timedelta(days=1)
 
-        refresh_token = RefreshToken(
+        _refresh_token = RefreshToken(
             user_id=user_id,
             token=token,
             expires_at=expires_at,
@@ -378,7 +378,7 @@ class TestRefreshTokenEquality:
 
         assert token != "not a token"
         assert token != 123
-        assert token != None
+        assert token is not None
 
     def test_token_hash(self):
         """Test that token can be hashed"""

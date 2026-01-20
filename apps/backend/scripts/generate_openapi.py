@@ -32,7 +32,7 @@ from pathlib import Path
 app_dir = Path(__file__).parent.parent
 sys.path.insert(0, str(app_dir))
 
-from fastapi.openapi.utils import get_openapi
+from fastapi.openapi.utils import get_openapi  # noqa: E402
 
 
 def generate_openapi_spec(output_path: str = "../../../openapi/openapi.json") -> None:
@@ -42,7 +42,7 @@ def generate_openapi_spec(output_path: str = "../../../openapi/openapi.json") ->
         output_path: Path to output file (relative to this script)
     """
     # Import the FastAPI app
-    from app.main import app
+    from app.main import app  # noqa: E402
 
     # Generate OpenAPI schema
     openapi_schema = get_openapi(

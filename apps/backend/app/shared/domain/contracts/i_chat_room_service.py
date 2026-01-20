@@ -21,7 +21,7 @@ class ChatRoomDTO:
 class IChatRoomService(ABC):
     """
     Interface for managing chat rooms.
-    
+
     This service provides chat room management functionality
     without exposing the Social bounded context's internal implementation.
     """
@@ -32,11 +32,11 @@ class IChatRoomService(ABC):
     ) -> ChatRoomDTO:
         """
         Get existing chat room or create a new one for two users.
-        
+
         Args:
             user1_id: First user UUID
             user2_id: Second user UUID
-            
+
         Returns:
             ChatRoomDTO for the chat room
         """
@@ -48,11 +48,11 @@ class IChatRoomService(ABC):
     ) -> Optional[ChatRoomDTO]:
         """
         Get chat room between two users if it exists.
-        
+
         Args:
             user1_id: First user UUID
             user2_id: Second user UUID
-            
+
         Returns:
             ChatRoomDTO if chat room exists, None otherwise
         """

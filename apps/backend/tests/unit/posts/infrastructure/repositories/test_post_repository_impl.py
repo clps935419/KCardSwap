@@ -216,7 +216,7 @@ class TestPostRepositoryImpl:
         """Test marking expired posts"""
         # Arrange
         expected_count = 3
-        
+
         # Create mock expired post models
         mock_posts = []
         for _ in range(expected_count):

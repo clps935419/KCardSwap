@@ -79,7 +79,7 @@ class TestSubscriptionFlow:
                 "email": "test@example.com",
             }
 
-            response = client.post(
+            _response = client.post(
                 "/api/v1/subscriptions/verify-receipt",
                 json=request_data,
                 headers=auth_headers,
@@ -87,7 +87,7 @@ class TestSubscriptionFlow:
 
             # Note: This test will fail until database is properly configured
             # Expected behavior when working:
-            # assert response.status_code == 200
+            # assert _response.status_code == 200
             # data = response.json()
             # assert data["plan"] == "premium"
             # assert data["status"] == "active"
@@ -110,12 +110,12 @@ class TestSubscriptionFlow:
                 "email": "test@example.com",
             }
 
-            response = client.get("/api/v1/subscriptions/status", headers=auth_headers)
+            _response = client.get("/api/v1/subscriptions/status", headers=auth_headers)
 
             # Note: This test will fail until database is properly configured
             # Expected behavior when working:
-            # assert response.status_code == 200
-            # data = response.json()
+            # assert _response.status_code == 200
+            # data = _response.json()
             # assert "plan" in data
             # assert "status" in data
             # assert "entitlement_active" in data
@@ -136,7 +136,7 @@ class TestSubscriptionFlow:
                 "email": "test@example.com",
             }
 
-            response = client.post(
+            _response = client.post(
                 "/api/v1/subscriptions/verify-receipt",
                 json=request_data,
                 headers=auth_headers,
@@ -184,15 +184,15 @@ class TestSubscriptionFlow:
                 )
                 mock_repo.return_value = mock_instance
 
-                response = client.post(
+                _response = client.post(
                     "/api/v1/subscriptions/verify-receipt",
                     json=request_data,
                     headers=auth_headers,
                 )
 
                 # Expected: conflict error
-                # assert response.status_code == 409
-                # assert "PURCHASE_TOKEN_ALREADY_USED" in response.text
+                # assert _response.status_code == 409
+                # assert "PURCHASE_TOKEN_ALREADY_USED" in _response.text
 
     def test_verify_receipt_idempotent(self, mock_google_billing_service, auth_headers):
         """
@@ -216,14 +216,14 @@ class TestSubscriptionFlow:
             mock_auth.return_value = {"id": user_id, "email": "test@example.com"}
 
             # First call - would verify with Google Play
-            response1 = client.post(
+            _response1 = client.post(
                 "/api/v1/subscriptions/verify-receipt",
                 json=request_data,
                 headers=auth_headers,
             )
 
             # Second call - should be idempotent
-            response2 = client.post(
+            _response2 = client.post(
                 "/api/v1/subscriptions/verify-receipt",
                 json=request_data,
                 headers=auth_headers,
@@ -243,11 +243,11 @@ class TestSubscriptionFlow:
         - Background job marks them as expired
         - Returns count of expired subscriptions
         """
-        response = client.post("/api/v1/subscriptions/expire-subscriptions")
+        _response = client.post("/api/v1/subscriptions/expire-subscriptions")
 
         # Note: This endpoint should be protected in production
         # Expected behavior when database configured:
-        # assert response.status_code == 200
+        # assert _response.status_code == 200
         # data = response.json()
         # assert "expired_count" in data
         # assert "processed_at" in data

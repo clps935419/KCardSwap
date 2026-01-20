@@ -7,7 +7,7 @@ from app.modules.posts.domain.entities.city_code import CityCode
 
 class CityRepositoryImpl(ICityRepository):
     """Implementation of city repository using static data."""
-    
+
     # Complete list of Taiwan cities/counties with official English and Chinese names
     _CITIES = [
         # Six Special Municipalities (直轄市)
@@ -17,12 +17,12 @@ class CityRepositoryImpl(ICityRepository):
         City(CityCode.TXG, "Taichung City", "台中市"),
         City(CityCode.TNN, "Tainan City", "台南市"),
         City(CityCode.KHH, "Kaohsiung City", "高雄市"),
-        
+
         # Provincial Cities (省轄市)
         City(CityCode.KEE, "Keelung City", "基隆市"),
         City(CityCode.HSZ, "Hsinchu City", "新竹市"),
         City(CityCode.CYI, "Chiayi City", "嘉義市"),
-        
+
         # Counties (縣)
         City(CityCode.HSQ, "Hsinchu County", "新竹縣"),
         City(CityCode.MIA, "Miaoli County", "苗栗縣"),
@@ -38,10 +38,10 @@ class CityRepositoryImpl(ICityRepository):
         City(CityCode.KIN, "Kinmen County", "金門縣"),
         City(CityCode.LIE, "Lienchiang County", "連江縣"),
     ]
-    
+
     async def get_all_cities(self) -> list[City]:
         """Get all Taiwan cities/counties.
-        
+
         Returns:
             List of all 22 Taiwan cities/counties
         """

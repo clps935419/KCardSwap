@@ -22,11 +22,11 @@ from app.modules.posts.application.use_cases.express_interest_use_case import (
 from app.modules.posts.application.use_cases.list_board_posts_use_case import (
     ListBoardPostsUseCase,
 )
-from app.modules.posts.application.use_cases.reject_interest_use_case import (
-    RejectInterestUseCase,
-)
 from app.modules.posts.application.use_cases.list_post_interests_use_case import (
     ListPostInterestsUseCase,
+)
+from app.modules.posts.application.use_cases.reject_interest_use_case import (
+    RejectInterestUseCase,
 )
 from app.shared.infrastructure.database.connection import get_db_session
 

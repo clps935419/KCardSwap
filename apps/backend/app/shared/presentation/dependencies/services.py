@@ -21,7 +21,7 @@ async def get_subscription_service(
 ) -> ISubscriptionQueryService:
     """
     Get subscription query service.
-    
+
     Creates the implementation from IdentityModule using the provided session.
     """
     # Import implementation here to avoid circular imports
@@ -31,7 +31,7 @@ async def get_subscription_service(
     from app.modules.identity.infrastructure.repositories.subscription_repository_impl import (
         SubscriptionRepositoryImpl,
     )
-    
+
     subscription_repo = SubscriptionRepositoryImpl(session)
     return SubscriptionQueryServiceImpl(subscription_repository=subscription_repo)
 
@@ -41,7 +41,7 @@ async def get_profile_service(
 ) -> IProfileQueryService:
     """
     Get profile query service.
-    
+
     Creates the implementation from IdentityModule using the provided session.
     """
     # Import implementation here to avoid circular imports
@@ -51,6 +51,6 @@ async def get_profile_service(
     from app.modules.identity.infrastructure.repositories.profile_repository_impl import (
         ProfileRepositoryImpl,
     )
-    
+
     profile_repo = ProfileRepositoryImpl(session)
     return ProfileQueryServiceImpl(profile_repository=profile_repo)
