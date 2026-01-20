@@ -3,8 +3,34 @@ name: PR Checks
 on:
   pull_request:
     branches: [ main, master, develop ]
+  workflow_dispatch:
 
 jobs:
+  changes:
+    name: Detect changed paths
+    runs-on: ubuntu-latest
+    outputs:
+      backend_related: ${{ steps.filter.outputs.backend_related }}
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Filter paths
+      id: filter
+      uses: dorny/paths-filter@v3
+      with:
+        filters: |
+          backend_related:
+            - 'apps/backend/**'
+            - 'backend/**'
+            - 'docker-compose.yml'
+            - 'docker-compose.override.yml'
+            - 'Dockerfile'
+            - 'apps/backend/Dockerfile'
+            - '.github/workflows/backend-ci.yml'
+
   pr-checks:
     name: Pull Request Validation
     runs-on: ubuntu-latest
@@ -54,6 +80,8 @@ jobs:
   docker-build:
     name: Docker Build Test
     runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.backend_related == 'true' || github.event_name == 'workflow_dispatch'
     
     steps:
     - uses: actions/checkout@v4
