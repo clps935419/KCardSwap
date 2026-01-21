@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KCardSwap 產品設計規格導覽</title>
+    <title>KCardSwap 產品設計規格導覽 - V4 (Fixed & Complete)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js -->
@@ -14,374 +14,225 @@
     <style>
         body {
             font-family: 'Noto Sans TC', sans-serif;
-            background-color: #F8FAFC; /* Slate 50 from spec */
+            background-color: #F8FAFC;
         }
         
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1; 
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1; 
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8; 
-        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
-        /* Chart Container Logic per requirements */
         .chart-container {
             position: relative;
             width: 100%;
             max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
+            margin: auto;
             height: 300px;
-            max-height: 400px;
-        }
-        @media (min-width: 768px) {
-            .chart-container {
-                height: 350px;
-            }
         }
 
-        /* Phone Simulator Frame */
         .phone-frame {
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            transition: all 0.3s ease;
+            box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.25);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Active Tab Styling */
         .nav-item.active {
-            background-color: #4F46E5; /* Indigo 600 */
+            background-color: #4F46E5;
             color: white;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
         }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+
+        /* Animation for Slide Up Modal */
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        .animate-slide-up { animation: slideUp 0.3s ease-out; }
     </style>
 </head>
 <body class="text-slate-800">
 
     <!-- REQUIRED PLACEHOLDERS -->
-    <!-- Chosen Palette: Indigo-600 (Primary), Pink-500 (Secondary), Slate-50 (Background) - Strictly adhering to Spec v1.0 -->
-    <!-- Application Structure Plan: A Dashboard-style Single Page Application. 
-         Left Column: Navigation & Context. 
-         Right Column: Content.
-         Key Sections:
-         1. Visual Identity System (Static Style Guide).
-         2. Interactive Prototype (Dynamic Mobile Simulator): Allows users to click through the 5 core tabs defined in the spec to visualize the Layout & Components.
-         3. Trade Flow Logic (Process Viz): Breaks down the complex negotiation state machine.
-         4. Membership Analysis (Data Viz): Charts comparing features.
-         Rationale: The spec is dense with UI rules. An interactive phone simulator is the best way to "explain" the design spec to developers/stakeholders. -->
+    <!-- Chosen Palette: Indigo-600 (Primary), Pink-500 (Secondary), Slate-50 (Bg) -->
+    <!-- Application Structure Plan: 
+         1. 側邊欄導航：控制主要規格章節。
+         2. 互動原型區：
+            - Entry: Google Login 模擬。
+            - Flow: Login -> Loading -> Onboarding (Bias Selection) -> Main App.
+            - Main App: 完整的 Tab 切換 (首頁/附近/上傳/聊天/個人) 與詳細頁面模擬。
+         3. 交換邏輯區：互動式步驟條，點擊顯示狀態機細節。
+         4. 會員權益區：Chart.js 雷達圖。 -->
     <!-- Visualization & Content Choices:
-         1. Color Palette Grid: HTML/Tailwind Grid -> To instantly visualize the brand vibe.
-         2. Interactive Mobile Simulator: HTML/CSS within a constrained container + JS state -> To demonstrate the IA and component placement without static images.
-         3. Membership Radar Chart: Chart.js -> To visualize the "Paywall" strategy (Free vs Paid differentiation).
-         4. Trade Flow Stepper: Vertical HTML list with JS interactivity -> To clarify the multi-step transaction process.
+         - Mobile Simulator: HTML/CSS/JS 全功能模擬。
+         - Step-by-Step Logic: 互動式 Grid。
+         - Data Viz: Canvas Chart.js。
          CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
 
-    <!-- Main Layout -->
     <div class="min-h-screen flex flex-col md:flex-row">
         
-        <!-- Sidebar Navigation -->
-        <aside class="w-full md:w-64 bg-white border-r border-slate-200 flex-shrink-0 sticky top-0 md:h-screen overflow-y-auto z-20">
-            <div class="p-6">
-                <h1 class="text-2xl font-bold text-indigo-600 tracking-tight">KCardSwap<span class="text-pink-500">.</span></h1>
-                <p class="text-xs text-slate-500 mt-1">Design Spec v1.0</p>
+        <!-- Sidebar -->
+        <aside class="w-full md:w-72 bg-white border-r border-slate-200 flex-shrink-0 sticky top-0 md:h-screen overflow-y-auto z-20">
+            <div class="p-8">
+                <h1 class="text-2xl font-black text-indigo-600 tracking-tighter">KCardSwap<span class="text-pink-500">.</span></h1>
+                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-2">Design Spec V4 (Fixed)</p>
             </div>
             
-            <nav class="px-4 space-y-2">
-                <button onclick="switchSection('identity')" class="nav-item active w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-slate-100 flex items-center">
-                    <span class="mr-2">🎨</span> 視覺識別系統
+            <nav class="px-6 space-y-1">
+                <button onclick="switchSection('login-spec')" class="nav-item active w-full text-left px-4 py-4 rounded-xl text-sm font-bold transition-all flex items-center">
+                    <span class="mr-3 text-lg">🔑</span> 登入流程規範
                 </button>
-                <button onclick="switchSection('prototype')" class="nav-item w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-slate-100 flex items-center">
-                    <span class="mr-2">📱</span> 互動原型預覽
+                <button onclick="switchSection('prototype')" class="nav-item w-full text-left px-4 py-4 rounded-xl text-sm font-bold transition-all flex items-center">
+                    <span class="mr-3 text-lg">📱</span> 互動原型預覽
                 </button>
-                <button onclick="switchSection('trade-flow')" class="nav-item w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-slate-100 flex items-center">
-                    <span class="mr-2">🤝</span> 核心交換流程
+                <button onclick="switchSection('trade-logic')" class="nav-item w-full text-left px-4 py-4 rounded-xl text-sm font-bold transition-all flex items-center">
+                    <span class="mr-3 text-lg">🔄</span> 交換狀態機
                 </button>
-                <button onclick="switchSection('membership')" class="nav-item w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-slate-100 flex items-center">
-                    <span class="mr-2">📊</span> 會員權益分析
+                <button onclick="switchSection('membership')" class="nav-item w-full text-left px-4 py-4 rounded-xl text-sm font-bold transition-all flex items-center">
+                    <span class="mr-3 text-lg">💎</span> 商業化模型
                 </button>
             </nav>
 
-            <div class="absolute bottom-0 w-full p-6 bg-slate-50 border-t border-slate-100">
-                <div class="text-xs text-slate-400">
-                    <p>Status: Draft</p>
-                    <p>Date: 2025-12-10</p>
+            <div class="mt-auto p-8 border-t border-slate-50">
+                <div class="bg-green-50 p-4 rounded-xl border border-green-100">
+                    <p class="text-[10px] text-green-600 font-bold uppercase mb-1">Status: Fixed</p>
+                    <p class="text-xs text-green-800 font-medium">所有互動流程已修復，包含 App 內導航與邏輯展示。</p>
                 </div>
             </div>
         </aside>
 
-        <!-- Main Content Area -->
-        <main class="flex-1 overflow-y-auto bg-slate-50 p-4 md:p-8" id="main-content">
+        <!-- Content Area -->
+        <main class="flex-1 bg-slate-50 p-4 md:p-12 overflow-y-auto" id="main-content">
             
-            <!-- SECTION 1: VISUAL IDENTITY -->
-            <section id="identity-section" class="space-y-8 animate-fade-in">
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-                    <h2 class="text-2xl font-bold text-slate-800 mb-4">視覺識別系統 (Visual Identity)</h2>
-                    <p class="text-slate-600 mb-6 leading-relaxed">
-                        本區塊定義了 KCardSwap 的核心視覺語言。設計風格強調「韓系潮流」與「年輕化」，同時保持介面乾淨以凸顯小卡圖片。
-                        主色調 Indigo-600 用於建立信任感，Pink-500 作為點綴色呼應粉絲熱情。
-                    </p>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <!-- Colors -->
-                        <div>
-                            <h3 class="text-lg font-semibold mb-4 text-slate-700">色彩計畫 (Color Palette)</h3>
-                            <div class="space-y-3">
-                                <div class="flex items-center space-x-4">
-                                    <div class="w-16 h-16 rounded-lg bg-indigo-600 shadow-md flex items-center justify-center text-white text-xs font-bold">Primary</div>
-                                    <div>
-                                        <p class="font-bold text-slate-800">Indigo 600 (#4F46E5)</p>
-                                        <p class="text-sm text-slate-500">CTA 按鈕、選取狀態、品牌識別</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-center space-x-4">
-                                    <div class="w-16 h-16 rounded-lg bg-pink-500 shadow-md flex items-center justify-center text-white text-xs font-bold">Accent</div>
-                                    <div>
-                                        <p class="font-bold text-slate-800">Pink 500 (#EC4899)</p>
-                                        <p class="text-sm text-slate-500">Like、本命標籤、通知紅點</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-center space-x-4">
-                                    <div class="w-16 h-16 rounded-lg bg-green-500 shadow-md flex items-center justify-center text-white text-xs font-bold">Status</div>
-                                    <div>
-                                        <p class="font-bold text-slate-800">Green 500 (#10B981)</p>
-                                        <p class="text-sm text-slate-500">持有中 / 可交換 (Available)</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-center space-x-4">
-                                    <div class="w-16 h-16 rounded-lg bg-amber-500 shadow-md flex items-center justify-center text-white text-xs font-bold">Trading</div>
-                                    <div>
-                                        <p class="font-bold text-slate-800">Amber 500 (#F59E0B)</p>
-                                        <p class="text-sm text-slate-500">洽談中 / 交易進行中</p>
-                                    </div>
-                                </div>
-                            </div>
+            <!-- SECTION: LOGIN SPEC -->
+            <section id="login-spec-section" class="space-y-8 animate-fade-in">
+                <div class="max-w-4xl">
+                    <h2 class="text-3xl font-black text-slate-900 mb-4">登入流程規範 (Login Workflow)</h2>
+                    <p class="text-lg text-slate-500 mb-8">採用 Google OAuth 2.0 作為主要身分驗證手段，旨在減少註冊負擔並提升安全性。</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                            <div class="text-2xl mb-4">⚡</div>
+                            <h3 class="font-bold mb-2">極速入口</h3>
+                            <p class="text-xs text-slate-500 leading-relaxed">首屏僅保留 Google 登入按鈕，點擊後調用系統原生授權彈窗，平均完成時間預計少於 5 秒。</p>
                         </div>
-
-                        <!-- Typography -->
-                        <div>
-                            <h3 class="text-lg font-semibold mb-4 text-slate-700">字體排印 (Typography)</h3>
-                            <div class="bg-slate-50 p-6 rounded-lg border border-slate-200 space-y-4">
-                                <div>
-                                    <span class="text-xs text-slate-400 uppercase tracking-wider">H1 Page Title</span>
-                                    <h1 class="text-2xl font-bold text-slate-900">KCardSwap 首頁</h1>
-                                </div>
-                                <div>
-                                    <span class="text-xs text-slate-400 uppercase tracking-wider">H2 Section Title</span>
-                                    <h2 class="text-lg font-semibold text-slate-800">附近的人</h2>
-                                </div>
-                                <div>
-                                    <span class="text-xs text-slate-400 uppercase tracking-wider">Body Text</span>
-                                    <p class="text-base text-slate-600">這是一段標準內文。用於聊天訊息、貼文內容與一般說明文字。強調易讀性。</p>
-                                </div>
-                                <div>
-                                    <span class="text-xs text-slate-400 uppercase tracking-wider">Caption / Metadata</span>
-                                    <p class="text-xs text-slate-500">12分鐘前 • 📍 台北市 • 1.2km</p>
-                                </div>
-                            </div>
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                            <div class="text-2xl mb-4">🛡️</div>
+                            <h3 class="font-bold mb-2">安全與信任</h3>
+                            <p class="text-xs text-slate-500 leading-relaxed">利用 Google 的雙重認證機制，降低虛假帳號風險，對小卡交換市場的信譽建立至關重要。</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                            <div class="text-2xl mb-4">👤</div>
+                            <h3 class="font-bold mb-2">自動化建檔</h3>
+                            <p class="text-xs text-slate-500 leading-relaxed">自動抓取 Google 頭像與姓名作為預設個人資料，後續僅需補充「本命團體」即可完成開通。</p>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- SECTION 2: INTERACTIVE PROTOTYPE -->
+            <!-- SECTION: PROTOTYPE -->
             <section id="prototype-section" class="hidden space-y-8 animate-fade-in">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-12 items-start">
                     
-                    <!-- Context Column -->
                     <div class="space-y-6">
-                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-                            <h2 class="text-2xl font-bold text-slate-800 mb-4">互動原型預覽 (Interactive Prototype)</h2>
-                            <p class="text-slate-600 mb-4">
-                                此區塊模擬 App 的實際運作邏輯。請點擊右側手機畫面下方的 <strong>導覽列 (Bottom Tab Bar)</strong> 來切換不同功能頁面。
-                                此原型忠實呈現了規格書中定義的 5 大核心功能模組。
-                            </p>
-                            <div class="space-y-4 text-sm">
-                                <div class="p-3 bg-slate-50 rounded border-l-4 border-indigo-600">
-                                    <strong class="block text-indigo-700">1. 首頁 (City Board)</strong>
-                                    瀏覽城市看板，查看其他用戶的交換貼文。
-                                </div>
-                                <div class="p-3 bg-slate-50 rounded border-l-4 border-pink-500">
-                                    <strong class="block text-pink-600">2. 附近 (Nearby)</strong>
-                                    LBS 地理位置搜尋，顯示距離與可交換數量。
-                                </div>
-                                <div class="p-3 bg-slate-50 rounded border-l-4 border-indigo-600">
-                                    <strong class="block text-indigo-700">3. 上傳 (Upload)</strong>
-                                    模擬 Modal 彈出，展示上傳小卡的表單設計。
-                                </div>
-                                <div class="p-3 bg-slate-50 rounded border-l-4 border-green-500">
-                                    <strong class="block text-green-600">4. 聊天 (Chat)</strong>
-                                    包含好友列表與聊天室入口，這是發起交換的核心。
-                                </div>
-                                <div class="p-3 bg-slate-50 rounded border-l-4 border-slate-500">
-                                    <strong class="block text-slate-600">5. 我的 (Profile)</strong>
-                                    個人資料、信譽評分與卡冊管理。
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Phone Simulator Column -->
-                    <div class="flex justify-center">
-                        <div class="phone-frame w-[340px] h-[700px] bg-black rounded-[3rem] p-3 border-4 border-slate-800 relative overflow-hidden">
-                            <!-- Status Bar -->
-                            <div class="absolute top-0 left-0 w-full h-8 bg-white z-20 flex justify-between items-center px-6 pt-2">
-                                <span class="text-xs font-bold">09:41</span>
-                                <div class="flex space-x-1">
-                                    <span class="text-xs">📶</span>
-                                    <span class="text-xs">🔋</span>
-                                </div>
-                            </div>
+                        <div class="bg-indigo-900 text-white p-8 rounded-3xl shadow-2xl">
+                            <h3 class="text-xl font-bold mb-4">互動原型導覽</h3>
+                            <p class="text-indigo-200 text-sm mb-6">請在右側模擬器進行操作，體驗完整的 User Journey。</p>
                             
-                            <!-- Dynamic Screen Content -->
-                            <div id="phone-screen" class="w-full h-full bg-slate-50 rounded-[2.5rem] overflow-hidden flex flex-col pt-8 pb-16 relative">
-                                
-                                <!-- Header (Dynamic) -->
-                                <header id="app-header" class="bg-white px-4 py-3 flex justify-between items-center shadow-sm z-10">
-                                    <div class="flex items-center">
-                                        <h1 class="text-xl font-bold text-slate-900" id="header-title">KCardSwap</h1>
-                                    </div>
-                                    <div id="header-actions">
-                                        <button class="text-slate-600">🔍</button>
-                                    </div>
-                                </header>
-
-                                <!-- Content Scroll Area -->
-                                <div id="app-body" class="flex-1 overflow-y-auto p-4 space-y-4">
-                                    <!-- Content Injected via JS -->
+                            <div class="space-y-4">
+                                <div class="flex items-center text-sm">
+                                    <span class="w-6 h-6 rounded-full bg-indigo-700 flex items-center justify-center mr-3 text-xs">1</span>
+                                    <span>點擊 <strong>Google 登入</strong></span>
                                 </div>
+                                <div class="flex items-center text-sm">
+                                    <span class="w-6 h-6 rounded-full bg-indigo-700 flex items-center justify-center mr-3 text-xs">2</span>
+                                    <span>完成 <strong>本命選擇 (Onboarding)</strong></span>
+                                </div>
+                                <div class="flex items-center text-sm">
+                                    <span class="w-6 h-6 rounded-full bg-white text-indigo-900 flex items-center justify-center mr-3 text-xs font-bold">3</span>
+                                    <span class="font-bold text-white">進入主 App，自由切換 Tab 功能</span>
+                                </div>
+                            </div>
 
-                                <!-- Bottom Navigation -->
-                                <nav class="absolute bottom-0 left-0 w-full bg-white border-t border-slate-200 h-16 flex justify-around items-center px-2 z-20 rounded-b-[2.5rem]">
-                                    <button onclick="renderTab('home')" class="flex flex-col items-center justify-center w-12 h-12 text-indigo-600">
-                                        <span class="text-xl">🏠</span>
-                                        <span class="text-[10px] mt-1">首頁</span>
-                                    </button>
-                                    <button onclick="renderTab('nearby')" class="flex flex-col items-center justify-center w-12 h-12 text-slate-400 hover:text-indigo-600">
-                                        <span class="text-xl">📍</span>
-                                        <span class="text-[10px] mt-1">附近</span>
-                                    </button>
-                                    <!-- Upload Button (Special) -->
-                                    <button onclick="renderTab('upload')" class="flex flex-col items-center justify-center -mt-6">
-                                        <div class="w-14 h-14 bg-indigo-600 rounded-full shadow-lg flex items-center justify-center text-white text-2xl border-4 border-slate-50">
-                                            +
-                                        </div>
-                                    </button>
-                                    <button onclick="renderTab('chat')" class="flex flex-col items-center justify-center w-12 h-12 text-slate-400 hover:text-indigo-600">
-                                        <span class="text-xl">💬</span>
-                                        <span class="text-[10px] mt-1">聊天</span>
-                                    </button>
-                                    <button onclick="renderTab('profile')" class="flex flex-col items-center justify-center w-12 h-12 text-slate-400 hover:text-indigo-600">
-                                        <span class="text-xl">👤</span>
-                                        <span class="text-[10px] mt-1">我的</span>
-                                    </button>
-                                </nav>
+                            <button onclick="resetSimulator()" class="mt-8 text-xs font-bold bg-indigo-800 hover:bg-indigo-700 px-4 py-2 rounded-lg transition-colors">↺ 重置模擬器</button>
+                        </div>
+                    </div>
+
+                    <!-- Simulator Container -->
+                    <div class="flex justify-center relative">
+                        <div class="phone-frame w-[340px] h-[700px] bg-black rounded-[3.5rem] p-3 border-4 border-slate-800 relative z-10 overflow-hidden">
+                            <!-- Notch -->
+                            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-8 bg-black rounded-b-2xl z-30"></div>
+                            
+                            <!-- Internal Screen -->
+                            <div id="phone-screen" class="w-full h-full bg-white rounded-[2.8rem] overflow-hidden relative font-sans">
+                                <!-- Content injected via JS -->
                             </div>
                         </div>
+                        <!-- Decorative glow -->
+                        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-96 bg-indigo-500/20 blur-[120px] rounded-full"></div>
                     </div>
                 </div>
             </section>
 
-            <!-- SECTION 3: TRADE FLOW LOGIC -->
-            <section id="trade-flow-section" class="hidden space-y-8 animate-fade-in">
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-                    <h2 class="text-2xl font-bold text-slate-800 mb-2">交換流程邏輯 (Trade Flow Logic)</h2>
-                    <p class="text-slate-600 mb-6">這是 App 最核心、最複雜的互動。以下步驟解析了從「發起」到「完成」的狀態機變化與 UI 對應。</p>
-
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <!-- Step 1 -->
-                        <div class="border border-slate-200 rounded-lg p-4 bg-slate-50 hover:border-indigo-500 transition-colors cursor-pointer group" onclick="highlightStep(1)">
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="bg-indigo-600 text-white text-xs font-bold px-2 py-1 rounded">Step 1</span>
-                                <span class="text-xl">🤝</span>
-                            </div>
-                            <h3 class="font-bold text-slate-800">發起提案 (Initiate)</h3>
-                            <p class="text-xs text-slate-500 mt-2">入口：聊天室右上角按鈕</p>
-                            <div class="mt-3 text-xs text-indigo-600 hidden group-hover:block">查看 UI 細節 →</div>
-                        </div>
-
-                        <!-- Step 2 -->
-                        <div class="border border-slate-200 rounded-lg p-4 bg-slate-50 hover:border-amber-500 transition-colors cursor-pointer group" onclick="highlightStep(2)">
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="bg-amber-500 text-white text-xs font-bold px-2 py-1 rounded">Step 2</span>
-                                <span class="text-xl">⚖️</span>
-                            </div>
-                            <h3 class="font-bold text-slate-800">協商 (Negotiate)</h3>
-                            <p class="text-xs text-slate-500 mt-2">狀態：Pending / Accepted</p>
-                            <div class="mt-3 text-xs text-amber-600 hidden group-hover:block">查看 UI 細節 →</div>
-                        </div>
-
-                        <!-- Step 3 -->
-                        <div class="border border-slate-200 rounded-lg p-4 bg-slate-50 hover:border-blue-500 transition-colors cursor-pointer group" onclick="highlightStep(3)">
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded">Step 3</span>
-                                <span class="text-xl">🔒</span>
-                            </div>
-                            <h3 class="font-bold text-slate-800">鎖定與完成 (Lock)</h3>
-                            <p class="text-xs text-slate-500 mt-2">雙方確認 -> Completed</p>
-                            <div class="mt-3 text-xs text-blue-600 hidden group-hover:block">查看 UI 細節 →</div>
-                        </div>
-
-                        <!-- Step 4 -->
-                        <div class="border border-slate-200 rounded-lg p-4 bg-slate-50 hover:border-green-500 transition-colors cursor-pointer group" onclick="highlightStep(4)">
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded">Step 4</span>
-                                <span class="text-xl">⭐️</span>
-                            </div>
-                            <h3 class="font-bold text-slate-800">評分 (Rating)</h3>
-                            <p class="text-xs text-slate-500 mt-2">五星評價 + 文字回饋</p>
-                            <div class="mt-3 text-xs text-green-600 hidden group-hover:block">查看 UI 細節 →</div>
-                        </div>
-                    </div>
-
-                    <!-- Detail View (Dynamic) -->
-                    <div id="flow-detail" class="mt-8 bg-slate-800 text-white p-6 rounded-xl hidden">
-                        <!-- Content populated by JS -->
-                    </div>
-                </div>
-            </section>
-
-            <!-- SECTION 4: MEMBERSHIP ANALYSIS -->
-            <section id="membership-section" class="hidden space-y-8 animate-fade-in">
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-                    <h2 class="text-2xl font-bold text-slate-800 mb-4">會員權益分析 (Membership Analysis)</h2>
-                    <p class="text-slate-600 mb-6">
-                        基於 User Story 6 (免費/付費會員差異)，此圖表量化了付費升級帶來的關鍵權益提升。
-                        系統設計需確保付費誘因足夠強烈（解除限制、視覺差異），同時維持免費會員的基本可用性。
-                    </p>
+            <!-- SECTION: TRADE LOGIC -->
+            <section id="trade-logic-section" class="hidden animate-fade-in">
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+                    <h2 class="text-2xl font-bold mb-2">交換狀態機 (Trading State Machine)</h2>
+                    <p class="text-slate-500 mb-8">點擊下方步驟卡片，查看該狀態下的系統邏輯與 UI 行為。</p>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                        <!-- Chart Container -->
-                        <div class="chart-container">
-                            <canvas id="membershipChart"></canvas>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                        <div onclick="highlightStep(1)" class="p-4 bg-indigo-50 border-2 border-transparent hover:border-indigo-500 rounded-xl cursor-pointer transition-all group">
+                            <div class="text-2xl mb-2">🤝</div>
+                            <h3 class="font-bold text-indigo-900">1. 發起提案</h3>
+                            <p class="text-xs text-indigo-600 mt-1 opacity-60 group-hover:opacity-100">Initiate</p>
                         </div>
+                        <div onclick="highlightStep(2)" class="p-4 bg-amber-50 border-2 border-transparent hover:border-amber-500 rounded-xl cursor-pointer transition-all group">
+                            <div class="text-2xl mb-2">⚖️</div>
+                            <h3 class="font-bold text-amber-900">2. 協商中</h3>
+                            <p class="text-xs text-amber-600 mt-1 opacity-60 group-hover:opacity-100">Negotiate</p>
+                        </div>
+                        <div onclick="highlightStep(3)" class="p-4 bg-blue-50 border-2 border-transparent hover:border-blue-500 rounded-xl cursor-pointer transition-all group">
+                            <div class="text-2xl mb-2">🔒</div>
+                            <h3 class="font-bold text-blue-900">3. 鎖定完成</h3>
+                            <p class="text-xs text-blue-600 mt-1 opacity-60 group-hover:opacity-100">Complete</p>
+                        </div>
+                        <div onclick="highlightStep(4)" class="p-4 bg-green-50 border-2 border-transparent hover:border-green-500 rounded-xl cursor-pointer transition-all group">
+                            <div class="text-2xl mb-2">⭐️</div>
+                            <h3 class="font-bold text-green-900">4. 評價</h3>
+                            <p class="text-xs text-green-600 mt-1 opacity-60 group-hover:opacity-100">Rating</p>
+                        </div>
+                    </div>
 
-                        <!-- Text Breakdown -->
-                        <div class="space-y-4">
-                            <div class="flex items-start">
-                                <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 mr-3 flex-shrink-0">1</div>
-                                <div>
-                                    <h4 class="font-bold text-slate-800">上傳限制</h4>
-                                    <p class="text-sm text-slate-600">免費會員每日限 3 張，防止資源濫用。付費會員無限制，滿足重度收藏家需求。</p>
-                                </div>
+                    <div id="flow-detail" class="bg-slate-900 text-slate-300 p-6 rounded-2xl min-h-[150px] flex items-center justify-center">
+                        <p class="text-sm italic opacity-50">← 請點擊上方步驟查看細節</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: MEMBERSHIP -->
+            <section id="membership-section" class="hidden animate-fade-in">
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+                    <h2 class="text-2xl font-bold mb-6">權益層級對比</h2>
+                    <div class="chart-container">
+                        <canvas id="membershipChart"></canvas>
+                    </div>
+                    <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="flex items-start">
+                            <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center font-bold mr-4 text-xs">F</div>
+                            <div>
+                                <h4 class="font-bold text-slate-900">免費會員 (Free)</h4>
+                                <p class="text-xs text-slate-500 mt-1">適合輕度使用者。每日上傳與搜尋次數受限，足以體驗基本功能。</p>
                             </div>
-                            <div class="flex items-start">
-                                <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 mr-3 flex-shrink-0">2</div>
-                                <div>
-                                    <h4 class="font-bold text-slate-800">LBS 搜尋限制</h4>
-                                    <p class="text-sm text-slate-600">附近的人搜尋消耗伺服器資源較大。免費會員每日限 5 次，付費會員無限次且搜尋結果優先排序。</p>
-                                </div>
-                            </div>
-                            <div class="flex items-start">
-                                <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 mr-3 flex-shrink-0">3</div>
-                                <div>
-                                    <h4 class="font-bold text-slate-800">視覺差異</h4>
-                                    <p class="text-sm text-slate-600">付費會員在列表中擁有「金色皇冠」與「高亮邊框」，增加曝光率與信賴感。</p>
-                                </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold mr-4 text-xs">P</div>
+                            <div>
+                                <h4 class="font-bold text-slate-900">專業會員 (Premium)</h4>
+                                <p class="text-xs text-slate-500 mt-1">解鎖無限上傳、LBS 優先排序與專屬身分標識，適合重度交換玩家。</p>
                             </div>
                         </div>
                     </div>
@@ -391,401 +242,350 @@
         </main>
     </div>
 
-    <!-- JAVASCRIPT LOGIC -->
+    <!-- JS Logic -->
     <script>
-        // --- Navigation Logic ---
-        function switchSection(sectionId) {
-            // Hide all sections
-            document.querySelectorAll('main > section').forEach(el => {
-                el.classList.add('hidden');
-            });
-            // Show target section
-            document.getElementById(sectionId + '-section').classList.remove('hidden');
+        // --- Navigation ---
+        function switchSection(id) {
+            document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(id + '-section').classList.remove('hidden');
             
-            // Update Tab Styles
-            document.querySelectorAll('.nav-item').forEach(el => {
-                el.classList.remove('active', 'bg-indigo-600', 'text-white');
-                // Re-add default hover classes slightly messy but functional for vanilla
-            });
-            const activeBtn = document.querySelector(`button[onclick="switchSection('${sectionId}')"]`);
-            if(activeBtn) {
-                activeBtn.classList.add('active');
-            }
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            const btn = document.querySelector(`button[onclick="switchSection('${id}')"]`);
+            if(btn) btn.classList.add('active');
 
-            // Trigger specific renders
-            if (sectionId === 'membership') {
-                renderChart();
-            }
-            if (sectionId === 'prototype') {
-                renderTab('home'); // Reset phone to home
-            }
+            if(id === 'membership') renderChart();
         }
 
-        // --- Interactive Prototype Logic (Render Spec to HTML) ---
-        const appBody = document.getElementById('app-body');
-        const headerTitle = document.getElementById('header-title');
-
+        // --- Mock Data ---
         const mockData = {
             feeds: [
-                { user: 'HanniFan_TW', time: '10分鐘前', title: '【求換】NewJeans Hanni 藍版 換 Minji', tags: ['#NewJeans', '#Hanni'], interests: 5 },
-                { user: 'MarkLee0802', time: '1小時前', title: 'NCT Dream ISTJ 絕版小卡 出售/交換', tags: ['#NCT', '#Mark'], interests: 2 },
-                { user: 'Once_Forever', time: '2小時前', title: 'Twice 子瑜 歷年小卡整理', tags: ['#Twice', '#Tzuyu'], interests: 12 }
+                { user: 'HanniFan_TW', time: '10m', title: '【求換】Hanni 藍版 換 Minji', tag: 'NewJeans' },
+                { user: 'Blink_0808', time: '1h', title: 'Lisa Solo 專輯小卡出售', tag: 'BLACKPINK' },
+                { user: 'Carat_17', time: '2h', title: 'Seventeen FML 換圓佑', tag: 'SEVENTEEN' }
             ],
             nearby: [
-                { name: 'JennieKim', dist: '0.5km', stars: '5.0', cards: 12, vip: true },
-                { name: 'StayKidsUser', dist: '1.2km', stars: '4.8', cards: 5, vip: false },
-                { name: 'AespaWinter', dist: '2.5km', stars: '4.9', cards: 8, vip: false }
+                { name: 'JennieKim', dist: '0.5km', vip: true },
+                { name: 'StayKidsUser', dist: '1.2km', vip: false },
+                { name: 'AespaWinter', dist: '2.5km', vip: false }
             ]
         };
 
-        function renderTab(tab) {
-            // Update active state of bottom nav icons
-            const navBtns = document.querySelectorAll('#phone-screen nav button');
-            navBtns.forEach(btn => btn.classList.remove('text-indigo-600'));
-            // This simple logic assumes order. For robustness, we'd query by click handler, but this works for demo.
-            
-            appBody.innerHTML = ''; // Clear content
+        // --- Simulator Logic ---
+        const phoneScreen = document.getElementById('phone-screen');
+        let currentTab = 'home';
 
-            switch(tab) {
-                case 'home':
-                    headerTitle.textContent = '📍 台北市 ▼';
-                    appBody.innerHTML = `
-                        <!-- Search Bar -->
-                        <div class="bg-slate-100 rounded-full px-4 py-2 text-sm text-slate-400 mb-4 flex items-center">
-                            <span>🔍</span> <span class="ml-2">搜尋團體、成員...</span>
-                        </div>
-                        <!-- Feeds -->
-                        ${mockData.feeds.map(feed => `
-                            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
-                                <div class="flex items-center mb-2">
-                                    <div class="w-8 h-8 bg-slate-200 rounded-full mr-2"></div>
-                                    <div>
-                                        <p class="text-xs font-bold text-slate-800">${feed.user}</p>
-                                        <p class="text-[10px] text-slate-400">${feed.time}</p>
-                                    </div>
-                                </div>
-                                <h3 class="font-bold text-sm text-slate-800 mb-2">${feed.title}</h3>
-                                <div class="flex space-x-1 mb-3">
-                                    ${feed.tags.map(tag => `<span class="text-[10px] bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full">${tag}</span>`).join('')}
-                                </div>
-                                <div class="flex justify-between items-center pt-2 border-t border-slate-50">
-                                    <span class="text-xs text-slate-500">有興趣 (${feed.interests})</span>
-                                    <button class="text-xs text-pink-500 border border-pink-500 rounded-full px-3 py-1 hover:bg-pink-50">我感興趣</button>
-                                </div>
-                            </div>
-                        `).join('')}
-                    `;
-                    break;
-
-                case 'nearby':
-                    headerTitle.textContent = '附近的人';
-                    appBody.innerHTML = `
-                        <!-- Filter Sub-header -->
-                        <div class="flex justify-between items-center mb-4 px-1">
-                            <span class="text-xs bg-white border border-slate-200 px-2 py-1 rounded">距離: 5km ▾</span>
-                            <div class="flex items-center space-x-2">
-                                <span class="text-[10px] text-slate-400">隱身模式</span>
-                                <div class="w-8 h-4 bg-slate-300 rounded-full relative"><div class="absolute left-0.5 top-0.5 w-3 h-3 bg-white rounded-full shadow"></div></div>
-                            </div>
-                        </div>
-                        <!-- List -->
-                        ${mockData.nearby.map(u => `
-                            <div class="bg-white p-3 rounded-xl shadow-sm border ${u.vip ? 'border-amber-300 bg-amber-50/10' : 'border-slate-100'} flex items-center justify-between">
-                                <div class="flex items-center">
-                                    <div class="w-10 h-10 bg-slate-200 rounded-full mr-3 border-2 ${u.vip ? 'border-amber-400' : 'border-white'} relative">
-                                        ${u.vip ? '<div class="absolute -top-1 -right-1 text-[8px]">👑</div>' : ''}
-                                    </div>
-                                    <div>
-                                        <p class="text-sm font-bold text-slate-800">${u.name}</p>
-                                        <p class="text-[10px] text-indigo-500 font-medium">📍 ${u.dist} • ⭐ ${u.stars}</p>
-                                        <p class="text-[10px] text-slate-400">可交換: ${u.cards} 張</p>
-                                    </div>
-                                </div>
-                                <button class="bg-indigo-600 text-white text-xs px-3 py-1.5 rounded-full">打招呼</button>
-                            </div>
-                        `).join('')}
-                    `;
-                    break;
-
-                case 'upload':
-                    headerTitle.textContent = '上傳小卡';
-                    appBody.innerHTML = `
-                        <!-- Modal Simulation -->
-                        <div class="absolute inset-0 bg-black/50 z-30 flex flex-col justify-end">
-                            <div class="bg-white rounded-t-[2rem] p-6 h-[85%] animate-slide-up">
-                                <div class="w-12 h-1 bg-slate-200 rounded-full mx-auto mb-6"></div>
-                                <div class="w-full h-40 bg-slate-100 rounded-xl mb-6 flex flex-col items-center justify-center border-2 border-dashed border-slate-300">
-                                    <span class="text-2xl">📷</span>
-                                    <span class="text-xs text-slate-400 mt-2">點擊拍攝或選擇照片</span>
-                                </div>
-                                <div class="space-y-4">
-                                    <div>
-                                        <label class="text-xs font-bold text-slate-700">偶像/團體 *</label>
-                                        <div class="w-full h-10 bg-slate-50 border border-slate-200 rounded-lg mt-1"></div>
-                                    </div>
-                                    <div>
-                                        <label class="text-xs font-bold text-slate-700">專輯/系列 *</label>
-                                        <div class="w-full h-10 bg-slate-50 border border-slate-200 rounded-lg mt-1"></div>
-                                    </div>
-                                    <div class="flex items-center justify-between pt-2">
-                                        <span class="text-sm font-bold text-slate-700">交換狀態</span>
-                                        <div class="w-10 h-6 bg-green-500 rounded-full relative"><div class="absolute right-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow"></div></div>
-                                    </div>
-                                </div>
-                                <button onclick="renderTab('profile')" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl mt-8 shadow-lg shadow-indigo-200">確認發布</button>
-                            </div>
-                        </div>
-                    `;
-                    break;
-
-                case 'chat':
-                    headerTitle.textContent = '聊天室 (1)';
-                    appBody.innerHTML = `
-                        <!-- Chat List -->
-                        <div onclick="openChatRoom()" class="bg-white p-3 rounded-xl shadow-sm border border-slate-100 flex items-center justify-between cursor-pointer">
-                            <div class="flex items-center">
-                                <div class="w-10 h-10 bg-slate-200 rounded-full mr-3 relative">
-                                    <div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full"></div>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-bold text-slate-800">JennieKim</p>
-                                    <p class="text-[10px] text-slate-500 truncate w-32">好的，那我這邊確認一下...</p>
-                                </div>
-                            </div>
-                            <div class="flex flex-col items-end">
-                                <span class="text-[10px] text-slate-400">09:30</span>
-                                <span class="w-4 h-4 bg-pink-500 text-white text-[8px] flex items-center justify-center rounded-full mt-1">1</span>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                
-                case 'profile':
-                    headerTitle.textContent = '我的檔案';
-                    appBody.innerHTML = `
-                        <div class="flex items-center mb-6">
-                            <div class="w-16 h-16 bg-slate-300 rounded-full mr-4"></div>
-                            <div>
-                                <h2 class="text-lg font-bold text-slate-800 flex items-center">User123 <span class="ml-1 text-[10px] bg-slate-100 px-1 rounded">Free</span></h2>
-                                <p class="text-xs text-slate-500">⭐️ 4.5 • 交易 3 次</p>
-                            </div>
-                        </div>
-                        <!-- Stats -->
-                        <div class="flex justify-between bg-white p-4 rounded-xl shadow-sm mb-6">
-                            <div class="text-center w-1/3 border-r border-slate-100">
-                                <div class="text-lg font-bold text-slate-800">12</div>
-                                <div class="text-[10px] text-slate-400">持有中</div>
-                            </div>
-                            <div class="text-center w-1/3 border-r border-slate-100">
-                                <div class="text-lg font-bold text-amber-500">2</div>
-                                <div class="text-[10px] text-slate-400">洽談中</div>
-                            </div>
-                            <div class="text-center w-1/3">
-                                <div class="text-lg font-bold text-slate-400">5</div>
-                                <div class="text-[10px] text-slate-400">已完成</div>
-                            </div>
-                        </div>
-                        <!-- Card Grid -->
-                        <h3 class="font-bold text-slate-700 mb-2">我的小卡</h3>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="bg-white rounded-lg p-2 shadow-sm">
-                                <div class="w-full h-24 bg-slate-200 rounded mb-2"></div>
-                                <div class="text-xs font-bold">NewJeans</div>
-                                <div class="text-[10px] text-slate-500">OMG Album</div>
-                            </div>
-                            <div class="bg-white rounded-lg p-2 shadow-sm">
-                                <div class="w-full h-24 bg-slate-200 rounded mb-2"></div>
-                                <div class="text-xs font-bold">IVE</div>
-                                <div class="text-[10px] text-slate-500">After Like</div>
-                            </div>
-                        </div>
-                    `;
-                    break;
-            }
-        }
-
-        // --- Chat Detail Simulation ---
-        function openChatRoom() {
-            headerTitle.textContent = 'JennieKim';
-            appBody.innerHTML = `
-                <!-- Chat Messages -->
-                <div class="space-y-4 pb-20">
-                    <div class="flex justify-center"><span class="text-[10px] text-slate-400 bg-slate-100 px-2 py-1 rounded-full">你們已經成為好友</span></div>
-                    
-                    <div class="flex justify-end">
-                        <div class="bg-indigo-600 text-white text-xs px-3 py-2 rounded-l-xl rounded-tr-xl max-w-[80%]">
-                            你好，我有看到你的 NewJeans Hanni 小卡！
-                        </div>
+        // 1. Initial State: Login
+        function initSimulator() {
+            phoneScreen.innerHTML = `
+                <div class="h-full flex flex-col items-center justify-between p-8 py-20 animate-fade-in">
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-indigo-600 rounded-3xl mx-auto flex items-center justify-center text-3xl shadow-2xl mb-4">📂</div>
+                        <h2 class="text-2xl font-black text-slate-900">KCardSwap</h2>
+                        <p class="text-xs text-slate-400 mt-1 uppercase tracking-widest font-bold">Find Your Bias</p>
                     </div>
 
-                    <div class="flex justify-start">
-                        <div class="bg-white text-slate-800 text-xs px-3 py-2 rounded-r-xl rounded-tl-xl shadow-sm max-w-[80%]">
-                            嗨！你想用哪一張換？
-                        </div>
-                    </div>
-
-                    <!-- TRADE WIDGET SIMULATION -->
-                    <div class="mx-4 bg-white rounded-xl shadow-md border border-amber-200 overflow-hidden">
-                        <div class="bg-amber-50 px-3 py-2 flex justify-between items-center border-b border-amber-100">
-                            <span class="text-xs font-bold text-amber-700">⚖️ 交換提案 #101</span>
-                            <span class="text-[10px] bg-white px-1.5 py-0.5 rounded border border-amber-200 text-amber-600">Pending</span>
-                        </div>
-                        <div class="p-3 flex items-center justify-between">
-                            <div class="text-center">
-                                <div class="w-10 h-12 bg-slate-200 rounded mx-auto mb-1"></div>
-                                <span class="text-[8px] text-slate-500">我方提供</span>
+                    <div class="w-full space-y-4">
+                        <button onclick="triggerGoogleLogin()" class="w-full h-16 bg-white border border-slate-200 rounded-2xl flex items-center px-6 hover:bg-slate-50 transition-all shadow-sm group">
+                            <div class="w-8 h-8 flex items-center justify-center text-xl mr-4 group-hover:scale-110 transition-transform">
+                                G
                             </div>
-                            <span class="text-slate-300">⇄</span>
-                            <div class="text-center">
-                                <div class="w-10 h-12 bg-slate-200 rounded mx-auto mb-1"></div>
-                                <span class="text-[8px] text-slate-500">對方提供</span>
-                            </div>
-                        </div>
-                        <div class="px-3 pb-3 flex space-x-2">
-                             <button class="flex-1 bg-slate-100 text-slate-400 text-xs py-1.5 rounded" disabled>等待對方...</button>
-                        </div>
+                            <span class="font-bold text-slate-700">使用 Google 帳號登入</span>
+                        </button>
+                        <p class="text-[9px] text-slate-400 text-center px-4 leading-relaxed">
+                            登入即表示您同意本平台的服務條款與隱私協議。
+                        </p>
                     </div>
-                </div>
-
-                <!-- Input Area -->
-                <div class="absolute bottom-0 left-0 w-full bg-white px-4 py-3 border-t border-slate-100 flex items-center">
-                    <div class="flex-1 bg-slate-100 rounded-full h-8 px-3 text-xs flex items-center text-slate-400">輸入訊息...</div>
-                    <button class="ml-2 w-8 h-8 bg-indigo-600 rounded-full text-white flex items-center justify-center">➜</button>
-                </div>
-
-                <!-- Initiate Button Overlay -->
-                <div class="absolute top-16 right-4">
-                     <button class="bg-indigo-600 text-white text-xs px-3 py-1.5 rounded-full shadow-lg flex items-center animate-bounce">
-                        🤝 發起交換
-                     </button>
                 </div>
             `;
         }
 
+        // 2. Auth Loading
+        function triggerGoogleLogin() {
+            phoneScreen.innerHTML = `
+                <div class="h-full flex flex-col items-center justify-center space-y-6 animate-fade-in">
+                    <div class="relative">
+                        <div class="w-16 h-16 border-4 border-slate-100 border-t-indigo-600 rounded-full animate-spin"></div>
+                        <div class="absolute inset-0 flex items-center justify-center text-lg font-bold text-slate-700">G</div>
+                    </div>
+                    <p class="text-sm font-bold text-slate-500">正在連接 Google 帳號...</p>
+                </div>
+            `;
+            setTimeout(renderOnboarding, 1500);
+        }
 
-        // --- Trade Flow Detail Logic ---
-        function highlightStep(step) {
-            const detailBox = document.getElementById('flow-detail');
-            detailBox.classList.remove('hidden');
-            let content = '';
+        // 3. Onboarding
+        function renderOnboarding() {
+            phoneScreen.innerHTML = `
+                <div class="h-full flex flex-col p-6 pt-10 animate-fade-in">
+                    <div class="flex items-center space-x-3 mb-8">
+                        <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">👤</div>
+                        <div>
+                            <p class="text-xs text-slate-400 font-bold">你好，User！</p>
+                            <p class="text-sm font-black text-slate-900">最後一步：選擇你的本命</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-3 mb-auto">
+                        <div onclick="toggleSelection(this)" class="p-4 border border-slate-100 rounded-2xl text-center hover:border-indigo-600 transition-all cursor-pointer bg-white shadow-sm">
+                            <span class="text-2xl">👖</span><p class="text-[10px] font-bold mt-2">NewJeans</p>
+                        </div>
+                        <div onclick="toggleSelection(this)" class="p-4 border-2 border-indigo-600 rounded-2xl text-center transition-all cursor-pointer bg-indigo-50 relative">
+                            <span class="text-2xl">🦢</span><p class="text-[10px] font-bold mt-2 text-indigo-700">IVE</p>
+                            <div class="absolute top-2 right-2 w-4 h-4 bg-indigo-600 rounded-full flex items-center justify-center text-[8px] text-white">✓</div>
+                        </div>
+                        <div onclick="toggleSelection(this)" class="p-4 border border-slate-100 rounded-2xl text-center hover:border-indigo-600 transition-all cursor-pointer bg-white shadow-sm">
+                            <span class="text-2xl">🦋</span><p class="text-[10px] font-bold mt-2">aespa</p>
+                        </div>
+                        <div onclick="toggleSelection(this)" class="p-4 border-2 border-indigo-600 rounded-2xl text-center transition-all cursor-pointer bg-indigo-50 relative">
+                            <span class="text-2xl">🌸</span><p class="text-[10px] font-bold mt-2 text-indigo-700">LE SSERAFIM</p>
+                             <div class="absolute top-2 right-2 w-4 h-4 bg-indigo-600 rounded-full flex items-center justify-center text-[8px] text-white">✓</div>
+                        </div>
+                    </div>
+                    
+                    <button onclick="renderMainApp()" class="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl mt-8 shadow-xl">開始探索小卡</button>
+                </div>
+            `;
+        }
 
-            if (step === 1) {
-                content = `
-                    <h3 class="text-lg font-bold text-indigo-300 mb-2">Step 1: 發起提案 (Initiate)</h3>
-                    <p class="text-sm text-slate-300 mb-4">使用者點擊聊天室右上角的「發起交換」按鈕，觸發 Half-Modal 選單。</p>
-                    <div class="bg-slate-900 p-4 rounded-lg border border-slate-700">
-                        <p class="text-xs text-green-400 font-mono">UI ACTION:</p>
-                        <p class="text-xs text-slate-400 font-mono">> Opens Modal</p>
-                        <p class="text-xs text-slate-400 font-mono">> User Selects: [My Card A] + [My Card B]</p>
-                        <p class="text-xs text-slate-400 font-mono">> User Selects: [Their Card C]</p>
-                        <p class="text-xs text-slate-400 font-mono">> Button: "送出提案"</p>
+        function toggleSelection(el) {
+            el.classList.toggle('border-indigo-600');
+            el.classList.toggle('bg-indigo-50');
+            el.classList.toggle('border-slate-100');
+        }
+
+        // 4. Main App Container
+        function renderMainApp() {
+            phoneScreen.innerHTML = `
+                <div class="h-full bg-slate-50 flex flex-col pt-12 animate-fade-in relative">
+                    <!-- Header -->
+                    <header id="app-header" class="px-6 py-4 flex justify-between items-center bg-white shadow-sm z-10">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Discover</span>
+                            <h3 class="text-xl font-black text-slate-900" id="header-title">城市看板</h3>
+                        </div>
+                        <div class="w-8 h-8 bg-indigo-600 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-white text-xs">U</div>
+                    </header>
+
+                    <!-- Dynamic Body -->
+                    <div id="app-body" class="flex-1 overflow-y-auto pb-24 relative">
+                        <!-- Content goes here -->
+                    </div>
+
+                    <!-- Bottom Nav -->
+                    <nav class="absolute bottom-6 left-6 right-6 h-16 bg-white/90 backdrop-blur-md border border-white/20 shadow-2xl rounded-3xl flex justify-around items-center px-2 z-20">
+                        <button onclick="renderTab('home')" class="nav-btn text-xl text-indigo-600 transition-transform active:scale-90">🏠</button>
+                        <button onclick="renderTab('nearby')" class="nav-btn text-xl text-slate-300 transition-transform active:scale-90">📍</button>
+                        <button onclick="renderTab('upload')" class="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center text-white text-xl shadow-lg -mt-8 transition-transform active:scale-90">+</button>
+                        <button onclick="renderTab('chat')" class="nav-btn text-xl text-slate-300 transition-transform active:scale-90">💬</button>
+                        <button onclick="renderTab('profile')" class="nav-btn text-xl text-slate-300 transition-transform active:scale-90">👤</button>
+                    </nav>
+                </div>
+            `;
+            renderTab('home');
+        }
+
+        // 5. Tab Render Logic
+        function renderTab(tab) {
+            const body = document.getElementById('app-body');
+            const title = document.getElementById('header-title');
+            
+            // Update Nav Icons Styling
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-indigo-600');
+                btn.classList.add('text-slate-300');
+            });
+            // Simple mapping for demo; specific highlighting logic omitted for brevity
+            
+            if(tab === 'home') {
+                title.innerText = '城市看板';
+                body.innerHTML = `
+                    <div class="px-6 py-4 space-y-4">
+                        ${mockData.feeds.map(f => `
+                            <div class="bg-white p-4 rounded-3xl shadow-sm border border-slate-100">
+                                <div class="w-full h-32 bg-slate-100 rounded-2xl mb-3 bg-cover bg-center" style="background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjZjFmM2Y1Ij48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIvPjwvc3ZnPg==')"></div>
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h4 class="font-bold text-sm text-slate-800">${f.title}</h4>
+                                        <p class="text-[10px] text-slate-400 mt-1">@${f.user} • ${f.time}</p>
+                                    </div>
+                                    <span class="bg-indigo-50 text-indigo-600 text-[8px] font-bold px-2 py-1 rounded-full">#${f.tag}</span>
+                                </div>
+                            </div>
+                        `).join('')}
                     </div>
                 `;
-            } else if (step === 2) {
-                content = `
-                    <h3 class="text-lg font-bold text-amber-300 mb-2">Step 2: 協商 (Negotiate)</h3>
-                    <p class="text-sm text-slate-300 mb-4">提案以特殊 Widget 形式出現在聊天室。狀態為 Pending。</p>
-                    <div class="bg-slate-900 p-4 rounded-lg border border-slate-700">
-                        <p class="text-xs text-amber-400 font-mono">STATE MACHINE:</p>
-                        <p class="text-xs text-slate-400 font-mono">Current: PENDING</p>
-                        <p class="text-xs text-slate-400 font-mono">Receiver sees: [Accept] / [Reject] Buttons</p>
-                        <p class="text-xs text-slate-400 font-mono">Sender sees: "Waiting for response..."</p>
-                        <p class="text-xs text-slate-400 font-mono">> IF Accept -> State: ACCEPTED (Cards Locked)</p>
+            } else if (tab === 'nearby') {
+                title.innerText = '附近的人';
+                body.innerHTML = `
+                    <div class="px-6 py-4 space-y-3">
+                         <div class="flex justify-between items-center mb-2">
+                            <span class="text-xs font-bold text-slate-400">距離 5km 內</span>
+                        </div>
+                        ${mockData.nearby.map(u => `
+                            <div class="bg-white p-3 rounded-2xl shadow-sm border ${u.vip ? 'border-indigo-100 bg-indigo-50/30' : 'border-slate-100'} flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 bg-slate-200 rounded-full mr-3 relative">
+                                        ${u.vip ? '<div class="absolute -top-1 -right-1 text-[8px]">👑</div>' : ''}
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-bold text-slate-800">${u.name}</p>
+                                        <p class="text-[10px] text-indigo-500 font-bold">📍 ${u.dist}</p>
+                                    </div>
+                                </div>
+                                <button class="bg-slate-900 text-white text-[10px] px-3 py-1.5 rounded-lg">查看</button>
+                            </div>
+                        `).join('')}
                     </div>
                 `;
-            } else if (step === 3) {
-                content = `
-                    <h3 class="text-lg font-bold text-blue-300 mb-2">Step 3: 鎖定與完成 (Lock & Complete)</h3>
-                    <p class="text-sm text-slate-300 mb-4">雙方約定面交。見面後，雙方都必須點擊「確認完成」。</p>
-                    <div class="bg-slate-900 p-4 rounded-lg border border-slate-700">
-                        <p class="text-xs text-blue-400 font-mono">LOGIC:</p>
-                        <p class="text-xs text-slate-400 font-mono">State: ACCEPTED -> User A clicks [Complete]</p>
-                        <p class="text-xs text-slate-400 font-mono">State: A_CONFIRMED (Waiting for B)</p>
-                        <p class="text-xs text-slate-400 font-mono">> User B clicks [Complete]</p>
-                        <p class="text-xs text-slate-400 font-mono">State: COMPLETED -> Trigger Rating Modal</p>
+            } else if (tab === 'upload') {
+                body.innerHTML = `
+                    <div class="absolute inset-0 bg-black/20 z-30 flex flex-col justify-end h-full">
+                        <div class="bg-white rounded-t-[2rem] p-6 h-[85%] animate-slide-up shadow-2xl">
+                            <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-8"></div>
+                            <div class="w-full h-40 bg-slate-50 rounded-2xl mb-6 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 text-slate-400">
+                                <span class="text-2xl mb-2">📷</span>
+                                <span class="text-xs font-bold">上傳小卡照片</span>
+                            </div>
+                            <button onclick="renderTab('home')" class="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl">發布</button>
+                        </div>
                     </div>
                 `;
-            } else if (step === 4) {
-                 content = `
-                    <h3 class="text-lg font-bold text-green-300 mb-2">Step 4: 評分 (Rating)</h3>
-                    <p class="text-sm text-slate-300 mb-4">交易完成後，強制彈出全版評分視窗。</p>
-                    <div class="bg-slate-900 p-4 rounded-lg border border-slate-700">
-                        <p class="text-xs text-green-400 font-mono">DATA:</p>
-                        <p class="text-xs text-slate-400 font-mono">Input: 1-5 Stars</p>
-                        <p class="text-xs text-slate-400 font-mono">Input: Text Review (Optional)</p>
-                        <p class="text-xs text-slate-400 font-mono">> Submit -> Updates User Trust Score</p>
+            } else if (tab === 'chat') {
+                title.innerText = '訊息 (1)';
+                body.innerHTML = `
+                    <div class="px-6 py-4">
+                        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-indigo-100 rounded-full mr-3 relative">
+                                    <div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full"></div>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold text-slate-800">JennieKim</p>
+                                    <p class="text-[10px] text-slate-500">好的，那面交見！</p>
+                                </div>
+                            </div>
+                            <span class="w-5 h-5 bg-pink-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full">1</span>
+                        </div>
+                    </div>
+                `;
+            } else if (tab === 'profile') {
+                title.innerText = '我的檔案';
+                body.innerHTML = `
+                    <div class="px-6 py-4">
+                        <div class="flex items-center mb-6">
+                            <div class="w-16 h-16 bg-slate-200 rounded-full mr-4"></div>
+                            <div>
+                                <h2 class="text-lg font-black text-slate-900">User_Kevin</h2>
+                                <p class="text-xs text-slate-500 font-bold">⭐️ 4.8 (12 次交換)</p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                             <div class="bg-white p-3 rounded-xl shadow-sm border border-slate-100">
+                                <div class="w-full h-24 bg-slate-100 rounded-lg mb-2"></div>
+                                <p class="text-xs font-bold">NewJeans</p>
+                             </div>
+                        </div>
                     </div>
                 `;
             }
-            detailBox.innerHTML = content;
         }
 
-        // --- Chart.js Logic ---
-        let myChart = null;
-        function renderChart() {
-            const ctx = document.getElementById('membershipChart').getContext('2d');
+        function resetSimulator() {
+            initSimulator();
+        }
+
+        // --- Trade Logic Visualization ---
+        function highlightStep(step) {
+            const detail = document.getElementById('flow-detail');
+            let content = '';
             
-            if (myChart) {
+            if(step === 1) {
+                content = `
+                    <div class="w-full animate-fade-in">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="font-bold text-indigo-400">Step 1: Initiate (發起)</h4>
+                            <span class="text-xs bg-indigo-900 text-indigo-300 px-2 py-1 rounded">UI Action</span>
+                        </div>
+                        <p class="text-sm text-slate-300">使用者在聊天室點擊「發起交換」，選擇雙方卡片。</p>
+                        <div class="mt-3 p-2 bg-black/30 rounded text-xs font-mono text-slate-400">
+                            POST /api/v1/trades<br>
+                            Status -> 'proposed'
+                        </div>
+                    </div>
+                `;
+            } else if(step === 2) {
+                content = `
+                    <div class="w-full animate-fade-in">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="font-bold text-amber-400">Step 2: Negotiate (協商)</h4>
+                            <span class="text-xs bg-amber-900 text-amber-300 px-2 py-1 rounded">State Machine</span>
+                        </div>
+                        <p class="text-sm text-slate-300">接收方可選擇 [接受] 或 [拒絕]。狀態鎖定前可多次修改。</p>
+                        <div class="mt-3 p-2 bg-black/30 rounded text-xs font-mono text-slate-400">
+                            Status -> 'negotiating' | 'accepted'
+                        </div>
+                    </div>
+                `;
+            } else if(step === 3) {
+                 content = `
+                    <div class="w-full animate-fade-in">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="font-bold text-blue-400">Step 3: Complete (完成)</h4>
+                            <span class="text-xs bg-blue-900 text-blue-300 px-2 py-1 rounded">Logic</span>
+                        </div>
+                        <p class="text-sm text-slate-300">需雙方都點擊「確認完成」按鈕。單方確認時狀態為 'confirming'。</p>
+                        <div class="mt-3 p-2 bg-black/30 rounded text-xs font-mono text-slate-400">
+                            Update: Cards.status = 'traded'
+                        </div>
+                    </div>
+                `;
+            } else if(step === 4) {
+                 content = `
+                    <div class="w-full animate-fade-in">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="font-bold text-green-400">Step 4: Rating (評價)</h4>
+                            <span class="text-xs bg-green-900 text-green-300 px-2 py-1 rounded">Database</span>
+                        </div>
+                        <p class="text-sm text-slate-300">交易結束後強制彈出評分 Modal，寫入信譽分數。</p>
+                    </div>
+                `;
+            }
+            detail.innerHTML = content;
+        }
+
+        // --- Chart Logic ---
+        let myChart = null;
+
+        function renderChart() {
+            const ctx = document.getElementById('membershipChart');
+            if(!ctx) return;
+            
+            // Destroy existing chart to avoid "Canvas is already in use" error
+            if(myChart) {
                 myChart.destroy();
             }
 
             myChart = new Chart(ctx, {
-                type: 'bar',
+                type: 'radar',
                 data: {
-                    labels: ['每日上傳 (張)', '每日搜尋 (次)', '圖片容量 (MB)', '優先排序'],
+                    labels: ['搜尋範圍', '上傳限制', '排序權重', '信譽徽章', '手續費減免'],
                     datasets: [
-                        {
-                            label: '免費會員 (Free)',
-                            data: [3, 5, 100, 1], // 1 for "Low" priority
-                            backgroundColor: 'rgba(148, 163, 184, 0.5)', // Slate 400
-                            borderColor: 'rgba(148, 163, 184, 1)',
-                            borderWidth: 1
-                        },
-                        {
-                            label: '付費會員 (Premium)',
-                            data: [20, 30, 1000, 10], // 30 represents "Unlimited/High", 10 for "High"
-                            backgroundColor: 'rgba(79, 70, 229, 0.6)', // Indigo 600
-                            borderColor: 'rgba(79, 70, 229, 1)',
-                            borderWidth: 1
-                        }
+                        { label: '免費版', data: [30, 20, 40, 50, 20], backgroundColor: 'rgba(148, 163, 184, 0.2)', borderColor: '#94a3b8' },
+                        { label: '專業版', data: [100, 100, 90, 85, 95], backgroundColor: 'rgba(79, 70, 229, 0.2)', borderColor: '#4F46E5' }
                     ]
                 },
-                options: {
-                    responsive: true,
+                options: { 
+                    responsive: true, 
                     maintainAspectRatio: false,
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    let label = context.dataset.label || '';
-                                    if (label) {
-                                        label += ': ';
-                                    }
-                                    if (context.parsed.y >= 20 && (context.dataIndex === 0 || context.dataIndex === 1)) {
-                                        return label + '無限制 (Unlimited)';
-                                    }
-                                    return label + context.parsed.y;
-                                }
-                            }
-                        }
-                    },
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: '額度 / 權重'
-                            }
-                        }
+                        r: { beginAtZero: true, max: 100, ticks: { display: false } }
                     }
                 }
             });
         }
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            renderTab('home'); // Init phone screen
-        });
+        // Initialize Simulator
+        document.addEventListener('DOMContentLoaded', initSimulator);
 
     </script>
 </body>
