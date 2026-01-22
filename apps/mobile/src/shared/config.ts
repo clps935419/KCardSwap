@@ -7,7 +7,6 @@ export const config = {
   appName: process.env.EXPO_PUBLIC_APP_NAME || '小卡Show!',
   appVersion: process.env.EXPO_PUBLIC_APP_VERSION || '1.0.0',
   env: process.env.EXPO_PUBLIC_ENV || 'development',
-  enableDevLogin: process.env.EXPO_PUBLIC_ENABLE_DEV_LOGIN === 'true',
 
   // API timeouts (in milliseconds)
   apiTimeout: 30000, // 30 seconds
@@ -16,4 +15,4 @@ export const config = {
 
 export const isDevelopment = config.env === 'development';
 export const isProduction = config.env === 'production';
-export const isDevLoginEnabled = config.enableDevLogin;
+export const isDevLoginEnabled = isDevelopment; // Show dev login in development mode
