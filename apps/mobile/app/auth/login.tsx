@@ -74,41 +74,50 @@ export default function LoginScreen() {
   };
 
   return (
-    <Box className="flex-1 items-center justify-center bg-white p-4">
-      <Heading size="3xl" className="mb-2 text-gray-800">
-        Welcome to KCardSwap
-      </Heading>
-      <Text size="md" className="mb-8 text-gray-600 text-center">
-        Sign in to start trading your cards
-      </Text>
+    <Box className="flex-1 items-center justify-center bg-white p-6">
+      {/* Logo/Title Section */}
+      <Box className="items-center mb-12">
+        <Heading size="2xl" className="font-black text-[rgb(169,142,216)] tracking-tight">
+          KCardSwap
+        </Heading>
+        <Text size="xs" className="text-[rgb(165,162,159)] mt-1 uppercase tracking-widest font-bold">
+          Find Your Bias
+        </Text>
+      </Box>
 
-      <Button
-        onPress={handleGoogleLogin}
-        isDisabled={isLoading}
-        size="lg"
-        className={`px-8 py-4 rounded-lg shadow-md ${
-          isLoading ? 'bg-blue-300' : 'bg-blue-500'
-        }`}
-      >
-        {isLoading ? (
-          <Spinner color="white" />
-        ) : (
-          <ButtonText size="lg" className="font-semibold">
-            Sign in with Google
-          </ButtonText>
-        )}
-      </Button>
+      {/* Google Login Button */}
+      <Box className="w-full max-w-sm space-y-4">
+        <Button
+          onPress={handleGoogleLogin}
+          isDisabled={isLoading}
+          className="w-full h-16 bg-white border border-[rgb(240,237,234)] rounded-2xl shadow-sm"
+        >
+          {isLoading ? (
+            <Spinner color="#A98ED8" />
+          ) : (
+            <Box className="flex-row items-center">
+              <Text size="xl" className="mr-4 font-bold">
+                G
+              </Text>
+              <ButtonText className="font-bold text-[rgb(133,130,127)]">
+                使用 Google 帳號登入
+              </ButtonText>
+            </Box>
+          )}
+        </Button>
 
+        {/* Terms Text */}
+        <Text size="xs" className="text-[rgb(165,162,159)] text-center px-4 leading-relaxed">
+          登入即表示您同意本平台的服務條款與隱私協議。
+        </Text>
+      </Box>
+
+      {/* Loading State */}
       {isLoading && (
-        <Text size="sm" className="mt-4 text-gray-500">
-          Redirecting to Google...
+        <Text size="sm" className="mt-6 text-[rgb(133,130,127)] font-medium">
+          正在連接 Google 帳號...
         </Text>
       )}
-
-      <Text size="sm" className="mt-8 text-gray-500 text-center">
-        Phase 3 (US1): Google OAuth with PKCE{'\n'}
-        Secure mobile authentication
-      </Text>
     </Box>
   );
 }
