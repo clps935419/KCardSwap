@@ -115,6 +115,13 @@ def create_application() -> FastAPI:
     app.include_router(auth_router, prefix=settings.API_PREFIX)
     app.include_router(profile_router, prefix=settings.API_PREFIX)
 
+    # Phase 3.2: Identity module (Idol Groups List)
+    from .modules.identity.presentation.routers.idols_router import (
+        router as idols_router,
+    )
+
+    app.include_router(idols_router, prefix=settings.API_PREFIX)
+
     # Phase 4: Social module (Cards)
     from .modules.social.presentation.routers.cards_router import (
         router as cards_router,
