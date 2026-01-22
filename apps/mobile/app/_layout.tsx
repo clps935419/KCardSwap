@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAuthStore } from '@/src/shared/state/authStore';
 import { GluestackUIProvider } from '@/src/shared/ui/components/gluestack-ui-provider';
 import { useNotifications } from '@/src/features/notifications/hooks/useNotifications';
+import { configureSDK } from '@/src/shared/api/sdk';
 import '@/global.css';
 
 // Create a client
@@ -15,6 +16,9 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+// Configure SDK once at module load
+configureSDK();
 
 export default function RootLayout() {
   const segments = useSegments();
