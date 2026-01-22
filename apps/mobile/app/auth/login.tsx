@@ -1,8 +1,10 @@
-import { Alert } from 'react-native';
+import { Alert, Platform } from 'react-native';
 import { useState } from 'react';
 import { router } from 'expo-router';
 import { useAuthStore } from '@/src/shared/state/authStore';
 import { googleLoginWithPKCE, isGoogleOAuthConfigured } from '@/src/shared/auth/googleOAuth';
+import { isDevLoginEnabled } from '@/src/shared/config';
+import { adminLoginApiV1AuthAdminLoginPost } from '@/src/shared/api/generated';
 import {
   Box,
   Text,
@@ -10,10 +12,14 @@ import {
   Button,
   ButtonText,
   Spinner,
+  Input,
+  InputField,
 } from '@/src/shared/ui/components';
 
 export default function LoginScreen() {
   const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const { login } = useAuthStore();
 
   const handleGoogleLogin = async () => {
@@ -23,8 +29,8 @@ export default function LoginScreen() {
       // Check if Google OAuth is configured
       if (!isGoogleOAuthConfigured()) {
         Alert.alert(
-          'Configuration Error',
-          'Google OAuth is not configured. Please set GOOGLE_CLIENT_ID in your .env file.'
+          '設定錯誤',
+          'Google OAuth 尚未設定。請在 .env 檔案中設定 GOOGLE_CLIENT_ID。'
         );
         return;
       }
@@ -57,17 +63,77 @@ export default function LoginScreen() {
     } catch (error: any) {
       console.error('Google login error:', error);
       
-      let errorMessage = 'Failed to sign in with Google. Please try again.';
+      let errorMessage = '使用 Google 帳號登入失敗，請再試一次。';
       
       if (error.message?.includes('cancelled')) {
-        errorMessage = 'Login was cancelled.';
+        errorMessage = '登入已取消。';
       } else if (error.message?.includes('timeout')) {
-        errorMessage = 'Connection timeout. Please check your network and try again.';
+        errorMessage = '連線逾時，請檢查網路連線後再試一次。';
       } else if (error.message?.includes('configuration')) {
         errorMessage = error.message;
       }
 
-      Alert.alert('Login Failed', errorMessage);
+      Alert.alert('登入失敗', errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDevLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('錯誤', '請輸入帳號和密碼');
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      console.log('Starting dev login...');
+
+      // Call admin login API
+      const response = await adminLoginApiV1AuthAdminLoginPost({
+        body: { email, password },
+      });
+
+      const result = response.data;
+      
+      if (!result) {
+        throw new Error('登入回應無效');
+      }
+
+      console.log('Dev login successful, user:', result.email);
+
+      // Calculate token expiration time
+      const expiresAt = Date.now() + result.expires_in * 1000;
+
+      // Save tokens and user data to auth store
+      await login(
+        {
+          accessToken: result.access_token,
+          refreshToken: result.refresh_token,
+          expiresAt,
+        },
+        {
+          id: result.user_id,
+          email: result.email,
+        }
+      );
+
+      // Navigate to main app
+      router.replace('/(tabs)');
+    } catch (error: any) {
+      console.error('Dev login error:', error);
+      
+      let errorMessage = '登入失敗，請檢查帳號密碼是否正確。';
+      
+      if (error.response?.status === 401) {
+        errorMessage = '帳號或密碼錯誤';
+      } else if (error.response?.status === 404) {
+        errorMessage = '找不到此帳號';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      Alert.alert('登入失敗', errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -75,31 +141,83 @@ export default function LoginScreen() {
 
   return (
     <Box className="flex-1 items-center justify-center bg-white p-6">
-      {/* Logo/Title Section */}
+      {/* Logo/Title Section - 小卡Show! Branding */}
       <Box className="items-center mb-12">
-        <Heading size="2xl" className="font-black text-[rgb(169,142,216)] tracking-tight">
-          KCardSwap
+        {/* Logo Icon */}
+        <Box className="w-20 h-20 bg-gradient-to-br from-pink-500 to-rose-400 rounded-3xl mb-4 items-center justify-center shadow-2xl">
+          <Text size="3xl">✨</Text>
+        </Box>
+        
+        <Heading size="2xl" className="font-black text-slate-900 tracking-tight">
+          小卡Show!
         </Heading>
-        <Text size="xs" className="text-[rgb(165,162,159)] mt-1 uppercase tracking-widest font-bold">
+        <Text size="xs" className="text-slate-400 mt-1 uppercase tracking-widest font-bold">
           Find Your Bias
         </Text>
       </Box>
 
-      {/* Google Login Button */}
+      {/* Login Forms */}
       <Box className="w-full max-w-sm space-y-4">
+        {/* Development Mode: Email/Password Login */}
+        {isDevLoginEnabled && (
+          <Box className="space-y-4 mb-6 p-4 bg-slate-50 rounded-2xl border border-slate-200">
+            <Text size="xs" className="text-slate-500 font-bold uppercase tracking-wider text-center">
+              開發者模式
+            </Text>
+            
+            <Input variant="outline" size="md" className="bg-white">
+              <InputField
+                placeholder="電子信箱"
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                editable={!isLoading}
+              />
+            </Input>
+
+            <Input variant="outline" size="md" className="bg-white">
+              <InputField
+                placeholder="密碼"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+                editable={!isLoading}
+              />
+            </Input>
+
+            <Button
+              onPress={handleDevLogin}
+              isDisabled={isLoading}
+              className="w-full h-12 bg-slate-700 rounded-xl"
+            >
+              {isLoading ? (
+                <Spinner color="#ffffff" />
+              ) : (
+                <ButtonText className="font-bold text-white">
+                  開發者登入
+                </ButtonText>
+              )}
+            </Button>
+
+            <Box className="w-full h-px bg-slate-200 my-4" />
+          </Box>
+        )}
+
+        {/* Google Login Button */}
         <Button
           onPress={handleGoogleLogin}
           isDisabled={isLoading}
-          className="w-full h-16 bg-white border border-[rgb(240,237,234)] rounded-2xl shadow-sm"
+          className="w-full h-16 bg-white border border-slate-200 rounded-2xl shadow-sm"
         >
           {isLoading ? (
-            <Spinner color="#A98ED8" />
+            <Spinner color="#EC4899" />
           ) : (
             <Box className="flex-row items-center">
-              <Text size="xl" className="mr-4 font-bold">
+              <Text size="xl" className="mr-4 font-bold text-slate-700">
                 G
               </Text>
-              <ButtonText className="font-bold text-[rgb(133,130,127)]">
+              <ButtonText className="font-bold text-slate-700">
                 使用 Google 帳號登入
               </ButtonText>
             </Box>
@@ -107,15 +225,15 @@ export default function LoginScreen() {
         </Button>
 
         {/* Terms Text */}
-        <Text size="xs" className="text-[rgb(165,162,159)] text-center px-4 leading-relaxed">
+        <Text size="xs" className="text-slate-400 text-center px-4 leading-relaxed">
           登入即表示您同意本平台的服務條款與隱私協議。
         </Text>
       </Box>
 
       {/* Loading State */}
       {isLoading && (
-        <Text size="sm" className="mt-6 text-[rgb(133,130,127)] font-medium">
-          正在連接 Google 帳號...
+        <Text size="sm" className="mt-6 text-slate-500 font-medium">
+          正在連接帳號...
         </Text>
       )}
     </Box>
