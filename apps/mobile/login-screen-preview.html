@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小卡Show! 登入畫面預覽</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen flex items-center justify-center p-4">
+    <div class="max-w-6xl w-full">
+        <h1 class="text-3xl font-black text-center mb-8 text-slate-900">小卡Show! 登入畫面實作預覽</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- 生產模式 -->
+            <div class="bg-white rounded-3xl shadow-2xl overflow-hidden">
+                <div class="bg-slate-900 text-white py-3 px-6">
+                    <h2 class="font-bold text-lg">生產模式 (Production)</h2>
+                    <p class="text-xs text-slate-400">EXPO_PUBLIC_ENABLE_DEV_LOGIN=false</p>
+                </div>
+                
+                <div class="aspect-[9/16] bg-white flex flex-col items-center justify-center p-8">
+                    <!-- Logo Section -->
+                    <div class="text-center mb-12">
+                        <div class="w-20 h-20 bg-gradient-to-br from-pink-500 to-rose-400 rounded-3xl mx-auto flex items-center justify-center text-4xl shadow-2xl shadow-pink-200 mb-4 ring-4 ring-pink-50">
+                            ✨
+                        </div>
+                        <h3 class="text-3xl font-black text-slate-900 tracking-tight mb-1">
+                            小卡Show!
+                        </h3>
+                        <p class="text-xs text-slate-400 uppercase tracking-widest font-bold">
+                            Find Your Bias
+                        </p>
+                    </div>
+                    
+                    <!-- Login Button -->
+                    <div class="w-full max-w-sm space-y-4">
+                        <button class="w-full h-16 bg-white border border-slate-200 rounded-2xl flex items-center px-6 hover:bg-slate-50 transition-all shadow-sm group">
+                            <div class="w-8 h-8 flex items-center justify-center text-xl font-bold text-slate-700 mr-4 group-hover:scale-110 transition-transform">
+                                G
+                            </div>
+                            <span class="font-bold text-slate-700">使用 Google 帳號登入</span>
+                        </button>
+                        
+                        <p class="text-xs text-slate-400 text-center px-4 leading-relaxed">
+                            登入即表示您同意本平台的服務條款與隱私協議。
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 開發模式 -->
+            <div class="bg-white rounded-3xl shadow-2xl overflow-hidden">
+                <div class="bg-indigo-600 text-white py-3 px-6">
+                    <h2 class="font-bold text-lg">開發模式 (Development)</h2>
+                    <p class="text-xs text-indigo-200">EXPO_PUBLIC_ENABLE_DEV_LOGIN=true</p>
+                </div>
+                
+                <div class="aspect-[9/16] bg-white flex flex-col items-center justify-center p-8">
+                    <!-- Logo Section -->
+                    <div class="text-center mb-8">
+                        <div class="w-20 h-20 bg-gradient-to-br from-pink-500 to-rose-400 rounded-3xl mx-auto flex items-center justify-center text-4xl shadow-2xl shadow-pink-200 mb-4 ring-4 ring-pink-50">
+                            ✨
+                        </div>
+                        <h3 class="text-3xl font-black text-slate-900 tracking-tight mb-1">
+                            小卡Show!
+                        </h3>
+                        <p class="text-xs text-slate-400 uppercase tracking-widest font-bold">
+                            Find Your Bias
+                        </p>
+                    </div>
+                    
+                    <!-- Dev Login Section -->
+                    <div class="w-full max-w-sm space-y-4">
+                        <!-- Dev Mode Box -->
+                        <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 space-y-4">
+                            <p class="text-xs text-slate-500 font-bold uppercase tracking-wider text-center">
+                                開發者模式
+                            </p>
+                            
+                            <input 
+                                type="email" 
+                                placeholder="電子信箱" 
+                                class="w-full h-12 px-4 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500"
+                            />
+                            
+                            <input 
+                                type="password" 
+                                placeholder="密碼" 
+                                class="w-full h-12 px-4 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500"
+                            />
+                            
+                            <button class="w-full h-12 bg-slate-700 hover:bg-slate-800 text-white font-bold rounded-xl transition-colors">
+                                開發者登入
+                            </button>
+                            
+                            <div class="w-full h-px bg-slate-200"></div>
+                        </div>
+                        
+                        <!-- Google Login Button -->
+                        <button class="w-full h-16 bg-white border border-slate-200 rounded-2xl flex items-center px-6 hover:bg-slate-50 transition-all shadow-sm group">
+                            <div class="w-8 h-8 flex items-center justify-center text-xl font-bold text-slate-700 mr-4 group-hover:scale-110 transition-transform">
+                                G
+                            </div>
+                            <span class="font-bold text-slate-700">使用 Google 帳號登入</span>
+                        </button>
+                        
+                        <p class="text-xs text-slate-400 text-center px-4 leading-relaxed">
+                            登入即表示您同意本平台的服務條款與隱私協議。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Legend -->
+        <div class="mt-8 bg-white rounded-2xl p-6 shadow-lg">
+            <h3 class="text-xl font-bold mb-4 text-slate-900">🎨 設計規格</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="space-y-2">
+                    <h4 class="font-bold text-sm text-slate-700">Logo</h4>
+                    <ul class="text-xs text-slate-600 space-y-1">
+                        <li>• 尺寸：80x80px (w-20 h-20)</li>
+                        <li>• 漸層：Pink-500 → Rose-400</li>
+                        <li>• 圓角：rounded-3xl (24px)</li>
+                        <li>• 圖示：✨ emoji</li>
+                        <li>• 陰影：shadow-2xl + ring-4 pink-50</li>
+                    </ul>
+                </div>
+                <div class="space-y-2">
+                    <h4 class="font-bold text-sm text-slate-700">品牌</h4>
+                    <ul class="text-xs text-slate-600 space-y-1">
+                        <li>• 名稱：小卡Show!</li>
+                        <li>• 字體：font-black (900)</li>
+                        <li>• 顏色：text-slate-900</li>
+                        <li>• 副標題：Find Your Bias</li>
+                        <li>• 副標題樣式：text-slate-400 uppercase</li>
+                    </ul>
+                </div>
+                <div class="space-y-2">
+                    <h4 class="font-bold text-sm text-slate-700">開發模式</h4>
+                    <ul class="text-xs text-slate-600 space-y-1">
+                        <li>• 背景：bg-slate-50</li>
+                        <li>• 邊框：border-slate-200</li>
+                        <li>• 按鈕：bg-slate-700</li>
+                        <li>• 標籤：uppercase tracking-wider</li>
+                        <li>• 環境變數控制顯示/隱藏</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Technical Info -->
+        <div class="mt-4 bg-slate-50 rounded-2xl p-6 border border-slate-200">
+            <h3 class="text-lg font-bold mb-3 text-slate-900">⚙️ 技術實作</h3>
+            <div class="space-y-2 text-sm">
+                <div class="flex items-start">
+                    <span class="font-bold text-slate-700 w-32 flex-shrink-0">框架：</span>
+                    <span class="text-slate-600">React Native (Expo SDK 54) + Gluestack UI</span>
+                </div>
+                <div class="flex items-start">
+                    <span class="font-bold text-slate-700 w-32 flex-shrink-0">樣式：</span>
+                    <span class="text-slate-600">Tailwind CSS (NativeWind)</span>
+                </div>
+                <div class="flex items-start">
+                    <span class="font-bold text-slate-700 w-32 flex-shrink-0">API：</span>
+                    <span class="text-slate-600">POST /api/v1/auth/admin-login (開發模式)</span>
+                </div>
+                <div class="flex items-start">
+                    <span class="font-bold text-slate-700 w-32 flex-shrink-0">驗證：</span>
+                    <span class="text-slate-600">Zustand (state) + expo-secure-store (tokens)</span>
+                </div>
+                <div class="flex items-start">
+                    <span class="font-bold text-slate-700 w-32 flex-shrink-0">切換：</span>
+                    <span class="text-slate-600">EXPO_PUBLIC_ENABLE_DEV_LOGIN (true/false)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
