@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KCardSwap 產品設計規格導覽 - V4 (Fixed & Complete)</title>
+    <title>KCardSwap 產品設計規格導覽 - V5 (Logo Concepts)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     
     <style>
         body {
@@ -52,6 +52,12 @@
             to { transform: translateY(0); }
         }
         .animate-slide-up { animation: slideUp 0.3s ease-out; }
+
+        /* Logo Concept Styles */
+        .logo-grid-bg {
+            background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
     </style>
 </head>
 <body class="text-slate-800">
@@ -59,17 +65,14 @@
     <!-- REQUIRED PLACEHOLDERS -->
     <!-- Chosen Palette: Indigo-600 (Primary), Pink-500 (Secondary), Slate-50 (Bg) -->
     <!-- Application Structure Plan: 
-         1. 側邊欄導航：控制主要規格章節。
-         2. 互動原型區：
-            - Entry: Google Login 模擬。
-            - Flow: Login -> Loading -> Onboarding (Bias Selection) -> Main App.
-            - Main App: 完整的 Tab 切換 (首頁/附近/上傳/聊天/個人) 與詳細頁面模擬。
-         3. 交換邏輯區：互動式步驟條，點擊顯示狀態機細節。
-         4. 會員權益區：Chart.js 雷達圖。 -->
+         1. 側邊欄導航：新增「Logo 設計發想」章節。
+         2. Logo 區塊：展示「KCardSwap (原案)」、「小卡Show!」、「小卡蒐」三種設計概念與 CSS 實現的 Mockup。
+         3. 互動原型區：維持 V4 的完整功能。
+         4. 交換邏輯區：維持 V4。
+         5. 會員權益區：維持 V4。 -->
     <!-- Visualization & Content Choices:
-         - Mobile Simulator: HTML/CSS/JS 全功能模擬。
-         - Step-by-Step Logic: 互動式 Grid。
-         - Data Viz: Canvas Chart.js。
+         - Logo Concepts: 使用 HTML/CSS 幾何圖形 (div, border-radius) 模擬 App Icon，不依賴圖片檔。
+         - Typography: 使用 Google Fonts 展示品牌字體搭配。
          CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
 
     <div class="min-h-screen flex flex-col md:flex-row">
@@ -78,11 +81,14 @@
         <aside class="w-full md:w-72 bg-white border-r border-slate-200 flex-shrink-0 sticky top-0 md:h-screen overflow-y-auto z-20">
             <div class="p-8">
                 <h1 class="text-2xl font-black text-indigo-600 tracking-tighter">KCardSwap<span class="text-pink-500">.</span></h1>
-                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-2">Design Spec V4 (Fixed)</p>
+                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-2">Design Spec V5 (Logo)</p>
             </div>
             
             <nav class="px-6 space-y-1">
-                <button onclick="switchSection('login-spec')" class="nav-item active w-full text-left px-4 py-4 rounded-xl text-sm font-bold transition-all flex items-center">
+                <button onclick="switchSection('logo-design')" class="nav-item active w-full text-left px-4 py-4 rounded-xl text-sm font-bold transition-all flex items-center">
+                    <span class="mr-3 text-lg">🎨</span> Logo 設計發想 <span class="ml-auto bg-pink-100 text-pink-600 text-[10px] px-2 py-0.5 rounded-full">New</span>
+                </button>
+                <button onclick="switchSection('login-spec')" class="nav-item w-full text-left px-4 py-4 rounded-xl text-sm font-bold transition-all flex items-center">
                     <span class="mr-3 text-lg">🔑</span> 登入流程規範
                 </button>
                 <button onclick="switchSection('prototype')" class="nav-item w-full text-left px-4 py-4 rounded-xl text-sm font-bold transition-all flex items-center">
@@ -97,18 +103,128 @@
             </nav>
 
             <div class="mt-auto p-8 border-t border-slate-50">
-                <div class="bg-green-50 p-4 rounded-xl border border-green-100">
-                    <p class="text-[10px] text-green-600 font-bold uppercase mb-1">Status: Fixed</p>
-                    <p class="text-xs text-green-800 font-medium">所有互動流程已修復，包含 App 內導航與邏輯展示。</p>
+                <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100">
+                    <p class="text-[10px] text-indigo-600 font-bold uppercase mb-1">Update</p>
+                    <p class="text-xs text-indigo-800 font-medium">新增「小卡Show!」與「小卡蒐」品牌識別提案。</p>
                 </div>
             </div>
         </aside>
 
         <!-- Content Area -->
         <main class="flex-1 bg-slate-50 p-4 md:p-12 overflow-y-auto" id="main-content">
+
+            <!-- SECTION: LOGO DESIGN -->
+            <section id="logo-design-section" class="space-y-8 animate-fade-in">
+                <div class="max-w-5xl">
+                    <h2 class="text-3xl font-black text-slate-900 mb-6">品牌識別與 Logo 提案</h2>
+                    <p class="text-lg text-slate-500 mb-8">針對中文市場發想的兩個新命名方向，分別強調「展示社群」與「收藏搜尋」兩種核心價值。</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        
+                        <!-- Option A: Original -->
+                        <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition-all group">
+                            <div class="logo-grid-bg h-48 rounded-2xl mb-6 flex items-center justify-center relative overflow-hidden">
+                                <!-- CSS Logo Construction -->
+                                <div class="w-24 h-24 bg-indigo-600 rounded-2xl transform rotate-3 shadow-xl flex items-center justify-center group-hover:rotate-6 transition-transform">
+                                    <div class="text-5xl">📂</div>
+                                </div>
+                                <div class="absolute -bottom-2 -right-2 w-12 h-12 bg-pink-500 rounded-full flex items-center justify-center text-white font-bold border-4 border-white">⇄</div>
+                            </div>
+                            <h3 class="text-xl font-bold text-slate-800 mb-2">Option A: KCardSwap</h3>
+                            <p class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-4">Functional • Trust • Direct</p>
+                            <p class="text-sm text-slate-600 leading-relaxed">
+                                原案設計。強調「交換 (Swap)」的功能性。圖標使用卡冊文件夾結合交換箭頭，傳達專業與工具屬性。
+                            </p>
+                        </div>
+
+                        <!-- Option B: Show -->
+                        <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition-all group ring-2 ring-transparent hover:ring-pink-500">
+                            <div class="logo-grid-bg h-48 rounded-2xl mb-6 flex items-center justify-center relative overflow-hidden">
+                                <!-- CSS Logo Construction -->
+                                <div class="relative">
+                                    <div class="w-24 h-32 bg-gradient-to-br from-pink-500 to-rose-400 rounded-xl shadow-xl transform -rotate-6 flex items-center justify-center group-hover:-rotate-12 transition-transform">
+                                        <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                                            <span class="text-4xl">✨</span>
+                                        </div>
+                                    </div>
+                                    <div class="absolute -top-2 -right-2 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg animate-bounce">
+                                        <span class="text-xs font-black text-yellow-900">S!</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2 mb-2">
+                                <h3 class="text-xl font-black text-slate-900">小卡Show!</h3>
+                                <span class="bg-pink-100 text-pink-600 text-[10px] px-2 py-1 rounded-full font-bold">推薦</span>
+                            </div>
+                            <p class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-4">Energetic • Social • Stage</p>
+                            <p class="text-sm text-slate-600 leading-relaxed">
+                                概念：每個人的收藏都是一場秀。以高彩度的粉色系為主，結合「聚光燈」與「閃耀」元素，吸引喜歡分享的年輕族群。
+                            </p>
+                        </div>
+
+                        <!-- Option C: Sou -->
+                        <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition-all group">
+                            <div class="logo-grid-bg h-48 rounded-2xl mb-6 flex items-center justify-center relative overflow-hidden">
+                                <!-- CSS Logo Construction -->
+                                <div class="relative w-28 h-28 flex items-center justify-center">
+                                    <!-- Card Stack -->
+                                    <div class="absolute top-4 left-4 w-16 h-20 bg-slate-300 rounded-lg transform -rotate-12"></div>
+                                    <div class="absolute top-2 left-6 w-16 h-20 bg-indigo-300 rounded-lg transform -rotate-6"></div>
+                                    <div class="absolute top-0 left-8 w-16 h-20 bg-indigo-600 rounded-lg shadow-lg z-10"></div>
+                                    <!-- Magnifying Glass -->
+                                    <div class="absolute -bottom-2 -right-2 w-14 h-14 border-4 border-slate-800 bg-white/50 backdrop-blur rounded-full z-20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <div class="w-8 h-8 bg-indigo-600 rounded-full opacity-20"></div>
+                                    </div>
+                                    <div class="absolute bottom-0 right-0 w-4 h-10 bg-slate-800 transform -rotate-45 translate-y-3 translate-x-3 rounded-full z-10"></div>
+                                </div>
+                            </div>
+                            <h3 class="text-xl font-bold text-slate-800 mb-2">小卡蒐 (Sou)</h3>
+                            <p class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-4">Search • Collection • Soul</p>
+                            <p class="text-sm text-slate-600 leading-relaxed">
+                                概念：專注於「蒐集」與「尋找」。以放大鏡與卡片堆疊為核心，強調功能性與資料庫的完整度。Sou 亦諧音 Soul (本命魂)。
+                            </p>
+                        </div>
+
+                    </div>
+                    
+                    <!-- App Icon Preview -->
+                    <div class="mt-12 bg-white p-8 rounded-3xl border border-slate-100">
+                        <h3 class="text-lg font-bold text-slate-800 mb-6">App Icon 應用預覽 (Home Screen)</h3>
+                        <div class="flex justify-around items-center bg-slate-100 p-8 rounded-2xl overflow-hidden relative">
+                            <!-- Background Pattern -->
+                            <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#6366f1 2px, transparent 2px); background-size: 30px 30px;"></div>
+
+                            <!-- Icon 1 -->
+                            <div class="text-center z-10">
+                                <div class="w-16 h-16 bg-indigo-600 rounded-2xl shadow-xl flex items-center justify-center mb-2 mx-auto">
+                                    <span class="text-2xl">📂</span>
+                                </div>
+                                <p class="text-xs font-medium text-slate-600">KCardSwap</p>
+                            </div>
+
+                            <!-- Icon 2 -->
+                            <div class="text-center z-10">
+                                <div class="w-16 h-16 bg-gradient-to-br from-pink-500 to-rose-400 rounded-2xl shadow-xl flex items-center justify-center mb-2 mx-auto ring-4 ring-pink-200">
+                                    <span class="text-2xl text-white font-black">S!</span>
+                                </div>
+                                <p class="text-xs font-bold text-slate-900">小卡Show!</p>
+                            </div>
+
+                            <!-- Icon 3 -->
+                            <div class="text-center z-10">
+                                <div class="w-16 h-16 bg-slate-900 rounded-2xl shadow-xl flex items-center justify-center mb-2 mx-auto relative overflow-hidden">
+                                    <div class="absolute top-2 right-2 w-8 h-8 bg-indigo-500 rounded-full blur-xl"></div>
+                                    <span class="text-2xl relative z-10">🔍</span>
+                                </div>
+                                <p class="text-xs font-medium text-slate-600">小卡蒐</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
             
-            <!-- SECTION: LOGIN SPEC -->
-            <section id="login-spec-section" class="space-y-8 animate-fade-in">
+            <!-- SECTION: LOGIN SPEC (Original) -->
+            <section id="login-spec-section" class="hidden space-y-8 animate-fade-in">
                 <div class="max-w-4xl">
                     <h2 class="text-3xl font-black text-slate-900 mb-4">登入流程規範 (Login Workflow)</h2>
                     <p class="text-lg text-slate-500 mb-8">採用 Google OAuth 2.0 作為主要身分驗證手段，旨在減少註冊負擔並提升安全性。</p>
@@ -133,7 +249,7 @@
                 </div>
             </section>
 
-            <!-- SECTION: PROTOTYPE -->
+            <!-- SECTION: PROTOTYPE (Original) -->
             <section id="prototype-section" class="hidden space-y-8 animate-fade-in">
                 <div class="grid grid-cols-1 xl:grid-cols-2 gap-12 items-start">
                     
@@ -178,7 +294,7 @@
                 </div>
             </section>
 
-            <!-- SECTION: TRADE LOGIC -->
+            <!-- SECTION: TRADE LOGIC (Original) -->
             <section id="trade-logic-section" class="hidden animate-fade-in">
                 <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
                     <h2 class="text-2xl font-bold mb-2">交換狀態機 (Trading State Machine)</h2>
@@ -213,7 +329,7 @@
                 </div>
             </section>
 
-            <!-- SECTION: MEMBERSHIP -->
+            <!-- SECTION: MEMBERSHIP (Original) -->
             <section id="membership-section" class="hidden animate-fade-in">
                 <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
                     <h2 class="text-2xl font-bold mb-6">權益層級對比</h2>
@@ -279,8 +395,9 @@
             phoneScreen.innerHTML = `
                 <div class="h-full flex flex-col items-center justify-between p-8 py-20 animate-fade-in">
                     <div class="text-center">
-                        <div class="w-20 h-20 bg-indigo-600 rounded-3xl mx-auto flex items-center justify-center text-3xl shadow-2xl mb-4">📂</div>
-                        <h2 class="text-2xl font-black text-slate-900">KCardSwap</h2>
+                        <!-- Updated Logo in Simulator -->
+                        <div class="w-20 h-20 bg-gradient-to-br from-pink-500 to-rose-400 rounded-3xl mx-auto flex items-center justify-center text-4xl shadow-2xl shadow-pink-200 mb-4 ring-4 ring-pink-50">✨</div>
+                        <h2 class="text-2xl font-black text-slate-900">小卡Show!</h2>
                         <p class="text-xs text-slate-400 mt-1 uppercase tracking-widest font-bold">Find Your Bias</p>
                     </div>
 
@@ -304,7 +421,7 @@
             phoneScreen.innerHTML = `
                 <div class="h-full flex flex-col items-center justify-center space-y-6 animate-fade-in">
                     <div class="relative">
-                        <div class="w-16 h-16 border-4 border-slate-100 border-t-indigo-600 rounded-full animate-spin"></div>
+                        <div class="w-16 h-16 border-4 border-slate-100 border-t-pink-500 rounded-full animate-spin"></div>
                         <div class="absolute inset-0 flex items-center justify-center text-lg font-bold text-slate-700">G</div>
                     </div>
                     <p class="text-sm font-bold text-slate-500">正在連接 Google 帳號...</p>
@@ -375,7 +492,7 @@
                     <nav class="absolute bottom-6 left-6 right-6 h-16 bg-white/90 backdrop-blur-md border border-white/20 shadow-2xl rounded-3xl flex justify-around items-center px-2 z-20">
                         <button onclick="renderTab('home')" class="nav-btn text-xl text-indigo-600 transition-transform active:scale-90">🏠</button>
                         <button onclick="renderTab('nearby')" class="nav-btn text-xl text-slate-300 transition-transform active:scale-90">📍</button>
-                        <button onclick="renderTab('upload')" class="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center text-white text-xl shadow-lg -mt-8 transition-transform active:scale-90">+</button>
+                        <button onclick="renderTab('upload')" class="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center text-white text-xl shadow-lg -mt-8 transition-transform active:scale-90 hover:scale-105">+</button>
                         <button onclick="renderTab('chat')" class="nav-btn text-xl text-slate-300 transition-transform active:scale-90">💬</button>
                         <button onclick="renderTab('profile')" class="nav-btn text-xl text-slate-300 transition-transform active:scale-90">👤</button>
                     </nav>
@@ -401,7 +518,7 @@
                 body.innerHTML = `
                     <div class="px-6 py-4 space-y-4">
                         ${mockData.feeds.map(f => `
-                            <div class="bg-white p-4 rounded-3xl shadow-sm border border-slate-100">
+                            <div class="bg-white p-4 rounded-3xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow cursor-pointer">
                                 <div class="w-full h-32 bg-slate-100 rounded-2xl mb-3 bg-cover bg-center" style="background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjZjFmM2Y1Ij48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIvPjwvc3ZnPg==')"></div>
                                 <div class="flex justify-between items-start">
                                     <div>
@@ -422,7 +539,7 @@
                             <span class="text-xs font-bold text-slate-400">距離 5km 內</span>
                         </div>
                         ${mockData.nearby.map(u => `
-                            <div class="bg-white p-3 rounded-2xl shadow-sm border ${u.vip ? 'border-indigo-100 bg-indigo-50/30' : 'border-slate-100'} flex items-center justify-between">
+                            <div class="bg-white p-3 rounded-2xl shadow-sm border ${u.vip ? 'border-indigo-100 bg-indigo-50/30' : 'border-slate-100'} flex items-center justify-between hover:shadow-md transition-shadow">
                                 <div class="flex items-center">
                                     <div class="w-10 h-10 bg-slate-200 rounded-full mr-3 relative">
                                         ${u.vip ? '<div class="absolute -top-1 -right-1 text-[8px]">👑</div>' : ''}
@@ -454,7 +571,7 @@
                 title.innerText = '訊息 (1)';
                 body.innerHTML = `
                     <div class="px-6 py-4">
-                        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
+                        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between hover:bg-slate-50 cursor-pointer">
                             <div class="flex items-center">
                                 <div class="w-10 h-10 bg-indigo-100 rounded-full mr-3 relative">
                                     <div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full"></div>
@@ -585,7 +702,11 @@
         }
 
         // Initialize Simulator
-        document.addEventListener('DOMContentLoaded', initSimulator);
+        document.addEventListener('DOMContentLoaded', () => {
+            initSimulator();
+            // Default to Logo Section for feedback
+            switchSection('logo-design');
+        });
 
     </script>
 </body>
