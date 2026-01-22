@@ -29,6 +29,7 @@ import {
   getChatRoomsApiV1ChatsGet,
   getCitiesApiV1LocationsCitiesGet,
   getFriendsApiV1FriendsGet,
+  getIdolGroupsApiV1IdolsGroupsGet,
   getMessagesApiV1ChatsRoomIdMessagesGet,
   getMyCardsApiV1CardsMeGet,
   getMyProfileApiV1ProfileMeGet,
@@ -105,6 +106,8 @@ import type {
   GetFriendsApiV1FriendsGetData,
   GetFriendsApiV1FriendsGetError,
   GetFriendsApiV1FriendsGetResponse,
+  GetIdolGroupsApiV1IdolsGroupsGetData,
+  GetIdolGroupsApiV1IdolsGroupsGetResponse,
   GetMessagesApiV1ChatsRoomIdMessagesGetData,
   GetMessagesApiV1ChatsRoomIdMessagesGetError,
   GetMessagesApiV1ChatsRoomIdMessagesGetResponse,
@@ -465,6 +468,47 @@ export const updateMyProfileApiV1ProfileMePutMutation = (
   };
   return mutationOptions;
 };
+
+export const getIdolGroupsApiV1IdolsGroupsGetQueryKey = (
+  options?: Options<GetIdolGroupsApiV1IdolsGroupsGetData>
+) => createQueryKey('getIdolGroupsApiV1IdolsGroupsGet', options);
+
+/**
+ * Get all idol groups
+ *
+ * Get a list of all available K-pop idol groups for onboarding.
+ *
+ * This endpoint provides the complete list of idol groups that users can select
+ * during the onboarding process to indicate their preferences.
+ *
+ * Each idol group includes:
+ * - `id`: Unique identifier (e.g., newjeans, ive, aespa)
+ * - `name`: Display name (e.g., NewJeans, IVE, aespa)
+ * - `emoji`: Emoji representing the group (e.g., 👖, 🦢, 🦋)
+ *
+ * This is a **public endpoint** that **does not require authentication**.
+ * Frontend applications should use this to dynamically populate idol group selection.
+ */
+export const getIdolGroupsApiV1IdolsGroupsGetOptions = (
+  options?: Options<GetIdolGroupsApiV1IdolsGroupsGetData>
+) =>
+  queryOptions<
+    GetIdolGroupsApiV1IdolsGroupsGetResponse,
+    DefaultError,
+    GetIdolGroupsApiV1IdolsGroupsGetResponse,
+    ReturnType<typeof getIdolGroupsApiV1IdolsGroupsGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getIdolGroupsApiV1IdolsGroupsGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getIdolGroupsApiV1IdolsGroupsGetQueryKey(options),
+  });
 
 /**
  * Get upload signed URL
