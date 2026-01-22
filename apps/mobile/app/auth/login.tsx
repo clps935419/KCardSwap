@@ -5,6 +5,7 @@ import { useAuthStore } from '@/src/shared/state/authStore';
 import { googleLoginWithPKCE, isGoogleOAuthConfigured } from '@/src/shared/auth/googleOAuth';
 import { isDevLoginEnabled } from '@/src/shared/config';
 import { adminLoginApiV1AuthAdminLoginPost } from '@/src/shared/api/generated';
+import { brandShadows } from '@/src/shared/styles/shadows';
 import {
   Box,
   Text,
@@ -162,12 +163,12 @@ export default function LoginScreen() {
       <Box className="w-full max-w-sm space-y-4">
         {/* Development Mode: Email/Password Login */}
         {isDevLoginEnabled && (
-          <Box className="space-y-4 mb-6 p-4 bg-slate-50 rounded-2xl border border-slate-200">
+          <Box className={`space-y-4 mb-6 p-4 bg-slate-50 rounded-2xl border border-slate-200 ${brandShadows.devSection}`}>
             <Text size="xs" className="text-slate-500 font-bold uppercase tracking-wider text-center">
               開發者模式
             </Text>
             
-            <Input variant="outline" size="md" className="bg-white">
+            <Input variant="outline" size="md" className={`bg-white ${brandShadows.input}`}>
               <InputField
                 placeholder="電子信箱"
                 value={email}
@@ -178,7 +179,7 @@ export default function LoginScreen() {
               />
             </Input>
 
-            <Input variant="outline" size="md" className="bg-white">
+            <Input variant="outline" size="md" className={`bg-white ${brandShadows.input}`}>
               <InputField
                 placeholder="密碼"
                 value={password}
@@ -191,7 +192,7 @@ export default function LoginScreen() {
             <Button
               onPress={handleDevLogin}
               isDisabled={isLoading}
-              className="w-full h-12 bg-slate-700 rounded-xl"
+              className={`w-full h-12 bg-slate-700 rounded-xl ${brandShadows.devButton}`}
             >
               {isLoading ? (
                 <Spinner color="#ffffff" />
@@ -210,13 +211,13 @@ export default function LoginScreen() {
         <Button
           onPress={handleGoogleLogin}
           isDisabled={isLoading}
-          className="w-full h-16 bg-gradient-to-r from-pink-50 to-rose-50 border-2 border-pink-200 rounded-2xl shadow-md"
+          className={`w-full h-16 bg-gradient-to-r from-pink-50 to-rose-50 border-2 border-pink-200 rounded-2xl ${brandShadows.googleButton}`}
         >
           {isLoading ? (
             <Spinner color="#EC4899" />
           ) : (
             <Box className="flex-row items-center justify-center">
-              <Box className="w-10 h-10 bg-white rounded-full items-center justify-center mr-3 shadow-sm">
+              <Box className={`w-10 h-10 bg-white rounded-full items-center justify-center mr-3 ${brandShadows.googleIcon}`}>
                 <Text size="xl" className="font-black text-pink-500">
                   G
                 </Text>
