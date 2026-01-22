@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Slot, useRouter, useSegments } from 'expo-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAuthStore } from '@/src/shared/state/authStore';
@@ -6,6 +6,10 @@ import { GluestackUIProvider } from '@/src/shared/ui/components/gluestack-ui-pro
 import { useNotifications } from '@/src/features/notifications/hooks/useNotifications';
 import { configureSDK } from '@/src/shared/api/sdk';
 import '@/global.css';
+
+// Configure SDK at module load time (before any components render)
+// This ensures all API calls have the correct baseURL from the start
+configureSDK();
 
 // Create a client
 const queryClient = new QueryClient({
@@ -21,25 +25,19 @@ export default function RootLayout() {
   const segments = useSegments();
   const router = useRouter();
   const { isAuthenticated, isLoading, initialize } = useAuthStore();
-  const [sdkConfigured, setSdkConfigured] = useState(false);
 
   // Initialize push notifications (M404)
   useNotifications();
 
-  // Configure SDK and initialize auth on app start
+  // Initialize auth on app start
   useEffect(() => {
-    // Configure SDK first
-    configureSDK();
-    setSdkConfigured(true);
-    
-    // Then initialize auth
     initialize();
   }, []);
 
   // Handle navigation based on auth state
   useEffect(() => {
-    // Wait for SDK to be configured and auth to finish loading
-    if (!sdkConfigured || isLoading) return;
+    // Wait for auth to finish loading
+    if (isLoading) return;
 
     const inAuthGroup = segments[0] === 'auth';
 
@@ -50,7 +48,7 @@ export default function RootLayout() {
       // Redirect to main app if authenticated
       router.replace('/(tabs)');
     }
-  }, [isAuthenticated, isLoading, segments, sdkConfigured]);
+  }, [isAuthenticated, isLoading, segments]);
 
   return (
     <GluestackUIProvider mode="light">
