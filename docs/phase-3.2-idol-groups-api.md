@@ -82,4 +82,17 @@ function OnboardingScreen() {
 ✅ Mobile SDK 已更新  
 ✅ 測試完整  
 ✅ 無安全問題（CodeQL 通過）  
-✅ 資料與前端完全一致
+✅ 資料與前端完全一致  
+✅ **前端已串接新的 API** (commit: 5689fd3)
+
+## 前端整合 (已完成)
+
+已完成前端串接，OnboardingScreen 現在從 API 獲取偶像團體列表。
+
+詳細說明請參考: `docs/frontend-integration-idol-groups.md`
+
+### 變更檔案
+- 新增: `apps/mobile/src/features/profile/hooks/useProfile.ts`
+- 新增: `apps/mobile/src/features/profile/hooks/useIdolGroups.ts`
+- 新增: `apps/mobile/src/features/profile/hooks/index.ts`
+- 修改: `apps/mobile/src/features/profile/screens/OnboardingScreen.tsx`
