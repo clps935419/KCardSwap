@@ -335,6 +335,7 @@ export const CityCode = {
   TXG: 'TXG',
   TNN: 'TNN',
   KHH: 'KHH',
+  KEE: 'KEE',
   HSZ: 'HSZ',
   CYI: 'CYI',
   HSQ: 'HSQ',
@@ -672,9 +673,9 @@ export type FriendshipResponse = {
   /**
    * Created At
    *
-   * Creation timestamp
+   * Creation timestamp (None for unblocked status)
    */
-  created_at: string;
+  created_at?: string | null;
 };
 
 /**
@@ -742,6 +743,63 @@ export type HttpValidationError = {
    * Detail
    */
   detail?: ValidationError[];
+};
+
+/**
+ * IdolGroupListResponse
+ *
+ * Response schema for list of all idol groups.
+ */
+export type IdolGroupListResponse = {
+  /**
+   * Groups
+   *
+   * List of all available idol groups for onboarding
+   */
+  groups: IdolGroupResponse[];
+};
+
+/**
+ * IdolGroupListResponseWrapper
+ *
+ * Response wrapper for idol group list (standardized envelope)
+ */
+export type IdolGroupListResponseWrapper = {
+  data: IdolGroupListResponse;
+  /**
+   * Meta
+   */
+  meta?: null;
+  /**
+   * Error
+   */
+  error?: null;
+};
+
+/**
+ * IdolGroupResponse
+ *
+ * Response schema for a single idol group.
+ */
+export type IdolGroupResponse = {
+  /**
+   * Id
+   *
+   * Idol group ID (e.g., newjeans, ive, aespa)
+   */
+  id: string;
+  /**
+   * Name
+   *
+   * Idol group name (e.g., NewJeans, IVE, aespa)
+   */
+  name: string;
+  /**
+   * Emoji
+   *
+   * Emoji representing the idol group (e.g., 👖, 🦢, 🦋)
+   */
+  emoji: string;
 };
 
 /**
@@ -2516,6 +2574,23 @@ export type UpdateMyProfileApiV1ProfileMePutResponses = {
 export type UpdateMyProfileApiV1ProfileMePutResponse =
   UpdateMyProfileApiV1ProfileMePutResponses[keyof UpdateMyProfileApiV1ProfileMePutResponses];
 
+export type GetIdolGroupsApiV1IdolsGroupsGetData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/v1/idols/groups';
+};
+
+export type GetIdolGroupsApiV1IdolsGroupsGetResponses = {
+  /**
+   * List of all idol groups retrieved successfully
+   */
+  200: IdolGroupListResponseWrapper;
+};
+
+export type GetIdolGroupsApiV1IdolsGroupsGetResponse =
+  GetIdolGroupsApiV1IdolsGroupsGetResponses[keyof GetIdolGroupsApiV1IdolsGroupsGetResponses];
+
 export type GetUploadUrlApiV1CardsUploadUrlPostData = {
   body: UploadCardRequest;
   path?: never;
@@ -2553,11 +2628,11 @@ export type GetMyCardsApiV1CardsMeGetData = {
   path?: never;
   query?: {
     /**
-     * Status Filter
+     * Status
      *
      * Filter by status (available/trading/traded)
      */
-    status_filter?: string | null;
+    status?: string | null;
   };
   url: '/api/v1/cards/me';
 };

@@ -57,6 +57,8 @@ import type {
   GetFriendsApiV1FriendsGetData,
   GetFriendsApiV1FriendsGetErrors,
   GetFriendsApiV1FriendsGetResponses,
+  GetIdolGroupsApiV1IdolsGroupsGetData,
+  GetIdolGroupsApiV1IdolsGroupsGetResponses,
   GetMessagesApiV1ChatsRoomIdMessagesGetData,
   GetMessagesApiV1ChatsRoomIdMessagesGetErrors,
   GetMessagesApiV1ChatsRoomIdMessagesGetResponses,
@@ -322,6 +324,29 @@ export const updateMyProfileApiV1ProfileMePut = <ThrowOnError extends boolean = 
       ...options.headers,
     },
   });
+
+/**
+ * Get all idol groups
+ *
+ * Get a list of all available K-pop idol groups for onboarding.
+ *
+ * This endpoint provides the complete list of idol groups that users can select
+ * during the onboarding process to indicate their preferences.
+ *
+ * Each idol group includes:
+ * - `id`: Unique identifier (e.g., newjeans, ive, aespa)
+ * - `name`: Display name (e.g., NewJeans, IVE, aespa)
+ * - `emoji`: Emoji representing the group (e.g., 👖, 🦢, 🦋)
+ *
+ * This is a **public endpoint** that **does not require authentication**.
+ * Frontend applications should use this to dynamically populate idol group selection.
+ */
+export const getIdolGroupsApiV1IdolsGroupsGet = <ThrowOnError extends boolean = false>(
+  options?: Options<GetIdolGroupsApiV1IdolsGroupsGetData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<GetIdolGroupsApiV1IdolsGroupsGetResponses, unknown, ThrowOnError>(
+    { url: '/api/v1/idols/groups', ...options }
+  );
 
 /**
  * Get upload signed URL

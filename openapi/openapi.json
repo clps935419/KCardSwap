@@ -324,6 +324,49 @@
         ]
       }
     },
+    "/api/v1/idols/groups": {
+      "get": {
+        "tags": [
+          "idols"
+        ],
+        "summary": "Get all idol groups",
+        "description": "Get a list of all available K-pop idol groups for onboarding.\n\n    This endpoint provides the complete list of idol groups that users can select\n    during the onboarding process to indicate their preferences.\n\n    Each idol group includes:\n    - `id`: Unique identifier (e.g., newjeans, ive, aespa)\n    - `name`: Display name (e.g., NewJeans, IVE, aespa)\n    - `emoji`: Emoji representing the group (e.g., 👖, 🦢, 🦋)\n\n    This is a **public endpoint** that **does not require authentication**.\n    Frontend applications should use this to dynamically populate idol group selection.",
+        "operationId": "get_idol_groups_api_v1_idols_groups_get",
+        "responses": {
+          "200": {
+            "description": "List of all idol groups retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdolGroupListResponseWrapper"
+                },
+                "example": {
+                  "data": {
+                    "groups": [
+                      {
+                        "id": "newjeans",
+                        "name": "NewJeans",
+                        "emoji": "👖"
+                      },
+                      {
+                        "id": "ive",
+                        "name": "IVE",
+                        "emoji": "🦢"
+                      },
+                      {
+                        "id": "aespa",
+                        "name": "aespa",
+                        "emoji": "🦋"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/cards/upload-url": {
       "post": {
         "tags": [
@@ -385,7 +428,7 @@
         ],
         "parameters": [
           {
-            "name": "status_filter",
+            "name": "status",
             "in": "query",
             "required": false,
             "schema": {
@@ -398,7 +441,7 @@
                 }
               ],
               "description": "Filter by status (available/trading/traded)",
-              "title": "Status Filter"
+              "title": "Status"
             },
             "description": "Filter by status (available/trading/traded)"
           }
@@ -2436,7 +2479,7 @@
           "locations"
         ],
         "summary": "Get all Taiwan cities",
-        "description": "Get a list of all available Taiwan cities/counties.\n    \n    This endpoint provides the complete list of Taiwan's 22 cities/counties including:\n    - **Six Special Municipalities** (直轄市): Taipei, New Taipei, Taoyuan, Taichung, Tainan, Kaohsiung\n    - **Provincial Cities** (省轄市): Hsinchu City, Chiayi City  \n    - **Counties** (縣): Hsinchu County, Miaoli, Changhua, Nantou, Yunlin, Chiayi County, Pingtung, Yilan, Hualien, Taitung, Penghu, Kinmen, Lienchiang\n    \n    Each city includes:\n    - `code`: City code used in APIs (e.g., TPE, NTP, TAO)\n    - `name`: English name (e.g., Taipei City)\n    - `name_zh`: Chinese name (e.g., 台北市)\n    \n    This is a public endpoint that **does not require authentication**.\n    Frontend applications should use this to dynamically populate city selection dropdowns.",
+        "description": "Get a list of all available Taiwan cities/counties.\n\n    This endpoint provides the complete list of Taiwan's 22 cities/counties including:\n    - **Six Special Municipalities** (直轄市): Taipei, New Taipei, Taoyuan, Taichung, Tainan, Kaohsiung\n    - **Provincial Cities** (省轄市): Hsinchu City, Chiayi City\n    - **Counties** (縣): Hsinchu County, Miaoli, Changhua, Nantou, Yunlin, Chiayi County, Pingtung, Yilan, Hualien, Taitung, Penghu, Kinmen, Lienchiang\n\n    Each city includes:\n    - `code`: City code used in APIs (e.g., TPE, NTP, TAO)\n    - `name`: English name (e.g., Taipei City)\n    - `name_zh`: Chinese name (e.g., 台北市)\n\n    This is a public endpoint that **does not require authentication**.\n    Frontend applications should use this to dynamically populate city selection dropdowns.",
         "operationId": "get_cities_api_v1_locations_cities_get",
         "responses": {
           "200": {
@@ -2965,6 +3008,7 @@
           "TXG",
           "TNN",
           "KHH",
+          "KEE",
           "HSZ",
           "CYI",
           "HSQ",
@@ -3558,6 +3602,72 @@
         },
         "type": "object",
         "title": "HTTPValidationError"
+      },
+      "IdolGroupListResponse": {
+        "properties": {
+          "groups": {
+            "items": {
+              "$ref": "#/components/schemas/IdolGroupResponse"
+            },
+            "type": "array",
+            "title": "Groups",
+            "description": "List of all available idol groups for onboarding"
+          }
+        },
+        "type": "object",
+        "required": [
+          "groups"
+        ],
+        "title": "IdolGroupListResponse",
+        "description": "Response schema for list of all idol groups."
+      },
+      "IdolGroupListResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/IdolGroupListResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "IdolGroupListResponseWrapper",
+        "description": "Response wrapper for idol group list (standardized envelope)"
+      },
+      "IdolGroupResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "Idol group ID (e.g., newjeans, ive, aespa)"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "Idol group name (e.g., NewJeans, IVE, aespa)"
+          },
+          "emoji": {
+            "type": "string",
+            "title": "Emoji",
+            "description": "Emoji representing the idol group (e.g., 👖, 🦢, 🦋)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "emoji"
+        ],
+        "title": "IdolGroupResponse",
+        "description": "Response schema for a single idol group."
       },
       "LoginResponse": {
         "properties": {
