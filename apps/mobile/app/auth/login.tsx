@@ -95,13 +95,14 @@ export default function LoginScreen() {
         body: { email, password },
       });
 
-      const result = response.data;
+      // Response structure: { data: { data: TokenResponse } }
+      const result = response.data?.data;
       
       if (!result) {
         throw new Error('登入回應無效');
       }
 
-      console.log('Dev login successful, user:', result.email);
+      console.log('Dev login successful, user:', result.user_id);
 
       // Calculate token expiration time
       const expiresAt = Date.now() + result.expires_in * 1000;
