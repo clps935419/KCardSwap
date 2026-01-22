@@ -210,16 +210,18 @@ export default function LoginScreen() {
         <Button
           onPress={handleGoogleLogin}
           isDisabled={isLoading}
-          className="w-full h-16 bg-white border border-slate-200 rounded-2xl shadow-sm"
+          className="w-full h-16 bg-gradient-to-r from-pink-50 to-rose-50 border-2 border-pink-200 rounded-2xl shadow-md"
         >
           {isLoading ? (
             <Spinner color="#EC4899" />
           ) : (
-            <Box className="flex-row items-center">
-              <Text size="xl" className="mr-4 font-bold text-slate-700">
-                G
-              </Text>
-              <ButtonText className="font-bold text-slate-700">
+            <Box className="flex-row items-center justify-center">
+              <Box className="w-10 h-10 bg-white rounded-full items-center justify-center mr-3 shadow-sm">
+                <Text size="xl" className="font-black text-pink-500">
+                  G
+                </Text>
+              </Box>
+              <ButtonText className="font-bold text-pink-600 text-base">
                 使用 Google 帳號登入
               </ButtonText>
             </Box>
