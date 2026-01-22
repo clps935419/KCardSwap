@@ -1,4 +1,4 @@
-import { Alert, Platform } from 'react-native';
+import { Alert, Platform, Image } from 'react-native';
 import { useState } from 'react';
 import { router } from 'expo-router';
 import { useAuthStore } from '@/src/shared/state/authStore';
@@ -143,16 +143,18 @@ export default function LoginScreen() {
     <Box className="flex-1 items-center justify-center bg-white p-6">
       {/* Logo/Title Section - 小卡Show! Branding */}
       <Box className="items-center mb-12">
-        {/* Logo Icon */}
-        <Box className="w-20 h-20 bg-gradient-to-br from-pink-500 to-rose-400 rounded-3xl mb-4 items-center justify-center shadow-2xl">
-          <Text size="3xl">✨</Text>
-        </Box>
+        {/* Logo Image */}
+        <Image
+          source={require('@/assets/CardShow_Logo.png')}
+          style={{ width: 80, height: 80, marginBottom: 16 }}
+          resizeMode="contain"
+        />
         
-        <Heading size="2xl" className="font-black text-slate-900 tracking-tight">
+        <Heading size="2xl" className="font-black text-pink-500 tracking-tight">
           小卡Show!
         </Heading>
-        <Text size="xs" className="text-slate-400 mt-1 uppercase tracking-widest font-bold">
-          Find Your Bias
+        <Text size="xs" className="text-slate-500 mt-1 tracking-wide font-medium">
+          尋找你的本命
         </Text>
       </Box>
 
