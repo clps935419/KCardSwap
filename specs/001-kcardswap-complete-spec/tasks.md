@@ -323,6 +323,46 @@
 
 ---
 
+## Phase 3.2: Idol Groups List API（Onboarding 後端列表）
+
+**目標**: Onboarding 偶像團體列表改由後端提供，避免前端硬編碼
+
+**獨立測試標準**:
+- ✓ `GET /api/v1/idols/groups` 回傳偶像團體列表（公開 API）
+- ✓ Mobile Onboarding 使用 API 列表渲染選項
+
+### Presentation Layer (Identity Module)
+
+- [ ] T065A [P] [US1] 定義 IdolGroup Schema：apps/backend/app/modules/identity/presentation/schemas/idol_schemas.py（IdolGroupResponse, IdolGroupListResponse）
+- [ ] T065B [US1] 建立 Idols Router：apps/backend/app/modules/identity/presentation/routers/idols_router.py（GET /api/v1/idols/groups；無需 JWT）
+
+### Infrastructure Layer (Identity Module)
+
+- [ ] T065C [P] [US1] 新增 Idol Groups 靜態資料來源：apps/backend/app/modules/identity/infrastructure/data/idol_groups.py（id, name, emoji, sort_order；對齊前端現有列表）
+
+### Integration
+
+- [ ] T065D [US1] 註冊 Idols Router 到 main.py：apps/backend/app/main.py（包含 /idols 路由）
+
+### Testing
+
+- [ ] T065E [P] [US1] 撰寫 Idols API Integration Tests：tests/integration/modules/identity/test_idol_groups_api.py（公開列表）
+
+### Documentation
+
+- [ ] T065F [P] [US1] 更新 API 文件：apps/backend/docs/api/identity-module.md（新增 /idols/groups）
+
+### OpenAPI
+
+- [ ] T065G [P] [US1] 更新 OpenAPI snapshot：openapi/openapi.json（需先 generate 再提交）
+
+### Mobile (Expo)
+
+- [ ] M104A [US1] Onboarding 改用 SDK 讀取偶像團體列表：apps/mobile/src/features/profile/screens/OnboardingScreen.tsx
+- [ ] M104B [US1] 移除硬編碼列表或保留 fallback：apps/mobile/src/features/profile/constants/idolGroups.ts（僅作為離線備援，並在 UI 標示）
+
+---
+
 ## Phase 4: User Story 2 - 新增小卡與上傳限制 (Priority: P1)
 
 **目標**: 使用者可以上傳小卡圖片，系統管理上傳限制（免費：2張/日、10MB/張、1GB總容量）
