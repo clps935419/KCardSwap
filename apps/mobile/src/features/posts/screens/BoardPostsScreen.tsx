@@ -1,6 +1,6 @@
 /**
  * M701: 城市看板列表
- * Board Posts Screen
+ * Board Posts Screen (Updated to match UI prototype)
  * 
  * 功能：
  * - 顯示指定城市的貼文列表
@@ -8,7 +8,7 @@
  * - 點擊貼文查看詳情
  * - 導航至建立貼文頁面
  * 
- * 使用 Gluestack UI 元件
+ * 使用 Gluestack UI 元件 + Indigo 主色調
  */
 
 import React, { useState } from 'react';
@@ -23,6 +23,7 @@ import {
   ButtonText,
   Input,
   InputField,
+  Heading,
 } from '@/src/shared/ui/components';
 import { useBoardPosts } from '@/src/features/posts/hooks/usePosts';
 import type { Post } from '@/src/features/posts/types';
@@ -71,73 +72,81 @@ export function BoardPostsScreen() {
     const isExpired = new Date(post.expires_at) < new Date();
     const isClosed = post.status === 'closed';
 
+    // Calculate relative time (simplified)
+    const getRelativeTime = (dateString: string) => {
+      const now = new Date();
+      const created = new Date(dateString);
+      const diffMs = now.getTime() - created.getTime();
+      const diffMins = Math.floor(diffMs / 60000);
+      
+      if (diffMins < 60) return `${diffMins}m`;
+      const diffHours = Math.floor(diffMins / 60);
+      if (diffHours < 24) return `${diffHours}h`;
+      return `${Math.floor(diffHours / 24)}d`;
+    };
+
     return (
       <Pressable
-        className="p-4 mb-3 bg-white rounded-lg shadow-sm border border-gray-200"
+        className="p-4 mb-3 bg-white rounded-3xl shadow-sm border border-gray-100"
         onPress={() => handlePostPress(post)}
       >
-        {/* 貼文標題 */}
-        <Text className="text-lg font-bold text-gray-900 mb-2">{post.title}</Text>
+        {/* Mock Image Placeholder - 原型中有圖片 */}
+        <Box className="w-full h-32 bg-gray-100 rounded-2xl mb-3" />
 
-        {/* 貼文內容預覽 */}
-        <Text className="text-sm text-gray-700 mb-2" numberOfLines={3}>
-          {post.content}
-        </Text>
-
-        {/* 偶像/團體標籤 */}
-        <Box className="flex-row flex-wrap gap-2 mb-2">
-          {post.idol && (
-            <Box className="px-2 py-1 bg-blue-100 rounded">
-              <Text className="text-xs text-blue-700">{post.idol}</Text>
-            </Box>
-          )}
-          {post.idol_group && (
-            <Box className="px-2 py-1 bg-purple-100 rounded">
-              <Text className="text-xs text-purple-700">{post.idol_group}</Text>
-            </Box>
-          )}
-        </Box>
-
-        {/* 貼文狀態與到期時間 */}
-        <Box className="flex-row justify-between items-center">
-          <Text className="text-xs text-gray-500">
-            到期: {new Date(post.expires_at).toLocaleDateString('zh-TW')}
-          </Text>
-          <Box
-            className={`px-2 py-1 rounded ${
-              isClosed || isExpired ? 'bg-gray-200' : 'bg-green-100'
-            }`}
-          >
-            <Text
-              className={`text-xs font-semibold ${
-                isClosed || isExpired ? 'text-gray-600' : 'text-green-700'
-              }`}
-            >
-              {isClosed ? '已關閉' : isExpired ? '已到期' : '開放中'}
+        {/* 貼文資訊 */}
+        <Box className="flex-row justify-between items-start">
+          <Box className="flex-1 mr-3">
+            <Text className="text-sm font-bold text-gray-800 mb-1">
+              {post.title}
+            </Text>
+            <Text className="text-xs text-gray-400">
+              • {getRelativeTime(post.created_at)}
             </Text>
           </Box>
+          
+          {/* 偶像團體標籤 */}
+          {(post.idol_group || post.idol) && (
+            <Box className="px-2 py-1 bg-indigo-50 rounded-full">
+              <Text className="text-xs text-indigo-600 font-bold">
+                #{post.idol_group || post.idol}
+              </Text>
+            </Box>
+          )}
         </Box>
       </Pressable>
     );
   };
 
   const renderHeader = () => (
-    <Box className="px-4 pb-4">
+    <Box className="mb-4">
+      {/* 頁面標題 */}
+      <Box className="px-6 pt-4 pb-2">
+        <Text className="text-xs text-gray-400 font-bold uppercase tracking-widest">
+          Discover
+        </Text>
+        <Heading size="2xl" className="text-gray-900 font-black">
+          城市看板
+        </Heading>
+      </Box>
+
       {/* 城市選擇 */}
-      <Box className="mb-4">
-        <Text className="text-sm font-bold text-gray-900 mb-2">選擇城市</Text>
+      <Box className="px-6 py-3">
         <Box className="flex-row flex-wrap gap-2">
           {CITIES.map((city) => (
             <Pressable
               key={city.code}
               className={`px-4 py-2 rounded-full ${
-                selectedCity === city.code ? 'bg-blue-500' : 'bg-gray-200'
+                selectedCity === city.code 
+                  ? 'bg-indigo-600' 
+                  : 'bg-gray-100'
               }`}
               onPress={() => setSelectedCity(city.code)}
             >
               <Text
-                className={`text-sm ${
-                  selectedCity === city.code ? 'text-white font-bold' : 'text-gray-700'
+                className={`text-sm font-bold ${
+                  selectedCity === city.code 
+                    ? 'text-white' 
+                    : 'text-gray-700'
                 }`}
               >
                 {city.name}
@@ -146,49 +155,13 @@ export function BoardPostsScreen() {
           ))}
         </Box>
       </Box>
-
-      {/* 篩選器 */}
-      <Box className="mb-4">
-        <Text className="text-sm font-bold text-gray-900 mb-2">篩選</Text>
-        <Box className="gap-2">
-          <Input variant="outline" size="md">
-            <InputField
-              placeholder="偶像名稱"
-              value={idolFilter}
-              onChangeText={setIdolFilter}
-            />
-          </Input>
-          <Input variant="outline" size="md">
-            <InputField
-              placeholder="團體名稱"
-              value={idolGroupFilter}
-              onChangeText={setIdolGroupFilter}
-            />
-          </Input>
-        </Box>
-      </Box>
-
-      {/* 建立貼文按鈕 */}
-      <Button
-        size="lg"
-        variant="solid"
-        action="primary"
-        className="w-full"
-        onPress={handleCreatePost}
-      >
-        <ButtonText>建立新貼文</ButtonText>
-      </Button>
-
-      {/* 貼文數量 */}
-      <Text className="text-sm text-gray-600 mt-4">
-        共 {posts.length} 則貼文
-      </Text>
     </Box>
   );
 
   const renderEmpty = () => (
-    <Box className="items-center justify-center py-12 px-4">
-      <Text className="text-lg text-gray-500 text-center mb-2">
+    <Box className="items-center justify-center py-12 px-6">
+      <Text className="text-4xl mb-4">📭</Text>
+      <Text className="text-lg text-gray-500 text-center mb-2 font-bold">
         目前沒有貼文
       </Text>
       <Text className="text-sm text-gray-400 text-center">
@@ -200,7 +173,7 @@ export function BoardPostsScreen() {
   if (isLoading) {
     return (
       <Box className="flex-1 items-center justify-center bg-gray-50">
-        <Spinner size="large" />
+        <Spinner size="large" color="#4F46E5" />
         <Text className="mt-4 text-gray-600">載入中...</Text>
       </Box>
     );
@@ -208,15 +181,19 @@ export function BoardPostsScreen() {
 
   if (error) {
     return (
-      <Box className="flex-1 items-center justify-center bg-gray-50 px-4">
-        <Text className="text-lg text-red-600 text-center mb-4">
+      <Box className="flex-1 items-center justify-center bg-gray-50 px-6">
+        <Text className="text-4xl mb-4">⚠️</Text>
+        <Text className="text-lg text-red-600 text-center mb-2 font-bold">
           載入失敗
         </Text>
         <Text className="text-sm text-gray-600 text-center mb-4">
           {error instanceof Error ? error.message : '請稍後再試'}
         </Text>
-        <Button onPress={() => refetch()}>
-          <ButtonText>重試</ButtonText>
+        <Button 
+          className="bg-indigo-600"
+          onPress={() => refetch()}
+        >
+          <ButtonText className="text-white font-bold">重試</ButtonText>
         </Button>
       </Box>
     );
@@ -230,9 +207,13 @@ export function BoardPostsScreen() {
         keyExtractor={(item) => item.id}
         ListHeaderComponent={renderHeader}
         ListEmptyComponent={renderEmpty}
-        contentContainerStyle={{ paddingTop: 16, paddingBottom: 16 }}
+        contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 16 }}
         refreshControl={
-          <RefreshControl refreshing={isRefetching} onRefresh={refetch} />
+          <RefreshControl 
+            refreshing={isRefetching} 
+            onRefresh={refetch}
+            tintColor="#4F46E5"
+          />
         }
       />
     </Box>

@@ -242,7 +242,14 @@ apps/mobile/
 ├── app/                      # Expo Router app directory (routes)
 │   ├── _layout.tsx          # Root layout with providers (Gluestack + TanStack Query)
 │   ├── auth/                # Auth screens (login, etc.)
-│   └── (tabs)/              # Main app with tab navigation
+│   ├── onboarding.tsx       # 🆕 Onboarding screen (idol group selection)
+│   └── (tabs)/              # Main app with 5-tab navigation
+│       ├── index.tsx        # 🔄 Home Tab - 城市看板 (BoardPostsScreen)
+│       ├── nearby.tsx       # Nearby Tab - 附近搜尋
+│       ├── upload.tsx       # 🆕 Upload Tab - 上傳選項
+│       ├── chat.tsx         # 🆕 Chat Tab - 聊天列表
+│       ├── profile.tsx      # Profile Tab - 個人檔案
+│       └── cards/           # Cards management (hidden from tab bar)
 ├── components/               # Gluestack UI components
 │   └── ui/                  # UI components added via CLI
 │       ├── button/          # Button component
@@ -256,19 +263,23 @@ apps/mobile/
 │   │   ├── state/          # Zustand stores
 │   │   ├── ui/             # UI components and theme
 │   │   │   ├── components/ # Shared UI component exports (Button, Card, Input)
-│   │   │   └── theme/      # Theme tokens (colors, spacing, typography)
+│   │   │   └── theme/      # 🆕 Theme tokens & colors (Indigo/Pink/Slate)
 │   │   └── config.ts       # App configuration
-│   └── features/            # Feature modules (to be implemented)
+│   └── features/            # Feature modules
 │       ├── auth/
 │       ├── profile/
+│       │   ├── constants/  # 🆕 Idol groups list
+│       │   └── screens/    # 🆕 OnboardingScreen
 │       ├── cards/
 │       ├── nearby/
 │       ├── friends/
 │       ├── chat/
 │       ├── trade/
+│       ├── posts/          # 🔄 Updated BoardPostsScreen (Indigo theme)
 │       └── subscription/
 ├── __tests__/               # Test files
-└── assets/                  # Images, fonts, etc.
+├── assets/                  # Images, fonts, etc.
+└── UI_PROTOTYPE_IMPLEMENTATION.md  # 🆕 Implementation guide
 ```
 
 ## Development
@@ -355,7 +366,32 @@ npm run test:coverage
 - [x] ESLint and Prettier
 - [x] Mobile CI workflow
 
-### Phase 3: US1 - Google Login & Profile (To be implemented)
+### UI Prototype Implementation ✅ (Phase 9)
+
+- [x] **5-Tab Navigation** (Home/Nearby/Upload/Chat/Profile)
+  - [x] Home Tab → 城市看板 (BoardPostsScreen)
+  - [x] Nearby Tab → 附近搜尋
+  - [x] Upload Tab → 上傳選項 (Bottom Sheet style)
+  - [x] Chat Tab → 聊天列表
+  - [x] Profile Tab → 個人檔案
+- [x] **Onboarding Screen** - 偶像團體選擇
+  - [x] 12 個預設 K-pop 團體
+  - [x] 多選設計
+  - [x] 儲存到 Profile.preferences
+- [x] **Indigo Theme** - 主色調更新
+  - [x] Primary: Indigo-600 (#4F46E5)
+  - [x] Secondary: Pink-500 (#EC4899)
+  - [x] Background: Slate-50 (#F8FAFC)
+  - [x] Theme colors constant file
+- [x] **UI Updates**
+  - [x] BoardPostsScreen redesign (matching prototype)
+  - [x] Relative time display (10m, 1h, 2d)
+  - [x] Rounded card design
+  - [x] Image placeholders
+
+📖 **詳細說明請見：** [UI_PROTOTYPE_IMPLEMENTATION.md](./UI_PROTOTYPE_IMPLEMENTATION.md)
+
+### Phase 3: US1 - Google Login & Profile ✅ (Complete)
 
 - [ ] Google OAuth with PKCE flow
 - [ ] Profile view and edit screens
