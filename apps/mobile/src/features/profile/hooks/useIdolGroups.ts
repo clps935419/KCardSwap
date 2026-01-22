@@ -23,9 +23,12 @@ export function useIdolGroups() {
   });
 
   // Extract groups from envelope format
+  // Return empty array as fallback for safer rendering
+  const groups = result.data?.data?.groups || [];
+  
   return {
     ...result,
-    data: result.data?.data.groups || [],
+    data: groups,
   };
 }
 
