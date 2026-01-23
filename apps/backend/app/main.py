@@ -195,6 +195,17 @@ def create_application() -> FastAPI:
 
     app.include_router(media_router, prefix=settings.API_PREFIX)
 
+    # Phase 11: Social module (Private Messages & Inbox - User Story 5)
+    from .modules.social.presentation.routers.message_requests_router import (
+        router as message_requests_router,
+    )
+    from .modules.social.presentation.routers.threads_router import (
+        router as threads_router,
+    )
+
+    app.include_router(message_requests_router, prefix=settings.API_PREFIX)
+    app.include_router(threads_router, prefix=settings.API_PREFIX)
+
     return app
 
 

@@ -155,23 +155,23 @@ description: "Task list for implementing Posts-first POC (V2)"
 
 ### Tests（後端）
 
-- [ ] T056 [P] [US5] 新增 message request/accept/thread 唯一性整合測試（新增 apps/backend/tests/integration/modules/social/test_message_requests_v2.py）
+- [x] T056 [P] [US5] 新增 message request/accept/thread 唯一性整合測試（新增 apps/backend/tests/integration/modules/social/test_message_requests_v2.py）
 
 ### Backend（建議：social/chat 擴充）
 
-- [ ] T057 [P] [US5] 定義 MessageRequest/Thread/Message domain models（新增 apps/backend/app/modules/social/domain/models/message_request.py 與 apps/backend/app/modules/social/domain/models/message.py）
-- [ ] T058 [P] [US5] 實作唯一對話規則（新增 apps/backend/app/modules/social/application/services/thread_uniqueness_service.py）
-- [ ] T059 [P] [US5] 實作 request create/accept/decline use cases（新增 apps/backend/app/modules/social/application/use_cases/message_requests/ 目錄）
-- [ ] T060 [P] [US5] 實作 thread list/message list/send message use cases（新增 apps/backend/app/modules/social/application/use_cases/messages/ 目錄）
-- [ ] T061 [US5] 建立 message request + threads routers（新增 apps/backend/app/modules/social/presentation/routers/message_requests_router.py 與 apps/backend/app/modules/social/presentation/routers/threads_router.py；包含 message-requests create/inbox/accept/decline 與 threads list/messages list/send）
-- [ ] T062 [US5] 封鎖/隱私設定檢查（更新 apps/backend/app/modules/identity/application/services/privacy_service.py：拒絕陌生人私訊 + block 規則）
+- [x] T057 [P] [US5] 定義 MessageRequest/Thread/Message domain models（新增 apps/backend/app/modules/social/domain/models/message_request.py 與 apps/backend/app/modules/social/domain/models/message.py）
+- [x] T058 [P] [US5] 實作唯一對話規則（新增 apps/backend/app/modules/social/application/services/thread_uniqueness_service.py）
+- [x] T059 [P] [US5] 實作 request create/accept/decline use cases（新增 apps/backend/app/modules/social/application/use_cases/message_requests/ 目錄）
+- [x] T060 [P] [US5] 實作 thread list/message list/send message use cases（新增 apps/backend/app/modules/social/application/use_cases/messages/ 目錄）
+- [x] T061 [US5] 建立 message request + threads routers（新增 apps/backend/app/modules/social/presentation/routers/message_requests_router.py 與 apps/backend/app/modules/social/presentation/routers/threads_router.py；包含 message-requests create/inbox/accept/decline 與 threads list/messages list/send）
+- [x] T062 [US5] 封鎖/隱私設定檢查（更新 apps/backend/app/modules/identity/application/services/privacy_service.py：拒絕陌生人私訊 + block 規則）
 
 ### Web（apps/web）
 
-- [ ] T063 [P] [US5] 建立 Inbox UI：Requests/Threads tabs（新增 apps/web/src/app/(app)/inbox/page.tsx）
-- [ ] T064 [P] [US5] 建立 thread 頁與訊息列表（新增 apps/web/src/app/(app)/inbox/threads/[threadId]/page.tsx）
-- [ ] T065 [US5] 串接送出訊息（新增 apps/web/src/features/inbox/hooks/useSendMessage.ts）
-- [ ] T066 [US5] 在貼文詳情/卡片加入「私信作者」入口（更新 apps/web/src/features/posts/components/PostCard.tsx）
+- [x] T063 [P] [US5] 建立 Inbox UI：Requests/Threads tabs（新增 apps/web/src/app/(app)/inbox/page.tsx）
+- [x] T064 [P] [US5] 建立 thread 頁與訊息列表（新增 apps/web/src/app/(app)/inbox/threads/[threadId]/page.tsx）
+- [x] T065 [US5] 串接送出訊息（新增 apps/web/src/features/inbox/hooks/useSendMessage.ts）
+- [x] T066 [US5] 在貼文詳情/卡片加入「私信作者」入口（更新 apps/web/src/features/posts/components/PostCard.tsx）
 
 ---
 

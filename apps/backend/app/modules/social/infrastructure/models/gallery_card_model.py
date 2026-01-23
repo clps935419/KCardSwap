@@ -8,7 +8,7 @@ from sqlalchemy import String, Integer, DateTime, Text, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.shared.infrastructure.database.base import Base
+from app.shared.infrastructure.database.connection import Base
 
 
 class GalleryCardModel(Base):
