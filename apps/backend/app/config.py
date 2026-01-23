@@ -30,6 +30,17 @@ class Settings:
     )
     REFRESH_TOKEN_EXPIRE_DAYS: int = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", "7"))
 
+    # Cookie-JWT Settings (for Web POC)
+    # Cookie names for access and refresh tokens
+    ACCESS_COOKIE_NAME: str = os.getenv("ACCESS_COOKIE_NAME", "access_token")
+    REFRESH_COOKIE_NAME: str = os.getenv("REFRESH_COOKIE_NAME", "refresh_token")
+    # Cookie security settings
+    COOKIE_SAMESITE: str = os.getenv("COOKIE_SAMESITE", "lax")  # lax, strict, none
+    COOKIE_SECURE: bool = os.getenv("COOKIE_SECURE", "false").lower() == "true"  # true for HTTPS
+    COOKIE_HTTPONLY: bool = True  # Always httpOnly for security
+    COOKIE_DOMAIN: str | None = os.getenv("COOKIE_DOMAIN")  # None for same-origin
+    COOKIE_PATH: str = "/"  # Root path for all cookies
+
     # Google OAuth
     GOOGLE_CLIENT_ID: str = os.getenv("GOOGLE_CLIENT_ID", "")
     GOOGLE_CLIENT_SECRET: str = os.getenv("GOOGLE_CLIENT_SECRET", "")
