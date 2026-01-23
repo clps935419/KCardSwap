@@ -41,7 +41,7 @@ from app.modules.social.presentation.schemas.message_schemas import (
     ThreadResponse,
 )
 
-router = APIRouter(prefix="/api/v1/message-requests", tags=["message-requests"])
+router = APIRouter(prefix="/message-requests", tags=["message-requests"])
 
 
 @router.post("", response_model=MessageRequestResponse, status_code=status.HTTP_201_CREATED)

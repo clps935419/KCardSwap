@@ -3003,14 +3003,14 @@
         }
       }
     },
-    "/api/v1/api/v1/message-requests": {
+    "/api/v1/message-requests": {
       "post": {
         "tags": [
           "message-requests"
         ],
         "summary": "Create Message Request",
         "description": "Create a message request to another user.\n\nImplements FR-011: Message Requests for strangers.\nImplements FR-013: Privacy setting to block stranger messages.\nImplements FR-014: One unique thread per user pair.",
-        "operationId": "create_message_request_api_v1_api_v1_message_requests_post",
+        "operationId": "create_message_request_api_v1_message_requests_post",
         "requestBody": {
           "content": {
             "application/json": {
@@ -3050,14 +3050,14 @@
         ]
       }
     },
-    "/api/v1/api/v1/message-requests/inbox": {
+    "/api/v1/message-requests/inbox": {
       "get": {
         "tags": [
           "message-requests"
         ],
         "summary": "Get My Message Requests",
         "description": "Get message requests for the current user.\n\nSupports FR-016: Inbox clearly separates Requests vs Threads.\n\nQuery params:\n- status_filter: \"pending\", \"accepted\", \"declined\", or \"all\" (default: \"pending\")",
-        "operationId": "get_my_message_requests_api_v1_api_v1_message_requests_inbox_get",
+        "operationId": "get_my_message_requests_api_v1_message_requests_inbox_get",
         "security": [
           {
             "HTTPBearer": []
@@ -3085,7 +3085,7 @@
                   "items": {
                     "$ref": "#/components/schemas/MessageRequestResponse"
                   },
-                  "title": "Response Get My Message Requests Api V1 Api V1 Message Requests Inbox Get"
+                  "title": "Response Get My Message Requests Api V1 Message Requests Inbox Get"
                 }
               }
             }
@@ -3103,14 +3103,14 @@
         }
       }
     },
-    "/api/v1/api/v1/message-requests/{request_id}/accept": {
+    "/api/v1/message-requests/{request_id}/accept": {
       "post": {
         "tags": [
           "message-requests"
         ],
         "summary": "Accept Message Request",
         "description": "Accept a message request and create a thread.\n\nImplements FR-012: Recipient can accept/decline requests.\nCreates unique thread (FR-014).",
-        "operationId": "accept_message_request_api_v1_api_v1_message_requests__request_id__accept_post",
+        "operationId": "accept_message_request_api_v1_message_requests__request_id__accept_post",
         "security": [
           {
             "HTTPBearer": []
@@ -3151,14 +3151,14 @@
         }
       }
     },
-    "/api/v1/api/v1/message-requests/{request_id}/decline": {
+    "/api/v1/message-requests/{request_id}/decline": {
       "post": {
         "tags": [
           "message-requests"
         ],
         "summary": "Decline Message Request",
         "description": "Decline a message request.\n\nImplements FR-012: Recipient can accept/decline requests.",
-        "operationId": "decline_message_request_api_v1_api_v1_message_requests__request_id__decline_post",
+        "operationId": "decline_message_request_api_v1_message_requests__request_id__decline_post",
         "security": [
           {
             "HTTPBearer": []
@@ -3199,14 +3199,14 @@
         }
       }
     },
-    "/api/v1/api/v1/threads": {
+    "/api/v1/threads": {
       "get": {
         "tags": [
           "threads"
         ],
         "summary": "Get My Threads",
         "description": "Get all threads for the current user.\n\nSupports FR-016: Inbox clearly separates Requests vs Threads.\nReturns threads ordered by last_message_at descending.",
-        "operationId": "get_my_threads_api_v1_api_v1_threads_get",
+        "operationId": "get_my_threads_api_v1_threads_get",
         "security": [
           {
             "HTTPBearer": []
@@ -3261,14 +3261,14 @@
         }
       }
     },
-    "/api/v1/api/v1/threads/{thread_id}/messages": {
+    "/api/v1/threads/{thread_id}/messages": {
       "get": {
         "tags": [
           "threads"
         ],
         "summary": "Get Thread Messages",
         "description": "Get messages in a thread.\n\nReturns messages ordered by created_at ascending (oldest first).\nUser must be part of the thread to view messages.",
-        "operationId": "get_thread_messages_api_v1_api_v1_threads__thread_id__messages_get",
+        "operationId": "get_thread_messages_api_v1_threads__thread_id__messages_get",
         "security": [
           {
             "HTTPBearer": []
@@ -3337,7 +3337,7 @@
         ],
         "summary": "Send Message",
         "description": "Send a message in a thread.\n\nSupports FR-015: Messages can reference post_id.\nUser must be part of the thread to send messages.",
-        "operationId": "send_message_api_v1_api_v1_threads__thread_id__messages_post",
+        "operationId": "send_message_api_v1_threads__thread_id__messages_post",
         "security": [
           {
             "HTTPBearer": []

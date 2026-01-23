@@ -30,7 +30,7 @@ from app.modules.social.presentation.schemas.message_schemas import (
     SendMessageRequest,
 )
 
-router = APIRouter(prefix="/api/v1/threads", tags=["threads"])
+router = APIRouter(prefix="/threads", tags=["threads"])
 
 
 @router.get("", response_model=ThreadListResponse)

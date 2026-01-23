@@ -51,7 +51,7 @@ def get_gallery_card_repository(
 )
 async def get_user_gallery_cards(
     user_id: UUID,
-    current_user: Annotated[dict, Depends(require_user)],
+    current_user_id: Annotated[UUID, Depends(require_user)],
     repository: Annotated[IGalleryCardRepository, Depends(get_gallery_card_repository)],
 ) -> GalleryCardListResponse:
     """Get a user's gallery cards."""
@@ -93,11 +93,11 @@ async def get_user_gallery_cards(
     description="Get the authenticated user's own gallery cards.",
 )
 async def get_my_gallery_cards(
-    current_user: Annotated[dict, Depends(require_user)],
+    current_user_id: Annotated[UUID, Depends(require_user)],
     repository: Annotated[IGalleryCardRepository, Depends(get_gallery_card_repository)],
 ) -> GalleryCardListResponse:
     """Get the current user's gallery cards."""
-    user_id = UUID(current_user["user_id"])
+    user_id = current_user_id
     
     try:
         cards = await repository.find_by_user_id(user_id)
@@ -138,11 +138,11 @@ async def get_my_gallery_cards(
 )
 async def create_gallery_card(
     request: CreateGalleryCardRequest,
-    current_user: Annotated[dict, Depends(require_user)],
+    current_user_id: Annotated[UUID, Depends(require_user)],
     repository: Annotated[IGalleryCardRepository, Depends(get_gallery_card_repository)],
 ) -> GalleryCardResponse:
     """Create a new gallery card."""
-    user_id = UUID(current_user["user_id"])
+    user_id = current_user_id
     
     try:
         # Get current max display_order for this user
@@ -190,11 +190,11 @@ async def create_gallery_card(
 )
 async def delete_gallery_card(
     card_id: UUID,
-    current_user: Annotated[dict, Depends(require_user)],
+    current_user_id: Annotated[UUID, Depends(require_user)],
     repository: Annotated[IGalleryCardRepository, Depends(get_gallery_card_repository)],
 ):
     """Delete a gallery card."""
-    user_id = UUID(current_user["user_id"])
+    user_id = current_user_id
     
     try:
         # Check if card exists and belongs to user
@@ -240,11 +240,11 @@ async def delete_gallery_card(
 )
 async def reorder_gallery_cards(
     request: ReorderGalleryCardsRequest,
-    current_user: Annotated[dict, Depends(require_user)],
+    current_user_id: Annotated[UUID, Depends(require_user)],
     repository: Annotated[IGalleryCardRepository, Depends(get_gallery_card_repository)],
 ) -> ReorderGalleryCardsResponse:
     """Reorder gallery cards."""
-    user_id = UUID(current_user["user_id"])
+    user_id = current_user_id
     
     try:
         use_case = ReorderGalleryCardsUseCase(repository)
