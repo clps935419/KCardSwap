@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
-    "sdk:generate": "openapi-ts -i ../../openapi/openapi.json -o ./src/shared/api/generated -c axios"
+    "sdk:generate": "openapi-ts --config openapi.config.ts"
   },
   "dependencies": {
     "next": "^14.2.0",

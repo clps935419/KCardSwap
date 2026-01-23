@@ -120,6 +120,47 @@ RUN_GCS_SMOKE=1 poetry run pytest -m gcs_smoke
 
 詳細規範請參考 [infra/gcs/README.md](/infra/gcs/README.md)
 
+## OpenAPI Spec Generation (POC Workflow)
+
+**Important**: For the Posts-first POC, we use a stable OpenAPI snapshot to ensure consistent SDK generation across environments.
+
+### Generate OpenAPI Snapshot
+
+The `generate_openapi.py` script can be run independently without a full Poetry environment:
+
+```bash
+# Method 1: Direct Python execution (Recommended for CI/agents)
+cd apps/backend
+pip3 install fastapi pydantic sqlalchemy injector asyncpg python-jose passlib bcrypt email-validator google-auth google-cloud-storage firebase-admin httpx python-multipart
+python3 scripts/generate_openapi.py
+
+# Method 2: Using Makefile (from repo root)
+make generate-openapi
+
+# Method 3: Using Poetry (full environment)
+cd apps/backend
+poetry run python scripts/generate_openapi.py
+```
+
+This generates `openapi/openapi.json` at the repository root.
+
+### Frontend SDK Generation
+
+After updating the OpenAPI spec:
+
+```bash
+cd apps/web
+npm run sdk:generate
+```
+
+This generates TypeScript SDK with TanStack Query hooks in `apps/web/src/shared/api/generated/`.
+
+### Workflow Summary
+
+1. Backend: Modify API endpoints → Run `python3 scripts/generate_openapi.py`
+2. Frontend: Run `npm run sdk:generate` to update SDK
+3. Frontend: Use generated hooks in components (do not hand-write API calls)
+
 ## 常用命令
 
 ### Poetry
