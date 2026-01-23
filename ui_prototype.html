@@ -1,0 +1,1645 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KCardSwap V2（貼文優先 POC）Web UI 原型</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js (quota visualization) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Google 字體 -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      /* Korean Minimalist Girl Aesthetic (apps/mobile/COLOR_THEME.md)
+         Keep this prototype palette in sync with mobile theme tokens. */
+      --kc-primary-500: #A98ED8;   /* Soft Lavender */
+      --kc-primary-400: #B9A4E4;
+      --kc-primary-50: #FCF8FF;
+
+      --kc-secondary-500: #FEC5E5; /* Blush Pink */
+      --kc-secondary-300: #FFC5D5;
+      --kc-secondary-50: #FFFBFC;
+      --kc-secondary-900: #723949;
+
+      --kc-tertiary-500: #8CCFC1;  /* Dreamy Mint */
+      --kc-tertiary-300: #B8E4DC;
+      --kc-tertiary-50: #F7FEFC;
+
+      --kc-ink-900: #262320;       /* typography-900 */
+      --kc-ink-600: #66635F;       /* typography-600 */
+      --kc-ink-500: #857F7E;       /* typography-500 */
+
+      --kc-bg-0: #FFFFFF;
+      --kc-bg-50: #FCFBF9;         /* card background */
+      --kc-bg-soft: #FAF8F6;       /* warm muted */
+
+      --kc-outline-500: #A5A29F;
+      --kc-outline-200: rgba(165, 162, 159, 0.28);
+      --kc-outline-150: rgba(165, 162, 159, 0.18);
+      --kc-outline-100: rgba(165, 162, 159, 0.12);
+
+      --kc-error: #F26A5B;
+      --kc-success: #5CB879;
+      --kc-warning: #FF9E58;
+      --kc-info: #52BAF0;
+    }
+
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+      background-color: var(--kc-bg-soft);
+      color: var(--kc-ink-900);
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--kc-bg-soft); }
+    ::-webkit-scrollbar-thumb { background: rgba(165, 162, 159, 0.5); border-radius: 10px; }
+
+    .phone-frame {
+      box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.25);
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .nav-item.active {
+      background-color: var(--kc-primary-500);
+      color: white;
+      box-shadow: 0 8px 24px rgba(169, 142, 216, 0.25);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    .animate-slide-up { animation: slideUp 0.3s ease-out; }
+
+    .logo-grid-bg {
+      background-image: radial-gradient(rgba(165, 162, 159, 0.35) 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+
+    .segmented {
+      background: rgba(38, 35, 32, 0.06);
+      padding: 4px;
+      border-radius: 999px;
+    }
+
+    .segmented button.active {
+      background: var(--kc-bg-0);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+      color: var(--kc-ink-900);
+    }
+
+    .toast {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      max-width: 420px;
+      z-index: 50;
+    }
+
+    /*
+      Tailwind Color Overrides (Prototype-only)
+      - Keep existing markup mostly intact by remapping common utility classes.
+      - This is safe here because this file is a standalone HTML prototype.
+    */
+    .bg-white { background-color: var(--kc-bg-0) !important; }
+
+    .bg-slate-50 { background-color: var(--kc-bg-soft) !important; }
+    .bg-slate-100 { background-color: rgba(165, 162, 159, 0.12) !important; }
+    .bg-slate-200 { background-color: rgba(165, 162, 159, 0.18) !important; }
+    .bg-slate-300 { background-color: rgba(165, 162, 159, 0.28) !important; }
+    .bg-slate-900 { background-color: var(--kc-ink-900) !important; }
+
+    .text-slate-900 { color: var(--kc-ink-900) !important; }
+    .text-slate-800 { color: var(--kc-ink-900) !important; }
+    .text-slate-700 { color: rgba(38, 35, 32, 0.85) !important; }
+    .text-slate-600 { color: var(--kc-ink-600) !important; }
+    .text-slate-500 { color: var(--kc-ink-500) !important; }
+    .text-slate-400 { color: var(--kc-outline-500) !important; }
+    .text-slate-300 { color: rgba(165, 162, 159, 0.75) !important; }
+    .text-slate-200 { color: rgba(165, 162, 159, 0.55) !important; }
+
+    .border-slate-50 { border-color: var(--kc-outline-100) !important; }
+    .border-slate-100 { border-color: var(--kc-outline-150) !important; }
+    .border-slate-200 { border-color: var(--kc-outline-200) !important; }
+    .border-slate-800 { border-color: rgba(38, 35, 32, 0.7) !important; }
+
+    .text-indigo-300 { color: rgba(169, 142, 216, 0.6) !important; }
+    .text-indigo-400 { color: var(--kc-primary-400) !important; }
+    .text-indigo-500 { color: rgba(169, 142, 216, 0.9) !important; }
+    .text-indigo-600 { color: var(--kc-primary-500) !important; }
+    .text-indigo-700 { color: var(--kc-primary-500) !important; }
+    .text-indigo-900 { color: rgba(38, 35, 32, 0.95) !important; }
+
+    .bg-indigo-50 { background-color: var(--kc-primary-50) !important; }
+    .bg-indigo-100 { background-color: rgba(169, 142, 216, 0.16) !important; }
+    .bg-indigo-300 { background-color: rgba(169, 142, 216, 0.35) !important; }
+    .bg-indigo-500 { background-color: rgba(169, 142, 216, 0.85) !important; }
+    .bg-indigo-600 { background-color: var(--kc-primary-500) !important; }
+    .bg-indigo-700 { background-color: rgba(169, 142, 216, 0.95) !important; }
+    .bg-indigo-800 { background-color: rgba(120, 95, 170, 0.95) !important; }
+    .bg-indigo-900 { background-color: rgba(60, 44, 92, 0.98) !important; }
+
+    .border-indigo-100 { border-color: rgba(169, 142, 216, 0.18) !important; }
+    .border-indigo-200 { border-color: rgba(169, 142, 216, 0.28) !important; }
+    .border-indigo-500 { border-color: rgba(169, 142, 216, 0.6) !important; }
+    .border-indigo-600 { border-color: var(--kc-primary-500) !important; }
+
+    .text-pink-500 { color: var(--kc-secondary-900) !important; }
+    .text-pink-600 { color: var(--kc-secondary-900) !important; }
+    .text-pink-700 { color: var(--kc-secondary-900) !important; }
+
+    .bg-pink-50 { background-color: var(--kc-secondary-50) !important; }
+    .bg-pink-100 { background-color: rgba(254, 197, 229, 0.35) !important; }
+    .bg-pink-200 { background-color: rgba(254, 197, 229, 0.55) !important; }
+    .bg-pink-500 { background-color: var(--kc-secondary-500) !important; }
+
+    .border-pink-50 { border-color: rgba(254, 197, 229, 0.22) !important; }
+    .border-pink-100 { border-color: rgba(254, 197, 229, 0.28) !important; }
+    .border-pink-200 { border-color: rgba(254, 197, 229, 0.45) !important; }
+
+    .ring-pink-50 { --tw-ring-color: rgba(254, 197, 229, 0.22) !important; }
+    .ring-pink-200 { --tw-ring-color: rgba(254, 197, 229, 0.45) !important; }
+    .shadow-pink-200 { --tw-shadow-color: rgba(254, 197, 229, 0.35) !important; }
+
+    .from-pink-50 { --tw-gradient-from: var(--kc-secondary-50) !important; --tw-gradient-to: rgba(255, 255, 255, 0) !important; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important; }
+    .from-pink-500 { --tw-gradient-from: var(--kc-secondary-500) !important; --tw-gradient-to: rgba(255, 255, 255, 0) !important; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important; }
+    .to-rose-50 { --tw-gradient-to: rgba(254, 197, 229, 0.18) !important; }
+    .to-rose-400 { --tw-gradient-to: rgba(254, 197, 229, 0.78) !important; }
+
+    /* Make cards slightly creamy by default (while keeping layout intact) */
+    .border-slate-100.bg-white,
+    .border-slate-100.bg-white\/0,
+    .border-slate-100.bg-white\/50 { background-color: var(--kc-bg-50) !important; }
+  </style>
+</head>
+
+<body class="text-slate-800">
+  <!--
+    Chosen Palette: Soft Lavender (#A98ED8), Blush Pink (#FEC5E5), Warm Neutrals (#FAF8F6/#FCFBF9)
+
+    POC Tech Constraints (for implementation, not required for prototype):
+    - Next.js + shadcn/ui
+    - react-hook-form
+    - TanStack Query
+
+    Confirmation:
+    - NO SVG graphics used.
+    - NO Mermaid JS used.
+  -->
+
+  <div class="min-h-screen flex flex-col md:flex-row">
+    <!-- Sidebar -->
+    <aside class="w-full md:w-72 bg-white border-r border-slate-200 flex-shrink-0 sticky top-0 md:h-screen overflow-y-auto z-20">
+      <div class="p-8">
+        <h1 class="text-2xl font-black text-indigo-600 tracking-tighter">KCardSwap<span class="text-pink-500">.</span></h1>
+        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-2">V2 貼文優先 POC • Web UI 原型</p>
+      </div>
+
+      <nav class="px-6 space-y-1">
+        <button onclick="switchSection('logo-design')" class="nav-item active w-full text-left px-4 py-4 rounded-xl text-sm font-bold transition-all flex items-center">
+          <span class="mr-3 text-lg">🎨</span> Logo 設計發想
+        </button>
+        <button onclick="switchSection('auth-spec')" class="nav-item w-full text-left px-4 py-4 rounded-xl text-sm font-bold transition-all flex items-center">
+          <span class="mr-3 text-lg">🔑</span> 登入/權限規則
+        </button>
+        <button onclick="switchSection('prototype')" class="nav-item w-full text-left px-4 py-4 rounded-xl text-sm font-bold transition-all flex items-center">
+          <span class="mr-3 text-lg">🧪</span> V2 UI 流程原型
+          <span class="ml-auto bg-pink-100 text-pink-600 text-[10px] px-2 py-0.5 rounded-full">POC</span>
+        </button>
+        <button onclick="switchSection('quota')" class="nav-item w-full text-left px-4 py-4 rounded-xl text-sm font-bold transition-all flex items-center">
+          <span class="mr-3 text-lg">💎</span> 配額/限制
+        </button>
+      </nav>
+
+      <div class="mt-auto p-8 border-t border-slate-50">
+        <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100">
+          <p class="text-[10px] text-indigo-600 font-bold uppercase mb-1">V2 主要規則</p>
+          <ul class="text-xs text-indigo-900 font-medium space-y-1">
+            <li>• 所有瀏覽需要登入</li>
+            <li>• 全域列表顯示全部貼文</li>
+            <li>• IG 式訊息請求 + 信箱</li>
+            <li>• 相簿小卡可新增/刪除/排序</li>
+          </ul>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Content Area -->
+    <main class="flex-1 bg-slate-50 p-4 md:p-12 overflow-y-auto" id="main-content">
+      <!-- SECTION: LOGO DESIGN -->
+      <section id="logo-design-section" class="space-y-8 animate-fade-in">
+        <div class="max-w-5xl">
+          <h2 class="text-3xl font-black text-slate-900 mb-6">品牌識別與 Logo 提案</h2>
+          <p class="text-lg text-slate-500 mb-8">保留現有風格，這份原型主要更新為 V2（貼文優先 + 信箱 + 相簿）UI 流程。</p>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition-all group">
+              <div class="logo-grid-bg h-48 rounded-2xl mb-6 flex items-center justify-center relative overflow-hidden">
+                <div class="w-24 h-24 bg-indigo-600 rounded-2xl transform rotate-3 shadow-xl flex items-center justify-center group-hover:rotate-6 transition-transform">
+                  <div class="text-5xl">🗂️</div>
+                </div>
+                <div class="absolute -bottom-2 -right-2 w-12 h-12 bg-pink-500 rounded-full flex items-center justify-center text-white font-bold border-4 border-white">⇄</div>
+              </div>
+              <h3 class="text-xl font-bold text-slate-800 mb-2">方案 A：KCardSwap</h3>
+              <p class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-4">務實 • 信任 • 直接</p>
+              <p class="text-sm text-slate-600 leading-relaxed">原案設計。POC 已改為貼文優先，圖標可保留工具屬性但弱化「交換」。</p>
+            </div>
+
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition-all group ring-2 ring-transparent hover:ring-pink-500">
+              <div class="logo-grid-bg h-48 rounded-2xl mb-6 flex items-center justify-center relative overflow-hidden">
+                <div class="relative">
+                  <div class="w-24 h-32 bg-gradient-to-br from-pink-500 to-rose-400 rounded-xl shadow-xl transform -rotate-6 flex items-center justify-center group-hover:-rotate-12 transition-transform">
+                    <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                      <span class="text-4xl">✨</span>
+                    </div>
+                  </div>
+                  <div class="absolute -top-2 -right-2 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg animate-bounce">
+                    <span class="text-xs font-black text-yellow-900">S!</span>
+                  </div>
+                </div>
+              </div>
+              <div class="flex items-center space-x-2 mb-2">
+                <h3 class="text-xl font-black text-slate-900">小卡Show!</h3>
+                <span class="bg-pink-100 text-pink-600 text-[10px] px-2 py-1 rounded-full font-bold">推薦</span>
+              </div>
+              <p class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-4">活力 • 社交 • 舞台</p>
+              <p class="text-sm text-slate-600 leading-relaxed">貼文 + 相簿展示最契合「Show」敘事：分享、互動（按讚）、私信。</p>
+            </div>
+
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition-all group">
+              <div class="logo-grid-bg h-48 rounded-2xl mb-6 flex items-center justify-center relative overflow-hidden">
+                <div class="relative w-28 h-28 flex items-center justify-center">
+                  <div class="absolute top-4 left-4 w-16 h-20 bg-slate-300 rounded-lg transform -rotate-12"></div>
+                  <div class="absolute top-2 left-6 w-16 h-20 bg-indigo-300 rounded-lg transform -rotate-6"></div>
+                  <div class="absolute top-0 left-8 w-16 h-20 bg-indigo-600 rounded-lg shadow-lg z-10"></div>
+                  <div class="absolute -bottom-2 -right-2 w-14 h-14 border-4 border-slate-800 bg-white/50 backdrop-blur rounded-full z-20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <div class="w-8 h-8 bg-indigo-600 rounded-full opacity-20"></div>
+                  </div>
+                  <div class="absolute bottom-0 right-0 w-4 h-10 bg-slate-800 transform -rotate-45 translate-y-3 translate-x-3 rounded-full z-10"></div>
+                </div>
+              </div>
+              <h3 class="text-xl font-bold text-slate-800 mb-2">小卡蒐 (Sou)</h3>
+              <p class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-4">搜尋 • 收藏 • 靈魂</p>
+              <p class="text-sm text-slate-600 leading-relaxed">若未來重回搜尋導向，可再強化此命名；POC 當前以貼文/信箱/相簿閉環為主。</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION: AUTH SPEC -->
+      <section id="auth-spec-section" class="hidden space-y-8 animate-fade-in">
+        <div class="max-w-4xl">
+          <h2 class="text-3xl font-black text-slate-900 mb-4">登入 / 權限規則</h2>
+          <p class="text-lg text-slate-500 mb-8">V2 POC 決策：所有瀏覽都需要登入（包含貼文列表/貼文詳情/個人頁/相簿）。</p>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+              <p class="text-[10px] text-indigo-600 font-bold uppercase mb-2">規則 1</p>
+              <h3 class="text-base font-black text-slate-900 mb-2">必須登入才能看內容</h3>
+              <p class="text-sm text-slate-600">未登入時只顯示登入畫面，不提供任何列表或個人頁預覽。</p>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+              <p class="text-[10px] text-indigo-600 font-bold uppercase mb-2">規則 2</p>
+              <h3 class="text-base font-black text-slate-900 mb-2">互動都要求登入</h3>
+              <p class="text-sm text-slate-600">發文、按讚、私信、相簿管理都在登入狀態下進行。</p>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+              <p class="text-[10px] text-indigo-600 font-bold uppercase mb-2">規則 3</p>
+              <h3 class="text-base font-black text-slate-900 mb-2">陌生人私訊可控</h3>
+              <p class="text-sm text-slate-600">可關閉陌生人私訊；開啟時陌生人訊息先進「請求」。</p>
+            </div>
+          </div>
+
+          <div class="mt-8 bg-white p-6 rounded-2xl border border-slate-100">
+            <h3 class="text-lg font-black text-slate-900 mb-2">Web POC（實作）技術選型</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-slate-700">
+              <div class="bg-slate-50 border border-slate-100 rounded-xl p-4">
+                <p class="font-bold">UI</p>
+                <p class="text-slate-600">Next.js + shadcn/ui</p>
+              </div>
+              <div class="bg-slate-50 border border-slate-100 rounded-xl p-4">
+                <p class="font-bold">表單</p>
+                <p class="text-slate-600">react-hook-form</p>
+              </div>
+              <div class="bg-slate-50 border border-slate-100 rounded-xl p-4">
+                <p class="font-bold">資料</p>
+                <p class="text-slate-600">TanStack Query（抓取/快取/重試/失敗狀態）</p>
+              </div>
+              <div class="bg-slate-50 border border-slate-100 rounded-xl p-4">
+                <p class="font-bold">驗證</p>
+                <p class="text-slate-600">JWT（後端）+ Web session 管理（POC）</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION: PROTOTYPE -->
+      <section id="prototype-section" class="hidden space-y-8 animate-fade-in">
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-12 items-start">
+          <div class="space-y-6">
+            <div class="bg-indigo-900 text-white p-8 rounded-3xl shadow-2xl">
+              <h2 class="text-2xl font-black mb-2">V2 UI 流程（對應使用情境）</h2>
+              <p class="text-indigo-100 text-sm leading-relaxed">這個原型以「UI 流程」為主：登入 → 貼文列表/發文（含附圖流程）→ 按讚 → 私信作者（請求/接受）→ 信箱 → 個人相簿管理。風格盡量延續現有 Tailwind 視覺語言。</p>
+
+              <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div class="bg-white/10 rounded-2xl p-4 border border-white/10">
+                  <p class="font-bold">情境 1</p>
+                  <p class="text-indigo-100">貼文列表（全域=全部）+ 城市/分類篩選</p>
+                </div>
+                <div class="bg-white/10 rounded-2xl p-4 border border-white/10">
+                  <p class="font-bold">情境 3</p>
+                  <p class="text-indigo-100">附圖：授權 → 上傳 → 確認（confirm）→ 附加（attach）</p>
+                </div>
+                <div class="bg-white/10 rounded-2xl p-4 border border-white/10">
+                  <p class="font-bold">情境 4</p>
+                  <p class="text-indigo-100">按讚 / 取消讚（不重複計數）</p>
+                </div>
+                <div class="bg-white/10 rounded-2xl p-4 border border-white/10">
+                  <p class="font-bold">情境 5</p>
+                  <p class="text-indigo-100">私訊：訊息請求 + 信箱（同一組合僅一個對話）</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-black text-slate-900">互動提示</h3>
+                <div class="segmented flex items-center gap-1">
+                  <button id="persona-me" onclick="setPersona('me')" class="active text-xs font-bold px-3 py-2 rounded-full">我是發送者</button>
+                  <button id="persona-recipient" onclick="setPersona('recipient')" class="text-xs font-bold px-3 py-2 rounded-full text-slate-500">我是收件者</button>
+                </div>
+              </div>
+              <ul class="text-sm text-slate-600 space-y-2">
+                <li>• 底部導覽：🏠首頁 / ➕發文 / 💬信箱（個人頁由右上角頭像進入）</li>
+                <li>• 先用「我是發送者」在貼文卡片點「私信作者」送出請求，再切到「我是收件者」到信箱接受。</li>
+                <li>• 發文時可切「範圍=城市」並填「城市代碼（city_code）」；全域列表仍會看到該城市貼文。</li>
+                <li>• 可以在「方案」切換「免費/專業」來觸發配額錯誤 UI。</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Simulator -->
+          <div class="flex justify-center relative">
+            <div class="phone-frame w-[360px] h-[740px] bg-black rounded-[3.5rem] p-3 border-4 border-slate-800 relative z-10 overflow-hidden">
+              <div class="w-full h-full bg-slate-50 rounded-[3rem] overflow-hidden relative">
+                <div id="phone-screen" class="h-full"></div>
+              </div>
+            </div>
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-96 bg-indigo-500/20 blur-[120px] rounded-full"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION: QUOTA -->
+      <section id="quota-section" class="hidden space-y-8 animate-fade-in">
+        <div class="max-w-5xl">
+          <h2 class="text-3xl font-black text-slate-900 mb-4">配額 / 限制（免費 vs 專業）</h2>
+          <p class="text-lg text-slate-500 mb-8">原型以視覺化呈現配額差異，實作時超額統一回傳 422_LIMIT_EXCEEDED，並包含 limit_key/limit_value/current_value/reset_at。</p>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="bg-white p-8 rounded-3xl border border-slate-100">
+              <h3 class="text-lg font-black text-slate-900 mb-4">配額雷達圖</h3>
+              <div class="relative w-full" style="height: 340px;">
+                <canvas id="quotaChart"></canvas>
+              </div>
+            </div>
+
+            <div class="bg-white p-8 rounded-3xl border border-slate-100">
+              <h3 class="text-lg font-black text-slate-900 mb-4">鍵值與預設</h3>
+              <div class="grid grid-cols-1 gap-3 text-sm">
+                <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4 flex items-start justify-between">
+                  <div>
+                    <p class="font-bold">posts_per_day</p>
+                    <p class="text-slate-500">每日 00:00 Asia/Taipei 重置</p>
+                  </div>
+                  <div class="text-right">
+                    <p class="font-black text-slate-900">免費 2 / 專業 20</p>
+                  </div>
+                </div>
+                <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4 flex items-start justify-between">
+                  <div>
+                    <p class="font-bold">post_images_per_post_max</p>
+                    <p class="text-slate-500">每則貼文最多圖片</p>
+                  </div>
+                  <div class="text-right">
+                    <p class="font-black text-slate-900">免費 1 / 專業 4</p>
+                  </div>
+                </div>
+                <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4 flex items-start justify-between">
+                  <div>
+                    <p class="font-bold">gallery_cards_count_max</p>
+                    <p class="text-slate-500">相簿小卡總數上限</p>
+                  </div>
+                  <div class="text-right">
+                    <p class="font-black text-slate-900">免費 50 / 專業 500</p>
+                  </div>
+                </div>
+                <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4 flex items-start justify-between">
+                  <div>
+                    <p class="font-bold">media_file_bytes_max</p>
+                    <p class="text-slate-500">單檔大小上限</p>
+                  </div>
+                  <div class="text-right">
+                    <p class="font-black text-slate-900">免費 1MB / 專業 5MB</p>
+                  </div>
+                </div>
+                <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4 flex items-start justify-between">
+                  <div>
+                    <p class="font-bold">media_bytes_per_month</p>
+                    <p class="text-slate-500">每月 1 日 00:00 Asia/Taipei 重置</p>
+                  </div>
+                  <div class="text-right">
+                    <p class="font-black text-slate-900">免費 50MB / 專業 2GB</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-6 bg-slate-900 text-slate-200 p-4 rounded-2xl text-xs">
+                <p class="font-bold text-white mb-2">422_LIMIT_EXCEEDED（範例）</p>
+                <pre class="whitespace-pre-wrap">{
+  "error": "422_LIMIT_EXCEEDED",
+  "limit_key": "media_bytes_per_month",
+  "limit_value": 52428800,
+  "current_value": 53000000,
+  "reset_at": "2026-02-01T00:00:00+08:00"
+}</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Toast container -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script>
+    // --- Sidebar navigation ---
+    let quotaChart = null;
+
+    function switchSection(id) {
+      document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
+      document.getElementById(id + '-section').classList.remove('hidden');
+
+      document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+      const btn = document.querySelector(`button[onclick="switchSection('${id}')"]`);
+      if (btn) btn.classList.add('active');
+
+      if (id === 'quota') renderQuotaChart();
+      if (id === 'prototype') initSimulator();
+    }
+
+    // --- Mock state ---
+    const state = {
+      persona: 'me',
+      plan: 'free',
+      auth: { loggedIn: false },
+      activeTab: 'feed',
+      navTab: 'feed',
+      activePostId: null,
+      users: {
+        me: { id: 'u_me', name: '我', handle: '我' },
+        recipient: { id: 'u_recipient', name: 'Hanni粉_TW', handle: 'hannifan_tw', allow_stranger_dm: true }
+      },
+      filters: { city: 'ALL', category: 'ALL' },
+      posts: [
+        {
+          id: 'p1',
+          authorId: 'u_recipient',
+          author: 'HanniFan_TW',
+          time: '10 分',
+          category: 'trade',
+          scope: 'city',
+          city_code: 'TPE',
+          title: '【求換】Hanni 藍版 換 Minji',
+          media_count: 1,
+          like_count: 12
+        },
+        {
+          id: 'p2',
+          authorId: 'u2',
+          author: 'Blink_0808',
+          time: '1 小時',
+          category: 'giveaway',
+          scope: 'global',
+          city_code: null,
+          title: 'Lisa Solo 小卡抽抽（送出）',
+          media_count: 0,
+          like_count: 33
+        },
+        {
+          id: 'p3',
+          authorId: 'u3',
+          author: 'Carat_17',
+          time: '2 小時',
+          category: 'showcase',
+          scope: 'city',
+          city_code: 'KHH',
+          title: 'Seventeen FML 收藏展示（可交流）',
+          media_count: 2,
+          like_count: 8
+        }
+      ],
+      likes: new Set(),
+      messageRequests: [],
+      threads: [],
+      gallery: [
+        { id: 'g1', title: 'NewJeans Hanni', note: '最喜歡的版本', image: '🃏' },
+        { id: 'g2', title: 'BLACKPINK Lisa', note: 'Solo 周邊', image: '🃏' },
+        { id: 'g3', title: 'SEVENTEEN', note: '偏好圓佑', image: '🃏' }
+      ],
+      quota: {
+        free: {
+          posts_per_day: 2,
+          post_images_per_post_max: 1,
+          gallery_cards_count_max: 50,
+          media_file_bytes_max: 1 * 1024 * 1024,
+          media_bytes_per_month: 50 * 1024 * 1024
+        },
+        premium: {
+          posts_per_day: 20,
+          post_images_per_post_max: 4,
+          gallery_cards_count_max: 500,
+          media_file_bytes_max: 5 * 1024 * 1024,
+          media_bytes_per_month: 2 * 1024 * 1024 * 1024
+        },
+        usage: {
+          posts_today: 0,
+          media_bytes_month: 12 * 1024 * 1024
+        }
+      }
+    };
+
+    function setPersona(p) {
+      state.persona = p;
+      document.getElementById('persona-me').classList.toggle('active', p === 'me');
+      document.getElementById('persona-recipient').classList.toggle('active', p === 'recipient');
+      if (!state.auth.loggedIn) initSimulator();
+      else renderMainApp();
+    }
+
+    function showToast(kind, title, detail) {
+      const toast = document.getElementById('toast');
+      const colors = {
+        success: 'border-emerald-200 bg-emerald-50 text-emerald-900',
+        info: 'border-indigo-200 bg-indigo-50 text-indigo-900',
+        danger: 'border-rose-200 bg-rose-50 text-rose-900'
+      };
+      toast.className = `toast ${colors[kind] || colors.info} border rounded-2xl p-4 shadow-xl`;
+      toast.innerHTML = `
+        <div class="flex items-start gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white/60 flex items-center justify-center">${kind === 'danger' ? '⚠️' : kind === 'success' ? '✅' : 'ℹ️'}</div>
+          <div class="flex-1">
+            <p class="font-black">${title}</p>
+            <p class="text-sm opacity-80 mt-1">${detail}</p>
+          </div>
+          <button class="text-sm font-bold opacity-60 hover:opacity-100" onclick="hideToast()">關閉</button>
+        </div>
+      `;
+      toast.classList.remove('hidden');
+      setTimeout(() => hideToast(), 3500);
+    }
+
+    function hideToast() {
+      document.getElementById('toast').classList.add('hidden');
+    }
+
+    function planLabel(plan) {
+      return plan === 'free' ? '免費' : '專業';
+    }
+
+    // --- Simulator ---
+    const phoneScreen = () => document.getElementById('phone-screen');
+
+    function initSimulator() {
+      state.auth.loggedIn = false;
+      phoneScreen().innerHTML = `
+        <div class="h-full flex flex-col items-center justify-between p-8 py-20 animate-fade-in bg-gradient-to-b from-slate-50 to-white">
+          <div class="text-center">
+            <div class="w-20 h-20 bg-pink-100 rounded-3xl mx-auto flex items-center justify-center shadow-2xl shadow-pink-200 mb-4 ring-4 ring-pink-50">
+              <div class="w-14 h-14 bg-gradient-to-br from-pink-500 to-rose-400 rounded-2xl flex items-center justify-center text-white font-black">S!</div>
+            </div>
+            <h2 class="text-2xl font-black text-pink-500">小卡Show!</h2>
+            <p class="text-xs text-slate-500 mt-1 tracking-wide font-medium">貼文優先 POC • Web 流程</p>
+          </div>
+
+          <div class="w-full space-y-3">
+            <div class="bg-white border border-slate-100 rounded-2xl p-4">
+              <p class="text-xs text-slate-500">目前身份：<span class="font-black text-slate-900">${state.persona === 'me' ? '發送者' : '收件者'}</span></p>
+              <p class="text-[11px] text-slate-400 mt-1">所有瀏覽需登入（V2 決策）</p>
+            </div>
+
+            <button onclick="triggerGoogleLogin()" class="w-full h-16 bg-gradient-to-r from-pink-50 to-rose-50 border-2 border-pink-200 rounded-2xl flex items-center justify-center px-6 hover:from-pink-100 hover:to-rose-100 transition-all shadow-md">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-white rounded-xl shadow flex items-center justify-center font-black">G</div>
+                <div class="text-left">
+                  <p class="text-sm font-black text-slate-900">使用 Google 登入</p>
+                  <p class="text-[10px] text-slate-500">登入後才能瀏覽貼文、相簿與信箱</p>
+                </div>
+              </div>
+            </button>
+
+            <div class="bg-slate-900 text-slate-200 rounded-2xl p-4">
+              <p class="text-xs font-bold text-white">POC 互動路徑</p>
+              <p class="text-[11px] mt-1 opacity-80">貼文 → 私信作者（送出請求）→ 收件者接受 → 信箱對話</p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function triggerGoogleLogin() {
+      phoneScreen().innerHTML = `
+        <div class="h-full flex flex-col items-center justify-center space-y-6 animate-fade-in">
+          <div class="relative">
+            <div class="w-16 h-16 border-4 border-slate-100 border-t-pink-500 rounded-full animate-spin"></div>
+            <div class="absolute inset-0 flex items-center justify-center text-lg font-bold text-slate-700">G</div>
+          </div>
+          <p class="text-sm font-black text-slate-500">正在連接 Google 帳號...</p>
+        </div>
+      `;
+      setTimeout(() => {
+        state.auth.loggedIn = true;
+        renderMainApp();
+      }, 900);
+    }
+
+    function renderMainApp() {
+      phoneScreen().innerHTML = `
+        <div class="h-full bg-slate-50 flex flex-col pt-12 animate-fade-in relative">
+          <header class="px-6 py-4 flex justify-between items-center bg-white shadow-sm z-10">
+            <div class="flex flex-col">
+              <p id="header-title" class="text-sm font-black text-slate-900">貼文</p>
+              <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">V2 貼文優先</p>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button onclick="togglePlan()" class="px-3 py-2 rounded-xl text-[10px] font-black border border-slate-200 bg-white hover:bg-slate-50">
+                方案：<span id="plan-pill" class="${state.plan === 'free' ? 'text-slate-900' : 'text-pink-600'}">${planLabel(state.plan)}</span>
+              </button>
+              <button onclick="renderTab('profile')" class="w-9 h-9 bg-indigo-600 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-white text-xs font-black transition-transform active:scale-95" aria-label="前往我的檔案">
+                U
+              </button>
+            </div>
+          </header>
+
+          <div id="app-body" class="flex-1 overflow-y-auto pb-24 relative"></div>
+
+          <nav class="absolute bottom-6 left-6 right-6 h-[74px] bg-white/90 backdrop-blur-md border border-slate-200 shadow-2xl rounded-[28px] px-3 z-20">
+            <!--
+              UI 設計取捨（依 POC 範圍）：
+              - 底部只保留必備主流程：首頁（貼文） / 發文（必放） / 信箱
+              - 個人頁改由 header 頭像進入（不占 tab）
+              - 不放探索：POC 沒有探索需求，避免增加認知成本
+            -->
+            <div class="grid grid-cols-3 items-center h-full">
+              <button data-tab="feed" onclick="renderTab('feed')" class="nav-btn h-14 rounded-2xl flex flex-col items-center justify-center gap-1 text-slate-400 hover:text-slate-600 hover:bg-slate-50 active:bg-slate-100 transition-transform active:scale-95">
+                <div class="text-xl leading-none">🏠</div>
+                <div class="text-[10px] font-black tracking-wide">首頁</div>
+              </button>
+
+              <button onclick="renderTab('create')" class="justify-self-center w-14 h-14 bg-slate-900 rounded-2xl flex flex-col items-center justify-center gap-0.5 text-white shadow-xl transition-transform active:scale-95 hover:scale-105" aria-label="發文">
+                <div class="text-2xl leading-none">+</div>
+                <div class="text-[9px] font-black tracking-wide text-white/90">發文</div>
+              </button>
+
+              <button data-tab="inbox" onclick="renderTab('inbox')" class="nav-btn h-14 rounded-2xl flex flex-col items-center justify-center gap-1 text-slate-400 hover:text-slate-600 hover:bg-slate-50 active:bg-slate-100 transition-transform active:scale-95">
+                <div class="text-xl leading-none">💬</div>
+                <div class="text-[10px] font-black tracking-wide">信箱</div>
+              </button>
+            </div>
+          </nav>
+        </div>
+      `;
+
+      renderTab('feed');
+    }
+
+    function setActiveNav(tab) {
+      const buttons = document.querySelectorAll('button.nav-btn[data-tab]');
+      buttons.forEach(btn => {
+        btn.classList.remove('text-indigo-600', 'bg-indigo-50', 'shadow-sm');
+        btn.classList.add('text-slate-400');
+      });
+
+      const active = document.querySelector(`button.nav-btn[data-tab="${tab}"]`);
+      if (active) {
+        active.classList.remove('text-slate-400');
+        active.classList.add('text-indigo-600', 'bg-indigo-50', 'shadow-sm');
+      }
+    }
+
+    function renderTab(tab) {
+      state.activeTab = tab;
+      const body = document.getElementById('app-body');
+      const title = document.getElementById('header-title');
+
+      if (tab === 'feed') {
+        state.navTab = 'feed';
+        title.innerText = '貼文';
+        setActiveNav('feed');
+        body.innerHTML = renderFeed();
+      }
+
+      if (tab === 'create') {
+        body.innerHTML = renderCreateModal();
+      }
+
+      if (tab === 'inbox') {
+        state.navTab = 'inbox';
+        title.innerText = '信箱';
+        setActiveNav('inbox');
+        body.innerHTML = renderInbox();
+      }
+
+      if (tab === 'profile') {
+        title.innerText = '我的檔案';
+        setActiveNav(state.navTab);
+        body.innerHTML = renderProfile();
+      }
+
+      if (tab === 'post') {
+        title.innerText = '貼文';
+        state.navTab = 'feed';
+        setActiveNav('feed');
+        body.innerHTML = renderPost();
+      }
+
+      if (tab === 'thread') {
+        title.innerText = '對話';
+        state.navTab = 'inbox';
+        setActiveNav('inbox');
+        body.innerHTML = renderThread();
+      }
+    }
+
+    function togglePlan() {
+      state.plan = state.plan === 'free' ? 'premium' : 'free';
+      const pill = document.getElementById('plan-pill');
+      if (pill) {
+        pill.innerText = planLabel(state.plan);
+        pill.className = state.plan === 'free' ? 'text-slate-900' : 'text-pink-600';
+      }
+      showToast('info', '方案切換', `目前方案：${planLabel(state.plan)}（用於模擬配額錯誤 UI）`);
+    }
+
+    // --- Feed ---
+    const categories = [
+      { key: 'ALL', label: '全部' },
+      { key: 'trade', label: '求換' },
+      { key: 'giveaway', label: '送出' },
+      { key: 'group', label: '揪團' },
+      { key: 'showcase', label: '展示' },
+      { key: 'help', label: '求助' },
+      { key: 'announcement', label: '公告' }
+    ];
+
+    const cities = [
+      { key: 'ALL', label: '全部城市' },
+      { key: 'TPE', label: '台北 TPE' }
+    ];
+
+    function badgeScope(p) {
+      if (p.scope === 'global') return '<span class="bg-slate-900 text-white text-[10px] px-2 py-1 rounded-full font-black">全域</span>';
+      return `<span class="bg-indigo-50 text-indigo-700 text-[10px] px-2 py-1 rounded-full font-black">城市 • ${p.city_code}</span>`;
+    }
+
+    function badgeCategory(cat) {
+      const map = {
+        trade: 'bg-rose-50 text-rose-700',
+        giveaway: 'bg-emerald-50 text-emerald-700',
+        group: 'bg-amber-50 text-amber-700',
+        showcase: 'bg-indigo-50 text-indigo-700',
+        help: 'bg-slate-100 text-slate-700',
+        announcement: 'bg-purple-50 text-purple-700'
+      };
+      const labels = {
+        trade: '求換',
+        giveaway: '送出',
+        group: '揪團',
+        showcase: '展示',
+        help: '求助',
+        announcement: '公告'
+      };
+      const cls = map[cat] || 'bg-slate-100 text-slate-700';
+      return `<span class="${cls} text-[10px] px-2 py-1 rounded-full font-black">${labels[cat] || '其他'}</span>`;
+    }
+
+    function renderFeed() {
+      const fCity = state.filters.city;
+      const fCat = state.filters.category;
+      const filtered = state.posts
+        .filter(p => fCity === 'ALL' ? true : p.city_code === fCity)
+        .filter(p => fCat === 'ALL' ? true : p.category === fCat);
+
+      const catChips = categories.map(c => `
+        <button onclick="setCategory('${c.key}')" class="px-3 py-2 rounded-full text-[11px] font-black border ${fCat === c.key ? 'border-indigo-600 bg-indigo-50 text-indigo-700' : 'border-slate-200 bg-white text-slate-600'}">
+          ${c.label}
+        </button>
+      `).join('');
+
+      const cityChips = cities.map(c => `
+        <button onclick="setCity('${c.key}')" class="px-3 py-2 rounded-full text-[11px] font-black border ${fCity === c.key ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-200 bg-white text-slate-600'}">
+          ${c.label}
+        </button>
+      `).join('');
+
+      const cards = filtered.map(p => {
+        const liked = state.likes.has(p.id);
+        return `
+          <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">👤</div>
+                <div>
+                  <p class="text-sm font-black text-slate-900">${p.author}</p>
+                  <p class="text-[10px] text-slate-400 font-bold uppercase">${p.time} • ${p.id}</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                ${badgeCategory(p.category)}
+                ${badgeScope(p)}
+              </div>
+            </div>
+
+            <button onclick="openPost('${p.id}')" class="w-full text-left mt-1 group">
+              <p class="text-sm text-slate-800 font-bold leading-relaxed group-hover:underline">${p.title}</p>
+              <div class="mt-2 flex items-center justify-between text-[11px] text-slate-500">
+                <span>${p.media_count ? `📷 ${p.media_count} 張` : '無附圖'}</span>
+                <span class="font-black text-indigo-600">查看貼文 ›</span>
+              </div>
+            </button>
+
+            <div class="mt-3 flex items-center justify-between">
+              <button onclick="toggleLike('${p.id}')" class="flex items-center gap-2 px-3 py-2 rounded-xl border ${liked ? 'border-pink-200 bg-pink-50 text-pink-700' : 'border-slate-200 bg-white text-slate-600'}">
+                <span class="text-base">${liked ? '💗' : '🤍'}</span>
+                <span class="text-[11px] font-black">${liked ? '已讚' : '讚'} • <span id="like-count-${p.id}">${p.like_count}</span></span>
+              </button>
+
+              <button onclick="openDMComposer('${p.id}')" class="px-4 py-2 rounded-xl bg-slate-900 text-white text-[11px] font-black shadow">
+                私信作者
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      return `
+        <div class="px-6 py-4 space-y-4">
+          <div class="bg-white rounded-2xl border border-slate-100 p-4">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-sm font-black text-slate-900">全域列表（顯示全部貼文）</p>
+                <p class="text-[11px] text-slate-500">城市列表在這裡用 chip 篩選模擬</p>
+              </div>
+              <button onclick="showToast('info','範圍規則','全域=全部；城市=貼文屬性（可被城市篩選）')" class="text-[11px] font-black text-indigo-600">規則</button>
+            </div>
+
+            <div class="mt-3 flex flex-wrap gap-2">${cityChips}</div>
+            <div class="mt-3 flex flex-wrap gap-2">${catChips}</div>
+          </div>
+
+          ${cards || '<div class="text-center text-slate-400 text-sm py-12">沒有符合篩選的貼文</div>'}
+        </div>
+      `;
+    }
+
+    function setCity(code) {
+      state.filters.city = code;
+      renderTab('feed');
+    }
+
+    function setCategory(key) {
+      state.filters.category = key;
+      renderTab('feed');
+    }
+
+    function toggleLike(postId) {
+      const post = state.posts.find(p => p.id === postId);
+      if (!post) return;
+
+      if (state.likes.has(postId)) {
+        state.likes.delete(postId);
+        post.like_count = Math.max(0, post.like_count - 1);
+      } else {
+        state.likes.add(postId);
+        post.like_count += 1;
+      }
+
+      const el = document.getElementById(`like-count-${postId}`);
+      if (el) el.innerText = String(post.like_count);
+
+      // Keep current context: if user is in post detail, stay there.
+      if (state.activeTab === 'post' && state.activePostId === postId) {
+        renderTab('post');
+      } else {
+        renderTab('feed');
+      }
+    }
+
+    function openPost(postId) {
+      state.activePostId = postId;
+      renderTab('post');
+    }
+
+    function renderPost() {
+      const p = state.posts.find(x => x.id === state.activePostId);
+      if (!p) {
+        return `
+          <div class="px-6 py-6">
+            <div class="bg-white border border-slate-100 rounded-2xl p-5">
+              <p class="text-sm font-black text-slate-900">找不到貼文</p>
+              <button onclick="renderTab('feed')" class="mt-3 h-11 px-4 rounded-2xl bg-slate-900 text-white font-black">回列表</button>
+            </div>
+          </div>
+        `;
+      }
+
+      const liked = state.likes.has(p.id);
+      const media = Array.from({ length: Math.max(0, p.media_count || 0) }).map((_, idx) => `
+        <div class="aspect-square rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center">
+          <div class="text-2xl">🖼️</div>
+          <span class="sr-only">圖片 ${idx + 1}</span>
+        </div>
+      `).join('');
+
+      return `
+        <div class="px-6 py-4 space-y-4">
+          <div class="flex items-center justify-between">
+            <button onclick="renderTab('feed')" class="text-[11px] font-black text-indigo-600">← 回貼文列表</button>
+            <button onclick="showToast('info','分享','POC：此處可複製貼文連結')" class="text-[11px] font-black text-slate-500">分享</button>
+          </div>
+
+          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex items-start gap-3">
+                <div class="w-10 h-10 bg-indigo-100 rounded-2xl flex items-center justify-center">👤</div>
+                <div>
+                  <p class="text-sm font-black text-slate-900">${p.author}</p>
+                  <p class="text-[10px] text-slate-400 font-bold uppercase">${p.time} • ${p.id}</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                ${badgeCategory(p.category)}
+                ${badgeScope(p)}
+              </div>
+            </div>
+
+            <p class="mt-4 text-base text-slate-900 font-black leading-relaxed">${p.title}</p>
+
+            ${p.media_count ? `
+              <div class="mt-4 grid grid-cols-2 gap-3">${media}</div>
+              <div class="mt-3 bg-slate-50 border border-slate-100 rounded-2xl p-4">
+                <p class="text-[11px] font-black text-slate-900">媒體狀態（示意）</p>
+                <p class="text-[11px] text-slate-500 mt-1">授權 → PUT → 確認（confirm，成功才計入配額）→ 附加（attach）</p>
+              </div>
+            ` : ''}
+
+            <div class="mt-5 flex items-center justify-between">
+              <button onclick="toggleLike('${p.id}')" class="flex items-center gap-2 px-4 py-3 rounded-2xl border ${liked ? 'border-pink-200 bg-pink-50 text-pink-700' : 'border-slate-200 bg-white text-slate-600'}">
+                <span class="text-lg">${liked ? '💗' : '🤍'}</span>
+                <span class="text-[12px] font-black">${liked ? '已讚' : '讚'} • ${p.like_count}</span>
+              </button>
+              <button onclick="openDMComposer('${p.id}')" class="px-5 py-3 rounded-2xl bg-slate-900 text-white text-[12px] font-black shadow">
+                私信作者
+              </button>
+            </div>
+          </div>
+
+          <div class="bg-white border border-slate-100 rounded-2xl p-5">
+            <p class="text-sm font-black text-slate-900">貼文內互動（POC 示意）</p>
+            <p class="text-[11px] text-slate-500 mt-1">按讚 / 私信作者 / 分享 / 檢舉（此版本先以 toast 模擬）</p>
+            <div class="mt-4 grid grid-cols-2 gap-3">
+              <button onclick="showToast('info','檢舉','POC：送出 report')" class="h-12 rounded-2xl border border-slate-200 bg-white font-black">檢舉</button>
+              <button onclick="showToast('info','封鎖','POC：封鎖該使用者')" class="h-12 rounded-2xl border border-slate-200 bg-white font-black">封鎖</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // --- Create Post Modal ---
+    function renderCreateModal() {
+      const maxImages = state.plan === 'free' ? 1 : 4;
+
+      return `
+        <div class="absolute inset-0 bg-black/20 z-30 flex flex-col justify-end h-full">
+          <div class="bg-white rounded-t-[2rem] p-6 h-[85%] animate-slide-up shadow-2xl">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">發文</p>
+                <h3 class="text-lg font-black text-slate-900">發佈貼文</h3>
+              </div>
+              <button onclick="renderTab('feed')" class="w-10 h-10 rounded-2xl bg-slate-900 text-white font-black">×</button>
+            </div>
+
+            <div class="space-y-4">
+              <div class="grid grid-cols-2 gap-3">
+                <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4">
+                  <p class="text-[10px] font-bold text-slate-400 uppercase">分類</p>
+                  <select id="create-category" class="mt-2 w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm font-bold">
+                    <option value="trade">求換</option>
+                    <option value="giveaway">送出</option>
+                    <option value="group">揪團</option>
+                    <option value="showcase" selected>展示</option>
+                    <option value="help">求助</option>
+                    <option value="announcement">公告</option>
+                  </select>
+                </div>
+
+                <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4">
+                  <p class="text-[10px] font-bold text-slate-400 uppercase">範圍</p>
+                  <select id="create-scope" onchange="toggleCityField()" class="mt-2 w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm font-bold">
+                    <option value="global" selected>全域（不限）</option>
+                    <option value="city">城市（指定城市）</option>
+                  </select>
+                  <input id="create-city" placeholder="城市代碼（例如 TPE）" class="mt-2 hidden w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm font-bold" />
+                </div>
+              </div>
+
+              <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4">
+                <p class="text-[10px] font-bold text-slate-400 uppercase">內容</p>
+                <textarea id="create-title" rows="3" class="mt-2 w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm" placeholder="想分享什麼？（示意）"></textarea>
+              </div>
+
+              <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase">圖片</p>
+                    <p class="text-[11px] text-slate-500">每則貼文最多 ${maxImages} 張（依方案）</p>
+                  </div>
+                  <button onclick="simulateUpload()" class="px-3 py-2 rounded-xl bg-white border border-slate-200 text-[11px] font-black">+ 加圖片</button>
+                </div>
+
+                <div id="upload-area" class="mt-3 grid grid-cols-2 gap-3"></div>
+
+                <div class="mt-3 bg-white border border-slate-200 rounded-xl p-3">
+                  <p class="text-[11px] font-black text-slate-900">上傳流程（示意）</p>
+                  <p class="text-[11px] text-slate-500">授權 → PUT 上傳 → 確認（confirm）→ 附加（attach）</p>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <button onclick="simulateQuotaError()" class="h-12 rounded-2xl border border-rose-200 bg-rose-50 text-rose-700 font-black">測試超額錯誤</button>
+                <button onclick="submitPost()" class="h-12 rounded-2xl bg-slate-900 text-white font-black shadow-xl">發佈</button>
+              </div>
+
+              <p class="text-[10px] text-slate-400 leading-relaxed">POC 重點：發文需要登入、範圍規則、附圖需確認（confirm）成功才計費、超額回 422_LIMIT_EXCEEDED。</p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function toggleCityField() {
+      const scope = document.getElementById('create-scope')?.value;
+      const city = document.getElementById('create-city');
+      if (!city) return;
+      if (scope === 'city') city.classList.remove('hidden');
+      else city.classList.add('hidden');
+    }
+
+    function simulateUpload() {
+      const area = document.getElementById('upload-area');
+      if (!area) return;
+
+      const maxImages = state.plan === 'free' ? 1 : 4;
+      const existing = area.querySelectorAll('[data-upload]').length;
+      if (existing >= maxImages) {
+        showToast('danger', '已達圖片上限', `本方案每則貼文最多 ${maxImages} 張`);
+        return;
+      }
+
+      const id = `u_${Math.random().toString(16).slice(2, 8)}`;
+      const card = document.createElement('div');
+      card.setAttribute('data-upload', id);
+      card.className = 'bg-white border border-slate-200 rounded-2xl p-3 relative overflow-hidden';
+      card.innerHTML = `
+        <div class="flex items-start justify-between">
+          <div>
+            <p class="text-[11px] font-black text-slate-900">圖片</p>
+            <p id="st-${id}" class="text-[10px] text-slate-500">授權中...</p>
+          </div>
+          <div class="w-9 h-9 rounded-xl bg-slate-900 text-white flex items-center justify-center font-black">🖼️</div>
+        </div>
+        <div class="mt-2 w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+          <div id="bar-${id}" class="h-2 bg-indigo-600 w-[10%]"></div>
+        </div>
+      `;
+      area.appendChild(card);
+
+      setTimeout(() => {
+        const st = document.getElementById(`st-${id}`);
+        const bar = document.getElementById(`bar-${id}`);
+        if (st) st.innerText = '上傳中（PUT）...';
+        if (bar) bar.style.width = '55%';
+      }, 400);
+
+      setTimeout(() => {
+        const st = document.getElementById(`st-${id}`);
+        const bar = document.getElementById(`bar-${id}`);
+        if (st) st.innerText = '確認（confirm）成功（可附加 attach）';
+        if (bar) bar.style.width = '100%';
+      }, 1100);
+    }
+
+    function simulateQuotaError() {
+      showToast('danger', '422_LIMIT_EXCEEDED', 'limit_key/media_bytes_per_month，請查看限制與 reset_at');
+    }
+
+    function submitPost() {
+      const title = (document.getElementById('create-title')?.value || '').trim();
+      const category = document.getElementById('create-category')?.value || 'showcase';
+      const scope = document.getElementById('create-scope')?.value || 'global';
+      const city_code_raw = (document.getElementById('create-city')?.value || '').trim().toUpperCase();
+
+      if (!title) {
+        showToast('danger', '內容必填', '請輸入貼文內容（示意）');
+        return;
+      }
+
+      if (scope === 'city' && !city_code_raw) {
+        showToast('danger', '缺少城市代碼', '範圍=城市 時必須提供城市代碼（city_code）');
+        return;
+      }
+
+      // posts_per_day quota
+      const limit = state.plan === 'free' ? state.quota.free.posts_per_day : state.quota.premium.posts_per_day;
+      if (state.quota.usage.posts_today >= limit) {
+        showToast('danger', '422_LIMIT_EXCEEDED', `limit_key=posts_per_day (limit=${limit})，reset_at=明日 00:00+08:00`);
+        return;
+      }
+
+      state.quota.usage.posts_today += 1;
+
+      const newPost = {
+        id: `p${state.posts.length + 1}`,
+        authorId: state.users.me.id,
+        author: state.users.me.name,
+        time: '剛剛',
+        category,
+        scope,
+        city_code: scope === 'city' ? city_code_raw : null,
+        title,
+        like_count: 0
+      };
+      state.posts.unshift(newPost);
+      showToast('success', '已發佈', '貼文已出現在全域列表');
+      renderTab('feed');
+    }
+
+    // --- DM composer + Requests/Inbox ---
+    function openDMComposer(postId) {
+      const post = state.posts.find(p => p.id === postId);
+      if (!post) return;
+
+      // Self DM no-op
+      if (post.authorId === state.users.me.id) {
+        showToast('info', '提示', '不能私信自己');
+        return;
+      }
+
+      const body = document.getElementById('app-body');
+      if (!body) return;
+
+      body.innerHTML = `
+        <div class="absolute inset-0 bg-black/20 z-30 flex flex-col justify-end h-full">
+          <div class="bg-white rounded-t-[2rem] p-6 h-[70%] animate-slide-up shadow-2xl">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">私訊</p>
+                <h3 class="text-lg font-black text-slate-900">私信 ${post.author}</h3>
+                <p class="text-[11px] text-slate-500">可選引用 post_id：<span class="font-black">${post.id}</span></p>
+              </div>
+              <button onclick="renderTab('feed')" class="w-10 h-10 rounded-2xl bg-slate-900 text-white font-black">×</button>
+            </div>
+
+            <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4">
+              <p class="text-[11px] font-black text-slate-900">訊息請求（IG 模式）</p>
+              <p class="text-[11px] text-slate-500 mt-1">陌生人第一則訊息會先進「請求」，對方接受後才變成正式對話。</p>
+            </div>
+
+            <div class="mt-4">
+              <textarea id="dm-text" rows="5" class="w-full bg-white border border-slate-200 rounded-2xl px-4 py-3 text-sm" placeholder="輸入訊息...（示意）"></textarea>
+              <div class="mt-3 grid grid-cols-2 gap-3">
+                <button onclick="sendDMRequest('${post.authorId}','${post.author}','${post.id}')" class="h-12 rounded-2xl bg-slate-900 text-white font-black shadow-xl">送出請求</button>
+                <button onclick="renderTab('feed')" class="h-12 rounded-2xl border border-slate-200 bg-white font-black">返回</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function sendDMRequest(recipientId, recipientName, postId) {
+      // recipient privacy
+      if (!state.users.recipient.allow_stranger_dm) {
+        showToast('danger', '無法私信', '對方已關閉陌生人私訊');
+        return;
+      }
+
+      // unique conversation per pair
+      const pairKey = `${state.users.me.id}__${recipientId}`;
+      const hasReq = state.messageRequests.find(r => r.pairKey === pairKey && r.status === 'pending');
+      const hasThread = state.threads.find(t => t.pairKey === pairKey);
+      if (hasReq || hasThread) {
+        showToast('info', '已存在對話', '同一組使用者只允許一個對話（待處理或已建立）');
+        renderTab('inbox');
+        return;
+      }
+
+      const text = (document.getElementById('dm-text')?.value || '').trim();
+      state.messageRequests.unshift({
+        id: `r${state.messageRequests.length + 1}`,
+        pairKey,
+        from: state.users.me.name,
+        to: recipientName,
+        post_id: postId,
+        preview: text || '（無內容）',
+        status: 'pending'
+      });
+
+      showToast('success', '請求已送出', '切換到「我是收件者」可在信箱看到並接受');
+      renderTab('feed');
+    }
+
+    function renderInbox() {
+      const requestCount = state.messageRequests.filter(r => r.status === 'pending').length;
+      const threadCount = state.threads.length;
+
+      const tabs = `
+        <div class="bg-white border border-slate-100 rounded-2xl p-3 flex gap-2">
+          <button onclick="renderInboxTab('requests')" class="flex-1 h-10 rounded-xl font-black text-[11px] bg-slate-900 text-white">請求 (${requestCount})</button>
+          <button onclick="renderInboxTab('threads')" class="flex-1 h-10 rounded-xl font-black text-[11px] bg-white border border-slate-200 text-slate-700">聊天 (${threadCount})</button>
+        </div>
+      `;
+
+      return `
+        <div class="px-6 py-4 space-y-4">
+          ${tabs}
+          <div id="inbox-body">${renderRequests()}</div>
+        </div>
+      `;
+    }
+
+    function renderInboxTab(tab) {
+      const box = document.getElementById('inbox-body');
+      if (!box) return;
+      box.innerHTML = tab === 'threads' ? renderThreads() : renderRequests();
+
+      // update tab styles
+      const parent = box.parentElement;
+      const btns = parent?.querySelectorAll('button');
+      if (!btns || btns.length < 2) return;
+      const reqBtn = btns[0];
+      const thBtn = btns[1];
+
+      if (tab === 'threads') {
+        reqBtn.className = 'flex-1 h-10 rounded-xl font-black text-[11px] bg-white border border-slate-200 text-slate-700';
+        thBtn.className = 'flex-1 h-10 rounded-xl font-black text-[11px] bg-slate-900 text-white';
+      } else {
+        reqBtn.className = 'flex-1 h-10 rounded-xl font-black text-[11px] bg-slate-900 text-white';
+        thBtn.className = 'flex-1 h-10 rounded-xl font-black text-[11px] bg-white border border-slate-200 text-slate-700';
+      }
+    }
+
+    function renderRequests() {
+      if (state.persona !== 'recipient') {
+        return `
+          <div class="bg-white border border-slate-100 rounded-2xl p-5">
+            <p class="text-sm font-black text-slate-900">你目前是「發送者」</p>
+            <p class="text-[11px] text-slate-500 mt-1">切換到「我是收件者」才會看到請求（示意）。</p>
+          </div>
+        `;
+      }
+
+      const pending = state.messageRequests.filter(r => r.status === 'pending');
+      if (pending.length === 0) {
+        return `<div class="text-center text-slate-400 text-sm py-12">目前沒有請求</div>`;
+      }
+
+      return pending.map(r => `
+        <div class="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm">
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="text-sm font-black text-slate-900">來自 ${r.from}</p>
+              <p class="text-[11px] text-slate-500">引用貼文：${r.post_id || '—'}</p>
+              <p class="text-[11px] text-slate-600 mt-2">${r.preview}</p>
+            </div>
+            <span class="bg-amber-50 text-amber-700 text-[10px] px-2 py-1 rounded-full font-black">待處理</span>
+          </div>
+          <div class="mt-3 grid grid-cols-2 gap-3">
+            <button onclick="acceptRequest('${r.id}')" class="h-11 rounded-2xl bg-slate-900 text-white font-black">接受</button>
+            <button onclick="declineRequest('${r.id}')" class="h-11 rounded-2xl border border-slate-200 bg-white font-black">拒絕</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function acceptRequest(reqId) {
+      const req = state.messageRequests.find(r => r.id === reqId);
+      if (!req) return;
+      req.status = 'accepted';
+
+      // create thread (unique)
+      const thread = {
+        id: `t${state.threads.length + 1}`,
+        pairKey: req.pairKey,
+        peer: req.from,
+        messages: [
+          { by: req.from, text: req.preview || '（無內容）', post_id: req.post_id || null }
+        ]
+      };
+      state.threads.unshift(thread);
+
+      showToast('success', '已接受', '已建立對話，已移到「聊天」');
+      renderTab('inbox');
+      renderInboxTab('threads');
+    }
+
+    function declineRequest(reqId) {
+      const req = state.messageRequests.find(r => r.id === reqId);
+      if (!req) return;
+      req.status = 'declined';
+      showToast('info', '已拒絕', '此請求已標記為「拒絕」');
+      renderTab('inbox');
+    }
+
+    function renderThreads() {
+      if (state.threads.length === 0) {
+        return `<div class="text-center text-slate-400 text-sm py-12">目前沒有聊天</div>`;
+      }
+
+      return state.threads.map(t => {
+        const last = t.messages[t.messages.length - 1];
+        return `
+          <div onclick="openThread('${t.id}')" class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between hover:bg-slate-50 cursor-pointer">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-indigo-100 rounded-2xl flex items-center justify-center">💬</div>
+              <div>
+                <p class="text-sm font-black text-slate-900">${t.peer}</p>
+                <p class="text-[11px] text-slate-500">${last?.text || ''}</p>
+              </div>
+            </div>
+            <span class="text-slate-300 font-black">›</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    let activeThreadId = null;
+
+    function openThread(id) {
+      activeThreadId = id;
+      renderTab('thread');
+    }
+
+    function renderThread() {
+      const t = state.threads.find(x => x.id === activeThreadId);
+      if (!t) return `<div class="px-6 py-4 text-slate-400">找不到對話</div>`;
+
+      const bubbles = t.messages.map(m => {
+        const mine = state.persona === 'me' ? (m.by === state.users.me.name) : (m.by !== state.users.me.name);
+        const align = mine ? 'justify-end' : 'justify-start';
+        const bubble = mine ? 'bg-slate-900 text-white' : 'bg-white border border-slate-200 text-slate-800';
+        const meta = m.post_id ? `<p class="text-[10px] opacity-70 mt-1">引用貼文：${m.post_id}</p>` : '';
+        return `
+          <div class="flex ${align}">
+            <div class="max-w-[75%] rounded-2xl px-4 py-3 ${bubble}">
+              <p class="text-sm font-bold">${m.text}</p>
+              ${meta}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      return `
+        <div class="h-full flex flex-col">
+          <div class="px-6 py-3 bg-white border-b border-slate-100 flex items-center justify-between">
+            <button onclick="renderTab('inbox')" class="text-[11px] font-black text-indigo-600">← 返回信箱</button>
+            <p class="text-[11px] text-slate-500 font-black">唯一對話規則（per pair）</p>
+          </div>
+
+          <div class="flex-1 px-6 py-4 space-y-3 overflow-y-auto">
+            ${bubbles}
+          </div>
+
+          <div class="px-6 py-4 bg-white border-t border-slate-100">
+            <div class="flex gap-2">
+              <input id="msg-input" class="flex-1 bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm" placeholder="輸入訊息..." />
+              <button onclick="sendMessage()" class="w-14 rounded-2xl bg-slate-900 text-white font-black">送</button>
+            </div>
+            <p class="text-[10px] text-slate-400 mt-2">示意：訊息可選帶 post_id 引用（此頁不再額外演示）</p>
+          </div>
+        </div>
+      `;
+    }
+
+    function sendMessage() {
+      const t = state.threads.find(x => x.id === activeThreadId);
+      const input = document.getElementById('msg-input');
+      if (!t || !input) return;
+      const text = input.value.trim();
+      if (!text) return;
+
+      const by = (state.persona === 'me') ? state.users.me.name : t.peer;
+      t.messages.push({ by, text, post_id: null });
+      input.value = '';
+      renderTab('thread');
+    }
+
+    // --- Profile/Gallery ---
+    function renderProfile() {
+      const canManage = state.persona === 'me';
+      const cards = state.gallery.map((g, idx) => `
+        <div class="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm">
+          <div class="flex items-start justify-between">
+            <div class="flex items-start gap-3">
+              <div class="w-11 h-11 bg-indigo-100 rounded-2xl flex items-center justify-center text-xl">${g.image}</div>
+              <div>
+                <p class="text-sm font-black text-slate-900">${g.title}</p>
+                <p class="text-[11px] text-slate-500">${g.note}</p>
+                <p class="text-[10px] text-slate-400 font-bold uppercase mt-1">順序：${idx + 1}</p>
+              </div>
+            </div>
+            ${canManage ? `
+              <div class="flex flex-col gap-2">
+                <button onclick="moveGallery(${idx}, -1)" class="w-10 h-10 rounded-2xl border border-slate-200 bg-white font-black">↑</button>
+                <button onclick="moveGallery(${idx}, 1)" class="w-10 h-10 rounded-2xl border border-slate-200 bg-white font-black">↓</button>
+              </div>
+            ` : ''}
+          </div>
+
+          ${canManage ? `
+            <div class="mt-3 flex items-center justify-end">
+              <button onclick="deleteGallery('${g.id}')" class="px-3 py-2 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-[11px] font-black">刪除</button>
+            </div>
+          ` : ''}
+        </div>
+      `).join('');
+
+      return `
+        <div class="px-6 py-4 space-y-4">
+          <div class="bg-white border border-slate-100 rounded-2xl p-5">
+            <div class="flex items-start justify-between">
+              <div>
+                <p class="text-sm font-black text-slate-900">相簿小卡</p>
+                <p class="text-[11px] text-slate-500">可新增 / 刪除 / 排序；不含交換狀態</p>
+              </div>
+              <span class="bg-indigo-50 text-indigo-700 text-[10px] px-2 py-1 rounded-full font-black">V2</span>
+            </div>
+
+            <div class="mt-4 grid grid-cols-2 gap-3">
+              <button onclick="toggleAllowStrangerDM()" class="h-12 rounded-2xl border border-slate-200 bg-white font-black">陌生人私訊：<span class="${state.users.recipient.allow_stranger_dm ? 'text-emerald-600' : 'text-rose-600'}">${state.users.recipient.allow_stranger_dm ? '開' : '關'}</span></button>
+              <button onclick="addGallery()" class="h-12 rounded-2xl bg-slate-900 text-white font-black shadow-xl" ${canManage ? '' : 'disabled'}>${canManage ? '新增小卡' : '（切換到發送者才可管理）'}</button>
+            </div>
+
+            <p class="text-[10px] text-slate-400 mt-3">提示：POC 規則是「所有瀏覽需登入」，因此此頁只在登入後可見。</p>
+          </div>
+
+          ${cards || '<div class="text-center text-slate-400 text-sm py-12">相簿目前沒有內容</div>'}
+        </div>
+      `;
+    }
+
+    function toggleAllowStrangerDM() {
+      state.users.recipient.allow_stranger_dm = !state.users.recipient.allow_stranger_dm;
+      showToast('info', '隱私設定', `陌生人私訊：${state.users.recipient.allow_stranger_dm ? '開啟' : '關閉'}`);
+      renderTab('profile');
+    }
+
+    function addGallery() {
+      // gallery_cards_count_max quota (only a simple guard)
+      const max = state.plan === 'free' ? state.quota.free.gallery_cards_count_max : state.quota.premium.gallery_cards_count_max;
+      if (state.gallery.length >= max) {
+        showToast('danger', '422_LIMIT_EXCEEDED', `limit_key=gallery_cards_count_max (limit=${max})`);
+        return;
+      }
+
+      const id = `g${state.gallery.length + 1}`;
+      state.gallery.unshift({ id, title: '新相簿小卡', note: '（示意）', image: '🃏' });
+      showToast('success', '已新增', '相簿小卡已加入清單');
+      renderTab('profile');
+    }
+
+    function deleteGallery(id) {
+      state.gallery = state.gallery.filter(x => x.id !== id);
+      showToast('info', '已刪除', '相簿小卡已移除');
+      renderTab('profile');
+    }
+
+    function moveGallery(index, delta) {
+      const target = index + delta;
+      if (target < 0 || target >= state.gallery.length) return;
+      const arr = state.gallery;
+      [arr[index], arr[target]] = [arr[target], arr[index]];
+      showToast('success', '已排序', '順序已更新（示意）');
+      renderTab('profile');
+    }
+
+    // --- Quota chart ---
+    function renderQuotaChart() {
+      const ctx = document.getElementById('quotaChart');
+      if (!ctx) return;
+
+      if (quotaChart) quotaChart.destroy();
+
+      // Normalize values for radar
+      const free = state.quota.free;
+      const premium = state.quota.premium;
+
+      const labels = [
+        '每日貼文',
+        '每則圖片',
+        '相簿上限',
+        '單檔大小',
+        '每月媒體'
+      ];
+
+      const norm = {
+        posts: 20,
+        images: 4,
+        gallery: 500,
+        file: 5 * 1024 * 1024,
+        month: 2 * 1024 * 1024 * 1024
+      };
+
+      const f = [
+        (free.posts_per_day / norm.posts) * 100,
+        (free.post_images_per_post_max / norm.images) * 100,
+        (free.gallery_cards_count_max / norm.gallery) * 100,
+        (free.media_file_bytes_max / norm.file) * 100,
+        (free.media_bytes_per_month / norm.month) * 100
+      ];
+
+      const p = [
+        (premium.posts_per_day / norm.posts) * 100,
+        (premium.post_images_per_post_max / norm.images) * 100,
+        (premium.gallery_cards_count_max / norm.gallery) * 100,
+        (premium.media_file_bytes_max / norm.file) * 100,
+        (premium.media_bytes_per_month / norm.month) * 100
+      ];
+
+      quotaChart = new Chart(ctx, {
+        type: 'radar',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: '免費',
+              data: f,
+              backgroundColor: 'rgba(169, 142, 216, 0.14)',
+              borderColor: 'rgba(169, 142, 216, 0.90)',
+              pointBackgroundColor: 'rgba(169, 142, 216, 1)'
+            },
+            {
+              label: '專業',
+              data: p,
+              backgroundColor: 'rgba(254, 197, 229, 0.20)',
+              borderColor: 'rgba(114, 57, 73, 0.88)',
+              pointBackgroundColor: 'rgba(114, 57, 73, 1)'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            r: {
+              min: 0,
+              max: 100,
+              ticks: { display: false },
+              grid: { color: 'rgba(38, 35, 32, 0.10)' },
+              angleLines: { color: 'rgba(38, 35, 32, 0.10)' },
+              pointLabels: { color: '#262320', font: { size: 11, weight: 'bold' } }
+            }
+          },
+          plugins: {
+            legend: { labels: { boxWidth: 10, boxHeight: 10, font: { weight: 'bold' } } }
+          }
+        }
+      });
+    }
+
+    // Default
+    document.addEventListener('DOMContentLoaded', () => {
+      initSimulator();
+      switchSection('prototype');
+    });
+  </script>
+</body>
+</html>
