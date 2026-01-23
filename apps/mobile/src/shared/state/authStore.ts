@@ -98,7 +98,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       await saveTokens(tokens);
     } catch (error) {
       console.error('Failed to save tokens:', error);
-      set({ error: 'Failed to save authentication tokens' });
+      set({ error: '儲存驗證資料失敗' });
     }
   },
 
@@ -119,7 +119,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     } catch (error) {
       console.error('Login failed:', error);
       set({
-        error: 'Login failed. Please try again.',
+        error: '登入失敗，請再試一次。',
         isLoading: false,
       });
       throw error;
@@ -142,7 +142,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     } catch (error) {
       console.error('Logout failed:', error);
       set({
-        error: 'Logout failed. Please try again.',
+        error: '登出失敗，請再試一次。',
         isLoading: false,
       });
     }

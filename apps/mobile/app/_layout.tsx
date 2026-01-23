@@ -4,7 +4,12 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAuthStore } from '@/src/shared/state/authStore';
 import { GluestackUIProvider } from '@/src/shared/ui/components/gluestack-ui-provider';
 import { useNotifications } from '@/src/features/notifications/hooks/useNotifications';
+import { configureSDK } from '@/src/shared/api/sdk';
 import '@/global.css';
+
+// Configure SDK at module load time (before any components render)
+// This ensures all API calls have the correct baseURL from the start
+configureSDK();
 
 // Create a client
 const queryClient = new QueryClient({
@@ -31,6 +36,7 @@ export default function RootLayout() {
 
   // Handle navigation based on auth state
   useEffect(() => {
+    // Wait for auth to finish loading
     if (isLoading) return;
 
     const inAuthGroup = segments[0] === 'auth';
