@@ -127,23 +127,23 @@ description: "Task list for implementing Posts-first POC (V2)"
 
 ### Tests（後端）
 
-- [ ] T045 [P] [US3] 新增 media 上傳確認與 attach 整合測試（新增 apps/backend/tests/integration/modules/media/test_media_upload_confirm_attach.py）
+- [x] T045 [P] [US3] 新增 media 上傳確認與 attach 整合測試（新增 apps/backend/tests/integration/modules/media/test_media_upload_confirm_attach.py）
 
 ### Backend（新增 media module）
 
-- [ ] T046 [P] [US3] 建立 MediaAsset domain model（新增 apps/backend/app/modules/media/domain/models/media_asset.py）
-- [ ] T047 [P] [US3] 建立 presign use case（新增 apps/backend/app/modules/media/application/use_cases/create_upload_url.py）
-- [ ] T048 [P] [US3] 建立 confirm use case（新增 apps/backend/app/modules/media/application/use_cases/confirm_upload.py）
-- [ ] T049 [P] [US3] 建立 attach-to-post / attach-to-gallery use cases（新增 apps/backend/app/modules/media/application/use_cases/attach_media.py）
-- [ ] T050 [P] [US3] 建立 media repository（新增 apps/backend/app/modules/media/infrastructure/repositories/media_repository.py）
-- [ ] T051 [US3] 建立 media router endpoints（新增 apps/backend/app/modules/media/presentation/routers/media_router.py 並在 apps/backend/app/main.py 註冊；包含 media/upload-url、media/{media_id}/confirm、posts/{post_id}/media/attach、gallery/cards/{card_id}/media/attach）
-- [ ] T052 [US3] 在 confirm use case 套用 media 配額（更新 apps/backend/app/modules/media/application/use_cases/confirm_upload.py 使用 apps/backend/app/shared/domain/quota/media_quota_service.py）
+- [x] T046 [P] [US3] 建立 MediaAsset domain model（新增 apps/backend/app/modules/media/domain/models/media_asset.py）
+- [x] T047 [P] [US3] 建立 presign use case（新增 apps/backend/app/modules/media/application/use_cases/create_upload_url.py）
+- [x] T048 [P] [US3] 建立 confirm use case（新增 apps/backend/app/modules/media/application/use_cases/confirm_upload.py）
+- [x] T049 [P] [US3] 建立 attach-to-post / attach-to-gallery use cases（新增 apps/backend/app/modules/media/application/use_cases/attach_media.py）
+- [x] T050 [P] [US3] 建立 media repository（新增 apps/backend/app/modules/media/infrastructure/repositories/media_repository.py）
+- [x] T051 [US3] 建立 media router endpoints（新增 apps/backend/app/modules/media/presentation/routers/media_router.py 並在 apps/backend/app/main.py 註冊；包含 media/upload-url、media/{media_id}/confirm、posts/{post_id}/media/attach、gallery/cards/{card_id}/media/attach）
+- [x] T052 [US3] 在 confirm use case 套用 media 配額（更新 apps/backend/app/modules/media/application/use_cases/confirm_upload.py 使用 apps/backend/app/shared/domain/quota/media_quota_service.py）
 
 ### Web（apps/web）
 
-- [ ] T053 [P] [US3] 建立通用上傳 helper（新增 apps/web/src/lib/media/uploadFlow.ts：presign→PUT→confirm）
-- [ ] T054 [US3] 發文表單加入圖片欄位並串接 attach（更新 apps/web/src/features/posts/components/CreatePostForm.tsx）
-- [ ] T055 [US3] 相簿新增卡流程加入圖片上傳（更新 apps/web/src/features/gallery/components/GalleryCreateCardForm.tsx）
+- [x] T053 [P] [US3] 建立通用上傳 helper（新增 apps/web/src/lib/media/uploadFlow.ts：presign→PUT→confirm）
+- [x] T054 [US3] 發文表單加入圖片欄位並串接 attach（更新 apps/web/src/features/posts/components/CreatePostForm.tsx）
+- [x] T055 [US3] 相簿新增卡流程加入圖片上傳（更新 apps/web/src/features/gallery/components/GalleryCreateCardForm.tsx）
 
 ---
 
