@@ -72,8 +72,9 @@ class MediaQuotaService:
         limit = QUOTA_LIMITS[QuotaKey.MEDIA_FILE_BYTES_MAX][tier]
 
         if file_size_bytes > limit:
-            # No periodic reset for file size limit
-            reset_at = datetime.max.replace(tzinfo=None)
+            # No periodic reset for file size limit - use far future with UTC timezone
+            from zoneinfo import ZoneInfo
+            reset_at = datetime.max.replace(tzinfo=ZoneInfo("UTC"))
             raise LimitExceededException(
                 limit_key=QuotaKey.MEDIA_FILE_BYTES_MAX.value,
                 limit_value=limit,
