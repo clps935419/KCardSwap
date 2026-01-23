@@ -69,7 +69,7 @@ class PostRepositoryImpl(IPostRepository):
         List posts with flexible filtering (V2: supports global/city filtering)
         
         FR-005:
-        - When city_code is None: returns all posts (scope=global + scope=city)
+        - When city_code is None: returns all posts (both scope=global and scope=city)
         - When city_code is provided: returns only posts with that city_code AND scope=city
         """
         query = select(PostModel)
@@ -83,7 +83,7 @@ class PostRepositoryImpl(IPostRepository):
                     PostModel.city_code == city_code
                 )
             )
-        # else: Global view includes all posts (no filtering by scope)
+        # else: Global view includes all posts (both scope=global and scope=city)
         
         # Category filter
         if category:

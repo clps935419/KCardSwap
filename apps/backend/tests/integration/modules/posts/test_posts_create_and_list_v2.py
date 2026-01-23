@@ -26,6 +26,8 @@ class TestPostsCreateAndListV2:
     @pytest_asyncio.fixture
     async def test_user(self, db_session) -> UUID:
         """Create test user and return user ID"""
+        import uuid
+        unique_id = str(uuid.uuid4())
         result = await db_session.execute(
             text("""
                 INSERT INTO users (google_id, email, role)
@@ -33,8 +35,8 @@ class TestPostsCreateAndListV2:
                 RETURNING id
             """),
             {
-                "google_id": "test_posts_v2_user",
-                "email": "postsv2@test.com",
+                "google_id": f"test_posts_v2_{unique_id}",
+                "email": f"postsv2_{unique_id}@test.com",
                 "role": "user"
             }
         )

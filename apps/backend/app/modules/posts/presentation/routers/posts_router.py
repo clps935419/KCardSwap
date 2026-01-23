@@ -62,6 +62,25 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/posts", tags=["Posts"])
 
 
+def _post_to_response(post) -> PostResponse:
+    """Helper to convert Post entity to PostResponse"""
+    return PostResponse(
+        id=UUID(post.id),
+        owner_id=UUID(post.owner_id),
+        scope=post.scope.value,
+        city_code=post.city_code,
+        category=post.category.value,
+        title=post.title,
+        content=post.content,
+        idol=post.idol,
+        idol_group=post.idol_group,
+        status=post.status.value,
+        expires_at=post.expires_at,
+        created_at=post.created_at,
+        updated_at=post.updated_at,
+    )
+
+
 @router.post(
     "",
     response_model=PostResponseWrapper,
@@ -107,21 +126,7 @@ async def create_post(
             expires_at=request.expires_at,
         )
 
-        data = PostResponse(
-            id=UUID(post.id),
-            owner_id=UUID(post.owner_id),
-            scope=post.scope.value,
-            city_code=post.city_code,
-            category=post.category.value,
-            title=post.title,
-            content=post.content,
-            idol=post.idol,
-            idol_group=post.idol_group,
-            status=post.status.value,
-            expires_at=post.expires_at,
-            created_at=post.created_at,
-            updated_at=post.updated_at,
-        )
+        data = _post_to_response(post)
         return PostResponseWrapper(data=data, meta=None, error=None)
 
     except ValueError as e:
@@ -176,24 +181,7 @@ async def list_posts(
             offset=offset,
         )
 
-        post_responses = [
-            PostResponse(
-                id=UUID(post.id),
-                owner_id=UUID(post.owner_id),
-                scope=post.scope.value,
-                city_code=post.city_code,
-                category=post.category.value,
-                title=post.title,
-                content=post.content,
-                idol=post.idol,
-                idol_group=post.idol_group,
-                status=post.status.value,
-                expires_at=post.expires_at,
-                created_at=post.created_at,
-                updated_at=post.updated_at,
-            )
-            for post in posts
-        ]
+        post_responses = [_post_to_response(post) for post in posts]
 
         data = PostListResponse(posts=post_responses, total=len(post_responses))
         return PostListResponseWrapper(data=data, meta=None, error=None)
