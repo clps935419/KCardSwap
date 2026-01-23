@@ -9,26 +9,57 @@ Tests FR-003, FR-004, FR-005:
 - Authentication required
 """
 
-import uuid
-from datetime import datetime, timedelta, timezone
-
 import pytest
-from httpx import AsyncClient
-from sqlalchemy.ext.asyncio import AsyncSession
+import pytest_asyncio
+from fastapi.testclient import TestClient
+from sqlalchemy import text
+from uuid import UUID
 
-from app.modules.posts.domain.entities.post_enums import PostCategory, PostScope
+from app.main import app
+from app.shared.infrastructure.database.connection import get_db_session
+from app.shared.presentation.dependencies.auth import get_current_user_id
 
 
 class TestPostsCreateAndListV2:
     """Test posts creation and listing with V2 features (scope/category)"""
 
-    @pytest.mark.asyncio
-    async def test_create_global_post(
-        self,
-        async_client: AsyncClient,
-        auth_headers: dict,
-        db_session: AsyncSession,
-    ):
+    @pytest_asyncio.fixture
+    async def test_user(self, db_session) -> UUID:
+        """Create test user and return user ID"""
+        result = await db_session.execute(
+            text("""
+                INSERT INTO users (google_id, email, role)
+                VALUES (:google_id, :email, :role)
+                RETURNING id
+            """),
+            {
+                "google_id": "test_posts_v2_user",
+                "email": "postsv2@test.com",
+                "role": "user"
+            }
+        )
+        user_id = result.scalar()
+        await db_session.flush()
+        return user_id
+
+    @pytest.fixture
+    def authenticated_client(self, test_user, db_session):
+        """Provide authenticated test client"""
+        def override_get_current_user_id():
+            return test_user
+
+        async def override_get_db_session():
+            yield db_session
+
+        app.dependency_overrides[get_current_user_id] = override_get_current_user_id
+        app.dependency_overrides[get_db_session] = override_get_db_session
+
+        client = TestClient(app)
+        yield client
+
+        app.dependency_overrides.clear()
+
+    def test_create_global_post(self, authenticated_client):
         """Test creating a global post (FR-003)"""
         payload = {
             "scope": "global",
@@ -37,11 +68,7 @@ class TestPostsCreateAndListV2:
             "content": "I have duplicate Jungkook cards to trade",
         }
 
-        response = await async_client.post(
-            "/api/v1/posts",
-            json=payload,
-            headers=auth_headers,
-        )
+        response = authenticated_client.post("/api/v1/posts", json=payload)
 
         assert response.status_code == 201
         data = response.json()["data"]
@@ -51,13 +78,7 @@ class TestPostsCreateAndListV2:
         assert data["title"] == payload["title"]
         assert data["status"] == "open"
 
-    @pytest.mark.asyncio
-    async def test_create_city_post(
-        self,
-        async_client: AsyncClient,
-        auth_headers: dict,
-        db_session: AsyncSession,
-    ):
+    def test_create_city_post(self, authenticated_client):
         """Test creating a city post with city_code (FR-003, FR-004)"""
         payload = {
             "scope": "city",
@@ -67,11 +88,7 @@ class TestPostsCreateAndListV2:
             "content": "Giving away duplicate cards",
         }
 
-        response = await async_client.post(
-            "/api/v1/posts",
-            json=payload,
-            headers=auth_headers,
-        )
+        response = authenticated_client.post("/api/v1/posts", json=payload)
 
         assert response.status_code == 201
         data = response.json()["data"]
@@ -79,12 +96,7 @@ class TestPostsCreateAndListV2:
         assert data["city_code"] == "TPE"
         assert data["category"] == "giveaway"
 
-    @pytest.mark.asyncio
-    async def test_create_city_post_without_city_code_fails(
-        self,
-        async_client: AsyncClient,
-        auth_headers: dict,
-    ):
+    def test_create_city_post_without_city_code_fails(self, authenticated_client):
         """Test that scope=city requires city_code (FR-004)"""
         payload = {
             "scope": "city",
@@ -93,21 +105,12 @@ class TestPostsCreateAndListV2:
             "content": "Test content",
         }
 
-        response = await async_client.post(
-            "/api/v1/posts",
-            json=payload,
-            headers=auth_headers,
-        )
+        response = authenticated_client.post("/api/v1/posts", json=payload)
 
         assert response.status_code == 422
         assert "city_code" in response.text.lower()
 
-    @pytest.mark.asyncio
-    async def test_create_global_post_with_city_code_fails(
-        self,
-        async_client: AsyncClient,
-        auth_headers: dict,
-    ):
+    def test_create_global_post_with_city_code_fails(self, authenticated_client):
         """Test that scope=global must not have city_code (FR-004)"""
         payload = {
             "scope": "global",
@@ -117,24 +120,15 @@ class TestPostsCreateAndListV2:
             "content": "Test content",
         }
 
-        response = await async_client.post(
-            "/api/v1/posts",
-            json=payload,
-            headers=auth_headers,
-        )
+        response = authenticated_client.post("/api/v1/posts", json=payload)
 
         assert response.status_code == 422
         assert "city_code" in response.text.lower()
 
-    @pytest.mark.asyncio
-    async def test_list_global_includes_all_posts(
-        self,
-        async_client: AsyncClient,
-        auth_headers: dict,
-    ):
+    def test_list_global_includes_all_posts(self, authenticated_client):
         """Test that global list includes all posts (FR-005)"""
         # Create 1 global post
-        await async_client.post(
+        authenticated_client.post(
             "/api/v1/posts",
             json={
                 "scope": "global",
@@ -142,11 +136,10 @@ class TestPostsCreateAndListV2:
                 "title": "Global post",
                 "content": "Content",
             },
-            headers=auth_headers,
         )
 
         # Create 1 city post
-        await async_client.post(
+        authenticated_client.post(
             "/api/v1/posts",
             json={
                 "scope": "city",
@@ -155,14 +148,10 @@ class TestPostsCreateAndListV2:
                 "title": "Taipei post",
                 "content": "Content",
             },
-            headers=auth_headers,
         )
 
         # List without city_code (global view)
-        response = await async_client.get(
-            "/api/v1/posts",
-            headers=auth_headers,
-        )
+        response = authenticated_client.get("/api/v1/posts")
 
         assert response.status_code == 200
         data = response.json()["data"]
@@ -173,15 +162,10 @@ class TestPostsCreateAndListV2:
         assert "global" in scopes
         assert "city" in scopes
 
-    @pytest.mark.asyncio
-    async def test_list_city_only_includes_city_posts(
-        self,
-        async_client: AsyncClient,
-        auth_headers: dict,
-    ):
+    def test_list_city_only_includes_city_posts(self, authenticated_client):
         """Test that city list only includes city-specific posts (FR-005)"""
         # Create posts for different cities
-        await async_client.post(
+        authenticated_client.post(
             "/api/v1/posts",
             json={
                 "scope": "city",
@@ -190,10 +174,9 @@ class TestPostsCreateAndListV2:
                 "title": "Taipei post",
                 "content": "Content",
             },
-            headers=auth_headers,
         )
 
-        await async_client.post(
+        authenticated_client.post(
             "/api/v1/posts",
             json={
                 "scope": "city",
@@ -202,14 +185,10 @@ class TestPostsCreateAndListV2:
                 "title": "Kaohsiung post",
                 "content": "Content",
             },
-            headers=auth_headers,
         )
 
         # List with city_code=TPE
-        response = await async_client.get(
-            "/api/v1/posts?city_code=TPE",
-            headers=auth_headers,
-        )
+        response = authenticated_client.get("/api/v1/posts?city_code=TPE")
 
         assert response.status_code == 200
         data = response.json()["data"]
@@ -219,15 +198,10 @@ class TestPostsCreateAndListV2:
             assert post["city_code"] == "TPE"
             assert post["scope"] == "city"
 
-    @pytest.mark.asyncio
-    async def test_category_filtering(
-        self,
-        async_client: AsyncClient,
-        auth_headers: dict,
-    ):
+    def test_category_filtering(self, authenticated_client):
         """Test filtering by category (FR-002)"""
         # Create posts with different categories
-        await async_client.post(
+        authenticated_client.post(
             "/api/v1/posts",
             json={
                 "scope": "global",
@@ -235,10 +209,9 @@ class TestPostsCreateAndListV2:
                 "title": "Trade post",
                 "content": "Content",
             },
-            headers=auth_headers,
         )
 
-        await async_client.post(
+        authenticated_client.post(
             "/api/v1/posts",
             json={
                 "scope": "global",
@@ -246,14 +219,10 @@ class TestPostsCreateAndListV2:
                 "title": "Giveaway post",
                 "content": "Content",
             },
-            headers=auth_headers,
         )
 
         # Filter by category=trade
-        response = await async_client.get(
-            "/api/v1/posts?category=trade",
-            headers=auth_headers,
-        )
+        response = authenticated_client.get("/api/v1/posts?category=trade")
 
         assert response.status_code == 200
         data = response.json()["data"]
@@ -262,22 +231,16 @@ class TestPostsCreateAndListV2:
         for post in data["posts"]:
             assert post["category"] == "trade"
 
-    @pytest.mark.asyncio
-    async def test_list_posts_requires_authentication(
-        self,
-        async_client: AsyncClient,
-    ):
+    def test_list_posts_requires_authentication(self):
         """Test that listing posts requires login (FR-001)"""
-        response = await async_client.get("/api/v1/posts")
+        client = TestClient(app)
+        response = client.get("/api/v1/posts")
         
         assert response.status_code == 401
 
-    @pytest.mark.asyncio
-    async def test_create_post_requires_authentication(
-        self,
-        async_client: AsyncClient,
-    ):
+    def test_create_post_requires_authentication(self):
         """Test that creating posts requires login (FR-001)"""
+        client = TestClient(app)
         payload = {
             "scope": "global",
             "category": "trade",
@@ -285,19 +248,11 @@ class TestPostsCreateAndListV2:
             "content": "Test content",
         }
 
-        response = await async_client.post(
-            "/api/v1/posts",
-            json=payload,
-        )
+        response = client.post("/api/v1/posts", json=payload)
         
         assert response.status_code == 401
 
-    @pytest.mark.asyncio
-    async def test_all_categories_are_valid(
-        self,
-        async_client: AsyncClient,
-        auth_headers: dict,
-    ):
+    def test_all_categories_are_valid(self, authenticated_client):
         """Test that all defined categories are accepted (FR-002)"""
         categories = ["trade", "giveaway", "group", "showcase", "help", "announcement"]
         
@@ -309,11 +264,7 @@ class TestPostsCreateAndListV2:
                 "content": "Test content",
             }
 
-            response = await async_client.post(
-                "/api/v1/posts",
-                json=payload,
-                headers=auth_headers,
-            )
+            response = authenticated_client.post("/api/v1/posts", json=payload)
 
             assert response.status_code == 201
             data = response.json()["data"]
