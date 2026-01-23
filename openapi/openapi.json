@@ -200,26 +200,34 @@
         "tags": [
           "Authentication"
         ],
-        "summary": "Refresh access token",
-        "description": "Use refresh token to obtain new access and refresh tokens",
+        "summary": "Refresh access token (cookie-based)",
+        "description": "Use refresh token from httpOnly cookie to obtain new access and refresh tokens",
         "operationId": "refresh_token_api_v1_auth_refresh_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RefreshTokenRequest"
-              }
+        "parameters": [
+          {
+            "name": "refresh_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Refresh Token"
             }
-          },
-          "required": true
-        },
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successfully refreshed tokens",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/LoginResponse"
+                  "$ref": "#/components/schemas/RefreshSuccessResponse"
                 }
               }
             }
@@ -4774,21 +4782,24 @@
         "title": "RatingResponseWrapper",
         "description": "Response wrapper for single rating (standardized envelope)"
       },
-      "RefreshTokenRequest": {
+      "RefreshSuccessResponse": {
         "properties": {
-          "refresh_token": {
+          "success": {
+            "type": "boolean",
+            "title": "Success",
+            "description": "Indicates successful refresh",
+            "default": true
+          },
+          "message": {
             "type": "string",
-            "minLength": 1,
-            "title": "Refresh Token",
-            "description": "Refresh token"
+            "title": "Message",
+            "description": "Success message",
+            "default": "Tokens refreshed successfully"
           }
         },
         "type": "object",
-        "required": [
-          "refresh_token"
-        ],
-        "title": "RefreshTokenRequest",
-        "description": "Request schema for refreshing access token"
+        "title": "RefreshSuccessResponse",
+        "description": "Response for successful token refresh (cookie-based)"
       },
       "ReportListResponse": {
         "properties": {
