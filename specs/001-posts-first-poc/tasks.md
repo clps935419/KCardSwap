@@ -101,21 +101,21 @@ description: "Task list for implementing Posts-first POC (V2)"
 
 ### Tests（後端）
 
-- [ ] T036 [P] [US2] 新增 gallery cards CRUD+reorder 整合測試（新增 apps/backend/tests/integration/modules/social/test_gallery_cards_v2.py）
+- [x] T036 [P] [US2] 新增 gallery cards CRUD+reorder 整合測試（新增 apps/backend/tests/integration/modules/social/test_gallery_cards_v2.py）
 
 ### Backend（建議：social module 新增 GalleryCard bounded context；避免使用 trading/traded 狀態）
 
-- [ ] T037 [P] [US2] 定義 GalleryCard domain model（新增 apps/backend/app/modules/social/domain/models/gallery_card.py）
-- [ ] T038 [P] [US2] 定義排序規則與 reordering use case（新增 apps/backend/app/modules/social/application/use_cases/reorder_gallery_cards.py）
-- [ ] T039 [P] [US2] 建立 repository（新增 apps/backend/app/modules/social/infrastructure/repositories/gallery_card_repository.py）
-- [ ] T040 [US2] 建立 gallery router endpoints（新增 apps/backend/app/modules/social/presentation/routers/gallery_router.py 並在 apps/backend/app/modules/social/module.py 註冊；包含 users/{user_id}/gallery/cards、gallery/cards/me、POST gallery/cards、DELETE gallery/cards/{card_id}、PUT gallery/cards/reorder）
-- [ ] T041 [US2] 將 require_user 依賴套用到 gallery router（更新 apps/backend/app/modules/social/presentation/routers/gallery_router.py）
+- [x] T037 [P] [US2] 定義 GalleryCard domain model（新增 apps/backend/app/modules/social/domain/entities/gallery_card.py）
+- [x] T038 [P] [US2] 定義排序規則與 reordering use case（新增 apps/backend/app/modules/social/application/use_cases/reorder_gallery_cards.py）
+- [x] T039 [P] [US2] 建立 repository（新增 apps/backend/app/modules/social/infrastructure/repositories/gallery_card_repository.py 與 domain/repositories/i_gallery_card_repository.py）
+- [x] T040 [US2] 建立 gallery router endpoints（新增 apps/backend/app/modules/social/presentation/routers/gallery_router.py 並在 apps/backend/app/main.py 註冊；包含 users/{user_id}/gallery/cards、gallery/cards/me、POST gallery/cards、DELETE gallery/cards/{card_id}、PUT gallery/cards/reorder）
+- [x] T041 [US2] 將 require_user 依賴套用到 gallery router（更新 apps/backend/app/modules/social/presentation/routers/gallery_router.py）
 
 ### Web（apps/web）
 
-- [ ] T042 [P] [US2] 建立個人頁與相簿區塊 UI（新增 apps/web/src/app/(app)/users/[userId]/page.tsx 與 apps/web/src/features/gallery/components/GalleryGrid.tsx）
-- [ ] T043 [P] [US2] 建立我的相簿管理頁（新增 apps/web/src/app/(app)/me/gallery/page.tsx）
-- [ ] T044 [US2] 串接新增/刪除/排序 mutations（新增 apps/web/src/features/gallery/hooks/useGalleryMutations.ts）
+- [x] T042 [P] [US2] 建立個人頁與相簿區塊 UI（新增 apps/web/src/app/(app)/users/[userId]/page.tsx 與 apps/web/src/features/gallery/components/GalleryGrid.tsx）
+- [x] T043 [P] [US2] 建立我的相簿管理頁（新增 apps/web/src/app/(app)/me/gallery/page.tsx）
+- [x] T044 [US2] 串接新增/刪除/排序 mutations（新增 apps/web/src/features/gallery/hooks/useGalleryMutations.ts）
 
 ---
 

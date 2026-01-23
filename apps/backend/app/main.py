@@ -181,6 +181,20 @@ def create_application() -> FastAPI:
 
     app.include_router(location_router, prefix=settings.API_PREFIX)
 
+    # Phase 9: Social module (Gallery Cards - User Story 2)
+    from .modules.social.presentation.routers.gallery_router import (
+        router as gallery_router,
+    )
+
+    app.include_router(gallery_router, prefix=settings.API_PREFIX)
+
+    # Phase 10: Media module (Media Upload & Attach - User Story 3)
+    from .modules.media.presentation.routers.media_router import (
+        router as media_router,
+    )
+
+    app.include_router(media_router, prefix=settings.API_PREFIX)
+
     return app
 
 
