@@ -7,18 +7,29 @@ from datetime import datetime
 from typing import List, Optional
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from app.modules.posts.domain.entities.city_code import CityCode
+from app.modules.posts.domain.entities.post_enums import PostCategory, PostScope
 
 
 class CreatePostRequest(BaseModel):
-    """Request schema for creating a post"""
+    """Request schema for creating a post (V2: with scope/category)"""
 
-    city_code: CityCode = Field(
+    scope: PostScope = Field(
         ...,
-        description="City code - must be one of: TPE (Taipei), NTP (New Taipei), TAO (Taoyuan), TXG (Taichung), TNN (Tainan), KHH (Kaohsiung), HSZ (Hsinchu City), CYI (Chiayi City), and other Taiwan cities",
+        description="Post scope: global (visible everywhere) or city (city-specific)",
+        examples=["global", "city"],
+    )
+    city_code: Optional[CityCode] = Field(
+        None,
+        description="City code - required when scope=city, must be empty when scope=global",
         examples=["TPE"],
+    )
+    category: PostCategory = Field(
+        ...,
+        description="Post category",
+        examples=["trade", "giveaway", "group", "showcase", "help", "announcement"],
     )
     title: str = Field(
         ...,
@@ -48,10 +59,23 @@ class CreatePostRequest(BaseModel):
         description="Expiry datetime (defaults to 14 days from now)",
     )
 
+    @field_validator("city_code")
+    @classmethod
+    def validate_city_code_with_scope(cls, v, info):
+        """Validate FR-004: scope=city requires city_code"""
+        scope = info.data.get("scope")
+        if scope == PostScope.CITY and not v:
+            raise ValueError("city_code is required when scope is 'city'")
+        if scope == PostScope.GLOBAL and v:
+            raise ValueError("city_code must be empty when scope is 'global'")
+        return v
+
     class Config:
         json_schema_extra = {
             "example": {
+                "scope": "city",
                 "city_code": "TPE",
+                "category": "trade",
                 "title": "Looking for BTS cards in Taipei",
                 "content": "I have Jungkook cards and looking for V cards",
                 "idol": "Jungkook",
@@ -61,11 +85,13 @@ class CreatePostRequest(BaseModel):
 
 
 class PostResponse(BaseModel):
-    """Response schema for post details"""
+    """Response schema for post details (V2: with scope/category)"""
 
     id: UUID = Field(..., description="Post ID")
     owner_id: UUID = Field(..., description="Owner user ID")
-    city_code: CityCode = Field(..., description="City code")
+    scope: str = Field(..., description="Post scope (global/city)")
+    city_code: Optional[str] = Field(None, description="City code (if scope=city)")
+    category: str = Field(..., description="Post category")
     title: str = Field(..., description="Post title")
     content: str = Field(..., description="Post content")
     idol: Optional[str] = Field(None, description="Idol name")
@@ -85,7 +111,9 @@ class PostResponse(BaseModel):
             "example": {
                 "id": "123e4567-e89b-12d3-a456-426614174000",
                 "owner_id": "987e6543-e21b-12d3-a456-426614174000",
+                "scope": "city",
                 "city_code": "TPE",
+                "category": "trade",
                 "title": "Looking for BTS cards in Taipei",
                 "content": "I have Jungkook cards and looking for V cards",
                 "idol": "Jungkook",
@@ -111,7 +139,9 @@ class PostListResponse(BaseModel):
                     {
                         "id": "123e4567-e89b-12d3-a456-426614174000",
                         "owner_id": "987e6543-e21b-12d3-a456-426614174000",
+                        "scope": "city",
                         "city_code": "TPE",
+                        "category": "trade",
                         "title": "Looking for BTS cards",
                         "content": "I have Jungkook cards",
                         "idol": "Jungkook",

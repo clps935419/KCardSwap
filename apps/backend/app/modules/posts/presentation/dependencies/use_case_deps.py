@@ -25,6 +25,9 @@ from app.modules.posts.application.use_cases.list_board_posts_use_case import (
 from app.modules.posts.application.use_cases.list_post_interests_use_case import (
     ListPostInterestsUseCase,
 )
+from app.modules.posts.application.use_cases.list_posts_v2_use_case import (
+    ListPostsV2UseCase,
+)
 from app.modules.posts.application.use_cases.reject_interest_use_case import (
     RejectInterestUseCase,
 )
@@ -56,6 +59,17 @@ async def get_list_board_posts_use_case(
     child = injector.create_child_injector()
     child.binder.bind(AsyncSession, to=session)
     return child.get(ListBoardPostsUseCase)
+
+
+async def get_list_posts_v2_use_case(
+    session: Annotated[AsyncSession, Depends(get_db_session)],
+    request: Request = None,
+) -> ListPostsV2UseCase:
+    """Get ListPostsV2UseCase from injector with request-scoped session."""
+    injector = _get_injector(request)
+    child = injector.create_child_injector()
+    child.binder.bind(AsyncSession, to=session)
+    return child.get(ListPostsV2UseCase)
 
 
 async def get_express_interest_use_case(
