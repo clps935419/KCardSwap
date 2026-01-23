@@ -10,8 +10,11 @@ dist/
 downloads/
 eggs/
 .eggs/
+# Python virtual environments
 lib/
 lib64/
+# But allow web/src/lib (Next.js convention)
+!apps/web/src/lib/
 parts/
 sdist/
 var/
