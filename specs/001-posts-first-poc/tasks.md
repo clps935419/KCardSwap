@@ -46,15 +46,15 @@ description: "Task list for implementing Posts-first POC (V2)"
 - [x] T010 定義 POC 共用錯誤格式（新增 apps/backend/app/shared/presentation/errors/limit_exceeded.py，支援 422_LIMIT_EXCEEDED payload: limit_key/limit_value/current_value/reset_at）
 - [x] T011 實作「所有瀏覽需登入」的共用依賴（新增 apps/backend/app/shared/presentation/deps/require_user.py 並套用到後續 routers）
 - [x] T012 [P] 新增/調整 cookie-JWT（access/refresh）設定（更新 apps/backend/app/config.py，加入 cookie 名稱、TTL、SameSite、Secure 等設定項）
-- [ ] T013 實作 refresh endpoint 改為 httpOnly cookie 流程（更新 apps/backend/app/modules/identity/presentation/routers/auth_router.py，讓 /api/v1/auth/refresh 旋轉/換發 access cookie）
-- [ ] T014 [P] 新增後端整合測試：refresh cookie 行為（新增 apps/backend/tests/integration/modules/identity/test_auth_refresh_cookie.py）
+- [x] T013 實作 refresh endpoint 改為 httpOnly cookie 流程（更新 apps/backend/app/modules/identity/presentation/routers/auth_router.py，讓 /api/v1/auth/refresh 旋轉/換發 access cookie）
+- [x] T014 [P] 新增後端整合測試：refresh cookie 行為（新增 apps/backend/tests/integration/modules/identity/test_auth_refresh_cookie.py）
 - [x] T015 統一「內容/媒體配額」domain 介面（新增 apps/backend/app/shared/domain/quota/ 目錄，包含 limit keys 與 reset policy）
-- [ ] T016 [P] 實作 posts_per_day 配額檢查（新增 apps/backend/app/modules/posts/application/services/post_quota_service.py 並在建立貼文 use case 套用）
-- [ ] T017 [P] 實作 media 配額介面（新增 apps/backend/app/shared/domain/quota/media_quota_service.py，支援 media_file_bytes_max 與 media_bytes_per_month）
+- [x] T016 [P] 實作 posts_per_day 配額檢查（新增 apps/backend/app/modules/posts/application/services/post_quota_service.py 並在建立貼文 use case 套用）
+- [x] T017 [P] 實作 media 配額介面（新增 apps/backend/app/shared/domain/quota/media_quota_service.py，支援 media_file_bytes_max 與 media_bytes_per_month）
 - [x] T018 Web：建立 API client 與 cookie 傳遞規則（新增 apps/web/src/lib/api/axios.ts，預設 withCredentials 並集中處理 baseURL）
 - [x] T019 Web：建立 401 → refresh → retry 機制（新增 apps/web/src/lib/api/auth-refresh.ts 與 apps/web/src/lib/api/axios-interceptors.ts）
 - [x] T020 OpenAPI 生成流程對齊（更新 apps/backend/scripts/generate_openapi.py 的說明文件：apps/backend/README.md 新增 POC 流程段落）
-- [ ] T021 生成並提交最新 OpenAPI snapshot（更新 openapi/openapi.json）
+- [x] T021 生成並提交最新 OpenAPI snapshot（更新 openapi/openapi.json）
 - [x] T022 Web：建立 hey-api 生成設定與輸出位置（新增 apps/web/openapi.config.ts 與 apps/web/src/shared/api/generated/ 目錄）
 - [x] T023 Web：新增 SDK 生成腳本（更新 apps/web/package.json 新增 "sdk:generate" 指令，讀取 repo root openapi/openapi.json）
 
@@ -70,24 +70,24 @@ description: "Task list for implementing Posts-first POC (V2)"
 
 ### Tests（後端）
 
-- [ ] T024 [P] [US1] 新增 posts 建立/列表整合測試（新增 apps/backend/tests/integration/modules/posts/test_posts_create_and_list_v2.py）
+- [x] T024 [P] [US1] 新增 posts 建立/列表整合測試（新增 apps/backend/tests/integration/modules/posts/test_posts_create_and_list_v2.py）
 
 ### Backend（DDD: posts module）
 
-- [ ] T025 [P] [US1] 定義 PostCategory 與 PostScope（新增 apps/backend/app/modules/posts/domain/models/post_enums.py）
-- [ ] T026 [P] [US1] 調整 Post domain model 支援 scope/city_code/category（更新 apps/backend/app/modules/posts/domain/models/post.py）
-- [ ] T027 [US1] 調整 CreatePostRequest/Response schema（更新 apps/backend/app/modules/posts/presentation/schemas/post_schemas.py）
-- [ ] T028 [US1] 調整 list_posts 查詢支援 global（含 city）與 city 篩選（更新 apps/backend/app/modules/posts/infrastructure/repositories/post_repository.py）
-- [ ] T029 [US1] 更新 posts router 合約支援 scope/city_code/category（更新 apps/backend/app/modules/posts/presentation/routers/posts_router.py；GET/POST /api/v1/posts 依 specs/001-posts-first-poc/spec.md FR-003/FR-004/FR-005）
-- [ ] T030 [US1] 將 require_user 依賴套用到 posts router（更新 apps/backend/app/modules/posts/presentation/routers/posts_router.py）
+- [x] T025 [P] [US1] 定義 PostCategory 與 PostScope（新增 apps/backend/app/modules/posts/domain/models/post_enums.py）
+- [x] T026 [P] [US1] 調整 Post domain model 支援 scope/city_code/category（更新 apps/backend/app/modules/posts/domain/models/post.py）
+- [x] T027 [US1] 調整 CreatePostRequest/Response schema（更新 apps/backend/app/modules/posts/presentation/schemas/post_schemas.py）
+- [x] T028 [US1] 調整 list_posts 查詢支援 global（含 city）與 city 篩選（更新 apps/backend/app/modules/posts/infrastructure/repositories/post_repository.py）
+- [x] T029 [US1] 更新 posts router 合約支援 scope/city_code/category（更新 apps/backend/app/modules/posts/presentation/routers/posts_router.py；GET/POST /api/v1/posts 依 specs/001-posts-first-poc/spec.md FR-003/FR-004/FR-005）
+- [x] T030 [US1] 將 require_user 依賴套用到 posts router（更新 apps/backend/app/modules/posts/presentation/routers/posts_router.py）
 
 ### Web（apps/web）
 
-- [ ] T031 [P] [US1] 建立貼文列表頁骨架（新增 apps/web/src/app/(app)/posts/page.tsx）
-- [ ] T032 [P] [US1] 建立貼文列表查詢 hook（新增 apps/web/src/features/posts/hooks/usePostsList.ts，使用生成的 TanStack Query hooks）
-- [ ] T033 [P] [US1] 建立貼文篩選 UI（新增 apps/web/src/features/posts/components/PostFilters.tsx）
-- [ ] T034 [US1] 建立發文頁與表單（新增 apps/web/src/app/(app)/posts/new/page.tsx 與 apps/web/src/features/posts/components/CreatePostForm.tsx）
-- [ ] T035 [US1] 串接建立貼文 mutation（更新 apps/web/src/features/posts/components/CreatePostForm.tsx）
+- [x] T031 [P] [US1] 建立貼文列表頁骨架（新增 apps/web/src/app/(app)/posts/page.tsx）
+- [x] T032 [P] [US1] 建立貼文列表查詢 hook（新增 apps/web/src/features/posts/hooks/usePostsList.ts，使用生成的 TanStack Query hooks）
+- [x] T033 [P] [US1] 建立貼文篩選 UI（新增 apps/web/src/features/posts/components/PostFilters.tsx）
+- [x] T034 [US1] 建立發文頁與表單（新增 apps/web/src/app/(app)/posts/new/page.tsx 與 apps/web/src/features/posts/components/CreatePostForm.tsx）
+- [x] T035 [US1] 串接建立貼文 mutation（更新 apps/web/src/features/posts/components/CreatePostForm.tsx）
 
 **Checkpoint**: US1 可獨立 demo（文字貼文 + global/city + 分類/城市篩選）。
 

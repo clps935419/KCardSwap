@@ -8,6 +8,7 @@ from abc import ABC, abstractmethod
 from typing import List, Optional
 
 from app.modules.posts.domain.entities.post import Post, PostStatus
+from app.modules.posts.domain.entities.post_enums import PostCategory
 
 
 class IPostRepository(ABC):
@@ -41,6 +42,31 @@ class IPostRepository(ABC):
             status: Filter by post status
             idol: Filter by idol name
             idol_group: Filter by idol group
+            limit: Maximum number of results
+            offset: Pagination offset
+        """
+        pass
+
+    @abstractmethod
+    async def list_posts(
+        self,
+        city_code: Optional[str] = None,
+        category: Optional[PostCategory] = None,
+        status: Optional[PostStatus] = None,
+        limit: int = 50,
+        offset: int = 0,
+    ) -> List[Post]:
+        """
+        List posts with flexible filtering (V2: supports global/city filtering)
+        
+        FR-005: 
+        - When city_code is None: returns all posts (global + city)
+        - When city_code is provided: returns only posts with that city_code
+        
+        Args:
+            city_code: Optional city filter (None = global view, includes all posts)
+            category: Optional category filter
+            status: Filter by post status (defaults to OPEN)
             limit: Maximum number of results
             offset: Pagination offset
         """

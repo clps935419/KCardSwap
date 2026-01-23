@@ -1,5 +1,3 @@
-import { defineConfig } from '@hey-api/openapi-ts'
-
 /**
  * OpenAPI SDK Generation Configuration
  *
@@ -10,13 +8,11 @@ import { defineConfig } from '@hey-api/openapi-ts'
  * 4. Generate TanStack Query hooks for React
  */
 
-export default defineConfig({
+export default {
   client: '@hey-api/client-axios',
   input: '../../openapi/openapi.json',
   output: {
     path: './src/shared/api/generated',
-    format: 'prettier',
-    lint: 'eslint',
   },
   plugins: [
     '@hey-api/typescript',
@@ -28,4 +24,4 @@ export default defineConfig({
       queryOptions: true,
     },
   ],
-})
+}

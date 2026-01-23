@@ -6,10 +6,11 @@ from datetime import datetime, timezone
 from typing import List, Optional
 from uuid import UUID
 
-from sqlalchemy import and_, func, select
+from sqlalchemy import and_, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.posts.domain.entities.post import Post, PostStatus
+from app.modules.posts.domain.entities.post_enums import PostCategory, PostScope
 from app.modules.posts.domain.repositories.i_post_repository import IPostRepository
 from app.modules.posts.infrastructure.database.models.post_model import PostModel
 
@@ -27,7 +28,9 @@ class PostRepositoryImpl(IPostRepository):
             owner_id=(
                 UUID(post.owner_id) if isinstance(post.owner_id, str) else post.owner_id
             ),
+            scope=post.scope.value if isinstance(post.scope, PostScope) else post.scope,
             city_code=post.city_code,
+            category=post.category.value if isinstance(post.category, PostCategory) else post.category,
             title=post.title,
             content=post.content,
             idol=post.idol,
@@ -54,6 +57,52 @@ class PostRepositoryImpl(IPostRepository):
         model = result.scalar_one_or_none()
         return self._to_entity(model) if model else None
 
+    async def list_posts(
+        self,
+        city_code: Optional[str] = None,
+        category: Optional[PostCategory] = None,
+        status: Optional[PostStatus] = None,
+        limit: int = 50,
+        offset: int = 0,
+    ) -> List[Post]:
+        """
+        List posts with flexible filtering (V2: supports global/city filtering)
+        
+        FR-005:
+        - When city_code is None: returns all posts (both scope=global and scope=city)
+        - When city_code is provided: returns only posts with that city_code AND scope=city
+        """
+        query = select(PostModel)
+        
+        # FR-005: City filtering
+        if city_code:
+            # City-specific view: only show posts for this city
+            query = query.where(
+                and_(
+                    PostModel.scope == PostScope.CITY.value,
+                    PostModel.city_code == city_code
+                )
+            )
+        # else: Global view includes all posts (both scope=global and scope=city)
+        
+        # Category filter
+        if category:
+            category_value = category.value if isinstance(category, PostCategory) else category
+            query = query.where(PostModel.category == category_value)
+        
+        # Status filter (defaults to OPEN if not specified)
+        if status:
+            status_value = status.value if isinstance(status, PostStatus) else status
+            query = query.where(PostModel.status == status_value)
+        else:
+            query = query.where(PostModel.status == PostStatus.OPEN.value)
+        
+        query = query.order_by(PostModel.created_at.desc()).limit(limit).offset(offset)
+        
+        result = await self.session.execute(query)
+        models = result.scalars().all()
+        return [self._to_entity(model) for model in models]
+
     async def list_by_city(
         self,
         city_code: str,
@@ -64,7 +113,7 @@ class PostRepositoryImpl(IPostRepository):
         offset: int = 0,
     ) -> List[Post]:
         """
-        List posts for a specific city with optional filters
+        List posts for a specific city with optional filters (Legacy method)
         """
         query = select(PostModel).where(PostModel.city_code == city_code)
 
@@ -118,7 +167,9 @@ class PostRepositoryImpl(IPostRepository):
         if not model:
             raise ValueError(f"Post with id {post.id} not found")
 
+        model.scope = post.scope.value if isinstance(post.scope, PostScope) else post.scope
         model.city_code = post.city_code
+        model.category = post.category.value if isinstance(post.category, PostCategory) else post.category
         model.title = post.title
         model.content = post.content
         model.idol = post.idol
@@ -198,7 +249,9 @@ class PostRepositoryImpl(IPostRepository):
         return Post(
             id=str(model.id),
             owner_id=str(model.owner_id),
+            scope=PostScope(model.scope),
             city_code=model.city_code,
+            category=PostCategory(model.category),
             title=model.title,
             content=model.content,
             idol=model.idol,

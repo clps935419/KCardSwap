@@ -5,55 +5,63 @@ from datetime import datetime, timedelta, timezone
 from typing import Optional
 from uuid import UUID
 
+from app.modules.posts.application.services.post_quota_service import PostQuotaService
 from app.modules.posts.domain.entities.post import Post, PostStatus
+from app.modules.posts.domain.entities.post_enums import PostCategory, PostScope
 from app.modules.posts.domain.repositories.i_post_repository import IPostRepository
 from app.shared.domain.contracts.i_subscription_query_service import (
     ISubscriptionQueryService,
 )
+from app.shared.presentation.errors.limit_exceeded import LimitExceededException
 
 
 class CreatePostUseCase:
     """
-    Use case for creating a new city board post
+    Use case for creating a new city board post (V2: with scope/category)
 
     Business Rules:
     - Free users: 2 posts per day
-    - Premium users: unlimited posts
+    - Premium users: 20 posts per day (FR-023)
     - Posts expire after 14 days by default
-    - city_code is required
+    - scope and category are required
+    - city_code required if scope=city (FR-004)
     - title and content are required
     """
 
-    # Daily post limits
-    FREE_USER_DAILY_LIMIT = 2
     DEFAULT_EXPIRY_DAYS = 14
 
     def __init__(
         self,
         post_repository: IPostRepository,
         subscription_repository: ISubscriptionQueryService,
+        quota_service: Optional[PostQuotaService] = None,
     ):
         self.post_repository = post_repository
         self.subscription_repository = subscription_repository
+        self.quota_service = quota_service or PostQuotaService(subscription_repository)
 
     async def execute(
         self,
         owner_id: str,
-        city_code: str,
+        scope: PostScope,
+        category: PostCategory,
         title: str,
         content: str,
+        city_code: Optional[str] = None,
         idol: Optional[str] = None,
         idol_group: Optional[str] = None,
         expires_at: Optional[datetime] = None,
     ) -> Post:
         """
-        Create a new post
+        Create a new post (V2: with scope/category)
 
         Args:
             owner_id: ID of the user creating the post
-            city_code: City code (e.g., 'TPE')
+            scope: Post scope (global/city)
+            category: Post category
             title: Post title (max 120 chars)
             content: Post content
+            city_code: Optional city code (required if scope=city)
             idol: Optional idol name for filtering
             idol_group: Optional idol group for filtering
             expires_at: Optional expiry datetime (defaults to now + 14 days)
@@ -62,35 +70,26 @@ class CreatePostUseCase:
             Created Post entity
 
         Raises:
-            ValueError: If daily limit exceeded or validation fails
+            ValueError: If validation fails
+            LimitExceededException: If daily limit exceeded
         """
         # Validate required fields
-        if not city_code:
-            raise ValueError("City code is required")
         if not title or len(title) > 120:
             raise ValueError("Title is required and must be <= 120 characters")
         if not content:
             raise ValueError("Content is required")
 
-        # Check daily post limit for free users
-        # Convert owner_id string to UUID for the service call
-        user_uuid = UUID(owner_id) if isinstance(owner_id, str) else owner_id
-        subscription_info = await self.subscription_repository.get_subscription_info(
-            user_uuid
-        )
-        is_premium = (
-            subscription_info
-            and subscription_info.is_active
-            and subscription_info.plan_type == "premium"
-        )
+        # FR-004: Validate scope and city_code relationship
+        if scope == PostScope.CITY and not city_code:
+            raise ValueError("city_code is required when scope is 'city'")
+        if scope == PostScope.GLOBAL and city_code:
+            raise ValueError("city_code must be empty when scope is 'global'")
 
-        if not is_premium:
-            posts_today = await self.post_repository.count_user_posts_today(owner_id)
-            if posts_today >= self.FREE_USER_DAILY_LIMIT:
-                raise ValueError(
-                    f"Daily post limit reached. Free users can create "
-                    f"{self.FREE_USER_DAILY_LIMIT} posts per day."
-                )
+        # Check daily post limit using quota service
+        user_uuid = UUID(owner_id) if isinstance(owner_id, str) else owner_id
+        posts_today = await self.post_repository.count_user_posts_today(owner_id)
+        
+        await self.quota_service.check_posts_per_day(user_uuid, posts_today)
 
         # Set default expiry if not provided
         if expires_at is None:
@@ -100,11 +99,13 @@ class CreatePostUseCase:
         if expires_at <= datetime.now(timezone.utc):
             raise ValueError("Expiry date must be in the future")
 
-        # Create post entity
+        # Create post entity (will validate scope/city_code in __init__)
         post = Post(
             id=str(uuid.uuid4()),
             owner_id=owner_id,
+            scope=scope,
             city_code=city_code,
+            category=category,
             title=title,
             content=content,
             idol=idol,

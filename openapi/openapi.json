@@ -200,26 +200,34 @@
         "tags": [
           "Authentication"
         ],
-        "summary": "Refresh access token",
-        "description": "Use refresh token to obtain new access and refresh tokens",
+        "summary": "Refresh access token (cookie-based)",
+        "description": "Use refresh token from httpOnly cookie to obtain new access and refresh tokens",
         "operationId": "refresh_token_api_v1_auth_refresh_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RefreshTokenRequest"
-              }
+        "parameters": [
+          {
+            "name": "refresh_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Refresh Token"
             }
-          },
-          "required": true
-        },
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successfully refreshed tokens",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/LoginResponse"
+                  "$ref": "#/components/schemas/RefreshSuccessResponse"
                 }
               }
             }
@@ -1921,8 +1929,8 @@
         "tags": [
           "Posts"
         ],
-        "summary": "Create a new city board post",
-        "description": "Create a new post on a city board. Free users limited to 2 posts per day.",
+        "summary": "Create a new post (V2: with scope/category)",
+        "description": "Create a new post. Requires authentication. Free users limited to 2 posts per day, Premium to 20.",
         "operationId": "create_post_api_v1_posts_post",
         "security": [
           {
@@ -1968,56 +1976,50 @@
         "tags": [
           "Posts"
         ],
-        "summary": "List posts on a city board",
-        "description": "List all open posts for a specific city with optional filters",
+        "summary": "List posts (V2: global/city filtering with category)",
+        "description": "List posts. FR-005: Global view (no city_code) shows all posts; City view (with city_code) shows city-specific posts.",
         "operationId": "list_posts_api_v1_posts_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "city_code",
             "in": "query",
-            "required": true,
+            "required": false,
             "schema": {
-              "type": "string",
-              "description": "City code (required)",
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Optional city filter (omit for global view)",
               "title": "City Code"
             },
-            "description": "City code (required)"
+            "description": "Optional city filter (omit for global view)"
           },
           {
-            "name": "idol",
+            "name": "category",
             "in": "query",
             "required": false,
             "schema": {
               "anyOf": [
                 {
-                  "type": "string"
+                  "$ref": "#/components/schemas/PostCategory"
                 },
                 {
                   "type": "null"
                 }
               ],
-              "description": "Filter by idol name",
-              "title": "Idol"
+              "description": "Optional category filter",
+              "title": "Category"
             },
-            "description": "Filter by idol name"
-          },
-          {
-            "name": "idol_group",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "Filter by idol group",
-              "title": "Idol Group"
-            },
-            "description": "Filter by idol group"
+            "description": "Optional category filter"
           },
           {
             "name": "limit",
@@ -2058,8 +2060,11 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized (not logged in)"
+          },
           "400": {
-            "description": "Bad request (city_code required)"
+            "description": "Bad request"
           },
           "500": {
             "description": "Internal server error"
@@ -3096,11 +3101,38 @@
       },
       "CreatePostRequest": {
         "properties": {
+          "scope": {
+            "$ref": "#/components/schemas/PostScope",
+            "description": "Post scope: global (visible everywhere) or city (city-specific)",
+            "examples": [
+              "global",
+              "city"
+            ]
+          },
           "city_code": {
-            "$ref": "#/components/schemas/CityCode",
-            "description": "City code - must be one of: TPE (Taipei), NTP (New Taipei), TAO (Taoyuan), TXG (Taichung), TNN (Tainan), KHH (Kaohsiung), HSZ (Hsinchu City), CYI (Chiayi City), and other Taiwan cities",
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CityCode"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "City code - required when scope=city, must be empty when scope=global",
             "examples": [
               "TPE"
+            ]
+          },
+          "category": {
+            "$ref": "#/components/schemas/PostCategory",
+            "description": "Post category",
+            "examples": [
+              "trade",
+              "giveaway",
+              "group",
+              "showcase",
+              "help",
+              "announcement"
             ]
           },
           "title": {
@@ -3168,17 +3200,20 @@
         },
         "type": "object",
         "required": [
-          "city_code",
+          "scope",
+          "category",
           "title",
           "content"
         ],
         "title": "CreatePostRequest",
-        "description": "Request schema for creating a post",
+        "description": "Request schema for creating a post (V2: with scope/category)",
         "example": {
+          "category": "trade",
           "city_code": "TPE",
           "content": "I have Jungkook cards and looking for V cards",
           "idol": "Jungkook",
           "idol_group": "BTS",
+          "scope": "city",
           "title": "Looking for BTS cards in Taipei"
         }
       },
@@ -3963,6 +3998,19 @@
           "version": "Standard"
         }
       },
+      "PostCategory": {
+        "type": "string",
+        "enum": [
+          "trade",
+          "giveaway",
+          "group",
+          "showcase",
+          "help",
+          "announcement"
+        ],
+        "title": "PostCategory",
+        "description": "Post category enumeration (FR-002)"
+      },
       "PostInterestListResponse": {
         "properties": {
           "interests": {
@@ -4131,6 +4179,7 @@
         "example": {
           "posts": [
             {
+              "category": "trade",
               "city_code": "TPE",
               "content": "I have Jungkook cards",
               "created_at": "2024-01-01T00:00:00Z",
@@ -4139,6 +4188,7 @@
               "idol": "Jungkook",
               "idol_group": "BTS",
               "owner_id": "987e6543-e21b-12d3-a456-426614174000",
+              "scope": "city",
               "status": "open",
               "title": "Looking for BTS cards",
               "updated_at": "2024-01-01T00:00:00Z"
@@ -4182,9 +4232,27 @@
             "title": "Owner Id",
             "description": "Owner user ID"
           },
+          "scope": {
+            "type": "string",
+            "title": "Scope",
+            "description": "Post scope (global/city)"
+          },
           "city_code": {
-            "$ref": "#/components/schemas/CityCode",
-            "description": "City code"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City Code",
+            "description": "City code (if scope=city)"
+          },
+          "category": {
+            "type": "string",
+            "title": "Category",
+            "description": "Post category"
           },
           "title": {
             "type": "string",
@@ -4254,7 +4322,8 @@
         "required": [
           "id",
           "owner_id",
-          "city_code",
+          "scope",
+          "category",
           "title",
           "content",
           "status",
@@ -4263,8 +4332,9 @@
           "updated_at"
         ],
         "title": "PostResponse",
-        "description": "Response schema for post details",
+        "description": "Response schema for post details (V2: with scope/category)",
         "example": {
+          "category": "trade",
           "city_code": "TPE",
           "content": "I have Jungkook cards and looking for V cards",
           "created_at": "2024-01-01T00:00:00Z",
@@ -4273,6 +4343,7 @@
           "idol": "Jungkook",
           "idol_group": "BTS",
           "owner_id": "987e6543-e21b-12d3-a456-426614174000",
+          "scope": "city",
           "status": "open",
           "title": "Looking for BTS cards in Taipei",
           "updated_at": "2024-01-01T00:00:00Z"
@@ -4298,6 +4369,15 @@
         ],
         "title": "PostResponseWrapper",
         "description": "Response wrapper for single post (standardized envelope)"
+      },
+      "PostScope": {
+        "type": "string",
+        "enum": [
+          "global",
+          "city"
+        ],
+        "title": "PostScope",
+        "description": "Post scope enumeration (FR-003)"
       },
       "ProfileResponse": {
         "properties": {
@@ -4774,21 +4854,24 @@
         "title": "RatingResponseWrapper",
         "description": "Response wrapper for single rating (standardized envelope)"
       },
-      "RefreshTokenRequest": {
+      "RefreshSuccessResponse": {
         "properties": {
-          "refresh_token": {
+          "success": {
+            "type": "boolean",
+            "title": "Success",
+            "description": "Indicates successful refresh",
+            "default": true
+          },
+          "message": {
             "type": "string",
-            "minLength": 1,
-            "title": "Refresh Token",
-            "description": "Refresh token"
+            "title": "Message",
+            "description": "Success message",
+            "default": "Tokens refreshed successfully"
           }
         },
         "type": "object",
-        "required": [
-          "refresh_token"
-        ],
-        "title": "RefreshTokenRequest",
-        "description": "Request schema for refreshing access token"
+        "title": "RefreshSuccessResponse",
+        "description": "Response for successful token refresh (cookie-based)"
       },
       "ReportListResponse": {
         "properties": {

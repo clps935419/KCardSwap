@@ -1,6 +1,6 @@
 """
 Posts Router for Posts Module
-Handles city board posts and interest management
+Handles city board posts and interest management (V2: with scope/category/require_user)
 """
 
 import logging
@@ -20,8 +20,8 @@ from app.modules.posts.application.use_cases.create_post_use_case import (
 from app.modules.posts.application.use_cases.express_interest_use_case import (
     ExpressInterestUseCase,
 )
-from app.modules.posts.application.use_cases.list_board_posts_use_case import (
-    ListBoardPostsUseCase,
+from app.modules.posts.application.use_cases.list_posts_v2_use_case import (
+    ListPostsV2UseCase,
 )
 from app.modules.posts.application.use_cases.list_post_interests_use_case import (
     ListPostInterestsUseCase,
@@ -29,6 +29,7 @@ from app.modules.posts.application.use_cases.list_post_interests_use_case import
 from app.modules.posts.application.use_cases.reject_interest_use_case import (
     RejectInterestUseCase,
 )
+from app.modules.posts.domain.entities.post_enums import PostCategory, PostScope
 from app.modules.posts.presentation.dependencies.use_case_deps import (
     get_accept_interest_use_case,
     get_close_post_use_case,
@@ -36,6 +37,7 @@ from app.modules.posts.presentation.dependencies.use_case_deps import (
     get_express_interest_use_case,
     get_list_board_posts_use_case,
     get_list_post_interests_use_case,
+    get_list_posts_v2_use_case,
     get_reject_interest_use_case,
 )
 from app.modules.posts.presentation.schemas.post_schemas import (
@@ -52,12 +54,31 @@ from app.modules.posts.presentation.schemas.post_schemas import (
     PostResponseWrapper,
 )
 from app.shared.infrastructure.database.connection import get_db_session
-from app.shared.presentation.dependencies.auth import get_current_user_id
+from app.shared.presentation.deps.require_user import require_user
 
 logger = logging.getLogger(__name__)
 
 # Create router
 router = APIRouter(prefix="/posts", tags=["Posts"])
+
+
+def _post_to_response(post) -> PostResponse:
+    """Helper to convert Post entity to PostResponse"""
+    return PostResponse(
+        id=UUID(post.id),
+        owner_id=UUID(post.owner_id),
+        scope=post.scope.value,
+        city_code=post.city_code,
+        category=post.category.value,
+        title=post.title,
+        content=post.content,
+        idol=post.idol,
+        idol_group=post.idol_group,
+        status=post.status.value,
+        expires_at=post.expires_at,
+        created_at=post.created_at,
+        updated_at=post.updated_at,
+    )
 
 
 @router.post(
@@ -73,27 +94,30 @@ router = APIRouter(prefix="/posts", tags=["Posts"])
         },
         500: {"description": "Internal server error"},
     },
-    summary="Create a new city board post",
-    description="Create a new post on a city board. Free users limited to 2 posts per day.",
+    summary="Create a new post (V2: with scope/category)",
+    description="Create a new post. Requires authentication. Free users limited to 2 posts per day, Premium to 20.",
 )
 async def create_post(
     request: CreatePostRequest,
-    current_user_id: Annotated[UUID, Depends(get_current_user_id)],
+    current_user_id: Annotated[UUID, Depends(require_user)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
     use_case: Annotated[CreatePostUseCase, Depends(get_create_post_use_case)],
 ) -> PostResponseWrapper:
     """
-    Create a new city board post.
+    Create a new post (V2: with scope/category).
 
-    Business rules:
+    Business rules (FR-003, FR-004, FR-023):
     - Free users: 2 posts per day
-    - Premium users: unlimited posts
+    - Premium users: 20 posts per day
     - Posts expire after 14 days by default
+    - scope=city requires city_code
+    - scope=global must not have city_code
     """
     try:
-        # Execute use case
         post = await use_case.execute(
             owner_id=str(current_user_id),
+            scope=request.scope,
+            category=request.category,
             city_code=request.city_code,
             title=request.title,
             content=request.content,
@@ -102,7 +126,7 @@ async def create_post(
             expires_at=request.expires_at,
         )
 
-        data = PostResponse(            id=UUID(post.id),            owner_id=UUID(post.owner_id),            city_code=post.city_code,            title=post.title,            content=post.content,            idol=post.idol,            idol_group=post.idol_group,            status=post.status.value,            expires_at=post.expires_at,            created_at=post.created_at,            updated_at=post.updated_at,        )
+        data = _post_to_response(post)
         return PostResponseWrapper(data=data, meta=None, error=None)
 
     except ValueError as e:
@@ -123,55 +147,41 @@ async def create_post(
     response_model=PostListResponseWrapper,
     responses={
         200: {"description": "Posts retrieved successfully"},
-        400: {"description": "Bad request (city_code required)"},
+        401: {"description": "Unauthorized (not logged in)"},
+        400: {"description": "Bad request"},
         500: {"description": "Internal server error"},
     },
-    summary="List posts on a city board",
-    description="List all open posts for a specific city with optional filters",
+    summary="List posts (V2: global/city filtering with category)",
+    description="List posts. FR-005: Global view (no city_code) shows all posts; City view (with city_code) shows city-specific posts.",
 )
 async def list_posts(
-    city_code: Annotated[str, Query(description="City code (required)")],
+    current_user_id: Annotated[UUID, Depends(require_user)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
-    use_case: Annotated[ListBoardPostsUseCase, Depends(get_list_board_posts_use_case)],
-    idol: Annotated[Optional[str], Query(description="Filter by idol name")] = None,
-    idol_group: Annotated[
-        Optional[str], Query(description="Filter by idol group")
-    ] = None,
+    use_case: Annotated[ListPostsV2UseCase, Depends(get_list_posts_v2_use_case)],
+    city_code: Annotated[Optional[str], Query(description="Optional city filter (omit for global view)")] = None,
+    category: Annotated[Optional[PostCategory], Query(description="Optional category filter")] = None,
     limit: Annotated[int, Query(ge=1, le=100, description="Maximum results")] = 50,
     offset: Annotated[int, Query(ge=0, description="Pagination offset")] = 0,
 ) -> PostListResponseWrapper:
     """
-    List posts for a city board.
-
+    List posts (V2: supports global/city filtering).
+    
+    FR-005:
+    - Global view (city_code=None): shows all posts (scope=global + scope=city)
+    - City view (city_code provided): shows only posts for that city
+    
     Only shows posts with status=open and not expired.
     Results ordered by created_at DESC (newest first).
     """
     try:
-        # Execute use case
         posts = await use_case.execute(
             city_code=city_code,
-            idol=idol,
-            idol_group=idol_group,
+            category=category,
             limit=limit,
             offset=offset,
         )
 
-        post_responses = [
-            PostResponse(
-                id=UUID(post.id),
-                owner_id=UUID(post.owner_id),
-                city_code=post.city_code,
-                title=post.title,
-                content=post.content,
-                idol=post.idol,
-                idol_group=post.idol_group,
-                status=post.status.value,
-                expires_at=post.expires_at,
-                created_at=post.created_at,
-                updated_at=post.updated_at,
-            )
-            for post in posts
-        ]
+        post_responses = [_post_to_response(post) for post in posts]
 
         data = PostListResponse(posts=post_responses, total=len(post_responses))
         return PostListResponseWrapper(data=data, meta=None, error=None)
@@ -203,7 +213,7 @@ async def list_posts(
 )
 async def express_interest(
     post_id: UUID,
-    current_user_id: Annotated[UUID, Depends(get_current_user_id)],
+    current_user_id: Annotated[UUID, Depends(require_user)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
     use_case: Annotated[ExpressInterestUseCase, Depends(get_express_interest_use_case)],
 ) -> PostInterestResponseWrapper:
@@ -258,7 +268,7 @@ async def express_interest(
 async def accept_interest(
     post_id: UUID,
     interest_id: UUID,
-    current_user_id: Annotated[UUID, Depends(get_current_user_id)],
+    current_user_id: Annotated[UUID, Depends(require_user)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
     use_case: Annotated[AcceptInterestUseCase, Depends(get_accept_interest_use_case)],
 ) -> AcceptInterestResponseWrapper:
@@ -317,7 +327,7 @@ async def accept_interest(
 async def reject_interest(
     post_id: UUID,
     interest_id: UUID,
-    current_user_id: Annotated[UUID, Depends(get_current_user_id)],
+    current_user_id: Annotated[UUID, Depends(require_user)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
     use_case: Annotated[RejectInterestUseCase, Depends(get_reject_interest_use_case)],
 ) -> None:
@@ -370,7 +380,7 @@ async def reject_interest(
 )
 async def close_post(
     post_id: UUID,
-    current_user_id: Annotated[UUID, Depends(get_current_user_id)],
+    current_user_id: Annotated[UUID, Depends(require_user)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
     use_case: Annotated[ClosePostUseCase, Depends(get_close_post_use_case)],
 ) -> None:
@@ -421,7 +431,7 @@ async def close_post(
 )
 async def list_post_interests(
     post_id: UUID,
-    current_user_id: Annotated[UUID, Depends(get_current_user_id)],
+    current_user_id: Annotated[UUID, Depends(require_user)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
     use_case: Annotated[
         ListPostInterestsUseCase, Depends(get_list_post_interests_use_case)
@@ -509,7 +519,7 @@ async def list_post_interests(
 async def get_post_interest(
     post_id: UUID,
     interest_id: UUID,
-    current_user_id: Annotated[UUID, Depends(get_current_user_id)],
+    current_user_id: Annotated[UUID, Depends(require_user)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
     use_case: Annotated[
         ListPostInterestsUseCase, Depends(get_list_post_interests_use_case)
