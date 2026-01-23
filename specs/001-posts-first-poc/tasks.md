@@ -183,19 +183,19 @@ description: "Task list for implementing Posts-first POC (V2)"
 
 ### Tests（後端）
 
-- [ ] T067 [P] [US4] 新增 like create/delete/idempotent 整合測試（新增 apps/backend/tests/integration/modules/posts/test_post_likes_v2.py）
+- [x] T067 [P] [US4] 新增 like create/delete/idempotent 整合測試（新增 apps/backend/tests/integration/modules/posts/test_post_likes_v2.py）
 
 ### Backend（posts module）
 
-- [ ] T068 [P] [US4] 定義 PostLike domain model（新增 apps/backend/app/modules/posts/domain/models/post_like.py）
-- [ ] T069 [P] [US4] 建立 like repository（新增 apps/backend/app/modules/posts/infrastructure/repositories/post_like_repository.py）
-- [ ] T070 [P] [US4] 建立 like use cases（新增 apps/backend/app/modules/posts/application/use_cases/toggle_like.py）
-- [ ] T071 [US4] 新增 like endpoints 與回傳欄位（更新 apps/backend/app/modules/posts/presentation/routers/posts_router.py 與 apps/backend/app/modules/posts/presentation/schemas/post_schemas.py；POST/DELETE posts/{post_id}/like；Post response 帶 like_count、liked_by_me）
+- [x] T068 [P] [US4] 定義 PostLike domain model（新增 apps/backend/app/modules/posts/domain/models/post_like.py）
+- [x] T069 [P] [US4] 建立 like repository（新增 apps/backend/app/modules/posts/infrastructure/repositories/post_like_repository.py）
+- [x] T070 [P] [US4] 建立 like use cases（新增 apps/backend/app/modules/posts/application/use_cases/toggle_like.py）
+- [x] T071 [US4] 新增 like endpoints 與回傳欄位（更新 apps/backend/app/modules/posts/presentation/routers/posts_router.py 與 apps/backend/app/modules/posts/presentation/schemas/post_schemas.py；POST/DELETE posts/{post_id}/like；Post response 帶 like_count、liked_by_me）
 
 ### Web（apps/web）
 
-- [ ] T072 [P] [US4] 建立 LikeButton 元件（新增 apps/web/src/features/posts/components/LikeButton.tsx）
-- [ ] T073 [US4] 在貼文卡片串接 like mutation 與 optimistic update（更新 apps/web/src/features/posts/components/PostCard.tsx）
+- [x] T072 [P] [US4] 建立 LikeButton 元件（新增 apps/web/src/features/posts/components/LikeButton.tsx）
+- [x] T073 [US4] 在貼文卡片串接 like mutation 與 optimistic update（更新 apps/web/src/features/posts/components/PostCard.tsx）
 
 ---
 

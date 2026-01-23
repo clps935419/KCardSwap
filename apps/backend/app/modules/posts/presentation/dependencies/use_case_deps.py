@@ -31,6 +31,7 @@ from app.modules.posts.application.use_cases.list_posts_v2_use_case import (
 from app.modules.posts.application.use_cases.reject_interest_use_case import (
     RejectInterestUseCase,
 )
+from app.modules.posts.application.use_cases.toggle_like import ToggleLikeUseCase
 from app.shared.infrastructure.database.connection import get_db_session
 
 
@@ -125,3 +126,14 @@ async def get_list_post_interests_use_case(
     child = injector.create_child_injector()
     child.binder.bind(AsyncSession, to=session)
     return child.get(ListPostInterestsUseCase)
+
+
+async def get_toggle_like_use_case(
+    session: Annotated[AsyncSession, Depends(get_db_session)],
+    request: Request = None,
+) -> ToggleLikeUseCase:
+    """Get ToggleLikeUseCase from injector with request-scoped session."""
+    injector = _get_injector(request)
+    child = injector.create_child_injector()
+    child.binder.bind(AsyncSession, to=session)
+    return child.get(ToggleLikeUseCase)

@@ -8,6 +8,8 @@ import { Spinner } from '@/components/ui/spinner'
 import { MessageCircle, Loader2 } from 'lucide-react'
 import { usePostsList } from '@/features/posts/hooks/usePostsList'
 import { useCreateMessageRequest } from '@/features/inbox/hooks/useCreateMessageRequest'
+import { useToggleLike } from '@/features/posts/hooks/useToggleLike'
+import { LikeButton } from '@/features/posts/components/LikeButton'
 import { useToast } from '@/components/ui/use-toast'
 import type { PostCategory, PostResponse } from '@/shared/api/generated'
 
@@ -45,6 +47,7 @@ export function PostsList() {
   })
   
   const { createRequest, loading: creatingRequest } = useCreateMessageRequest()
+  const toggleLikeMutation = useToggleLike()
 
   const handleMessageAuthor = async (post: PostResponse) => {
     setMessagingPostId(post.id)
@@ -72,6 +75,18 @@ export function PostsList() {
       })
     } finally {
       setMessagingPostId(null)
+    }
+  }
+
+  const handleToggleLike = async (postId: string) => {
+    try {
+      await toggleLikeMutation.mutateAsync(postId)
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Failed to update like. Please try again.",
+        variant: "destructive",
+      })
     }
   }
 
@@ -133,19 +148,27 @@ export function PostsList() {
                   <span>作者 ID：{post.owner_id}</span>
                   <span>發布時間：{formatDate(post.created_at)}</span>
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleMessageAuthor(post)}
-                  disabled={messagingPostId === post.id}
-                >
-                  {messagingPostId === post.id ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : (
-                    <MessageCircle className="mr-2 h-4 w-4" />
-                  )}
-                  私訊作者
-                </Button>
+                <div className="flex items-center gap-2">
+                  <LikeButton
+                    liked={post.liked_by_me ?? false}
+                    likeCount={post.like_count ?? 0}
+                    onToggle={() => handleToggleLike(post.id)}
+                    disabled={toggleLikeMutation.isPending}
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleMessageAuthor(post)}
+                    disabled={messagingPostId === post.id}
+                  >
+                    {messagingPostId === post.id ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <MessageCircle className="mr-2 h-4 w-4" />
+                    )}
+                    私訊作者
+                  </Button>
+                </div>
               </div>
             </div>
           </div>

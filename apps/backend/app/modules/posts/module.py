@@ -24,14 +24,21 @@ from app.modules.posts.application.use_cases.list_board_posts_use_case import (
 from app.modules.posts.application.use_cases.list_post_interests_use_case import (
     ListPostInterestsUseCase,
 )
+from app.modules.posts.application.use_cases.list_posts_v2_use_case import (
+    ListPostsV2UseCase,
+)
 from app.modules.posts.application.use_cases.reject_interest_use_case import (
     RejectInterestUseCase,
 )
+from app.modules.posts.application.use_cases.toggle_like import ToggleLikeUseCase
 from app.modules.posts.infrastructure.repositories.post_interest_repository_impl import (
     PostInterestRepositoryImpl,
 )
 from app.modules.posts.infrastructure.repositories.post_repository_impl import (
     PostRepositoryImpl,
+)
+from app.modules.posts.infrastructure.repositories.post_like_repository_impl import (
+    PostLikeRepositoryImpl,
 )
 from app.shared.domain.contracts.i_chat_room_service import IChatRoomService
 from app.shared.domain.contracts.i_friendship_service import IFriendshipService
@@ -119,4 +126,26 @@ class PostsModule(Module):
         post_interest_repo = PostInterestRepositoryImpl(session)
         return ListPostInterestsUseCase(
             post_repository=post_repo, post_interest_repository=post_interest_repo
+        )
+
+    @provider
+    def provide_list_posts_v2_use_case(
+        self, session: AsyncSession
+    ) -> ListPostsV2UseCase:
+        """Provide ListPostsV2UseCase with dependencies."""
+        post_repo = PostRepositoryImpl(session)
+        like_repo = PostLikeRepositoryImpl(session)
+        return ListPostsV2UseCase(
+            post_repository=post_repo, like_repository=like_repo
+        )
+
+    @provider
+    def provide_toggle_like_use_case(
+        self, session: AsyncSession
+    ) -> ToggleLikeUseCase:
+        """Provide ToggleLikeUseCase with dependencies."""
+        post_repo = PostRepositoryImpl(session)
+        like_repo = PostLikeRepositoryImpl(session)
+        return ToggleLikeUseCase(
+            post_repository=post_repo, like_repository=like_repo
         )

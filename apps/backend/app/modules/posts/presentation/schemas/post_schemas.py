@@ -85,7 +85,7 @@ class CreatePostRequest(BaseModel):
 
 
 class PostResponse(BaseModel):
-    """Response schema for post details (V2: with scope/category)"""
+    """Response schema for post details (V2: with scope/category + like fields)"""
 
     id: UUID = Field(..., description="Post ID")
     owner_id: UUID = Field(..., description="Owner user ID")
@@ -101,6 +101,8 @@ class PostResponse(BaseModel):
         description="Post status",
         examples=["open", "closed", "expired", "deleted"],
     )
+    like_count: int = Field(0, description="Total number of likes on this post")
+    liked_by_me: bool = Field(False, description="Whether the current user has liked this post")
     expires_at: datetime = Field(..., description="Expiry datetime")
     created_at: datetime = Field(..., description="Creation timestamp")
     updated_at: datetime = Field(..., description="Last update timestamp")
@@ -119,6 +121,8 @@ class PostResponse(BaseModel):
                 "idol": "Jungkook",
                 "idol_group": "BTS",
                 "status": "open",
+                "like_count": 5,
+                "liked_by_me": True,
                 "expires_at": "2024-02-01T00:00:00Z",
                 "created_at": "2024-01-01T00:00:00Z",
                 "updated_at": "2024-01-01T00:00:00Z",
@@ -265,5 +269,28 @@ class AcceptInterestResponseWrapper(BaseModel):
     """Response wrapper for accept interest response (standardized envelope)"""
 
     data: AcceptInterestResponse
+    meta: None = None
+    error: None = None
+
+
+class ToggleLikeResponse(BaseModel):
+    """Response schema for toggle like action"""
+
+    liked: bool = Field(..., description="Whether the post is now liked by the user")
+    like_count: int = Field(..., description="Current total like count for the post")
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "liked": True,
+                "like_count": 6,
+            }
+        }
+
+
+class ToggleLikeResponseWrapper(BaseModel):
+    """Response wrapper for toggle like response (standardized envelope)"""
+
+    data: ToggleLikeResponse
     meta: None = None
     error: None = None
