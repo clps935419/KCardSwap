@@ -9,7 +9,7 @@
     "lint": "biome lint .",
     "format": "biome format --write .",
     "check": "biome check --write .",
-    "sdk:generate": "openapi-ts --config openapi.config.ts"
+    "sdk:generate": "openapi-ts -f openapi.config.ts"
   },
   "dependencies": {
     "@hey-api/client-axios": "^0.9.1",

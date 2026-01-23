@@ -55,7 +55,7 @@ export function PostsList() {
     )
   }
 
-  const posts = data?.posts || []
+  const posts = data?.data?.posts || []
 
   if (posts.length === 0) {
     return (

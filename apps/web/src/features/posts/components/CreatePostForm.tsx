@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { apiClient } from '@/lib/api/client'
+import { createPostApiV1PostsPostMutation, listPostsApiV1PostsGetQueryKey } from '@/shared/api/generated/@tanstack/react-query.gen'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Spinner } from '@/components/ui/spinner'
-import type { PostCategory, PostScope, CityCode, PostResponseWrapper } from '@/shared/api/generated'
+import type { PostCategory, PostScope, CityCode } from '@/shared/api/generated'
 
 const CATEGORIES: { value: PostCategory; label: string }[] = [
   { value: 'trade', label: '交換' },
@@ -64,18 +64,9 @@ export function CreatePostForm() {
   })
 
   const createPostMutation = useMutation({
-    mutationFn: async (data: FormData) => {
-      const response = await apiClient.post<PostResponseWrapper>('/api/v1/posts', {
-        title: data.title,
-        content: data.content,
-        scope: data.scope,
-        city_code: data.scope === 'city' ? data.city_code || null : null,
-        category: data.category,
-      })
-      return response.data
-    },
+    ...createPostApiV1PostsPostMutation(),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['posts', 'list'] })
+      queryClient.invalidateQueries({ queryKey: listPostsApiV1PostsGetQueryKey() })
       router.push('/posts')
     },
     onError: (error: any) => {
@@ -103,7 +94,15 @@ export function CreatePostForm() {
       return
     }
 
-    createPostMutation.mutate(data)
+    createPostMutation.mutate({
+      body: {
+        title: data.title,
+        content: data.content,
+        scope: data.scope,
+        city_code: data.scope === 'city' ? data.city_code || null : null,
+        category: data.category,
+      },
+    })
   }
 
   return (
