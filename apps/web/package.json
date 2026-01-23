@@ -25,7 +25,9 @@
     "clsx": "^2.1.0",
     "tailwind-merge": "^2.2.0",
     "lucide-react": "^0.312.0",
-    "next-auth": "^4.24.0"
+    "next-auth": "^4.24.0",
+    "@radix-ui/react-slot": "^1.1.0",
+    "@radix-ui/react-label": "^2.1.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
