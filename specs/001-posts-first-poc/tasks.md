@@ -27,14 +27,14 @@ description: "Task list for implementing Posts-first POC (V2)"
 
 **Purpose**: 建立 Web POC 專案骨架與 repo-level 工具串接（不做任何功能邏輯）。
 
-- [ ] T001 建立 Web app 目錄與基礎 README（新增 apps/web/README.md）
-- [ ] T002 初始化 Next.js App Router 專案骨架（建立 apps/web/package.json 與 apps/web/src/app/ 入口檔）
-- [ ] T003 [P] 設定 Web 開發環境檔案（新增 apps/web/.env.example 與 apps/web/.env.local 指引寫在 apps/web/README.md）
-- [ ] T004 [P] 設定 Web lint/format（新增 apps/web/eslint.config.js、apps/web/prettier.config.js）
-- [ ] T005 [P] 安裝並初始化 shadcn/ui（更新 apps/web/components.json 並建立 apps/web/src/components/ui/）
-- [ ] T006 [P] 設定 TanStack Query Provider 與 queryClient（新增 apps/web/src/app/providers.tsx 與 apps/web/src/lib/query-client.ts）
-- [ ] T007 [P] 建立共用 UI/utility 結構（新增 apps/web/src/components/、apps/web/src/lib/、apps/web/src/features/ 目錄占位檔）
-- [ ] T008 建立 Web 專案的路由骨架（新增 apps/web/src/app/(auth)/login/page.tsx 與 apps/web/src/app/(app)/layout.tsx）
+- [x] T001 建立 Web app 目錄與基礎 README（新增 apps/web/README.md）
+- [x] T002 初始化 Next.js App Router 專案骨架（建立 apps/web/package.json 與 apps/web/src/app/ 入口檔）
+- [x] T003 [P] 設定 Web 開發環境檔案（新增 apps/web/.env.example 與 apps/web/.env.local 指引寫在 apps/web/README.md）
+- [x] T004 [P] 設定 Web lint/format（新增 apps/web/eslint.config.js、apps/web/prettier.config.js）
+- [x] T005 [P] 安裝並初始化 shadcn/ui（更新 apps/web/components.json 並建立 apps/web/src/components/ui/）
+- [x] T006 [P] 設定 TanStack Query Provider 與 queryClient（新增 apps/web/src/app/providers.tsx 與 apps/web/src/lib/query-client.ts）
+- [x] T007 [P] 建立共用 UI/utility 結構（新增 apps/web/src/components/、apps/web/src/lib/、apps/web/src/features/ 目錄占位檔）
+- [x] T008 建立 Web 專案的路由骨架（新增 apps/web/src/app/(auth)/login/page.tsx 與 apps/web/src/app/(app)/layout.tsx）
 
 ---
 
@@ -42,21 +42,21 @@ description: "Task list for implementing Posts-first POC (V2)"
 
 **Purpose**: 所有 user story 共同依賴的後端合約、認證、錯誤格式、配額與 SDK 生成流程。
 
-- [ ] T009 盤點現有 API 與本 POC 規格缺口（更新 specs/001-posts-first-poc/research.md，輸出需含：①要新增/調整的 endpoints 清單（path+method+owner）②明確「不使用/需移除」清單（NEARBY/TRADE/評分相關；含 path+method→對應 router/module/test 檔案與處理策略：移除/停用/保留但不曝光）③是否已從 openapi/openapi.json 移除）
-- [ ] T010 定義 POC 共用錯誤格式（新增 apps/backend/app/shared/presentation/errors/limit_exceeded.py，支援 422_LIMIT_EXCEEDED payload: limit_key/limit_value/current_value/reset_at）
-- [ ] T011 實作「所有瀏覽需登入」的共用依賴（新增 apps/backend/app/shared/presentation/deps/require_user.py 並套用到後續 routers）
-- [ ] T012 [P] 新增/調整 cookie-JWT（access/refresh）設定（更新 apps/backend/app/config.py，加入 cookie 名稱、TTL、SameSite、Secure 等設定項）
+- [x] T009 盤點現有 API 與本 POC 規格缺口（更新 specs/001-posts-first-poc/research.md，輸出需含：①要新增/調整的 endpoints 清單（path+method+owner）②明確「不使用/需移除」清單（NEARBY/TRADE/評分相關；含 path+method→對應 router/module/test 檔案與處理策略：移除/停用/保留但不曝光）③是否已從 openapi/openapi.json 移除）
+- [x] T010 定義 POC 共用錯誤格式（新增 apps/backend/app/shared/presentation/errors/limit_exceeded.py，支援 422_LIMIT_EXCEEDED payload: limit_key/limit_value/current_value/reset_at）
+- [x] T011 實作「所有瀏覽需登入」的共用依賴（新增 apps/backend/app/shared/presentation/deps/require_user.py 並套用到後續 routers）
+- [x] T012 [P] 新增/調整 cookie-JWT（access/refresh）設定（更新 apps/backend/app/config.py，加入 cookie 名稱、TTL、SameSite、Secure 等設定項）
 - [ ] T013 實作 refresh endpoint 改為 httpOnly cookie 流程（更新 apps/backend/app/modules/identity/presentation/routers/auth_router.py，讓 /api/v1/auth/refresh 旋轉/換發 access cookie）
 - [ ] T014 [P] 新增後端整合測試：refresh cookie 行為（新增 apps/backend/tests/integration/modules/identity/test_auth_refresh_cookie.py）
-- [ ] T015 統一「內容/媒體配額」domain 介面（新增 apps/backend/app/shared/domain/quota/ 目錄，包含 limit keys 與 reset policy）
+- [x] T015 統一「內容/媒體配額」domain 介面（新增 apps/backend/app/shared/domain/quota/ 目錄，包含 limit keys 與 reset policy）
 - [ ] T016 [P] 實作 posts_per_day 配額檢查（新增 apps/backend/app/modules/posts/application/services/post_quota_service.py 並在建立貼文 use case 套用）
 - [ ] T017 [P] 實作 media 配額介面（新增 apps/backend/app/shared/domain/quota/media_quota_service.py，支援 media_file_bytes_max 與 media_bytes_per_month）
-- [ ] T018 Web：建立 API client 與 cookie 傳遞規則（新增 apps/web/src/lib/api/axios.ts，預設 withCredentials 並集中處理 baseURL）
-- [ ] T019 Web：建立 401 → refresh → retry 機制（新增 apps/web/src/lib/api/auth-refresh.ts 與 apps/web/src/lib/api/axios-interceptors.ts）
-- [ ] T020 OpenAPI 生成流程對齊（更新 apps/backend/scripts/generate_openapi.py 的說明文件：apps/backend/README.md 新增 POC 流程段落）
+- [x] T018 Web：建立 API client 與 cookie 傳遞規則（新增 apps/web/src/lib/api/axios.ts，預設 withCredentials 並集中處理 baseURL）
+- [x] T019 Web：建立 401 → refresh → retry 機制（新增 apps/web/src/lib/api/auth-refresh.ts 與 apps/web/src/lib/api/axios-interceptors.ts）
+- [x] T020 OpenAPI 生成流程對齊（更新 apps/backend/scripts/generate_openapi.py 的說明文件：apps/backend/README.md 新增 POC 流程段落）
 - [ ] T021 生成並提交最新 OpenAPI snapshot（更新 openapi/openapi.json）
-- [ ] T022 Web：建立 hey-api 生成設定與輸出位置（新增 apps/web/openapi.config.ts 與 apps/web/src/shared/api/generated/ 目錄）
-- [ ] T023 Web：新增 SDK 生成腳本（更新 apps/web/package.json 新增 "sdk:generate" 指令，讀取 repo root openapi/openapi.json）
+- [x] T022 Web：建立 hey-api 生成設定與輸出位置（新增 apps/web/openapi.config.ts 與 apps/web/src/shared/api/generated/ 目錄）
+- [x] T023 Web：新增 SDK 生成腳本（更新 apps/web/package.json 新增 "sdk:generate" 指令，讀取 repo root openapi/openapi.json）
 
 **Checkpoint**: Foundation 完成後，US1..US5 可開始分工實作。
 
