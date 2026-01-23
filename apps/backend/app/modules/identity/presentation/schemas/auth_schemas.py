@@ -87,3 +87,10 @@ class LoginResponse(BaseModel):
     data: TokenResponse
     meta: None = None
     error: None = None
+
+
+class RefreshSuccessResponse(BaseModel):
+    """Response for successful token refresh (cookie-based)"""
+
+    success: bool = Field(default=True, description="Indicates successful refresh")
+    message: str = Field(default="Tokens refreshed successfully", description="Success message")

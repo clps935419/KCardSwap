@@ -5,7 +5,7 @@ Handles Google login, token refresh, and logout
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Cookie, Depends, HTTPException, Response, status
 
 from app.config import settings
 from app.modules.identity.application.use_cases.auth.admin_login import (
@@ -31,6 +31,7 @@ from app.modules.identity.presentation.schemas.auth_schemas import (
     GoogleCallbackRequest,
     GoogleLoginRequest,
     LoginResponse,
+    RefreshSuccessResponse,
     RefreshTokenRequest,
     TokenResponse,
 )
@@ -203,29 +204,42 @@ async def google_callback(
 
 @router.post(
     "/refresh",
-    response_model=LoginResponse,
+    response_model=RefreshSuccessResponse,
     status_code=status.HTTP_200_OK,
     responses={
         200: {"description": "Successfully refreshed tokens"},
         401: {"description": "Invalid or expired refresh token"},
     },
-    summary="Refresh access token",
-    description="Use refresh token to obtain new access and refresh tokens",
+    summary="Refresh access token (cookie-based)",
+    description="Use refresh token from httpOnly cookie to obtain new access and refresh tokens",
 )
 async def refresh_token(
-    request: RefreshTokenRequest,
+    response: Response,
     use_case: Annotated[RefreshTokenUseCase, Depends(get_refresh_token_use_case)],
     jwt_service: JWTService = Depends(lambda: JWTService()),
-) -> LoginResponse:
+    refresh_token_cookie: str | None = Cookie(None, alias=settings.REFRESH_COOKIE_NAME),
+) -> RefreshSuccessResponse:
     """
-    Refresh access token using refresh token.
+    Refresh access token using refresh token from httpOnly cookie.
 
+    - Reads refresh_token from httpOnly cookie
     - Validates refresh token
     - Revokes old refresh token
     - Issues new access and refresh tokens
+    - Sets new tokens as httpOnly cookies
     """
+    # Check if refresh token exists in cookie
+    if not refresh_token_cookie:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail={
+                "code": "UNAUTHORIZED",
+                "message": "Refresh token not found in cookie",
+            },
+        )
+
     # Execute use case
-    result = await use_case.execute(request.refresh_token)
+    result = await use_case.execute(refresh_token_cookie)
 
     if result is None:
         raise HTTPException(
@@ -238,25 +252,32 @@ async def refresh_token(
 
     new_access_token, new_refresh_token = result
 
-    # Extract user info from new access token for response
-    try:
-        payload = jwt_service.verify_token(new_access_token, expected_type="access")
-        user_id = payload["sub"]
-        email = payload.get("email", "")
-    except Exception:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={"code": "INTERNAL_ERROR", "message": "Failed to generate tokens"},
-        )
-
-    # Build response
-    token_response = TokenResponse(
-        access_token=new_access_token,
-        refresh_token=new_refresh_token,
-        token_type="bearer",
-        expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
-        user_id=user_id,
-        email=email,
+    # Set new tokens as httpOnly cookies
+    # Access token cookie
+    response.set_cookie(
+        key=settings.ACCESS_COOKIE_NAME,
+        value=new_access_token,
+        max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        httponly=settings.COOKIE_HTTPONLY,
+        samesite=settings.COOKIE_SAMESITE,
+        secure=settings.COOKIE_SECURE,
+        domain=settings.COOKIE_DOMAIN,
+        path=settings.COOKIE_PATH,
     )
 
-    return LoginResponse(data=token_response, meta=None, error=None)
+    # Refresh token cookie
+    response.set_cookie(
+        key=settings.REFRESH_COOKIE_NAME,
+        value=new_refresh_token,
+        max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60,
+        httponly=settings.COOKIE_HTTPONLY,
+        samesite=settings.COOKIE_SAMESITE,
+        secure=settings.COOKIE_SECURE,
+        domain=settings.COOKIE_DOMAIN,
+        path=settings.COOKIE_PATH,
+    )
+
+    return RefreshSuccessResponse(
+        success=True,
+        message="Tokens refreshed successfully",
+    )

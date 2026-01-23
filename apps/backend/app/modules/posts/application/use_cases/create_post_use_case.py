@@ -5,6 +5,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Optional
 from uuid import UUID
 
+from app.modules.posts.application.services.post_quota_service import PostQuotaService
 from app.modules.posts.domain.entities.post import Post, PostStatus
 from app.modules.posts.domain.repositories.i_post_repository import IPostRepository
 from app.shared.domain.contracts.i_subscription_query_service import (
@@ -32,9 +33,12 @@ class CreatePostUseCase:
         self,
         post_repository: IPostRepository,
         subscription_repository: ISubscriptionQueryService,
+        quota_service: Optional[PostQuotaService] = None,
     ):
         self.post_repository = post_repository
         self.subscription_repository = subscription_repository
+        # Initialize quota service if not provided (for backward compatibility)
+        self.quota_service = quota_service or PostQuotaService(subscription_repository)
 
     async def execute(
         self,
@@ -72,25 +76,18 @@ class CreatePostUseCase:
         if not content:
             raise ValueError("Content is required")
 
-        # Check daily post limit for free users
-        # Convert owner_id string to UUID for the service call
+        # Check daily post limit using quota service
         user_uuid = UUID(owner_id) if isinstance(owner_id, str) else owner_id
-        subscription_info = await self.subscription_repository.get_subscription_info(
-            user_uuid
-        )
-        is_premium = (
-            subscription_info
-            and subscription_info.is_active
-            and subscription_info.plan_type == "premium"
-        )
-
-        if not is_premium:
-            posts_today = await self.post_repository.count_user_posts_today(owner_id)
-            if posts_today >= self.FREE_USER_DAILY_LIMIT:
-                raise ValueError(
-                    f"Daily post limit reached. Free users can create "
-                    f"{self.FREE_USER_DAILY_LIMIT} posts per day."
-                )
+        posts_today = await self.post_repository.count_user_posts_today(owner_id)
+        
+        try:
+            await self.quota_service.check_posts_per_day(user_uuid, posts_today)
+        except Exception as e:
+            # Re-raise LimitExceededException as-is, convert other exceptions to ValueError
+            from app.shared.presentation.errors.limit_exceeded import LimitExceededException
+            if isinstance(e, LimitExceededException):
+                raise
+            raise ValueError(str(e))
 
         # Set default expiry if not provided
         if expires_at is None:

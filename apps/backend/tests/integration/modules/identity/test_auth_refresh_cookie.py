@@ -1,0 +1,202 @@
+"""
+Integration tests for cookie-based token refresh.
+
+Tests the complete cookie-based refresh flow:
+1. Refresh endpoint reads refresh_token from httpOnly cookie
+2. Successfully exchanges for new access and refresh tokens
+3. Sets new tokens as httpOnly cookies with correct attributes
+4. Rejects invalid or missing refresh_token
+"""
+
+from datetime import datetime, timedelta
+from unittest.mock import AsyncMock, Mock, patch
+from uuid import uuid4
+
+import pytest
+from fastapi.testclient import TestClient
+
+from app.config import settings
+from app.main import app
+from app.modules.identity.domain.entities.refresh_token import RefreshToken
+
+client = TestClient(app)
+
+
+class TestRefreshTokenCookie:
+    """Test suite for cookie-based token refresh (T014)"""
+
+    @pytest.fixture
+    def mock_refresh_token_use_case(self):
+        """Mock RefreshTokenUseCase for testing"""
+        with patch(
+            "app.modules.identity.presentation.routers.auth_router.get_refresh_token_use_case"
+        ) as mock_dep:
+            use_case = Mock()
+            mock_dep.return_value = use_case
+            yield use_case
+
+    @pytest.fixture
+    def valid_refresh_token(self):
+        """Generate a valid refresh token for testing"""
+        return "valid_refresh_token_string_12345"
+
+    @pytest.fixture
+    def new_tokens(self):
+        """New tokens returned after refresh"""
+        return (
+            "new_access_token_67890",
+            "new_refresh_token_67890",
+        )
+
+    def test_refresh_success_with_cookie(
+        self, mock_refresh_token_use_case, valid_refresh_token, new_tokens
+    ):
+        """
+        Test successful token refresh with cookie
+
+        Scenario:
+        - Client sends request with refresh_token in httpOnly cookie
+        - Backend validates and exchanges for new tokens
+        - Response sets new access and refresh cookies
+        - Cookie attributes are correct (httpOnly, SameSite, Secure, etc.)
+        """
+        # Mock use case to return new tokens
+        mock_refresh_token_use_case.execute = AsyncMock(return_value=new_tokens)
+
+        # Send request with refresh_token in cookie
+        cookies = {settings.REFRESH_COOKIE_NAME: valid_refresh_token}
+        response = client.post("/api/v1/auth/refresh", cookies=cookies)
+
+        # Verify response status
+        assert response.status_code == 200
+        data = response.json()
+        assert data["success"] is True
+        assert data["message"] == "Tokens refreshed successfully"
+
+        # Verify use case was called with correct token
+        mock_refresh_token_use_case.execute.assert_called_once_with(
+            valid_refresh_token
+        )
+
+        # Verify cookies are set in response
+        cookies_dict = response.cookies
+        
+        # Check access_token cookie
+        assert settings.ACCESS_COOKIE_NAME in cookies_dict
+        access_cookie = cookies_dict[settings.ACCESS_COOKIE_NAME]
+        assert access_cookie == new_tokens[0]
+        
+        # Check refresh_token cookie
+        assert settings.REFRESH_COOKIE_NAME in cookies_dict
+        refresh_cookie = cookies_dict[settings.REFRESH_COOKIE_NAME]
+        assert refresh_cookie == new_tokens[1]
+
+        # Note: TestClient doesn't expose all cookie attributes (httponly, samesite, secure)
+        # These should be tested in E2E or browser tests
+        # For now, we verify the cookies are set with correct values
+
+    def test_refresh_missing_cookie(self, mock_refresh_token_use_case):
+        """
+        Test refresh endpoint rejects request without refresh_token cookie
+
+        Scenario:
+        - Client sends request without refresh_token cookie
+        - Backend returns 401 Unauthorized
+        """
+        # Send request without cookie
+        response = client.post("/api/v1/auth/refresh")
+
+        # Verify error response
+        assert response.status_code == 401
+        error = response.json()
+        assert error["detail"]["code"] == "UNAUTHORIZED"
+        assert "not found in cookie" in error["detail"]["message"]
+
+        # Verify use case was NOT called
+        mock_refresh_token_use_case.execute.assert_not_called()
+
+    def test_refresh_invalid_token(
+        self, mock_refresh_token_use_case, valid_refresh_token
+    ):
+        """
+        Test refresh endpoint rejects invalid refresh_token
+
+        Scenario:
+        - Client sends request with invalid refresh_token in cookie
+        - Use case returns None (token validation failed)
+        - Backend returns 401 Unauthorized
+        """
+        # Mock use case to return None (invalid token)
+        mock_refresh_token_use_case.execute = AsyncMock(return_value=None)
+
+        # Send request with invalid token
+        cookies = {settings.REFRESH_COOKIE_NAME: "invalid_token"}
+        response = client.post("/api/v1/auth/refresh", cookies=cookies)
+
+        # Verify error response
+        assert response.status_code == 401
+        error = response.json()
+        assert error["detail"]["code"] == "UNAUTHORIZED"
+        assert "Invalid or expired" in error["detail"]["message"]
+
+        # Verify use case was called
+        mock_refresh_token_use_case.execute.assert_called_once_with("invalid_token")
+
+    def test_refresh_expired_token(
+        self, mock_refresh_token_use_case, valid_refresh_token
+    ):
+        """
+        Test refresh endpoint rejects expired refresh_token
+
+        Scenario:
+        - Client sends request with expired refresh_token in cookie
+        - Use case returns None (token expired)
+        - Backend returns 401 Unauthorized
+        """
+        # Mock use case to return None (expired token)
+        mock_refresh_token_use_case.execute = AsyncMock(return_value=None)
+
+        # Send request with expired token (simulated by mock returning None)
+        cookies = {settings.REFRESH_COOKIE_NAME: valid_refresh_token}
+        response = client.post("/api/v1/auth/refresh", cookies=cookies)
+
+        # Verify error response
+        assert response.status_code == 401
+        error = response.json()
+        assert error["detail"]["code"] == "UNAUTHORIZED"
+
+    def test_refresh_cookie_attributes_configuration(self):
+        """
+        Test that cookie settings are correctly configured
+
+        Verifies:
+        - Cookie names match configuration
+        - Security settings are defined
+        """
+        # Verify cookie configuration
+        assert settings.ACCESS_COOKIE_NAME == "access_token"
+        assert settings.REFRESH_COOKIE_NAME == "refresh_token"
+        assert settings.COOKIE_HTTPONLY is True
+        assert settings.COOKIE_SAMESITE in ["lax", "strict", "none"]
+        assert settings.COOKIE_PATH == "/"
+        # COOKIE_SECURE should be True in production
+        # COOKIE_DOMAIN may be None for same-origin
+
+
+class TestRefreshTokenCookieIntegration:
+    """Integration tests with real use case (optional, requires DB)"""
+
+    @pytest.mark.skip(reason="Requires database setup")
+    async def test_full_refresh_flow_with_db(self):
+        """
+        Full integration test with database
+
+        This test would:
+        1. Create a user and refresh token in DB
+        2. Call refresh endpoint with cookie
+        3. Verify new tokens are created and old token is revoked
+        4. Verify cookies are set correctly
+
+        Skipped by default - run manually with proper DB setup
+        """
+        pass
