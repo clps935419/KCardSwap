@@ -2478,6 +2478,64 @@
         }
       }
     },
+    "/api/v1/posts/{post_id}/like": {
+      "post": {
+        "tags": [
+          "Posts"
+        ],
+        "summary": "Toggle like on a post (FR-008, FR-009)",
+        "description": "Like or unlike a post. Idempotent: if already liked, unlikes; if not liked, likes. Each user can like a post at most once.",
+        "operationId": "toggle_like_api_v1_posts__post_id__like_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "post_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Post Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Like toggled successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ToggleLikeResponseWrapper"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (not logged in)"
+          },
+          "404": {
+            "description": "Post not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/locations/cities": {
       "get": {
         "tags": [
@@ -2512,6 +2570,817 @@
                       "name_zh": "桃園市"
                     }
                   ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/users/{user_id}/gallery/cards": {
+      "get": {
+        "tags": [
+          "Gallery"
+        ],
+        "summary": "Get user's gallery cards",
+        "description": "View another user's public gallery cards (requires authentication).",
+        "operationId": "get_user_gallery_cards_api_v1_users__user_id__gallery_cards_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "User Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GalleryCardListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/gallery/cards/me": {
+      "get": {
+        "tags": [
+          "Gallery"
+        ],
+        "summary": "Get my gallery cards",
+        "description": "Get the authenticated user's own gallery cards.",
+        "operationId": "get_my_gallery_cards_api_v1_gallery_cards_me_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GalleryCardListResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/gallery/cards": {
+      "post": {
+        "tags": [
+          "Gallery"
+        ],
+        "summary": "Create gallery card",
+        "description": "Create a new gallery card in the user's personal album.",
+        "operationId": "create_gallery_card_api_v1_gallery_cards_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateGalleryCardRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GalleryCardResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/gallery/cards/{card_id}": {
+      "delete": {
+        "tags": [
+          "Gallery"
+        ],
+        "summary": "Delete gallery card",
+        "description": "Delete a gallery card (only owner can delete).",
+        "operationId": "delete_gallery_card_api_v1_gallery_cards__card_id__delete",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "card_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Card Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/gallery/cards/reorder": {
+      "put": {
+        "tags": [
+          "Gallery"
+        ],
+        "summary": "Reorder gallery cards",
+        "description": "Update the display order of gallery cards.",
+        "operationId": "reorder_gallery_cards_api_v1_gallery_cards_reorder_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReorderGalleryCardsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReorderGalleryCardsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/media/upload-url": {
+      "post": {
+        "tags": [
+          "media"
+        ],
+        "summary": "Generate presigned upload URL",
+        "description": "Step 1: Generate a presigned URL for uploading media to GCS. FR-006.",
+        "operationId": "create_upload_url_api_v1_media_upload_url_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUploadUrlRequestSchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateUploadUrlResponseSchema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/media/{media_id}/confirm": {
+      "post": {
+        "tags": [
+          "media"
+        ],
+        "summary": "Confirm media upload",
+        "description": "Step 2: Confirm that media was uploaded to GCS. Applies quota. FR-022, T052.",
+        "operationId": "confirm_upload_api_v1_media__media_id__confirm_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "media_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Media Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfirmUploadResponseSchema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/media/posts/{post_id}/attach": {
+      "post": {
+        "tags": [
+          "media"
+        ],
+        "summary": "Attach media to post",
+        "description": "Step 3: Attach confirmed media to a post. FR-007.",
+        "operationId": "attach_media_to_post_api_v1_media_posts__post_id__attach_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "post_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Post Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttachMediaToPostRequestSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttachMediaResponseSchema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/media/gallery/cards/{card_id}/attach": {
+      "post": {
+        "tags": [
+          "media"
+        ],
+        "summary": "Attach media to gallery card",
+        "description": "Step 3: Attach confirmed media to a gallery card. FR-007, FR-020.",
+        "operationId": "attach_media_to_gallery_card_api_v1_media_gallery_cards__card_id__attach_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "card_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Card Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttachMediaToGalleryCardRequestSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttachMediaResponseSchema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/api/v1/message-requests": {
+      "post": {
+        "tags": [
+          "message-requests"
+        ],
+        "summary": "Create Message Request",
+        "description": "Create a message request to another user.\n\nImplements FR-011: Message Requests for strangers.\nImplements FR-013: Privacy setting to block stranger messages.\nImplements FR-014: One unique thread per user pair.",
+        "operationId": "create_message_request_api_v1_api_v1_message_requests_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMessageRequestRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageRequestResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/api/v1/message-requests/inbox": {
+      "get": {
+        "tags": [
+          "message-requests"
+        ],
+        "summary": "Get My Message Requests",
+        "description": "Get message requests for the current user.\n\nSupports FR-016: Inbox clearly separates Requests vs Threads.\n\nQuery params:\n- status_filter: \"pending\", \"accepted\", \"declined\", or \"all\" (default: \"pending\")",
+        "operationId": "get_my_message_requests_api_v1_api_v1_message_requests_inbox_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "status_filter",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "pending",
+              "title": "Status Filter"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MessageRequestResponse"
+                  },
+                  "title": "Response Get My Message Requests Api V1 Api V1 Message Requests Inbox Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/api/v1/message-requests/{request_id}/accept": {
+      "post": {
+        "tags": [
+          "message-requests"
+        ],
+        "summary": "Accept Message Request",
+        "description": "Accept a message request and create a thread.\n\nImplements FR-012: Recipient can accept/decline requests.\nCreates unique thread (FR-014).",
+        "operationId": "accept_message_request_api_v1_api_v1_message_requests__request_id__accept_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Request Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptRequestResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/api/v1/message-requests/{request_id}/decline": {
+      "post": {
+        "tags": [
+          "message-requests"
+        ],
+        "summary": "Decline Message Request",
+        "description": "Decline a message request.\n\nImplements FR-012: Recipient can accept/decline requests.",
+        "operationId": "decline_message_request_api_v1_api_v1_message_requests__request_id__decline_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Request Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageRequestResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/api/v1/threads": {
+      "get": {
+        "tags": [
+          "threads"
+        ],
+        "summary": "Get My Threads",
+        "description": "Get all threads for the current user.\n\nSupports FR-016: Inbox clearly separates Requests vs Threads.\nReturns threads ordered by last_message_at descending.",
+        "operationId": "get_my_threads_api_v1_api_v1_threads_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThreadListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/api/v1/threads/{thread_id}/messages": {
+      "get": {
+        "tags": [
+          "threads"
+        ],
+        "summary": "Get Thread Messages",
+        "description": "Get messages in a thread.\n\nReturns messages ordered by created_at ascending (oldest first).\nUser must be part of the thread to view messages.",
+        "operationId": "get_thread_messages_api_v1_api_v1_threads__thread_id__messages_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "thread_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Thread Id"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThreadMessagesResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "threads"
+        ],
+        "summary": "Send Message",
+        "description": "Send a message in a thread.\n\nSupports FR-015: Messages can reference post_id.\nUser must be part of the thread to send messages.",
+        "operationId": "send_message_api_v1_api_v1_threads__thread_id__messages_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "thread_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Thread Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/app__modules__social__presentation__schemas__message_schemas__SendMessageRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThreadMessageResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -2577,6 +3446,23 @@
         "title": "AcceptInterestResponseWrapper",
         "description": "Response wrapper for accept interest response (standardized envelope)"
       },
+      "AcceptRequestResponse": {
+        "properties": {
+          "message_request": {
+            "$ref": "#/components/schemas/MessageRequestResponse"
+          },
+          "thread": {
+            "$ref": "#/components/schemas/ThreadResponse"
+          }
+        },
+        "type": "object",
+        "required": [
+          "message_request",
+          "thread"
+        ],
+        "title": "AcceptRequestResponse",
+        "description": "Response for accepting a request"
+      },
       "AdminLoginRequest": {
         "properties": {
           "email": {
@@ -2599,6 +3485,74 @@
         ],
         "title": "AdminLoginRequest",
         "description": "Request schema for admin login with email/password"
+      },
+      "AttachMediaResponseSchema": {
+        "properties": {
+          "media_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Media Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "description": "Media status after attachment",
+            "example": "attached"
+          },
+          "attached_to": {
+            "type": "string",
+            "title": "Attached To",
+            "description": "Type of entity attached to",
+            "example": "post"
+          },
+          "target_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Target Id",
+            "description": "ID of the entity media was attached to"
+          }
+        },
+        "type": "object",
+        "required": [
+          "media_id",
+          "status",
+          "attached_to",
+          "target_id"
+        ],
+        "title": "AttachMediaResponseSchema",
+        "description": "Response schema after attaching media."
+      },
+      "AttachMediaToGalleryCardRequestSchema": {
+        "properties": {
+          "media_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Media Id",
+            "description": "ID of confirmed media to attach"
+          }
+        },
+        "type": "object",
+        "required": [
+          "media_id"
+        ],
+        "title": "AttachMediaToGalleryCardRequestSchema",
+        "description": "Request schema for attaching media to gallery card."
+      },
+      "AttachMediaToPostRequestSchema": {
+        "properties": {
+          "media_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Media Id",
+            "description": "ID of confirmed media to attach"
+          }
+        },
+        "type": "object",
+        "required": [
+          "media_id"
+        ],
+        "title": "AttachMediaToPostRequestSchema",
+        "description": "Request schema for attaching media to post."
       },
       "AverageRatingResponse": {
         "properties": {
@@ -3099,6 +4053,115 @@
         "title": "CityResponse",
         "description": "Response schema for a single city."
       },
+      "ConfirmUploadResponseSchema": {
+        "properties": {
+          "media_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Media Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "description": "Media status after confirmation",
+            "example": "confirmed"
+          },
+          "file_size_bytes": {
+            "type": "integer",
+            "title": "File Size Bytes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "media_id",
+          "status",
+          "file_size_bytes"
+        ],
+        "title": "ConfirmUploadResponseSchema",
+        "description": "Response schema after confirming upload."
+      },
+      "CreateGalleryCardRequest": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Title"
+          },
+          "idol_name": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Idol Name"
+          },
+          "era": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Era"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "idol_name"
+        ],
+        "title": "CreateGalleryCardRequest",
+        "description": "Request to create a gallery card."
+      },
+      "CreateMessageRequestRequest": {
+        "properties": {
+          "recipient_id": {
+            "type": "string",
+            "title": "Recipient Id",
+            "description": "ID of the recipient user"
+          },
+          "initial_message": {
+            "type": "string",
+            "maxLength": 5000,
+            "minLength": 1,
+            "title": "Initial Message",
+            "description": "Initial message content"
+          },
+          "post_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Post Id",
+            "description": "Optional post ID being referenced"
+          }
+        },
+        "type": "object",
+        "required": [
+          "recipient_id",
+          "initial_message"
+        ],
+        "title": "CreateMessageRequestRequest",
+        "description": "Request to create a message request"
+      },
       "CreatePostRequest": {
         "properties": {
           "scope": {
@@ -3275,6 +4338,71 @@
           ],
           "responder_id": "323e4567-e89b-12d3-a456-426614174000"
         }
+      },
+      "CreateUploadUrlRequestSchema": {
+        "properties": {
+          "content_type": {
+            "type": "string",
+            "title": "Content Type",
+            "description": "Content type of the file (e.g., image/jpeg)",
+            "example": "image/jpeg"
+          },
+          "file_size_bytes": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "File Size Bytes",
+            "description": "File size in bytes",
+            "example": 1048576
+          },
+          "filename": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Filename",
+            "description": "Original filename",
+            "example": "card.jpg"
+          }
+        },
+        "type": "object",
+        "required": [
+          "content_type",
+          "file_size_bytes"
+        ],
+        "title": "CreateUploadUrlRequestSchema",
+        "description": "Request schema for creating upload URL."
+      },
+      "CreateUploadUrlResponseSchema": {
+        "properties": {
+          "media_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Media Id",
+            "description": "Media asset ID for confirmation"
+          },
+          "upload_url": {
+            "type": "string",
+            "title": "Upload Url",
+            "description": "Presigned URL for uploading file"
+          },
+          "expires_in_minutes": {
+            "type": "integer",
+            "title": "Expires In Minutes",
+            "description": "URL expiration time in minutes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "media_id",
+          "upload_url",
+          "expires_in_minutes"
+        ],
+        "title": "CreateUploadUrlResponseSchema",
+        "description": "Response schema for upload URL."
       },
       "DeleteSuccessResponse": {
         "properties": {
@@ -3573,6 +4701,110 @@
         "title": "FriendshipResponseWrapper",
         "description": "Response wrapper for friendship (standardized envelope)"
       },
+      "GalleryCardListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/GalleryCardResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "GalleryCardListResponse",
+        "description": "Response for a list of gallery cards."
+      },
+      "GalleryCardResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "User Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "idol_name": {
+            "type": "string",
+            "title": "Idol Name"
+          },
+          "era": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Era"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "media_asset_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Media Asset Id"
+          },
+          "display_order": {
+            "type": "integer",
+            "title": "Display Order"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "user_id",
+          "title",
+          "idol_name",
+          "display_order",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "GalleryCardResponse",
+        "description": "Response for a single gallery card."
+      },
       "GoogleCallbackRequest": {
         "properties": {
           "code": {
@@ -3724,6 +4956,76 @@
         ],
         "title": "LoginResponse",
         "description": "Response wrapper for successful login (standardized envelope)"
+      },
+      "MessageRequestResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "sender_id": {
+            "type": "string",
+            "title": "Sender Id"
+          },
+          "recipient_id": {
+            "type": "string",
+            "title": "Recipient Id"
+          },
+          "initial_message": {
+            "type": "string",
+            "title": "Initial Message"
+          },
+          "post_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Post Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "thread_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Thread Id"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "sender_id",
+          "recipient_id",
+          "initial_message",
+          "post_id",
+          "status",
+          "thread_id",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "MessageRequestResponse",
+        "description": "Response for a message request"
       },
       "MessageResponse": {
         "properties": {
@@ -4299,6 +5601,18 @@
               "deleted"
             ]
           },
+          "like_count": {
+            "type": "integer",
+            "title": "Like Count",
+            "description": "Total number of likes on this post",
+            "default": 0
+          },
+          "liked_by_me": {
+            "type": "boolean",
+            "title": "Liked By Me",
+            "description": "Whether the current user has liked this post",
+            "default": false
+          },
           "expires_at": {
             "type": "string",
             "format": "date-time",
@@ -4332,7 +5646,7 @@
           "updated_at"
         ],
         "title": "PostResponse",
-        "description": "Response schema for post details (V2: with scope/category)",
+        "description": "Response schema for post details (V2: with scope/category + like fields)",
         "example": {
           "category": "trade",
           "city_code": "TPE",
@@ -4342,6 +5656,8 @@
           "id": "123e4567-e89b-12d3-a456-426614174000",
           "idol": "Jungkook",
           "idol_group": "BTS",
+          "like_count": 5,
+          "liked_by_me": true,
           "owner_id": "987e6543-e21b-12d3-a456-426614174000",
           "scope": "city",
           "status": "open",
@@ -4873,6 +6189,44 @@
         "title": "RefreshSuccessResponse",
         "description": "Response for successful token refresh (cookie-based)"
       },
+      "ReorderGalleryCardsRequest": {
+        "properties": {
+          "card_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Card Ids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "card_ids"
+        ],
+        "title": "ReorderGalleryCardsRequest",
+        "description": "Request to reorder gallery cards."
+      },
+      "ReorderGalleryCardsResponse": {
+        "properties": {
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "default": "Gallery cards reordered successfully"
+          },
+          "updated_count": {
+            "type": "integer",
+            "title": "Updated Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "updated_count"
+        ],
+        "title": "ReorderGalleryCardsResponse",
+        "description": "Response after reordering gallery cards."
+      },
       "ReportListResponse": {
         "properties": {
           "reports": {
@@ -5278,6 +6632,192 @@
         ],
         "title": "SubscriptionStatusResponse",
         "description": "Response wrapper for subscription status (standardized envelope)"
+      },
+      "ThreadListResponse": {
+        "properties": {
+          "threads": {
+            "items": {
+              "$ref": "#/components/schemas/ThreadResponse"
+            },
+            "type": "array",
+            "title": "Threads"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "threads",
+          "total"
+        ],
+        "title": "ThreadListResponse",
+        "description": "Response for list of threads"
+      },
+      "ThreadMessageResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "thread_id": {
+            "type": "string",
+            "title": "Thread Id"
+          },
+          "sender_id": {
+            "type": "string",
+            "title": "Sender Id"
+          },
+          "content": {
+            "type": "string",
+            "title": "Content"
+          },
+          "post_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Post Id"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "thread_id",
+          "sender_id",
+          "content",
+          "post_id",
+          "created_at"
+        ],
+        "title": "ThreadMessageResponse",
+        "description": "Response for a thread message"
+      },
+      "ThreadMessagesResponse": {
+        "properties": {
+          "messages": {
+            "items": {
+              "$ref": "#/components/schemas/ThreadMessageResponse"
+            },
+            "type": "array",
+            "title": "Messages"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "messages",
+          "total"
+        ],
+        "title": "ThreadMessagesResponse",
+        "description": "Response for list of messages in a thread"
+      },
+      "ThreadResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "user_a_id": {
+            "type": "string",
+            "title": "User A Id"
+          },
+          "user_b_id": {
+            "type": "string",
+            "title": "User B Id"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "last_message_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Message At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "user_a_id",
+          "user_b_id",
+          "created_at",
+          "updated_at",
+          "last_message_at"
+        ],
+        "title": "ThreadResponse",
+        "description": "Response for a message thread"
+      },
+      "ToggleLikeResponse": {
+        "properties": {
+          "liked": {
+            "type": "boolean",
+            "title": "Liked",
+            "description": "Whether the post is now liked by the user"
+          },
+          "like_count": {
+            "type": "integer",
+            "title": "Like Count",
+            "description": "Current total like count for the post"
+          }
+        },
+        "type": "object",
+        "required": [
+          "liked",
+          "like_count"
+        ],
+        "title": "ToggleLikeResponse",
+        "description": "Response schema for toggle like action",
+        "example": {
+          "like_count": 6,
+          "liked": true
+        }
+      },
+      "ToggleLikeResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ToggleLikeResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "ToggleLikeResponseWrapper",
+        "description": "Response wrapper for toggle like response (standardized envelope)"
       },
       "TokenResponse": {
         "properties": {
@@ -6072,6 +7612,35 @@
           "product_id": "premium_monthly",
           "purchase_token": "abc123xyz..."
         }
+      },
+      "app__modules__social__presentation__schemas__message_schemas__SendMessageRequest": {
+        "properties": {
+          "content": {
+            "type": "string",
+            "maxLength": 5000,
+            "minLength": 1,
+            "title": "Content",
+            "description": "Message content"
+          },
+          "post_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Post Id",
+            "description": "Optional post ID to reference"
+          }
+        },
+        "type": "object",
+        "required": [
+          "content"
+        ],
+        "title": "SendMessageRequest",
+        "description": "Request to send a message in a thread"
       }
     },
     "securitySchemes": {

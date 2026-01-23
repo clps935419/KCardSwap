@@ -5,7 +5,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.shared.infrastructure.database.session import get_db_session
+from app.shared.infrastructure.database.connection import get_db_session
 from app.shared.presentation.deps.require_user import require_user
 from app.modules.social.application.use_cases.message_requests.create_request import (
     CreateMessageRequestUseCase,
