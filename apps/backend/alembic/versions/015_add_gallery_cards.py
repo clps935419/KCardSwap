@@ -2,7 +2,7 @@
 
 Revision ID: 015_add_gallery_cards
 Revises: 014_add_posts_scope_category
-Create Date: 2026-01-23
+Create Date: 2024-01-23
 
 FR-017, FR-018, FR-019: Personal gallery cards with display ordering
 """
