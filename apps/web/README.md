@@ -4,12 +4,13 @@ Posts-first POC 的 Web 客戶端，使用 Next.js App Router 實作。
 
 ## 技術棧
 
-- **框架**: Next.js 14+ (App Router)
+- **框架**: Next.js 16+ (App Router)
 - **UI 元件**: shadcn/ui
 - **表單**: react-hook-form
 - **資料抓取**: TanStack Query
 - **API SDK**: hey-api (從 `openapi/openapi.json` 生成)
 - **驗證**: NextAuth + httpOnly cookie
+- **代碼品質**: Biome (linting & formatting)
 
 ## 快速開始
 
@@ -127,13 +128,16 @@ Web 與 API 需同機同源部署，以確保 cookie 能正確傳遞。
 4. **表單**: 使用 react-hook-form
 5. **驗證**: 所有頁面都需要登入 (除了登入頁)
 
-### Lint 與 Format
+### 代碼檢查與格式化
 
 ```bash
-# Lint
+# 檢查並修復代碼問題 (lint + format)
+npm run check
+
+# 僅檢查 linting
 npm run lint
 
-# Format
+# 僅格式化代碼
 npm run format
 ```
 
