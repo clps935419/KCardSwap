@@ -14,6 +14,7 @@ from app.modules.posts.application.use_cases.express_interest_use_case import (
     ExpressInterestUseCase,
 )
 from app.modules.posts.domain.entities.post import Post, PostStatus
+from app.modules.posts.domain.entities.post_enums import PostCategory, PostScope
 
 
 class TestExpressInterestUseCase:
@@ -47,6 +48,8 @@ class TestExpressInterestUseCase:
             title="Test Post",
             content="Test content",
             status=PostStatus.OPEN,
+            scope=PostScope.CITY,
+            category=PostCategory.TRADE,
             expires_at=datetime.now(timezone.utc) + timedelta(days=14),
             created_at=datetime.now(timezone.utc),
         )
@@ -133,6 +136,8 @@ class TestExpressInterestUseCase:
             title="Test Post",
             content="Test content",
             status=PostStatus.CLOSED,
+            scope=PostScope.CITY,
+            category=PostCategory.TRADE,
             expires_at=datetime.now(timezone.utc) + timedelta(days=14),
             created_at=datetime.now(timezone.utc),
         )
@@ -159,6 +164,8 @@ class TestExpressInterestUseCase:
             title="Test Post",
             content="Test content",
             status=PostStatus.OPEN,
+            scope=PostScope.CITY,
+            category=PostCategory.TRADE,
             expires_at=datetime.now(timezone.utc) - timedelta(days=1),  # Expired
             created_at=datetime.now(timezone.utc),
         )

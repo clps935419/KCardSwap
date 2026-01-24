@@ -14,6 +14,7 @@ from app.modules.posts.application.use_cases.list_board_posts_use_case import (
     ListBoardPostsUseCase,
 )
 from app.modules.posts.domain.entities.post import Post, PostStatus
+from app.modules.posts.domain.entities.post_enums import PostCategory, PostScope
 
 
 class TestListBoardPostsUseCase:
@@ -49,6 +50,8 @@ class TestListBoardPostsUseCase:
             idol=idol,
             idol_group=idol_group,
             status=PostStatus.OPEN,
+            scope=PostScope.CITY,
+            category=PostCategory.TRADE,
             expires_at=expires_at,
             created_at=datetime.now(timezone.utc),
             updated_at=datetime.now(timezone.utc),
@@ -73,6 +76,8 @@ class TestListBoardPostsUseCase:
         mock_post_repository.list_by_city.assert_called_once_with(
             city_code=city_code,
             status=PostStatus.OPEN,
+            scope=PostScope.CITY,
+            category=PostCategory.TRADE,
             idol=None,
             idol_group=None,
             limit=50,
@@ -118,6 +123,8 @@ class TestListBoardPostsUseCase:
         mock_post_repository.list_by_city.assert_called_once_with(
             city_code=city_code,
             status=PostStatus.OPEN,
+            scope=PostScope.CITY,
+            category=PostCategory.TRADE,
             idol=idol,
             idol_group=None,
             limit=50,
@@ -143,6 +150,8 @@ class TestListBoardPostsUseCase:
         mock_post_repository.list_by_city.assert_called_once_with(
             city_code=city_code,
             status=PostStatus.OPEN,
+            scope=PostScope.CITY,
+            category=PostCategory.TRADE,
             idol=None,
             idol_group=idol_group,
             limit=50,
@@ -169,6 +178,8 @@ class TestListBoardPostsUseCase:
         mock_post_repository.list_by_city.assert_called_once_with(
             city_code=city_code,
             status=PostStatus.OPEN,
+            scope=PostScope.CITY,
+            category=PostCategory.TRADE,
             idol=None,
             idol_group=None,
             limit=limit,

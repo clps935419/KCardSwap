@@ -14,6 +14,7 @@ from app.modules.posts.application.use_cases.accept_interest_use_case import (
     AcceptInterestUseCase,
 )
 from app.modules.posts.domain.entities.post import Post
+from app.modules.posts.domain.entities.post_enums import PostCategory, PostScope
 from app.modules.posts.domain.entities.post_interest import PostInterest
 from app.modules.social.domain.entities.chat_room import ChatRoom
 from app.modules.social.domain.entities.friendship import Friendship, FriendshipStatus
@@ -64,12 +65,14 @@ class TestAcceptInterestUseCase:
         return Post(
             id=str(uuid4()),
             owner_id=str(uuid4()),
-            city_code="TPE",
             title="Test Post",
             content="Test content",
             status="active",
-            created_at=datetime.now(timezone.utc),
+            scope=PostScope.CITY,
+            category=PostCategory.TRADE,
             expires_at=datetime.now(timezone.utc),
+            city_code="TPE",
+            created_at=datetime.now(timezone.utc),
         )
 
     @pytest.fixture

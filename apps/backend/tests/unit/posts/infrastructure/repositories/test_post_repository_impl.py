@@ -12,6 +12,7 @@ import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.posts.domain.entities.post import Post, PostStatus
+from app.modules.posts.domain.entities.post_enums import PostCategory, PostScope
 from app.modules.posts.infrastructure.database.models.post_model import PostModel
 from app.modules.posts.infrastructure.repositories.post_repository_impl import (
     PostRepositoryImpl,
@@ -43,6 +44,8 @@ class TestPostRepositoryImpl:
             idol="IU",
             idol_group="Solo",
             status=PostStatus.OPEN,
+            scope=PostScope.CITY,
+            category=PostCategory.TRADE,
             expires_at=datetime.utcnow() + timedelta(days=14),
             created_at=datetime.utcnow(),
         )
@@ -136,7 +139,10 @@ class TestPostRepositoryImpl:
 
         # Act
         result = await repository.list_by_city(
-            city_code, status=PostStatus.OPEN, idol="IU", limit=10
+            city_code,
+            status=PostStatus.OPEN,
+            idol="IU",
+            limit=10,
         )
 
         # Assert

@@ -14,6 +14,7 @@ from app.modules.posts.application.use_cases.reject_interest_use_case import (
     RejectInterestUseCase,
 )
 from app.modules.posts.domain.entities.post import Post
+from app.modules.posts.domain.entities.post_enums import PostCategory, PostScope
 from app.modules.posts.domain.entities.post_interest import PostInterest
 
 
@@ -44,12 +45,14 @@ class TestRejectInterestUseCase:
         return Post(
             id=str(uuid4()),
             owner_id=str(uuid4()),
-            city_code="TPE",
             title="Test Post",
             content="Test content",
             status="active",
-            created_at=datetime.now(timezone.utc),
+            scope=PostScope.CITY,
+            category=PostCategory.TRADE,
             expires_at=datetime.now(timezone.utc),
+            city_code="TPE",
+            created_at=datetime.now(timezone.utc),
         )
 
     @pytest.fixture

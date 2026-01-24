@@ -13,6 +13,7 @@ from app.modules.posts.application.use_cases.list_post_interests_use_case import
     ListPostInterestsUseCase,
 )
 from app.modules.posts.domain.entities.post import Post, PostStatus
+from app.modules.posts.domain.entities.post_enums import PostCategory, PostScope
 from app.modules.posts.domain.entities.post_interest import (
     PostInterest,
     PostInterestStatus,
@@ -52,6 +53,8 @@ class TestListPostInterestsUseCase:
             title="Test Post",
             content="Test Content",
             status=PostStatus.OPEN,
+            scope=PostScope.CITY,
+            category=PostCategory.TRADE,
             expires_at=datetime.now(timezone.utc),
             created_at=datetime.now(timezone.utc),
         )

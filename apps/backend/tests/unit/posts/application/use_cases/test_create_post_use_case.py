@@ -13,6 +13,7 @@ import pytest
 from app.modules.posts.application.use_cases.create_post_use_case import (
     CreatePostUseCase,
 )
+from app.modules.posts.domain.entities.post_enums import PostCategory, PostScope
 
 
 class TestCreatePostUseCase:
@@ -65,6 +66,9 @@ class TestCreatePostUseCase:
             mock_subscription_info
         )
 
+        # Mock count_user_posts_today
+        mock_post_repository.count_user_posts_today.return_value = 0
+
         # Mock post creation
         def create_side_effect(post):
             return post
@@ -74,6 +78,8 @@ class TestCreatePostUseCase:
         # Act
         result = await use_case.execute(
             owner_id=owner_id,
+            scope=PostScope.CITY,
+            category=PostCategory.TRADE,
             city_code=city_code,
             title=title,
             content=content,
@@ -86,8 +92,6 @@ class TestCreatePostUseCase:
         assert result.title == title
         assert result.content == content
         mock_post_repository.create.assert_called_once()
-        # Premium users don't need daily limit check
-        mock_post_repository.count_user_posts_today.assert_not_called()
 
     @pytest.mark.asyncio
     async def test_create_post_success_free_user_under_limit(
@@ -112,6 +116,8 @@ class TestCreatePostUseCase:
         # Act
         result = await use_case.execute(
             owner_id=owner_id,
+            scope=PostScope.CITY,
+            category=PostCategory.TRADE,
             city_code="TPE",
             title="Test Post",
             content="Test content",
@@ -137,9 +143,13 @@ class TestCreatePostUseCase:
         mock_post_repository.count_user_posts_today.return_value = 2
 
         # Act & Assert
-        with pytest.raises(ValueError, match="Daily post limit reached"):
+        from app.shared.presentation.errors.limit_exceeded import LimitExceededException
+        
+        with pytest.raises(LimitExceededException):
             await use_case.execute(
                 owner_id=owner_id,
+                scope=PostScope.CITY,
+                category=PostCategory.TRADE,
                 city_code="TPE",
                 title="Test Post",
                 content="Test content",
@@ -153,9 +163,11 @@ class TestCreatePostUseCase:
     ):
         """Test post creation fails when city code is missing"""
         # Act & Assert
-        with pytest.raises(ValueError, match="City code is required"):
+        with pytest.raises(ValueError, match="city_code is required"):
             await use_case.execute(
                 owner_id=str(uuid4()),
+                scope=PostScope.CITY,
+                category=PostCategory.TRADE,
                 city_code="",
                 title="Test Post",
                 content="Test content",
@@ -172,6 +184,8 @@ class TestCreatePostUseCase:
         with pytest.raises(ValueError, match="Title is required"):
             await use_case.execute(
                 owner_id=str(uuid4()),
+                scope=PostScope.CITY,
+                category=PostCategory.TRADE,
                 city_code="TPE",
                 title="",
                 content="Test content",
@@ -191,6 +205,8 @@ class TestCreatePostUseCase:
         with pytest.raises(ValueError, match="Title is required and must be"):
             await use_case.execute(
                 owner_id=str(uuid4()),
+                scope=PostScope.CITY,
+                category=PostCategory.TRADE,
                 city_code="TPE",
                 title=long_title,
                 content="Test content",
@@ -207,6 +223,8 @@ class TestCreatePostUseCase:
         with pytest.raises(ValueError, match="Content is required"):
             await use_case.execute(
                 owner_id=str(uuid4()),
+                scope=PostScope.CITY,
+                category=PostCategory.TRADE,
                 city_code="TPE",
                 title="Test Post",
                 content="",
@@ -240,6 +258,9 @@ class TestCreatePostUseCase:
             mock_subscription_info
         )
 
+        # Mock count_user_posts_today
+        mock_post_repository.count_user_posts_today.return_value = 0
+
         # Mock post creation
         def create_side_effect(post):
             return post
@@ -249,6 +270,8 @@ class TestCreatePostUseCase:
         # Act
         result = await use_case.execute(
             owner_id=owner_id,
+            scope=PostScope.CITY,
+            category=PostCategory.TRADE,
             city_code="TPE",
             title="Test Post",
             content="Test content",
@@ -285,10 +308,15 @@ class TestCreatePostUseCase:
             mock_subscription_info
         )
 
+        # Mock count_user_posts_today
+        mock_post_repository.count_user_posts_today.return_value = 0
+
         # Act & Assert
         with pytest.raises(ValueError, match="Expiry date must be in the future"):
             await use_case.execute(
                 owner_id=owner_id,
+                scope=PostScope.CITY,
+                category=PostCategory.TRADE,
                 city_code="TPE",
                 title="Test Post",
                 content="Test content",
@@ -324,6 +352,9 @@ class TestCreatePostUseCase:
             mock_subscription_info
         )
 
+        # Mock count_user_posts_today
+        mock_post_repository.count_user_posts_today.return_value = 0
+
         # Mock post creation
         def create_side_effect(post):
             return post
@@ -333,6 +364,8 @@ class TestCreatePostUseCase:
         # Act
         result = await use_case.execute(
             owner_id=owner_id,
+            scope=PostScope.CITY,
+            category=PostCategory.TRADE,
             city_code="TPE",
             title="Test Post",
             content="Test content",
