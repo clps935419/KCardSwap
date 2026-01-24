@@ -155,7 +155,8 @@ class TestMockGCSStorageService:
         )
 
         # Assert
-        assert "Expires" in url or "2000" in url  # 20 * 100 = 2000
+        # Check that expiration info is in URL (format may vary)
+        assert "Expires" in url or "Goog-Expires" in url
 
     def test_multiple_url_generations(self, service):
         """Test generating multiple URLs works correctly"""

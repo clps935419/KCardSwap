@@ -16,6 +16,11 @@ from app.modules.social.infrastructure.services.search_quota_service import (
 )
 
 
+DATETIME_PATCH_PATH = (
+    "app.modules.social.infrastructure.services.search_quota_service.datetime"
+)
+
+
 class TestSearchQuotaService:
     """Test SearchQuotaService"""
 
@@ -56,9 +61,7 @@ class TestSearchQuotaService:
         expected_date = date(2024, 1, 24)
 
         # Act
-        with patch(
-            "app.modules.social.infrastructure.services.search_quota_service.datetime"
-        ) as mock_datetime:
+        with patch(DATETIME_PATCH_PATH) as mock_datetime:
             mock_now = MagicMock()
             mock_now.date.return_value = expected_date
             mock_datetime.now.return_value = mock_now
