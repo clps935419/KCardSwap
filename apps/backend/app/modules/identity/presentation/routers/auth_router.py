@@ -41,59 +41,14 @@ from app.shared.infrastructure.security.jwt_service import JWTService
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
-@router.post(
-    "/admin-login",
-    response_model=LoginResponse,
-    status_code=status.HTTP_200_OK,
-    responses={
-        200: {"description": "Successfully authenticated as admin"},
-        400: {"description": "Validation error"},
-        401: {"description": "Invalid credentials or not an admin"},
-    },
-    tags=["Admin"],
-    summary="Admin login with email/password",
-    description="Authenticate admin user with email and password. Only users with admin or super_admin role can login.",
-)
-async def admin_login(
-    request: AdminLoginRequest,
-    use_case: Annotated[AdminLoginUseCase, Depends(get_admin_login_use_case)],
-) -> LoginResponse:
-    """
-    Admin login with email/password.
-
-    - Verifies email and password
-    - Checks if user has admin role (admin or super_admin)
-    - Returns JWT access and refresh tokens
-
-    This endpoint is only for admin users with password-based authentication.
-    Regular users should use Google OAuth login.
-    """
-    # Execute use case
-    result = await use_case.execute(request.email, request.password)
-
-    if result is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail={
-                "code": "UNAUTHORIZED",
-                "message": "Invalid credentials or not an admin user",
-            },
-        )
-
-    access_token, refresh_token, user = result
-
-    # Build response
-    token_response = TokenResponse(
-        access_token=access_token,
-        refresh_token=refresh_token,
-        token_type="bearer",
-        expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,  # Convert to seconds
-        user_id=user.id,
-        email=user.email,
-        role=user.role,
-    )
-
-    return LoginResponse(data=token_response, meta=None, error=None)
+# REMOVED: Admin login endpoint - not required for web POC
+# @router.post(
+#     "/admin-login",
+#     ...
+# )
+# async def admin_login(...):
+#     """Admin login endpoint removed as per POC requirements"""
+#     pass
 
 
 @router.post(
