@@ -290,7 +290,10 @@ class TestSearchQuotaModel:
         test_date = date(2024, 1, 24)
 
         # Act
-        model = SearchQuotaModel.__table__.columns["count"]
+        # Note: Cannot directly test default on uninitialized model without DB
+        # but we can verify the column has the default defined
+        column = SearchQuotaModel.__table__.columns["count"]
 
         # Assert
-        assert model.default.arg == 0
+        assert column.default is not None
+        assert column.default.arg == 0
