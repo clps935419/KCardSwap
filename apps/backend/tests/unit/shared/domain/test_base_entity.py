@@ -138,7 +138,7 @@ class TestEntityEquality:
 
         assert entity != "not an entity"
         assert entity != 123
-        assert entity != None
+        assert entity is not None
 
     def test_entity_hash(self):
         """Test that entity can be hashed"""
