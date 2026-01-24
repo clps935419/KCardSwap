@@ -12,24 +12,14 @@ from app.modules.social.infrastructure.repositories.friendship_repository_impl i
 from app.modules.social.infrastructure.repositories.message_repository_impl import (
     MessageRepositoryImpl,
 )
-from app.modules.social.infrastructure.repositories.rating_repository_impl import (
-    RatingRepositoryImpl,
-)
 from app.modules.social.infrastructure.repositories.report_repository_impl import (
     ReportRepositoryImpl,
 )
 
 __all__ = [
     "CardRepositoryImpl",
-    "CardRepositoryImpl",
-    "FriendshipRepositoryImpl",
     "FriendshipRepositoryImpl",
     "ChatRoomRepositoryImpl",
-    "ChatRoomRepositoryImpl",
     "MessageRepositoryImpl",
-    "MessageRepositoryImpl",
-    "RatingRepositoryImpl",
-    "RatingRepositoryImpl",
-    "ReportRepositoryImpl",
     "ReportRepositoryImpl",
 ]

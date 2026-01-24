@@ -33,7 +33,6 @@ class ProfileModel(Base):
     privacy_flags = Column(
         JSON,
         default={
-            "nearby_visible": True,
             "show_online": True,
             "allow_stranger_chat": True,
         },

@@ -129,20 +129,10 @@ def create_application() -> FastAPI:
 
     app.include_router(cards_router, prefix=settings.API_PREFIX)
 
-    # Phase 5: Social module (Nearby Search)
-    from .modules.social.presentation.routers.nearby_router import (
-        router as nearby_router,
-    )
-
-    app.include_router(nearby_router, prefix=settings.API_PREFIX)
-
-    # Phase 6: Social module (Friends, Chat, Ratings, Reports)
+    # Phase 6: Social module (Friends, Chat, Reports)
     from .modules.social.presentation.routers.chat_router import router as chat_router
     from .modules.social.presentation.routers.friends_router import (
         router as friends_router,
-    )
-    from .modules.social.presentation.routers.rating_router import (
-        router as rating_router,
     )
     from .modules.social.presentation.routers.report_router import (
         router as report_router,
@@ -150,15 +140,7 @@ def create_application() -> FastAPI:
 
     app.include_router(friends_router, prefix=settings.API_PREFIX)
     app.include_router(chat_router, prefix=settings.API_PREFIX)
-    app.include_router(rating_router, prefix=settings.API_PREFIX)
     app.include_router(report_router, prefix=settings.API_PREFIX)
-
-    # Phase 7: Social module (Trade)
-    from .modules.social.presentation.routers.trade_router import (
-        router as trade_router,
-    )
-
-    app.include_router(trade_router, prefix=settings.API_PREFIX)
 
     # Phase 8: Identity module (Subscription)
     from .modules.identity.presentation.routers.subscription_router import (

@@ -24,7 +24,7 @@ class ProfileResponse(BaseModel):
     )
     privacy_flags: Optional[Dict[str, bool]] = Field(
         default_factory=lambda: {
-            "nearby_visible": True,
+            
             "show_online": True,
             "allow_stranger_chat": True,
         },
@@ -45,7 +45,7 @@ class ProfileResponse(BaseModel):
                 "region": "Seoul",
                 "preferences": {"language": "ko", "theme": "dark"},
                 "privacy_flags": {
-                    "nearby_visible": True,
+                    
                     "show_online": True,
                     "allow_stranger_chat": False,
                 },
@@ -75,7 +75,7 @@ class UpdateProfileRequest(BaseModel):
                 "nickname": "NewNickname",
                 "bio": "Updated bio",
                 "privacy_flags": {
-                    "nearby_visible": True,
+                    
                     "show_online": False,
                     "allow_stranger_chat": True,
                 },

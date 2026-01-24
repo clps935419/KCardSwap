@@ -69,7 +69,7 @@ async def get_my_profile(
         region=profile.region,
         preferences=profile.preferences or {},
         privacy_flags=profile.privacy_flags
-        or {"nearby_visible": True, "show_online": True, "allow_stranger_chat": True},
+        or {"show_online": True, "allow_stranger_chat": True},
         created_at=profile.created_at,
         updated_at=profile.updated_at,
     )
@@ -127,7 +127,7 @@ async def update_my_profile(
         region=profile.region,
         preferences=profile.preferences or {},
         privacy_flags=profile.privacy_flags
-        or {"nearby_visible": True, "show_online": True, "allow_stranger_chat": True},
+        or {"show_online": True, "allow_stranger_chat": True},
         created_at=profile.created_at,
         updated_at=profile.updated_at,
     )
