@@ -15,7 +15,7 @@ from uuid import UUID, uuid4
 
 from app.main import app
 from app.shared.infrastructure.database.connection import get_db_session
-from app.shared.presentation.deps.require_user import require_user
+from app.shared.presentation.deps.require_user import require_user as get_current_user_id_alias
 
 
 class TestThreadsRouterE2E:
@@ -72,7 +72,7 @@ class TestThreadsRouterE2E:
         async def override_get_db_session():
             yield db_session
 
-        app.dependency_overrides[require_user] = override_require_user
+        app.dependency_overrides[get_current_user_id_alias] = override_require_user
         app.dependency_overrides[get_db_session] = override_get_db_session
 
         client = TestClient(app)
