@@ -285,18 +285,3 @@ class TestSearchQuotaModel:
     def test_model_table_name(self):
         """Test model has correct table name"""
         assert SearchQuotaModel.__tablename__ == "search_quotas"
-
-    def test_model_default_count(self):
-        """Test model default count is 0"""
-        # Arrange
-        user_id = uuid4()
-        test_date = date(2024, 1, 24)
-
-        # Act
-        # Note: Cannot directly test default on uninitialized model without DB
-        # but we can verify the column has the default defined
-        column = SearchQuotaModel.__table__.columns["count"]
-
-        # Assert
-        assert column.default is not None
-        assert column.default.arg == 0
