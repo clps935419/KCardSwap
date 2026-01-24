@@ -57,55 +57,6 @@
         }
       }
     },
-    "/api/v1/auth/admin-login": {
-      "post": {
-        "tags": [
-          "Authentication",
-          "Admin"
-        ],
-        "summary": "Admin login with email/password",
-        "description": "Authenticate admin user with email and password. Only users with admin or super_admin role can login.",
-        "operationId": "admin_login_api_v1_auth_admin_login_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AdminLoginRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successfully authenticated as admin",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LoginResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Validation error"
-          },
-          "401": {
-            "description": "Invalid credentials or not an admin"
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/v1/auth/google-login": {
       "post": {
         "tags": [
@@ -332,517 +283,13 @@
         ]
       }
     },
-    "/api/v1/idols/groups": {
-      "get": {
-        "tags": [
-          "idols"
-        ],
-        "summary": "Get all idol groups",
-        "description": "Get a list of all available K-pop idol groups for onboarding.\n\n    This endpoint provides the complete list of idol groups that users can select\n    during the onboarding process to indicate their preferences.\n\n    Each idol group includes:\n    - `id`: Unique identifier (e.g., newjeans, ive, aespa)\n    - `name`: Display name (e.g., NewJeans, IVE, aespa)\n    - `emoji`: Emoji representing the group (e.g., 👖, 🦢, 🦋)\n\n    This is a **public endpoint** that **does not require authentication**.\n    Frontend applications should use this to dynamically populate idol group selection.",
-        "operationId": "get_idol_groups_api_v1_idols_groups_get",
-        "responses": {
-          "200": {
-            "description": "List of all idol groups retrieved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/IdolGroupListResponseWrapper"
-                },
-                "example": {
-                  "data": {
-                    "groups": [
-                      {
-                        "id": "newjeans",
-                        "name": "NewJeans",
-                        "emoji": "👖"
-                      },
-                      {
-                        "id": "ive",
-                        "name": "IVE",
-                        "emoji": "🦢"
-                      },
-                      {
-                        "id": "aespa",
-                        "name": "aespa",
-                        "emoji": "🦋"
-                      }
-                    ]
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/cards/upload-url": {
-      "post": {
-        "tags": [
-          "Cards"
-        ],
-        "summary": "Get upload signed URL",
-        "description": "Generate a signed URL for uploading a card image to GCS",
-        "operationId": "get_upload_url_api_v1_cards_upload_url_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UploadCardRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Upload URL generated successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UploadUrlResponseWrapper"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid request (file type/size)"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "422": {
-            "description": "Quota exceeded"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ]
-      }
-    },
-    "/api/v1/cards/me": {
-      "get": {
-        "tags": [
-          "Cards"
-        ],
-        "summary": "Get my cards",
-        "description": "Retrieve all cards owned by the authenticated user",
-        "operationId": "get_my_cards_api_v1_cards_me_get",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "status",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "Filter by status (available/trading/traded)",
-              "title": "Status"
-            },
-            "description": "Filter by status (available/trading/traded)"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Cards retrieved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CardListResponseWrapper"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/cards/{card_id}": {
-      "delete": {
-        "tags": [
-          "Cards"
-        ],
-        "summary": "Delete a card",
-        "description": "Delete a card owned by the authenticated user",
-        "operationId": "delete_card_api_v1_cards__card_id__delete",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "card_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Card Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Card deleted successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DeleteSuccessResponseWrapper"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Not the card owner"
-          },
-          "404": {
-            "description": "Card not found"
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/cards/quota/status": {
-      "get": {
-        "tags": [
-          "Cards"
-        ],
-        "summary": "Get quota status",
-        "description": "Check current upload quota usage",
-        "operationId": "get_quota_status_api_v1_cards_quota_status_get",
-        "responses": {
-          "200": {
-            "description": "Quota status retrieved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/QuotaStatusResponseWrapper"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ]
-      }
-    },
-    "/api/v1/cards/{card_id}/confirm-upload": {
-      "post": {
-        "tags": [
-          "Cards"
-        ],
-        "summary": "Confirm card upload",
-        "description": "Confirm that the card image has been successfully uploaded to GCS after using the signed URL",
-        "operationId": "confirm_card_upload_api_v1_cards__card_id__confirm_upload_post",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "card_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Card Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Upload confirmed successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DeleteSuccessResponseWrapper"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid request (already confirmed, no image, etc.)"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Not the card owner"
-          },
-          "404": {
-            "description": "Card not found or image not found in storage"
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/nearby/search": {
-      "post": {
-        "tags": [
-          "Nearby Search"
-        ],
-        "summary": "Search for nearby cards",
-        "description": "Search for cards near a specific location. Free users: 5 searches/day. Premium users: unlimited.",
-        "operationId": "search_nearby_cards_api_v1_nearby_search_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SearchNearbyRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Search successful",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SearchNearbyResponseWrapper"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Rate limit exceeded"
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ]
-      }
-    },
-    "/api/v1/nearby/location": {
-      "put": {
-        "tags": [
-          "Nearby Search"
-        ],
-        "summary": "Update user location",
-        "description": "Update the user's current location for nearby search visibility",
-        "operationId": "update_user_location_api_v1_nearby_location_put",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateLocationRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Location updated successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UpdateLocationResponseWrapper"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid coordinates"
-          },
-          "404": {
-            "description": "User profile not found"
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ]
-      }
-    },
-    "/api/v1/friends/request": {
-      "post": {
-        "tags": [
-          "Friends"
-        ],
-        "summary": "Send friend request",
-        "description": "Send a friend request to another user",
-        "operationId": "send_friend_request_api_v1_friends_request_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SendFriendRequestRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "description": "Friend request sent successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FriendshipResponseWrapper"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request (validation failed)"
-          },
-          "401": {
-            "description": "Unauthorized (not logged in)"
-          },
-          "422": {
-            "description": "Unprocessable entity (cannot send request - already friends, pending, or blocked)"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ]
-      }
-    },
-    "/api/v1/friends/{friendship_id}/accept": {
-      "post": {
-        "tags": [
-          "Friends"
-        ],
-        "summary": "Accept friend request",
-        "description": "Accept a pending friend request",
-        "operationId": "accept_friend_request_api_v1_friends__friendship_id__accept_post",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "friendship_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Friendship Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Friend request accepted successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FriendshipResponseWrapper"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized (not logged in)"
-          },
-          "403": {
-            "description": "Forbidden (not authorized to accept this request)"
-          },
-          "404": {
-            "description": "Friend request not found"
-          },
-          "422": {
-            "description": "Unprocessable entity (request cannot be accepted)"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
     "/api/v1/friends/block": {
       "post": {
         "tags": [
           "Friends"
         ],
-        "summary": "Block user",
-        "description": "Block another user (prevents all interactions)",
+        "summary": "Block a user",
+        "description": "Block a user to prevent interaction. Required for FR-025 (blocking support).",
         "operationId": "block_user_api_v1_friends_block_post",
         "requestBody": {
           "content": {
@@ -856,26 +303,35 @@
         },
         "responses": {
           "200": {
-            "description": "User blocked successfully",
+            "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/FriendshipResponseWrapper"
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Block User Api V1 Friends Block Post"
                 }
               }
             }
           },
           "400": {
-            "description": "Bad request (validation failed)"
+            "description": "Invalid request"
           },
           "401": {
-            "description": "Unauthorized (not logged in)"
-          },
-          "422": {
-            "description": "Unprocessable entity (cannot block user)"
+            "description": "Unauthorized"
           },
           "500": {
             "description": "Internal server error"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -890,8 +346,8 @@
         "tags": [
           "Friends"
         ],
-        "summary": "Unblock user",
-        "description": "Unblock a previously blocked user (allows future interactions)",
+        "summary": "Unblock a user",
+        "description": "Unblock a previously blocked user. Required for FR-025.",
         "operationId": "unblock_user_api_v1_friends_unblock_post",
         "requestBody": {
           "content": {
@@ -905,29 +361,35 @@
         },
         "responses": {
           "200": {
-            "description": "User unblocked successfully",
+            "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/FriendshipResponseWrapper"
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Unblock User Api V1 Friends Unblock Post"
                 }
               }
             }
           },
           "400": {
-            "description": "Bad request (validation failed)"
+            "description": "Invalid request"
           },
           "401": {
-            "description": "Unauthorized (not logged in)"
-          },
-          "404": {
-            "description": "No blocked relationship found"
-          },
-          "422": {
-            "description": "Unprocessable entity (cannot unblock user)"
+            "description": "Unauthorized"
           },
           "500": {
             "description": "Internal server error"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -935,504 +397,6 @@
             "HTTPBearer": []
           }
         ]
-      }
-    },
-    "/api/v1/friends": {
-      "get": {
-        "tags": [
-          "Friends"
-        ],
-        "summary": "Get friend list",
-        "description": "Get list of friends (optionally filtered by status)",
-        "operationId": "get_friends_api_v1_friends_get",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "status",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "Filter by friendship status (accepted, pending, blocked). If not provided, returns all friendships.",
-              "title": "Status"
-            },
-            "description": "Filter by friendship status (accepted, pending, blocked). If not provided, returns all friendships."
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Friend list retrieved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FriendListResponseWrapper"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized (not logged in)"
-          },
-          "500": {
-            "description": "Internal server error"
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/chats": {
-      "get": {
-        "tags": [
-          "Chat"
-        ],
-        "summary": "Get chat rooms",
-        "description": "Get all chat rooms for the current user",
-        "operationId": "get_chat_rooms_api_v1_chats_get",
-        "responses": {
-          "200": {
-            "description": "Chat rooms retrieved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ChatRoomListResponseWrapper"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized (not logged in)"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ]
-      }
-    },
-    "/api/v1/chats/{room_id}/messages": {
-      "get": {
-        "tags": [
-          "Chat"
-        ],
-        "summary": "Get messages",
-        "description": "Get messages from a chat room (with pagination support via after_message_id)",
-        "operationId": "get_messages_api_v1_chats__room_id__messages_get",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "room_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Room Id"
-            }
-          },
-          {
-            "name": "after_message_id",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "format": "uuid"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "Get messages after this message ID",
-              "title": "After Message Id"
-            },
-            "description": "Get messages after this message ID"
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "maximum": 100,
-              "minimum": 1,
-              "description": "Maximum number of messages",
-              "default": 50,
-              "title": "Limit"
-            },
-            "description": "Maximum number of messages"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Messages retrieved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MessagesListResponseWrapper"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized (not logged in)"
-          },
-          "403": {
-            "description": "Forbidden (not a participant of this room)"
-          },
-          "404": {
-            "description": "Chat room not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Chat"
-        ],
-        "summary": "Send message",
-        "description": "Send a message in a chat room (triggers FCM push notification)",
-        "operationId": "send_message_api_v1_chats__room_id__messages_post",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "room_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Room Id"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SendMessageRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Message sent successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MessageResponseWrapper"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request (validation failed)"
-          },
-          "401": {
-            "description": "Unauthorized (not logged in)"
-          },
-          "403": {
-            "description": "Forbidden (not authorized to send message)"
-          },
-          "404": {
-            "description": "Chat room not found"
-          },
-          "422": {
-            "description": "Unprocessable entity (blocked or not friends)"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
-    "/api/v1/chats/{room_id}/messages/{message_id}/read": {
-      "post": {
-        "tags": [
-          "Chat"
-        ],
-        "summary": "Mark message as read",
-        "description": "Mark a message as read by the current user",
-        "operationId": "mark_message_read_api_v1_chats__room_id__messages__message_id__read_post",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "room_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Room Id"
-            }
-          },
-          {
-            "name": "message_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Message Id"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Message marked as read"
-          },
-          "401": {
-            "description": "Unauthorized (not logged in)"
-          },
-          "403": {
-            "description": "Forbidden (not authorized)"
-          },
-          "404": {
-            "description": "Message not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/ratings": {
-      "post": {
-        "tags": [
-          "Ratings"
-        ],
-        "summary": "Submit rating",
-        "description": "Submit a rating for another user (based on friendship or completed trade)",
-        "operationId": "submit_rating_api_v1_ratings_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RatingRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "description": "Rating submitted successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RatingResponseWrapper"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request (validation failed)"
-          },
-          "401": {
-            "description": "Unauthorized (not logged in)"
-          },
-          "422": {
-            "description": "Unprocessable entity (cannot rate user)"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ]
-      }
-    },
-    "/api/v1/ratings/user/{user_id}": {
-      "get": {
-        "tags": [
-          "Ratings"
-        ],
-        "summary": "Get user ratings",
-        "description": "Get ratings received by a specific user",
-        "operationId": "get_user_ratings_api_v1_ratings_user__user_id__get",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "user_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "User Id"
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "maximum": 100,
-              "minimum": 1,
-              "description": "Maximum number of ratings",
-              "default": 50,
-              "title": "Limit"
-            },
-            "description": "Maximum number of ratings"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Ratings retrieved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RatingListResponseWrapper"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized (not logged in)"
-          },
-          "404": {
-            "description": "User not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/ratings/user/{user_id}/average": {
-      "get": {
-        "tags": [
-          "Ratings"
-        ],
-        "summary": "Get average rating",
-        "description": "Get average rating score for a specific user",
-        "operationId": "get_average_rating_api_v1_ratings_user__user_id__average_get",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "user_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "User Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Average rating retrieved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AverageRatingResponseWrapper"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized (not logged in)"
-          },
-          "404": {
-            "description": "User not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
       }
     },
     "/api/v1/reports": {
@@ -1513,415 +477,6 @@
             "HTTPBearer": []
           }
         ]
-      }
-    },
-    "/api/v1/trades": {
-      "post": {
-        "tags": [
-          "Trades"
-        ],
-        "summary": "Create trade proposal",
-        "description": "Create a new trade proposal between two users",
-        "operationId": "create_trade_api_v1_trades_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateTradeRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "description": "Trade proposal created successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TradeResponseWrapper"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request (validation failed)"
-          },
-          "401": {
-            "description": "Unauthorized (not logged in)"
-          },
-          "422": {
-            "description": "Unprocessable entity (validation error)"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ]
-      }
-    },
-    "/api/v1/trades/{trade_id}/accept": {
-      "post": {
-        "tags": [
-          "Trades"
-        ],
-        "summary": "Accept trade proposal",
-        "description": "Accept a trade proposal (responder only)",
-        "operationId": "accept_trade_api_v1_trades__trade_id__accept_post",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "trade_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Trade Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Trade accepted successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TradeResponseWrapper"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized (not logged in)"
-          },
-          "404": {
-            "description": "Trade not found"
-          },
-          "422": {
-            "description": "Unprocessable entity (cannot accept trade)"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
-    "/api/v1/trades/{trade_id}/reject": {
-      "post": {
-        "tags": [
-          "Trades"
-        ],
-        "summary": "Reject trade proposal",
-        "description": "Reject a trade proposal (responder only)",
-        "operationId": "reject_trade_api_v1_trades__trade_id__reject_post",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "trade_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Trade Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TradeResponseWrapper"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/trades/{trade_id}/cancel": {
-      "post": {
-        "tags": [
-          "Trades"
-        ],
-        "summary": "Cancel trade",
-        "description": "Cancel a trade (either party can cancel)",
-        "operationId": "cancel_trade_api_v1_trades__trade_id__cancel_post",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "trade_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Trade Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TradeResponseWrapper"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/trades/{trade_id}/complete": {
-      "post": {
-        "tags": [
-          "Trades"
-        ],
-        "summary": "Confirm trade completion",
-        "description": "Confirm trade completion (each party confirms independently)",
-        "operationId": "complete_trade_api_v1_trades__trade_id__complete_post",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "trade_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Trade Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TradeResponseWrapper"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/trades/history": {
-      "get": {
-        "tags": [
-          "Trades"
-        ],
-        "summary": "Get trade history",
-        "description": "Get all trades for current user (as initiator or responder)",
-        "operationId": "get_trade_history_api_v1_trades_history_get",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "maximum": 100,
-              "minimum": 1,
-              "description": "Maximum number of results",
-              "default": 50,
-              "title": "Limit"
-            },
-            "description": "Maximum number of results"
-          },
-          {
-            "name": "offset",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "minimum": 0,
-              "description": "Number of results to skip",
-              "default": 0,
-              "title": "Offset"
-            },
-            "description": "Number of results to skip"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TradeHistoryResponseWrapper"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/subscriptions/verify-receipt": {
-      "post": {
-        "tags": [
-          "Subscriptions"
-        ],
-        "summary": "Verify Receipt",
-        "description": "Verify Google Play purchase receipt and update subscription.\n\nFeatures:\n- Idempotent: Same token + same user returns current status\n- Token binding: Prevents cross-user replay attacks\n- Auto-acknowledge: Acknowledges purchase after verification\n\nError codes:\n- 400_VALIDATION_FAILED: Invalid platform or missing fields\n- 401_UNAUTHORIZED: Not logged in\n- 409_CONFLICT: Purchase token already used by another user\n- 503_SERVICE_UNAVAILABLE: Google Play API unavailable",
-        "operationId": "verify_receipt_api_v1_subscriptions_verify_receipt_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/VerifyReceiptRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SubscriptionStatusResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ]
-      }
-    },
-    "/api/v1/subscriptions/status": {
-      "get": {
-        "tags": [
-          "Subscriptions"
-        ],
-        "summary": "Get Subscription Status",
-        "description": "Get current subscription status for authenticated user.\n\nReturns server-side subscription state.\nCalled by app when opening or returning to foreground.\n\nError codes:\n- 401_UNAUTHORIZED: Not logged in\n- 503_SERVICE_UNAVAILABLE: Database unavailable",
-        "operationId": "get_subscription_status_api_v1_subscriptions_status_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SubscriptionStatusResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ]
-      }
-    },
-    "/api/v1/subscriptions/expire-subscriptions": {
-      "post": {
-        "tags": [
-          "Subscriptions"
-        ],
-        "summary": "Expire Subscriptions",
-        "description": "Expire active subscriptions that have passed their expiry date.\n\nThis endpoint should be called by a scheduled background task (e.g., daily cron job).\nFor POC, it's exposed as an HTTP endpoint for manual triggering.\n\nIn production, this should be:\n- Protected by admin authentication or internal-only access\n- Triggered by a scheduler (APScheduler, Celery Beat, Cloud Scheduler, etc.)\n\nReturns:\n    Number of subscriptions expired and processing timestamp",
-        "operationId": "expire_subscriptions_api_v1_subscriptions_expire_subscriptions_post",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExpireSubscriptionsResponse"
-                }
-              }
-            }
-          }
-        }
       }
     },
     "/api/v1/posts": {
@@ -2082,178 +637,6 @@
         }
       }
     },
-    "/api/v1/posts/{post_id}/interest": {
-      "post": {
-        "tags": [
-          "Posts"
-        ],
-        "summary": "Express interest in a post",
-        "description": "Express interest in a post. Cannot express interest in your own post or duplicate interests.",
-        "operationId": "express_interest_api_v1_posts__post_id__interest_post",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "post_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Post Id"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Interest expressed successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PostInterestResponseWrapper"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized (not logged in)"
-          },
-          "404": {
-            "description": "Post not found"
-          },
-          "422": {
-            "description": "Unprocessable entity (validation failed)"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
-    "/api/v1/posts/{post_id}/interests/{interest_id}/accept": {
-      "post": {
-        "tags": [
-          "Posts"
-        ],
-        "summary": "Accept an interest",
-        "description": "Accept an interest. Automatically creates friendship and chat room.",
-        "operationId": "accept_interest_api_v1_posts__post_id__interests__interest_id__accept_post",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "post_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Post Id"
-            }
-          },
-          {
-            "name": "interest_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Interest Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Interest accepted successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AcceptInterestResponseWrapper"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized (not logged in)"
-          },
-          "403": {
-            "description": "Forbidden (not post owner)"
-          },
-          "404": {
-            "description": "Post or interest not found"
-          },
-          "422": {
-            "description": "Unprocessable entity (validation failed)"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
-    "/api/v1/posts/{post_id}/interests/{interest_id}/reject": {
-      "post": {
-        "tags": [
-          "Posts"
-        ],
-        "summary": "Reject an interest",
-        "description": "Reject an interest. Only post owner can reject.",
-        "operationId": "reject_interest_api_v1_posts__post_id__interests__interest_id__reject_post",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "post_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Post Id"
-            }
-          },
-          {
-            "name": "interest_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Interest Id"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Interest rejected successfully"
-          },
-          "401": {
-            "description": "Unauthorized (not logged in)"
-          },
-          "403": {
-            "description": "Forbidden (not post owner)"
-          },
-          "404": {
-            "description": "Post or interest not found"
-          },
-          "422": {
-            "description": "Unprocessable entity (validation failed)"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
     "/api/v1/posts/{post_id}/close": {
       "post": {
         "tags": [
@@ -2301,14 +684,14 @@
         }
       }
     },
-    "/api/v1/posts/{post_id}/interests": {
-      "get": {
+    "/api/v1/posts/{post_id}/like": {
+      "post": {
         "tags": [
           "Posts"
         ],
-        "summary": "List interests for a post (owner only)",
-        "description": "List all interests for a specific post. Only post owner can view.",
-        "operationId": "list_post_interests_api_v1_posts__post_id__interests_get",
+        "summary": "Toggle like on a post (FR-008, FR-009)",
+        "description": "Like or unlike a post. Idempotent: if already liked, unlikes; if not liked, likes. Each user can like a post at most once.",
+        "operationId": "toggle_like_api_v1_posts__post_id__like_post",
         "security": [
           {
             "HTTPBearer": []
@@ -2324,143 +707,24 @@
               "format": "uuid",
               "title": "Post Id"
             }
-          },
-          {
-            "name": "status",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "Filter by status",
-              "title": "Status"
-            },
-            "description": "Filter by status"
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "maximum": 100,
-              "minimum": 1,
-              "description": "Maximum results",
-              "default": 50,
-              "title": "Limit"
-            },
-            "description": "Maximum results"
-          },
-          {
-            "name": "offset",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "minimum": 0,
-              "description": "Pagination offset",
-              "default": 0,
-              "title": "Offset"
-            },
-            "description": "Pagination offset"
           }
         ],
         "responses": {
           "200": {
-            "description": "Interests retrieved successfully",
+            "description": "Like toggled successfully",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PostInterestListResponseWrapper"
+                  "$ref": "#/components/schemas/ToggleLikeResponseWrapper"
                 }
               }
             }
           },
           "401": {
             "description": "Unauthorized (not logged in)"
-          },
-          "403": {
-            "description": "Forbidden (not post owner)"
           },
           "404": {
             "description": "Post not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/posts/{post_id}/interests/{interest_id}": {
-      "get": {
-        "tags": [
-          "Posts"
-        ],
-        "summary": "Get a specific interest (owner only)",
-        "description": "Get details of a specific interest. Only post owner can view.",
-        "operationId": "get_post_interest_api_v1_posts__post_id__interests__interest_id__get",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "post_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Post Id"
-            }
-          },
-          {
-            "name": "interest_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Interest Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Interest retrieved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PostInterestResponseWrapper"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized (not logged in)"
-          },
-          "403": {
-            "description": "Forbidden (not post owner)"
-          },
-          "404": {
-            "description": "Post or interest not found"
           },
           "500": {
             "description": "Internal server error"
@@ -2518,144 +782,905 @@
           }
         }
       }
+    },
+    "/api/v1/users/{user_id}/gallery/cards": {
+      "get": {
+        "tags": [
+          "Gallery"
+        ],
+        "summary": "Get user's gallery cards",
+        "description": "View another user's public gallery cards (requires authentication).",
+        "operationId": "get_user_gallery_cards_api_v1_users__user_id__gallery_cards_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "User Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GalleryCardListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/gallery/cards/me": {
+      "get": {
+        "tags": [
+          "Gallery"
+        ],
+        "summary": "Get my gallery cards",
+        "description": "Get the authenticated user's own gallery cards.",
+        "operationId": "get_my_gallery_cards_api_v1_gallery_cards_me_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GalleryCardListResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/gallery/cards": {
+      "post": {
+        "tags": [
+          "Gallery"
+        ],
+        "summary": "Create gallery card",
+        "description": "Create a new gallery card in the user's personal album.",
+        "operationId": "create_gallery_card_api_v1_gallery_cards_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateGalleryCardRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GalleryCardResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/gallery/cards/{card_id}": {
+      "delete": {
+        "tags": [
+          "Gallery"
+        ],
+        "summary": "Delete gallery card",
+        "description": "Delete a gallery card (only owner can delete).",
+        "operationId": "delete_gallery_card_api_v1_gallery_cards__card_id__delete",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "card_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Card Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/gallery/cards/reorder": {
+      "put": {
+        "tags": [
+          "Gallery"
+        ],
+        "summary": "Reorder gallery cards",
+        "description": "Update the display order of gallery cards.",
+        "operationId": "reorder_gallery_cards_api_v1_gallery_cards_reorder_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReorderGalleryCardsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReorderGalleryCardsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/media/upload-url": {
+      "post": {
+        "tags": [
+          "media"
+        ],
+        "summary": "Generate presigned upload URL",
+        "description": "Step 1: Generate a presigned URL for uploading media to GCS. FR-006.",
+        "operationId": "create_upload_url_api_v1_media_upload_url_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUploadUrlRequestSchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateUploadUrlResponseSchema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/media/{media_id}/confirm": {
+      "post": {
+        "tags": [
+          "media"
+        ],
+        "summary": "Confirm media upload",
+        "description": "Step 2: Confirm that media was uploaded to GCS. Applies quota. FR-022, T052.",
+        "operationId": "confirm_upload_api_v1_media__media_id__confirm_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "media_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Media Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfirmUploadResponseSchema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/media/posts/{post_id}/attach": {
+      "post": {
+        "tags": [
+          "media"
+        ],
+        "summary": "Attach media to post",
+        "description": "Step 3: Attach confirmed media to a post. FR-007.",
+        "operationId": "attach_media_to_post_api_v1_media_posts__post_id__attach_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "post_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Post Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttachMediaToPostRequestSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttachMediaResponseSchema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/media/gallery/cards/{card_id}/attach": {
+      "post": {
+        "tags": [
+          "media"
+        ],
+        "summary": "Attach media to gallery card",
+        "description": "Step 3: Attach confirmed media to a gallery card. FR-007, FR-020.",
+        "operationId": "attach_media_to_gallery_card_api_v1_media_gallery_cards__card_id__attach_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "card_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Card Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttachMediaToGalleryCardRequestSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttachMediaResponseSchema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/message-requests": {
+      "post": {
+        "tags": [
+          "message-requests"
+        ],
+        "summary": "Create Message Request",
+        "description": "Create a message request to another user.\n\nImplements FR-011: Message Requests for strangers.\nImplements FR-013: Privacy setting to block stranger messages.\nImplements FR-014: One unique thread per user pair.",
+        "operationId": "create_message_request_api_v1_message_requests_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMessageRequestRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageRequestResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/message-requests/inbox": {
+      "get": {
+        "tags": [
+          "message-requests"
+        ],
+        "summary": "Get My Message Requests",
+        "description": "Get message requests for the current user.\n\nSupports FR-016: Inbox clearly separates Requests vs Threads.\n\nQuery params:\n- status_filter: \"pending\", \"accepted\", \"declined\", or \"all\" (default: \"pending\")",
+        "operationId": "get_my_message_requests_api_v1_message_requests_inbox_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "status_filter",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "pending",
+              "title": "Status Filter"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MessageRequestResponse"
+                  },
+                  "title": "Response Get My Message Requests Api V1 Message Requests Inbox Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/message-requests/{request_id}/accept": {
+      "post": {
+        "tags": [
+          "message-requests"
+        ],
+        "summary": "Accept Message Request",
+        "description": "Accept a message request and create a thread.\n\nImplements FR-012: Recipient can accept/decline requests.\nCreates unique thread (FR-014).",
+        "operationId": "accept_message_request_api_v1_message_requests__request_id__accept_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Request Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptRequestResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/message-requests/{request_id}/decline": {
+      "post": {
+        "tags": [
+          "message-requests"
+        ],
+        "summary": "Decline Message Request",
+        "description": "Decline a message request.\n\nImplements FR-012: Recipient can accept/decline requests.",
+        "operationId": "decline_message_request_api_v1_message_requests__request_id__decline_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Request Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageRequestResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/threads": {
+      "get": {
+        "tags": [
+          "threads"
+        ],
+        "summary": "Get My Threads",
+        "description": "Get all threads for the current user.\n\nSupports FR-016: Inbox clearly separates Requests vs Threads.\nReturns threads ordered by last_message_at descending.",
+        "operationId": "get_my_threads_api_v1_threads_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThreadListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/threads/{thread_id}/messages": {
+      "get": {
+        "tags": [
+          "threads"
+        ],
+        "summary": "Get Thread Messages",
+        "description": "Get messages in a thread.\n\nReturns messages ordered by created_at ascending (oldest first).\nUser must be part of the thread to view messages.",
+        "operationId": "get_thread_messages_api_v1_threads__thread_id__messages_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "thread_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Thread Id"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThreadMessagesResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "threads"
+        ],
+        "summary": "Send Message",
+        "description": "Send a message in a thread.\n\nSupports FR-015: Messages can reference post_id.\nUser must be part of the thread to send messages.",
+        "operationId": "send_message_api_v1_threads__thread_id__messages_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "thread_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Thread Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendMessageRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThreadMessageResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
-      "AcceptInterestResponse": {
+      "AcceptRequestResponse": {
         "properties": {
-          "interest_id": {
+          "message_request": {
+            "$ref": "#/components/schemas/MessageRequestResponse"
+          },
+          "thread": {
+            "$ref": "#/components/schemas/ThreadResponse"
+          }
+        },
+        "type": "object",
+        "required": [
+          "message_request",
+          "thread"
+        ],
+        "title": "AcceptRequestResponse",
+        "description": "Response for accepting a request"
+      },
+      "AttachMediaResponseSchema": {
+        "properties": {
+          "media_id": {
             "type": "string",
             "format": "uuid",
-            "title": "Interest Id",
-            "description": "Interest ID"
+            "title": "Media Id"
           },
-          "friendship_created": {
-            "type": "boolean",
-            "title": "Friendship Created",
-            "description": "Whether a new friendship was created"
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "description": "Media status after attachment",
+            "example": "attached"
           },
-          "chat_room_id": {
+          "attached_to": {
+            "type": "string",
+            "title": "Attached To",
+            "description": "Type of entity attached to",
+            "example": "post"
+          },
+          "target_id": {
             "type": "string",
             "format": "uuid",
-            "title": "Chat Room Id",
-            "description": "Chat room ID for conversation"
+            "title": "Target Id",
+            "description": "ID of the entity media was attached to"
           }
         },
         "type": "object",
         "required": [
-          "interest_id",
-          "friendship_created",
-          "chat_room_id"
+          "media_id",
+          "status",
+          "attached_to",
+          "target_id"
         ],
-        "title": "AcceptInterestResponse",
-        "description": "Response schema for accepting an interest",
-        "example": {
-          "chat_room_id": "987e6543-e21b-12d3-a456-426614174000",
-          "friendship_created": true,
-          "interest_id": "123e4567-e89b-12d3-a456-426614174000"
-        }
+        "title": "AttachMediaResponseSchema",
+        "description": "Response schema after attaching media."
       },
-      "AcceptInterestResponseWrapper": {
+      "AttachMediaToGalleryCardRequestSchema": {
         "properties": {
-          "data": {
-            "$ref": "#/components/schemas/AcceptInterestResponse"
-          },
-          "meta": {
-            "type": "null",
-            "title": "Meta"
-          },
-          "error": {
-            "type": "null",
-            "title": "Error"
-          }
-        },
-        "type": "object",
-        "required": [
-          "data"
-        ],
-        "title": "AcceptInterestResponseWrapper",
-        "description": "Response wrapper for accept interest response (standardized envelope)"
-      },
-      "AdminLoginRequest": {
-        "properties": {
-          "email": {
-            "type": "string",
-            "format": "email",
-            "title": "Email",
-            "description": "Admin email address"
-          },
-          "password": {
-            "type": "string",
-            "minLength": 8,
-            "title": "Password",
-            "description": "Admin password"
-          }
-        },
-        "type": "object",
-        "required": [
-          "email",
-          "password"
-        ],
-        "title": "AdminLoginRequest",
-        "description": "Request schema for admin login with email/password"
-      },
-      "AverageRatingResponse": {
-        "properties": {
-          "user_id": {
+          "media_id": {
             "type": "string",
             "format": "uuid",
-            "title": "User Id",
-            "description": "User ID"
-          },
-          "average_score": {
-            "type": "number",
-            "title": "Average Score",
-            "description": "Average rating score",
-            "examples": [
-              4.8
-            ]
-          },
-          "total_ratings": {
-            "type": "integer",
-            "title": "Total Ratings",
-            "description": "Total number of ratings received"
+            "title": "Media Id",
+            "description": "ID of confirmed media to attach"
           }
         },
         "type": "object",
         "required": [
-          "user_id",
-          "average_score",
-          "total_ratings"
+          "media_id"
         ],
-        "title": "AverageRatingResponse",
-        "description": "Response schema for average rating",
-        "example": {
-          "average_score": 4.8,
-          "total_ratings": 15,
-          "user_id": "123e4567-e89b-12d3-a456-426614174000"
-        }
+        "title": "AttachMediaToGalleryCardRequestSchema",
+        "description": "Request schema for attaching media to gallery card."
       },
-      "AverageRatingResponseWrapper": {
+      "AttachMediaToPostRequestSchema": {
         "properties": {
-          "data": {
-            "$ref": "#/components/schemas/AverageRatingResponse"
-          },
-          "meta": {
-            "type": "null",
-            "title": "Meta"
-          },
-          "error": {
-            "type": "null",
-            "title": "Error"
+          "media_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Media Id",
+            "description": "ID of confirmed media to attach"
           }
         },
         "type": "object",
         "required": [
-          "data"
+          "media_id"
         ],
-        "title": "AverageRatingResponseWrapper",
-        "description": "Response wrapper for average rating (standardized envelope)"
+        "title": "AttachMediaToPostRequestSchema",
+        "description": "Request schema for attaching media to post."
       },
       "BlockUserRequest": {
         "properties": {
@@ -2677,331 +1702,6 @@
         "description": "Request schema for blocking a user",
         "example": {
           "user_id": "123e4567-e89b-12d3-a456-426614174000"
-        }
-      },
-      "CardListResponseWrapper": {
-        "properties": {
-          "data": {
-            "items": {
-              "$ref": "#/components/schemas/CardResponse"
-            },
-            "type": "array",
-            "title": "Data"
-          },
-          "meta": {
-            "type": "null",
-            "title": "Meta"
-          },
-          "error": {
-            "type": "null",
-            "title": "Error"
-          }
-        },
-        "type": "object",
-        "required": [
-          "data"
-        ],
-        "title": "CardListResponseWrapper",
-        "description": "Response wrapper for card list (standardized envelope)"
-      },
-      "CardResponse": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Id",
-            "description": "Card ID"
-          },
-          "owner_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Owner Id",
-            "description": "Owner user ID"
-          },
-          "idol": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Idol",
-            "description": "Idol name"
-          },
-          "idol_group": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Idol Group",
-            "description": "Idol group"
-          },
-          "album": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Album",
-            "description": "Album name"
-          },
-          "version": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Version",
-            "description": "Version"
-          },
-          "rarity": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Rarity",
-            "description": "Card rarity"
-          },
-          "status": {
-            "type": "string",
-            "title": "Status",
-            "description": "Card status"
-          },
-          "image_url": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Image Url",
-            "description": "Image URL"
-          },
-          "size_bytes": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Size Bytes",
-            "description": "Image size in bytes"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Created At",
-            "description": "Creation timestamp"
-          },
-          "updated_at": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Updated At",
-            "description": "Last update timestamp"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "owner_id",
-          "status",
-          "created_at",
-          "updated_at"
-        ],
-        "title": "CardResponse",
-        "description": "Response schema for card details",
-        "example": {
-          "album": "Love Poem",
-          "created_at": "2024-01-01T00:00:00Z",
-          "id": "123e4567-e89b-12d3-a456-426614174000",
-          "idol": "IU",
-          "idol_group": "Solo",
-          "image_url": "https://storage.googleapis.com/bucket/cards/user_id/card_id.jpg",
-          "owner_id": "987e6543-e21b-12d3-a456-426614174000",
-          "rarity": "rare",
-          "size_bytes": 1234567,
-          "status": "available",
-          "updated_at": "2024-01-01T00:00:00Z",
-          "version": "Version A"
-        }
-      },
-      "ChatRoomListResponse": {
-        "properties": {
-          "rooms": {
-            "items": {
-              "$ref": "#/components/schemas/ChatRoomResponse"
-            },
-            "type": "array",
-            "title": "Rooms",
-            "description": "List of chat rooms"
-          },
-          "total": {
-            "type": "integer",
-            "title": "Total",
-            "description": "Total number of chat rooms"
-          }
-        },
-        "type": "object",
-        "required": [
-          "rooms",
-          "total"
-        ],
-        "title": "ChatRoomListResponse",
-        "description": "Response schema for list of chat rooms"
-      },
-      "ChatRoomListResponseWrapper": {
-        "properties": {
-          "data": {
-            "$ref": "#/components/schemas/ChatRoomListResponse"
-          },
-          "meta": {
-            "type": "null",
-            "title": "Meta"
-          },
-          "error": {
-            "type": "null",
-            "title": "Error"
-          }
-        },
-        "type": "object",
-        "required": [
-          "data"
-        ],
-        "title": "ChatRoomListResponseWrapper",
-        "description": "Response wrapper for chat room list (standardized envelope)"
-      },
-      "ChatRoomParticipantResponse": {
-        "properties": {
-          "user_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "User Id",
-            "description": "User ID"
-          },
-          "nickname": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Nickname",
-            "description": "User's nickname"
-          },
-          "avatar_url": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Avatar Url",
-            "description": "User's avatar URL"
-          }
-        },
-        "type": "object",
-        "required": [
-          "user_id"
-        ],
-        "title": "ChatRoomParticipantResponse",
-        "description": "Response schema for chat room participant"
-      },
-      "ChatRoomResponse": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Id",
-            "description": "Chat room ID"
-          },
-          "participants": {
-            "items": {
-              "$ref": "#/components/schemas/ChatRoomParticipantResponse"
-            },
-            "type": "array",
-            "title": "Participants",
-            "description": "Room participants"
-          },
-          "last_message": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/MessageResponse"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "description": "Last message in the room"
-          },
-          "unread_count": {
-            "type": "integer",
-            "title": "Unread Count",
-            "description": "Number of unread messages for current user",
-            "default": 0
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Created At",
-            "description": "Creation timestamp"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "participants",
-          "created_at"
-        ],
-        "title": "ChatRoomResponse",
-        "description": "Response schema for chat room details",
-        "example": {
-          "created_at": "2024-01-01T00:00:00Z",
-          "id": "987e6543-e21b-12d3-a456-426614174000",
-          "last_message": {
-            "content": "Hello!",
-            "created_at": "2024-01-01T00:00:00Z",
-            "id": "123e4567-e89b-12d3-a456-426614174000",
-            "room_id": "987e6543-e21b-12d3-a456-426614174000",
-            "sender_id": "456e7890-e12b-34d5-a678-901234567000",
-            "status": "read"
-          },
-          "participants": [
-            {
-              "avatar_url": "https://example.com/avatar.jpg",
-              "nickname": "John Doe",
-              "user_id": "456e7890-e12b-34d5-a678-901234567000"
-            },
-            {
-              "avatar_url": "https://example.com/avatar2.jpg",
-              "nickname": "Jane Smith",
-              "user_id": "789e0123-e45b-67d8-a901-234567890000"
-            }
-          ],
-          "unread_count": 0
         }
       },
       "CityCode": {
@@ -3098,6 +1798,115 @@
         ],
         "title": "CityResponse",
         "description": "Response schema for a single city."
+      },
+      "ConfirmUploadResponseSchema": {
+        "properties": {
+          "media_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Media Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "description": "Media status after confirmation",
+            "example": "confirmed"
+          },
+          "file_size_bytes": {
+            "type": "integer",
+            "title": "File Size Bytes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "media_id",
+          "status",
+          "file_size_bytes"
+        ],
+        "title": "ConfirmUploadResponseSchema",
+        "description": "Response schema after confirming upload."
+      },
+      "CreateGalleryCardRequest": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Title"
+          },
+          "idol_name": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Idol Name"
+          },
+          "era": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Era"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "idol_name"
+        ],
+        "title": "CreateGalleryCardRequest",
+        "description": "Request to create a gallery card."
+      },
+      "CreateMessageRequestRequest": {
+        "properties": {
+          "recipient_id": {
+            "type": "string",
+            "title": "Recipient Id",
+            "description": "ID of the recipient user"
+          },
+          "initial_message": {
+            "type": "string",
+            "maxLength": 5000,
+            "minLength": 1,
+            "title": "Initial Message",
+            "description": "Initial message content"
+          },
+          "post_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Post Id",
+            "description": "Optional post ID being referenced"
+          }
+        },
+        "type": "object",
+        "required": [
+          "recipient_id",
+          "initial_message"
+        ],
+        "title": "CreateMessageRequestRequest",
+        "description": "Request to create a message request"
       },
       "CreatePostRequest": {
         "properties": {
@@ -3217,361 +2026,174 @@
           "title": "Looking for BTS cards in Taipei"
         }
       },
-      "CreateTradeRequest": {
+      "CreateUploadUrlRequestSchema": {
         "properties": {
-          "responder_id": {
+          "content_type": {
+            "type": "string",
+            "title": "Content Type",
+            "description": "Content type of the file (e.g., image/jpeg)",
+            "example": "image/jpeg"
+          },
+          "file_size_bytes": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "File Size Bytes",
+            "description": "File size in bytes",
+            "example": 1048576
+          },
+          "filename": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Filename",
+            "description": "Original filename",
+            "example": "card.jpg"
+          }
+        },
+        "type": "object",
+        "required": [
+          "content_type",
+          "file_size_bytes"
+        ],
+        "title": "CreateUploadUrlRequestSchema",
+        "description": "Request schema for creating upload URL."
+      },
+      "CreateUploadUrlResponseSchema": {
+        "properties": {
+          "media_id": {
             "type": "string",
             "format": "uuid",
-            "title": "Responder Id",
-            "description": "User ID of the responder"
+            "title": "Media Id",
+            "description": "Media asset ID for confirmation"
           },
-          "initiator_card_ids": {
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            },
-            "type": "array",
-            "minItems": 1,
-            "title": "Initiator Card Ids",
-            "description": "List of card IDs from initiator",
-            "examples": [
-              [
-                "123e4567-e89b-12d3-a456-426614174000"
-              ]
-            ]
-          },
-          "responder_card_ids": {
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            },
-            "type": "array",
-            "minItems": 1,
-            "title": "Responder Card Ids",
-            "description": "List of card IDs from responder",
-            "examples": [
-              [
-                "223e4567-e89b-12d3-a456-426614174000"
-              ]
-            ]
-          }
-        },
-        "type": "object",
-        "required": [
-          "responder_id",
-          "initiator_card_ids",
-          "responder_card_ids"
-        ],
-        "title": "CreateTradeRequest",
-        "description": "Request schema for creating a trade proposal",
-        "example": {
-          "initiator_card_ids": [
-            "123e4567-e89b-12d3-a456-426614174000",
-            "124e4567-e89b-12d3-a456-426614174000"
-          ],
-          "responder_card_ids": [
-            "223e4567-e89b-12d3-a456-426614174000",
-            "224e4567-e89b-12d3-a456-426614174000"
-          ],
-          "responder_id": "323e4567-e89b-12d3-a456-426614174000"
-        }
-      },
-      "DeleteSuccessResponse": {
-        "properties": {
-          "success": {
-            "type": "boolean",
-            "title": "Success",
-            "description": "Operation success status",
-            "default": true
-          },
-          "message": {
+          "upload_url": {
             "type": "string",
-            "title": "Message",
-            "description": "Success message"
-          }
-        },
-        "type": "object",
-        "required": [
-          "message"
-        ],
-        "title": "DeleteSuccessResponse",
-        "description": "Success response for delete operations"
-      },
-      "DeleteSuccessResponseWrapper": {
-        "properties": {
-          "data": {
-            "$ref": "#/components/schemas/DeleteSuccessResponse"
+            "title": "Upload Url",
+            "description": "Presigned URL for uploading file"
           },
-          "meta": {
-            "type": "null",
-            "title": "Meta"
-          },
-          "error": {
-            "type": "null",
-            "title": "Error"
-          }
-        },
-        "type": "object",
-        "required": [
-          "data"
-        ],
-        "title": "DeleteSuccessResponseWrapper",
-        "description": "Response wrapper for delete success (standardized envelope)"
-      },
-      "ExpireSubscriptionsData": {
-        "properties": {
-          "expired_count": {
+          "expires_in_minutes": {
             "type": "integer",
-            "title": "Expired Count",
-            "description": "Number of subscriptions expired"
-          },
-          "processed_at": {
-            "type": "string",
-            "title": "Processed At",
-            "description": "Processing timestamp (ISO format)"
+            "title": "Expires In Minutes",
+            "description": "URL expiration time in minutes"
           }
         },
         "type": "object",
         "required": [
-          "expired_count",
-          "processed_at"
+          "media_id",
+          "upload_url",
+          "expires_in_minutes"
         ],
-        "title": "ExpireSubscriptionsData",
-        "description": "Data schema for expire subscriptions job",
-        "example": {
-          "expired_count": 5,
-          "processed_at": "2025-12-23T00:00:00"
-        }
+        "title": "CreateUploadUrlResponseSchema",
+        "description": "Response schema for upload URL."
       },
-      "ExpireSubscriptionsResponse": {
+      "GalleryCardListResponse": {
         "properties": {
-          "data": {
-            "$ref": "#/components/schemas/ExpireSubscriptionsData"
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/GalleryCardResponse"
+            },
+            "type": "array",
+            "title": "Items"
           },
-          "meta": {
-            "type": "null",
-            "title": "Meta"
-          },
-          "error": {
-            "type": "null",
-            "title": "Error"
+          "total": {
+            "type": "integer",
+            "title": "Total"
           }
         },
         "type": "object",
         "required": [
-          "data"
+          "items",
+          "total"
         ],
-        "title": "ExpireSubscriptionsResponse",
-        "description": "Response wrapper for expire subscriptions (standardized envelope)"
+        "title": "GalleryCardListResponse",
+        "description": "Response for a list of gallery cards."
       },
-      "FriendListItemResponse": {
+      "GalleryCardResponse": {
         "properties": {
           "id": {
             "type": "string",
             "format": "uuid",
-            "title": "Id",
-            "description": "Friendship ID (needed for accept/reject operations)"
+            "title": "Id"
           },
           "user_id": {
             "type": "string",
             "format": "uuid",
-            "title": "User Id",
-            "description": "Friend's user ID"
+            "title": "User Id"
           },
-          "nickname": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Nickname",
-            "description": "Friend's nickname"
-          },
-          "avatar_url": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Avatar Url",
-            "description": "Friend's avatar URL"
-          },
-          "status": {
+          "title": {
             "type": "string",
-            "title": "Status",
-            "description": "Friendship status"
+            "title": "Title"
+          },
+          "idol_name": {
+            "type": "string",
+            "title": "Idol Name"
+          },
+          "era": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Era"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "media_asset_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Media Asset Id"
+          },
+          "display_order": {
+            "type": "integer",
+            "title": "Display Order"
           },
           "created_at": {
             "type": "string",
             "format": "date-time",
-            "title": "Created At",
-            "description": "When friendship was created"
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
           }
         },
         "type": "object",
         "required": [
           "id",
           "user_id",
-          "status",
-          "created_at"
+          "title",
+          "idol_name",
+          "display_order",
+          "created_at",
+          "updated_at"
         ],
-        "title": "FriendListItemResponse",
-        "description": "Response schema for a single friend in the list",
-        "example": {
-          "avatar_url": "https://example.com/avatar.jpg",
-          "created_at": "2024-01-01T00:00:00Z",
-          "id": "789e0123-e45b-67d8-a901-234567890000",
-          "nickname": "John Doe",
-          "status": "accepted",
-          "user_id": "456e7890-e12b-34d5-a678-901234567000"
-        }
-      },
-      "FriendListResponse": {
-        "properties": {
-          "friends": {
-            "items": {
-              "$ref": "#/components/schemas/FriendListItemResponse"
-            },
-            "type": "array",
-            "title": "Friends",
-            "description": "List of friends"
-          },
-          "total": {
-            "type": "integer",
-            "title": "Total",
-            "description": "Total number of friends"
-          }
-        },
-        "type": "object",
-        "required": [
-          "friends",
-          "total"
-        ],
-        "title": "FriendListResponse",
-        "description": "Response schema for friend list",
-        "example": {
-          "friends": [
-            {
-              "avatar_url": "https://example.com/avatar.jpg",
-              "created_at": "2024-01-01T00:00:00Z",
-              "id": "789e0123-e45b-67d8-a901-234567890000",
-              "nickname": "John Doe",
-              "status": "accepted",
-              "user_id": "456e7890-e12b-34d5-a678-901234567000"
-            }
-          ],
-          "total": 1
-        }
-      },
-      "FriendListResponseWrapper": {
-        "properties": {
-          "data": {
-            "$ref": "#/components/schemas/FriendListResponse"
-          },
-          "meta": {
-            "type": "null",
-            "title": "Meta"
-          },
-          "error": {
-            "type": "null",
-            "title": "Error"
-          }
-        },
-        "type": "object",
-        "required": [
-          "data"
-        ],
-        "title": "FriendListResponseWrapper",
-        "description": "Response wrapper for friend list (standardized envelope)"
-      },
-      "FriendshipResponse": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Id",
-            "description": "Friendship ID"
-          },
-          "user_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "User Id",
-            "description": "User ID"
-          },
-          "friend_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Friend Id",
-            "description": "Friend ID"
-          },
-          "status": {
-            "type": "string",
-            "title": "Status",
-            "description": "Friendship status",
-            "examples": [
-              "pending",
-              "accepted",
-              "blocked",
-              "unblocked"
-            ]
-          },
-          "created_at": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Created At",
-            "description": "Creation timestamp (None for unblocked status)"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "user_id",
-          "friend_id",
-          "status"
-        ],
-        "title": "FriendshipResponse",
-        "description": "Response schema for friendship details",
-        "example": {
-          "created_at": "2024-01-01T00:00:00Z",
-          "friend_id": "456e7890-e12b-34d5-a678-901234567000",
-          "id": "123e4567-e89b-12d3-a456-426614174000",
-          "status": "accepted",
-          "user_id": "987e6543-e21b-12d3-a456-426614174000"
-        }
-      },
-      "FriendshipResponseWrapper": {
-        "properties": {
-          "data": {
-            "$ref": "#/components/schemas/FriendshipResponse"
-          },
-          "meta": {
-            "type": "null",
-            "title": "Meta"
-          },
-          "error": {
-            "type": "null",
-            "title": "Error"
-          }
-        },
-        "type": "object",
-        "required": [
-          "data"
-        ],
-        "title": "FriendshipResponseWrapper",
-        "description": "Response wrapper for friendship (standardized envelope)"
+        "title": "GalleryCardResponse",
+        "description": "Response for a single gallery card."
       },
       "GoogleCallbackRequest": {
         "properties": {
@@ -3638,72 +2260,6 @@
         "type": "object",
         "title": "HTTPValidationError"
       },
-      "IdolGroupListResponse": {
-        "properties": {
-          "groups": {
-            "items": {
-              "$ref": "#/components/schemas/IdolGroupResponse"
-            },
-            "type": "array",
-            "title": "Groups",
-            "description": "List of all available idol groups for onboarding"
-          }
-        },
-        "type": "object",
-        "required": [
-          "groups"
-        ],
-        "title": "IdolGroupListResponse",
-        "description": "Response schema for list of all idol groups."
-      },
-      "IdolGroupListResponseWrapper": {
-        "properties": {
-          "data": {
-            "$ref": "#/components/schemas/IdolGroupListResponse"
-          },
-          "meta": {
-            "type": "null",
-            "title": "Meta"
-          },
-          "error": {
-            "type": "null",
-            "title": "Error"
-          }
-        },
-        "type": "object",
-        "required": [
-          "data"
-        ],
-        "title": "IdolGroupListResponseWrapper",
-        "description": "Response wrapper for idol group list (standardized envelope)"
-      },
-      "IdolGroupResponse": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "title": "Id",
-            "description": "Idol group ID (e.g., newjeans, ive, aespa)"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name",
-            "description": "Idol group name (e.g., NewJeans, IVE, aespa)"
-          },
-          "emoji": {
-            "type": "string",
-            "title": "Emoji",
-            "description": "Emoji representing the idol group (e.g., 👖, 🦢, 🦋)"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "name",
-          "emoji"
-        ],
-        "title": "IdolGroupResponse",
-        "description": "Response schema for a single idol group."
-      },
       "LoginResponse": {
         "properties": {
           "data": {
@@ -3725,278 +2281,75 @@
         "title": "LoginResponse",
         "description": "Response wrapper for successful login (standardized envelope)"
       },
-      "MessageResponse": {
+      "MessageRequestResponse": {
         "properties": {
           "id": {
             "type": "string",
-            "format": "uuid",
-            "title": "Id",
-            "description": "Message ID"
-          },
-          "room_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Room Id",
-            "description": "Chat room ID"
+            "title": "Id"
           },
           "sender_id": {
             "type": "string",
-            "format": "uuid",
-            "title": "Sender Id",
-            "description": "Sender user ID"
+            "title": "Sender Id"
           },
-          "content": {
+          "recipient_id": {
             "type": "string",
-            "title": "Content",
-            "description": "Message content"
+            "title": "Recipient Id"
+          },
+          "initial_message": {
+            "type": "string",
+            "title": "Initial Message"
+          },
+          "post_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Post Id"
           },
           "status": {
             "type": "string",
-            "title": "Status",
-            "description": "Message status",
-            "examples": [
-              "sent",
-              "delivered",
-              "read"
-            ]
+            "title": "Status"
+          },
+          "thread_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Thread Id"
           },
           "created_at": {
             "type": "string",
             "format": "date-time",
-            "title": "Created At",
-            "description": "Creation timestamp"
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
           }
         },
         "type": "object",
         "required": [
           "id",
-          "room_id",
           "sender_id",
-          "content",
+          "recipient_id",
+          "initial_message",
+          "post_id",
           "status",
-          "created_at"
+          "thread_id",
+          "created_at",
+          "updated_at"
         ],
-        "title": "MessageResponse",
-        "description": "Response schema for a single message",
-        "example": {
-          "content": "Hello! I'm interested in trading cards.",
-          "created_at": "2024-01-01T00:00:00Z",
-          "id": "123e4567-e89b-12d3-a456-426614174000",
-          "room_id": "987e6543-e21b-12d3-a456-426614174000",
-          "sender_id": "456e7890-e12b-34d5-a678-901234567000",
-          "status": "sent"
-        }
-      },
-      "MessageResponseWrapper": {
-        "properties": {
-          "data": {
-            "$ref": "#/components/schemas/MessageResponse"
-          },
-          "meta": {
-            "type": "null",
-            "title": "Meta"
-          },
-          "error": {
-            "type": "null",
-            "title": "Error"
-          }
-        },
-        "type": "object",
-        "required": [
-          "data"
-        ],
-        "title": "MessageResponseWrapper",
-        "description": "Response wrapper for single message (standardized envelope)"
-      },
-      "MessagesListResponse": {
-        "properties": {
-          "messages": {
-            "items": {
-              "$ref": "#/components/schemas/MessageResponse"
-            },
-            "type": "array",
-            "title": "Messages",
-            "description": "List of messages"
-          },
-          "total": {
-            "type": "integer",
-            "title": "Total",
-            "description": "Total number of messages"
-          },
-          "has_more": {
-            "type": "boolean",
-            "title": "Has More",
-            "description": "Whether there are more messages to fetch"
-          }
-        },
-        "type": "object",
-        "required": [
-          "messages",
-          "total",
-          "has_more"
-        ],
-        "title": "MessagesListResponse",
-        "description": "Response schema for list of messages",
-        "example": {
-          "has_more": false,
-          "messages": [
-            {
-              "content": "Hello!",
-              "created_at": "2024-01-01T00:00:00Z",
-              "id": "123e4567-e89b-12d3-a456-426614174000",
-              "room_id": "987e6543-e21b-12d3-a456-426614174000",
-              "sender_id": "456e7890-e12b-34d5-a678-901234567000",
-              "status": "read"
-            }
-          ],
-          "total": 1
-        }
-      },
-      "MessagesListResponseWrapper": {
-        "properties": {
-          "data": {
-            "$ref": "#/components/schemas/MessagesListResponse"
-          },
-          "meta": {
-            "type": "null",
-            "title": "Meta"
-          },
-          "error": {
-            "type": "null",
-            "title": "Error"
-          }
-        },
-        "type": "object",
-        "required": [
-          "data"
-        ],
-        "title": "MessagesListResponseWrapper",
-        "description": "Response wrapper for message list (standardized envelope)"
-      },
-      "NearbyCardResponse": {
-        "properties": {
-          "card_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Card Id",
-            "description": "Card unique identifier"
-          },
-          "owner_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Owner Id",
-            "description": "Card owner's user ID"
-          },
-          "distance_km": {
-            "type": "number",
-            "title": "Distance Km",
-            "description": "Distance from search origin in kilometers"
-          },
-          "idol": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Idol",
-            "description": "Idol name"
-          },
-          "idol_group": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Idol Group",
-            "description": "Idol group name"
-          },
-          "album": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Album",
-            "description": "Album name"
-          },
-          "version": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Version",
-            "description": "Card version"
-          },
-          "rarity": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Rarity",
-            "description": "Card rarity"
-          },
-          "image_url": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Image Url",
-            "description": "Card image URL"
-          },
-          "owner_nickname": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Owner Nickname",
-            "description": "Owner's nickname"
-          }
-        },
-        "type": "object",
-        "required": [
-          "card_id",
-          "owner_id",
-          "distance_km"
-        ],
-        "title": "NearbyCardResponse",
-        "description": "Response schema for a nearby card result",
-        "example": {
-          "album": "Lilac",
-          "card_id": "123e4567-e89b-12d3-a456-426614174000",
-          "distance_km": 2.5,
-          "idol": "IU",
-          "idol_group": "Solo",
-          "image_url": "https://storage.googleapis.com/kcardswap/cards/...",
-          "owner_id": "987e6543-e21b-12d3-a456-426614174000",
-          "owner_nickname": "CardCollector123",
-          "rarity": "rare",
-          "version": "Standard"
-        }
+        "title": "MessageRequestResponse",
+        "description": "Response for a message request"
       },
       "PostCategory": {
         "type": "string",
@@ -4010,148 +2363,6 @@
         ],
         "title": "PostCategory",
         "description": "Post category enumeration (FR-002)"
-      },
-      "PostInterestListResponse": {
-        "properties": {
-          "interests": {
-            "items": {
-              "$ref": "#/components/schemas/PostInterestResponse"
-            },
-            "type": "array",
-            "title": "Interests",
-            "description": "List of interests"
-          },
-          "total": {
-            "type": "integer",
-            "title": "Total",
-            "description": "Total number of interests"
-          }
-        },
-        "type": "object",
-        "required": [
-          "interests",
-          "total"
-        ],
-        "title": "PostInterestListResponse",
-        "description": "Response schema for post interest list",
-        "example": {
-          "interests": [
-            {
-              "created_at": "2024-01-01T00:00:00Z",
-              "id": "123e4567-e89b-12d3-a456-426614174000",
-              "post_id": "987e6543-e21b-12d3-a456-426614174000",
-              "status": "pending",
-              "updated_at": "2024-01-01T00:00:00Z",
-              "user_id": "456e7890-e12b-34d5-a678-901234567000"
-            }
-          ],
-          "total": 1
-        }
-      },
-      "PostInterestListResponseWrapper": {
-        "properties": {
-          "data": {
-            "$ref": "#/components/schemas/PostInterestListResponse"
-          },
-          "meta": {
-            "type": "null",
-            "title": "Meta"
-          },
-          "error": {
-            "type": "null",
-            "title": "Error"
-          }
-        },
-        "type": "object",
-        "required": [
-          "data"
-        ],
-        "title": "PostInterestListResponseWrapper",
-        "description": "Response wrapper for post interest list (standardized envelope)"
-      },
-      "PostInterestResponse": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Id",
-            "description": "Interest ID"
-          },
-          "post_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Post Id",
-            "description": "Post ID"
-          },
-          "user_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "User Id",
-            "description": "User ID who expressed interest"
-          },
-          "status": {
-            "type": "string",
-            "title": "Status",
-            "description": "Interest status",
-            "examples": [
-              "pending",
-              "accepted",
-              "rejected"
-            ]
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Created At",
-            "description": "Creation timestamp"
-          },
-          "updated_at": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Updated At",
-            "description": "Last update timestamp"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "post_id",
-          "user_id",
-          "status",
-          "created_at",
-          "updated_at"
-        ],
-        "title": "PostInterestResponse",
-        "description": "Response schema for post interest details",
-        "example": {
-          "created_at": "2024-01-01T00:00:00Z",
-          "id": "123e4567-e89b-12d3-a456-426614174000",
-          "post_id": "987e6543-e21b-12d3-a456-426614174000",
-          "status": "pending",
-          "updated_at": "2024-01-01T00:00:00Z",
-          "user_id": "456e7890-e12b-34d5-a678-901234567000"
-        }
-      },
-      "PostInterestResponseWrapper": {
-        "properties": {
-          "data": {
-            "$ref": "#/components/schemas/PostInterestResponse"
-          },
-          "meta": {
-            "type": "null",
-            "title": "Meta"
-          },
-          "error": {
-            "type": "null",
-            "title": "Error"
-          }
-        },
-        "type": "object",
-        "required": [
-          "data"
-        ],
-        "title": "PostInterestResponseWrapper",
-        "description": "Response wrapper for single post interest (standardized envelope)"
       },
       "PostListResponse": {
         "properties": {
@@ -4299,6 +2510,18 @@
               "deleted"
             ]
           },
+          "like_count": {
+            "type": "integer",
+            "title": "Like Count",
+            "description": "Total number of likes on this post",
+            "default": 0
+          },
+          "liked_by_me": {
+            "type": "boolean",
+            "title": "Liked By Me",
+            "description": "Whether the current user has liked this post",
+            "default": false
+          },
           "expires_at": {
             "type": "string",
             "format": "date-time",
@@ -4332,7 +2555,7 @@
           "updated_at"
         ],
         "title": "PostResponse",
-        "description": "Response schema for post details (V2: with scope/category)",
+        "description": "Response schema for post details (V2: with scope/category + like fields)",
         "example": {
           "category": "trade",
           "city_code": "TPE",
@@ -4342,6 +2565,8 @@
           "id": "123e4567-e89b-12d3-a456-426614174000",
           "idol": "Jungkook",
           "idol_group": "BTS",
+          "like_count": 5,
+          "liked_by_me": true,
           "owner_id": "987e6543-e21b-12d3-a456-426614174000",
           "scope": "city",
           "status": "open",
@@ -4505,7 +2730,6 @@
           },
           "privacy_flags": {
             "allow_stranger_chat": false,
-            "nearby_visible": true,
             "show_online": true
           },
           "region": "Seoul",
@@ -4534,326 +2758,6 @@
         "title": "ProfileResponseWrapper",
         "description": "Response wrapper for profile data (standardized envelope)"
       },
-      "QuotaStatusResponse": {
-        "properties": {
-          "uploads_today": {
-            "type": "integer",
-            "title": "Uploads Today",
-            "description": "Number of uploads today"
-          },
-          "daily_limit": {
-            "type": "integer",
-            "title": "Daily Limit",
-            "description": "Daily upload limit"
-          },
-          "remaining_uploads": {
-            "type": "integer",
-            "title": "Remaining Uploads",
-            "description": "Remaining uploads for today"
-          },
-          "storage_used_bytes": {
-            "type": "integer",
-            "title": "Storage Used Bytes",
-            "description": "Total storage used in bytes"
-          },
-          "storage_limit_bytes": {
-            "type": "integer",
-            "title": "Storage Limit Bytes",
-            "description": "Storage limit in bytes"
-          },
-          "remaining_storage_bytes": {
-            "type": "integer",
-            "title": "Remaining Storage Bytes",
-            "description": "Remaining storage in bytes"
-          },
-          "storage_used_mb": {
-            "type": "number",
-            "title": "Storage Used Mb",
-            "description": "Storage used in MB"
-          },
-          "storage_limit_mb": {
-            "type": "number",
-            "title": "Storage Limit Mb",
-            "description": "Storage limit in MB"
-          },
-          "remaining_storage_mb": {
-            "type": "number",
-            "title": "Remaining Storage Mb",
-            "description": "Remaining storage in MB"
-          }
-        },
-        "type": "object",
-        "required": [
-          "uploads_today",
-          "daily_limit",
-          "remaining_uploads",
-          "storage_used_bytes",
-          "storage_limit_bytes",
-          "remaining_storage_bytes",
-          "storage_used_mb",
-          "storage_limit_mb",
-          "remaining_storage_mb"
-        ],
-        "title": "QuotaStatusResponse",
-        "description": "Response schema for quota status",
-        "example": {
-          "daily_limit": 2,
-          "remaining_storage_bytes": 1068498944,
-          "remaining_storage_mb": 1019.0,
-          "remaining_uploads": 1,
-          "storage_limit_bytes": 1073741824,
-          "storage_limit_mb": 1024.0,
-          "storage_used_bytes": 5242880,
-          "storage_used_mb": 5.0,
-          "uploads_today": 1
-        }
-      },
-      "QuotaStatusResponseWrapper": {
-        "properties": {
-          "data": {
-            "$ref": "#/components/schemas/QuotaStatusResponse"
-          },
-          "meta": {
-            "type": "null",
-            "title": "Meta"
-          },
-          "error": {
-            "type": "null",
-            "title": "Error"
-          }
-        },
-        "type": "object",
-        "required": [
-          "data"
-        ],
-        "title": "QuotaStatusResponseWrapper",
-        "description": "Response wrapper for quota status (standardized envelope)"
-      },
-      "RatingListResponse": {
-        "properties": {
-          "ratings": {
-            "items": {
-              "$ref": "#/components/schemas/RatingResponse"
-            },
-            "type": "array",
-            "title": "Ratings",
-            "description": "List of ratings"
-          },
-          "total": {
-            "type": "integer",
-            "title": "Total",
-            "description": "Total number of ratings"
-          }
-        },
-        "type": "object",
-        "required": [
-          "ratings",
-          "total"
-        ],
-        "title": "RatingListResponse",
-        "description": "Response schema for list of ratings",
-        "example": {
-          "ratings": [
-            {
-              "comment": "Great trader!",
-              "created_at": "2024-01-01T00:00:00Z",
-              "id": "456e7890-e12b-34d5-a678-901234567000",
-              "rated_user_id": "123e4567-e89b-12d3-a456-426614174000",
-              "rater_id": "789e0123-e45b-67d8-a901-234567890000",
-              "score": 5,
-              "trade_id": "987e6543-e21b-12d3-a456-426614174000"
-            }
-          ],
-          "total": 1
-        }
-      },
-      "RatingListResponseWrapper": {
-        "properties": {
-          "data": {
-            "$ref": "#/components/schemas/RatingListResponse"
-          },
-          "meta": {
-            "type": "null",
-            "title": "Meta"
-          },
-          "error": {
-            "type": "null",
-            "title": "Error"
-          }
-        },
-        "type": "object",
-        "required": [
-          "data"
-        ],
-        "title": "RatingListResponseWrapper",
-        "description": "Response wrapper for rating list (standardized envelope)"
-      },
-      "RatingRequest": {
-        "properties": {
-          "rated_user_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Rated User Id",
-            "description": "ID of user being rated",
-            "examples": [
-              "123e4567-e89b-12d3-a456-426614174000"
-            ]
-          },
-          "trade_id": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Trade Id",
-            "description": "Associated trade ID (optional)",
-            "examples": [
-              "987e6543-e21b-12d3-a456-426614174000"
-            ]
-          },
-          "score": {
-            "type": "integer",
-            "maximum": 5.0,
-            "minimum": 1.0,
-            "title": "Score",
-            "description": "Rating score (1-5)",
-            "examples": [
-              5
-            ]
-          },
-          "comment": {
-            "anyOf": [
-              {
-                "type": "string",
-                "maxLength": 500
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Comment",
-            "description": "Optional comment",
-            "examples": [
-              "Great trader! Fast and friendly communication."
-            ]
-          }
-        },
-        "type": "object",
-        "required": [
-          "rated_user_id",
-          "score"
-        ],
-        "title": "RatingRequest",
-        "description": "Request schema for submitting a rating",
-        "example": {
-          "comment": "Great trader! Fast and friendly communication.",
-          "rated_user_id": "123e4567-e89b-12d3-a456-426614174000",
-          "score": 5,
-          "trade_id": "987e6543-e21b-12d3-a456-426614174000"
-        }
-      },
-      "RatingResponse": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Id",
-            "description": "Rating ID"
-          },
-          "rater_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Rater Id",
-            "description": "User who gave the rating"
-          },
-          "rated_user_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Rated User Id",
-            "description": "User who received the rating"
-          },
-          "trade_id": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Trade Id",
-            "description": "Associated trade ID"
-          },
-          "score": {
-            "type": "integer",
-            "title": "Score",
-            "description": "Rating score (1-5)"
-          },
-          "comment": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Comment",
-            "description": "Rating comment"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Created At",
-            "description": "Creation timestamp"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "rater_id",
-          "rated_user_id",
-          "score",
-          "created_at"
-        ],
-        "title": "RatingResponse",
-        "description": "Response schema for a rating",
-        "example": {
-          "comment": "Great trader! Fast and friendly communication.",
-          "created_at": "2024-01-01T00:00:00Z",
-          "id": "456e7890-e12b-34d5-a678-901234567000",
-          "rated_user_id": "123e4567-e89b-12d3-a456-426614174000",
-          "rater_id": "789e0123-e45b-67d8-a901-234567890000",
-          "score": 5,
-          "trade_id": "987e6543-e21b-12d3-a456-426614174000"
-        }
-      },
-      "RatingResponseWrapper": {
-        "properties": {
-          "data": {
-            "$ref": "#/components/schemas/RatingResponse"
-          },
-          "meta": {
-            "type": "null",
-            "title": "Meta"
-          },
-          "error": {
-            "type": "null",
-            "title": "Error"
-          }
-        },
-        "type": "object",
-        "required": [
-          "data"
-        ],
-        "title": "RatingResponseWrapper",
-        "description": "Response wrapper for single rating (standardized envelope)"
-      },
       "RefreshSuccessResponse": {
         "properties": {
           "success": {
@@ -4872,6 +2776,44 @@
         "type": "object",
         "title": "RefreshSuccessResponse",
         "description": "Response for successful token refresh (cookie-based)"
+      },
+      "ReorderGalleryCardsRequest": {
+        "properties": {
+          "card_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Card Ids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "card_ids"
+        ],
+        "title": "ReorderGalleryCardsRequest",
+        "description": "Request to reorder gallery cards."
+      },
+      "ReorderGalleryCardsResponse": {
+        "properties": {
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "default": "Gallery cards reordered successfully"
+          },
+          "updated_count": {
+            "type": "integer",
+            "title": "Updated Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "updated_count"
+        ],
+        "title": "ReorderGalleryCardsResponse",
+        "description": "Response after reordering gallery cards."
       },
       "ReportListResponse": {
         "properties": {
@@ -5060,165 +3002,16 @@
         "title": "ReportResponseWrapper",
         "description": "Response wrapper for single report (standardized envelope)"
       },
-      "SearchNearbyRequest": {
-        "properties": {
-          "lat": {
-            "type": "number",
-            "maximum": 90.0,
-            "minimum": -90.0,
-            "title": "Lat",
-            "description": "Latitude (-90 to 90)"
-          },
-          "lng": {
-            "type": "number",
-            "maximum": 180.0,
-            "minimum": -180.0,
-            "title": "Lng",
-            "description": "Longitude (-180 to 180)"
-          },
-          "radius_km": {
-            "anyOf": [
-              {
-                "type": "number",
-                "maximum": 100.0,
-                "exclusiveMinimum": 0.0
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Radius Km",
-            "description": "Search radius in kilometers (max 100km)"
-          }
-        },
-        "type": "object",
-        "required": [
-          "lat",
-          "lng"
-        ],
-        "title": "SearchNearbyRequest",
-        "description": "Request schema for nearby card search"
-      },
-      "SearchNearbyResponse": {
-        "properties": {
-          "results": {
-            "items": {
-              "$ref": "#/components/schemas/NearbyCardResponse"
-            },
-            "type": "array",
-            "title": "Results",
-            "description": "List of nearby cards"
-          },
-          "count": {
-            "type": "integer",
-            "title": "Count",
-            "description": "Number of results returned"
-          }
-        },
-        "type": "object",
-        "required": [
-          "results",
-          "count"
-        ],
-        "title": "SearchNearbyResponse",
-        "description": "Response schema for nearby search results",
-        "example": {
-          "count": 1,
-          "results": [
-            {
-              "album": "Lilac",
-              "card_id": "123e4567-e89b-12d3-a456-426614174000",
-              "distance_km": 2.5,
-              "idol": "IU",
-              "idol_group": "Solo",
-              "image_url": "https://storage.googleapis.com/kcardswap/cards/...",
-              "owner_id": "987e6543-e21b-12d3-a456-426614174000",
-              "owner_nickname": "CardCollector123",
-              "rarity": "rare",
-              "version": "Standard"
-            }
-          ]
-        }
-      },
-      "SearchNearbyResponseWrapper": {
-        "properties": {
-          "data": {
-            "$ref": "#/components/schemas/SearchNearbyResponse"
-          },
-          "meta": {
-            "type": "null",
-            "title": "Meta"
-          },
-          "error": {
-            "type": "null",
-            "title": "Error"
-          }
-        },
-        "type": "object",
-        "required": [
-          "data"
-        ],
-        "title": "SearchNearbyResponseWrapper",
-        "description": "Response wrapper for nearby search (standardized envelope)"
-      },
-      "SendFriendRequestRequest": {
-        "properties": {
-          "target_user_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Target User Id",
-            "description": "ID of the target user to send friend request to",
-            "examples": [
-              "123e4567-e89b-12d3-a456-426614174000"
-            ]
-          }
-        },
-        "type": "object",
-        "required": [
-          "target_user_id"
-        ],
-        "title": "SendFriendRequestRequest",
-        "description": "Request schema for sending friend request",
-        "example": {
-          "target_user_id": "123e4567-e89b-12d3-a456-426614174000"
-        }
-      },
       "SendMessageRequest": {
         "properties": {
           "content": {
             "type": "string",
-            "maxLength": 2000,
+            "maxLength": 5000,
             "minLength": 1,
             "title": "Content",
-            "description": "Message content",
-            "examples": [
-              "Hello! I'm interested in trading cards."
-            ]
-          }
-        },
-        "type": "object",
-        "required": [
-          "content"
-        ],
-        "title": "SendMessageRequest",
-        "description": "Request schema for sending a message",
-        "example": {
-          "content": "Hello! I'm interested in trading cards."
-        }
-      },
-      "SubscriptionStatusData": {
-        "properties": {
-          "plan": {
-            "type": "string",
-            "title": "Plan",
-            "description": "Subscription plan: 'free' or 'premium'"
+            "description": "Message content"
           },
-          "status": {
-            "type": "string",
-            "title": "Status",
-            "description": "Subscription status: 'active', 'inactive', 'expired', 'pending'"
-          },
-          "expires_at": {
+          "post_id": {
             "anyOf": [
               {
                 "type": "string"
@@ -5227,41 +3020,186 @@
                 "type": "null"
               }
             ],
-            "title": "Expires At",
-            "description": "Expiry datetime (ISO format)"
-          },
-          "entitlement_active": {
-            "type": "boolean",
-            "title": "Entitlement Active",
-            "description": "Whether user has active premium entitlement"
-          },
-          "source": {
-            "type": "string",
-            "title": "Source",
-            "description": "Subscription source: 'google_play'"
+            "title": "Post Id",
+            "description": "Optional post ID to reference"
           }
         },
         "type": "object",
         "required": [
-          "plan",
-          "status",
-          "entitlement_active",
-          "source"
+          "content"
         ],
-        "title": "SubscriptionStatusData",
-        "description": "Data schema for subscription status",
+        "title": "SendMessageRequest",
+        "description": "Request to send a message in a thread"
+      },
+      "ThreadListResponse": {
+        "properties": {
+          "threads": {
+            "items": {
+              "$ref": "#/components/schemas/ThreadResponse"
+            },
+            "type": "array",
+            "title": "Threads"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "threads",
+          "total"
+        ],
+        "title": "ThreadListResponse",
+        "description": "Response for list of threads"
+      },
+      "ThreadMessageResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "thread_id": {
+            "type": "string",
+            "title": "Thread Id"
+          },
+          "sender_id": {
+            "type": "string",
+            "title": "Sender Id"
+          },
+          "content": {
+            "type": "string",
+            "title": "Content"
+          },
+          "post_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Post Id"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "thread_id",
+          "sender_id",
+          "content",
+          "post_id",
+          "created_at"
+        ],
+        "title": "ThreadMessageResponse",
+        "description": "Response for a thread message"
+      },
+      "ThreadMessagesResponse": {
+        "properties": {
+          "messages": {
+            "items": {
+              "$ref": "#/components/schemas/ThreadMessageResponse"
+            },
+            "type": "array",
+            "title": "Messages"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "messages",
+          "total"
+        ],
+        "title": "ThreadMessagesResponse",
+        "description": "Response for list of messages in a thread"
+      },
+      "ThreadResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "user_a_id": {
+            "type": "string",
+            "title": "User A Id"
+          },
+          "user_b_id": {
+            "type": "string",
+            "title": "User B Id"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "last_message_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Message At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "user_a_id",
+          "user_b_id",
+          "created_at",
+          "updated_at",
+          "last_message_at"
+        ],
+        "title": "ThreadResponse",
+        "description": "Response for a message thread"
+      },
+      "ToggleLikeResponse": {
+        "properties": {
+          "liked": {
+            "type": "boolean",
+            "title": "Liked",
+            "description": "Whether the post is now liked by the user"
+          },
+          "like_count": {
+            "type": "integer",
+            "title": "Like Count",
+            "description": "Current total like count for the post"
+          }
+        },
+        "type": "object",
+        "required": [
+          "liked",
+          "like_count"
+        ],
+        "title": "ToggleLikeResponse",
+        "description": "Response schema for toggle like action",
         "example": {
-          "entitlement_active": true,
-          "expires_at": "2025-12-31T23:59:59",
-          "plan": "premium",
-          "source": "google_play",
-          "status": "active"
+          "like_count": 6,
+          "liked": true
         }
       },
-      "SubscriptionStatusResponse": {
+      "ToggleLikeResponseWrapper": {
         "properties": {
           "data": {
-            "$ref": "#/components/schemas/SubscriptionStatusData"
+            "$ref": "#/components/schemas/ToggleLikeResponse"
           },
           "meta": {
             "type": "null",
@@ -5276,8 +3214,8 @@
         "required": [
           "data"
         ],
-        "title": "SubscriptionStatusResponse",
-        "description": "Response wrapper for subscription status (standardized envelope)"
+        "title": "ToggleLikeResponseWrapper",
+        "description": "Response wrapper for toggle like response (standardized envelope)"
       },
       "TokenResponse": {
         "properties": {
@@ -5347,292 +3285,6 @@
           "user_id": "123e4567-e89b-12d3-a456-426614174000"
         }
       },
-      "TradeHistoryResponse": {
-        "properties": {
-          "trades": {
-            "items": {
-              "$ref": "#/components/schemas/TradeResponse"
-            },
-            "type": "array",
-            "title": "Trades",
-            "description": "List of trades"
-          },
-          "total": {
-            "type": "integer",
-            "title": "Total",
-            "description": "Total number of trades"
-          },
-          "limit": {
-            "type": "integer",
-            "title": "Limit",
-            "description": "Limit used"
-          },
-          "offset": {
-            "type": "integer",
-            "title": "Offset",
-            "description": "Offset used"
-          }
-        },
-        "type": "object",
-        "required": [
-          "trades",
-          "total",
-          "limit",
-          "offset"
-        ],
-        "title": "TradeHistoryResponse",
-        "description": "Response schema for trade history list",
-        "example": {
-          "limit": 50,
-          "offset": 0,
-          "total": 5,
-          "trades": []
-        }
-      },
-      "TradeHistoryResponseWrapper": {
-        "properties": {
-          "data": {
-            "$ref": "#/components/schemas/TradeHistoryResponse"
-          },
-          "meta": {
-            "type": "null",
-            "title": "Meta"
-          },
-          "error": {
-            "type": "null",
-            "title": "Error"
-          }
-        },
-        "type": "object",
-        "required": [
-          "data"
-        ],
-        "title": "TradeHistoryResponseWrapper",
-        "description": "Response wrapper for trade history (standardized envelope)"
-      },
-      "TradeItemResponse": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Id",
-            "description": "Trade item ID"
-          },
-          "trade_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Trade Id",
-            "description": "Trade ID"
-          },
-          "card_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Card Id",
-            "description": "Card ID"
-          },
-          "owner_side": {
-            "type": "string",
-            "title": "Owner Side",
-            "description": "Which party owns this card",
-            "examples": [
-              "initiator",
-              "responder"
-            ]
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Created At",
-            "description": "Creation timestamp"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "trade_id",
-          "card_id",
-          "owner_side",
-          "created_at"
-        ],
-        "title": "TradeItemResponse",
-        "description": "Response schema for a trade item"
-      },
-      "TradeResponse": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Id",
-            "description": "Trade ID"
-          },
-          "initiator_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Initiator Id",
-            "description": "Initiator user ID"
-          },
-          "responder_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Responder Id",
-            "description": "Responder user ID"
-          },
-          "status": {
-            "type": "string",
-            "title": "Status",
-            "description": "Trade status",
-            "examples": [
-              "draft",
-              "proposed",
-              "accepted",
-              "completed",
-              "rejected",
-              "canceled"
-            ]
-          },
-          "accepted_at": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Accepted At",
-            "description": "Acceptance timestamp"
-          },
-          "initiator_confirmed_at": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Initiator Confirmed At",
-            "description": "Initiator confirmation timestamp"
-          },
-          "responder_confirmed_at": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Responder Confirmed At",
-            "description": "Responder confirmation timestamp"
-          },
-          "completed_at": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Completed At",
-            "description": "Completion timestamp"
-          },
-          "canceled_at": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Canceled At",
-            "description": "Cancellation timestamp"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Created At",
-            "description": "Creation timestamp"
-          },
-          "updated_at": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Updated At",
-            "description": "Last update timestamp"
-          },
-          "items": {
-            "anyOf": [
-              {
-                "items": {
-                  "$ref": "#/components/schemas/TradeItemResponse"
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Items",
-            "description": "Trade items (cards being exchanged)"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "initiator_id",
-          "responder_id",
-          "status",
-          "created_at",
-          "updated_at"
-        ],
-        "title": "TradeResponse",
-        "description": "Response schema for trade details",
-        "example": {
-          "created_at": "2025-01-01T00:00:00Z",
-          "id": "423e4567-e89b-12d3-a456-426614174000",
-          "initiator_id": "523e4567-e89b-12d3-a456-426614174000",
-          "items": [
-            {
-              "card_id": "123e4567-e89b-12d3-a456-426614174000",
-              "created_at": "2025-01-01T00:00:00Z",
-              "id": "723e4567-e89b-12d3-a456-426614174000",
-              "owner_side": "initiator",
-              "trade_id": "423e4567-e89b-12d3-a456-426614174000"
-            }
-          ],
-          "responder_id": "623e4567-e89b-12d3-a456-426614174000",
-          "status": "proposed",
-          "updated_at": "2025-01-01T00:00:00Z"
-        }
-      },
-      "TradeResponseWrapper": {
-        "properties": {
-          "data": {
-            "$ref": "#/components/schemas/TradeResponse"
-          },
-          "meta": {
-            "type": "null",
-            "title": "Meta"
-          },
-          "error": {
-            "type": "null",
-            "title": "Error"
-          }
-        },
-        "type": "object",
-        "required": [
-          "data"
-        ],
-        "title": "TradeResponseWrapper",
-        "description": "Response wrapper for single trade (standardized envelope)"
-      },
       "UnblockUserRequest": {
         "properties": {
           "user_id": {
@@ -5654,73 +3306,6 @@
         "example": {
           "user_id": "123e4567-e89b-12d3-a456-426614174000"
         }
-      },
-      "UpdateLocationRequest": {
-        "properties": {
-          "lat": {
-            "type": "number",
-            "maximum": 90.0,
-            "minimum": -90.0,
-            "title": "Lat",
-            "description": "Latitude (-90 to 90)"
-          },
-          "lng": {
-            "type": "number",
-            "maximum": 180.0,
-            "minimum": -180.0,
-            "title": "Lng",
-            "description": "Longitude (-180 to 180)"
-          }
-        },
-        "type": "object",
-        "required": [
-          "lat",
-          "lng"
-        ],
-        "title": "UpdateLocationRequest",
-        "description": "Request schema for updating user location"
-      },
-      "UpdateLocationResponseWrapper": {
-        "properties": {
-          "data": {
-            "$ref": "#/components/schemas/UpdateLocationSuccess"
-          },
-          "meta": {
-            "type": "null",
-            "title": "Meta"
-          },
-          "error": {
-            "type": "null",
-            "title": "Error"
-          }
-        },
-        "type": "object",
-        "required": [
-          "data"
-        ],
-        "title": "UpdateLocationResponseWrapper",
-        "description": "Response wrapper for location update (standardized envelope)"
-      },
-      "UpdateLocationSuccess": {
-        "properties": {
-          "success": {
-            "type": "boolean",
-            "title": "Success",
-            "description": "Operation success",
-            "default": true
-          },
-          "message": {
-            "type": "string",
-            "title": "Message",
-            "description": "Success message"
-          }
-        },
-        "type": "object",
-        "required": [
-          "message"
-        ],
-        "title": "UpdateLocationSuccess",
-        "description": "Success response for location update"
       },
       "UpdateProfileRequest": {
         "properties": {
@@ -5811,202 +3396,9 @@
           "nickname": "NewNickname",
           "privacy_flags": {
             "allow_stranger_chat": true,
-            "nearby_visible": true,
             "show_online": false
           }
         }
-      },
-      "UploadCardRequest": {
-        "properties": {
-          "content_type": {
-            "type": "string",
-            "title": "Content Type",
-            "description": "MIME type of the file (image/jpeg or image/png)",
-            "examples": [
-              "image/jpeg",
-              "image/png"
-            ]
-          },
-          "file_size_bytes": {
-            "type": "integer",
-            "exclusiveMinimum": 0.0,
-            "title": "File Size Bytes",
-            "description": "Size of file in bytes",
-            "examples": [
-              1234567
-            ]
-          },
-          "idol": {
-            "anyOf": [
-              {
-                "type": "string",
-                "maxLength": 100
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Idol",
-            "description": "Idol name"
-          },
-          "idol_group": {
-            "anyOf": [
-              {
-                "type": "string",
-                "maxLength": 100
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Idol Group",
-            "description": "Idol group"
-          },
-          "album": {
-            "anyOf": [
-              {
-                "type": "string",
-                "maxLength": 100
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Album",
-            "description": "Album name"
-          },
-          "version": {
-            "anyOf": [
-              {
-                "type": "string",
-                "maxLength": 100
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Version",
-            "description": "Version"
-          },
-          "rarity": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Rarity",
-            "description": "Card rarity",
-            "examples": [
-              "common",
-              "rare",
-              "epic",
-              "legendary"
-            ]
-          }
-        },
-        "type": "object",
-        "required": [
-          "content_type",
-          "file_size_bytes"
-        ],
-        "title": "UploadCardRequest",
-        "description": "Request schema for getting upload signed URL",
-        "example": {
-          "album": "Love Poem",
-          "content_type": "image/jpeg",
-          "file_size_bytes": 1234567,
-          "idol": "IU",
-          "idol_group": "Solo",
-          "rarity": "rare",
-          "version": "Version A"
-        }
-      },
-      "UploadUrlResponse": {
-        "properties": {
-          "upload_url": {
-            "type": "string",
-            "title": "Upload Url",
-            "description": "Signed URL for uploading"
-          },
-          "method": {
-            "type": "string",
-            "title": "Method",
-            "description": "HTTP method to use",
-            "examples": [
-              "PUT"
-            ]
-          },
-          "required_headers": {
-            "additionalProperties": {
-              "type": "string"
-            },
-            "type": "object",
-            "title": "Required Headers",
-            "description": "Required headers for upload"
-          },
-          "image_url": {
-            "type": "string",
-            "title": "Image Url",
-            "description": "Public URL of the image after upload"
-          },
-          "expires_at": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Expires At",
-            "description": "When the signed URL expires"
-          },
-          "card_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Card Id",
-            "description": "ID of the created card"
-          }
-        },
-        "type": "object",
-        "required": [
-          "upload_url",
-          "method",
-          "required_headers",
-          "image_url",
-          "expires_at",
-          "card_id"
-        ],
-        "title": "UploadUrlResponse",
-        "description": "Response schema for upload signed URL",
-        "example": {
-          "card_id": "123e4567-e89b-12d3-a456-426614174000",
-          "expires_at": "2025-01-01T00:15:00Z",
-          "image_url": "https://storage.googleapis.com/bucket/cards/user_id/card_id.jpg",
-          "method": "PUT",
-          "required_headers": {
-            "Content-Type": "image/jpeg"
-          },
-          "upload_url": "https://storage.googleapis.com/bucket/path?signature=..."
-        }
-      },
-      "UploadUrlResponseWrapper": {
-        "properties": {
-          "data": {
-            "$ref": "#/components/schemas/UploadUrlResponse"
-          },
-          "meta": {
-            "type": "null",
-            "title": "Meta"
-          },
-          "error": {
-            "type": "null",
-            "title": "Error"
-          }
-        },
-        "type": "object",
-        "required": [
-          "data"
-        ],
-        "title": "UploadUrlResponseWrapper",
-        "description": "Response wrapper for upload URL (standardized envelope)"
       },
       "ValidationError": {
         "properties": {
@@ -6040,38 +3432,6 @@
           "type"
         ],
         "title": "ValidationError"
-      },
-      "VerifyReceiptRequest": {
-        "properties": {
-          "platform": {
-            "type": "string",
-            "title": "Platform",
-            "description": "Platform: 'android' or 'ios'"
-          },
-          "purchase_token": {
-            "type": "string",
-            "title": "Purchase Token",
-            "description": "Purchase token from Google Play"
-          },
-          "product_id": {
-            "type": "string",
-            "title": "Product Id",
-            "description": "Product/SKU ID"
-          }
-        },
-        "type": "object",
-        "required": [
-          "platform",
-          "purchase_token",
-          "product_id"
-        ],
-        "title": "VerifyReceiptRequest",
-        "description": "Request schema for verifying purchase receipt",
-        "example": {
-          "platform": "android",
-          "product_id": "premium_monthly",
-          "purchase_token": "abc123xyz..."
-        }
       }
     },
     "securitySchemes": {

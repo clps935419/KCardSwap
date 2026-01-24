@@ -97,7 +97,6 @@ class ProfileRepositoryImpl(IProfileRepository):
             preferences=model.preferences or {},
             privacy_flags=model.privacy_flags
             or {
-                "nearby_visible": True,
                 "show_online": True,
                 "allow_stranger_chat": True,
             },

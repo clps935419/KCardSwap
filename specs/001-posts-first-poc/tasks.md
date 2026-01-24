@@ -101,21 +101,21 @@ description: "Task list for implementing Posts-first POC (V2)"
 
 ### Tests（後端）
 
-- [ ] T036 [P] [US2] 新增 gallery cards CRUD+reorder 整合測試（新增 apps/backend/tests/integration/modules/social/test_gallery_cards_v2.py）
+- [x] T036 [P] [US2] 新增 gallery cards CRUD+reorder 整合測試（新增 apps/backend/tests/integration/modules/social/test_gallery_cards_v2.py）
 
 ### Backend（建議：social module 新增 GalleryCard bounded context；避免使用 trading/traded 狀態）
 
-- [ ] T037 [P] [US2] 定義 GalleryCard domain model（新增 apps/backend/app/modules/social/domain/models/gallery_card.py）
-- [ ] T038 [P] [US2] 定義排序規則與 reordering use case（新增 apps/backend/app/modules/social/application/use_cases/reorder_gallery_cards.py）
-- [ ] T039 [P] [US2] 建立 repository（新增 apps/backend/app/modules/social/infrastructure/repositories/gallery_card_repository.py）
-- [ ] T040 [US2] 建立 gallery router endpoints（新增 apps/backend/app/modules/social/presentation/routers/gallery_router.py 並在 apps/backend/app/modules/social/module.py 註冊；包含 users/{user_id}/gallery/cards、gallery/cards/me、POST gallery/cards、DELETE gallery/cards/{card_id}、PUT gallery/cards/reorder）
-- [ ] T041 [US2] 將 require_user 依賴套用到 gallery router（更新 apps/backend/app/modules/social/presentation/routers/gallery_router.py）
+- [x] T037 [P] [US2] 定義 GalleryCard domain model（新增 apps/backend/app/modules/social/domain/entities/gallery_card.py）
+- [x] T038 [P] [US2] 定義排序規則與 reordering use case（新增 apps/backend/app/modules/social/application/use_cases/reorder_gallery_cards.py）
+- [x] T039 [P] [US2] 建立 repository（新增 apps/backend/app/modules/social/infrastructure/repositories/gallery_card_repository.py 與 domain/repositories/i_gallery_card_repository.py）
+- [x] T040 [US2] 建立 gallery router endpoints（新增 apps/backend/app/modules/social/presentation/routers/gallery_router.py 並在 apps/backend/app/main.py 註冊；包含 users/{user_id}/gallery/cards、gallery/cards/me、POST gallery/cards、DELETE gallery/cards/{card_id}、PUT gallery/cards/reorder）
+- [x] T041 [US2] 將 require_user 依賴套用到 gallery router（更新 apps/backend/app/modules/social/presentation/routers/gallery_router.py）
 
 ### Web（apps/web）
 
-- [ ] T042 [P] [US2] 建立個人頁與相簿區塊 UI（新增 apps/web/src/app/(app)/users/[userId]/page.tsx 與 apps/web/src/features/gallery/components/GalleryGrid.tsx）
-- [ ] T043 [P] [US2] 建立我的相簿管理頁（新增 apps/web/src/app/(app)/me/gallery/page.tsx）
-- [ ] T044 [US2] 串接新增/刪除/排序 mutations（新增 apps/web/src/features/gallery/hooks/useGalleryMutations.ts）
+- [x] T042 [P] [US2] 建立個人頁與相簿區塊 UI（新增 apps/web/src/app/(app)/users/[userId]/page.tsx 與 apps/web/src/features/gallery/components/GalleryGrid.tsx）
+- [x] T043 [P] [US2] 建立我的相簿管理頁（新增 apps/web/src/app/(app)/me/gallery/page.tsx）
+- [x] T044 [US2] 串接新增/刪除/排序 mutations（新增 apps/web/src/features/gallery/hooks/useGalleryMutations.ts）
 
 ---
 
@@ -127,23 +127,23 @@ description: "Task list for implementing Posts-first POC (V2)"
 
 ### Tests（後端）
 
-- [ ] T045 [P] [US3] 新增 media 上傳確認與 attach 整合測試（新增 apps/backend/tests/integration/modules/media/test_media_upload_confirm_attach.py）
+- [x] T045 [P] [US3] 新增 media 上傳確認與 attach 整合測試（新增 apps/backend/tests/integration/modules/media/test_media_upload_confirm_attach.py）
 
 ### Backend（新增 media module）
 
-- [ ] T046 [P] [US3] 建立 MediaAsset domain model（新增 apps/backend/app/modules/media/domain/models/media_asset.py）
-- [ ] T047 [P] [US3] 建立 presign use case（新增 apps/backend/app/modules/media/application/use_cases/create_upload_url.py）
-- [ ] T048 [P] [US3] 建立 confirm use case（新增 apps/backend/app/modules/media/application/use_cases/confirm_upload.py）
-- [ ] T049 [P] [US3] 建立 attach-to-post / attach-to-gallery use cases（新增 apps/backend/app/modules/media/application/use_cases/attach_media.py）
-- [ ] T050 [P] [US3] 建立 media repository（新增 apps/backend/app/modules/media/infrastructure/repositories/media_repository.py）
-- [ ] T051 [US3] 建立 media router endpoints（新增 apps/backend/app/modules/media/presentation/routers/media_router.py 並在 apps/backend/app/main.py 註冊；包含 media/upload-url、media/{media_id}/confirm、posts/{post_id}/media/attach、gallery/cards/{card_id}/media/attach）
-- [ ] T052 [US3] 在 confirm use case 套用 media 配額（更新 apps/backend/app/modules/media/application/use_cases/confirm_upload.py 使用 apps/backend/app/shared/domain/quota/media_quota_service.py）
+- [x] T046 [P] [US3] 建立 MediaAsset domain model（新增 apps/backend/app/modules/media/domain/models/media_asset.py）
+- [x] T047 [P] [US3] 建立 presign use case（新增 apps/backend/app/modules/media/application/use_cases/create_upload_url.py）
+- [x] T048 [P] [US3] 建立 confirm use case（新增 apps/backend/app/modules/media/application/use_cases/confirm_upload.py）
+- [x] T049 [P] [US3] 建立 attach-to-post / attach-to-gallery use cases（新增 apps/backend/app/modules/media/application/use_cases/attach_media.py）
+- [x] T050 [P] [US3] 建立 media repository（新增 apps/backend/app/modules/media/infrastructure/repositories/media_repository.py）
+- [x] T051 [US3] 建立 media router endpoints（新增 apps/backend/app/modules/media/presentation/routers/media_router.py 並在 apps/backend/app/main.py 註冊；包含 media/upload-url、media/{media_id}/confirm、posts/{post_id}/media/attach、gallery/cards/{card_id}/media/attach）
+- [x] T052 [US3] 在 confirm use case 套用 media 配額（更新 apps/backend/app/modules/media/application/use_cases/confirm_upload.py 使用 apps/backend/app/shared/domain/quota/media_quota_service.py）
 
 ### Web（apps/web）
 
-- [ ] T053 [P] [US3] 建立通用上傳 helper（新增 apps/web/src/lib/media/uploadFlow.ts：presign→PUT→confirm）
-- [ ] T054 [US3] 發文表單加入圖片欄位並串接 attach（更新 apps/web/src/features/posts/components/CreatePostForm.tsx）
-- [ ] T055 [US3] 相簿新增卡流程加入圖片上傳（更新 apps/web/src/features/gallery/components/GalleryCreateCardForm.tsx）
+- [x] T053 [P] [US3] 建立通用上傳 helper（新增 apps/web/src/lib/media/uploadFlow.ts：presign→PUT→confirm）
+- [x] T054 [US3] 發文表單加入圖片欄位並串接 attach（更新 apps/web/src/features/posts/components/CreatePostForm.tsx）
+- [x] T055 [US3] 相簿新增卡流程加入圖片上傳（更新 apps/web/src/features/gallery/components/GalleryCreateCardForm.tsx）
 
 ---
 
@@ -155,23 +155,23 @@ description: "Task list for implementing Posts-first POC (V2)"
 
 ### Tests（後端）
 
-- [ ] T056 [P] [US5] 新增 message request/accept/thread 唯一性整合測試（新增 apps/backend/tests/integration/modules/social/test_message_requests_v2.py）
+- [x] T056 [P] [US5] 新增 message request/accept/thread 唯一性整合測試（新增 apps/backend/tests/integration/modules/social/test_message_requests_v2.py）
 
 ### Backend（建議：social/chat 擴充）
 
-- [ ] T057 [P] [US5] 定義 MessageRequest/Thread/Message domain models（新增 apps/backend/app/modules/social/domain/models/message_request.py 與 apps/backend/app/modules/social/domain/models/message.py）
-- [ ] T058 [P] [US5] 實作唯一對話規則（新增 apps/backend/app/modules/social/application/services/thread_uniqueness_service.py）
-- [ ] T059 [P] [US5] 實作 request create/accept/decline use cases（新增 apps/backend/app/modules/social/application/use_cases/message_requests/ 目錄）
-- [ ] T060 [P] [US5] 實作 thread list/message list/send message use cases（新增 apps/backend/app/modules/social/application/use_cases/messages/ 目錄）
-- [ ] T061 [US5] 建立 message request + threads routers（新增 apps/backend/app/modules/social/presentation/routers/message_requests_router.py 與 apps/backend/app/modules/social/presentation/routers/threads_router.py；包含 message-requests create/inbox/accept/decline 與 threads list/messages list/send）
-- [ ] T062 [US5] 封鎖/隱私設定檢查（更新 apps/backend/app/modules/identity/application/services/privacy_service.py：拒絕陌生人私訊 + block 規則）
+- [x] T057 [P] [US5] 定義 MessageRequest/Thread/Message domain models（新增 apps/backend/app/modules/social/domain/models/message_request.py 與 apps/backend/app/modules/social/domain/models/message.py）
+- [x] T058 [P] [US5] 實作唯一對話規則（新增 apps/backend/app/modules/social/application/services/thread_uniqueness_service.py）
+- [x] T059 [P] [US5] 實作 request create/accept/decline use cases（新增 apps/backend/app/modules/social/application/use_cases/message_requests/ 目錄）
+- [x] T060 [P] [US5] 實作 thread list/message list/send message use cases（新增 apps/backend/app/modules/social/application/use_cases/messages/ 目錄）
+- [x] T061 [US5] 建立 message request + threads routers（新增 apps/backend/app/modules/social/presentation/routers/message_requests_router.py 與 apps/backend/app/modules/social/presentation/routers/threads_router.py；包含 message-requests create/inbox/accept/decline 與 threads list/messages list/send）
+- [x] T062 [US5] 封鎖/隱私設定檢查（更新 apps/backend/app/modules/identity/application/services/privacy_service.py：拒絕陌生人私訊 + block 規則）
 
 ### Web（apps/web）
 
-- [ ] T063 [P] [US5] 建立 Inbox UI：Requests/Threads tabs（新增 apps/web/src/app/(app)/inbox/page.tsx）
-- [ ] T064 [P] [US5] 建立 thread 頁與訊息列表（新增 apps/web/src/app/(app)/inbox/threads/[threadId]/page.tsx）
-- [ ] T065 [US5] 串接送出訊息（新增 apps/web/src/features/inbox/hooks/useSendMessage.ts）
-- [ ] T066 [US5] 在貼文詳情/卡片加入「私信作者」入口（更新 apps/web/src/features/posts/components/PostCard.tsx）
+- [x] T063 [P] [US5] 建立 Inbox UI：Requests/Threads tabs（新增 apps/web/src/app/(app)/inbox/page.tsx）
+- [x] T064 [P] [US5] 建立 thread 頁與訊息列表（新增 apps/web/src/app/(app)/inbox/threads/[threadId]/page.tsx）
+- [x] T065 [US5] 串接送出訊息（新增 apps/web/src/features/inbox/hooks/useSendMessage.ts）
+- [x] T066 [US5] 在貼文詳情/卡片加入「私信作者」入口（更新 apps/web/src/features/posts/components/PostCard.tsx）
 
 ---
 
@@ -183,19 +183,19 @@ description: "Task list for implementing Posts-first POC (V2)"
 
 ### Tests（後端）
 
-- [ ] T067 [P] [US4] 新增 like create/delete/idempotent 整合測試（新增 apps/backend/tests/integration/modules/posts/test_post_likes_v2.py）
+- [x] T067 [P] [US4] 新增 like create/delete/idempotent 整合測試（新增 apps/backend/tests/integration/modules/posts/test_post_likes_v2.py）
 
 ### Backend（posts module）
 
-- [ ] T068 [P] [US4] 定義 PostLike domain model（新增 apps/backend/app/modules/posts/domain/models/post_like.py）
-- [ ] T069 [P] [US4] 建立 like repository（新增 apps/backend/app/modules/posts/infrastructure/repositories/post_like_repository.py）
-- [ ] T070 [P] [US4] 建立 like use cases（新增 apps/backend/app/modules/posts/application/use_cases/toggle_like.py）
-- [ ] T071 [US4] 新增 like endpoints 與回傳欄位（更新 apps/backend/app/modules/posts/presentation/routers/posts_router.py 與 apps/backend/app/modules/posts/presentation/schemas/post_schemas.py；POST/DELETE posts/{post_id}/like；Post response 帶 like_count、liked_by_me）
+- [x] T068 [P] [US4] 定義 PostLike domain model（新增 apps/backend/app/modules/posts/domain/models/post_like.py）
+- [x] T069 [P] [US4] 建立 like repository（新增 apps/backend/app/modules/posts/infrastructure/repositories/post_like_repository.py）
+- [x] T070 [P] [US4] 建立 like use cases（新增 apps/backend/app/modules/posts/application/use_cases/toggle_like.py）
+- [x] T071 [US4] 新增 like endpoints 與回傳欄位（更新 apps/backend/app/modules/posts/presentation/routers/posts_router.py 與 apps/backend/app/modules/posts/presentation/schemas/post_schemas.py；POST/DELETE posts/{post_id}/like；Post response 帶 like_count、liked_by_me）
 
 ### Web（apps/web）
 
-- [ ] T072 [P] [US4] 建立 LikeButton 元件（新增 apps/web/src/features/posts/components/LikeButton.tsx）
-- [ ] T073 [US4] 在貼文卡片串接 like mutation 與 optimistic update（更新 apps/web/src/features/posts/components/PostCard.tsx）
+- [x] T072 [P] [US4] 建立 LikeButton 元件（新增 apps/web/src/features/posts/components/LikeButton.tsx）
+- [x] T073 [US4] 在貼文卡片串接 like mutation 與 optimistic update（更新 apps/web/src/features/posts/components/PostCard.tsx）
 
 ---
 

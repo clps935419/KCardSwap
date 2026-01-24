@@ -29,6 +29,7 @@ from app.modules.posts.application.use_cases.list_post_interests_use_case import
 from app.modules.posts.application.use_cases.reject_interest_use_case import (
     RejectInterestUseCase,
 )
+from app.modules.posts.application.use_cases.toggle_like import ToggleLikeUseCase
 from app.modules.posts.domain.entities.post_enums import PostCategory, PostScope
 from app.modules.posts.presentation.dependencies.use_case_deps import (
     get_accept_interest_use_case,
@@ -39,6 +40,7 @@ from app.modules.posts.presentation.dependencies.use_case_deps import (
     get_list_post_interests_use_case,
     get_list_posts_v2_use_case,
     get_reject_interest_use_case,
+    get_toggle_like_use_case,
 )
 from app.modules.posts.presentation.schemas.post_schemas import (
     AcceptInterestResponse,
@@ -52,6 +54,8 @@ from app.modules.posts.presentation.schemas.post_schemas import (
     PostListResponseWrapper,
     PostResponse,
     PostResponseWrapper,
+    ToggleLikeResponse,
+    ToggleLikeResponseWrapper,
 )
 from app.shared.infrastructure.database.connection import get_db_session
 from app.shared.presentation.deps.require_user import require_user
@@ -62,7 +66,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/posts", tags=["Posts"])
 
 
-def _post_to_response(post) -> PostResponse:
+def _post_to_response(post, like_count: int = 0, liked_by_me: bool = False) -> PostResponse:
     """Helper to convert Post entity to PostResponse"""
     return PostResponse(
         id=UUID(post.id),
@@ -75,6 +79,8 @@ def _post_to_response(post) -> PostResponse:
         idol=post.idol,
         idol_group=post.idol_group,
         status=post.status.value,
+        like_count=like_count,
+        liked_by_me=liked_by_me,
         expires_at=post.expires_at,
         created_at=post.created_at,
         updated_at=post.updated_at,
@@ -174,14 +180,22 @@ async def list_posts(
     Results ordered by created_at DESC (newest first).
     """
     try:
-        posts = await use_case.execute(
+        posts_with_likes = await use_case.execute(
+            current_user_id=str(current_user_id),
             city_code=city_code,
             category=category,
             limit=limit,
             offset=offset,
         )
 
-        post_responses = [_post_to_response(post) for post in posts]
+        post_responses = [
+            _post_to_response(
+                pwl.post,
+                like_count=pwl.like_count,
+                liked_by_me=pwl.liked_by_me,
+            )
+            for pwl in posts_with_likes
+        ]
 
         data = PostListResponse(posts=post_responses, total=len(post_responses))
         return PostListResponseWrapper(data=data, meta=None, error=None)
@@ -197,172 +211,9 @@ async def list_posts(
         )
 
 
-@router.post(
-    "/{post_id}/interest",
-    response_model=PostInterestResponseWrapper,
-    status_code=status.HTTP_201_CREATED,
-    responses={
-        201: {"description": "Interest expressed successfully"},
-        401: {"description": "Unauthorized (not logged in)"},
-        404: {"description": "Post not found"},
-        422: {"description": "Unprocessable entity (validation failed)"},
-        500: {"description": "Internal server error"},
-    },
-    summary="Express interest in a post",
-    description="Express interest in a post. Cannot express interest in your own post or duplicate interests.",
-)
-async def express_interest(
-    post_id: UUID,
-    current_user_id: Annotated[UUID, Depends(require_user)],
-    session: Annotated[AsyncSession, Depends(get_db_session)],
-    use_case: Annotated[ExpressInterestUseCase, Depends(get_express_interest_use_case)],
-) -> PostInterestResponseWrapper:
-    """
-    Express interest in a post.
-
-    Business rules:
-    - Cannot express interest in your own post
-    - Cannot express interest twice in the same post
-    - Post must be open and not expired
-    """
-    try:
-        # Execute use case
-        interest = await use_case.execute(
-            post_id=str(post_id),
-            user_id=str(current_user_id),
-        )
-
-        data = PostInterestResponse(            id=UUID(interest.id),            post_id=UUID(interest.post_id),            user_id=UUID(interest.user_id),            status=interest.status.value,            created_at=interest.created_at,            updated_at=interest.updated_at,        )
-        return PostInterestResponseWrapper(data=data, meta=None, error=None)
-
-    except ValueError as e:
-        error_msg = str(e).lower()
-        if "not found" in error_msg:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
-        logger.warning(f"Interest validation failed: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e)
-        )
-    except Exception as e:
-        logger.error(f"Error expressing interest: {e}", exc_info=True)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to express interest",
-        )
-
-
-@router.post(
-    "/{post_id}/interests/{interest_id}/accept",
-    response_model=AcceptInterestResponseWrapper,
-    responses={
-        200: {"description": "Interest accepted successfully"},
-        401: {"description": "Unauthorized (not logged in)"},
-        403: {"description": "Forbidden (not post owner)"},
-        404: {"description": "Post or interest not found"},
-        422: {"description": "Unprocessable entity (validation failed)"},
-        500: {"description": "Internal server error"},
-    },
-    summary="Accept an interest",
-    description="Accept an interest. Automatically creates friendship and chat room.",
-)
-async def accept_interest(
-    post_id: UUID,
-    interest_id: UUID,
-    current_user_id: Annotated[UUID, Depends(require_user)],
-    session: Annotated[AsyncSession, Depends(get_db_session)],
-    use_case: Annotated[AcceptInterestUseCase, Depends(get_accept_interest_use_case)],
-) -> AcceptInterestResponseWrapper:
-    """
-    Accept an interest.
-
-    Business rules:
-    - Only post owner can accept interests
-    - Interest must be pending
-    - Automatically creates friendship if not already friends
-    - Creates or reuses existing chat room
-    """
-    try:
-        # Execute use case
-        result = await use_case.execute(
-            post_id=str(post_id),
-            interest_id=str(interest_id),
-            current_user_id=str(current_user_id),
-        )
-
-        data = AcceptInterestResponse(            interest_id=UUID(result.interest_id),            friendship_created=result.friendship_created,            chat_room_id=UUID(result.chat_room_id),        )
-        return AcceptInterestResponseWrapper(data=data, meta=None, error=None)
-
-    except ValueError as e:
-        error_msg = str(e).lower()
-        if "not found" in error_msg:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
-        elif "only post owner" in error_msg:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
-        logger.warning(f"Accept interest validation failed: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e)
-        )
-    except Exception as e:
-        logger.error(f"Error accepting interest: {e}", exc_info=True)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to accept interest",
-        )
-
-
-@router.post(
-    "/{post_id}/interests/{interest_id}/reject",
-    status_code=status.HTTP_204_NO_CONTENT,
-    responses={
-        204: {"description": "Interest rejected successfully"},
-        401: {"description": "Unauthorized (not logged in)"},
-        403: {"description": "Forbidden (not post owner)"},
-        404: {"description": "Post or interest not found"},
-        422: {"description": "Unprocessable entity (validation failed)"},
-        500: {"description": "Internal server error"},
-    },
-    summary="Reject an interest",
-    description="Reject an interest. Only post owner can reject.",
-)
-async def reject_interest(
-    post_id: UUID,
-    interest_id: UUID,
-    current_user_id: Annotated[UUID, Depends(require_user)],
-    session: Annotated[AsyncSession, Depends(get_db_session)],
-    use_case: Annotated[RejectInterestUseCase, Depends(get_reject_interest_use_case)],
-) -> None:
-    """
-    Reject an interest.
-
-    Business rules:
-    - Only post owner can reject interests
-    - Interest must be pending
-    """
-    try:
-        # Execute use case
-        await use_case.execute(
-            post_id=str(post_id),
-            interest_id=str(interest_id),
-            current_user_id=str(current_user_id),
-        )
-
-    except ValueError as e:
-        error_msg = str(e).lower()
-        if "not found" in error_msg:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
-        elif "only post owner" in error_msg:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
-        logger.warning(f"Reject interest validation failed: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e)
-        )
-    except Exception as e:
-        logger.error(f"Error rejecting interest: {e}", exc_info=True)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to reject interest",
-        )
-
+# REMOVED: Post interest endpoints - not required for POC
+# The following 5 endpoints have been commented out:
+# - express_interest, accept_interest, reject_interest, list_post_interests, get_post_interest
 
 @router.post(
     "/{post_id}/close",
@@ -416,152 +267,55 @@ async def close_post(
         )
 
 
-@router.get(
-    "/{post_id}/interests",
-    response_model=PostInterestListResponseWrapper,
+@router.post(
+    "/{post_id}/like",
+    response_model=ToggleLikeResponseWrapper,
     responses={
-        200: {"description": "Interests retrieved successfully"},
+        200: {"description": "Like toggled successfully"},
         401: {"description": "Unauthorized (not logged in)"},
-        403: {"description": "Forbidden (not post owner)"},
         404: {"description": "Post not found"},
         500: {"description": "Internal server error"},
     },
-    summary="List interests for a post (owner only)",
-    description="List all interests for a specific post. Only post owner can view.",
+    summary="Toggle like on a post (FR-008, FR-009)",
+    description="Like or unlike a post. Idempotent: if already liked, unlikes; if not liked, likes. Each user can like a post at most once.",
 )
-async def list_post_interests(
+async def toggle_like(
     post_id: UUID,
     current_user_id: Annotated[UUID, Depends(require_user)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
-    use_case: Annotated[
-        ListPostInterestsUseCase, Depends(get_list_post_interests_use_case)
-    ],
-    status_filter: Annotated[
-        Optional[str], Query(alias="status", description="Filter by status")
-    ] = None,
-    limit: Annotated[int, Query(ge=1, le=100, description="Maximum results")] = 50,
-    offset: Annotated[int, Query(ge=0, description="Pagination offset")] = 0,
-) -> PostInterestListResponseWrapper:
+    use_case: Annotated[ToggleLikeUseCase, Depends(get_toggle_like_use_case)],
+) -> ToggleLikeResponseWrapper:
     """
-    List interests for a post.
-
-    Business rules:
-    - Only post owner can list interests
-    - Supports status filtering (pending, accepted, rejected)
-    - Supports pagination
+    Toggle like on a post (FR-008, FR-009).
+    
+    Idempotent operation:
+    - If user has already liked the post, this will unlike it
+    - If user has not liked the post, this will like it
+    
+    Returns the new like state (liked/unliked) and the current total like count.
     """
     try:
-        # Parse status filter if provided
-        from app.modules.posts.domain.entities.post_interest import PostInterestStatus
-
-        status_enum = None
-        if status_filter:
-            try:
-                status_enum = PostInterestStatus(status_filter)
-            except ValueError:
-                raise ValueError(
-                    f"Invalid status filter. Must be one of: {', '.join([s.value for s in PostInterestStatus])}"
-                )
-
-        # Execute use case
-        interests, total = await use_case.execute(
+        result = await use_case.execute(
             post_id=str(post_id),
-            current_user_id=str(current_user_id),
-            status=status_enum,
-            limit=limit,
-            offset=offset,
+            user_id=str(current_user_id),
         )
 
-        interest_responses = [
-            PostInterestResponse(
-                id=UUID(interest.id),
-                post_id=UUID(interest.post_id),
-                user_id=UUID(interest.user_id),
-                status=interest.status.value,
-                created_at=interest.created_at,
-                updated_at=interest.updated_at,
-            )
-            for interest in interests
-        ]
-
-        data = PostInterestListResponse(interests=interest_responses, total=total)
-        return PostInterestListResponseWrapper(data=data, meta=None, error=None)
+        data = ToggleLikeResponse(
+            liked=result.liked,
+            like_count=result.like_count,
+        )
+        return ToggleLikeResponseWrapper(data=data, meta=None, error=None)
 
     except ValueError as e:
         error_msg = str(e).lower()
         if "not found" in error_msg:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
-        elif "only post owner" in error_msg:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
-        logger.warning(f"List interests validation failed: {e}")
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e)
+        )
     except Exception as e:
-        logger.error(f"Error listing interests: {e}", exc_info=True)
+        logger.error(f"Error toggling like on post {post_id}: {e}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to list interests",
-        )
-
-
-@router.get(
-    "/{post_id}/interests/{interest_id}",
-    response_model=PostInterestResponseWrapper,
-    responses={
-        200: {"description": "Interest retrieved successfully"},
-        401: {"description": "Unauthorized (not logged in)"},
-        403: {"description": "Forbidden (not post owner)"},
-        404: {"description": "Post or interest not found"},
-        500: {"description": "Internal server error"},
-    },
-    summary="Get a specific interest (owner only)",
-    description="Get details of a specific interest. Only post owner can view.",
-)
-async def get_post_interest(
-    post_id: UUID,
-    interest_id: UUID,
-    current_user_id: Annotated[UUID, Depends(require_user)],
-    session: Annotated[AsyncSession, Depends(get_db_session)],
-    use_case: Annotated[
-        ListPostInterestsUseCase, Depends(get_list_post_interests_use_case)
-    ],
-) -> PostInterestResponseWrapper:
-    """
-    Get a specific interest.
-
-    Business rules:
-    - Only post owner can view interests
-    - Interest must belong to the specified post
-    """
-    try:
-        # First verify ownership by listing (which checks ownership)
-        # This is a simple approach - we could optimize with a dedicated use case
-        interests, _ = await use_case.execute(
-            post_id=str(post_id),
-            current_user_id=str(current_user_id),
-            status=None,
-            limit=100,  # Reasonable limit
-            offset=0,
-        )
-
-        # Find the specific interest
-        interest = next((i for i in interests if i.id == str(interest_id)), None)
-        if not interest:
-            raise ValueError("Interest not found")
-
-        data = PostInterestResponse(            id=UUID(interest.id),            post_id=UUID(interest.post_id),            user_id=UUID(interest.user_id),            status=interest.status.value,            created_at=interest.created_at,            updated_at=interest.updated_at,        )
-        return PostInterestResponseWrapper(data=data, meta=None, error=None)
-
-    except ValueError as e:
-        error_msg = str(e).lower()
-        if "not found" in error_msg:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
-        elif "only post owner" in error_msg:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
-        logger.warning(f"Get interest validation failed: {e}")
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
-    except Exception as e:
-        logger.error(f"Error getting interest: {e}", exc_info=True)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to get interest",
+            detail="Failed to toggle like",
         )

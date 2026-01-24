@@ -1,9 +1,16 @@
 'use client'
 
-import { useSearchParams } from 'next/navigation'
+import { useState } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { Card } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
+import { MessageCircle, Loader2 } from 'lucide-react'
 import { usePostsList } from '@/features/posts/hooks/usePostsList'
+import { useCreateMessageRequest } from '@/features/inbox/hooks/useCreateMessageRequest'
+import { useToggleLike } from '@/features/posts/hooks/useToggleLike'
+import { LikeButton } from '@/features/posts/components/LikeButton'
+import { useToast } from '@/components/ui/use-toast'
 import type { PostCategory, PostResponse } from '@/shared/api/generated'
 
 function formatDate(dateString: string) {
@@ -28,13 +35,60 @@ const CATEGORY_LABELS: Record<PostCategory, string> = {
 
 export function PostsList() {
   const searchParams = useSearchParams()
+  const router = useRouter()
+  const { toast } = useToast()
   const city = searchParams.get('city') || undefined
   const category = searchParams.get('category') as PostCategory | undefined
+  const [messagingPostId, setMessagingPostId] = useState<string | null>(null)
 
   const { data, isLoading, error } = usePostsList({
     cityCode: city === 'global' ? undefined : city,
     category,
   })
+  
+  const { createRequest, loading: creatingRequest } = useCreateMessageRequest()
+  const toggleLikeMutation = useToggleLike()
+
+  const handleMessageAuthor = async (post: PostResponse) => {
+    setMessagingPostId(post.id)
+    
+    try {
+      // Create message request
+      await createRequest({
+        recipientId: post.owner_id,
+        initialMessage: `Hi! I'm interested in your post "${post.title}"`,
+        postId: post.id,
+      })
+      
+      toast({
+        title: "Message request sent",
+        description: "The author will see your message in their inbox",
+      })
+      
+      // Navigate to inbox
+      router.push('/inbox?tab=requests')
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Failed to send message request. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setMessagingPostId(null)
+    }
+  }
+
+  const handleToggleLike = async (postId: string) => {
+    try {
+      await toggleLikeMutation.mutateAsync(postId)
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Failed to update like. Please try again.",
+        variant: "destructive",
+      })
+    }
+  }
 
   if (isLoading) {
     return (
@@ -89,9 +143,32 @@ export function PostsList() {
               </div>
               <h3 className="mt-2 text-lg font-semibold">{post.title}</h3>
               <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{post.content}</p>
-              <div className="mt-3 flex items-center gap-4 text-xs text-muted-foreground">
-                <span>作者 ID：{post.owner_id}</span>
-                <span>發布時間：{formatDate(post.created_at)}</span>
+              <div className="mt-3 flex items-center justify-between">
+                <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                  <span>作者 ID：{post.owner_id}</span>
+                  <span>發布時間：{formatDate(post.created_at)}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <LikeButton
+                    liked={post.liked_by_me ?? false}
+                    likeCount={post.like_count ?? 0}
+                    onToggle={() => handleToggleLike(post.id)}
+                    disabled={toggleLikeMutation.isPending}
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleMessageAuthor(post)}
+                    disabled={messagingPostId === post.id}
+                  >
+                    {messagingPostId === post.id ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <MessageCircle className="mr-2 h-4 w-4" />
+                    )}
+                    私訊作者
+                  </Button>
+                </div>
               </div>
             </div>
           </div>

@@ -115,57 +115,17 @@ def create_application() -> FastAPI:
     app.include_router(auth_router, prefix=settings.API_PREFIX)
     app.include_router(profile_router, prefix=settings.API_PREFIX)
 
-    # Phase 3.2: Identity module (Idol Groups List)
-    from .modules.identity.presentation.routers.idols_router import (
-        router as idols_router,
-    )
-
-    app.include_router(idols_router, prefix=settings.API_PREFIX)
-
-    # Phase 4: Social module (Cards)
-    from .modules.social.presentation.routers.cards_router import (
-        router as cards_router,
-    )
-
-    app.include_router(cards_router, prefix=settings.API_PREFIX)
-
-    # Phase 5: Social module (Nearby Search)
-    from .modules.social.presentation.routers.nearby_router import (
-        router as nearby_router,
-    )
-
-    app.include_router(nearby_router, prefix=settings.API_PREFIX)
-
-    # Phase 6: Social module (Friends, Chat, Ratings, Reports)
-    from .modules.social.presentation.routers.chat_router import router as chat_router
+    # Phase 6: Social module (Reports and Blocking)
     from .modules.social.presentation.routers.friends_router import (
         router as friends_router,
-    )
-    from .modules.social.presentation.routers.rating_router import (
-        router as rating_router,
     )
     from .modules.social.presentation.routers.report_router import (
         router as report_router,
     )
 
+    # Note: friends_router kept only for block/unblock endpoints (FR-025)
     app.include_router(friends_router, prefix=settings.API_PREFIX)
-    app.include_router(chat_router, prefix=settings.API_PREFIX)
-    app.include_router(rating_router, prefix=settings.API_PREFIX)
     app.include_router(report_router, prefix=settings.API_PREFIX)
-
-    # Phase 7: Social module (Trade)
-    from .modules.social.presentation.routers.trade_router import (
-        router as trade_router,
-    )
-
-    app.include_router(trade_router, prefix=settings.API_PREFIX)
-
-    # Phase 8: Identity module (Subscription)
-    from .modules.identity.presentation.routers.subscription_router import (
-        router as subscription_router,
-    )
-
-    app.include_router(subscription_router, prefix=settings.API_PREFIX)
 
     # Phase 8.5: Posts module (City Board Posts)
     from .modules.posts.presentation.routers.posts_router import (
@@ -180,6 +140,31 @@ def create_application() -> FastAPI:
     )
 
     app.include_router(location_router, prefix=settings.API_PREFIX)
+
+    # Phase 9: Social module (Gallery Cards - User Story 2)
+    from .modules.social.presentation.routers.gallery_router import (
+        router as gallery_router,
+    )
+
+    app.include_router(gallery_router, prefix=settings.API_PREFIX)
+
+    # Phase 10: Media module (Media Upload & Attach - User Story 3)
+    from .modules.media.presentation.routers.media_router import (
+        router as media_router,
+    )
+
+    app.include_router(media_router, prefix=settings.API_PREFIX)
+
+    # Phase 11: Social module (Private Messages & Inbox - User Story 5)
+    from .modules.social.presentation.routers.message_requests_router import (
+        router as message_requests_router,
+    )
+    from .modules.social.presentation.routers.threads_router import (
+        router as threads_router,
+    )
+
+    app.include_router(message_requests_router, prefix=settings.API_PREFIX)
+    app.include_router(threads_router, prefix=settings.API_PREFIX)
 
     return app
 

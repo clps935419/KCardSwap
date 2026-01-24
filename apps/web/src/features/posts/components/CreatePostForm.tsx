@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Spinner } from '@/components/ui/spinner'
+import { executeUploadFlow, attachMediaToPost } from '@/src/lib/media/uploadFlow'
 import type { PostCategory, PostScope, CityCode } from '@/shared/api/generated'
 
 const CATEGORIES: { value: PostCategory; label: string }[] = [
@@ -42,6 +43,7 @@ interface FormData {
   scope: PostScope
   city_code?: CityCode
   category: PostCategory
+  image?: FileList
 }
 
 export function CreatePostForm() {
@@ -49,6 +51,9 @@ export function CreatePostForm() {
   const queryClient = useQueryClient()
   const [scope, setScope] = useState<PostScope>('global')
   const [errorMessage, setErrorMessage] = useState<string>('')
+  const [uploadProgress, setUploadProgress] = useState<number>(0)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const {
     register,
@@ -86,23 +91,84 @@ export function CreatePostForm() {
     },
   })
 
-  const onSubmit = (data: FormData) => {
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        setErrorMessage('請選擇圖片檔案')
+        return
+      }
+      
+      // Create preview
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const removeImage = () => {
+    setImagePreview(null)
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
+  }
+
+  const onSubmit = async (data: FormData) => {
     setErrorMessage('')
+    setUploadProgress(0)
     
     if (data.scope === 'city' && !data.city_code) {
       setErrorMessage('當範圍為「指定城市」時，必須選擇城市')
       return
     }
 
-    createPostMutation.mutate({
-      body: {
-        title: data.title,
-        content: data.content,
-        scope: data.scope,
-        city_code: data.scope === 'city' ? data.city_code || null : null,
-        category: data.category,
-      },
-    })
+    try {
+      let mediaId: string | undefined
+
+      // Step 1: Upload image if selected (T054)
+      if (data.image && data.image.length > 0) {
+        const file = data.image[0]
+        mediaId = await executeUploadFlow({
+          file,
+          onProgress: setUploadProgress,
+        })
+      }
+
+      // Step 2: Create post
+      const postResponse = await createPostMutation.mutateAsync({
+        body: {
+          title: data.title,
+          content: data.content,
+          scope: data.scope,
+          city_code: data.scope === 'city' ? data.city_code || null : null,
+          category: data.category,
+        },
+      })
+
+      // Step 3: Attach media to post if uploaded
+      if (mediaId && postResponse?.data?.id) {
+        await attachMediaToPost(mediaId, postResponse.data.id)
+      }
+
+      // Success - mutations will handle navigation
+    } catch (error: any) {
+      if (error?.response?.status === 422) {
+        const errorData = error.response.data
+        if (errorData?.detail?.error_code === 'LIMIT_EXCEEDED') {
+          const limitInfo = errorData.detail
+          setErrorMessage(
+            `已達配額上限：${limitInfo.limit_key}（上限：${limitInfo.limit_value}，目前：${limitInfo.current_value}）。重置時間：${new Date(limitInfo.reset_at).toLocaleString('zh-TW')}`
+          )
+        } else {
+          setErrorMessage('資料驗證失敗，請檢查欄位是否正確')
+        }
+      } else {
+        setErrorMessage(error.message || '發文失敗，請稍後再試')
+      }
+    }
   }
 
   return (
@@ -204,6 +270,48 @@ export function CreatePostForm() {
             ))}
           </SelectContent>
         </Select>
+      </div>
+
+      {/* 圖片上傳 (T054) */}
+      <div className="space-y-2">
+        <Label htmlFor="image">圖片 (選填)</Label>
+        <Input
+          id="image"
+          type="file"
+          accept="image/*"
+          ref={fileInputRef}
+          {...register('image')}
+          onChange={handleImageChange}
+        />
+        {imagePreview && (
+          <div className="relative mt-2">
+            <img
+              src={imagePreview}
+              alt="預覽"
+              className="max-h-48 rounded-md border object-contain"
+            />
+            <Button
+              type="button"
+              variant="destructive"
+              size="sm"
+              className="absolute right-2 top-2"
+              onClick={removeImage}
+            >
+              移除
+            </Button>
+          </div>
+        )}
+        {uploadProgress > 0 && uploadProgress < 100 && (
+          <div className="mt-2">
+            <div className="h-2 w-full rounded-full bg-secondary">
+              <div
+                className="h-2 rounded-full bg-primary transition-all"
+                style={{ width: `${uploadProgress}%` }}
+              />
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">上傳中... {uploadProgress}%</p>
+          </div>
+        )}
       </div>
 
       {/* 錯誤訊息 */}

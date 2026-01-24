@@ -8,6 +8,7 @@ from injector import Injector
 
 from app.modules.identity.module import IdentityModule
 from app.modules.locations.module import LocationsModule
+from app.modules.media.module import MediaModule
 from app.modules.posts.module import PostsModule
 from app.modules.social.module import SocialModule
 from app.shared.module import SharedModule
@@ -20,5 +21,6 @@ injector = Injector(
         SocialModule(),
         PostsModule(),
         LocationsModule(),
+        MediaModule(),
     ]
 )
