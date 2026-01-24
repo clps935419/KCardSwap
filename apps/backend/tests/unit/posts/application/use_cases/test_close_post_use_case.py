@@ -12,6 +12,7 @@ import pytest
 
 from app.modules.posts.application.use_cases.close_post_use_case import ClosePostUseCase
 from app.modules.posts.domain.entities.post import Post, PostStatus
+from app.modules.posts.domain.entities.post_enums import PostCategory, PostScope
 
 
 class TestClosePostUseCase:
@@ -33,11 +34,13 @@ class TestClosePostUseCase:
         return Post(
             id=str(uuid4()),
             owner_id=str(uuid4()),
-            city_code="TPE",
             title="Test Post",
             content="Test content",
             status=PostStatus.OPEN,
+            scope=PostScope.CITY,
+            category=PostCategory.TRADE,
             expires_at=datetime.utcnow() + timedelta(days=14),
+            city_code="TPE",
             created_at=datetime.utcnow(),
         )
 
@@ -99,11 +102,13 @@ class TestClosePostUseCase:
         closed_post = Post(
             id=str(uuid4()),
             owner_id=str(uuid4()),
-            city_code="TPE",
             title="Test Post",
             content="Test content",
             status=PostStatus.CLOSED,
+            scope=PostScope.CITY,
+            category=PostCategory.TRADE,
             expires_at=datetime.utcnow() + timedelta(days=14),
+            city_code="TPE",
             created_at=datetime.utcnow(),
         )
 

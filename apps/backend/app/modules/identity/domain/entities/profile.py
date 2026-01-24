@@ -38,6 +38,7 @@ class Profile:
         self._region = region
         self._preferences = preferences or {}
         self._privacy_flags = privacy_flags or {
+            "nearby_visible": True,
             "show_online": True,
             "allow_stranger_chat": True,
         }
@@ -143,6 +144,10 @@ class Profile:
         """Update privacy settings"""
         self._privacy_flags.update(privacy_flags)
         self._updated_at = datetime.utcnow()
+
+    def is_nearby_visible(self) -> bool:
+        """Check if user is visible in nearby search"""
+        return self._privacy_flags.get("nearby_visible", True)
 
     def shows_online_status(self) -> bool:
         """Check if user shows online status"""
