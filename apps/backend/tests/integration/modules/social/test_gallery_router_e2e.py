@@ -139,7 +139,7 @@ class TestGalleryRouterE2E:
     def test_create_gallery_card_missing_required_fields(self, authenticated_client):
         """Test creating gallery card with missing required fields"""
         payload = {
-            "title": "Test Card"
+            "title": "Test Card",
             # Missing idol_name and era
         }
 
