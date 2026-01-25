@@ -152,41 +152,41 @@ def test_post_content_fuzzing(content):
 
 ### Priority 7: 整合測試完善 (建議階段)
 
-#### 真實資料庫整合測試增強
+#### 舊整合測試遷移與增強
 
 **目前狀態**:
-- 有 44 個測試因為需要真實資料庫而失敗
-- 現有整合測試主要使用 Mock
+- ✅ 測試資料庫已配置 (Makefile: `init-test-db`)
+- ✅ Priority 5 的 173 個 E2E 測試已使用真實資料庫
+- ⚠️ Priority 4 之前的舊整合測試可能需要更新以使用新測試資料庫設置
 
 **建議改善** (20-30 個測試):
 
-##### 1. Testcontainers 整合
+##### 1. 舊整合測試遷移
+**目標**: 確保所有現有整合測試都能用測試資料庫執行
+
 ```python
-import pytest
-from testcontainers.postgres import PostgresContainer
-
-@pytest.fixture(scope="session")
-def postgres_container():
-    with PostgresContainer("postgres:15") as postgres:
-        yield postgres
-
+# 將舊的 mock-based 測試遷移為使用真實資料庫
 @pytest.fixture
-def test_db(postgres_container):
-    """Provide test database"""
-    engine = create_async_engine(postgres_container.get_connection_url())
-    # Run migrations
-    # Return session
-    pass
+def test_db_session(db_session):
+    """Use the real test database session"""
+    return db_session
 ```
 
-**預估工作量**: 12-16 小時
+**任務**:
+- 檢查並更新 Priority 4 之前的整合測試
+- 移除不必要的 Mock，改用真實資料庫
+- 驗證所有測試在 CI 環境中通過
 
-##### 2. 外部服務整合測試
+**預估工作量**: 8-12 小時
+
+##### 2. 外部服務整合測試 (可選)
 - Google OAuth 整合測試 (使用測試帳號)
 - GCS 整合測試 (使用測試 bucket)
 - FCM 整合測試 (使用測試 topic)
 
-**預估工作量**: 10-15 小時
+**注意**: 這些是**可選的**，因為 Mock 測試已經足夠涵蓋大部分場景
+
+**預估工作量**: 10-15 小時 (可選)
 
 ---
 
@@ -251,10 +251,10 @@ async def test_complete_user_journey():
    - 回應時間測試
    - **原因**: 確保系統能處理預期流量
 
-3. **真實資料庫測試** (Priority 7)
-   - Testcontainers 設置
-   - 修復 44 個失敗的整合測試
-   - **原因**: 提高測試可靠性
+3. **舊整合測試遷移** (Priority 7)
+   - 更新舊測試以使用已配置的測試資料庫
+   - 移除不必要的 Mock
+   - **原因**: 統一測試方法，提高可靠性
 
 ### 🟢 低優先級 (可選)
 4. **壓力測試** (Priority 6 - Stress)
@@ -275,10 +275,10 @@ async def test_complete_user_journey():
 **產出**: 15-20 個效能測試
 **目標**: 驗證系統能承受基本負載
 
-### 階段 3: 整合測試完善 (Week 4-5)
-**投入**: 12-16 小時
-**產出**: Testcontainers 設置 + 修復失敗測試
-**目標**: 100% 整合測試通過率
+### 階段 3: 舊整合測試遷移 (Week 4-5)
+**投入**: 8-12 小時
+**產出**: 舊測試更新為使用真實測試資料庫
+**目標**: 統一測試方法，100% 整合測試通過率
 
 ---
 
@@ -315,10 +315,10 @@ async def test_complete_user_journey():
 如果資源有限，**優先完成**:
 1. ✅ 安全測試 (SQL Injection, XSS, 認證授權)
 2. ✅ 基本負載測試 (驗證能承受預期流量)
-3. ✅ 修復 Testcontainers 設置
+3. ✅ 舊整合測試遷移 (統一使用測試資料庫)
 
-**預估總工作量**: 30-40 小時
-**預期成果**: 系統安全性得到驗證，效能符合基本需求
+**預估總工作量**: 25-35 小時
+**預期成果**: 系統安全性得到驗證，效能符合基本需求，測試方法統一
 
 ### 完整方案
 如果有充足資源，**依序完成**:
@@ -329,7 +329,7 @@ async def test_complete_user_journey():
 5. Priority 8: 效能優化驗證
 6. Priority 9: 業務流程測試
 
-**預估總工作量**: 80-120 小時
+**預估總工作量**: 75-115 小時
 **預期成果**: 企業級測試品質，系統穩定可靠
 
 ---
