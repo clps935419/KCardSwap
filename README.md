@@ -11,6 +11,15 @@ A card trading platform built with FastAPI, Kong API Gateway, and PostgreSQL.
 
 ### Setup
 
+**Quick Setup (Recommended):**
+```bash
+make setup
+```
+
+This will automatically create the `.env` file and start all services.
+
+**Manual Setup:**
+
 1. Clone the repository:
    ```bash
    git clone <repository-url>
@@ -30,6 +39,9 @@ A card trading platform built with FastAPI, Kong API Gateway, and PostgreSQL.
    
    # Or for subsequent runs
    docker compose up -d
+   
+   # Or simply use
+   make dev
    ```
    
    **Note**: The backend now uses Poetry for dependency management and includes:
@@ -41,6 +53,8 @@ A card trading platform built with FastAPI, Kong API Gateway, and PostgreSQL.
    ```bash
    make health
    ```
+
+**Troubleshooting:** If you encounter any issues, see [DOCKER_TROUBLESHOOTING.md](./DOCKER_TROUBLESHOOTING.md)
 
 Access points:
 - Backend API: http://localhost:8000
