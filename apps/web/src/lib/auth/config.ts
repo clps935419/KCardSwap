@@ -36,6 +36,17 @@ export const authOptions: NextAuthOptions = {
         try {
           // Send Google ID token to our backend
           const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+
+          // Log token info for debugging (first/last 20 chars only for security)
+          console.log('[NextAuth] Sending Google ID token to backend')
+          console.log(
+            '[NextAuth] Token preview:',
+            account.id_token.substring(0, 20) +
+              '...' +
+              account.id_token.substring(account.id_token.length - 20)
+          )
+          console.log('[NextAuth] Backend URL:', backendUrl)
+
           const response = await fetch(`${backendUrl}/api/v1/auth/google-login`, {
             method: 'POST',
             headers: {
@@ -48,7 +59,9 @@ export const authOptions: NextAuthOptions = {
           })
 
           if (!response.ok) {
+            const errorText = await response.text()
             console.error('[NextAuth] Backend login failed:', response.status)
+            console.error('[NextAuth] Backend error response:', errorText)
             throw new Error('Backend authentication failed')
           }
 
@@ -60,6 +73,7 @@ export const authOptions: NextAuthOptions = {
             token.email = data.data.email
             token.accessToken = data.data.access_token
             token.refreshToken = data.data.refresh_token
+            console.log('[NextAuth] Backend authentication successful for user:', data.data.email)
           }
         } catch (error) {
           console.error('[NextAuth] Error during backend authentication:', error)
