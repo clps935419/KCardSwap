@@ -57,6 +57,54 @@
         }
       }
     },
+    "/api/v1/auth/admin-login": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Admin login with email/password",
+        "description": "Authenticate admin user with email and password and receive JWT tokens",
+        "operationId": "admin_login_api_v1_auth_admin_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminLoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully authenticated as admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error"
+          },
+          "401": {
+            "description": "Invalid credentials or not an admin"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/auth/google-login": {
       "post": {
         "tags": [
@@ -283,6 +331,145 @@
         ]
       }
     },
+    "/api/v1/idols/groups": {
+      "get": {
+        "tags": [
+          "idols"
+        ],
+        "summary": "Get all idol groups",
+        "description": "Get a list of all available K-pop idol groups for onboarding.\n\n    This endpoint provides the complete list of idol groups that users can select\n    during the onboarding process to indicate their preferences.\n\n    Each idol group includes:\n    - `id`: Unique identifier (e.g., newjeans, ive, aespa)\n    - `name`: Display name (e.g., NewJeans, IVE, aespa)\n    - `emoji`: Emoji representing the group (e.g., 👖, 🦢, 🦋)\n\n    This is a **public endpoint** that **does not require authentication**.\n    Frontend applications should use this to dynamically populate idol group selection.",
+        "operationId": "get_idol_groups_api_v1_idols_groups_get",
+        "responses": {
+          "200": {
+            "description": "List of all idol groups retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdolGroupListResponseWrapper"
+                },
+                "example": {
+                  "data": {
+                    "groups": [
+                      {
+                        "id": "newjeans",
+                        "name": "NewJeans",
+                        "emoji": "👖"
+                      },
+                      {
+                        "id": "ive",
+                        "name": "IVE",
+                        "emoji": "🦢"
+                      },
+                      {
+                        "id": "aespa",
+                        "name": "aespa",
+                        "emoji": "🦋"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/subscriptions/verify-receipt": {
+      "post": {
+        "tags": [
+          "Subscriptions"
+        ],
+        "summary": "Verify Receipt",
+        "description": "Verify Google Play purchase receipt and update subscription.\n\nFeatures:\n- Idempotent: Same token + same user returns current status\n- Token binding: Prevents cross-user replay attacks\n- Auto-acknowledge: Acknowledges purchase after verification\n\nError codes:\n- 400_VALIDATION_FAILED: Invalid platform or missing fields\n- 401_UNAUTHORIZED: Not logged in\n- 409_CONFLICT: Purchase token already used by another user\n- 503_SERVICE_UNAVAILABLE: Google Play API unavailable",
+        "operationId": "verify_receipt_api_v1_subscriptions_verify_receipt_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyReceiptRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionStatusResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/subscriptions/status": {
+      "get": {
+        "tags": [
+          "Subscriptions"
+        ],
+        "summary": "Get Subscription Status",
+        "description": "Get current subscription status for authenticated user.\n\nReturns server-side subscription state.\nCalled by app when opening or returning to foreground.\n\nError codes:\n- 401_UNAUTHORIZED: Not logged in\n- 503_SERVICE_UNAVAILABLE: Database unavailable",
+        "operationId": "get_subscription_status_api_v1_subscriptions_status_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionStatusResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/subscriptions/expire-subscriptions": {
+      "post": {
+        "tags": [
+          "Subscriptions"
+        ],
+        "summary": "Expire Subscriptions",
+        "description": "Expire active subscriptions that have passed their expiry date.\n\nThis endpoint should be called by a scheduled background task (e.g., daily cron job).\nFor POC, it's exposed as an HTTP endpoint for manual triggering.\n\nIn production, this should be:\n- Protected by admin authentication or internal-only access\n- Triggered by a scheduler (APScheduler, Celery Beat, Cloud Scheduler, etc.)\n\nReturns:\n    Number of subscriptions expired and processing timestamp",
+        "operationId": "expire_subscriptions_api_v1_subscriptions_expire_subscriptions_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExpireSubscriptionsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/friends/block": {
       "post": {
         "tags": [
@@ -477,6 +664,517 @@
             "HTTPBearer": []
           }
         ]
+      }
+    },
+    "/api/v1/cards/upload-url": {
+      "post": {
+        "tags": [
+          "Cards"
+        ],
+        "summary": "Get upload signed URL",
+        "description": "Generate a signed URL for uploading a card image to GCS",
+        "operationId": "get_upload_url_api_v1_cards_upload_url_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadCardRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Upload URL generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadUrlResponseWrapper"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request (file type/size)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "422": {
+            "description": "Quota exceeded"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/cards/me": {
+      "get": {
+        "tags": [
+          "Cards"
+        ],
+        "summary": "Get my cards",
+        "description": "Retrieve all cards owned by the authenticated user",
+        "operationId": "get_my_cards_api_v1_cards_me_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by status (available/trading/traded)",
+              "title": "Status"
+            },
+            "description": "Filter by status (available/trading/traded)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cards retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CardListResponseWrapper"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/cards/{card_id}": {
+      "delete": {
+        "tags": [
+          "Cards"
+        ],
+        "summary": "Delete a card",
+        "description": "Delete a card owned by the authenticated user",
+        "operationId": "delete_card_api_v1_cards__card_id__delete",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "card_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Card Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Card deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteSuccessResponseWrapper"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Not the card owner"
+          },
+          "404": {
+            "description": "Card not found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/cards/quota/status": {
+      "get": {
+        "tags": [
+          "Cards"
+        ],
+        "summary": "Get quota status",
+        "description": "Check current upload quota usage",
+        "operationId": "get_quota_status_api_v1_cards_quota_status_get",
+        "responses": {
+          "200": {
+            "description": "Quota status retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuotaStatusResponseWrapper"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/cards/{card_id}/confirm-upload": {
+      "post": {
+        "tags": [
+          "Cards"
+        ],
+        "summary": "Confirm card upload",
+        "description": "Confirm that the card image has been successfully uploaded to GCS after using the signed URL",
+        "operationId": "confirm_card_upload_api_v1_cards__card_id__confirm_upload_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "card_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Card Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Upload confirmed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteSuccessResponseWrapper"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request (already confirmed, no image, etc.)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Not the card owner"
+          },
+          "404": {
+            "description": "Card not found or image not found in storage"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/chats": {
+      "get": {
+        "tags": [
+          "Chat"
+        ],
+        "summary": "Get chat rooms",
+        "description": "Get all chat rooms for the current user",
+        "operationId": "get_chat_rooms_api_v1_chats_get",
+        "responses": {
+          "200": {
+            "description": "Chat rooms retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatRoomListResponseWrapper"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (not logged in)"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/chats/{room_id}/messages": {
+      "get": {
+        "tags": [
+          "Chat"
+        ],
+        "summary": "Get messages",
+        "description": "Get messages from a chat room (with pagination support via after_message_id)",
+        "operationId": "get_messages_api_v1_chats__room_id__messages_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "room_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Room Id"
+            }
+          },
+          {
+            "name": "after_message_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Get messages after this message ID",
+              "title": "After Message Id"
+            },
+            "description": "Get messages after this message ID"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Maximum number of messages",
+              "default": 50,
+              "title": "Limit"
+            },
+            "description": "Maximum number of messages"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Messages retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesListResponseWrapper"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (not logged in)"
+          },
+          "403": {
+            "description": "Forbidden (not a participant of this room)"
+          },
+          "404": {
+            "description": "Chat room not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Chat"
+        ],
+        "summary": "Send message",
+        "description": "Send a message in a chat room (triggers FCM push notification)",
+        "operationId": "send_message_api_v1_chats__room_id__messages_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "room_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Room Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/app__modules__social__presentation__schemas__chat_schemas__SendMessageRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Message sent successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseWrapper"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (validation failed)"
+          },
+          "401": {
+            "description": "Unauthorized (not logged in)"
+          },
+          "403": {
+            "description": "Forbidden (not authorized to send message)"
+          },
+          "404": {
+            "description": "Chat room not found"
+          },
+          "422": {
+            "description": "Unprocessable entity (blocked or not friends)"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/chats/{room_id}/messages/{message_id}/read": {
+      "post": {
+        "tags": [
+          "Chat"
+        ],
+        "summary": "Mark message as read",
+        "description": "Mark a message as read by the current user",
+        "operationId": "mark_message_read_api_v1_chats__room_id__messages__message_id__read_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "room_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Room Id"
+            }
+          },
+          {
+            "name": "message_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Message Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Message marked as read"
+          },
+          "401": {
+            "description": "Unauthorized (not logged in)"
+          },
+          "403": {
+            "description": "Forbidden (not authorized)"
+          },
+          "404": {
+            "description": "Message not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/v1/posts": {
@@ -1614,6 +2312,29 @@
         "title": "AcceptRequestResponse",
         "description": "Response for accepting a request"
       },
+      "AdminLoginRequest": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email",
+            "description": "Admin email address"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8,
+            "title": "Password",
+            "description": "Admin password"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "title": "AdminLoginRequest",
+        "description": "Request schema for admin login with email/password"
+      },
       "AttachMediaResponseSchema": {
         "properties": {
           "media_id": {
@@ -1702,6 +2423,331 @@
         "description": "Request schema for blocking a user",
         "example": {
           "user_id": "123e4567-e89b-12d3-a456-426614174000"
+        }
+      },
+      "CardListResponseWrapper": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/CardResponse"
+            },
+            "type": "array",
+            "title": "Data"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "CardListResponseWrapper",
+        "description": "Response wrapper for card list (standardized envelope)"
+      },
+      "CardResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id",
+            "description": "Card ID"
+          },
+          "owner_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Owner Id",
+            "description": "Owner user ID"
+          },
+          "idol": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Idol",
+            "description": "Idol name"
+          },
+          "idol_group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Idol Group",
+            "description": "Idol group"
+          },
+          "album": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Album",
+            "description": "Album name"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version",
+            "description": "Version"
+          },
+          "rarity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rarity",
+            "description": "Card rarity"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "description": "Card status"
+          },
+          "image_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image Url",
+            "description": "Image URL"
+          },
+          "size_bytes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size Bytes",
+            "description": "Image size in bytes"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At",
+            "description": "Creation timestamp"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At",
+            "description": "Last update timestamp"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "owner_id",
+          "status",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "CardResponse",
+        "description": "Response schema for card details",
+        "example": {
+          "album": "Love Poem",
+          "created_at": "2024-01-01T00:00:00Z",
+          "id": "123e4567-e89b-12d3-a456-426614174000",
+          "idol": "IU",
+          "idol_group": "Solo",
+          "image_url": "https://storage.googleapis.com/bucket/cards/user_id/card_id.jpg",
+          "owner_id": "987e6543-e21b-12d3-a456-426614174000",
+          "rarity": "rare",
+          "size_bytes": 1234567,
+          "status": "available",
+          "updated_at": "2024-01-01T00:00:00Z",
+          "version": "Version A"
+        }
+      },
+      "ChatRoomListResponse": {
+        "properties": {
+          "rooms": {
+            "items": {
+              "$ref": "#/components/schemas/ChatRoomResponse"
+            },
+            "type": "array",
+            "title": "Rooms",
+            "description": "List of chat rooms"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total",
+            "description": "Total number of chat rooms"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rooms",
+          "total"
+        ],
+        "title": "ChatRoomListResponse",
+        "description": "Response schema for list of chat rooms"
+      },
+      "ChatRoomListResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ChatRoomListResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "ChatRoomListResponseWrapper",
+        "description": "Response wrapper for chat room list (standardized envelope)"
+      },
+      "ChatRoomParticipantResponse": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "User Id",
+            "description": "User ID"
+          },
+          "nickname": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nickname",
+            "description": "User's nickname"
+          },
+          "avatar_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avatar Url",
+            "description": "User's avatar URL"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id"
+        ],
+        "title": "ChatRoomParticipantResponse",
+        "description": "Response schema for chat room participant"
+      },
+      "ChatRoomResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id",
+            "description": "Chat room ID"
+          },
+          "participants": {
+            "items": {
+              "$ref": "#/components/schemas/ChatRoomParticipantResponse"
+            },
+            "type": "array",
+            "title": "Participants",
+            "description": "Room participants"
+          },
+          "last_message": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MessageResponse"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Last message in the room"
+          },
+          "unread_count": {
+            "type": "integer",
+            "title": "Unread Count",
+            "description": "Number of unread messages for current user",
+            "default": 0
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At",
+            "description": "Creation timestamp"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "participants",
+          "created_at"
+        ],
+        "title": "ChatRoomResponse",
+        "description": "Response schema for chat room details",
+        "example": {
+          "created_at": "2024-01-01T00:00:00Z",
+          "id": "987e6543-e21b-12d3-a456-426614174000",
+          "last_message": {
+            "content": "Hello!",
+            "created_at": "2024-01-01T00:00:00Z",
+            "id": "123e4567-e89b-12d3-a456-426614174000",
+            "room_id": "987e6543-e21b-12d3-a456-426614174000",
+            "sender_id": "456e7890-e12b-34d5-a678-901234567000",
+            "status": "read"
+          },
+          "participants": [
+            {
+              "avatar_url": "https://example.com/avatar.jpg",
+              "nickname": "John Doe",
+              "user_id": "456e7890-e12b-34d5-a678-901234567000"
+            },
+            {
+              "avatar_url": "https://example.com/avatar2.jpg",
+              "nickname": "Jane Smith",
+              "user_id": "789e0123-e45b-67d8-a901-234567890000"
+            }
+          ],
+          "unread_count": 0
         }
       },
       "CityCode": {
@@ -2091,6 +3137,94 @@
         "title": "CreateUploadUrlResponseSchema",
         "description": "Response schema for upload URL."
       },
+      "DeleteSuccessResponse": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success",
+            "description": "Operation success status",
+            "default": true
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "description": "Success message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "title": "DeleteSuccessResponse",
+        "description": "Success response for delete operations"
+      },
+      "DeleteSuccessResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/DeleteSuccessResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "DeleteSuccessResponseWrapper",
+        "description": "Response wrapper for delete success (standardized envelope)"
+      },
+      "ExpireSubscriptionsData": {
+        "properties": {
+          "expired_count": {
+            "type": "integer",
+            "title": "Expired Count",
+            "description": "Number of subscriptions expired"
+          },
+          "processed_at": {
+            "type": "string",
+            "title": "Processed At",
+            "description": "Processing timestamp (ISO format)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "expired_count",
+          "processed_at"
+        ],
+        "title": "ExpireSubscriptionsData",
+        "description": "Data schema for expire subscriptions job",
+        "example": {
+          "expired_count": 5,
+          "processed_at": "2025-12-23T00:00:00"
+        }
+      },
+      "ExpireSubscriptionsResponse": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ExpireSubscriptionsData"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "ExpireSubscriptionsResponse",
+        "description": "Response wrapper for expire subscriptions (standardized envelope)"
+      },
       "GalleryCardListResponse": {
         "properties": {
           "items": {
@@ -2260,6 +3394,72 @@
         "type": "object",
         "title": "HTTPValidationError"
       },
+      "IdolGroupListResponse": {
+        "properties": {
+          "groups": {
+            "items": {
+              "$ref": "#/components/schemas/IdolGroupResponse"
+            },
+            "type": "array",
+            "title": "Groups",
+            "description": "List of all available idol groups for onboarding"
+          }
+        },
+        "type": "object",
+        "required": [
+          "groups"
+        ],
+        "title": "IdolGroupListResponse",
+        "description": "Response schema for list of all idol groups."
+      },
+      "IdolGroupListResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/IdolGroupListResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "IdolGroupListResponseWrapper",
+        "description": "Response wrapper for idol group list (standardized envelope)"
+      },
+      "IdolGroupResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "Idol group ID (e.g., newjeans, ive, aespa)"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "Idol group name (e.g., NewJeans, IVE, aespa)"
+          },
+          "emoji": {
+            "type": "string",
+            "title": "Emoji",
+            "description": "Emoji representing the idol group (e.g., 👖, 🦢, 🦋)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "emoji"
+        ],
+        "title": "IdolGroupResponse",
+        "description": "Response schema for a single idol group."
+      },
       "LoginResponse": {
         "properties": {
           "data": {
@@ -2350,6 +3550,154 @@
         ],
         "title": "MessageRequestResponse",
         "description": "Response for a message request"
+      },
+      "MessageResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id",
+            "description": "Message ID"
+          },
+          "room_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Room Id",
+            "description": "Chat room ID"
+          },
+          "sender_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Sender Id",
+            "description": "Sender user ID"
+          },
+          "content": {
+            "type": "string",
+            "title": "Content",
+            "description": "Message content"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "description": "Message status",
+            "examples": [
+              "sent",
+              "delivered",
+              "read"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At",
+            "description": "Creation timestamp"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "room_id",
+          "sender_id",
+          "content",
+          "status",
+          "created_at"
+        ],
+        "title": "MessageResponse",
+        "description": "Response schema for a single message",
+        "example": {
+          "content": "Hello! I'm interested in trading cards.",
+          "created_at": "2024-01-01T00:00:00Z",
+          "id": "123e4567-e89b-12d3-a456-426614174000",
+          "room_id": "987e6543-e21b-12d3-a456-426614174000",
+          "sender_id": "456e7890-e12b-34d5-a678-901234567000",
+          "status": "sent"
+        }
+      },
+      "MessageResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/MessageResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "MessageResponseWrapper",
+        "description": "Response wrapper for single message (standardized envelope)"
+      },
+      "MessagesListResponse": {
+        "properties": {
+          "messages": {
+            "items": {
+              "$ref": "#/components/schemas/MessageResponse"
+            },
+            "type": "array",
+            "title": "Messages",
+            "description": "List of messages"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total",
+            "description": "Total number of messages"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More",
+            "description": "Whether there are more messages to fetch"
+          }
+        },
+        "type": "object",
+        "required": [
+          "messages",
+          "total",
+          "has_more"
+        ],
+        "title": "MessagesListResponse",
+        "description": "Response schema for list of messages",
+        "example": {
+          "has_more": false,
+          "messages": [
+            {
+              "content": "Hello!",
+              "created_at": "2024-01-01T00:00:00Z",
+              "id": "123e4567-e89b-12d3-a456-426614174000",
+              "room_id": "987e6543-e21b-12d3-a456-426614174000",
+              "sender_id": "456e7890-e12b-34d5-a678-901234567000",
+              "status": "read"
+            }
+          ],
+          "total": 1
+        }
+      },
+      "MessagesListResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/MessagesListResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "MessagesListResponseWrapper",
+        "description": "Response wrapper for message list (standardized envelope)"
       },
       "PostCategory": {
         "type": "string",
@@ -2758,6 +4106,101 @@
         "title": "ProfileResponseWrapper",
         "description": "Response wrapper for profile data (standardized envelope)"
       },
+      "QuotaStatusResponse": {
+        "properties": {
+          "uploads_today": {
+            "type": "integer",
+            "title": "Uploads Today",
+            "description": "Number of uploads today"
+          },
+          "daily_limit": {
+            "type": "integer",
+            "title": "Daily Limit",
+            "description": "Daily upload limit"
+          },
+          "remaining_uploads": {
+            "type": "integer",
+            "title": "Remaining Uploads",
+            "description": "Remaining uploads for today"
+          },
+          "storage_used_bytes": {
+            "type": "integer",
+            "title": "Storage Used Bytes",
+            "description": "Total storage used in bytes"
+          },
+          "storage_limit_bytes": {
+            "type": "integer",
+            "title": "Storage Limit Bytes",
+            "description": "Storage limit in bytes"
+          },
+          "remaining_storage_bytes": {
+            "type": "integer",
+            "title": "Remaining Storage Bytes",
+            "description": "Remaining storage in bytes"
+          },
+          "storage_used_mb": {
+            "type": "number",
+            "title": "Storage Used Mb",
+            "description": "Storage used in MB"
+          },
+          "storage_limit_mb": {
+            "type": "number",
+            "title": "Storage Limit Mb",
+            "description": "Storage limit in MB"
+          },
+          "remaining_storage_mb": {
+            "type": "number",
+            "title": "Remaining Storage Mb",
+            "description": "Remaining storage in MB"
+          }
+        },
+        "type": "object",
+        "required": [
+          "uploads_today",
+          "daily_limit",
+          "remaining_uploads",
+          "storage_used_bytes",
+          "storage_limit_bytes",
+          "remaining_storage_bytes",
+          "storage_used_mb",
+          "storage_limit_mb",
+          "remaining_storage_mb"
+        ],
+        "title": "QuotaStatusResponse",
+        "description": "Response schema for quota status",
+        "example": {
+          "daily_limit": 2,
+          "remaining_storage_bytes": 1068498944,
+          "remaining_storage_mb": 1019.0,
+          "remaining_uploads": 1,
+          "storage_limit_bytes": 1073741824,
+          "storage_limit_mb": 1024.0,
+          "storage_used_bytes": 5242880,
+          "storage_used_mb": 5.0,
+          "uploads_today": 1
+        }
+      },
+      "QuotaStatusResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/QuotaStatusResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "QuotaStatusResponseWrapper",
+        "description": "Response wrapper for quota status (standardized envelope)"
+      },
       "RefreshSuccessResponse": {
         "properties": {
           "success": {
@@ -3030,6 +4473,79 @@
         ],
         "title": "SendMessageRequest",
         "description": "Request to send a message in a thread"
+      },
+      "SubscriptionStatusData": {
+        "properties": {
+          "plan": {
+            "type": "string",
+            "title": "Plan",
+            "description": "Subscription plan: 'free' or 'premium'"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "description": "Subscription status: 'active', 'inactive', 'expired', 'pending'"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At",
+            "description": "Expiry datetime (ISO format)"
+          },
+          "entitlement_active": {
+            "type": "boolean",
+            "title": "Entitlement Active",
+            "description": "Whether user has active premium entitlement"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source",
+            "description": "Subscription source: 'google_play'"
+          }
+        },
+        "type": "object",
+        "required": [
+          "plan",
+          "status",
+          "entitlement_active",
+          "source"
+        ],
+        "title": "SubscriptionStatusData",
+        "description": "Data schema for subscription status",
+        "example": {
+          "entitlement_active": true,
+          "expires_at": "2025-12-31T23:59:59",
+          "plan": "premium",
+          "source": "google_play",
+          "status": "active"
+        }
+      },
+      "SubscriptionStatusResponse": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/SubscriptionStatusData"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "SubscriptionStatusResponse",
+        "description": "Response wrapper for subscription status (standardized envelope)"
       },
       "ThreadListResponse": {
         "properties": {
@@ -3400,6 +4916,198 @@
           }
         }
       },
+      "UploadCardRequest": {
+        "properties": {
+          "content_type": {
+            "type": "string",
+            "title": "Content Type",
+            "description": "MIME type of the file (image/jpeg or image/png)",
+            "examples": [
+              "image/jpeg",
+              "image/png"
+            ]
+          },
+          "file_size_bytes": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "File Size Bytes",
+            "description": "Size of file in bytes",
+            "examples": [
+              1234567
+            ]
+          },
+          "idol": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Idol",
+            "description": "Idol name"
+          },
+          "idol_group": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Idol Group",
+            "description": "Idol group"
+          },
+          "album": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Album",
+            "description": "Album name"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version",
+            "description": "Version"
+          },
+          "rarity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rarity",
+            "description": "Card rarity",
+            "examples": [
+              "common",
+              "rare",
+              "epic",
+              "legendary"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "content_type",
+          "file_size_bytes"
+        ],
+        "title": "UploadCardRequest",
+        "description": "Request schema for getting upload signed URL",
+        "example": {
+          "album": "Love Poem",
+          "content_type": "image/jpeg",
+          "file_size_bytes": 1234567,
+          "idol": "IU",
+          "idol_group": "Solo",
+          "rarity": "rare",
+          "version": "Version A"
+        }
+      },
+      "UploadUrlResponse": {
+        "properties": {
+          "upload_url": {
+            "type": "string",
+            "title": "Upload Url",
+            "description": "Signed URL for uploading"
+          },
+          "method": {
+            "type": "string",
+            "title": "Method",
+            "description": "HTTP method to use",
+            "examples": [
+              "PUT"
+            ]
+          },
+          "required_headers": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Required Headers",
+            "description": "Required headers for upload"
+          },
+          "image_url": {
+            "type": "string",
+            "title": "Image Url",
+            "description": "Public URL of the image after upload"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Expires At",
+            "description": "When the signed URL expires"
+          },
+          "card_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Card Id",
+            "description": "ID of the created card"
+          }
+        },
+        "type": "object",
+        "required": [
+          "upload_url",
+          "method",
+          "required_headers",
+          "image_url",
+          "expires_at",
+          "card_id"
+        ],
+        "title": "UploadUrlResponse",
+        "description": "Response schema for upload signed URL",
+        "example": {
+          "card_id": "123e4567-e89b-12d3-a456-426614174000",
+          "expires_at": "2025-01-01T00:15:00Z",
+          "image_url": "https://storage.googleapis.com/bucket/cards/user_id/card_id.jpg",
+          "method": "PUT",
+          "required_headers": {
+            "Content-Type": "image/jpeg"
+          },
+          "upload_url": "https://storage.googleapis.com/bucket/path?signature=..."
+        }
+      },
+      "UploadUrlResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/UploadUrlResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "UploadUrlResponseWrapper",
+        "description": "Response wrapper for upload URL (standardized envelope)"
+      },
       "ValidationError": {
         "properties": {
           "loc": {
@@ -3432,6 +5140,61 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "VerifyReceiptRequest": {
+        "properties": {
+          "platform": {
+            "type": "string",
+            "title": "Platform",
+            "description": "Platform: 'android' or 'ios'"
+          },
+          "purchase_token": {
+            "type": "string",
+            "title": "Purchase Token",
+            "description": "Purchase token from Google Play"
+          },
+          "product_id": {
+            "type": "string",
+            "title": "Product Id",
+            "description": "Product/SKU ID"
+          }
+        },
+        "type": "object",
+        "required": [
+          "platform",
+          "purchase_token",
+          "product_id"
+        ],
+        "title": "VerifyReceiptRequest",
+        "description": "Request schema for verifying purchase receipt",
+        "example": {
+          "platform": "android",
+          "product_id": "premium_monthly",
+          "purchase_token": "abc123xyz..."
+        }
+      },
+      "app__modules__social__presentation__schemas__chat_schemas__SendMessageRequest": {
+        "properties": {
+          "content": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Content",
+            "description": "Message content",
+            "examples": [
+              "Hello! I'm interested in trading cards."
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "content"
+        ],
+        "title": "SendMessageRequest",
+        "description": "Request schema for sending a message",
+        "example": {
+          "content": "Hello! I'm interested in trading cards."
+        }
       }
     },
     "securitySchemes": {
