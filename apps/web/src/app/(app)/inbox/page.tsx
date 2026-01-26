@@ -1,45 +1,49 @@
-/**
- * Inbox Page - Shows message requests and threads
- * 
- * Implements FR-016: Inbox clearly separates Requests vs Threads
- */
-"use client";
+'use client'
 
-import { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { MessageRequestsList } from "@/features/inbox/components/MessageRequestsList";
-import { ThreadsList } from "@/features/inbox/components/ThreadsList";
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { MessageRequestsList } from '@/features/inbox/components/MessageRequestsList'
+import { ThreadsList } from '@/features/inbox/components/ThreadsList'
 
 export default function InboxPage() {
-  const [activeTab, setActiveTab] = useState<string>("threads");
+  const [activeTab, setActiveTab] = useState<'requests' | 'threads'>('requests')
 
   return (
-    <div className="container max-w-4xl py-8">
-      <Card>
-        <CardHeader>
-          <CardTitle>Inbox</CardTitle>
-          <CardDescription>
-            Manage your message requests and conversations
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="threads">Threads</TabsTrigger>
-              <TabsTrigger value="requests">Requests</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="threads" className="mt-6">
-              <ThreadsList />
-            </TabsContent>
-            
-            <TabsContent value="requests" className="mt-6">
-              <MessageRequestsList />
-            </TabsContent>
-          </Tabs>
-        </CardContent>
+    <div className="max-w-2xl mx-auto space-y-4">
+      {/* Tab Switcher */}
+      <Card className="p-3 rounded-2xl border border-border/30 bg-card">
+        <div className="flex gap-2">
+          <Button
+            variant={activeTab === 'requests' ? 'default' : 'outline'}
+            onClick={() => setActiveTab('requests')}
+            className={`flex-1 h-10 rounded-xl font-black text-[11px] ${
+              activeTab === 'requests'
+                ? 'bg-slate-900 text-white hover:bg-slate-800'
+                : 'bg-card border border-border text-muted-foreground hover:bg-muted'
+            }`}
+          >
+            請求
+          </Button>
+          <Button
+            variant={activeTab === 'threads' ? 'default' : 'outline'}
+            onClick={() => setActiveTab('threads')}
+            className={`flex-1 h-10 rounded-xl font-black text-[11px] ${
+              activeTab === 'threads'
+                ? 'bg-slate-900 text-white hover:bg-slate-800'
+                : 'bg-card border border-border text-muted-foreground hover:bg-muted'
+            }`}
+          >
+            聊天
+          </Button>
+        </div>
       </Card>
+
+      {/* Tab Content */}
+      <div>
+        {activeTab === 'requests' && <MessageRequestsList />}
+        {activeTab === 'threads' && <ThreadsList />}
+      </div>
     </div>
-  );
+  )
 }
