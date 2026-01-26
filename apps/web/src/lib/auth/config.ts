@@ -28,60 +28,14 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     /**
      * JWT callback - Called when creating/updating JWT
-     * We send Google ID token to backend and get our JWT tokens
+     * 
+     * NOTE: This callback is no longer used for backend authentication.
+     * Frontend now directly calls backend /api/v1/auth/google-login
+     * to receive httpOnly cookies. This callback is kept for backward
+     * compatibility but does nothing.
      */
     async jwt({ token, account }) {
-      // Initial sign in
-      if (account?.id_token) {
-        try {
-          // Send Google ID token to our backend
-          const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
-
-          // Log token info for debugging (first/last 20 chars only for security)
-          console.log('[NextAuth] Sending Google ID token to backend')
-          console.log(
-            '[NextAuth] Token preview:',
-            account.id_token.substring(0, 20) +
-              '...' +
-              account.id_token.substring(account.id_token.length - 20)
-          )
-          console.log('[NextAuth] Backend URL:', backendUrl)
-
-          const response = await fetch(`${backendUrl}/api/v1/auth/google-login`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            credentials: 'include', // Important for cookies
-            body: JSON.stringify({
-              google_token: account.id_token,
-            }),
-          })
-
-          if (!response.ok) {
-            const errorText = await response.text()
-            console.error('[NextAuth] Backend login failed:', response.status)
-            console.error('[NextAuth] Backend error response:', errorText)
-            throw new Error('Backend authentication failed')
-          }
-
-          const data = await response.json()
-
-          // Store backend user info in token
-          if (data.data) {
-            token.userId = data.data.user_id
-            token.email = data.data.email
-            token.accessToken = data.data.access_token
-            token.refreshToken = data.data.refresh_token
-            console.log('[NextAuth] Backend authentication successful for user:', data.data.email)
-          }
-        } catch (error) {
-          console.error('[NextAuth] Error during backend authentication:', error)
-          // Return token anyway to prevent breaking auth flow
-          // User will be redirected to login if backend auth actually failed
-        }
-      }
-
+      // No longer sending to backend - frontend handles this directly
       return token
     },
 

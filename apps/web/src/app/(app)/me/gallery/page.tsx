@@ -1,6 +1,6 @@
 'use client'
 
-import { signOut } from 'next-auth/react'
+import { logout } from '@/lib/google-oauth'
 import { useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
@@ -136,7 +136,7 @@ export default function MyGalleryPage() {
             <p className="text-[11px] text-muted-foreground">登出後需重新登入才能使用</p>
           </div>
           <Button
-            onClick={() => signOut({ callbackUrl: '/login' })}
+            onClick={() => logout()}
             variant="outline"
             className="w-full h-12 rounded-2xl border-border bg-card font-black hover:bg-muted hover:text-destructive"
           >

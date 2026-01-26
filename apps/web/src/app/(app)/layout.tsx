@@ -2,8 +2,27 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useSession } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
+import { useState, useEffect } from 'react'
+
+// Get user email from backend API
+async function fetchUserEmail(): Promise<string> {
+  try {
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+    const response = await fetch(`${backendUrl}/api/v1/users/me`, {
+      credentials: 'include',
+    })
+    
+    if (response.ok) {
+      const data = await response.json()
+      return data.data?.email || ''
+    }
+  } catch (error) {
+    console.error('Failed to fetch user:', error)
+  }
+  
+  return ''
+}
 
 // Constants for page titles
 const PAGE_TITLES = {
@@ -24,8 +43,13 @@ function getPageTitle(pathname: string): string {
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  const { data: session } = useSession()
+  const [userEmail, setUserEmail] = useState<string>('')
   const pageTitle = getPageTitle(pathname)
+
+  // Fetch user email on mount
+  useEffect(() => {
+    fetchUserEmail().then(setUserEmail)
+  }, [])
 
   return (
     <div className="min-h-screen bg-background flex flex-col relative">
@@ -54,11 +78,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               type="button"
               className="w-9 h-9 bg-primary-500 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-white text-xs font-black transition-transform active:scale-95 hover:scale-105"
               aria-label="前往我的檔案"
-              title={session?.user?.email || '使用者'}
+              title={userEmail || '使用者'}
             >
-              {session?.user?.name?.[0]?.toUpperCase() ||
-                session?.user?.email?.[0]?.toUpperCase() ||
-                'U'}
+              {userEmail?.[0]?.toUpperCase() || 'U'}
             </button>
           </Link>
         </div>

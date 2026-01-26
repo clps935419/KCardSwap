@@ -1,16 +1,22 @@
 'use client'
 
-import { signIn } from 'next-auth/react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { initGoogleOAuth, loginWithGoogle } from '@/lib/google-oauth'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [googleError, setGoogleError] = useState('')
 
   // Check if running in development mode
   const isDev = process.env.NODE_ENV === 'development'
+
+  // Initialize Google OAuth on mount
+  useEffect(() => {
+    initGoogleOAuth()
+  }, [])
 
   const handleAdminLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -37,6 +43,22 @@ export default function LoginPage() {
     } catch (err: unknown) {
       const error = err as { response?: { data?: { error?: { message?: string } } } }
       setError(error.response?.data?.error?.message || '登入失敗，請檢查帳號密碼')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleGoogleLogin = async () => {
+    setGoogleError('')
+    setIsLoading(true)
+
+    try {
+      await loginWithGoogle()
+      // Login successful, redirect to posts feed
+      window.location.href = '/posts'
+    } catch (err: unknown) {
+      const error = err as Error
+      setGoogleError(error.message || 'Google 登入失敗，請稍後再試')
     } finally {
       setIsLoading(false)
     }
@@ -106,21 +128,25 @@ export default function LoginPage() {
         )}
 
         {/* Google Login Button */}
-        <button
-          type="button"
-          onClick={() => signIn('google', { callbackUrl: '/posts' })}
-          className="w-full h-16 bg-gradient-to-r from-secondary-50 to-rose-50 border-2 border-secondary-300 rounded-2xl flex items-center justify-center px-6 hover:from-secondary-50/80 hover:to-rose-50/80 transition-all shadow-md"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-white rounded-xl shadow flex items-center justify-center font-black">
-              G
+        <div className="space-y-2">
+          <button
+            type="button"
+            onClick={handleGoogleLogin}
+            disabled={isLoading}
+            className="w-full h-16 bg-gradient-to-r from-secondary-50 to-rose-50 border-2 border-secondary-300 rounded-2xl flex items-center justify-center px-6 hover:from-secondary-50/80 hover:to-rose-50/80 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-white rounded-xl shadow flex items-center justify-center font-black">
+                G
+              </div>
+              <div className="text-left">
+                <p className="text-sm font-black text-foreground">使用 Google 登入</p>
+                <p className="text-[10px] text-muted-foreground">登入後才能瀏覽貼文、相簿與信箱</p>
+              </div>
             </div>
-            <div className="text-left">
-              <p className="text-sm font-black text-foreground">使用 Google 登入</p>
-              <p className="text-[10px] text-muted-foreground">登入後才能瀏覽貼文、相簿與信箱</p>
-            </div>
-          </div>
-        </button>
+          </button>
+          {googleError && <p className="text-xs text-red-600 font-medium">{googleError}</p>}
+        </div>
 
         {/* POC Info */}
         <div className="bg-slate-900 text-slate-200 rounded-2xl p-4">

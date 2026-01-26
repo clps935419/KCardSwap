@@ -1,11 +1,12 @@
 import { redirect } from 'next/navigation'
-import { getSession } from '@/lib/auth/utils'
+import { cookies } from 'next/headers'
 
 export default async function HomePage() {
-  const session = await getSession()
+  const cookieStore = await cookies()
+  const accessToken = cookieStore.get('access_token')
 
   // Redirect based on authentication status
-  if (session) {
+  if (accessToken) {
     // User is logged in, redirect to posts feed
     redirect('/posts')
   } else {
