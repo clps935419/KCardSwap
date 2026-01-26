@@ -18,7 +18,7 @@ export function proxy(request: NextRequest) {
     request.cookies.get('__Secure-next-auth.session-token')
 
   // Public routes that don't require authentication
-  const isPublicRoute = pathname.startsWith('/login')
+  const isPublicRoute = pathname.startsWith('/login') || pathname.startsWith('/auth-test')
 
   // Allow access to public routes
   if (isPublicRoute) {
