@@ -5,12 +5,20 @@ import { usePathname } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
 
+// Constants for page titles
+const PAGE_TITLES = {
+  POSTS: '貼文',
+  INBOX: '信箱',
+  PROFILE: '我的檔案',
+  DEFAULT: '貼文',
+} as const
+
 // Get page title based on current pathname
 function getPageTitle(pathname: string): string {
-  if (pathname.startsWith('/posts')) return '貼文'
-  if (pathname.startsWith('/inbox')) return '信箱'
-  if (pathname.startsWith('/me')) return '我的檔案'
-  return '貼文'
+  if (pathname.startsWith('/posts')) return PAGE_TITLES.POSTS
+  if (pathname.startsWith('/inbox')) return PAGE_TITLES.INBOX
+  if (pathname.startsWith('/me')) return PAGE_TITLES.PROFILE
+  return PAGE_TITLES.DEFAULT
 }
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
