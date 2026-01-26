@@ -143,7 +143,7 @@ export function PostsList() {
                 </div>
                 <div>
                   <p className="text-sm font-black text-foreground">
-                    {post.owner_name || `User ${post.owner_id.slice(0, 8)}`}
+                    User {post.owner_id.slice(0, 8)}
                   </p>
                   <p className="text-[10px] text-muted-foreground font-bold uppercase">
                     {formatTimeAgo(post.created_at)} • {post.id.slice(0, 8)}
@@ -175,7 +175,7 @@ export function PostsList() {
                 {post.title}
               </p>
               <div className="mt-2 flex items-center justify-between text-[11px] text-muted-foreground">
-                <span>{post.media_count ? `📷 ${post.media_count} 張` : '無附圖'}</span>
+                <span>無附圖</span>
                 <span className="font-black text-primary-500">查看貼文 ›</span>
               </div>
             </button>

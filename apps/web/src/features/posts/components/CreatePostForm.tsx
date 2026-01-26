@@ -4,7 +4,7 @@ import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { createPostApiV1PostsPostMutation, listPostsApiV1PostsGetQueryKey } from '@/shared/api/generated/@tanstack/react-query.gen'
+import { PostsService } from '@/shared/api/generated/services.gen'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -69,9 +69,9 @@ export function CreatePostForm() {
   })
 
   const createPostMutation = useMutation({
-    ...createPostApiV1PostsPostMutation(),
+    mutationFn: (data: any) => PostsService.createPostApiV1PostsPost(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: listPostsApiV1PostsGetQueryKey() })
+      queryClient.invalidateQueries({ queryKey: ['posts'] })
       router.push('/posts')
     },
     onError: (error: any) => {
@@ -139,7 +139,7 @@ export function CreatePostForm() {
 
       // Step 2: Create post
       const postResponse = await createPostMutation.mutateAsync({
-        body: {
+        requestBody: {
           title: data.title,
           content: data.content,
           scope: data.scope,
