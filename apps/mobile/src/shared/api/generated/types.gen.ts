@@ -5,46 +5,13 @@ export type ClientOptions = {
 };
 
 /**
- * AcceptInterestResponse
+ * AcceptRequestResponse
  *
- * Response schema for accepting an interest
+ * Response for accepting a request
  */
-export type AcceptInterestResponse = {
-  /**
-   * Interest Id
-   *
-   * Interest ID
-   */
-  interest_id: string;
-  /**
-   * Friendship Created
-   *
-   * Whether a new friendship was created
-   */
-  friendship_created: boolean;
-  /**
-   * Chat Room Id
-   *
-   * Chat room ID for conversation
-   */
-  chat_room_id: string;
-};
-
-/**
- * AcceptInterestResponseWrapper
- *
- * Response wrapper for accept interest response (standardized envelope)
- */
-export type AcceptInterestResponseWrapper = {
-  data: AcceptInterestResponse;
-  /**
-   * Meta
-   */
-  meta?: null;
-  /**
-   * Error
-   */
-  error?: null;
+export type AcceptRequestResponse = {
+  message_request: MessageRequestResponse;
+  thread: ThreadResponse;
 };
 
 /**
@@ -68,46 +35,61 @@ export type AdminLoginRequest = {
 };
 
 /**
- * AverageRatingResponse
+ * AttachMediaResponseSchema
  *
- * Response schema for average rating
+ * Response schema after attaching media.
  */
-export type AverageRatingResponse = {
+export type AttachMediaResponseSchema = {
   /**
-   * User Id
-   *
-   * User ID
+   * Media Id
    */
-  user_id: string;
+  media_id: string;
   /**
-   * Average Score
+   * Status
    *
-   * Average rating score
+   * Media status after attachment
    */
-  average_score: number;
+  status: string;
   /**
-   * Total Ratings
+   * Attached To
    *
-   * Total number of ratings received
+   * Type of entity attached to
    */
-  total_ratings: number;
+  attached_to: string;
+  /**
+   * Target Id
+   *
+   * ID of the entity media was attached to
+   */
+  target_id: string;
 };
 
 /**
- * AverageRatingResponseWrapper
+ * AttachMediaToGalleryCardRequestSchema
  *
- * Response wrapper for average rating (standardized envelope)
+ * Request schema for attaching media to gallery card.
  */
-export type AverageRatingResponseWrapper = {
-  data: AverageRatingResponse;
+export type AttachMediaToGalleryCardRequestSchema = {
   /**
-   * Meta
+   * Media Id
+   *
+   * ID of confirmed media to attach
    */
-  meta?: null;
+  media_id: string;
+};
+
+/**
+ * AttachMediaToPostRequestSchema
+ *
+ * Request schema for attaching media to post.
+ */
+export type AttachMediaToPostRequestSchema = {
   /**
-   * Error
+   * Media Id
+   *
+   * ID of confirmed media to attach
    */
-  error?: null;
+  media_id: string;
 };
 
 /**
@@ -418,15 +400,95 @@ export type CityResponse = {
 };
 
 /**
+ * ConfirmUploadResponseSchema
+ *
+ * Response schema after confirming upload.
+ */
+export type ConfirmUploadResponseSchema = {
+  /**
+   * Media Id
+   */
+  media_id: string;
+  /**
+   * Status
+   *
+   * Media status after confirmation
+   */
+  status: string;
+  /**
+   * File Size Bytes
+   */
+  file_size_bytes: number;
+};
+
+/**
+ * CreateGalleryCardRequest
+ *
+ * Request to create a gallery card.
+ */
+export type CreateGalleryCardRequest = {
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Idol Name
+   */
+  idol_name: string;
+  /**
+   * Era
+   */
+  era?: string | null;
+  /**
+   * Description
+   */
+  description?: string | null;
+};
+
+/**
+ * CreateMessageRequestRequest
+ *
+ * Request to create a message request
+ */
+export type CreateMessageRequestRequest = {
+  /**
+   * Recipient Id
+   *
+   * ID of the recipient user
+   */
+  recipient_id: string;
+  /**
+   * Initial Message
+   *
+   * Initial message content
+   */
+  initial_message: string;
+  /**
+   * Post Id
+   *
+   * Optional post ID being referenced
+   */
+  post_id?: string | null;
+};
+
+/**
  * CreatePostRequest
  *
- * Request schema for creating a post
+ * Request schema for creating a post (V2: with scope/category)
  */
 export type CreatePostRequest = {
   /**
-   * City code - must be one of: TPE (Taipei), NTP (New Taipei), TAO (Taoyuan), TXG (Taichung), TNN (Tainan), KHH (Kaohsiung), HSZ (Hsinchu City), CYI (Chiayi City), and other Taiwan cities
+   * Post scope: global (visible everywhere) or city (city-specific)
    */
-  city_code: CityCode;
+  scope: PostScope;
+  /**
+   * City code - required when scope=city, must be empty when scope=global
+   */
+  city_code?: CityCode | null;
+  /**
+   * Post category
+   */
+  category: PostCategory;
   /**
    * Title
    *
@@ -460,29 +522,55 @@ export type CreatePostRequest = {
 };
 
 /**
- * CreateTradeRequest
+ * CreateUploadUrlRequestSchema
  *
- * Request schema for creating a trade proposal
+ * Request schema for creating upload URL.
  */
-export type CreateTradeRequest = {
+export type CreateUploadUrlRequestSchema = {
   /**
-   * Responder Id
+   * Content Type
    *
-   * User ID of the responder
+   * Content type of the file (e.g., image/jpeg)
    */
-  responder_id: string;
+  content_type: string;
   /**
-   * Initiator Card Ids
+   * File Size Bytes
    *
-   * List of card IDs from initiator
+   * File size in bytes
    */
-  initiator_card_ids: string[];
+  file_size_bytes: number;
   /**
-   * Responder Card Ids
+   * Filename
    *
-   * List of card IDs from responder
+   * Original filename
    */
-  responder_card_ids: string[];
+  filename?: string | null;
+};
+
+/**
+ * CreateUploadUrlResponseSchema
+ *
+ * Response schema for upload URL.
+ */
+export type CreateUploadUrlResponseSchema = {
+  /**
+   * Media Id
+   *
+   * Media asset ID for confirmation
+   */
+  media_id: string;
+  /**
+   * Upload Url
+   *
+   * Presigned URL for uploading file
+   */
+  upload_url: string;
+  /**
+   * Expires In Minutes
+   *
+   * URL expiration time in minutes
+   */
+  expires_in_minutes: number;
 };
 
 /**
@@ -560,139 +648,67 @@ export type ExpireSubscriptionsResponse = {
 };
 
 /**
- * FriendListItemResponse
+ * GalleryCardListResponse
  *
- * Response schema for a single friend in the list
+ * Response for a list of gallery cards.
  */
-export type FriendListItemResponse = {
+export type GalleryCardListResponse = {
   /**
-   * Id
-   *
-   * Friendship ID (needed for accept/reject operations)
+   * Items
    */
-  id: string;
-  /**
-   * User Id
-   *
-   * Friend's user ID
-   */
-  user_id: string;
-  /**
-   * Nickname
-   *
-   * Friend's nickname
-   */
-  nickname?: string | null;
-  /**
-   * Avatar Url
-   *
-   * Friend's avatar URL
-   */
-  avatar_url?: string | null;
-  /**
-   * Status
-   *
-   * Friendship status
-   */
-  status: string;
-  /**
-   * Created At
-   *
-   * When friendship was created
-   */
-  created_at: string;
-};
-
-/**
- * FriendListResponse
- *
- * Response schema for friend list
- */
-export type FriendListResponse = {
-  /**
-   * Friends
-   *
-   * List of friends
-   */
-  friends: FriendListItemResponse[];
+  items: GalleryCardResponse[];
   /**
    * Total
-   *
-   * Total number of friends
    */
   total: number;
 };
 
 /**
- * FriendListResponseWrapper
+ * GalleryCardResponse
  *
- * Response wrapper for friend list (standardized envelope)
+ * Response for a single gallery card.
  */
-export type FriendListResponseWrapper = {
-  data: FriendListResponse;
-  /**
-   * Meta
-   */
-  meta?: null;
-  /**
-   * Error
-   */
-  error?: null;
-};
-
-/**
- * FriendshipResponse
- *
- * Response schema for friendship details
- */
-export type FriendshipResponse = {
+export type GalleryCardResponse = {
   /**
    * Id
-   *
-   * Friendship ID
    */
   id: string;
   /**
    * User Id
-   *
-   * User ID
    */
   user_id: string;
   /**
-   * Friend Id
-   *
-   * Friend ID
+   * Title
    */
-  friend_id: string;
+  title: string;
   /**
-   * Status
-   *
-   * Friendship status
+   * Idol Name
    */
-  status: string;
+  idol_name: string;
+  /**
+   * Era
+   */
+  era?: string | null;
+  /**
+   * Description
+   */
+  description?: string | null;
+  /**
+   * Media Asset Id
+   */
+  media_asset_id?: string | null;
+  /**
+   * Display Order
+   */
+  display_order: number;
   /**
    * Created At
-   *
-   * Creation timestamp (None for unblocked status)
    */
-  created_at?: string | null;
-};
-
-/**
- * FriendshipResponseWrapper
- *
- * Response wrapper for friendship (standardized envelope)
- */
-export type FriendshipResponseWrapper = {
-  data: FriendshipResponse;
+  created_at: string;
   /**
-   * Meta
+   * Updated At
    */
-  meta?: null;
-  /**
-   * Error
-   */
-  error?: null;
+  updated_at: string;
 };
 
 /**
@@ -820,6 +836,50 @@ export type LoginResponse = {
 };
 
 /**
+ * MessageRequestResponse
+ *
+ * Response for a message request
+ */
+export type MessageRequestResponse = {
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Sender Id
+   */
+  sender_id: string;
+  /**
+   * Recipient Id
+   */
+  recipient_id: string;
+  /**
+   * Initial Message
+   */
+  initial_message: string;
+  /**
+   * Post Id
+   */
+  post_id: string | null;
+  /**
+   * Status
+   */
+  status: string;
+  /**
+   * Thread Id
+   */
+  thread_id: string | null;
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Updated At
+   */
+  updated_at: string;
+};
+
+/**
  * MessageResponse
  *
  * Response schema for a single message
@@ -924,170 +984,25 @@ export type MessagesListResponseWrapper = {
 };
 
 /**
- * NearbyCardResponse
+ * PostCategory
  *
- * Response schema for a nearby card result
+ * Post category enumeration (FR-002)
  */
-export type NearbyCardResponse = {
-  /**
-   * Card Id
-   *
-   * Card unique identifier
-   */
-  card_id: string;
-  /**
-   * Owner Id
-   *
-   * Card owner's user ID
-   */
-  owner_id: string;
-  /**
-   * Distance Km
-   *
-   * Distance from search origin in kilometers
-   */
-  distance_km: number;
-  /**
-   * Idol
-   *
-   * Idol name
-   */
-  idol?: string | null;
-  /**
-   * Idol Group
-   *
-   * Idol group name
-   */
-  idol_group?: string | null;
-  /**
-   * Album
-   *
-   * Album name
-   */
-  album?: string | null;
-  /**
-   * Version
-   *
-   * Card version
-   */
-  version?: string | null;
-  /**
-   * Rarity
-   *
-   * Card rarity
-   */
-  rarity?: string | null;
-  /**
-   * Image Url
-   *
-   * Card image URL
-   */
-  image_url?: string | null;
-  /**
-   * Owner Nickname
-   *
-   * Owner's nickname
-   */
-  owner_nickname?: string | null;
-};
+export const PostCategory = {
+  TRADE: 'trade',
+  GIVEAWAY: 'giveaway',
+  GROUP: 'group',
+  SHOWCASE: 'showcase',
+  HELP: 'help',
+  ANNOUNCEMENT: 'announcement',
+} as const;
 
 /**
- * PostInterestListResponse
+ * PostCategory
  *
- * Response schema for post interest list
+ * Post category enumeration (FR-002)
  */
-export type PostInterestListResponse = {
-  /**
-   * Interests
-   *
-   * List of interests
-   */
-  interests: PostInterestResponse[];
-  /**
-   * Total
-   *
-   * Total number of interests
-   */
-  total: number;
-};
-
-/**
- * PostInterestListResponseWrapper
- *
- * Response wrapper for post interest list (standardized envelope)
- */
-export type PostInterestListResponseWrapper = {
-  data: PostInterestListResponse;
-  /**
-   * Meta
-   */
-  meta?: null;
-  /**
-   * Error
-   */
-  error?: null;
-};
-
-/**
- * PostInterestResponse
- *
- * Response schema for post interest details
- */
-export type PostInterestResponse = {
-  /**
-   * Id
-   *
-   * Interest ID
-   */
-  id: string;
-  /**
-   * Post Id
-   *
-   * Post ID
-   */
-  post_id: string;
-  /**
-   * User Id
-   *
-   * User ID who expressed interest
-   */
-  user_id: string;
-  /**
-   * Status
-   *
-   * Interest status
-   */
-  status: string;
-  /**
-   * Created At
-   *
-   * Creation timestamp
-   */
-  created_at: string;
-  /**
-   * Updated At
-   *
-   * Last update timestamp
-   */
-  updated_at: string;
-};
-
-/**
- * PostInterestResponseWrapper
- *
- * Response wrapper for single post interest (standardized envelope)
- */
-export type PostInterestResponseWrapper = {
-  data: PostInterestResponse;
-  /**
-   * Meta
-   */
-  meta?: null;
-  /**
-   * Error
-   */
-  error?: null;
-};
+export type PostCategory = (typeof PostCategory)[keyof typeof PostCategory];
 
 /**
  * PostListResponse
@@ -1129,7 +1044,7 @@ export type PostListResponseWrapper = {
 /**
  * PostResponse
  *
- * Response schema for post details
+ * Response schema for post details (V2: with scope/category + like fields)
  */
 export type PostResponse = {
   /**
@@ -1145,9 +1060,23 @@ export type PostResponse = {
    */
   owner_id: string;
   /**
-   * City code
+   * Scope
+   *
+   * Post scope (global/city)
    */
-  city_code: CityCode;
+  scope: string;
+  /**
+   * City Code
+   *
+   * City code (if scope=city)
+   */
+  city_code?: string | null;
+  /**
+   * Category
+   *
+   * Post category
+   */
+  category: string;
   /**
    * Title
    *
@@ -1178,6 +1107,18 @@ export type PostResponse = {
    * Post status
    */
   status: string;
+  /**
+   * Like Count
+   *
+   * Total number of likes on this post
+   */
+  like_count?: number;
+  /**
+   * Liked By Me
+   *
+   * Whether the current user has liked this post
+   */
+  liked_by_me?: boolean;
   /**
    * Expires At
    *
@@ -1214,6 +1155,20 @@ export type PostResponseWrapper = {
    */
   error?: null;
 };
+
+/**
+ * PostScope
+ *
+ * Post scope enumeration (FR-003)
+ */
+export const PostScope = { GLOBAL: 'global', CITY: 'city' } as const;
+
+/**
+ * PostScope
+ *
+ * Post scope enumeration (FR-003)
+ */
+export type PostScope = (typeof PostScope)[keyof typeof PostScope];
 
 /**
  * ProfileResponse
@@ -1384,153 +1339,51 @@ export type QuotaStatusResponseWrapper = {
 };
 
 /**
- * RatingListResponse
+ * RefreshSuccessResponse
  *
- * Response schema for list of ratings
+ * Response for successful token refresh (cookie-based)
  */
-export type RatingListResponse = {
+export type RefreshSuccessResponse = {
   /**
-   * Ratings
+   * Success
    *
-   * List of ratings
+   * Indicates successful refresh
    */
-  ratings: RatingResponse[];
+  success?: boolean;
   /**
-   * Total
+   * Message
    *
-   * Total number of ratings
+   * Success message
    */
-  total: number;
+  message?: string;
 };
 
 /**
- * RatingListResponseWrapper
+ * ReorderGalleryCardsRequest
  *
- * Response wrapper for rating list (standardized envelope)
+ * Request to reorder gallery cards.
  */
-export type RatingListResponseWrapper = {
-  data: RatingListResponse;
+export type ReorderGalleryCardsRequest = {
   /**
-   * Meta
+   * Card Ids
    */
-  meta?: null;
-  /**
-   * Error
-   */
-  error?: null;
+  card_ids: string[];
 };
 
 /**
- * RatingRequest
+ * ReorderGalleryCardsResponse
  *
- * Request schema for submitting a rating
+ * Response after reordering gallery cards.
  */
-export type RatingRequest = {
+export type ReorderGalleryCardsResponse = {
   /**
-   * Rated User Id
-   *
-   * ID of user being rated
+   * Message
    */
-  rated_user_id: string;
+  message?: string;
   /**
-   * Trade Id
-   *
-   * Associated trade ID (optional)
+   * Updated Count
    */
-  trade_id?: string | null;
-  /**
-   * Score
-   *
-   * Rating score (1-5)
-   */
-  score: number;
-  /**
-   * Comment
-   *
-   * Optional comment
-   */
-  comment?: string | null;
-};
-
-/**
- * RatingResponse
- *
- * Response schema for a rating
- */
-export type RatingResponse = {
-  /**
-   * Id
-   *
-   * Rating ID
-   */
-  id: string;
-  /**
-   * Rater Id
-   *
-   * User who gave the rating
-   */
-  rater_id: string;
-  /**
-   * Rated User Id
-   *
-   * User who received the rating
-   */
-  rated_user_id: string;
-  /**
-   * Trade Id
-   *
-   * Associated trade ID
-   */
-  trade_id?: string | null;
-  /**
-   * Score
-   *
-   * Rating score (1-5)
-   */
-  score: number;
-  /**
-   * Comment
-   *
-   * Rating comment
-   */
-  comment?: string | null;
-  /**
-   * Created At
-   *
-   * Creation timestamp
-   */
-  created_at: string;
-};
-
-/**
- * RatingResponseWrapper
- *
- * Response wrapper for single rating (standardized envelope)
- */
-export type RatingResponseWrapper = {
-  data: RatingResponse;
-  /**
-   * Meta
-   */
-  meta?: null;
-  /**
-   * Error
-   */
-  error?: null;
-};
-
-/**
- * RefreshTokenRequest
- *
- * Request schema for refreshing access token
- */
-export type RefreshTokenRequest = {
-  /**
-   * Refresh Token
-   *
-   * Refresh token
-   */
-  refresh_token: string;
+  updated_count: number;
 };
 
 /**
@@ -1681,86 +1534,9 @@ export type ReportResponseWrapper = {
 };
 
 /**
- * SearchNearbyRequest
- *
- * Request schema for nearby card search
- */
-export type SearchNearbyRequest = {
-  /**
-   * Lat
-   *
-   * Latitude (-90 to 90)
-   */
-  lat: number;
-  /**
-   * Lng
-   *
-   * Longitude (-180 to 180)
-   */
-  lng: number;
-  /**
-   * Radius Km
-   *
-   * Search radius in kilometers (max 100km)
-   */
-  radius_km?: number | null;
-};
-
-/**
- * SearchNearbyResponse
- *
- * Response schema for nearby search results
- */
-export type SearchNearbyResponse = {
-  /**
-   * Results
-   *
-   * List of nearby cards
-   */
-  results: NearbyCardResponse[];
-  /**
-   * Count
-   *
-   * Number of results returned
-   */
-  count: number;
-};
-
-/**
- * SearchNearbyResponseWrapper
- *
- * Response wrapper for nearby search (standardized envelope)
- */
-export type SearchNearbyResponseWrapper = {
-  data: SearchNearbyResponse;
-  /**
-   * Meta
-   */
-  meta?: null;
-  /**
-   * Error
-   */
-  error?: null;
-};
-
-/**
- * SendFriendRequestRequest
- *
- * Request schema for sending friend request
- */
-export type SendFriendRequestRequest = {
-  /**
-   * Target User Id
-   *
-   * ID of the target user to send friend request to
-   */
-  target_user_id: string;
-};
-
-/**
  * SendMessageRequest
  *
- * Request schema for sending a message
+ * Request to send a message in a thread
  */
 export type SendMessageRequest = {
   /**
@@ -1769,6 +1545,12 @@ export type SendMessageRequest = {
    * Message content
    */
   content: string;
+  /**
+   * Post Id
+   *
+   * Optional post ID to reference
+   */
+  post_id?: string | null;
 };
 
 /**
@@ -1816,6 +1598,139 @@ export type SubscriptionStatusData = {
  */
 export type SubscriptionStatusResponse = {
   data: SubscriptionStatusData;
+  /**
+   * Meta
+   */
+  meta?: null;
+  /**
+   * Error
+   */
+  error?: null;
+};
+
+/**
+ * ThreadListResponse
+ *
+ * Response for list of threads
+ */
+export type ThreadListResponse = {
+  /**
+   * Threads
+   */
+  threads: ThreadResponse[];
+  /**
+   * Total
+   */
+  total: number;
+};
+
+/**
+ * ThreadMessageResponse
+ *
+ * Response for a thread message
+ */
+export type ThreadMessageResponse = {
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Thread Id
+   */
+  thread_id: string;
+  /**
+   * Sender Id
+   */
+  sender_id: string;
+  /**
+   * Content
+   */
+  content: string;
+  /**
+   * Post Id
+   */
+  post_id: string | null;
+  /**
+   * Created At
+   */
+  created_at: string;
+};
+
+/**
+ * ThreadMessagesResponse
+ *
+ * Response for list of messages in a thread
+ */
+export type ThreadMessagesResponse = {
+  /**
+   * Messages
+   */
+  messages: ThreadMessageResponse[];
+  /**
+   * Total
+   */
+  total: number;
+};
+
+/**
+ * ThreadResponse
+ *
+ * Response for a message thread
+ */
+export type ThreadResponse = {
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * User A Id
+   */
+  user_a_id: string;
+  /**
+   * User B Id
+   */
+  user_b_id: string;
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Updated At
+   */
+  updated_at: string;
+  /**
+   * Last Message At
+   */
+  last_message_at: string | null;
+};
+
+/**
+ * ToggleLikeResponse
+ *
+ * Response schema for toggle like action
+ */
+export type ToggleLikeResponse = {
+  /**
+   * Liked
+   *
+   * Whether the post is now liked by the user
+   */
+  liked: boolean;
+  /**
+   * Like Count
+   *
+   * Current total like count for the post
+   */
+  like_count: number;
+};
+
+/**
+ * ToggleLikeResponseWrapper
+ *
+ * Response wrapper for toggle like response (standardized envelope)
+ */
+export type ToggleLikeResponseWrapper = {
+  data: ToggleLikeResponse;
   /**
    * Meta
    */
@@ -1877,190 +1792,6 @@ export type TokenResponse = {
 };
 
 /**
- * TradeHistoryResponse
- *
- * Response schema for trade history list
- */
-export type TradeHistoryResponse = {
-  /**
-   * Trades
-   *
-   * List of trades
-   */
-  trades: TradeResponse[];
-  /**
-   * Total
-   *
-   * Total number of trades
-   */
-  total: number;
-  /**
-   * Limit
-   *
-   * Limit used
-   */
-  limit: number;
-  /**
-   * Offset
-   *
-   * Offset used
-   */
-  offset: number;
-};
-
-/**
- * TradeHistoryResponseWrapper
- *
- * Response wrapper for trade history (standardized envelope)
- */
-export type TradeHistoryResponseWrapper = {
-  data: TradeHistoryResponse;
-  /**
-   * Meta
-   */
-  meta?: null;
-  /**
-   * Error
-   */
-  error?: null;
-};
-
-/**
- * TradeItemResponse
- *
- * Response schema for a trade item
- */
-export type TradeItemResponse = {
-  /**
-   * Id
-   *
-   * Trade item ID
-   */
-  id: string;
-  /**
-   * Trade Id
-   *
-   * Trade ID
-   */
-  trade_id: string;
-  /**
-   * Card Id
-   *
-   * Card ID
-   */
-  card_id: string;
-  /**
-   * Owner Side
-   *
-   * Which party owns this card
-   */
-  owner_side: string;
-  /**
-   * Created At
-   *
-   * Creation timestamp
-   */
-  created_at: string;
-};
-
-/**
- * TradeResponse
- *
- * Response schema for trade details
- */
-export type TradeResponse = {
-  /**
-   * Id
-   *
-   * Trade ID
-   */
-  id: string;
-  /**
-   * Initiator Id
-   *
-   * Initiator user ID
-   */
-  initiator_id: string;
-  /**
-   * Responder Id
-   *
-   * Responder user ID
-   */
-  responder_id: string;
-  /**
-   * Status
-   *
-   * Trade status
-   */
-  status: string;
-  /**
-   * Accepted At
-   *
-   * Acceptance timestamp
-   */
-  accepted_at?: string | null;
-  /**
-   * Initiator Confirmed At
-   *
-   * Initiator confirmation timestamp
-   */
-  initiator_confirmed_at?: string | null;
-  /**
-   * Responder Confirmed At
-   *
-   * Responder confirmation timestamp
-   */
-  responder_confirmed_at?: string | null;
-  /**
-   * Completed At
-   *
-   * Completion timestamp
-   */
-  completed_at?: string | null;
-  /**
-   * Canceled At
-   *
-   * Cancellation timestamp
-   */
-  canceled_at?: string | null;
-  /**
-   * Created At
-   *
-   * Creation timestamp
-   */
-  created_at: string;
-  /**
-   * Updated At
-   *
-   * Last update timestamp
-   */
-  updated_at: string;
-  /**
-   * Items
-   *
-   * Trade items (cards being exchanged)
-   */
-  items?: TradeItemResponse[] | null;
-};
-
-/**
- * TradeResponseWrapper
- *
- * Response wrapper for single trade (standardized envelope)
- */
-export type TradeResponseWrapper = {
-  data: TradeResponse;
-  /**
-   * Meta
-   */
-  meta?: null;
-  /**
-   * Error
-   */
-  error?: null;
-};
-
-/**
  * UnblockUserRequest
  *
  * Request schema for unblocking a user
@@ -2072,63 +1803,6 @@ export type UnblockUserRequest = {
    * ID of user to unblock
    */
   user_id: string;
-};
-
-/**
- * UpdateLocationRequest
- *
- * Request schema for updating user location
- */
-export type UpdateLocationRequest = {
-  /**
-   * Lat
-   *
-   * Latitude (-90 to 90)
-   */
-  lat: number;
-  /**
-   * Lng
-   *
-   * Longitude (-180 to 180)
-   */
-  lng: number;
-};
-
-/**
- * UpdateLocationResponseWrapper
- *
- * Response wrapper for location update (standardized envelope)
- */
-export type UpdateLocationResponseWrapper = {
-  data: UpdateLocationSuccess;
-  /**
-   * Meta
-   */
-  meta?: null;
-  /**
-   * Error
-   */
-  error?: null;
-};
-
-/**
- * UpdateLocationSuccess
- *
- * Success response for location update
- */
-export type UpdateLocationSuccess = {
-  /**
-   * Success
-   *
-   * Operation success
-   */
-  success?: boolean;
-  /**
-   * Message
-   *
-   * Success message
-   */
-  message: string;
 };
 
 /**
@@ -2336,6 +2010,20 @@ export type VerifyReceiptRequest = {
   product_id: string;
 };
 
+/**
+ * SendMessageRequest
+ *
+ * Request schema for sending a message
+ */
+export type AppModulesSocialPresentationSchemasChatSchemasSendMessageRequest = {
+  /**
+   * Content
+   *
+   * Message content
+   */
+  content: string;
+};
+
 export type HealthCheckHealthGetData = {
   body?: never;
   path?: never;
@@ -2481,7 +2169,7 @@ export type GoogleCallbackApiV1AuthGoogleCallbackPostResponse =
   GoogleCallbackApiV1AuthGoogleCallbackPostResponses[keyof GoogleCallbackApiV1AuthGoogleCallbackPostResponses];
 
 export type RefreshTokenApiV1AuthRefreshPostData = {
-  body: RefreshTokenRequest;
+  body?: never;
   path?: never;
   query?: never;
   url: '/api/v1/auth/refresh';
@@ -2505,7 +2193,7 @@ export type RefreshTokenApiV1AuthRefreshPostResponses = {
   /**
    * Successfully refreshed tokens
    */
-  200: LoginResponse;
+  200: RefreshSuccessResponse;
 };
 
 export type RefreshTokenApiV1AuthRefreshPostResponse =
@@ -2590,6 +2278,217 @@ export type GetIdolGroupsApiV1IdolsGroupsGetResponses = {
 
 export type GetIdolGroupsApiV1IdolsGroupsGetResponse =
   GetIdolGroupsApiV1IdolsGroupsGetResponses[keyof GetIdolGroupsApiV1IdolsGroupsGetResponses];
+
+export type VerifyReceiptApiV1SubscriptionsVerifyReceiptPostData = {
+  body: VerifyReceiptRequest;
+  path?: never;
+  query?: never;
+  url: '/api/v1/subscriptions/verify-receipt';
+};
+
+export type VerifyReceiptApiV1SubscriptionsVerifyReceiptPostErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type VerifyReceiptApiV1SubscriptionsVerifyReceiptPostError =
+  VerifyReceiptApiV1SubscriptionsVerifyReceiptPostErrors[keyof VerifyReceiptApiV1SubscriptionsVerifyReceiptPostErrors];
+
+export type VerifyReceiptApiV1SubscriptionsVerifyReceiptPostResponses = {
+  /**
+   * Successful Response
+   */
+  200: SubscriptionStatusResponse;
+};
+
+export type VerifyReceiptApiV1SubscriptionsVerifyReceiptPostResponse =
+  VerifyReceiptApiV1SubscriptionsVerifyReceiptPostResponses[keyof VerifyReceiptApiV1SubscriptionsVerifyReceiptPostResponses];
+
+export type GetSubscriptionStatusApiV1SubscriptionsStatusGetData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/v1/subscriptions/status';
+};
+
+export type GetSubscriptionStatusApiV1SubscriptionsStatusGetResponses = {
+  /**
+   * Successful Response
+   */
+  200: SubscriptionStatusResponse;
+};
+
+export type GetSubscriptionStatusApiV1SubscriptionsStatusGetResponse =
+  GetSubscriptionStatusApiV1SubscriptionsStatusGetResponses[keyof GetSubscriptionStatusApiV1SubscriptionsStatusGetResponses];
+
+export type ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/v1/subscriptions/expire-subscriptions';
+};
+
+export type ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostResponses = {
+  /**
+   * Successful Response
+   */
+  200: ExpireSubscriptionsResponse;
+};
+
+export type ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostResponse =
+  ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostResponses[keyof ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostResponses];
+
+export type BlockUserApiV1FriendsBlockPostData = {
+  body: BlockUserRequest;
+  path?: never;
+  query?: never;
+  url: '/api/v1/friends/block';
+};
+
+export type BlockUserApiV1FriendsBlockPostErrors = {
+  /**
+   * Invalid request
+   */
+  400: unknown;
+  /**
+   * Unauthorized
+   */
+  401: unknown;
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+  /**
+   * Internal server error
+   */
+  500: unknown;
+};
+
+export type BlockUserApiV1FriendsBlockPostError =
+  BlockUserApiV1FriendsBlockPostErrors[keyof BlockUserApiV1FriendsBlockPostErrors];
+
+export type BlockUserApiV1FriendsBlockPostResponses = {
+  /**
+   * Response Block User Api V1 Friends Block Post
+   *
+   * Successful Response
+   */
+  200: {
+    [key: string]: unknown;
+  };
+};
+
+export type BlockUserApiV1FriendsBlockPostResponse =
+  BlockUserApiV1FriendsBlockPostResponses[keyof BlockUserApiV1FriendsBlockPostResponses];
+
+export type UnblockUserApiV1FriendsUnblockPostData = {
+  body: UnblockUserRequest;
+  path?: never;
+  query?: never;
+  url: '/api/v1/friends/unblock';
+};
+
+export type UnblockUserApiV1FriendsUnblockPostErrors = {
+  /**
+   * Invalid request
+   */
+  400: unknown;
+  /**
+   * Unauthorized
+   */
+  401: unknown;
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+  /**
+   * Internal server error
+   */
+  500: unknown;
+};
+
+export type UnblockUserApiV1FriendsUnblockPostError =
+  UnblockUserApiV1FriendsUnblockPostErrors[keyof UnblockUserApiV1FriendsUnblockPostErrors];
+
+export type UnblockUserApiV1FriendsUnblockPostResponses = {
+  /**
+   * Response Unblock User Api V1 Friends Unblock Post
+   *
+   * Successful Response
+   */
+  200: {
+    [key: string]: unknown;
+  };
+};
+
+export type UnblockUserApiV1FriendsUnblockPostResponse =
+  UnblockUserApiV1FriendsUnblockPostResponses[keyof UnblockUserApiV1FriendsUnblockPostResponses];
+
+export type GetMyReportsApiV1ReportsGetData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/v1/reports';
+};
+
+export type GetMyReportsApiV1ReportsGetErrors = {
+  /**
+   * Unauthorized (not logged in)
+   */
+  401: unknown;
+  /**
+   * Internal server error
+   */
+  500: unknown;
+};
+
+export type GetMyReportsApiV1ReportsGetResponses = {
+  /**
+   * Reports retrieved successfully
+   */
+  200: ReportListResponseWrapper;
+};
+
+export type GetMyReportsApiV1ReportsGetResponse =
+  GetMyReportsApiV1ReportsGetResponses[keyof GetMyReportsApiV1ReportsGetResponses];
+
+export type SubmitReportApiV1ReportsPostData = {
+  body: ReportRequest;
+  path?: never;
+  query?: never;
+  url: '/api/v1/reports';
+};
+
+export type SubmitReportApiV1ReportsPostErrors = {
+  /**
+   * Bad request (validation failed)
+   */
+  400: unknown;
+  /**
+   * Unauthorized (not logged in)
+   */
+  401: unknown;
+  /**
+   * Unprocessable entity (cannot report user)
+   */
+  422: unknown;
+  /**
+   * Internal server error
+   */
+  500: unknown;
+};
+
+export type SubmitReportApiV1ReportsPostResponses = {
+  /**
+   * Report submitted successfully
+   */
+  201: ReportResponseWrapper;
+};
+
+export type SubmitReportApiV1ReportsPostResponse =
+  SubmitReportApiV1ReportsPostResponses[keyof SubmitReportApiV1ReportsPostResponses];
 
 export type GetUploadUrlApiV1CardsUploadUrlPostData = {
   body: UploadCardRequest;
@@ -2777,271 +2676,6 @@ export type ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostResponses = {
 export type ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostResponse =
   ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostResponses[keyof ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostResponses];
 
-export type SearchNearbyCardsApiV1NearbySearchPostData = {
-  body: SearchNearbyRequest;
-  path?: never;
-  query?: never;
-  url: '/api/v1/nearby/search';
-};
-
-export type SearchNearbyCardsApiV1NearbySearchPostErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-  /**
-   * Rate limit exceeded
-   */
-  429: unknown;
-};
-
-export type SearchNearbyCardsApiV1NearbySearchPostError =
-  SearchNearbyCardsApiV1NearbySearchPostErrors[keyof SearchNearbyCardsApiV1NearbySearchPostErrors];
-
-export type SearchNearbyCardsApiV1NearbySearchPostResponses = {
-  /**
-   * Search successful
-   */
-  200: SearchNearbyResponseWrapper;
-};
-
-export type SearchNearbyCardsApiV1NearbySearchPostResponse =
-  SearchNearbyCardsApiV1NearbySearchPostResponses[keyof SearchNearbyCardsApiV1NearbySearchPostResponses];
-
-export type UpdateUserLocationApiV1NearbyLocationPutData = {
-  body: UpdateLocationRequest;
-  path?: never;
-  query?: never;
-  url: '/api/v1/nearby/location';
-};
-
-export type UpdateUserLocationApiV1NearbyLocationPutErrors = {
-  /**
-   * Invalid coordinates
-   */
-  400: unknown;
-  /**
-   * User profile not found
-   */
-  404: unknown;
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type UpdateUserLocationApiV1NearbyLocationPutError =
-  UpdateUserLocationApiV1NearbyLocationPutErrors[keyof UpdateUserLocationApiV1NearbyLocationPutErrors];
-
-export type UpdateUserLocationApiV1NearbyLocationPutResponses = {
-  /**
-   * Location updated successfully
-   */
-  200: UpdateLocationResponseWrapper;
-};
-
-export type UpdateUserLocationApiV1NearbyLocationPutResponse =
-  UpdateUserLocationApiV1NearbyLocationPutResponses[keyof UpdateUserLocationApiV1NearbyLocationPutResponses];
-
-export type SendFriendRequestApiV1FriendsRequestPostData = {
-  body: SendFriendRequestRequest;
-  path?: never;
-  query?: never;
-  url: '/api/v1/friends/request';
-};
-
-export type SendFriendRequestApiV1FriendsRequestPostErrors = {
-  /**
-   * Bad request (validation failed)
-   */
-  400: unknown;
-  /**
-   * Unauthorized (not logged in)
-   */
-  401: unknown;
-  /**
-   * Unprocessable entity (cannot send request - already friends, pending, or blocked)
-   */
-  422: unknown;
-  /**
-   * Internal server error
-   */
-  500: unknown;
-};
-
-export type SendFriendRequestApiV1FriendsRequestPostResponses = {
-  /**
-   * Friend request sent successfully
-   */
-  201: FriendshipResponseWrapper;
-};
-
-export type SendFriendRequestApiV1FriendsRequestPostResponse =
-  SendFriendRequestApiV1FriendsRequestPostResponses[keyof SendFriendRequestApiV1FriendsRequestPostResponses];
-
-export type AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostData = {
-  body?: never;
-  path: {
-    /**
-     * Friendship Id
-     */
-    friendship_id: string;
-  };
-  query?: never;
-  url: '/api/v1/friends/{friendship_id}/accept';
-};
-
-export type AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostErrors = {
-  /**
-   * Unauthorized (not logged in)
-   */
-  401: unknown;
-  /**
-   * Forbidden (not authorized to accept this request)
-   */
-  403: unknown;
-  /**
-   * Friend request not found
-   */
-  404: unknown;
-  /**
-   * Unprocessable entity (request cannot be accepted)
-   */
-  422: unknown;
-  /**
-   * Internal server error
-   */
-  500: unknown;
-};
-
-export type AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostResponses = {
-  /**
-   * Friend request accepted successfully
-   */
-  200: FriendshipResponseWrapper;
-};
-
-export type AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostResponse =
-  AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostResponses[keyof AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostResponses];
-
-export type BlockUserApiV1FriendsBlockPostData = {
-  body: BlockUserRequest;
-  path?: never;
-  query?: never;
-  url: '/api/v1/friends/block';
-};
-
-export type BlockUserApiV1FriendsBlockPostErrors = {
-  /**
-   * Bad request (validation failed)
-   */
-  400: unknown;
-  /**
-   * Unauthorized (not logged in)
-   */
-  401: unknown;
-  /**
-   * Unprocessable entity (cannot block user)
-   */
-  422: unknown;
-  /**
-   * Internal server error
-   */
-  500: unknown;
-};
-
-export type BlockUserApiV1FriendsBlockPostResponses = {
-  /**
-   * User blocked successfully
-   */
-  200: FriendshipResponseWrapper;
-};
-
-export type BlockUserApiV1FriendsBlockPostResponse =
-  BlockUserApiV1FriendsBlockPostResponses[keyof BlockUserApiV1FriendsBlockPostResponses];
-
-export type UnblockUserApiV1FriendsUnblockPostData = {
-  body: UnblockUserRequest;
-  path?: never;
-  query?: never;
-  url: '/api/v1/friends/unblock';
-};
-
-export type UnblockUserApiV1FriendsUnblockPostErrors = {
-  /**
-   * Bad request (validation failed)
-   */
-  400: unknown;
-  /**
-   * Unauthorized (not logged in)
-   */
-  401: unknown;
-  /**
-   * No blocked relationship found
-   */
-  404: unknown;
-  /**
-   * Unprocessable entity (cannot unblock user)
-   */
-  422: unknown;
-  /**
-   * Internal server error
-   */
-  500: unknown;
-};
-
-export type UnblockUserApiV1FriendsUnblockPostResponses = {
-  /**
-   * User unblocked successfully
-   */
-  200: FriendshipResponseWrapper;
-};
-
-export type UnblockUserApiV1FriendsUnblockPostResponse =
-  UnblockUserApiV1FriendsUnblockPostResponses[keyof UnblockUserApiV1FriendsUnblockPostResponses];
-
-export type GetFriendsApiV1FriendsGetData = {
-  body?: never;
-  path?: never;
-  query?: {
-    /**
-     * Status
-     *
-     * Filter by friendship status (accepted, pending, blocked). If not provided, returns all friendships.
-     */
-    status?: string | null;
-  };
-  url: '/api/v1/friends';
-};
-
-export type GetFriendsApiV1FriendsGetErrors = {
-  /**
-   * Unauthorized (not logged in)
-   */
-  401: unknown;
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-  /**
-   * Internal server error
-   */
-  500: unknown;
-};
-
-export type GetFriendsApiV1FriendsGetError =
-  GetFriendsApiV1FriendsGetErrors[keyof GetFriendsApiV1FriendsGetErrors];
-
-export type GetFriendsApiV1FriendsGetResponses = {
-  /**
-   * Friend list retrieved successfully
-   */
-  200: FriendListResponseWrapper;
-};
-
-export type GetFriendsApiV1FriendsGetResponse =
-  GetFriendsApiV1FriendsGetResponses[keyof GetFriendsApiV1FriendsGetResponses];
-
 export type GetChatRoomsApiV1ChatsGetData = {
   body?: never;
   path?: never;
@@ -3132,7 +2766,7 @@ export type GetMessagesApiV1ChatsRoomIdMessagesGetResponse =
   GetMessagesApiV1ChatsRoomIdMessagesGetResponses[keyof GetMessagesApiV1ChatsRoomIdMessagesGetResponses];
 
 export type SendMessageApiV1ChatsRoomIdMessagesPostData = {
-  body: SendMessageRequest;
+  body: AppModulesSocialPresentationSchemasChatSchemasSendMessageRequest;
   path: {
     /**
      * Room Id
@@ -3232,497 +2866,22 @@ export type MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostResponses = 
 export type MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostResponse =
   MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostResponses[keyof MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostResponses];
 
-export type SubmitRatingApiV1RatingsPostData = {
-  body: RatingRequest;
-  path?: never;
-  query?: never;
-  url: '/api/v1/ratings';
-};
-
-export type SubmitRatingApiV1RatingsPostErrors = {
-  /**
-   * Bad request (validation failed)
-   */
-  400: unknown;
-  /**
-   * Unauthorized (not logged in)
-   */
-  401: unknown;
-  /**
-   * Unprocessable entity (cannot rate user)
-   */
-  422: unknown;
-  /**
-   * Internal server error
-   */
-  500: unknown;
-};
-
-export type SubmitRatingApiV1RatingsPostResponses = {
-  /**
-   * Rating submitted successfully
-   */
-  201: RatingResponseWrapper;
-};
-
-export type SubmitRatingApiV1RatingsPostResponse =
-  SubmitRatingApiV1RatingsPostResponses[keyof SubmitRatingApiV1RatingsPostResponses];
-
-export type GetUserRatingsApiV1RatingsUserUserIdGetData = {
-  body?: never;
-  path: {
-    /**
-     * User Id
-     */
-    user_id: string;
-  };
-  query?: {
-    /**
-     * Limit
-     *
-     * Maximum number of ratings
-     */
-    limit?: number;
-  };
-  url: '/api/v1/ratings/user/{user_id}';
-};
-
-export type GetUserRatingsApiV1RatingsUserUserIdGetErrors = {
-  /**
-   * Unauthorized (not logged in)
-   */
-  401: unknown;
-  /**
-   * User not found
-   */
-  404: unknown;
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-  /**
-   * Internal server error
-   */
-  500: unknown;
-};
-
-export type GetUserRatingsApiV1RatingsUserUserIdGetError =
-  GetUserRatingsApiV1RatingsUserUserIdGetErrors[keyof GetUserRatingsApiV1RatingsUserUserIdGetErrors];
-
-export type GetUserRatingsApiV1RatingsUserUserIdGetResponses = {
-  /**
-   * Ratings retrieved successfully
-   */
-  200: RatingListResponseWrapper;
-};
-
-export type GetUserRatingsApiV1RatingsUserUserIdGetResponse =
-  GetUserRatingsApiV1RatingsUserUserIdGetResponses[keyof GetUserRatingsApiV1RatingsUserUserIdGetResponses];
-
-export type GetAverageRatingApiV1RatingsUserUserIdAverageGetData = {
-  body?: never;
-  path: {
-    /**
-     * User Id
-     */
-    user_id: string;
-  };
-  query?: never;
-  url: '/api/v1/ratings/user/{user_id}/average';
-};
-
-export type GetAverageRatingApiV1RatingsUserUserIdAverageGetErrors = {
-  /**
-   * Unauthorized (not logged in)
-   */
-  401: unknown;
-  /**
-   * User not found
-   */
-  404: unknown;
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-  /**
-   * Internal server error
-   */
-  500: unknown;
-};
-
-export type GetAverageRatingApiV1RatingsUserUserIdAverageGetError =
-  GetAverageRatingApiV1RatingsUserUserIdAverageGetErrors[keyof GetAverageRatingApiV1RatingsUserUserIdAverageGetErrors];
-
-export type GetAverageRatingApiV1RatingsUserUserIdAverageGetResponses = {
-  /**
-   * Average rating retrieved successfully
-   */
-  200: AverageRatingResponseWrapper;
-};
-
-export type GetAverageRatingApiV1RatingsUserUserIdAverageGetResponse =
-  GetAverageRatingApiV1RatingsUserUserIdAverageGetResponses[keyof GetAverageRatingApiV1RatingsUserUserIdAverageGetResponses];
-
-export type GetMyReportsApiV1ReportsGetData = {
-  body?: never;
-  path?: never;
-  query?: never;
-  url: '/api/v1/reports';
-};
-
-export type GetMyReportsApiV1ReportsGetErrors = {
-  /**
-   * Unauthorized (not logged in)
-   */
-  401: unknown;
-  /**
-   * Internal server error
-   */
-  500: unknown;
-};
-
-export type GetMyReportsApiV1ReportsGetResponses = {
-  /**
-   * Reports retrieved successfully
-   */
-  200: ReportListResponseWrapper;
-};
-
-export type GetMyReportsApiV1ReportsGetResponse =
-  GetMyReportsApiV1ReportsGetResponses[keyof GetMyReportsApiV1ReportsGetResponses];
-
-export type SubmitReportApiV1ReportsPostData = {
-  body: ReportRequest;
-  path?: never;
-  query?: never;
-  url: '/api/v1/reports';
-};
-
-export type SubmitReportApiV1ReportsPostErrors = {
-  /**
-   * Bad request (validation failed)
-   */
-  400: unknown;
-  /**
-   * Unauthorized (not logged in)
-   */
-  401: unknown;
-  /**
-   * Unprocessable entity (cannot report user)
-   */
-  422: unknown;
-  /**
-   * Internal server error
-   */
-  500: unknown;
-};
-
-export type SubmitReportApiV1ReportsPostResponses = {
-  /**
-   * Report submitted successfully
-   */
-  201: ReportResponseWrapper;
-};
-
-export type SubmitReportApiV1ReportsPostResponse =
-  SubmitReportApiV1ReportsPostResponses[keyof SubmitReportApiV1ReportsPostResponses];
-
-export type CreateTradeApiV1TradesPostData = {
-  body: CreateTradeRequest;
-  path?: never;
-  query?: never;
-  url: '/api/v1/trades';
-};
-
-export type CreateTradeApiV1TradesPostErrors = {
-  /**
-   * Bad request (validation failed)
-   */
-  400: unknown;
-  /**
-   * Unauthorized (not logged in)
-   */
-  401: unknown;
-  /**
-   * Unprocessable entity (validation error)
-   */
-  422: unknown;
-  /**
-   * Internal server error
-   */
-  500: unknown;
-};
-
-export type CreateTradeApiV1TradesPostResponses = {
-  /**
-   * Trade proposal created successfully
-   */
-  201: TradeResponseWrapper;
-};
-
-export type CreateTradeApiV1TradesPostResponse =
-  CreateTradeApiV1TradesPostResponses[keyof CreateTradeApiV1TradesPostResponses];
-
-export type AcceptTradeApiV1TradesTradeIdAcceptPostData = {
-  body?: never;
-  path: {
-    /**
-     * Trade Id
-     */
-    trade_id: string;
-  };
-  query?: never;
-  url: '/api/v1/trades/{trade_id}/accept';
-};
-
-export type AcceptTradeApiV1TradesTradeIdAcceptPostErrors = {
-  /**
-   * Unauthorized (not logged in)
-   */
-  401: unknown;
-  /**
-   * Trade not found
-   */
-  404: unknown;
-  /**
-   * Unprocessable entity (cannot accept trade)
-   */
-  422: unknown;
-  /**
-   * Internal server error
-   */
-  500: unknown;
-};
-
-export type AcceptTradeApiV1TradesTradeIdAcceptPostResponses = {
-  /**
-   * Trade accepted successfully
-   */
-  200: TradeResponseWrapper;
-};
-
-export type AcceptTradeApiV1TradesTradeIdAcceptPostResponse =
-  AcceptTradeApiV1TradesTradeIdAcceptPostResponses[keyof AcceptTradeApiV1TradesTradeIdAcceptPostResponses];
-
-export type RejectTradeApiV1TradesTradeIdRejectPostData = {
-  body?: never;
-  path: {
-    /**
-     * Trade Id
-     */
-    trade_id: string;
-  };
-  query?: never;
-  url: '/api/v1/trades/{trade_id}/reject';
-};
-
-export type RejectTradeApiV1TradesTradeIdRejectPostErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type RejectTradeApiV1TradesTradeIdRejectPostError =
-  RejectTradeApiV1TradesTradeIdRejectPostErrors[keyof RejectTradeApiV1TradesTradeIdRejectPostErrors];
-
-export type RejectTradeApiV1TradesTradeIdRejectPostResponses = {
-  /**
-   * Successful Response
-   */
-  200: TradeResponseWrapper;
-};
-
-export type RejectTradeApiV1TradesTradeIdRejectPostResponse =
-  RejectTradeApiV1TradesTradeIdRejectPostResponses[keyof RejectTradeApiV1TradesTradeIdRejectPostResponses];
-
-export type CancelTradeApiV1TradesTradeIdCancelPostData = {
-  body?: never;
-  path: {
-    /**
-     * Trade Id
-     */
-    trade_id: string;
-  };
-  query?: never;
-  url: '/api/v1/trades/{trade_id}/cancel';
-};
-
-export type CancelTradeApiV1TradesTradeIdCancelPostErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type CancelTradeApiV1TradesTradeIdCancelPostError =
-  CancelTradeApiV1TradesTradeIdCancelPostErrors[keyof CancelTradeApiV1TradesTradeIdCancelPostErrors];
-
-export type CancelTradeApiV1TradesTradeIdCancelPostResponses = {
-  /**
-   * Successful Response
-   */
-  200: TradeResponseWrapper;
-};
-
-export type CancelTradeApiV1TradesTradeIdCancelPostResponse =
-  CancelTradeApiV1TradesTradeIdCancelPostResponses[keyof CancelTradeApiV1TradesTradeIdCancelPostResponses];
-
-export type CompleteTradeApiV1TradesTradeIdCompletePostData = {
-  body?: never;
-  path: {
-    /**
-     * Trade Id
-     */
-    trade_id: string;
-  };
-  query?: never;
-  url: '/api/v1/trades/{trade_id}/complete';
-};
-
-export type CompleteTradeApiV1TradesTradeIdCompletePostErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type CompleteTradeApiV1TradesTradeIdCompletePostError =
-  CompleteTradeApiV1TradesTradeIdCompletePostErrors[keyof CompleteTradeApiV1TradesTradeIdCompletePostErrors];
-
-export type CompleteTradeApiV1TradesTradeIdCompletePostResponses = {
-  /**
-   * Successful Response
-   */
-  200: TradeResponseWrapper;
-};
-
-export type CompleteTradeApiV1TradesTradeIdCompletePostResponse =
-  CompleteTradeApiV1TradesTradeIdCompletePostResponses[keyof CompleteTradeApiV1TradesTradeIdCompletePostResponses];
-
-export type GetTradeHistoryApiV1TradesHistoryGetData = {
-  body?: never;
-  path?: never;
-  query?: {
-    /**
-     * Limit
-     *
-     * Maximum number of results
-     */
-    limit?: number;
-    /**
-     * Offset
-     *
-     * Number of results to skip
-     */
-    offset?: number;
-  };
-  url: '/api/v1/trades/history';
-};
-
-export type GetTradeHistoryApiV1TradesHistoryGetErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type GetTradeHistoryApiV1TradesHistoryGetError =
-  GetTradeHistoryApiV1TradesHistoryGetErrors[keyof GetTradeHistoryApiV1TradesHistoryGetErrors];
-
-export type GetTradeHistoryApiV1TradesHistoryGetResponses = {
-  /**
-   * Successful Response
-   */
-  200: TradeHistoryResponseWrapper;
-};
-
-export type GetTradeHistoryApiV1TradesHistoryGetResponse =
-  GetTradeHistoryApiV1TradesHistoryGetResponses[keyof GetTradeHistoryApiV1TradesHistoryGetResponses];
-
-export type VerifyReceiptApiV1SubscriptionsVerifyReceiptPostData = {
-  body: VerifyReceiptRequest;
-  path?: never;
-  query?: never;
-  url: '/api/v1/subscriptions/verify-receipt';
-};
-
-export type VerifyReceiptApiV1SubscriptionsVerifyReceiptPostErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type VerifyReceiptApiV1SubscriptionsVerifyReceiptPostError =
-  VerifyReceiptApiV1SubscriptionsVerifyReceiptPostErrors[keyof VerifyReceiptApiV1SubscriptionsVerifyReceiptPostErrors];
-
-export type VerifyReceiptApiV1SubscriptionsVerifyReceiptPostResponses = {
-  /**
-   * Successful Response
-   */
-  200: SubscriptionStatusResponse;
-};
-
-export type VerifyReceiptApiV1SubscriptionsVerifyReceiptPostResponse =
-  VerifyReceiptApiV1SubscriptionsVerifyReceiptPostResponses[keyof VerifyReceiptApiV1SubscriptionsVerifyReceiptPostResponses];
-
-export type GetSubscriptionStatusApiV1SubscriptionsStatusGetData = {
-  body?: never;
-  path?: never;
-  query?: never;
-  url: '/api/v1/subscriptions/status';
-};
-
-export type GetSubscriptionStatusApiV1SubscriptionsStatusGetResponses = {
-  /**
-   * Successful Response
-   */
-  200: SubscriptionStatusResponse;
-};
-
-export type GetSubscriptionStatusApiV1SubscriptionsStatusGetResponse =
-  GetSubscriptionStatusApiV1SubscriptionsStatusGetResponses[keyof GetSubscriptionStatusApiV1SubscriptionsStatusGetResponses];
-
-export type ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostData = {
-  body?: never;
-  path?: never;
-  query?: never;
-  url: '/api/v1/subscriptions/expire-subscriptions';
-};
-
-export type ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostResponses = {
-  /**
-   * Successful Response
-   */
-  200: ExpireSubscriptionsResponse;
-};
-
-export type ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostResponse =
-  ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostResponses[keyof ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostResponses];
-
 export type ListPostsApiV1PostsGetData = {
   body?: never;
   path?: never;
-  query: {
+  query?: {
     /**
      * City Code
      *
-     * City code (required)
+     * Optional city filter (omit for global view)
      */
-    city_code: string;
+    city_code?: string | null;
     /**
-     * Idol
+     * Category
      *
-     * Filter by idol name
+     * Optional category filter
      */
-    idol?: string | null;
-    /**
-     * Idol Group
-     *
-     * Filter by idol group
-     */
-    idol_group?: string | null;
+    category?: PostCategory | null;
     /**
      * Limit
      *
@@ -3741,9 +2900,13 @@ export type ListPostsApiV1PostsGetData = {
 
 export type ListPostsApiV1PostsGetErrors = {
   /**
-   * Bad request (city_code required)
+   * Bad request
    */
   400: unknown;
+  /**
+   * Unauthorized (not logged in)
+   */
+  401: unknown;
   /**
    * Validation Error
    */
@@ -3803,145 +2966,6 @@ export type CreatePostApiV1PostsPostResponses = {
 export type CreatePostApiV1PostsPostResponse =
   CreatePostApiV1PostsPostResponses[keyof CreatePostApiV1PostsPostResponses];
 
-export type ExpressInterestApiV1PostsPostIdInterestPostData = {
-  body?: never;
-  path: {
-    /**
-     * Post Id
-     */
-    post_id: string;
-  };
-  query?: never;
-  url: '/api/v1/posts/{post_id}/interest';
-};
-
-export type ExpressInterestApiV1PostsPostIdInterestPostErrors = {
-  /**
-   * Unauthorized (not logged in)
-   */
-  401: unknown;
-  /**
-   * Post not found
-   */
-  404: unknown;
-  /**
-   * Unprocessable entity (validation failed)
-   */
-  422: unknown;
-  /**
-   * Internal server error
-   */
-  500: unknown;
-};
-
-export type ExpressInterestApiV1PostsPostIdInterestPostResponses = {
-  /**
-   * Interest expressed successfully
-   */
-  201: PostInterestResponseWrapper;
-};
-
-export type ExpressInterestApiV1PostsPostIdInterestPostResponse =
-  ExpressInterestApiV1PostsPostIdInterestPostResponses[keyof ExpressInterestApiV1PostsPostIdInterestPostResponses];
-
-export type AcceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostData = {
-  body?: never;
-  path: {
-    /**
-     * Post Id
-     */
-    post_id: string;
-    /**
-     * Interest Id
-     */
-    interest_id: string;
-  };
-  query?: never;
-  url: '/api/v1/posts/{post_id}/interests/{interest_id}/accept';
-};
-
-export type AcceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostErrors = {
-  /**
-   * Unauthorized (not logged in)
-   */
-  401: unknown;
-  /**
-   * Forbidden (not post owner)
-   */
-  403: unknown;
-  /**
-   * Post or interest not found
-   */
-  404: unknown;
-  /**
-   * Unprocessable entity (validation failed)
-   */
-  422: unknown;
-  /**
-   * Internal server error
-   */
-  500: unknown;
-};
-
-export type AcceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostResponses = {
-  /**
-   * Interest accepted successfully
-   */
-  200: AcceptInterestResponseWrapper;
-};
-
-export type AcceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostResponse =
-  AcceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostResponses[keyof AcceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostResponses];
-
-export type RejectInterestApiV1PostsPostIdInterestsInterestIdRejectPostData = {
-  body?: never;
-  path: {
-    /**
-     * Post Id
-     */
-    post_id: string;
-    /**
-     * Interest Id
-     */
-    interest_id: string;
-  };
-  query?: never;
-  url: '/api/v1/posts/{post_id}/interests/{interest_id}/reject';
-};
-
-export type RejectInterestApiV1PostsPostIdInterestsInterestIdRejectPostErrors = {
-  /**
-   * Unauthorized (not logged in)
-   */
-  401: unknown;
-  /**
-   * Forbidden (not post owner)
-   */
-  403: unknown;
-  /**
-   * Post or interest not found
-   */
-  404: unknown;
-  /**
-   * Unprocessable entity (validation failed)
-   */
-  422: unknown;
-  /**
-   * Internal server error
-   */
-  500: unknown;
-};
-
-export type RejectInterestApiV1PostsPostIdInterestsInterestIdRejectPostResponses = {
-  /**
-   * Interest rejected successfully
-   */
-  204: void;
-};
-
-export type RejectInterestApiV1PostsPostIdInterestsInterestIdRejectPostResponse =
-  RejectInterestApiV1PostsPostIdInterestsInterestIdRejectPostResponses[keyof RejectInterestApiV1PostsPostIdInterestsInterestIdRejectPostResponses];
-
 export type ClosePostApiV1PostsPostIdClosePostData = {
   body?: never;
   path: {
@@ -3987,7 +3011,7 @@ export type ClosePostApiV1PostsPostIdClosePostResponses = {
 export type ClosePostApiV1PostsPostIdClosePostResponse =
   ClosePostApiV1PostsPostIdClosePostResponses[keyof ClosePostApiV1PostsPostIdClosePostResponses];
 
-export type ListPostInterestsApiV1PostsPostIdInterestsGetData = {
+export type ToggleLikeApiV1PostsPostIdLikePostData = {
   body?: never;
   path: {
     /**
@@ -3995,38 +3019,15 @@ export type ListPostInterestsApiV1PostsPostIdInterestsGetData = {
      */
     post_id: string;
   };
-  query?: {
-    /**
-     * Status
-     *
-     * Filter by status
-     */
-    status?: string | null;
-    /**
-     * Limit
-     *
-     * Maximum results
-     */
-    limit?: number;
-    /**
-     * Offset
-     *
-     * Pagination offset
-     */
-    offset?: number;
-  };
-  url: '/api/v1/posts/{post_id}/interests';
+  query?: never;
+  url: '/api/v1/posts/{post_id}/like';
 };
 
-export type ListPostInterestsApiV1PostsPostIdInterestsGetErrors = {
+export type ToggleLikeApiV1PostsPostIdLikePostErrors = {
   /**
    * Unauthorized (not logged in)
    */
   401: unknown;
-  /**
-   * Forbidden (not post owner)
-   */
-  403: unknown;
   /**
    * Post not found
    */
@@ -4041,70 +3042,18 @@ export type ListPostInterestsApiV1PostsPostIdInterestsGetErrors = {
   500: unknown;
 };
 
-export type ListPostInterestsApiV1PostsPostIdInterestsGetError =
-  ListPostInterestsApiV1PostsPostIdInterestsGetErrors[keyof ListPostInterestsApiV1PostsPostIdInterestsGetErrors];
+export type ToggleLikeApiV1PostsPostIdLikePostError =
+  ToggleLikeApiV1PostsPostIdLikePostErrors[keyof ToggleLikeApiV1PostsPostIdLikePostErrors];
 
-export type ListPostInterestsApiV1PostsPostIdInterestsGetResponses = {
+export type ToggleLikeApiV1PostsPostIdLikePostResponses = {
   /**
-   * Interests retrieved successfully
+   * Like toggled successfully
    */
-  200: PostInterestListResponseWrapper;
+  200: ToggleLikeResponseWrapper;
 };
 
-export type ListPostInterestsApiV1PostsPostIdInterestsGetResponse =
-  ListPostInterestsApiV1PostsPostIdInterestsGetResponses[keyof ListPostInterestsApiV1PostsPostIdInterestsGetResponses];
-
-export type GetPostInterestApiV1PostsPostIdInterestsInterestIdGetData = {
-  body?: never;
-  path: {
-    /**
-     * Post Id
-     */
-    post_id: string;
-    /**
-     * Interest Id
-     */
-    interest_id: string;
-  };
-  query?: never;
-  url: '/api/v1/posts/{post_id}/interests/{interest_id}';
-};
-
-export type GetPostInterestApiV1PostsPostIdInterestsInterestIdGetErrors = {
-  /**
-   * Unauthorized (not logged in)
-   */
-  401: unknown;
-  /**
-   * Forbidden (not post owner)
-   */
-  403: unknown;
-  /**
-   * Post or interest not found
-   */
-  404: unknown;
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-  /**
-   * Internal server error
-   */
-  500: unknown;
-};
-
-export type GetPostInterestApiV1PostsPostIdInterestsInterestIdGetError =
-  GetPostInterestApiV1PostsPostIdInterestsInterestIdGetErrors[keyof GetPostInterestApiV1PostsPostIdInterestsInterestIdGetErrors];
-
-export type GetPostInterestApiV1PostsPostIdInterestsInterestIdGetResponses = {
-  /**
-   * Interest retrieved successfully
-   */
-  200: PostInterestResponseWrapper;
-};
-
-export type GetPostInterestApiV1PostsPostIdInterestsInterestIdGetResponse =
-  GetPostInterestApiV1PostsPostIdInterestsInterestIdGetResponses[keyof GetPostInterestApiV1PostsPostIdInterestsInterestIdGetResponses];
+export type ToggleLikeApiV1PostsPostIdLikePostResponse =
+  ToggleLikeApiV1PostsPostIdLikePostResponses[keyof ToggleLikeApiV1PostsPostIdLikePostResponses];
 
 export type GetCitiesApiV1LocationsCitiesGetData = {
   body?: never;
@@ -4122,3 +3071,495 @@ export type GetCitiesApiV1LocationsCitiesGetResponses = {
 
 export type GetCitiesApiV1LocationsCitiesGetResponse =
   GetCitiesApiV1LocationsCitiesGetResponses[keyof GetCitiesApiV1LocationsCitiesGetResponses];
+
+export type GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetData = {
+  body?: never;
+  path: {
+    /**
+     * User Id
+     */
+    user_id: string;
+  };
+  query?: never;
+  url: '/api/v1/users/{user_id}/gallery/cards';
+};
+
+export type GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetError =
+  GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetErrors[keyof GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetErrors];
+
+export type GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetResponses = {
+  /**
+   * Successful Response
+   */
+  200: GalleryCardListResponse;
+};
+
+export type GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetResponse =
+  GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetResponses[keyof GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetResponses];
+
+export type GetMyGalleryCardsApiV1GalleryCardsMeGetData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/v1/gallery/cards/me';
+};
+
+export type GetMyGalleryCardsApiV1GalleryCardsMeGetResponses = {
+  /**
+   * Successful Response
+   */
+  200: GalleryCardListResponse;
+};
+
+export type GetMyGalleryCardsApiV1GalleryCardsMeGetResponse =
+  GetMyGalleryCardsApiV1GalleryCardsMeGetResponses[keyof GetMyGalleryCardsApiV1GalleryCardsMeGetResponses];
+
+export type CreateGalleryCardApiV1GalleryCardsPostData = {
+  body: CreateGalleryCardRequest;
+  path?: never;
+  query?: never;
+  url: '/api/v1/gallery/cards';
+};
+
+export type CreateGalleryCardApiV1GalleryCardsPostErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type CreateGalleryCardApiV1GalleryCardsPostError =
+  CreateGalleryCardApiV1GalleryCardsPostErrors[keyof CreateGalleryCardApiV1GalleryCardsPostErrors];
+
+export type CreateGalleryCardApiV1GalleryCardsPostResponses = {
+  /**
+   * Successful Response
+   */
+  201: GalleryCardResponse;
+};
+
+export type CreateGalleryCardApiV1GalleryCardsPostResponse =
+  CreateGalleryCardApiV1GalleryCardsPostResponses[keyof CreateGalleryCardApiV1GalleryCardsPostResponses];
+
+export type DeleteGalleryCardApiV1GalleryCardsCardIdDeleteData = {
+  body?: never;
+  path: {
+    /**
+     * Card Id
+     */
+    card_id: string;
+  };
+  query?: never;
+  url: '/api/v1/gallery/cards/{card_id}';
+};
+
+export type DeleteGalleryCardApiV1GalleryCardsCardIdDeleteErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type DeleteGalleryCardApiV1GalleryCardsCardIdDeleteError =
+  DeleteGalleryCardApiV1GalleryCardsCardIdDeleteErrors[keyof DeleteGalleryCardApiV1GalleryCardsCardIdDeleteErrors];
+
+export type DeleteGalleryCardApiV1GalleryCardsCardIdDeleteResponses = {
+  /**
+   * Successful Response
+   */
+  204: void;
+};
+
+export type DeleteGalleryCardApiV1GalleryCardsCardIdDeleteResponse =
+  DeleteGalleryCardApiV1GalleryCardsCardIdDeleteResponses[keyof DeleteGalleryCardApiV1GalleryCardsCardIdDeleteResponses];
+
+export type ReorderGalleryCardsApiV1GalleryCardsReorderPutData = {
+  body: ReorderGalleryCardsRequest;
+  path?: never;
+  query?: never;
+  url: '/api/v1/gallery/cards/reorder';
+};
+
+export type ReorderGalleryCardsApiV1GalleryCardsReorderPutErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type ReorderGalleryCardsApiV1GalleryCardsReorderPutError =
+  ReorderGalleryCardsApiV1GalleryCardsReorderPutErrors[keyof ReorderGalleryCardsApiV1GalleryCardsReorderPutErrors];
+
+export type ReorderGalleryCardsApiV1GalleryCardsReorderPutResponses = {
+  /**
+   * Successful Response
+   */
+  200: ReorderGalleryCardsResponse;
+};
+
+export type ReorderGalleryCardsApiV1GalleryCardsReorderPutResponse =
+  ReorderGalleryCardsApiV1GalleryCardsReorderPutResponses[keyof ReorderGalleryCardsApiV1GalleryCardsReorderPutResponses];
+
+export type CreateUploadUrlApiV1MediaUploadUrlPostData = {
+  body: CreateUploadUrlRequestSchema;
+  path?: never;
+  query?: never;
+  url: '/api/v1/media/upload-url';
+};
+
+export type CreateUploadUrlApiV1MediaUploadUrlPostErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type CreateUploadUrlApiV1MediaUploadUrlPostError =
+  CreateUploadUrlApiV1MediaUploadUrlPostErrors[keyof CreateUploadUrlApiV1MediaUploadUrlPostErrors];
+
+export type CreateUploadUrlApiV1MediaUploadUrlPostResponses = {
+  /**
+   * Successful Response
+   */
+  201: CreateUploadUrlResponseSchema;
+};
+
+export type CreateUploadUrlApiV1MediaUploadUrlPostResponse =
+  CreateUploadUrlApiV1MediaUploadUrlPostResponses[keyof CreateUploadUrlApiV1MediaUploadUrlPostResponses];
+
+export type ConfirmUploadApiV1MediaMediaIdConfirmPostData = {
+  body?: never;
+  path: {
+    /**
+     * Media Id
+     */
+    media_id: string;
+  };
+  query?: never;
+  url: '/api/v1/media/{media_id}/confirm';
+};
+
+export type ConfirmUploadApiV1MediaMediaIdConfirmPostErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type ConfirmUploadApiV1MediaMediaIdConfirmPostError =
+  ConfirmUploadApiV1MediaMediaIdConfirmPostErrors[keyof ConfirmUploadApiV1MediaMediaIdConfirmPostErrors];
+
+export type ConfirmUploadApiV1MediaMediaIdConfirmPostResponses = {
+  /**
+   * Successful Response
+   */
+  200: ConfirmUploadResponseSchema;
+};
+
+export type ConfirmUploadApiV1MediaMediaIdConfirmPostResponse =
+  ConfirmUploadApiV1MediaMediaIdConfirmPostResponses[keyof ConfirmUploadApiV1MediaMediaIdConfirmPostResponses];
+
+export type AttachMediaToPostApiV1MediaPostsPostIdAttachPostData = {
+  body: AttachMediaToPostRequestSchema;
+  path: {
+    /**
+     * Post Id
+     */
+    post_id: string;
+  };
+  query?: never;
+  url: '/api/v1/media/posts/{post_id}/attach';
+};
+
+export type AttachMediaToPostApiV1MediaPostsPostIdAttachPostErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type AttachMediaToPostApiV1MediaPostsPostIdAttachPostError =
+  AttachMediaToPostApiV1MediaPostsPostIdAttachPostErrors[keyof AttachMediaToPostApiV1MediaPostsPostIdAttachPostErrors];
+
+export type AttachMediaToPostApiV1MediaPostsPostIdAttachPostResponses = {
+  /**
+   * Successful Response
+   */
+  200: AttachMediaResponseSchema;
+};
+
+export type AttachMediaToPostApiV1MediaPostsPostIdAttachPostResponse =
+  AttachMediaToPostApiV1MediaPostsPostIdAttachPostResponses[keyof AttachMediaToPostApiV1MediaPostsPostIdAttachPostResponses];
+
+export type AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostData = {
+  body: AttachMediaToGalleryCardRequestSchema;
+  path: {
+    /**
+     * Card Id
+     */
+    card_id: string;
+  };
+  query?: never;
+  url: '/api/v1/media/gallery/cards/{card_id}/attach';
+};
+
+export type AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostError =
+  AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostErrors[keyof AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostErrors];
+
+export type AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostResponses = {
+  /**
+   * Successful Response
+   */
+  200: AttachMediaResponseSchema;
+};
+
+export type AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostResponse =
+  AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostResponses[keyof AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostResponses];
+
+export type CreateMessageRequestApiV1MessageRequestsPostData = {
+  body: CreateMessageRequestRequest;
+  path?: never;
+  query?: never;
+  url: '/api/v1/message-requests';
+};
+
+export type CreateMessageRequestApiV1MessageRequestsPostErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type CreateMessageRequestApiV1MessageRequestsPostError =
+  CreateMessageRequestApiV1MessageRequestsPostErrors[keyof CreateMessageRequestApiV1MessageRequestsPostErrors];
+
+export type CreateMessageRequestApiV1MessageRequestsPostResponses = {
+  /**
+   * Successful Response
+   */
+  201: MessageRequestResponse;
+};
+
+export type CreateMessageRequestApiV1MessageRequestsPostResponse =
+  CreateMessageRequestApiV1MessageRequestsPostResponses[keyof CreateMessageRequestApiV1MessageRequestsPostResponses];
+
+export type GetMyMessageRequestsApiV1MessageRequestsInboxGetData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Status Filter
+     */
+    status_filter?: string;
+  };
+  url: '/api/v1/message-requests/inbox';
+};
+
+export type GetMyMessageRequestsApiV1MessageRequestsInboxGetErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type GetMyMessageRequestsApiV1MessageRequestsInboxGetError =
+  GetMyMessageRequestsApiV1MessageRequestsInboxGetErrors[keyof GetMyMessageRequestsApiV1MessageRequestsInboxGetErrors];
+
+export type GetMyMessageRequestsApiV1MessageRequestsInboxGetResponses = {
+  /**
+   * Response Get My Message Requests Api V1 Message Requests Inbox Get
+   *
+   * Successful Response
+   */
+  200: MessageRequestResponse[];
+};
+
+export type GetMyMessageRequestsApiV1MessageRequestsInboxGetResponse =
+  GetMyMessageRequestsApiV1MessageRequestsInboxGetResponses[keyof GetMyMessageRequestsApiV1MessageRequestsInboxGetResponses];
+
+export type AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostData = {
+  body?: never;
+  path: {
+    /**
+     * Request Id
+     */
+    request_id: string;
+  };
+  query?: never;
+  url: '/api/v1/message-requests/{request_id}/accept';
+};
+
+export type AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostError =
+  AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostErrors[keyof AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostErrors];
+
+export type AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostResponses = {
+  /**
+   * Successful Response
+   */
+  200: AcceptRequestResponse;
+};
+
+export type AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostResponse =
+  AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostResponses[keyof AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostResponses];
+
+export type DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostData = {
+  body?: never;
+  path: {
+    /**
+     * Request Id
+     */
+    request_id: string;
+  };
+  query?: never;
+  url: '/api/v1/message-requests/{request_id}/decline';
+};
+
+export type DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostError =
+  DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostErrors[keyof DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostErrors];
+
+export type DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostResponses = {
+  /**
+   * Successful Response
+   */
+  200: MessageRequestResponse;
+};
+
+export type DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostResponse =
+  DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostResponses[keyof DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostResponses];
+
+export type GetMyThreadsApiV1ThreadsGetData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Limit
+     */
+    limit?: number;
+    /**
+     * Offset
+     */
+    offset?: number;
+  };
+  url: '/api/v1/threads';
+};
+
+export type GetMyThreadsApiV1ThreadsGetErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type GetMyThreadsApiV1ThreadsGetError =
+  GetMyThreadsApiV1ThreadsGetErrors[keyof GetMyThreadsApiV1ThreadsGetErrors];
+
+export type GetMyThreadsApiV1ThreadsGetResponses = {
+  /**
+   * Successful Response
+   */
+  200: ThreadListResponse;
+};
+
+export type GetMyThreadsApiV1ThreadsGetResponse =
+  GetMyThreadsApiV1ThreadsGetResponses[keyof GetMyThreadsApiV1ThreadsGetResponses];
+
+export type GetThreadMessagesApiV1ThreadsThreadIdMessagesGetData = {
+  body?: never;
+  path: {
+    /**
+     * Thread Id
+     */
+    thread_id: string;
+  };
+  query?: {
+    /**
+     * Limit
+     */
+    limit?: number;
+    /**
+     * Offset
+     */
+    offset?: number;
+  };
+  url: '/api/v1/threads/{thread_id}/messages';
+};
+
+export type GetThreadMessagesApiV1ThreadsThreadIdMessagesGetErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type GetThreadMessagesApiV1ThreadsThreadIdMessagesGetError =
+  GetThreadMessagesApiV1ThreadsThreadIdMessagesGetErrors[keyof GetThreadMessagesApiV1ThreadsThreadIdMessagesGetErrors];
+
+export type GetThreadMessagesApiV1ThreadsThreadIdMessagesGetResponses = {
+  /**
+   * Successful Response
+   */
+  200: ThreadMessagesResponse;
+};
+
+export type GetThreadMessagesApiV1ThreadsThreadIdMessagesGetResponse =
+  GetThreadMessagesApiV1ThreadsThreadIdMessagesGetResponses[keyof GetThreadMessagesApiV1ThreadsThreadIdMessagesGetResponses];
+
+export type SendMessageApiV1ThreadsThreadIdMessagesPostData = {
+  body: SendMessageRequest;
+  path: {
+    /**
+     * Thread Id
+     */
+    thread_id: string;
+  };
+  query?: never;
+  url: '/api/v1/threads/{thread_id}/messages';
+};
+
+export type SendMessageApiV1ThreadsThreadIdMessagesPostErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type SendMessageApiV1ThreadsThreadIdMessagesPostError =
+  SendMessageApiV1ThreadsThreadIdMessagesPostErrors[keyof SendMessageApiV1ThreadsThreadIdMessagesPostErrors];
+
+export type SendMessageApiV1ThreadsThreadIdMessagesPostResponses = {
+  /**
+   * Successful Response
+   */
+  201: ThreadMessageResponse;
+};
+
+export type SendMessageApiV1ThreadsThreadIdMessagesPostResponse =
+  SendMessageApiV1ThreadsThreadIdMessagesPostResponses[keyof SendMessageApiV1ThreadsThreadIdMessagesPostResponses];

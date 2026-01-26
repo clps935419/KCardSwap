@@ -3,60 +3,60 @@
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
 import type {
-  AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostData,
-  AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostErrors,
-  AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostResponses,
-  AcceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostData,
-  AcceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostErrors,
-  AcceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostResponses,
-  AcceptTradeApiV1TradesTradeIdAcceptPostData,
-  AcceptTradeApiV1TradesTradeIdAcceptPostErrors,
-  AcceptTradeApiV1TradesTradeIdAcceptPostResponses,
+  AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostData,
+  AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostErrors,
+  AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostResponses,
   AdminLoginApiV1AuthAdminLoginPostData,
   AdminLoginApiV1AuthAdminLoginPostErrors,
   AdminLoginApiV1AuthAdminLoginPostResponses,
   ApiHealthCheckApiV1HealthGetData,
   ApiHealthCheckApiV1HealthGetResponses,
+  AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostData,
+  AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostErrors,
+  AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostResponses,
+  AttachMediaToPostApiV1MediaPostsPostIdAttachPostData,
+  AttachMediaToPostApiV1MediaPostsPostIdAttachPostErrors,
+  AttachMediaToPostApiV1MediaPostsPostIdAttachPostResponses,
   BlockUserApiV1FriendsBlockPostData,
   BlockUserApiV1FriendsBlockPostErrors,
   BlockUserApiV1FriendsBlockPostResponses,
-  CancelTradeApiV1TradesTradeIdCancelPostData,
-  CancelTradeApiV1TradesTradeIdCancelPostErrors,
-  CancelTradeApiV1TradesTradeIdCancelPostResponses,
   ClosePostApiV1PostsPostIdClosePostData,
   ClosePostApiV1PostsPostIdClosePostErrors,
   ClosePostApiV1PostsPostIdClosePostResponses,
-  CompleteTradeApiV1TradesTradeIdCompletePostData,
-  CompleteTradeApiV1TradesTradeIdCompletePostErrors,
-  CompleteTradeApiV1TradesTradeIdCompletePostResponses,
   ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostData,
   ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostErrors,
   ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostResponses,
+  ConfirmUploadApiV1MediaMediaIdConfirmPostData,
+  ConfirmUploadApiV1MediaMediaIdConfirmPostErrors,
+  ConfirmUploadApiV1MediaMediaIdConfirmPostResponses,
+  CreateGalleryCardApiV1GalleryCardsPostData,
+  CreateGalleryCardApiV1GalleryCardsPostErrors,
+  CreateGalleryCardApiV1GalleryCardsPostResponses,
+  CreateMessageRequestApiV1MessageRequestsPostData,
+  CreateMessageRequestApiV1MessageRequestsPostErrors,
+  CreateMessageRequestApiV1MessageRequestsPostResponses,
   CreatePostApiV1PostsPostData,
   CreatePostApiV1PostsPostErrors,
   CreatePostApiV1PostsPostResponses,
-  CreateTradeApiV1TradesPostData,
-  CreateTradeApiV1TradesPostErrors,
-  CreateTradeApiV1TradesPostResponses,
+  CreateUploadUrlApiV1MediaUploadUrlPostData,
+  CreateUploadUrlApiV1MediaUploadUrlPostErrors,
+  CreateUploadUrlApiV1MediaUploadUrlPostResponses,
+  DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostData,
+  DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostErrors,
+  DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostResponses,
   DeleteCardApiV1CardsCardIdDeleteData,
   DeleteCardApiV1CardsCardIdDeleteErrors,
   DeleteCardApiV1CardsCardIdDeleteResponses,
+  DeleteGalleryCardApiV1GalleryCardsCardIdDeleteData,
+  DeleteGalleryCardApiV1GalleryCardsCardIdDeleteErrors,
+  DeleteGalleryCardApiV1GalleryCardsCardIdDeleteResponses,
   ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostData,
   ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostResponses,
-  ExpressInterestApiV1PostsPostIdInterestPostData,
-  ExpressInterestApiV1PostsPostIdInterestPostErrors,
-  ExpressInterestApiV1PostsPostIdInterestPostResponses,
-  GetAverageRatingApiV1RatingsUserUserIdAverageGetData,
-  GetAverageRatingApiV1RatingsUserUserIdAverageGetErrors,
-  GetAverageRatingApiV1RatingsUserUserIdAverageGetResponses,
   GetChatRoomsApiV1ChatsGetData,
   GetChatRoomsApiV1ChatsGetErrors,
   GetChatRoomsApiV1ChatsGetResponses,
   GetCitiesApiV1LocationsCitiesGetData,
   GetCitiesApiV1LocationsCitiesGetResponses,
-  GetFriendsApiV1FriendsGetData,
-  GetFriendsApiV1FriendsGetErrors,
-  GetFriendsApiV1FriendsGetResponses,
   GetIdolGroupsApiV1IdolsGroupsGetData,
   GetIdolGroupsApiV1IdolsGroupsGetResponses,
   GetMessagesApiV1ChatsRoomIdMessagesGetData,
@@ -65,29 +65,34 @@ import type {
   GetMyCardsApiV1CardsMeGetData,
   GetMyCardsApiV1CardsMeGetErrors,
   GetMyCardsApiV1CardsMeGetResponses,
+  GetMyGalleryCardsApiV1GalleryCardsMeGetData,
+  GetMyGalleryCardsApiV1GalleryCardsMeGetResponses,
+  GetMyMessageRequestsApiV1MessageRequestsInboxGetData,
+  GetMyMessageRequestsApiV1MessageRequestsInboxGetErrors,
+  GetMyMessageRequestsApiV1MessageRequestsInboxGetResponses,
   GetMyProfileApiV1ProfileMeGetData,
   GetMyProfileApiV1ProfileMeGetErrors,
   GetMyProfileApiV1ProfileMeGetResponses,
   GetMyReportsApiV1ReportsGetData,
   GetMyReportsApiV1ReportsGetErrors,
   GetMyReportsApiV1ReportsGetResponses,
-  GetPostInterestApiV1PostsPostIdInterestsInterestIdGetData,
-  GetPostInterestApiV1PostsPostIdInterestsInterestIdGetErrors,
-  GetPostInterestApiV1PostsPostIdInterestsInterestIdGetResponses,
+  GetMyThreadsApiV1ThreadsGetData,
+  GetMyThreadsApiV1ThreadsGetErrors,
+  GetMyThreadsApiV1ThreadsGetResponses,
   GetQuotaStatusApiV1CardsQuotaStatusGetData,
   GetQuotaStatusApiV1CardsQuotaStatusGetErrors,
   GetQuotaStatusApiV1CardsQuotaStatusGetResponses,
   GetSubscriptionStatusApiV1SubscriptionsStatusGetData,
   GetSubscriptionStatusApiV1SubscriptionsStatusGetResponses,
-  GetTradeHistoryApiV1TradesHistoryGetData,
-  GetTradeHistoryApiV1TradesHistoryGetErrors,
-  GetTradeHistoryApiV1TradesHistoryGetResponses,
+  GetThreadMessagesApiV1ThreadsThreadIdMessagesGetData,
+  GetThreadMessagesApiV1ThreadsThreadIdMessagesGetErrors,
+  GetThreadMessagesApiV1ThreadsThreadIdMessagesGetResponses,
   GetUploadUrlApiV1CardsUploadUrlPostData,
   GetUploadUrlApiV1CardsUploadUrlPostErrors,
   GetUploadUrlApiV1CardsUploadUrlPostResponses,
-  GetUserRatingsApiV1RatingsUserUserIdGetData,
-  GetUserRatingsApiV1RatingsUserUserIdGetErrors,
-  GetUserRatingsApiV1RatingsUserUserIdGetResponses,
+  GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetData,
+  GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetErrors,
+  GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetResponses,
   GoogleCallbackApiV1AuthGoogleCallbackPostData,
   GoogleCallbackApiV1AuthGoogleCallbackPostErrors,
   GoogleCallbackApiV1AuthGoogleCallbackPostResponses,
@@ -96,9 +101,6 @@ import type {
   GoogleLoginApiV1AuthGoogleLoginPostResponses,
   HealthCheckHealthGetData,
   HealthCheckHealthGetResponses,
-  ListPostInterestsApiV1PostsPostIdInterestsGetData,
-  ListPostInterestsApiV1PostsPostIdInterestsGetErrors,
-  ListPostInterestsApiV1PostsPostIdInterestsGetResponses,
   ListPostsApiV1PostsGetData,
   ListPostsApiV1PostsGetErrors,
   ListPostsApiV1PostsGetResponses,
@@ -108,38 +110,29 @@ import type {
   RefreshTokenApiV1AuthRefreshPostData,
   RefreshTokenApiV1AuthRefreshPostErrors,
   RefreshTokenApiV1AuthRefreshPostResponses,
-  RejectInterestApiV1PostsPostIdInterestsInterestIdRejectPostData,
-  RejectInterestApiV1PostsPostIdInterestsInterestIdRejectPostErrors,
-  RejectInterestApiV1PostsPostIdInterestsInterestIdRejectPostResponses,
-  RejectTradeApiV1TradesTradeIdRejectPostData,
-  RejectTradeApiV1TradesTradeIdRejectPostErrors,
-  RejectTradeApiV1TradesTradeIdRejectPostResponses,
+  ReorderGalleryCardsApiV1GalleryCardsReorderPutData,
+  ReorderGalleryCardsApiV1GalleryCardsReorderPutErrors,
+  ReorderGalleryCardsApiV1GalleryCardsReorderPutResponses,
   RootGetData,
   RootGetResponses,
-  SearchNearbyCardsApiV1NearbySearchPostData,
-  SearchNearbyCardsApiV1NearbySearchPostErrors,
-  SearchNearbyCardsApiV1NearbySearchPostResponses,
-  SendFriendRequestApiV1FriendsRequestPostData,
-  SendFriendRequestApiV1FriendsRequestPostErrors,
-  SendFriendRequestApiV1FriendsRequestPostResponses,
   SendMessageApiV1ChatsRoomIdMessagesPostData,
   SendMessageApiV1ChatsRoomIdMessagesPostErrors,
   SendMessageApiV1ChatsRoomIdMessagesPostResponses,
-  SubmitRatingApiV1RatingsPostData,
-  SubmitRatingApiV1RatingsPostErrors,
-  SubmitRatingApiV1RatingsPostResponses,
+  SendMessageApiV1ThreadsThreadIdMessagesPostData,
+  SendMessageApiV1ThreadsThreadIdMessagesPostErrors,
+  SendMessageApiV1ThreadsThreadIdMessagesPostResponses,
   SubmitReportApiV1ReportsPostData,
   SubmitReportApiV1ReportsPostErrors,
   SubmitReportApiV1ReportsPostResponses,
+  ToggleLikeApiV1PostsPostIdLikePostData,
+  ToggleLikeApiV1PostsPostIdLikePostErrors,
+  ToggleLikeApiV1PostsPostIdLikePostResponses,
   UnblockUserApiV1FriendsUnblockPostData,
   UnblockUserApiV1FriendsUnblockPostErrors,
   UnblockUserApiV1FriendsUnblockPostResponses,
   UpdateMyProfileApiV1ProfileMePutData,
   UpdateMyProfileApiV1ProfileMePutErrors,
   UpdateMyProfileApiV1ProfileMePutResponses,
-  UpdateUserLocationApiV1NearbyLocationPutData,
-  UpdateUserLocationApiV1NearbyLocationPutErrors,
-  UpdateUserLocationApiV1NearbyLocationPutResponses,
   VerifyReceiptApiV1SubscriptionsVerifyReceiptPostData,
   VerifyReceiptApiV1SubscriptionsVerifyReceiptPostErrors,
   VerifyReceiptApiV1SubscriptionsVerifyReceiptPostResponses,
@@ -204,7 +197,7 @@ export const rootGet = <ThrowOnError extends boolean = false>(
 /**
  * Admin login with email/password
  *
- * Authenticate admin user with email and password. Only users with admin or super_admin role can login.
+ * Authenticate admin user with email and password and receive JWT tokens
  */
 export const adminLoginApiV1AuthAdminLoginPost = <ThrowOnError extends boolean = false>(
   options: Options<AdminLoginApiV1AuthAdminLoginPostData, ThrowOnError>
@@ -265,25 +258,18 @@ export const googleCallbackApiV1AuthGoogleCallbackPost = <ThrowOnError extends b
   });
 
 /**
- * Refresh access token
+ * Refresh access token (cookie-based)
  *
- * Use refresh token to obtain new access and refresh tokens
+ * Use refresh token from httpOnly cookie to obtain new access and refresh tokens
  */
 export const refreshTokenApiV1AuthRefreshPost = <ThrowOnError extends boolean = false>(
-  options: Options<RefreshTokenApiV1AuthRefreshPostData, ThrowOnError>
+  options?: Options<RefreshTokenApiV1AuthRefreshPostData, ThrowOnError>
 ) =>
-  (options.client ?? client).post<
+  (options?.client ?? client).post<
     RefreshTokenApiV1AuthRefreshPostResponses,
     RefreshTokenApiV1AuthRefreshPostErrors,
     ThrowOnError
-  >({
-    url: '/api/v1/auth/refresh',
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-  });
+  >({ url: '/api/v1/auth/refresh', ...options });
 
 /**
  * Get my profile
@@ -347,6 +333,178 @@ export const getIdolGroupsApiV1IdolsGroupsGet = <ThrowOnError extends boolean = 
   (options?.client ?? client).get<GetIdolGroupsApiV1IdolsGroupsGetResponses, unknown, ThrowOnError>(
     { url: '/api/v1/idols/groups', ...options }
   );
+
+/**
+ * Verify Receipt
+ *
+ * Verify Google Play purchase receipt and update subscription.
+ *
+ * Features:
+ * - Idempotent: Same token + same user returns current status
+ * - Token binding: Prevents cross-user replay attacks
+ * - Auto-acknowledge: Acknowledges purchase after verification
+ *
+ * Error codes:
+ * - 400_VALIDATION_FAILED: Invalid platform or missing fields
+ * - 401_UNAUTHORIZED: Not logged in
+ * - 409_CONFLICT: Purchase token already used by another user
+ * - 503_SERVICE_UNAVAILABLE: Google Play API unavailable
+ */
+export const verifyReceiptApiV1SubscriptionsVerifyReceiptPost = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<VerifyReceiptApiV1SubscriptionsVerifyReceiptPostData, ThrowOnError>
+) =>
+  (options.client ?? client).post<
+    VerifyReceiptApiV1SubscriptionsVerifyReceiptPostResponses,
+    VerifyReceiptApiV1SubscriptionsVerifyReceiptPostErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/subscriptions/verify-receipt',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Get Subscription Status
+ *
+ * Get current subscription status for authenticated user.
+ *
+ * Returns server-side subscription state.
+ * Called by app when opening or returning to foreground.
+ *
+ * Error codes:
+ * - 401_UNAUTHORIZED: Not logged in
+ * - 503_SERVICE_UNAVAILABLE: Database unavailable
+ */
+export const getSubscriptionStatusApiV1SubscriptionsStatusGet = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<GetSubscriptionStatusApiV1SubscriptionsStatusGetData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    GetSubscriptionStatusApiV1SubscriptionsStatusGetResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/subscriptions/status',
+    ...options,
+  });
+
+/**
+ * Expire Subscriptions
+ *
+ * Expire active subscriptions that have passed their expiry date.
+ *
+ * This endpoint should be called by a scheduled background task (e.g., daily cron job).
+ * For POC, it's exposed as an HTTP endpoint for manual triggering.
+ *
+ * In production, this should be:
+ * - Protected by admin authentication or internal-only access
+ * - Triggered by a scheduler (APScheduler, Celery Beat, Cloud Scheduler, etc.)
+ *
+ * Returns:
+ * Number of subscriptions expired and processing timestamp
+ */
+export const expireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPost = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostData, ThrowOnError>
+) =>
+  (options?.client ?? client).post<
+    ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostResponses,
+    unknown,
+    ThrowOnError
+  >({ url: '/api/v1/subscriptions/expire-subscriptions', ...options });
+
+/**
+ * Block a user
+ *
+ * Block a user to prevent interaction. Required for FR-025 (blocking support).
+ */
+export const blockUserApiV1FriendsBlockPost = <ThrowOnError extends boolean = false>(
+  options: Options<BlockUserApiV1FriendsBlockPostData, ThrowOnError>
+) =>
+  (options.client ?? client).post<
+    BlockUserApiV1FriendsBlockPostResponses,
+    BlockUserApiV1FriendsBlockPostErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/friends/block',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Unblock a user
+ *
+ * Unblock a previously blocked user. Required for FR-025.
+ */
+export const unblockUserApiV1FriendsUnblockPost = <ThrowOnError extends boolean = false>(
+  options: Options<UnblockUserApiV1FriendsUnblockPostData, ThrowOnError>
+) =>
+  (options.client ?? client).post<
+    UnblockUserApiV1FriendsUnblockPostResponses,
+    UnblockUserApiV1FriendsUnblockPostErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/friends/unblock',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Get my reports
+ *
+ * Get reports submitted by the current user
+ */
+export const getMyReportsApiV1ReportsGet = <ThrowOnError extends boolean = false>(
+  options?: Options<GetMyReportsApiV1ReportsGetData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    GetMyReportsApiV1ReportsGetResponses,
+    GetMyReportsApiV1ReportsGetErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/reports',
+    ...options,
+  });
+
+/**
+ * Submit report
+ *
+ * Submit a report for inappropriate behavior or content
+ */
+export const submitReportApiV1ReportsPost = <ThrowOnError extends boolean = false>(
+  options: Options<SubmitReportApiV1ReportsPostData, ThrowOnError>
+) =>
+  (options.client ?? client).post<
+    SubmitReportApiV1ReportsPostResponses,
+    SubmitReportApiV1ReportsPostErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/reports',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
 
 /**
  * Get upload signed URL
@@ -445,154 +603,6 @@ export const confirmCardUploadApiV1CardsCardIdConfirmUploadPost = <
   });
 
 /**
- * Search for nearby cards
- *
- * Search for cards near a specific location. Free users: 5 searches/day. Premium users: unlimited.
- */
-export const searchNearbyCardsApiV1NearbySearchPost = <ThrowOnError extends boolean = false>(
-  options: Options<SearchNearbyCardsApiV1NearbySearchPostData, ThrowOnError>
-) =>
-  (options.client ?? client).post<
-    SearchNearbyCardsApiV1NearbySearchPostResponses,
-    SearchNearbyCardsApiV1NearbySearchPostErrors,
-    ThrowOnError
-  >({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/nearby/search',
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-  });
-
-/**
- * Update user location
- *
- * Update the user's current location for nearby search visibility
- */
-export const updateUserLocationApiV1NearbyLocationPut = <ThrowOnError extends boolean = false>(
-  options: Options<UpdateUserLocationApiV1NearbyLocationPutData, ThrowOnError>
-) =>
-  (options.client ?? client).put<
-    UpdateUserLocationApiV1NearbyLocationPutResponses,
-    UpdateUserLocationApiV1NearbyLocationPutErrors,
-    ThrowOnError
-  >({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/nearby/location',
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-  });
-
-/**
- * Send friend request
- *
- * Send a friend request to another user
- */
-export const sendFriendRequestApiV1FriendsRequestPost = <ThrowOnError extends boolean = false>(
-  options: Options<SendFriendRequestApiV1FriendsRequestPostData, ThrowOnError>
-) =>
-  (options.client ?? client).post<
-    SendFriendRequestApiV1FriendsRequestPostResponses,
-    SendFriendRequestApiV1FriendsRequestPostErrors,
-    ThrowOnError
-  >({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/friends/request',
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-  });
-
-/**
- * Accept friend request
- *
- * Accept a pending friend request
- */
-export const acceptFriendRequestApiV1FriendsFriendshipIdAcceptPost = <
-  ThrowOnError extends boolean = false,
->(
-  options: Options<AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostData, ThrowOnError>
-) =>
-  (options.client ?? client).post<
-    AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostResponses,
-    AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostErrors,
-    ThrowOnError
-  >({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/friends/{friendship_id}/accept',
-    ...options,
-  });
-
-/**
- * Block user
- *
- * Block another user (prevents all interactions)
- */
-export const blockUserApiV1FriendsBlockPost = <ThrowOnError extends boolean = false>(
-  options: Options<BlockUserApiV1FriendsBlockPostData, ThrowOnError>
-) =>
-  (options.client ?? client).post<
-    BlockUserApiV1FriendsBlockPostResponses,
-    BlockUserApiV1FriendsBlockPostErrors,
-    ThrowOnError
-  >({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/friends/block',
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-  });
-
-/**
- * Unblock user
- *
- * Unblock a previously blocked user (allows future interactions)
- */
-export const unblockUserApiV1FriendsUnblockPost = <ThrowOnError extends boolean = false>(
-  options: Options<UnblockUserApiV1FriendsUnblockPostData, ThrowOnError>
-) =>
-  (options.client ?? client).post<
-    UnblockUserApiV1FriendsUnblockPostResponses,
-    UnblockUserApiV1FriendsUnblockPostErrors,
-    ThrowOnError
-  >({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/friends/unblock',
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-  });
-
-/**
- * Get friend list
- *
- * Get list of friends (optionally filtered by status)
- */
-export const getFriendsApiV1FriendsGet = <ThrowOnError extends boolean = false>(
-  options?: Options<GetFriendsApiV1FriendsGetData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    GetFriendsApiV1FriendsGetResponses,
-    GetFriendsApiV1FriendsGetErrors,
-    ThrowOnError
-  >({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/friends',
-    ...options,
-  });
-
-/**
  * Get chat rooms
  *
  * Get all chat rooms for the current user
@@ -671,323 +681,27 @@ export const markMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPost = <
   });
 
 /**
- * Submit rating
+ * List posts (V2: global/city filtering with category)
  *
- * Submit a rating for another user (based on friendship or completed trade)
- */
-export const submitRatingApiV1RatingsPost = <ThrowOnError extends boolean = false>(
-  options: Options<SubmitRatingApiV1RatingsPostData, ThrowOnError>
-) =>
-  (options.client ?? client).post<
-    SubmitRatingApiV1RatingsPostResponses,
-    SubmitRatingApiV1RatingsPostErrors,
-    ThrowOnError
-  >({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/ratings',
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-  });
-
-/**
- * Get user ratings
- *
- * Get ratings received by a specific user
- */
-export const getUserRatingsApiV1RatingsUserUserIdGet = <ThrowOnError extends boolean = false>(
-  options: Options<GetUserRatingsApiV1RatingsUserUserIdGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    GetUserRatingsApiV1RatingsUserUserIdGetResponses,
-    GetUserRatingsApiV1RatingsUserUserIdGetErrors,
-    ThrowOnError
-  >({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/ratings/user/{user_id}',
-    ...options,
-  });
-
-/**
- * Get average rating
- *
- * Get average rating score for a specific user
- */
-export const getAverageRatingApiV1RatingsUserUserIdAverageGet = <
-  ThrowOnError extends boolean = false,
->(
-  options: Options<GetAverageRatingApiV1RatingsUserUserIdAverageGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    GetAverageRatingApiV1RatingsUserUserIdAverageGetResponses,
-    GetAverageRatingApiV1RatingsUserUserIdAverageGetErrors,
-    ThrowOnError
-  >({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/ratings/user/{user_id}/average',
-    ...options,
-  });
-
-/**
- * Get my reports
- *
- * Get reports submitted by the current user
- */
-export const getMyReportsApiV1ReportsGet = <ThrowOnError extends boolean = false>(
-  options?: Options<GetMyReportsApiV1ReportsGetData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    GetMyReportsApiV1ReportsGetResponses,
-    GetMyReportsApiV1ReportsGetErrors,
-    ThrowOnError
-  >({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/reports',
-    ...options,
-  });
-
-/**
- * Submit report
- *
- * Submit a report for inappropriate behavior or content
- */
-export const submitReportApiV1ReportsPost = <ThrowOnError extends boolean = false>(
-  options: Options<SubmitReportApiV1ReportsPostData, ThrowOnError>
-) =>
-  (options.client ?? client).post<
-    SubmitReportApiV1ReportsPostResponses,
-    SubmitReportApiV1ReportsPostErrors,
-    ThrowOnError
-  >({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/reports',
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-  });
-
-/**
- * Create trade proposal
- *
- * Create a new trade proposal between two users
- */
-export const createTradeApiV1TradesPost = <ThrowOnError extends boolean = false>(
-  options: Options<CreateTradeApiV1TradesPostData, ThrowOnError>
-) =>
-  (options.client ?? client).post<
-    CreateTradeApiV1TradesPostResponses,
-    CreateTradeApiV1TradesPostErrors,
-    ThrowOnError
-  >({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/trades',
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-  });
-
-/**
- * Accept trade proposal
- *
- * Accept a trade proposal (responder only)
- */
-export const acceptTradeApiV1TradesTradeIdAcceptPost = <ThrowOnError extends boolean = false>(
-  options: Options<AcceptTradeApiV1TradesTradeIdAcceptPostData, ThrowOnError>
-) =>
-  (options.client ?? client).post<
-    AcceptTradeApiV1TradesTradeIdAcceptPostResponses,
-    AcceptTradeApiV1TradesTradeIdAcceptPostErrors,
-    ThrowOnError
-  >({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/trades/{trade_id}/accept',
-    ...options,
-  });
-
-/**
- * Reject trade proposal
- *
- * Reject a trade proposal (responder only)
- */
-export const rejectTradeApiV1TradesTradeIdRejectPost = <ThrowOnError extends boolean = false>(
-  options: Options<RejectTradeApiV1TradesTradeIdRejectPostData, ThrowOnError>
-) =>
-  (options.client ?? client).post<
-    RejectTradeApiV1TradesTradeIdRejectPostResponses,
-    RejectTradeApiV1TradesTradeIdRejectPostErrors,
-    ThrowOnError
-  >({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/trades/{trade_id}/reject',
-    ...options,
-  });
-
-/**
- * Cancel trade
- *
- * Cancel a trade (either party can cancel)
- */
-export const cancelTradeApiV1TradesTradeIdCancelPost = <ThrowOnError extends boolean = false>(
-  options: Options<CancelTradeApiV1TradesTradeIdCancelPostData, ThrowOnError>
-) =>
-  (options.client ?? client).post<
-    CancelTradeApiV1TradesTradeIdCancelPostResponses,
-    CancelTradeApiV1TradesTradeIdCancelPostErrors,
-    ThrowOnError
-  >({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/trades/{trade_id}/cancel',
-    ...options,
-  });
-
-/**
- * Confirm trade completion
- *
- * Confirm trade completion (each party confirms independently)
- */
-export const completeTradeApiV1TradesTradeIdCompletePost = <ThrowOnError extends boolean = false>(
-  options: Options<CompleteTradeApiV1TradesTradeIdCompletePostData, ThrowOnError>
-) =>
-  (options.client ?? client).post<
-    CompleteTradeApiV1TradesTradeIdCompletePostResponses,
-    CompleteTradeApiV1TradesTradeIdCompletePostErrors,
-    ThrowOnError
-  >({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/trades/{trade_id}/complete',
-    ...options,
-  });
-
-/**
- * Get trade history
- *
- * Get all trades for current user (as initiator or responder)
- */
-export const getTradeHistoryApiV1TradesHistoryGet = <ThrowOnError extends boolean = false>(
-  options?: Options<GetTradeHistoryApiV1TradesHistoryGetData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    GetTradeHistoryApiV1TradesHistoryGetResponses,
-    GetTradeHistoryApiV1TradesHistoryGetErrors,
-    ThrowOnError
-  >({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/trades/history',
-    ...options,
-  });
-
-/**
- * Verify Receipt
- *
- * Verify Google Play purchase receipt and update subscription.
- *
- * Features:
- * - Idempotent: Same token + same user returns current status
- * - Token binding: Prevents cross-user replay attacks
- * - Auto-acknowledge: Acknowledges purchase after verification
- *
- * Error codes:
- * - 400_VALIDATION_FAILED: Invalid platform or missing fields
- * - 401_UNAUTHORIZED: Not logged in
- * - 409_CONFLICT: Purchase token already used by another user
- * - 503_SERVICE_UNAVAILABLE: Google Play API unavailable
- */
-export const verifyReceiptApiV1SubscriptionsVerifyReceiptPost = <
-  ThrowOnError extends boolean = false,
->(
-  options: Options<VerifyReceiptApiV1SubscriptionsVerifyReceiptPostData, ThrowOnError>
-) =>
-  (options.client ?? client).post<
-    VerifyReceiptApiV1SubscriptionsVerifyReceiptPostResponses,
-    VerifyReceiptApiV1SubscriptionsVerifyReceiptPostErrors,
-    ThrowOnError
-  >({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/subscriptions/verify-receipt',
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-  });
-
-/**
- * Get Subscription Status
- *
- * Get current subscription status for authenticated user.
- *
- * Returns server-side subscription state.
- * Called by app when opening or returning to foreground.
- *
- * Error codes:
- * - 401_UNAUTHORIZED: Not logged in
- * - 503_SERVICE_UNAVAILABLE: Database unavailable
- */
-export const getSubscriptionStatusApiV1SubscriptionsStatusGet = <
-  ThrowOnError extends boolean = false,
->(
-  options?: Options<GetSubscriptionStatusApiV1SubscriptionsStatusGetData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    GetSubscriptionStatusApiV1SubscriptionsStatusGetResponses,
-    unknown,
-    ThrowOnError
-  >({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/subscriptions/status',
-    ...options,
-  });
-
-/**
- * Expire Subscriptions
- *
- * Expire active subscriptions that have passed their expiry date.
- *
- * This endpoint should be called by a scheduled background task (e.g., daily cron job).
- * For POC, it's exposed as an HTTP endpoint for manual triggering.
- *
- * In production, this should be:
- * - Protected by admin authentication or internal-only access
- * - Triggered by a scheduler (APScheduler, Celery Beat, Cloud Scheduler, etc.)
- *
- * Returns:
- * Number of subscriptions expired and processing timestamp
- */
-export const expireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPost = <
-  ThrowOnError extends boolean = false,
->(
-  options?: Options<ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostData, ThrowOnError>
-) =>
-  (options?.client ?? client).post<
-    ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostResponses,
-    unknown,
-    ThrowOnError
-  >({ url: '/api/v1/subscriptions/expire-subscriptions', ...options });
-
-/**
- * List posts on a city board
- *
- * List all open posts for a specific city with optional filters
+ * List posts. FR-005: Global view (no city_code) shows all posts; City view (with city_code) shows city-specific posts.
  */
 export const listPostsApiV1PostsGet = <ThrowOnError extends boolean = false>(
-  options: Options<ListPostsApiV1PostsGetData, ThrowOnError>
+  options?: Options<ListPostsApiV1PostsGetData, ThrowOnError>
 ) =>
-  (options.client ?? client).get<
+  (options?.client ?? client).get<
     ListPostsApiV1PostsGetResponses,
     ListPostsApiV1PostsGetErrors,
     ThrowOnError
-  >({ url: '/api/v1/posts', ...options });
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/posts',
+    ...options,
+  });
 
 /**
- * Create a new city board post
+ * Create a new post (V2: with scope/category)
  *
- * Create a new post on a city board. Free users limited to 2 posts per day.
+ * Create a new post. Requires authentication. Free users limited to 2 posts per day, Premium to 20.
  */
 export const createPostApiV1PostsPost = <ThrowOnError extends boolean = false>(
   options: Options<CreatePostApiV1PostsPostData, ThrowOnError>
@@ -1004,64 +718,6 @@ export const createPostApiV1PostsPost = <ThrowOnError extends boolean = false>(
       'Content-Type': 'application/json',
       ...options.headers,
     },
-  });
-
-/**
- * Express interest in a post
- *
- * Express interest in a post. Cannot express interest in your own post or duplicate interests.
- */
-export const expressInterestApiV1PostsPostIdInterestPost = <ThrowOnError extends boolean = false>(
-  options: Options<ExpressInterestApiV1PostsPostIdInterestPostData, ThrowOnError>
-) =>
-  (options.client ?? client).post<
-    ExpressInterestApiV1PostsPostIdInterestPostResponses,
-    ExpressInterestApiV1PostsPostIdInterestPostErrors,
-    ThrowOnError
-  >({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/posts/{post_id}/interest',
-    ...options,
-  });
-
-/**
- * Accept an interest
- *
- * Accept an interest. Automatically creates friendship and chat room.
- */
-export const acceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPost = <
-  ThrowOnError extends boolean = false,
->(
-  options: Options<AcceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostData, ThrowOnError>
-) =>
-  (options.client ?? client).post<
-    AcceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostResponses,
-    AcceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostErrors,
-    ThrowOnError
-  >({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/posts/{post_id}/interests/{interest_id}/accept',
-    ...options,
-  });
-
-/**
- * Reject an interest
- *
- * Reject an interest. Only post owner can reject.
- */
-export const rejectInterestApiV1PostsPostIdInterestsInterestIdRejectPost = <
-  ThrowOnError extends boolean = false,
->(
-  options: Options<RejectInterestApiV1PostsPostIdInterestsInterestIdRejectPostData, ThrowOnError>
-) =>
-  (options.client ?? client).post<
-    RejectInterestApiV1PostsPostIdInterestsInterestIdRejectPostResponses,
-    RejectInterestApiV1PostsPostIdInterestsInterestIdRejectPostErrors,
-    ThrowOnError
-  >({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/posts/{post_id}/interests/{interest_id}/reject',
-    ...options,
   });
 
 /**
@@ -1083,40 +739,20 @@ export const closePostApiV1PostsPostIdClosePost = <ThrowOnError extends boolean 
   });
 
 /**
- * List interests for a post (owner only)
+ * Toggle like on a post (FR-008, FR-009)
  *
- * List all interests for a specific post. Only post owner can view.
+ * Like or unlike a post. Idempotent: if already liked, unlikes; if not liked, likes. Each user can like a post at most once.
  */
-export const listPostInterestsApiV1PostsPostIdInterestsGet = <ThrowOnError extends boolean = false>(
-  options: Options<ListPostInterestsApiV1PostsPostIdInterestsGetData, ThrowOnError>
+export const toggleLikeApiV1PostsPostIdLikePost = <ThrowOnError extends boolean = false>(
+  options: Options<ToggleLikeApiV1PostsPostIdLikePostData, ThrowOnError>
 ) =>
-  (options.client ?? client).get<
-    ListPostInterestsApiV1PostsPostIdInterestsGetResponses,
-    ListPostInterestsApiV1PostsPostIdInterestsGetErrors,
+  (options.client ?? client).post<
+    ToggleLikeApiV1PostsPostIdLikePostResponses,
+    ToggleLikeApiV1PostsPostIdLikePostErrors,
     ThrowOnError
   >({
     security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/posts/{post_id}/interests',
-    ...options,
-  });
-
-/**
- * Get a specific interest (owner only)
- *
- * Get details of a specific interest. Only post owner can view.
- */
-export const getPostInterestApiV1PostsPostIdInterestsInterestIdGet = <
-  ThrowOnError extends boolean = false,
->(
-  options: Options<GetPostInterestApiV1PostsPostIdInterestsInterestIdGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    GetPostInterestApiV1PostsPostIdInterestsInterestIdGetResponses,
-    GetPostInterestApiV1PostsPostIdInterestsInterestIdGetErrors,
-    ThrowOnError
-  >({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/posts/{post_id}/interests/{interest_id}',
+    url: '/api/v1/posts/{post_id}/like',
     ...options,
   });
 
@@ -1144,3 +780,360 @@ export const getCitiesApiV1LocationsCitiesGet = <ThrowOnError extends boolean = 
   (options?.client ?? client).get<GetCitiesApiV1LocationsCitiesGetResponses, unknown, ThrowOnError>(
     { url: '/api/v1/locations/cities', ...options }
   );
+
+/**
+ * Get user's gallery cards
+ *
+ * View another user's public gallery cards (requires authentication).
+ */
+export const getUserGalleryCardsApiV1UsersUserIdGalleryCardsGet = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetResponses,
+    GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/users/{user_id}/gallery/cards',
+    ...options,
+  });
+
+/**
+ * Get my gallery cards
+ *
+ * Get the authenticated user's own gallery cards.
+ */
+export const getMyGalleryCardsApiV1GalleryCardsMeGet = <ThrowOnError extends boolean = false>(
+  options?: Options<GetMyGalleryCardsApiV1GalleryCardsMeGetData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    GetMyGalleryCardsApiV1GalleryCardsMeGetResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/gallery/cards/me',
+    ...options,
+  });
+
+/**
+ * Create gallery card
+ *
+ * Create a new gallery card in the user's personal album.
+ */
+export const createGalleryCardApiV1GalleryCardsPost = <ThrowOnError extends boolean = false>(
+  options: Options<CreateGalleryCardApiV1GalleryCardsPostData, ThrowOnError>
+) =>
+  (options.client ?? client).post<
+    CreateGalleryCardApiV1GalleryCardsPostResponses,
+    CreateGalleryCardApiV1GalleryCardsPostErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/gallery/cards',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Delete gallery card
+ *
+ * Delete a gallery card (only owner can delete).
+ */
+export const deleteGalleryCardApiV1GalleryCardsCardIdDelete = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<DeleteGalleryCardApiV1GalleryCardsCardIdDeleteData, ThrowOnError>
+) =>
+  (options.client ?? client).delete<
+    DeleteGalleryCardApiV1GalleryCardsCardIdDeleteResponses,
+    DeleteGalleryCardApiV1GalleryCardsCardIdDeleteErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/gallery/cards/{card_id}',
+    ...options,
+  });
+
+/**
+ * Reorder gallery cards
+ *
+ * Update the display order of gallery cards.
+ */
+export const reorderGalleryCardsApiV1GalleryCardsReorderPut = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<ReorderGalleryCardsApiV1GalleryCardsReorderPutData, ThrowOnError>
+) =>
+  (options.client ?? client).put<
+    ReorderGalleryCardsApiV1GalleryCardsReorderPutResponses,
+    ReorderGalleryCardsApiV1GalleryCardsReorderPutErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/gallery/cards/reorder',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Generate presigned upload URL
+ *
+ * Step 1: Generate a presigned URL for uploading media to GCS. FR-006.
+ */
+export const createUploadUrlApiV1MediaUploadUrlPost = <ThrowOnError extends boolean = false>(
+  options: Options<CreateUploadUrlApiV1MediaUploadUrlPostData, ThrowOnError>
+) =>
+  (options.client ?? client).post<
+    CreateUploadUrlApiV1MediaUploadUrlPostResponses,
+    CreateUploadUrlApiV1MediaUploadUrlPostErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/media/upload-url',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Confirm media upload
+ *
+ * Step 2: Confirm that media was uploaded to GCS. Applies quota. FR-022, T052.
+ */
+export const confirmUploadApiV1MediaMediaIdConfirmPost = <ThrowOnError extends boolean = false>(
+  options: Options<ConfirmUploadApiV1MediaMediaIdConfirmPostData, ThrowOnError>
+) =>
+  (options.client ?? client).post<
+    ConfirmUploadApiV1MediaMediaIdConfirmPostResponses,
+    ConfirmUploadApiV1MediaMediaIdConfirmPostErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/media/{media_id}/confirm',
+    ...options,
+  });
+
+/**
+ * Attach media to post
+ *
+ * Step 3: Attach confirmed media to a post. FR-007.
+ */
+export const attachMediaToPostApiV1MediaPostsPostIdAttachPost = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<AttachMediaToPostApiV1MediaPostsPostIdAttachPostData, ThrowOnError>
+) =>
+  (options.client ?? client).post<
+    AttachMediaToPostApiV1MediaPostsPostIdAttachPostResponses,
+    AttachMediaToPostApiV1MediaPostsPostIdAttachPostErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/media/posts/{post_id}/attach',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Attach media to gallery card
+ *
+ * Step 3: Attach confirmed media to a gallery card. FR-007, FR-020.
+ */
+export const attachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPost = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostData, ThrowOnError>
+) =>
+  (options.client ?? client).post<
+    AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostResponses,
+    AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/media/gallery/cards/{card_id}/attach',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Create Message Request
+ *
+ * Create a message request to another user.
+ *
+ * Implements FR-011: Message Requests for strangers.
+ * Implements FR-013: Privacy setting to block stranger messages.
+ * Implements FR-014: One unique thread per user pair.
+ */
+export const createMessageRequestApiV1MessageRequestsPost = <ThrowOnError extends boolean = false>(
+  options: Options<CreateMessageRequestApiV1MessageRequestsPostData, ThrowOnError>
+) =>
+  (options.client ?? client).post<
+    CreateMessageRequestApiV1MessageRequestsPostResponses,
+    CreateMessageRequestApiV1MessageRequestsPostErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/message-requests',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Get My Message Requests
+ *
+ * Get message requests for the current user.
+ *
+ * Supports FR-016: Inbox clearly separates Requests vs Threads.
+ *
+ * Query params:
+ * - status_filter: "pending", "accepted", "declined", or "all" (default: "pending")
+ */
+export const getMyMessageRequestsApiV1MessageRequestsInboxGet = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<GetMyMessageRequestsApiV1MessageRequestsInboxGetData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    GetMyMessageRequestsApiV1MessageRequestsInboxGetResponses,
+    GetMyMessageRequestsApiV1MessageRequestsInboxGetErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/message-requests/inbox',
+    ...options,
+  });
+
+/**
+ * Accept Message Request
+ *
+ * Accept a message request and create a thread.
+ *
+ * Implements FR-012: Recipient can accept/decline requests.
+ * Creates unique thread (FR-014).
+ */
+export const acceptMessageRequestApiV1MessageRequestsRequestIdAcceptPost = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostData, ThrowOnError>
+) =>
+  (options.client ?? client).post<
+    AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostResponses,
+    AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/message-requests/{request_id}/accept',
+    ...options,
+  });
+
+/**
+ * Decline Message Request
+ *
+ * Decline a message request.
+ *
+ * Implements FR-012: Recipient can accept/decline requests.
+ */
+export const declineMessageRequestApiV1MessageRequestsRequestIdDeclinePost = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostData, ThrowOnError>
+) =>
+  (options.client ?? client).post<
+    DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostResponses,
+    DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/message-requests/{request_id}/decline',
+    ...options,
+  });
+
+/**
+ * Get My Threads
+ *
+ * Get all threads for the current user.
+ *
+ * Supports FR-016: Inbox clearly separates Requests vs Threads.
+ * Returns threads ordered by last_message_at descending.
+ */
+export const getMyThreadsApiV1ThreadsGet = <ThrowOnError extends boolean = false>(
+  options?: Options<GetMyThreadsApiV1ThreadsGetData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    GetMyThreadsApiV1ThreadsGetResponses,
+    GetMyThreadsApiV1ThreadsGetErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/threads',
+    ...options,
+  });
+
+/**
+ * Get Thread Messages
+ *
+ * Get messages in a thread.
+ *
+ * Returns messages ordered by created_at ascending (oldest first).
+ * User must be part of the thread to view messages.
+ */
+export const getThreadMessagesApiV1ThreadsThreadIdMessagesGet = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetThreadMessagesApiV1ThreadsThreadIdMessagesGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    GetThreadMessagesApiV1ThreadsThreadIdMessagesGetResponses,
+    GetThreadMessagesApiV1ThreadsThreadIdMessagesGetErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/threads/{thread_id}/messages',
+    ...options,
+  });
+
+/**
+ * Send Message
+ *
+ * Send a message in a thread.
+ *
+ * Supports FR-015: Messages can reference post_id.
+ * User must be part of the thread to send messages.
+ */
+export const sendMessageApiV1ThreadsThreadIdMessagesPost = <ThrowOnError extends boolean = false>(
+  options: Options<SendMessageApiV1ThreadsThreadIdMessagesPostData, ThrowOnError>
+) =>
+  (options.client ?? client).post<
+    SendMessageApiV1ThreadsThreadIdMessagesPostResponses,
+    SendMessageApiV1ThreadsThreadIdMessagesPostErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/threads/{thread_id}/messages',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });

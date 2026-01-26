@@ -10,102 +10,106 @@ import {
 
 import { client } from '../client.gen';
 import {
-  acceptFriendRequestApiV1FriendsFriendshipIdAcceptPost,
-  acceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPost,
-  acceptTradeApiV1TradesTradeIdAcceptPost,
+  acceptMessageRequestApiV1MessageRequestsRequestIdAcceptPost,
   adminLoginApiV1AuthAdminLoginPost,
   apiHealthCheckApiV1HealthGet,
+  attachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPost,
+  attachMediaToPostApiV1MediaPostsPostIdAttachPost,
   blockUserApiV1FriendsBlockPost,
-  cancelTradeApiV1TradesTradeIdCancelPost,
   closePostApiV1PostsPostIdClosePost,
-  completeTradeApiV1TradesTradeIdCompletePost,
   confirmCardUploadApiV1CardsCardIdConfirmUploadPost,
+  confirmUploadApiV1MediaMediaIdConfirmPost,
+  createGalleryCardApiV1GalleryCardsPost,
+  createMessageRequestApiV1MessageRequestsPost,
   createPostApiV1PostsPost,
-  createTradeApiV1TradesPost,
+  createUploadUrlApiV1MediaUploadUrlPost,
+  declineMessageRequestApiV1MessageRequestsRequestIdDeclinePost,
   deleteCardApiV1CardsCardIdDelete,
+  deleteGalleryCardApiV1GalleryCardsCardIdDelete,
   expireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPost,
-  expressInterestApiV1PostsPostIdInterestPost,
-  getAverageRatingApiV1RatingsUserUserIdAverageGet,
   getChatRoomsApiV1ChatsGet,
   getCitiesApiV1LocationsCitiesGet,
-  getFriendsApiV1FriendsGet,
   getIdolGroupsApiV1IdolsGroupsGet,
   getMessagesApiV1ChatsRoomIdMessagesGet,
   getMyCardsApiV1CardsMeGet,
+  getMyGalleryCardsApiV1GalleryCardsMeGet,
+  getMyMessageRequestsApiV1MessageRequestsInboxGet,
   getMyProfileApiV1ProfileMeGet,
   getMyReportsApiV1ReportsGet,
-  getPostInterestApiV1PostsPostIdInterestsInterestIdGet,
+  getMyThreadsApiV1ThreadsGet,
   getQuotaStatusApiV1CardsQuotaStatusGet,
   getSubscriptionStatusApiV1SubscriptionsStatusGet,
-  getTradeHistoryApiV1TradesHistoryGet,
+  getThreadMessagesApiV1ThreadsThreadIdMessagesGet,
   getUploadUrlApiV1CardsUploadUrlPost,
-  getUserRatingsApiV1RatingsUserUserIdGet,
+  getUserGalleryCardsApiV1UsersUserIdGalleryCardsGet,
   googleCallbackApiV1AuthGoogleCallbackPost,
   googleLoginApiV1AuthGoogleLoginPost,
   healthCheckHealthGet,
-  listPostInterestsApiV1PostsPostIdInterestsGet,
   listPostsApiV1PostsGet,
   markMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPost,
   type Options,
   refreshTokenApiV1AuthRefreshPost,
-  rejectInterestApiV1PostsPostIdInterestsInterestIdRejectPost,
-  rejectTradeApiV1TradesTradeIdRejectPost,
+  reorderGalleryCardsApiV1GalleryCardsReorderPut,
   rootGet,
-  searchNearbyCardsApiV1NearbySearchPost,
-  sendFriendRequestApiV1FriendsRequestPost,
   sendMessageApiV1ChatsRoomIdMessagesPost,
-  submitRatingApiV1RatingsPost,
+  sendMessageApiV1ThreadsThreadIdMessagesPost,
   submitReportApiV1ReportsPost,
+  toggleLikeApiV1PostsPostIdLikePost,
   unblockUserApiV1FriendsUnblockPost,
   updateMyProfileApiV1ProfileMePut,
-  updateUserLocationApiV1NearbyLocationPut,
   verifyReceiptApiV1SubscriptionsVerifyReceiptPost,
 } from '../sdk.gen';
 import type {
-  AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostData,
-  AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostResponse,
-  AcceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostData,
-  AcceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostResponse,
-  AcceptTradeApiV1TradesTradeIdAcceptPostData,
-  AcceptTradeApiV1TradesTradeIdAcceptPostResponse,
+  AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostData,
+  AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostError,
+  AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostResponse,
   AdminLoginApiV1AuthAdminLoginPostData,
   AdminLoginApiV1AuthAdminLoginPostError,
   AdminLoginApiV1AuthAdminLoginPostResponse,
   ApiHealthCheckApiV1HealthGetData,
+  AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostData,
+  AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostError,
+  AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostResponse,
+  AttachMediaToPostApiV1MediaPostsPostIdAttachPostData,
+  AttachMediaToPostApiV1MediaPostsPostIdAttachPostError,
+  AttachMediaToPostApiV1MediaPostsPostIdAttachPostResponse,
   BlockUserApiV1FriendsBlockPostData,
+  BlockUserApiV1FriendsBlockPostError,
   BlockUserApiV1FriendsBlockPostResponse,
-  CancelTradeApiV1TradesTradeIdCancelPostData,
-  CancelTradeApiV1TradesTradeIdCancelPostError,
-  CancelTradeApiV1TradesTradeIdCancelPostResponse,
   ClosePostApiV1PostsPostIdClosePostData,
   ClosePostApiV1PostsPostIdClosePostResponse,
-  CompleteTradeApiV1TradesTradeIdCompletePostData,
-  CompleteTradeApiV1TradesTradeIdCompletePostError,
-  CompleteTradeApiV1TradesTradeIdCompletePostResponse,
   ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostData,
   ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostError,
   ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostResponse,
+  ConfirmUploadApiV1MediaMediaIdConfirmPostData,
+  ConfirmUploadApiV1MediaMediaIdConfirmPostError,
+  ConfirmUploadApiV1MediaMediaIdConfirmPostResponse,
+  CreateGalleryCardApiV1GalleryCardsPostData,
+  CreateGalleryCardApiV1GalleryCardsPostError,
+  CreateGalleryCardApiV1GalleryCardsPostResponse,
+  CreateMessageRequestApiV1MessageRequestsPostData,
+  CreateMessageRequestApiV1MessageRequestsPostError,
+  CreateMessageRequestApiV1MessageRequestsPostResponse,
   CreatePostApiV1PostsPostData,
   CreatePostApiV1PostsPostResponse,
-  CreateTradeApiV1TradesPostData,
-  CreateTradeApiV1TradesPostResponse,
+  CreateUploadUrlApiV1MediaUploadUrlPostData,
+  CreateUploadUrlApiV1MediaUploadUrlPostError,
+  CreateUploadUrlApiV1MediaUploadUrlPostResponse,
+  DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostData,
+  DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostError,
+  DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostResponse,
   DeleteCardApiV1CardsCardIdDeleteData,
   DeleteCardApiV1CardsCardIdDeleteError,
   DeleteCardApiV1CardsCardIdDeleteResponse,
+  DeleteGalleryCardApiV1GalleryCardsCardIdDeleteData,
+  DeleteGalleryCardApiV1GalleryCardsCardIdDeleteError,
+  DeleteGalleryCardApiV1GalleryCardsCardIdDeleteResponse,
   ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostData,
   ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostResponse,
-  ExpressInterestApiV1PostsPostIdInterestPostData,
-  ExpressInterestApiV1PostsPostIdInterestPostResponse,
-  GetAverageRatingApiV1RatingsUserUserIdAverageGetData,
-  GetAverageRatingApiV1RatingsUserUserIdAverageGetError,
-  GetAverageRatingApiV1RatingsUserUserIdAverageGetResponse,
   GetChatRoomsApiV1ChatsGetData,
   GetChatRoomsApiV1ChatsGetResponse,
   GetCitiesApiV1LocationsCitiesGetData,
   GetCitiesApiV1LocationsCitiesGetResponse,
-  GetFriendsApiV1FriendsGetData,
-  GetFriendsApiV1FriendsGetError,
-  GetFriendsApiV1FriendsGetResponse,
   GetIdolGroupsApiV1IdolsGroupsGetData,
   GetIdolGroupsApiV1IdolsGroupsGetResponse,
   GetMessagesApiV1ChatsRoomIdMessagesGetData,
@@ -114,34 +118,36 @@ import type {
   GetMyCardsApiV1CardsMeGetData,
   GetMyCardsApiV1CardsMeGetError,
   GetMyCardsApiV1CardsMeGetResponse,
+  GetMyGalleryCardsApiV1GalleryCardsMeGetData,
+  GetMyGalleryCardsApiV1GalleryCardsMeGetResponse,
+  GetMyMessageRequestsApiV1MessageRequestsInboxGetData,
+  GetMyMessageRequestsApiV1MessageRequestsInboxGetError,
+  GetMyMessageRequestsApiV1MessageRequestsInboxGetResponse,
   GetMyProfileApiV1ProfileMeGetData,
   GetMyProfileApiV1ProfileMeGetResponse,
   GetMyReportsApiV1ReportsGetData,
   GetMyReportsApiV1ReportsGetResponse,
-  GetPostInterestApiV1PostsPostIdInterestsInterestIdGetData,
-  GetPostInterestApiV1PostsPostIdInterestsInterestIdGetError,
-  GetPostInterestApiV1PostsPostIdInterestsInterestIdGetResponse,
+  GetMyThreadsApiV1ThreadsGetData,
+  GetMyThreadsApiV1ThreadsGetError,
+  GetMyThreadsApiV1ThreadsGetResponse,
   GetQuotaStatusApiV1CardsQuotaStatusGetData,
   GetQuotaStatusApiV1CardsQuotaStatusGetResponse,
   GetSubscriptionStatusApiV1SubscriptionsStatusGetData,
   GetSubscriptionStatusApiV1SubscriptionsStatusGetResponse,
-  GetTradeHistoryApiV1TradesHistoryGetData,
-  GetTradeHistoryApiV1TradesHistoryGetError,
-  GetTradeHistoryApiV1TradesHistoryGetResponse,
+  GetThreadMessagesApiV1ThreadsThreadIdMessagesGetData,
+  GetThreadMessagesApiV1ThreadsThreadIdMessagesGetError,
+  GetThreadMessagesApiV1ThreadsThreadIdMessagesGetResponse,
   GetUploadUrlApiV1CardsUploadUrlPostData,
   GetUploadUrlApiV1CardsUploadUrlPostResponse,
-  GetUserRatingsApiV1RatingsUserUserIdGetData,
-  GetUserRatingsApiV1RatingsUserUserIdGetError,
-  GetUserRatingsApiV1RatingsUserUserIdGetResponse,
+  GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetData,
+  GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetError,
+  GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetResponse,
   GoogleCallbackApiV1AuthGoogleCallbackPostData,
   GoogleCallbackApiV1AuthGoogleCallbackPostResponse,
   GoogleLoginApiV1AuthGoogleLoginPostData,
   GoogleLoginApiV1AuthGoogleLoginPostError,
   GoogleLoginApiV1AuthGoogleLoginPostResponse,
   HealthCheckHealthGetData,
-  ListPostInterestsApiV1PostsPostIdInterestsGetData,
-  ListPostInterestsApiV1PostsPostIdInterestsGetError,
-  ListPostInterestsApiV1PostsPostIdInterestsGetResponse,
   ListPostsApiV1PostsGetData,
   ListPostsApiV1PostsGetError,
   ListPostsApiV1PostsGetResponse,
@@ -151,31 +157,26 @@ import type {
   RefreshTokenApiV1AuthRefreshPostData,
   RefreshTokenApiV1AuthRefreshPostError,
   RefreshTokenApiV1AuthRefreshPostResponse,
-  RejectInterestApiV1PostsPostIdInterestsInterestIdRejectPostData,
-  RejectInterestApiV1PostsPostIdInterestsInterestIdRejectPostResponse,
-  RejectTradeApiV1TradesTradeIdRejectPostData,
-  RejectTradeApiV1TradesTradeIdRejectPostError,
-  RejectTradeApiV1TradesTradeIdRejectPostResponse,
+  ReorderGalleryCardsApiV1GalleryCardsReorderPutData,
+  ReorderGalleryCardsApiV1GalleryCardsReorderPutError,
+  ReorderGalleryCardsApiV1GalleryCardsReorderPutResponse,
   RootGetData,
-  SearchNearbyCardsApiV1NearbySearchPostData,
-  SearchNearbyCardsApiV1NearbySearchPostError,
-  SearchNearbyCardsApiV1NearbySearchPostResponse,
-  SendFriendRequestApiV1FriendsRequestPostData,
-  SendFriendRequestApiV1FriendsRequestPostResponse,
   SendMessageApiV1ChatsRoomIdMessagesPostData,
   SendMessageApiV1ChatsRoomIdMessagesPostResponse,
-  SubmitRatingApiV1RatingsPostData,
-  SubmitRatingApiV1RatingsPostResponse,
+  SendMessageApiV1ThreadsThreadIdMessagesPostData,
+  SendMessageApiV1ThreadsThreadIdMessagesPostError,
+  SendMessageApiV1ThreadsThreadIdMessagesPostResponse,
   SubmitReportApiV1ReportsPostData,
   SubmitReportApiV1ReportsPostResponse,
+  ToggleLikeApiV1PostsPostIdLikePostData,
+  ToggleLikeApiV1PostsPostIdLikePostError,
+  ToggleLikeApiV1PostsPostIdLikePostResponse,
   UnblockUserApiV1FriendsUnblockPostData,
+  UnblockUserApiV1FriendsUnblockPostError,
   UnblockUserApiV1FriendsUnblockPostResponse,
   UpdateMyProfileApiV1ProfileMePutData,
   UpdateMyProfileApiV1ProfileMePutError,
   UpdateMyProfileApiV1ProfileMePutResponse,
-  UpdateUserLocationApiV1NearbyLocationPutData,
-  UpdateUserLocationApiV1NearbyLocationPutError,
-  UpdateUserLocationApiV1NearbyLocationPutResponse,
   VerifyReceiptApiV1SubscriptionsVerifyReceiptPostData,
   VerifyReceiptApiV1SubscriptionsVerifyReceiptPostError,
   VerifyReceiptApiV1SubscriptionsVerifyReceiptPostResponse,
@@ -297,7 +298,7 @@ export const rootGetOptions = (options?: Options<RootGetData>) =>
 /**
  * Admin login with email/password
  *
- * Authenticate admin user with email and password. Only users with admin or super_admin role can login.
+ * Authenticate admin user with email and password and receive JWT tokens
  */
 export const adminLoginApiV1AuthAdminLoginPostMutation = (
   options?: Partial<Options<AdminLoginApiV1AuthAdminLoginPostData>>
@@ -382,9 +383,9 @@ export const googleCallbackApiV1AuthGoogleCallbackPostMutation = (
 };
 
 /**
- * Refresh access token
+ * Refresh access token (cookie-based)
  *
- * Use refresh token to obtain new access and refresh tokens
+ * Use refresh token from httpOnly cookie to obtain new access and refresh tokens
  */
 export const refreshTokenApiV1AuthRefreshPostMutation = (
   options?: Partial<Options<RefreshTokenApiV1AuthRefreshPostData>>
@@ -509,6 +510,239 @@ export const getIdolGroupsApiV1IdolsGroupsGetOptions = (
     },
     queryKey: getIdolGroupsApiV1IdolsGroupsGetQueryKey(options),
   });
+
+/**
+ * Verify Receipt
+ *
+ * Verify Google Play purchase receipt and update subscription.
+ *
+ * Features:
+ * - Idempotent: Same token + same user returns current status
+ * - Token binding: Prevents cross-user replay attacks
+ * - Auto-acknowledge: Acknowledges purchase after verification
+ *
+ * Error codes:
+ * - 400_VALIDATION_FAILED: Invalid platform or missing fields
+ * - 401_UNAUTHORIZED: Not logged in
+ * - 409_CONFLICT: Purchase token already used by another user
+ * - 503_SERVICE_UNAVAILABLE: Google Play API unavailable
+ */
+export const verifyReceiptApiV1SubscriptionsVerifyReceiptPostMutation = (
+  options?: Partial<Options<VerifyReceiptApiV1SubscriptionsVerifyReceiptPostData>>
+): UseMutationOptions<
+  VerifyReceiptApiV1SubscriptionsVerifyReceiptPostResponse,
+  VerifyReceiptApiV1SubscriptionsVerifyReceiptPostError,
+  Options<VerifyReceiptApiV1SubscriptionsVerifyReceiptPostData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    VerifyReceiptApiV1SubscriptionsVerifyReceiptPostResponse,
+    VerifyReceiptApiV1SubscriptionsVerifyReceiptPostError,
+    Options<VerifyReceiptApiV1SubscriptionsVerifyReceiptPostData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await verifyReceiptApiV1SubscriptionsVerifyReceiptPost({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const getSubscriptionStatusApiV1SubscriptionsStatusGetQueryKey = (
+  options?: Options<GetSubscriptionStatusApiV1SubscriptionsStatusGetData>
+) => createQueryKey('getSubscriptionStatusApiV1SubscriptionsStatusGet', options);
+
+/**
+ * Get Subscription Status
+ *
+ * Get current subscription status for authenticated user.
+ *
+ * Returns server-side subscription state.
+ * Called by app when opening or returning to foreground.
+ *
+ * Error codes:
+ * - 401_UNAUTHORIZED: Not logged in
+ * - 503_SERVICE_UNAVAILABLE: Database unavailable
+ */
+export const getSubscriptionStatusApiV1SubscriptionsStatusGetOptions = (
+  options?: Options<GetSubscriptionStatusApiV1SubscriptionsStatusGetData>
+) =>
+  queryOptions<
+    GetSubscriptionStatusApiV1SubscriptionsStatusGetResponse,
+    DefaultError,
+    GetSubscriptionStatusApiV1SubscriptionsStatusGetResponse,
+    ReturnType<typeof getSubscriptionStatusApiV1SubscriptionsStatusGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getSubscriptionStatusApiV1SubscriptionsStatusGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getSubscriptionStatusApiV1SubscriptionsStatusGetQueryKey(options),
+  });
+
+/**
+ * Expire Subscriptions
+ *
+ * Expire active subscriptions that have passed their expiry date.
+ *
+ * This endpoint should be called by a scheduled background task (e.g., daily cron job).
+ * For POC, it's exposed as an HTTP endpoint for manual triggering.
+ *
+ * In production, this should be:
+ * - Protected by admin authentication or internal-only access
+ * - Triggered by a scheduler (APScheduler, Celery Beat, Cloud Scheduler, etc.)
+ *
+ * Returns:
+ * Number of subscriptions expired and processing timestamp
+ */
+export const expireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostMutation = (
+  options?: Partial<Options<ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostData>>
+): UseMutationOptions<
+  ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostResponse,
+  DefaultError,
+  Options<ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostResponse,
+    DefaultError,
+    Options<ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await expireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPost({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Block a user
+ *
+ * Block a user to prevent interaction. Required for FR-025 (blocking support).
+ */
+export const blockUserApiV1FriendsBlockPostMutation = (
+  options?: Partial<Options<BlockUserApiV1FriendsBlockPostData>>
+): UseMutationOptions<
+  BlockUserApiV1FriendsBlockPostResponse,
+  BlockUserApiV1FriendsBlockPostError,
+  Options<BlockUserApiV1FriendsBlockPostData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    BlockUserApiV1FriendsBlockPostResponse,
+    BlockUserApiV1FriendsBlockPostError,
+    Options<BlockUserApiV1FriendsBlockPostData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await blockUserApiV1FriendsBlockPost({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Unblock a user
+ *
+ * Unblock a previously blocked user. Required for FR-025.
+ */
+export const unblockUserApiV1FriendsUnblockPostMutation = (
+  options?: Partial<Options<UnblockUserApiV1FriendsUnblockPostData>>
+): UseMutationOptions<
+  UnblockUserApiV1FriendsUnblockPostResponse,
+  UnblockUserApiV1FriendsUnblockPostError,
+  Options<UnblockUserApiV1FriendsUnblockPostData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    UnblockUserApiV1FriendsUnblockPostResponse,
+    UnblockUserApiV1FriendsUnblockPostError,
+    Options<UnblockUserApiV1FriendsUnblockPostData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await unblockUserApiV1FriendsUnblockPost({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const getMyReportsApiV1ReportsGetQueryKey = (
+  options?: Options<GetMyReportsApiV1ReportsGetData>
+) => createQueryKey('getMyReportsApiV1ReportsGet', options);
+
+/**
+ * Get my reports
+ *
+ * Get reports submitted by the current user
+ */
+export const getMyReportsApiV1ReportsGetOptions = (
+  options?: Options<GetMyReportsApiV1ReportsGetData>
+) =>
+  queryOptions<
+    GetMyReportsApiV1ReportsGetResponse,
+    DefaultError,
+    GetMyReportsApiV1ReportsGetResponse,
+    ReturnType<typeof getMyReportsApiV1ReportsGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getMyReportsApiV1ReportsGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getMyReportsApiV1ReportsGetQueryKey(options),
+  });
+
+/**
+ * Submit report
+ *
+ * Submit a report for inappropriate behavior or content
+ */
+export const submitReportApiV1ReportsPostMutation = (
+  options?: Partial<Options<SubmitReportApiV1ReportsPostData>>
+): UseMutationOptions<
+  SubmitReportApiV1ReportsPostResponse,
+  DefaultError,
+  Options<SubmitReportApiV1ReportsPostData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    SubmitReportApiV1ReportsPostResponse,
+    DefaultError,
+    Options<SubmitReportApiV1ReportsPostData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await submitReportApiV1ReportsPost({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
 
 /**
  * Get upload signed URL
@@ -657,210 +891,6 @@ export const confirmCardUploadApiV1CardsCardIdConfirmUploadPostMutation = (
   return mutationOptions;
 };
 
-/**
- * Search for nearby cards
- *
- * Search for cards near a specific location. Free users: 5 searches/day. Premium users: unlimited.
- */
-export const searchNearbyCardsApiV1NearbySearchPostMutation = (
-  options?: Partial<Options<SearchNearbyCardsApiV1NearbySearchPostData>>
-): UseMutationOptions<
-  SearchNearbyCardsApiV1NearbySearchPostResponse,
-  SearchNearbyCardsApiV1NearbySearchPostError,
-  Options<SearchNearbyCardsApiV1NearbySearchPostData>
-> => {
-  const mutationOptions: UseMutationOptions<
-    SearchNearbyCardsApiV1NearbySearchPostResponse,
-    SearchNearbyCardsApiV1NearbySearchPostError,
-    Options<SearchNearbyCardsApiV1NearbySearchPostData>
-  > = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await searchNearbyCardsApiV1NearbySearchPost({
-        ...options,
-        ...fnOptions,
-        throwOnError: true,
-      });
-      return data;
-    },
-  };
-  return mutationOptions;
-};
-
-/**
- * Update user location
- *
- * Update the user's current location for nearby search visibility
- */
-export const updateUserLocationApiV1NearbyLocationPutMutation = (
-  options?: Partial<Options<UpdateUserLocationApiV1NearbyLocationPutData>>
-): UseMutationOptions<
-  UpdateUserLocationApiV1NearbyLocationPutResponse,
-  UpdateUserLocationApiV1NearbyLocationPutError,
-  Options<UpdateUserLocationApiV1NearbyLocationPutData>
-> => {
-  const mutationOptions: UseMutationOptions<
-    UpdateUserLocationApiV1NearbyLocationPutResponse,
-    UpdateUserLocationApiV1NearbyLocationPutError,
-    Options<UpdateUserLocationApiV1NearbyLocationPutData>
-  > = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await updateUserLocationApiV1NearbyLocationPut({
-        ...options,
-        ...fnOptions,
-        throwOnError: true,
-      });
-      return data;
-    },
-  };
-  return mutationOptions;
-};
-
-/**
- * Send friend request
- *
- * Send a friend request to another user
- */
-export const sendFriendRequestApiV1FriendsRequestPostMutation = (
-  options?: Partial<Options<SendFriendRequestApiV1FriendsRequestPostData>>
-): UseMutationOptions<
-  SendFriendRequestApiV1FriendsRequestPostResponse,
-  DefaultError,
-  Options<SendFriendRequestApiV1FriendsRequestPostData>
-> => {
-  const mutationOptions: UseMutationOptions<
-    SendFriendRequestApiV1FriendsRequestPostResponse,
-    DefaultError,
-    Options<SendFriendRequestApiV1FriendsRequestPostData>
-  > = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await sendFriendRequestApiV1FriendsRequestPost({
-        ...options,
-        ...fnOptions,
-        throwOnError: true,
-      });
-      return data;
-    },
-  };
-  return mutationOptions;
-};
-
-/**
- * Accept friend request
- *
- * Accept a pending friend request
- */
-export const acceptFriendRequestApiV1FriendsFriendshipIdAcceptPostMutation = (
-  options?: Partial<Options<AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostData>>
-): UseMutationOptions<
-  AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostResponse,
-  DefaultError,
-  Options<AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostData>
-> => {
-  const mutationOptions: UseMutationOptions<
-    AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostResponse,
-    DefaultError,
-    Options<AcceptFriendRequestApiV1FriendsFriendshipIdAcceptPostData>
-  > = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await acceptFriendRequestApiV1FriendsFriendshipIdAcceptPost({
-        ...options,
-        ...fnOptions,
-        throwOnError: true,
-      });
-      return data;
-    },
-  };
-  return mutationOptions;
-};
-
-/**
- * Block user
- *
- * Block another user (prevents all interactions)
- */
-export const blockUserApiV1FriendsBlockPostMutation = (
-  options?: Partial<Options<BlockUserApiV1FriendsBlockPostData>>
-): UseMutationOptions<
-  BlockUserApiV1FriendsBlockPostResponse,
-  DefaultError,
-  Options<BlockUserApiV1FriendsBlockPostData>
-> => {
-  const mutationOptions: UseMutationOptions<
-    BlockUserApiV1FriendsBlockPostResponse,
-    DefaultError,
-    Options<BlockUserApiV1FriendsBlockPostData>
-  > = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await blockUserApiV1FriendsBlockPost({
-        ...options,
-        ...fnOptions,
-        throwOnError: true,
-      });
-      return data;
-    },
-  };
-  return mutationOptions;
-};
-
-/**
- * Unblock user
- *
- * Unblock a previously blocked user (allows future interactions)
- */
-export const unblockUserApiV1FriendsUnblockPostMutation = (
-  options?: Partial<Options<UnblockUserApiV1FriendsUnblockPostData>>
-): UseMutationOptions<
-  UnblockUserApiV1FriendsUnblockPostResponse,
-  DefaultError,
-  Options<UnblockUserApiV1FriendsUnblockPostData>
-> => {
-  const mutationOptions: UseMutationOptions<
-    UnblockUserApiV1FriendsUnblockPostResponse,
-    DefaultError,
-    Options<UnblockUserApiV1FriendsUnblockPostData>
-  > = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await unblockUserApiV1FriendsUnblockPost({
-        ...options,
-        ...fnOptions,
-        throwOnError: true,
-      });
-      return data;
-    },
-  };
-  return mutationOptions;
-};
-
-export const getFriendsApiV1FriendsGetQueryKey = (
-  options?: Options<GetFriendsApiV1FriendsGetData>
-) => createQueryKey('getFriendsApiV1FriendsGet', options);
-
-/**
- * Get friend list
- *
- * Get list of friends (optionally filtered by status)
- */
-export const getFriendsApiV1FriendsGetOptions = (
-  options?: Options<GetFriendsApiV1FriendsGetData>
-) =>
-  queryOptions<
-    GetFriendsApiV1FriendsGetResponse,
-    GetFriendsApiV1FriendsGetError,
-    GetFriendsApiV1FriendsGetResponse,
-    ReturnType<typeof getFriendsApiV1FriendsGetQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getFriendsApiV1FriendsGet({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getFriendsApiV1FriendsGetQueryKey(options),
-  });
-
 export const getChatRoomsApiV1ChatsGetQueryKey = (
   options?: Options<GetChatRoomsApiV1ChatsGetData>
 ) => createQueryKey('getChatRoomsApiV1ChatsGet', options);
@@ -979,55 +1009,23 @@ export const markMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostMutation = 
   return mutationOptions;
 };
 
-/**
- * Submit rating
- *
- * Submit a rating for another user (based on friendship or completed trade)
- */
-export const submitRatingApiV1RatingsPostMutation = (
-  options?: Partial<Options<SubmitRatingApiV1RatingsPostData>>
-): UseMutationOptions<
-  SubmitRatingApiV1RatingsPostResponse,
-  DefaultError,
-  Options<SubmitRatingApiV1RatingsPostData>
-> => {
-  const mutationOptions: UseMutationOptions<
-    SubmitRatingApiV1RatingsPostResponse,
-    DefaultError,
-    Options<SubmitRatingApiV1RatingsPostData>
-  > = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await submitRatingApiV1RatingsPost({
-        ...options,
-        ...fnOptions,
-        throwOnError: true,
-      });
-      return data;
-    },
-  };
-  return mutationOptions;
-};
-
-export const getUserRatingsApiV1RatingsUserUserIdGetQueryKey = (
-  options: Options<GetUserRatingsApiV1RatingsUserUserIdGetData>
-) => createQueryKey('getUserRatingsApiV1RatingsUserUserIdGet', options);
+export const listPostsApiV1PostsGetQueryKey = (options?: Options<ListPostsApiV1PostsGetData>) =>
+  createQueryKey('listPostsApiV1PostsGet', options);
 
 /**
- * Get user ratings
+ * List posts (V2: global/city filtering with category)
  *
- * Get ratings received by a specific user
+ * List posts. FR-005: Global view (no city_code) shows all posts; City view (with city_code) shows city-specific posts.
  */
-export const getUserRatingsApiV1RatingsUserUserIdGetOptions = (
-  options: Options<GetUserRatingsApiV1RatingsUserUserIdGetData>
-) =>
+export const listPostsApiV1PostsGetOptions = (options?: Options<ListPostsApiV1PostsGetData>) =>
   queryOptions<
-    GetUserRatingsApiV1RatingsUserUserIdGetResponse,
-    GetUserRatingsApiV1RatingsUserUserIdGetError,
-    GetUserRatingsApiV1RatingsUserUserIdGetResponse,
-    ReturnType<typeof getUserRatingsApiV1RatingsUserUserIdGetQueryKey>
+    ListPostsApiV1PostsGetResponse,
+    ListPostsApiV1PostsGetError,
+    ListPostsApiV1PostsGetResponse,
+    ReturnType<typeof listPostsApiV1PostsGetQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getUserRatingsApiV1RatingsUserUserIdGet({
+      const { data } = await listPostsApiV1PostsGet({
         ...options,
         ...queryKey[0],
         signal,
@@ -1035,271 +1033,7 @@ export const getUserRatingsApiV1RatingsUserUserIdGetOptions = (
       });
       return data;
     },
-    queryKey: getUserRatingsApiV1RatingsUserUserIdGetQueryKey(options),
-  });
-
-export const getAverageRatingApiV1RatingsUserUserIdAverageGetQueryKey = (
-  options: Options<GetAverageRatingApiV1RatingsUserUserIdAverageGetData>
-) => createQueryKey('getAverageRatingApiV1RatingsUserUserIdAverageGet', options);
-
-/**
- * Get average rating
- *
- * Get average rating score for a specific user
- */
-export const getAverageRatingApiV1RatingsUserUserIdAverageGetOptions = (
-  options: Options<GetAverageRatingApiV1RatingsUserUserIdAverageGetData>
-) =>
-  queryOptions<
-    GetAverageRatingApiV1RatingsUserUserIdAverageGetResponse,
-    GetAverageRatingApiV1RatingsUserUserIdAverageGetError,
-    GetAverageRatingApiV1RatingsUserUserIdAverageGetResponse,
-    ReturnType<typeof getAverageRatingApiV1RatingsUserUserIdAverageGetQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getAverageRatingApiV1RatingsUserUserIdAverageGet({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getAverageRatingApiV1RatingsUserUserIdAverageGetQueryKey(options),
-  });
-
-export const getMyReportsApiV1ReportsGetQueryKey = (
-  options?: Options<GetMyReportsApiV1ReportsGetData>
-) => createQueryKey('getMyReportsApiV1ReportsGet', options);
-
-/**
- * Get my reports
- *
- * Get reports submitted by the current user
- */
-export const getMyReportsApiV1ReportsGetOptions = (
-  options?: Options<GetMyReportsApiV1ReportsGetData>
-) =>
-  queryOptions<
-    GetMyReportsApiV1ReportsGetResponse,
-    DefaultError,
-    GetMyReportsApiV1ReportsGetResponse,
-    ReturnType<typeof getMyReportsApiV1ReportsGetQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getMyReportsApiV1ReportsGet({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getMyReportsApiV1ReportsGetQueryKey(options),
-  });
-
-/**
- * Submit report
- *
- * Submit a report for inappropriate behavior or content
- */
-export const submitReportApiV1ReportsPostMutation = (
-  options?: Partial<Options<SubmitReportApiV1ReportsPostData>>
-): UseMutationOptions<
-  SubmitReportApiV1ReportsPostResponse,
-  DefaultError,
-  Options<SubmitReportApiV1ReportsPostData>
-> => {
-  const mutationOptions: UseMutationOptions<
-    SubmitReportApiV1ReportsPostResponse,
-    DefaultError,
-    Options<SubmitReportApiV1ReportsPostData>
-  > = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await submitReportApiV1ReportsPost({
-        ...options,
-        ...fnOptions,
-        throwOnError: true,
-      });
-      return data;
-    },
-  };
-  return mutationOptions;
-};
-
-/**
- * Create trade proposal
- *
- * Create a new trade proposal between two users
- */
-export const createTradeApiV1TradesPostMutation = (
-  options?: Partial<Options<CreateTradeApiV1TradesPostData>>
-): UseMutationOptions<
-  CreateTradeApiV1TradesPostResponse,
-  DefaultError,
-  Options<CreateTradeApiV1TradesPostData>
-> => {
-  const mutationOptions: UseMutationOptions<
-    CreateTradeApiV1TradesPostResponse,
-    DefaultError,
-    Options<CreateTradeApiV1TradesPostData>
-  > = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await createTradeApiV1TradesPost({
-        ...options,
-        ...fnOptions,
-        throwOnError: true,
-      });
-      return data;
-    },
-  };
-  return mutationOptions;
-};
-
-/**
- * Accept trade proposal
- *
- * Accept a trade proposal (responder only)
- */
-export const acceptTradeApiV1TradesTradeIdAcceptPostMutation = (
-  options?: Partial<Options<AcceptTradeApiV1TradesTradeIdAcceptPostData>>
-): UseMutationOptions<
-  AcceptTradeApiV1TradesTradeIdAcceptPostResponse,
-  DefaultError,
-  Options<AcceptTradeApiV1TradesTradeIdAcceptPostData>
-> => {
-  const mutationOptions: UseMutationOptions<
-    AcceptTradeApiV1TradesTradeIdAcceptPostResponse,
-    DefaultError,
-    Options<AcceptTradeApiV1TradesTradeIdAcceptPostData>
-  > = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await acceptTradeApiV1TradesTradeIdAcceptPost({
-        ...options,
-        ...fnOptions,
-        throwOnError: true,
-      });
-      return data;
-    },
-  };
-  return mutationOptions;
-};
-
-/**
- * Reject trade proposal
- *
- * Reject a trade proposal (responder only)
- */
-export const rejectTradeApiV1TradesTradeIdRejectPostMutation = (
-  options?: Partial<Options<RejectTradeApiV1TradesTradeIdRejectPostData>>
-): UseMutationOptions<
-  RejectTradeApiV1TradesTradeIdRejectPostResponse,
-  RejectTradeApiV1TradesTradeIdRejectPostError,
-  Options<RejectTradeApiV1TradesTradeIdRejectPostData>
-> => {
-  const mutationOptions: UseMutationOptions<
-    RejectTradeApiV1TradesTradeIdRejectPostResponse,
-    RejectTradeApiV1TradesTradeIdRejectPostError,
-    Options<RejectTradeApiV1TradesTradeIdRejectPostData>
-  > = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await rejectTradeApiV1TradesTradeIdRejectPost({
-        ...options,
-        ...fnOptions,
-        throwOnError: true,
-      });
-      return data;
-    },
-  };
-  return mutationOptions;
-};
-
-/**
- * Cancel trade
- *
- * Cancel a trade (either party can cancel)
- */
-export const cancelTradeApiV1TradesTradeIdCancelPostMutation = (
-  options?: Partial<Options<CancelTradeApiV1TradesTradeIdCancelPostData>>
-): UseMutationOptions<
-  CancelTradeApiV1TradesTradeIdCancelPostResponse,
-  CancelTradeApiV1TradesTradeIdCancelPostError,
-  Options<CancelTradeApiV1TradesTradeIdCancelPostData>
-> => {
-  const mutationOptions: UseMutationOptions<
-    CancelTradeApiV1TradesTradeIdCancelPostResponse,
-    CancelTradeApiV1TradesTradeIdCancelPostError,
-    Options<CancelTradeApiV1TradesTradeIdCancelPostData>
-  > = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await cancelTradeApiV1TradesTradeIdCancelPost({
-        ...options,
-        ...fnOptions,
-        throwOnError: true,
-      });
-      return data;
-    },
-  };
-  return mutationOptions;
-};
-
-/**
- * Confirm trade completion
- *
- * Confirm trade completion (each party confirms independently)
- */
-export const completeTradeApiV1TradesTradeIdCompletePostMutation = (
-  options?: Partial<Options<CompleteTradeApiV1TradesTradeIdCompletePostData>>
-): UseMutationOptions<
-  CompleteTradeApiV1TradesTradeIdCompletePostResponse,
-  CompleteTradeApiV1TradesTradeIdCompletePostError,
-  Options<CompleteTradeApiV1TradesTradeIdCompletePostData>
-> => {
-  const mutationOptions: UseMutationOptions<
-    CompleteTradeApiV1TradesTradeIdCompletePostResponse,
-    CompleteTradeApiV1TradesTradeIdCompletePostError,
-    Options<CompleteTradeApiV1TradesTradeIdCompletePostData>
-  > = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await completeTradeApiV1TradesTradeIdCompletePost({
-        ...options,
-        ...fnOptions,
-        throwOnError: true,
-      });
-      return data;
-    },
-  };
-  return mutationOptions;
-};
-
-export const getTradeHistoryApiV1TradesHistoryGetQueryKey = (
-  options?: Options<GetTradeHistoryApiV1TradesHistoryGetData>
-) => createQueryKey('getTradeHistoryApiV1TradesHistoryGet', options);
-
-/**
- * Get trade history
- *
- * Get all trades for current user (as initiator or responder)
- */
-export const getTradeHistoryApiV1TradesHistoryGetOptions = (
-  options?: Options<GetTradeHistoryApiV1TradesHistoryGetData>
-) =>
-  queryOptions<
-    GetTradeHistoryApiV1TradesHistoryGetResponse,
-    GetTradeHistoryApiV1TradesHistoryGetError,
-    GetTradeHistoryApiV1TradesHistoryGetResponse,
-    ReturnType<typeof getTradeHistoryApiV1TradesHistoryGetQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getTradeHistoryApiV1TradesHistoryGet({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getTradeHistoryApiV1TradesHistoryGetQueryKey(options),
+    queryKey: listPostsApiV1PostsGetQueryKey(options),
   });
 
 const createInfiniteParams = <
@@ -1336,213 +1070,18 @@ const createInfiniteParams = <
   return params as unknown as typeof page;
 };
 
-export const getTradeHistoryApiV1TradesHistoryGetInfiniteQueryKey = (
-  options?: Options<GetTradeHistoryApiV1TradesHistoryGetData>
-): QueryKey<Options<GetTradeHistoryApiV1TradesHistoryGetData>> =>
-  createQueryKey('getTradeHistoryApiV1TradesHistoryGet', options, true);
-
-/**
- * Get trade history
- *
- * Get all trades for current user (as initiator or responder)
- */
-export const getTradeHistoryApiV1TradesHistoryGetInfiniteOptions = (
-  options?: Options<GetTradeHistoryApiV1TradesHistoryGetData>
-) =>
-  infiniteQueryOptions<
-    GetTradeHistoryApiV1TradesHistoryGetResponse,
-    GetTradeHistoryApiV1TradesHistoryGetError,
-    InfiniteData<GetTradeHistoryApiV1TradesHistoryGetResponse>,
-    QueryKey<Options<GetTradeHistoryApiV1TradesHistoryGetData>>,
-    | number
-    | Pick<
-        QueryKey<Options<GetTradeHistoryApiV1TradesHistoryGetData>>[0],
-        'body' | 'headers' | 'path' | 'query'
-      >
-  >(
-    // @ts-ignore
-    {
-      queryFn: async ({ pageParam, queryKey, signal }) => {
-        // @ts-ignore
-        const page: Pick<
-          QueryKey<Options<GetTradeHistoryApiV1TradesHistoryGetData>>[0],
-          'body' | 'headers' | 'path' | 'query'
-        > =
-          typeof pageParam === 'object'
-            ? pageParam
-            : {
-                query: {
-                  offset: pageParam,
-                },
-              };
-        const params = createInfiniteParams(queryKey, page);
-        const { data } = await getTradeHistoryApiV1TradesHistoryGet({
-          ...options,
-          ...params,
-          signal,
-          throwOnError: true,
-        });
-        return data;
-      },
-      queryKey: getTradeHistoryApiV1TradesHistoryGetInfiniteQueryKey(options),
-    }
-  );
-
-/**
- * Verify Receipt
- *
- * Verify Google Play purchase receipt and update subscription.
- *
- * Features:
- * - Idempotent: Same token + same user returns current status
- * - Token binding: Prevents cross-user replay attacks
- * - Auto-acknowledge: Acknowledges purchase after verification
- *
- * Error codes:
- * - 400_VALIDATION_FAILED: Invalid platform or missing fields
- * - 401_UNAUTHORIZED: Not logged in
- * - 409_CONFLICT: Purchase token already used by another user
- * - 503_SERVICE_UNAVAILABLE: Google Play API unavailable
- */
-export const verifyReceiptApiV1SubscriptionsVerifyReceiptPostMutation = (
-  options?: Partial<Options<VerifyReceiptApiV1SubscriptionsVerifyReceiptPostData>>
-): UseMutationOptions<
-  VerifyReceiptApiV1SubscriptionsVerifyReceiptPostResponse,
-  VerifyReceiptApiV1SubscriptionsVerifyReceiptPostError,
-  Options<VerifyReceiptApiV1SubscriptionsVerifyReceiptPostData>
-> => {
-  const mutationOptions: UseMutationOptions<
-    VerifyReceiptApiV1SubscriptionsVerifyReceiptPostResponse,
-    VerifyReceiptApiV1SubscriptionsVerifyReceiptPostError,
-    Options<VerifyReceiptApiV1SubscriptionsVerifyReceiptPostData>
-  > = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await verifyReceiptApiV1SubscriptionsVerifyReceiptPost({
-        ...options,
-        ...fnOptions,
-        throwOnError: true,
-      });
-      return data;
-    },
-  };
-  return mutationOptions;
-};
-
-export const getSubscriptionStatusApiV1SubscriptionsStatusGetQueryKey = (
-  options?: Options<GetSubscriptionStatusApiV1SubscriptionsStatusGetData>
-) => createQueryKey('getSubscriptionStatusApiV1SubscriptionsStatusGet', options);
-
-/**
- * Get Subscription Status
- *
- * Get current subscription status for authenticated user.
- *
- * Returns server-side subscription state.
- * Called by app when opening or returning to foreground.
- *
- * Error codes:
- * - 401_UNAUTHORIZED: Not logged in
- * - 503_SERVICE_UNAVAILABLE: Database unavailable
- */
-export const getSubscriptionStatusApiV1SubscriptionsStatusGetOptions = (
-  options?: Options<GetSubscriptionStatusApiV1SubscriptionsStatusGetData>
-) =>
-  queryOptions<
-    GetSubscriptionStatusApiV1SubscriptionsStatusGetResponse,
-    DefaultError,
-    GetSubscriptionStatusApiV1SubscriptionsStatusGetResponse,
-    ReturnType<typeof getSubscriptionStatusApiV1SubscriptionsStatusGetQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getSubscriptionStatusApiV1SubscriptionsStatusGet({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getSubscriptionStatusApiV1SubscriptionsStatusGetQueryKey(options),
-  });
-
-/**
- * Expire Subscriptions
- *
- * Expire active subscriptions that have passed their expiry date.
- *
- * This endpoint should be called by a scheduled background task (e.g., daily cron job).
- * For POC, it's exposed as an HTTP endpoint for manual triggering.
- *
- * In production, this should be:
- * - Protected by admin authentication or internal-only access
- * - Triggered by a scheduler (APScheduler, Celery Beat, Cloud Scheduler, etc.)
- *
- * Returns:
- * Number of subscriptions expired and processing timestamp
- */
-export const expireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostMutation = (
-  options?: Partial<Options<ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostData>>
-): UseMutationOptions<
-  ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostResponse,
-  DefaultError,
-  Options<ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostData>
-> => {
-  const mutationOptions: UseMutationOptions<
-    ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostResponse,
-    DefaultError,
-    Options<ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostData>
-  > = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await expireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPost({
-        ...options,
-        ...fnOptions,
-        throwOnError: true,
-      });
-      return data;
-    },
-  };
-  return mutationOptions;
-};
-
-export const listPostsApiV1PostsGetQueryKey = (options: Options<ListPostsApiV1PostsGetData>) =>
-  createQueryKey('listPostsApiV1PostsGet', options);
-
-/**
- * List posts on a city board
- *
- * List all open posts for a specific city with optional filters
- */
-export const listPostsApiV1PostsGetOptions = (options: Options<ListPostsApiV1PostsGetData>) =>
-  queryOptions<
-    ListPostsApiV1PostsGetResponse,
-    ListPostsApiV1PostsGetError,
-    ListPostsApiV1PostsGetResponse,
-    ReturnType<typeof listPostsApiV1PostsGetQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await listPostsApiV1PostsGet({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: listPostsApiV1PostsGetQueryKey(options),
-  });
-
 export const listPostsApiV1PostsGetInfiniteQueryKey = (
-  options: Options<ListPostsApiV1PostsGetData>
+  options?: Options<ListPostsApiV1PostsGetData>
 ): QueryKey<Options<ListPostsApiV1PostsGetData>> =>
   createQueryKey('listPostsApiV1PostsGet', options, true);
 
 /**
- * List posts on a city board
+ * List posts (V2: global/city filtering with category)
  *
- * List all open posts for a specific city with optional filters
+ * List posts. FR-005: Global view (no city_code) shows all posts; City view (with city_code) shows city-specific posts.
  */
 export const listPostsApiV1PostsGetInfiniteOptions = (
-  options: Options<ListPostsApiV1PostsGetData>
+  options?: Options<ListPostsApiV1PostsGetData>
 ) =>
   infiniteQueryOptions<
     ListPostsApiV1PostsGetResponse,
@@ -1581,9 +1120,9 @@ export const listPostsApiV1PostsGetInfiniteOptions = (
   );
 
 /**
- * Create a new city board post
+ * Create a new post (V2: with scope/category)
  *
- * Create a new post on a city board. Free users limited to 2 posts per day.
+ * Create a new post. Requires authentication. Free users limited to 2 posts per day, Premium to 20.
  */
 export const createPostApiV1PostsPostMutation = (
   options?: Partial<Options<CreatePostApiV1PostsPostData>>
@@ -1599,93 +1138,6 @@ export const createPostApiV1PostsPostMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await createPostApiV1PostsPost({
-        ...options,
-        ...fnOptions,
-        throwOnError: true,
-      });
-      return data;
-    },
-  };
-  return mutationOptions;
-};
-
-/**
- * Express interest in a post
- *
- * Express interest in a post. Cannot express interest in your own post or duplicate interests.
- */
-export const expressInterestApiV1PostsPostIdInterestPostMutation = (
-  options?: Partial<Options<ExpressInterestApiV1PostsPostIdInterestPostData>>
-): UseMutationOptions<
-  ExpressInterestApiV1PostsPostIdInterestPostResponse,
-  DefaultError,
-  Options<ExpressInterestApiV1PostsPostIdInterestPostData>
-> => {
-  const mutationOptions: UseMutationOptions<
-    ExpressInterestApiV1PostsPostIdInterestPostResponse,
-    DefaultError,
-    Options<ExpressInterestApiV1PostsPostIdInterestPostData>
-  > = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await expressInterestApiV1PostsPostIdInterestPost({
-        ...options,
-        ...fnOptions,
-        throwOnError: true,
-      });
-      return data;
-    },
-  };
-  return mutationOptions;
-};
-
-/**
- * Accept an interest
- *
- * Accept an interest. Automatically creates friendship and chat room.
- */
-export const acceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostMutation = (
-  options?: Partial<Options<AcceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostData>>
-): UseMutationOptions<
-  AcceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostResponse,
-  DefaultError,
-  Options<AcceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostData>
-> => {
-  const mutationOptions: UseMutationOptions<
-    AcceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostResponse,
-    DefaultError,
-    Options<AcceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPostData>
-  > = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await acceptInterestApiV1PostsPostIdInterestsInterestIdAcceptPost({
-        ...options,
-        ...fnOptions,
-        throwOnError: true,
-      });
-      return data;
-    },
-  };
-  return mutationOptions;
-};
-
-/**
- * Reject an interest
- *
- * Reject an interest. Only post owner can reject.
- */
-export const rejectInterestApiV1PostsPostIdInterestsInterestIdRejectPostMutation = (
-  options?: Partial<Options<RejectInterestApiV1PostsPostIdInterestsInterestIdRejectPostData>>
-): UseMutationOptions<
-  RejectInterestApiV1PostsPostIdInterestsInterestIdRejectPostResponse,
-  DefaultError,
-  Options<RejectInterestApiV1PostsPostIdInterestsInterestIdRejectPostData>
-> => {
-  const mutationOptions: UseMutationOptions<
-    RejectInterestApiV1PostsPostIdInterestsInterestIdRejectPostResponse,
-    DefaultError,
-    Options<RejectInterestApiV1PostsPostIdInterestsInterestIdRejectPostData>
-  > = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await rejectInterestApiV1PostsPostIdInterestsInterestIdRejectPost({
         ...options,
         ...fnOptions,
         throwOnError: true,
@@ -1725,117 +1177,34 @@ export const closePostApiV1PostsPostIdClosePostMutation = (
   return mutationOptions;
 };
 
-export const listPostInterestsApiV1PostsPostIdInterestsGetQueryKey = (
-  options: Options<ListPostInterestsApiV1PostsPostIdInterestsGetData>
-) => createQueryKey('listPostInterestsApiV1PostsPostIdInterestsGet', options);
-
 /**
- * List interests for a post (owner only)
+ * Toggle like on a post (FR-008, FR-009)
  *
- * List all interests for a specific post. Only post owner can view.
+ * Like or unlike a post. Idempotent: if already liked, unlikes; if not liked, likes. Each user can like a post at most once.
  */
-export const listPostInterestsApiV1PostsPostIdInterestsGetOptions = (
-  options: Options<ListPostInterestsApiV1PostsPostIdInterestsGetData>
-) =>
-  queryOptions<
-    ListPostInterestsApiV1PostsPostIdInterestsGetResponse,
-    ListPostInterestsApiV1PostsPostIdInterestsGetError,
-    ListPostInterestsApiV1PostsPostIdInterestsGetResponse,
-    ReturnType<typeof listPostInterestsApiV1PostsPostIdInterestsGetQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await listPostInterestsApiV1PostsPostIdInterestsGet({
+export const toggleLikeApiV1PostsPostIdLikePostMutation = (
+  options?: Partial<Options<ToggleLikeApiV1PostsPostIdLikePostData>>
+): UseMutationOptions<
+  ToggleLikeApiV1PostsPostIdLikePostResponse,
+  ToggleLikeApiV1PostsPostIdLikePostError,
+  Options<ToggleLikeApiV1PostsPostIdLikePostData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    ToggleLikeApiV1PostsPostIdLikePostResponse,
+    ToggleLikeApiV1PostsPostIdLikePostError,
+    Options<ToggleLikeApiV1PostsPostIdLikePostData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await toggleLikeApiV1PostsPostIdLikePost({
         ...options,
-        ...queryKey[0],
-        signal,
+        ...fnOptions,
         throwOnError: true,
       });
       return data;
     },
-    queryKey: listPostInterestsApiV1PostsPostIdInterestsGetQueryKey(options),
-  });
-
-export const listPostInterestsApiV1PostsPostIdInterestsGetInfiniteQueryKey = (
-  options: Options<ListPostInterestsApiV1PostsPostIdInterestsGetData>
-): QueryKey<Options<ListPostInterestsApiV1PostsPostIdInterestsGetData>> =>
-  createQueryKey('listPostInterestsApiV1PostsPostIdInterestsGet', options, true);
-
-/**
- * List interests for a post (owner only)
- *
- * List all interests for a specific post. Only post owner can view.
- */
-export const listPostInterestsApiV1PostsPostIdInterestsGetInfiniteOptions = (
-  options: Options<ListPostInterestsApiV1PostsPostIdInterestsGetData>
-) =>
-  infiniteQueryOptions<
-    ListPostInterestsApiV1PostsPostIdInterestsGetResponse,
-    ListPostInterestsApiV1PostsPostIdInterestsGetError,
-    InfiniteData<ListPostInterestsApiV1PostsPostIdInterestsGetResponse>,
-    QueryKey<Options<ListPostInterestsApiV1PostsPostIdInterestsGetData>>,
-    | number
-    | Pick<
-        QueryKey<Options<ListPostInterestsApiV1PostsPostIdInterestsGetData>>[0],
-        'body' | 'headers' | 'path' | 'query'
-      >
-  >(
-    // @ts-ignore
-    {
-      queryFn: async ({ pageParam, queryKey, signal }) => {
-        // @ts-ignore
-        const page: Pick<
-          QueryKey<Options<ListPostInterestsApiV1PostsPostIdInterestsGetData>>[0],
-          'body' | 'headers' | 'path' | 'query'
-        > =
-          typeof pageParam === 'object'
-            ? pageParam
-            : {
-                query: {
-                  offset: pageParam,
-                },
-              };
-        const params = createInfiniteParams(queryKey, page);
-        const { data } = await listPostInterestsApiV1PostsPostIdInterestsGet({
-          ...options,
-          ...params,
-          signal,
-          throwOnError: true,
-        });
-        return data;
-      },
-      queryKey: listPostInterestsApiV1PostsPostIdInterestsGetInfiniteQueryKey(options),
-    }
-  );
-
-export const getPostInterestApiV1PostsPostIdInterestsInterestIdGetQueryKey = (
-  options: Options<GetPostInterestApiV1PostsPostIdInterestsInterestIdGetData>
-) => createQueryKey('getPostInterestApiV1PostsPostIdInterestsInterestIdGet', options);
-
-/**
- * Get a specific interest (owner only)
- *
- * Get details of a specific interest. Only post owner can view.
- */
-export const getPostInterestApiV1PostsPostIdInterestsInterestIdGetOptions = (
-  options: Options<GetPostInterestApiV1PostsPostIdInterestsInterestIdGetData>
-) =>
-  queryOptions<
-    GetPostInterestApiV1PostsPostIdInterestsInterestIdGetResponse,
-    GetPostInterestApiV1PostsPostIdInterestsInterestIdGetError,
-    GetPostInterestApiV1PostsPostIdInterestsInterestIdGetResponse,
-    ReturnType<typeof getPostInterestApiV1PostsPostIdInterestsInterestIdGetQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getPostInterestApiV1PostsPostIdInterestsInterestIdGet({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getPostInterestApiV1PostsPostIdInterestsInterestIdGetQueryKey(options),
-  });
+  };
+  return mutationOptions;
+};
 
 export const getCitiesApiV1LocationsCitiesGetQueryKey = (
   options?: Options<GetCitiesApiV1LocationsCitiesGetData>
@@ -1879,3 +1248,605 @@ export const getCitiesApiV1LocationsCitiesGetOptions = (
     },
     queryKey: getCitiesApiV1LocationsCitiesGetQueryKey(options),
   });
+
+export const getUserGalleryCardsApiV1UsersUserIdGalleryCardsGetQueryKey = (
+  options: Options<GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetData>
+) => createQueryKey('getUserGalleryCardsApiV1UsersUserIdGalleryCardsGet', options);
+
+/**
+ * Get user's gallery cards
+ *
+ * View another user's public gallery cards (requires authentication).
+ */
+export const getUserGalleryCardsApiV1UsersUserIdGalleryCardsGetOptions = (
+  options: Options<GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetData>
+) =>
+  queryOptions<
+    GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetResponse,
+    GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetError,
+    GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetResponse,
+    ReturnType<typeof getUserGalleryCardsApiV1UsersUserIdGalleryCardsGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getUserGalleryCardsApiV1UsersUserIdGalleryCardsGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getUserGalleryCardsApiV1UsersUserIdGalleryCardsGetQueryKey(options),
+  });
+
+export const getMyGalleryCardsApiV1GalleryCardsMeGetQueryKey = (
+  options?: Options<GetMyGalleryCardsApiV1GalleryCardsMeGetData>
+) => createQueryKey('getMyGalleryCardsApiV1GalleryCardsMeGet', options);
+
+/**
+ * Get my gallery cards
+ *
+ * Get the authenticated user's own gallery cards.
+ */
+export const getMyGalleryCardsApiV1GalleryCardsMeGetOptions = (
+  options?: Options<GetMyGalleryCardsApiV1GalleryCardsMeGetData>
+) =>
+  queryOptions<
+    GetMyGalleryCardsApiV1GalleryCardsMeGetResponse,
+    DefaultError,
+    GetMyGalleryCardsApiV1GalleryCardsMeGetResponse,
+    ReturnType<typeof getMyGalleryCardsApiV1GalleryCardsMeGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getMyGalleryCardsApiV1GalleryCardsMeGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getMyGalleryCardsApiV1GalleryCardsMeGetQueryKey(options),
+  });
+
+/**
+ * Create gallery card
+ *
+ * Create a new gallery card in the user's personal album.
+ */
+export const createGalleryCardApiV1GalleryCardsPostMutation = (
+  options?: Partial<Options<CreateGalleryCardApiV1GalleryCardsPostData>>
+): UseMutationOptions<
+  CreateGalleryCardApiV1GalleryCardsPostResponse,
+  CreateGalleryCardApiV1GalleryCardsPostError,
+  Options<CreateGalleryCardApiV1GalleryCardsPostData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CreateGalleryCardApiV1GalleryCardsPostResponse,
+    CreateGalleryCardApiV1GalleryCardsPostError,
+    Options<CreateGalleryCardApiV1GalleryCardsPostData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await createGalleryCardApiV1GalleryCardsPost({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Delete gallery card
+ *
+ * Delete a gallery card (only owner can delete).
+ */
+export const deleteGalleryCardApiV1GalleryCardsCardIdDeleteMutation = (
+  options?: Partial<Options<DeleteGalleryCardApiV1GalleryCardsCardIdDeleteData>>
+): UseMutationOptions<
+  DeleteGalleryCardApiV1GalleryCardsCardIdDeleteResponse,
+  DeleteGalleryCardApiV1GalleryCardsCardIdDeleteError,
+  Options<DeleteGalleryCardApiV1GalleryCardsCardIdDeleteData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    DeleteGalleryCardApiV1GalleryCardsCardIdDeleteResponse,
+    DeleteGalleryCardApiV1GalleryCardsCardIdDeleteError,
+    Options<DeleteGalleryCardApiV1GalleryCardsCardIdDeleteData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await deleteGalleryCardApiV1GalleryCardsCardIdDelete({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Reorder gallery cards
+ *
+ * Update the display order of gallery cards.
+ */
+export const reorderGalleryCardsApiV1GalleryCardsReorderPutMutation = (
+  options?: Partial<Options<ReorderGalleryCardsApiV1GalleryCardsReorderPutData>>
+): UseMutationOptions<
+  ReorderGalleryCardsApiV1GalleryCardsReorderPutResponse,
+  ReorderGalleryCardsApiV1GalleryCardsReorderPutError,
+  Options<ReorderGalleryCardsApiV1GalleryCardsReorderPutData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    ReorderGalleryCardsApiV1GalleryCardsReorderPutResponse,
+    ReorderGalleryCardsApiV1GalleryCardsReorderPutError,
+    Options<ReorderGalleryCardsApiV1GalleryCardsReorderPutData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await reorderGalleryCardsApiV1GalleryCardsReorderPut({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Generate presigned upload URL
+ *
+ * Step 1: Generate a presigned URL for uploading media to GCS. FR-006.
+ */
+export const createUploadUrlApiV1MediaUploadUrlPostMutation = (
+  options?: Partial<Options<CreateUploadUrlApiV1MediaUploadUrlPostData>>
+): UseMutationOptions<
+  CreateUploadUrlApiV1MediaUploadUrlPostResponse,
+  CreateUploadUrlApiV1MediaUploadUrlPostError,
+  Options<CreateUploadUrlApiV1MediaUploadUrlPostData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CreateUploadUrlApiV1MediaUploadUrlPostResponse,
+    CreateUploadUrlApiV1MediaUploadUrlPostError,
+    Options<CreateUploadUrlApiV1MediaUploadUrlPostData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await createUploadUrlApiV1MediaUploadUrlPost({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Confirm media upload
+ *
+ * Step 2: Confirm that media was uploaded to GCS. Applies quota. FR-022, T052.
+ */
+export const confirmUploadApiV1MediaMediaIdConfirmPostMutation = (
+  options?: Partial<Options<ConfirmUploadApiV1MediaMediaIdConfirmPostData>>
+): UseMutationOptions<
+  ConfirmUploadApiV1MediaMediaIdConfirmPostResponse,
+  ConfirmUploadApiV1MediaMediaIdConfirmPostError,
+  Options<ConfirmUploadApiV1MediaMediaIdConfirmPostData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    ConfirmUploadApiV1MediaMediaIdConfirmPostResponse,
+    ConfirmUploadApiV1MediaMediaIdConfirmPostError,
+    Options<ConfirmUploadApiV1MediaMediaIdConfirmPostData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await confirmUploadApiV1MediaMediaIdConfirmPost({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Attach media to post
+ *
+ * Step 3: Attach confirmed media to a post. FR-007.
+ */
+export const attachMediaToPostApiV1MediaPostsPostIdAttachPostMutation = (
+  options?: Partial<Options<AttachMediaToPostApiV1MediaPostsPostIdAttachPostData>>
+): UseMutationOptions<
+  AttachMediaToPostApiV1MediaPostsPostIdAttachPostResponse,
+  AttachMediaToPostApiV1MediaPostsPostIdAttachPostError,
+  Options<AttachMediaToPostApiV1MediaPostsPostIdAttachPostData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    AttachMediaToPostApiV1MediaPostsPostIdAttachPostResponse,
+    AttachMediaToPostApiV1MediaPostsPostIdAttachPostError,
+    Options<AttachMediaToPostApiV1MediaPostsPostIdAttachPostData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await attachMediaToPostApiV1MediaPostsPostIdAttachPost({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Attach media to gallery card
+ *
+ * Step 3: Attach confirmed media to a gallery card. FR-007, FR-020.
+ */
+export const attachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostMutation = (
+  options?: Partial<Options<AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostData>>
+): UseMutationOptions<
+  AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostResponse,
+  AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostError,
+  Options<AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostResponse,
+    AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostError,
+    Options<AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await attachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPost({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Create Message Request
+ *
+ * Create a message request to another user.
+ *
+ * Implements FR-011: Message Requests for strangers.
+ * Implements FR-013: Privacy setting to block stranger messages.
+ * Implements FR-014: One unique thread per user pair.
+ */
+export const createMessageRequestApiV1MessageRequestsPostMutation = (
+  options?: Partial<Options<CreateMessageRequestApiV1MessageRequestsPostData>>
+): UseMutationOptions<
+  CreateMessageRequestApiV1MessageRequestsPostResponse,
+  CreateMessageRequestApiV1MessageRequestsPostError,
+  Options<CreateMessageRequestApiV1MessageRequestsPostData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CreateMessageRequestApiV1MessageRequestsPostResponse,
+    CreateMessageRequestApiV1MessageRequestsPostError,
+    Options<CreateMessageRequestApiV1MessageRequestsPostData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await createMessageRequestApiV1MessageRequestsPost({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const getMyMessageRequestsApiV1MessageRequestsInboxGetQueryKey = (
+  options?: Options<GetMyMessageRequestsApiV1MessageRequestsInboxGetData>
+) => createQueryKey('getMyMessageRequestsApiV1MessageRequestsInboxGet', options);
+
+/**
+ * Get My Message Requests
+ *
+ * Get message requests for the current user.
+ *
+ * Supports FR-016: Inbox clearly separates Requests vs Threads.
+ *
+ * Query params:
+ * - status_filter: "pending", "accepted", "declined", or "all" (default: "pending")
+ */
+export const getMyMessageRequestsApiV1MessageRequestsInboxGetOptions = (
+  options?: Options<GetMyMessageRequestsApiV1MessageRequestsInboxGetData>
+) =>
+  queryOptions<
+    GetMyMessageRequestsApiV1MessageRequestsInboxGetResponse,
+    GetMyMessageRequestsApiV1MessageRequestsInboxGetError,
+    GetMyMessageRequestsApiV1MessageRequestsInboxGetResponse,
+    ReturnType<typeof getMyMessageRequestsApiV1MessageRequestsInboxGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getMyMessageRequestsApiV1MessageRequestsInboxGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getMyMessageRequestsApiV1MessageRequestsInboxGetQueryKey(options),
+  });
+
+/**
+ * Accept Message Request
+ *
+ * Accept a message request and create a thread.
+ *
+ * Implements FR-012: Recipient can accept/decline requests.
+ * Creates unique thread (FR-014).
+ */
+export const acceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostMutation = (
+  options?: Partial<Options<AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostData>>
+): UseMutationOptions<
+  AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostResponse,
+  AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostError,
+  Options<AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostResponse,
+    AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostError,
+    Options<AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await acceptMessageRequestApiV1MessageRequestsRequestIdAcceptPost({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Decline Message Request
+ *
+ * Decline a message request.
+ *
+ * Implements FR-012: Recipient can accept/decline requests.
+ */
+export const declineMessageRequestApiV1MessageRequestsRequestIdDeclinePostMutation = (
+  options?: Partial<Options<DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostData>>
+): UseMutationOptions<
+  DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostResponse,
+  DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostError,
+  Options<DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostResponse,
+    DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostError,
+    Options<DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await declineMessageRequestApiV1MessageRequestsRequestIdDeclinePost({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const getMyThreadsApiV1ThreadsGetQueryKey = (
+  options?: Options<GetMyThreadsApiV1ThreadsGetData>
+) => createQueryKey('getMyThreadsApiV1ThreadsGet', options);
+
+/**
+ * Get My Threads
+ *
+ * Get all threads for the current user.
+ *
+ * Supports FR-016: Inbox clearly separates Requests vs Threads.
+ * Returns threads ordered by last_message_at descending.
+ */
+export const getMyThreadsApiV1ThreadsGetOptions = (
+  options?: Options<GetMyThreadsApiV1ThreadsGetData>
+) =>
+  queryOptions<
+    GetMyThreadsApiV1ThreadsGetResponse,
+    GetMyThreadsApiV1ThreadsGetError,
+    GetMyThreadsApiV1ThreadsGetResponse,
+    ReturnType<typeof getMyThreadsApiV1ThreadsGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getMyThreadsApiV1ThreadsGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getMyThreadsApiV1ThreadsGetQueryKey(options),
+  });
+
+export const getMyThreadsApiV1ThreadsGetInfiniteQueryKey = (
+  options?: Options<GetMyThreadsApiV1ThreadsGetData>
+): QueryKey<Options<GetMyThreadsApiV1ThreadsGetData>> =>
+  createQueryKey('getMyThreadsApiV1ThreadsGet', options, true);
+
+/**
+ * Get My Threads
+ *
+ * Get all threads for the current user.
+ *
+ * Supports FR-016: Inbox clearly separates Requests vs Threads.
+ * Returns threads ordered by last_message_at descending.
+ */
+export const getMyThreadsApiV1ThreadsGetInfiniteOptions = (
+  options?: Options<GetMyThreadsApiV1ThreadsGetData>
+) =>
+  infiniteQueryOptions<
+    GetMyThreadsApiV1ThreadsGetResponse,
+    GetMyThreadsApiV1ThreadsGetError,
+    InfiniteData<GetMyThreadsApiV1ThreadsGetResponse>,
+    QueryKey<Options<GetMyThreadsApiV1ThreadsGetData>>,
+    | number
+    | Pick<
+        QueryKey<Options<GetMyThreadsApiV1ThreadsGetData>>[0],
+        'body' | 'headers' | 'path' | 'query'
+      >
+  >(
+    // @ts-ignore
+    {
+      queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<
+          QueryKey<Options<GetMyThreadsApiV1ThreadsGetData>>[0],
+          'body' | 'headers' | 'path' | 'query'
+        > =
+          typeof pageParam === 'object'
+            ? pageParam
+            : {
+                query: {
+                  offset: pageParam,
+                },
+              };
+        const params = createInfiniteParams(queryKey, page);
+        const { data } = await getMyThreadsApiV1ThreadsGet({
+          ...options,
+          ...params,
+          signal,
+          throwOnError: true,
+        });
+        return data;
+      },
+      queryKey: getMyThreadsApiV1ThreadsGetInfiniteQueryKey(options),
+    }
+  );
+
+export const getThreadMessagesApiV1ThreadsThreadIdMessagesGetQueryKey = (
+  options: Options<GetThreadMessagesApiV1ThreadsThreadIdMessagesGetData>
+) => createQueryKey('getThreadMessagesApiV1ThreadsThreadIdMessagesGet', options);
+
+/**
+ * Get Thread Messages
+ *
+ * Get messages in a thread.
+ *
+ * Returns messages ordered by created_at ascending (oldest first).
+ * User must be part of the thread to view messages.
+ */
+export const getThreadMessagesApiV1ThreadsThreadIdMessagesGetOptions = (
+  options: Options<GetThreadMessagesApiV1ThreadsThreadIdMessagesGetData>
+) =>
+  queryOptions<
+    GetThreadMessagesApiV1ThreadsThreadIdMessagesGetResponse,
+    GetThreadMessagesApiV1ThreadsThreadIdMessagesGetError,
+    GetThreadMessagesApiV1ThreadsThreadIdMessagesGetResponse,
+    ReturnType<typeof getThreadMessagesApiV1ThreadsThreadIdMessagesGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getThreadMessagesApiV1ThreadsThreadIdMessagesGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getThreadMessagesApiV1ThreadsThreadIdMessagesGetQueryKey(options),
+  });
+
+export const getThreadMessagesApiV1ThreadsThreadIdMessagesGetInfiniteQueryKey = (
+  options: Options<GetThreadMessagesApiV1ThreadsThreadIdMessagesGetData>
+): QueryKey<Options<GetThreadMessagesApiV1ThreadsThreadIdMessagesGetData>> =>
+  createQueryKey('getThreadMessagesApiV1ThreadsThreadIdMessagesGet', options, true);
+
+/**
+ * Get Thread Messages
+ *
+ * Get messages in a thread.
+ *
+ * Returns messages ordered by created_at ascending (oldest first).
+ * User must be part of the thread to view messages.
+ */
+export const getThreadMessagesApiV1ThreadsThreadIdMessagesGetInfiniteOptions = (
+  options: Options<GetThreadMessagesApiV1ThreadsThreadIdMessagesGetData>
+) =>
+  infiniteQueryOptions<
+    GetThreadMessagesApiV1ThreadsThreadIdMessagesGetResponse,
+    GetThreadMessagesApiV1ThreadsThreadIdMessagesGetError,
+    InfiniteData<GetThreadMessagesApiV1ThreadsThreadIdMessagesGetResponse>,
+    QueryKey<Options<GetThreadMessagesApiV1ThreadsThreadIdMessagesGetData>>,
+    | number
+    | Pick<
+        QueryKey<Options<GetThreadMessagesApiV1ThreadsThreadIdMessagesGetData>>[0],
+        'body' | 'headers' | 'path' | 'query'
+      >
+  >(
+    // @ts-ignore
+    {
+      queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<
+          QueryKey<Options<GetThreadMessagesApiV1ThreadsThreadIdMessagesGetData>>[0],
+          'body' | 'headers' | 'path' | 'query'
+        > =
+          typeof pageParam === 'object'
+            ? pageParam
+            : {
+                query: {
+                  offset: pageParam,
+                },
+              };
+        const params = createInfiniteParams(queryKey, page);
+        const { data } = await getThreadMessagesApiV1ThreadsThreadIdMessagesGet({
+          ...options,
+          ...params,
+          signal,
+          throwOnError: true,
+        });
+        return data;
+      },
+      queryKey: getThreadMessagesApiV1ThreadsThreadIdMessagesGetInfiniteQueryKey(options),
+    }
+  );
+
+/**
+ * Send Message
+ *
+ * Send a message in a thread.
+ *
+ * Supports FR-015: Messages can reference post_id.
+ * User must be part of the thread to send messages.
+ */
+export const sendMessageApiV1ThreadsThreadIdMessagesPostMutation = (
+  options?: Partial<Options<SendMessageApiV1ThreadsThreadIdMessagesPostData>>
+): UseMutationOptions<
+  SendMessageApiV1ThreadsThreadIdMessagesPostResponse,
+  SendMessageApiV1ThreadsThreadIdMessagesPostError,
+  Options<SendMessageApiV1ThreadsThreadIdMessagesPostData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    SendMessageApiV1ThreadsThreadIdMessagesPostResponse,
+    SendMessageApiV1ThreadsThreadIdMessagesPostError,
+    Options<SendMessageApiV1ThreadsThreadIdMessagesPostData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await sendMessageApiV1ThreadsThreadIdMessagesPost({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
