@@ -3,7 +3,7 @@ Authentication Router for Identity Module
 Handles Google login, token refresh, and logout
 """
 
-from typing import Annotated
+from typing import Annotated, Optional
 
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Response, status
 
@@ -51,10 +51,11 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
         401: {"description": "Invalid credentials or not an admin"},
     },
     summary="Admin login with email/password",
-    description="Authenticate admin user with email and password and receive JWT tokens",
+    description="Authenticate admin user with email and password and receive JWT tokens via httpOnly cookies",
 )
 async def admin_login(
     request: AdminLoginRequest,
+    response: Response,
     use_case: Annotated[AdminLoginUseCase, Depends(get_admin_login_use_case)],
 ) -> LoginResponse:
     """
@@ -62,7 +63,8 @@ async def admin_login(
 
     - Verifies email and password
     - Checks if user has admin role
-    - Returns JWT access and refresh tokens
+    - Sets JWT access and refresh tokens as httpOnly cookies
+    - Returns token info in response body (for compatibility)
     """
     # Execute use case
     result = await use_case.execute(request.email, request.password)
@@ -78,7 +80,30 @@ async def admin_login(
 
     access_token, refresh_token, user = result
 
-    # Build response
+    # Set tokens as httpOnly cookies
+    response.set_cookie(
+        key=settings.ACCESS_COOKIE_NAME,
+        value=access_token,
+        max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        httponly=settings.COOKIE_HTTPONLY,
+        samesite=settings.COOKIE_SAMESITE,
+        secure=settings.COOKIE_SECURE,
+        domain=settings.COOKIE_DOMAIN,
+        path=settings.COOKIE_PATH,
+    )
+
+    response.set_cookie(
+        key=settings.REFRESH_COOKIE_NAME,
+        value=refresh_token,
+        max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60,
+        httponly=settings.COOKIE_HTTPONLY,
+        samesite=settings.COOKIE_SAMESITE,
+        secure=settings.COOKIE_SECURE,
+        domain=settings.COOKIE_DOMAIN,
+        path=settings.COOKIE_PATH,
+    )
+
+    # Build response (tokens still included for compatibility, but clients should use cookies)
     token_response = TokenResponse(
         access_token=access_token,
         refresh_token=refresh_token,
@@ -102,10 +127,11 @@ async def admin_login(
         401: {"description": "Invalid Google token"},
     },
     summary="Login with Google",
-    description="Authenticate user with Google OAuth token and receive JWT tokens",
+    description="Authenticate user with Google OAuth token and receive JWT tokens via httpOnly cookies",
 )
 async def google_login(
     request: GoogleLoginRequest,
+    response: Response,
     use_case: Annotated[GoogleLoginUseCase, Depends(get_google_login_use_case)],
 ) -> LoginResponse:
     """
@@ -113,7 +139,8 @@ async def google_login(
 
     - Verifies Google ID token
     - Creates user and profile if new user
-    - Returns JWT access and refresh tokens
+    - Sets JWT access and refresh tokens as httpOnly cookies
+    - Returns token info in response body (for compatibility)
     """
     # Execute use case
     result = await use_case.execute(request.google_token)
@@ -126,7 +153,30 @@ async def google_login(
 
     access_token, refresh_token, user = result
 
-    # Build response
+    # Set tokens as httpOnly cookies
+    response.set_cookie(
+        key=settings.ACCESS_COOKIE_NAME,
+        value=access_token,
+        max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        httponly=settings.COOKIE_HTTPONLY,
+        samesite=settings.COOKIE_SAMESITE,
+        secure=settings.COOKIE_SECURE,
+        domain=settings.COOKIE_DOMAIN,
+        path=settings.COOKIE_PATH,
+    )
+
+    response.set_cookie(
+        key=settings.REFRESH_COOKIE_NAME,
+        value=refresh_token,
+        max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60,
+        httponly=settings.COOKIE_HTTPONLY,
+        samesite=settings.COOKIE_SAMESITE,
+        secure=settings.COOKIE_SECURE,
+        domain=settings.COOKIE_DOMAIN,
+        path=settings.COOKIE_PATH,
+    )
+
+    # Build response (tokens still included for compatibility, but clients should use cookies)
     token_response = TokenResponse(
         access_token=access_token,
         refresh_token=refresh_token,
@@ -154,6 +204,7 @@ async def google_login(
 )
 async def google_callback(
     request: GoogleCallbackRequest,
+    response: Response,
     use_case: Annotated[GoogleCallbackUseCase, Depends(get_google_callback_use_case)],
 ) -> LoginResponse:
     """
@@ -162,7 +213,8 @@ async def google_callback(
     - Exchanges authorization code + code_verifier for ID token
     - Verifies Google ID token
     - Creates user and profile if new user
-    - Returns JWT access and refresh tokens
+    - Sets JWT access and refresh tokens as httpOnly cookies
+    - Returns token info in response body (for compatibility)
 
     This endpoint implements Authorization Code Flow with PKCE,
     which is the recommended OAuth flow for mobile applications.
@@ -185,7 +237,30 @@ async def google_callback(
 
     access_token, refresh_token, user = result
 
-    # Build response
+    # Set tokens as httpOnly cookies
+    response.set_cookie(
+        key=settings.ACCESS_COOKIE_NAME,
+        value=access_token,
+        max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        httponly=settings.COOKIE_HTTPONLY,
+        samesite=settings.COOKIE_SAMESITE,
+        secure=settings.COOKIE_SECURE,
+        domain=settings.COOKIE_DOMAIN,
+        path=settings.COOKIE_PATH,
+    )
+
+    response.set_cookie(
+        key=settings.REFRESH_COOKIE_NAME,
+        value=refresh_token,
+        max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60,
+        httponly=settings.COOKIE_HTTPONLY,
+        samesite=settings.COOKIE_SAMESITE,
+        secure=settings.COOKIE_SECURE,
+        domain=settings.COOKIE_DOMAIN,
+        path=settings.COOKIE_PATH,
+    )
+
+    # Build response (tokens still included for compatibility, but clients should use cookies)
     token_response = TokenResponse(
         access_token=access_token,
         refresh_token=refresh_token,
@@ -213,7 +288,7 @@ async def refresh_token(
     response: Response,
     use_case: Annotated[RefreshTokenUseCase, Depends(get_refresh_token_use_case)],
     jwt_service: JWTService = Depends(lambda: JWTService()),
-    refresh_token_cookie: str | None = Cookie(None, alias=settings.REFRESH_COOKIE_NAME),
+    refresh_token_cookie: Optional[str] = Cookie(None, alias=settings.REFRESH_COOKIE_NAME),
 ) -> RefreshSuccessResponse:
     """
     Refresh access token using refresh token from httpOnly cookie.
@@ -276,4 +351,54 @@ async def refresh_token(
     return RefreshSuccessResponse(
         success=True,
         message="Tokens refreshed successfully",
+    )
+
+
+@router.post(
+    "/logout",
+    response_model=RefreshSuccessResponse,
+    status_code=status.HTTP_200_OK,
+    responses={
+        200: {"description": "Successfully logged out"},
+    },
+    summary="Logout and clear authentication cookies",
+    description="Clear access and refresh token cookies to log out the user",
+)
+async def logout(
+    response: Response,
+) -> RefreshSuccessResponse:
+    """
+    Logout user by clearing httpOnly cookies.
+
+    - Clears access_token cookie
+    - Clears refresh_token cookie
+    - Sets max-age=0 to immediately expire cookies
+    """
+    # Clear access token cookie
+    response.set_cookie(
+        key=settings.ACCESS_COOKIE_NAME,
+        value="",
+        max_age=0,
+        httponly=settings.COOKIE_HTTPONLY,
+        samesite=settings.COOKIE_SAMESITE,
+        secure=settings.COOKIE_SECURE,
+        domain=settings.COOKIE_DOMAIN,
+        path=settings.COOKIE_PATH,
+    )
+
+    # Clear refresh token cookie
+    response.set_cookie(
+        key=settings.REFRESH_COOKIE_NAME,
+        value="",
+        max_age=0,
+        httponly=settings.COOKIE_HTTPONLY,
+        samesite=settings.COOKIE_SAMESITE,
+        secure=settings.COOKIE_SECURE,
+        domain=settings.COOKIE_DOMAIN,
+        path=settings.COOKIE_PATH,
+    )
+
+    return RefreshSuccessResponse(
+        success=True,
+        message="Logged out successfully",
     )

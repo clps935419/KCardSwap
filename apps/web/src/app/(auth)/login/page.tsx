@@ -28,10 +28,9 @@ export default function LoginPage() {
         },
       })
 
-      // Store tokens (you may want to use httpOnly cookies in production)
+      // Tokens are now stored in httpOnly cookies automatically
+      // No need to manually store them in localStorage
       if (response.data) {
-        localStorage.setItem('access_token', response.data.access_token)
-        localStorage.setItem('refresh_token', response.data.refresh_token)
         // Redirect to posts feed after login
         window.location.href = '/posts'
       }

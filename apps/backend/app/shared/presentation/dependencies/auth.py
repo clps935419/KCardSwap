@@ -8,25 +8,33 @@ Moved from Identity module to shared layer for proper separation of concerns.
 from typing import Optional
 from uuid import UUID
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Cookie, Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError
 
+from app.config import settings
 from app.shared.infrastructure.security.jwt_service import JWTService
 
-# HTTP Bearer security scheme
-security = HTTPBearer()
+# HTTP Bearer security scheme (optional for backward compatibility)
+# auto_error=False allows checking cookie first, then falling back to Bearer token
+security = HTTPBearer(auto_error=False)
 
 
 async def get_current_user_id(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
+    access_token_cookie: Optional[str] = Cookie(None, alias=settings.ACCESS_COOKIE_NAME),
     jwt_service: JWTService = Depends(lambda: JWTService()),
 ) -> UUID:
     """
     Dependency to get current authenticated user ID from JWT token.
+    
+    Priority:
+    1. First checks httpOnly cookie for access_token (recommended)
+    2. Falls back to Bearer token in Authorization header (for backward compatibility)
 
     Args:
-        credentials: HTTP Bearer credentials (JWT token)
+        credentials: Optional HTTP Bearer credentials (JWT token)
+        access_token_cookie: Optional access token from httpOnly cookie
         jwt_service: JWT service instance
 
     Returns:
@@ -35,7 +43,12 @@ async def get_current_user_id(
     Raises:
         HTTPException: 401 if token is invalid or missing
     """
-    token = credentials.credentials
+    # Priority 1: Check httpOnly cookie first (most secure)
+    token = access_token_cookie
+    
+    # Priority 2: Fallback to Bearer token (backward compatibility)
+    if not token and credentials:
+        token = credentials.credentials
 
     if not token:
         raise HTTPException(
@@ -89,27 +102,34 @@ async def get_current_user(user_id: UUID = Depends(get_current_user_id)) -> UUID
 
 
 async def get_optional_current_user_id(
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(
-        HTTPBearer(auto_error=False)
-    ),
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
+    access_token_cookie: Optional[str] = Cookie(None, alias=settings.ACCESS_COOKIE_NAME),
     jwt_service: JWTService = Depends(lambda: JWTService()),
 ) -> Optional[UUID]:
     """
     Dependency to optionally get current user ID from JWT token.
     Returns None if no token is provided or token is invalid.
     Useful for endpoints that work both with and without authentication.
+    
+    Priority:
+    1. First checks httpOnly cookie for access_token
+    2. Falls back to Bearer token in Authorization header
 
     Args:
         credentials: Optional HTTP Bearer credentials
+        access_token_cookie: Optional access token from httpOnly cookie
         jwt_service: JWT service instance
 
     Returns:
         User ID (UUID) or None
     """
-    if credentials is None:
-        return None
+    # Priority 1: Check httpOnly cookie first
+    token = access_token_cookie
+    
+    # Priority 2: Fallback to Bearer token
+    if not token and credentials:
+        token = credentials.credentials
 
-    token = credentials.credentials
     if not token:
         return None
 
