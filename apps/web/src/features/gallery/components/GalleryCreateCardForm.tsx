@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +14,9 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { executeUploadFlow, attachMediaToGalleryCard } from "@/lib/media/uploadFlow";
+import { executeUploadFlow } from "@/lib/media/uploadFlow";
+import { attachMediaToGalleryCard } from "@/shared/api/hooks/media";
+import { useCreateGalleryCard } from "@/shared/api/hooks/gallery";
 
 interface GalleryCreateCardFormProps {
   onSuccess?: () => void;
@@ -40,7 +42,8 @@ export function GalleryCreateCardForm({ onSuccess }: GalleryCreateCardFormProps)
 
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const createCardMutation = useCreateGalleryCard();
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -60,9 +63,7 @@ export function GalleryCreateCardForm({ onSuccess }: GalleryCreateCardFormProps)
 
   const removeImage = () => {
     setImagePreview(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
+    form.setValue("image", undefined);
   };
 
   const onSubmit = async (data: CreateCardFormData) => {
@@ -79,31 +80,20 @@ export function GalleryCreateCardForm({ onSuccess }: GalleryCreateCardFormProps)
         });
       }
 
-      // Step 2: Create gallery card
-      const response = await fetch("/api/v1/gallery/cards", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          title: data.title,
-          idol_name: data.idol_name,
-          era: data.era || undefined,
-          description: data.description || undefined,
-        }),
+      // Step 2: Create gallery card using SDK
+      const response = await createCardMutation.mutateAsync({
+        title: data.title,
+        idol_name: data.idol_name,
+        era: data.era || undefined,
+        description: data.description || undefined,
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to create card");
-      }
-
-      const cardData = await response.json();
+      const cardData = response as any;
       const cardId = cardData.data?.id;
 
       // Step 3: Attach media to gallery card if uploaded
       if (mediaId && cardId) {
-        await attachMediaToGalleryCard(mediaId, cardId);
+        await attachMediaToGalleryCard(cardId, mediaId);
       }
 
       onSuccess?.();
@@ -192,9 +182,9 @@ export function GalleryCreateCardForm({ onSuccess }: GalleryCreateCardFormProps)
             id="image"
             type="file"
             accept="image/*"
-            ref={fileInputRef}
-            {...form.register("image")}
-            onChange={handleImageChange}
+            {...form.register("image", {
+              onChange: handleImageChange,
+            })}
           />
           {imagePreview && (
             <div className="relative mt-2">
