@@ -1,6 +1,6 @@
-import { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
-import { apiClient } from './axios'
+import type { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import { refreshAccessToken } from './auth-refresh'
+import { apiClient } from './axios'
 
 /**
  * Auth Refresh Interceptor

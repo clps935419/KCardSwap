@@ -1,16 +1,16 @@
-"use client";
+'use client'
 
-import { useParams } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { GalleryGrid } from "@/features/gallery/components/GalleryGrid";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useUserGalleryCards } from "@/shared/api/hooks/gallery";
+import { useParams } from 'next/navigation'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
+import { GalleryGrid } from '@/features/gallery/components/GalleryGrid'
+import { useUserGalleryCards } from '@/shared/api/hooks/gallery'
 
 export default function UserProfilePage() {
-  const params = useParams();
-  const userId = params.userId as string;
-  
-  const { data, isLoading, error } = useUserGalleryCards(userId);
+  const params = useParams()
+  const userId = params.userId as string
+
+  const { data, isLoading, error } = useUserGalleryCards(userId)
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
@@ -19,9 +19,7 @@ export default function UserProfilePage() {
           <CardTitle className="text-2xl">User Profile</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground">
-            User ID: {userId}
-          </p>
+          <p className="text-muted-foreground">User ID: {userId}</p>
         </CardContent>
       </Card>
 
@@ -48,14 +46,9 @@ export default function UserProfilePage() {
             </div>
           )}
 
-          {data && (
-            <GalleryGrid 
-              cards={data.items || []} 
-              isOwner={false}
-            />
-          )}
+          {data && <GalleryGrid cards={data.items || []} isOwner={false} />}
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }

@@ -1,24 +1,26 @@
-"use client";
+'use client'
 
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import type { GalleryCardResponse } from "@/shared/api/generated";
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import type { GalleryCardResponse } from '@/shared/api/generated'
 
 interface GalleryGridProps {
-  cards: GalleryCardResponse[];
-  isOwner?: boolean;
-  onDelete?: (cardId: string) => void;
-  onMoveUp?: (index: number) => void;
-  onMoveDown?: (index: number) => void;
+  cards: GalleryCardResponse[]
+  isOwner?: boolean
+  onDelete?: (cardId: string) => void
+  onMoveUp?: (index: number) => void
+  onMoveDown?: (index: number) => void
 }
 
-export function GalleryGrid({ cards, isOwner = false, onDelete, onMoveUp, onMoveDown }: GalleryGridProps) {
+export function GalleryGrid({
+  cards,
+  isOwner = false,
+  onDelete,
+  onMoveUp,
+  onMoveDown,
+}: GalleryGridProps) {
   if (cards.length === 0) {
-    return (
-      <div className="text-center text-muted-foreground text-sm py-12">
-        相簿目前沒有內容
-      </div>
-    );
+    return <div className="text-center text-muted-foreground text-sm py-12">相簿目前沒有內容</div>
   }
 
   return (
@@ -38,7 +40,7 @@ export function GalleryGrid({ cards, isOwner = false, onDelete, onMoveUp, onMove
                 </p>
               </div>
             </div>
-            
+
             {isOwner && (onMoveUp || onMoveDown) && (
               <div className="flex flex-col gap-2">
                 {onMoveUp && (
@@ -82,5 +84,5 @@ export function GalleryGrid({ cards, isOwner = false, onDelete, onMoveUp, onMove
         </Card>
       ))}
     </div>
-  );
+  )
 }

@@ -1,37 +1,46 @@
 /**
  * Gallery API Hooks
- * 
+ *
  * TanStack Query hooks for gallery operations using the generated SDK.
  */
 
-import { useQuery, useMutation, useQueryClient, type UseQueryOptions, type UseMutationOptions } from '@tanstack/react-query';
-import { GalleryService } from '../generated';
-import { getAxiosClient } from '../sdk-config';
+import {
+  type UseMutationOptions,
+  type UseQueryOptions,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query'
 import type {
-  GetMyGalleryCardsApiV1GalleryCardsMeGetResponse,
-  GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetResponse,
   CreateGalleryCardApiV1GalleryCardsPostData,
   CreateGalleryCardApiV1GalleryCardsPostResponse,
   DeleteGalleryCardApiV1GalleryCardsCardIdDeleteData,
+  GetMyGalleryCardsApiV1GalleryCardsMeGetResponse,
+  GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetResponse,
   ReorderGalleryCardsApiV1GalleryCardsReorderPutData,
   ReorderGalleryCardsApiV1GalleryCardsReorderPutResponse,
-} from '../generated';
+} from '../generated'
+import { GalleryService } from '../generated'
+import { getAxiosClient } from '../sdk-config'
 
 /**
  * Hook to fetch current user's gallery cards
  */
 export function useMyGalleryCards(
-  options?: Omit<UseQueryOptions<GetMyGalleryCardsApiV1GalleryCardsMeGetResponse>, 'queryKey' | 'queryFn'>
+  options?: Omit<
+    UseQueryOptions<GetMyGalleryCardsApiV1GalleryCardsMeGetResponse>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery({
     queryKey: ['my-gallery'],
     queryFn: async () => {
-      const axiosClient = getAxiosClient();
-      const response = await GalleryService.getMyGalleryCardsApiV1GalleryCardsMeGet();
-      return response;
+      const axiosClient = getAxiosClient()
+      const response = await GalleryService.getMyGalleryCardsApiV1GalleryCardsMeGet()
+      return response
     },
     ...options,
-  });
+  })
 }
 
 /**
@@ -39,20 +48,23 @@ export function useMyGalleryCards(
  */
 export function useUserGalleryCards(
   userId: string,
-  options?: Omit<UseQueryOptions<GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetResponse>, 'queryKey' | 'queryFn'>
+  options?: Omit<
+    UseQueryOptions<GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetResponse>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery({
     queryKey: ['user-gallery', userId],
     queryFn: async () => {
-      const axiosClient = getAxiosClient();
+      const axiosClient = getAxiosClient()
       const response = await GalleryService.getUserGalleryCardsApiV1UsersUserIdGalleryCardsGet({
         userId,
-      });
-      return response;
+      })
+      return response
     },
     enabled: !!userId,
     ...options,
-  });
+  })
 }
 
 /**
@@ -65,43 +77,41 @@ export function useCreateGalleryCard(
     CreateGalleryCardApiV1GalleryCardsPostData['requestBody']
   >
 ) {
-  const queryClient = useQueryClient();
-  
+  const queryClient = useQueryClient()
+
   return useMutation({
     mutationFn: async (data: CreateGalleryCardApiV1GalleryCardsPostData['requestBody']) => {
-      const axiosClient = getAxiosClient();
+      const axiosClient = getAxiosClient()
       const response = await GalleryService.createGalleryCardApiV1GalleryCardsPost({
         requestBody: data,
-      });
-      return response;
+      })
+      return response
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['my-gallery'] });
+      queryClient.invalidateQueries({ queryKey: ['my-gallery'] })
     },
     ...options,
-  });
+  })
 }
 
 /**
  * Hook to delete a gallery card
  */
-export function useDeleteGalleryCard(
-  options?: UseMutationOptions<void, Error, string>
-) {
-  const queryClient = useQueryClient();
-  
+export function useDeleteGalleryCard(options?: UseMutationOptions<void, Error, string>) {
+  const queryClient = useQueryClient()
+
   return useMutation({
     mutationFn: async (cardId: string) => {
-      const axiosClient = getAxiosClient();
+      const axiosClient = getAxiosClient()
       await GalleryService.deleteGalleryCardApiV1GalleryCardsCardIdDelete({
         cardId,
-      });
+      })
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['my-gallery'] });
+      queryClient.invalidateQueries({ queryKey: ['my-gallery'] })
     },
     ...options,
-  });
+  })
 }
 
 /**
@@ -114,21 +124,21 @@ export function useReorderGalleryCards(
     string[]
   >
 ) {
-  const queryClient = useQueryClient();
-  
+  const queryClient = useQueryClient()
+
   return useMutation({
     mutationFn: async (cardIds: string[]) => {
-      const axiosClient = getAxiosClient();
+      const axiosClient = getAxiosClient()
       const response = await GalleryService.reorderGalleryCardsApiV1GalleryCardsReorderPut({
         requestBody: {
           card_ids: cardIds,
         },
-      });
-      return response;
+      })
+      return response
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['my-gallery'] });
+      queryClient.invalidateQueries({ queryKey: ['my-gallery'] })
     },
     ...options,
-  });
+  })
 }

@@ -1,5 +1,6 @@
 'use client'
 
+import { signIn } from 'next-auth/react'
 import { useState } from 'react'
 
 export default function LoginPage() {
@@ -19,7 +20,7 @@ export default function LoginPage() {
     try {
       // Import SDK dynamically to avoid build issues
       const { AuthenticationService } = await import('@/shared/api/generated')
-      
+
       const response = await AuthenticationService.adminLoginApiV1AuthAdminLoginPost({
         requestBody: {
           email,
@@ -34,8 +35,9 @@ export default function LoginPage() {
         // Redirect to home or dashboard
         window.location.href = '/'
       }
-    } catch (err: any) {
-      setError(err.response?.data?.error?.message || '登入失敗，請檢查帳號密碼')
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { error?: { message?: string } } } }
+      setError(error.response?.data?.error?.message || '登入失敗，請檢查帳號密碼')
     } finally {
       setIsLoading(false)
     }
@@ -63,9 +65,7 @@ export default function LoginPage() {
           <p className="text-xs text-muted-foreground">
             <span className="font-black text-foreground">所有瀏覽需登入（V2 決策）</span>
           </p>
-          <p className="text-[11px] text-muted-foreground mt-1">
-            登入後才能瀏覽貼文、相簿與信箱
-          </p>
+          <p className="text-[11px] text-muted-foreground mt-1">登入後才能瀏覽貼文、相簿與信箱</p>
         </div>
 
         {/* Admin Login Form (Dev Only) */}
@@ -82,7 +82,7 @@ export default function LoginPage() {
                 type="email"
                 placeholder="管理員 Email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={e => setEmail(e.target.value)}
                 className="w-full px-3 py-2 text-sm border border-amber-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400"
                 required
               />
@@ -90,13 +90,11 @@ export default function LoginPage() {
                 type="password"
                 placeholder="密碼"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={e => setPassword(e.target.value)}
                 className="w-full px-3 py-2 text-sm border border-amber-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400"
                 required
               />
-              {error && (
-                <p className="text-xs text-red-600 font-medium">{error}</p>
-              )}
+              {error && <p className="text-xs text-red-600 font-medium">{error}</p>}
               <button
                 type="submit"
                 disabled={isLoading}
@@ -109,16 +107,18 @@ export default function LoginPage() {
         )}
 
         {/* Google Login Button */}
-        <button className="w-full h-16 bg-gradient-to-r from-secondary-50 to-rose-50 border-2 border-secondary-300 rounded-2xl flex items-center justify-center px-6 hover:from-secondary-50/80 hover:to-rose-50/80 transition-all shadow-md">
+        <button
+          type="button"
+          onClick={() => signIn('google', { callbackUrl: '/' })}
+          className="w-full h-16 bg-gradient-to-r from-secondary-50 to-rose-50 border-2 border-secondary-300 rounded-2xl flex items-center justify-center px-6 hover:from-secondary-50/80 hover:to-rose-50/80 transition-all shadow-md"
+        >
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-white rounded-xl shadow flex items-center justify-center font-black">
               G
             </div>
             <div className="text-left">
               <p className="text-sm font-black text-foreground">使用 Google 登入</p>
-              <p className="text-[10px] text-muted-foreground">
-                登入後才能瀏覽貼文、相簿與信箱
-              </p>
+              <p className="text-[10px] text-muted-foreground">登入後才能瀏覽貼文、相簿與信箱</p>
             </div>
           </div>
         </button>

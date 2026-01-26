@@ -1,8 +1,8 @@
 'use client'
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { PostsService } from '@/shared/api/generated'
 import type { PostResponse } from '@/shared/api/generated'
+import { PostsService } from '@/shared/api/generated'
 
 interface ToggleLikeResponse {
   data: {
@@ -21,7 +21,7 @@ export function useToggleLike() {
       })
       return response as unknown as ToggleLikeResponse
     },
-    onMutate: async (postId) => {
+    onMutate: async postId => {
       // Cancel any outgoing refetches
       await queryClient.cancelQueries({ queryKey: ['posts'] })
 
@@ -31,14 +31,14 @@ export function useToggleLike() {
       // Optimistically update to the new value
       queryClient.setQueriesData<{ data: { posts: PostResponse[]; total: number } }>(
         { queryKey: ['posts'] },
-        (old) => {
+        old => {
           if (!old) return old
 
           return {
             ...old,
             data: {
               ...old.data,
-              posts: old.data.posts.map((post) => {
+              posts: old.data.posts.map(post => {
                 if (post.id === postId) {
                   const currentlyLiked = post.liked_by_me ?? false
                   return {

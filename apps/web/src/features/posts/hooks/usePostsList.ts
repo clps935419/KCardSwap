@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
-import { PostsService } from '@/shared/api/generated/services.gen'
 import type { PostCategory } from '@/shared/api/generated'
+import { PostsService } from '@/shared/api/generated/services.gen'
 
 interface UsePostsListParams {
   cityCode?: string | null

@@ -9,7 +9,7 @@ Posts-first POC 的 Web 客戶端，使用 Next.js App Router 實作。
 - **表單**: react-hook-form
 - **資料抓取**: TanStack Query
 - **API SDK**: hey-api (從 `openapi/openapi.json` 生成)
-- **驗證**: NextAuth + httpOnly cookie
+- **驗證**: NextAuth.js v4 + Google OAuth (詳見 [NEXTAUTH_GUIDE.md](./NEXTAUTH_GUIDE.md))
 - **代碼品質**: Biome (linting & formatting)
 
 ## 快速開始
@@ -41,6 +41,8 @@ cp .env.example .env.local
 - `GOOGLE_CLIENT_ID`: Google OAuth 客戶端 ID
 - `GOOGLE_CLIENT_SECRET`: Google OAuth 客戶端密鑰
 
+**Google OAuth 設定**: 請參考 [NEXTAUTH_GUIDE.md](./NEXTAUTH_GUIDE.md) 了解如何設定 Google OAuth。
+
 ### 開發模式
 
 ```bash
@@ -62,10 +64,12 @@ npm run start
 apps/web/
 ├── src/
 │   ├── app/              # Next.js App Router 路由
+│   │   ├── api/          # API routes
+│   │   │   └── auth/     # NextAuth API routes
 │   │   ├── (auth)/       # 登入相關頁面
 │   │   ├── (app)/        # 已登入的應用頁面
 │   │   ├── layout.tsx    # 根 layout
-│   │   └── providers.tsx # React providers
+│   │   └── providers.tsx # React providers (SessionProvider, QueryClient)
 │   ├── components/       # 共用元件
 │   │   └── ui/          # shadcn/ui 元件
 │   ├── features/        # 功能模組
@@ -74,12 +78,15 @@ apps/web/
 │   │   └── inbox/       # 訊息功能
 │   ├── lib/             # 工具函式
 │   │   ├── api/         # API 客戶端
+│   │   ├── auth/        # NextAuth 設定與工具
 │   │   └── query-client.ts # TanStack Query 設定
-│   └── shared/          # 共用型別與常數
-│       └── api/         # 生成的 API SDK
-│           └── generated/
+│   ├── shared/          # 共用型別與常數
+│   │   └── api/         # 生成的 API SDK
+│   │       └── generated/
+│   └── middleware.ts    # NextAuth 中介軟體（路由保護）
 ├── public/              # 靜態資源
 ├── .env.example         # 環境變數範例
+├── NEXTAUTH_GUIDE.md    # NextAuth 整合指南
 └── package.json
 ```
 
@@ -132,11 +139,16 @@ poetry run python scripts/init_admin.py --email admin@example.com --password Sec
 
 ## Cookie 與驗證
 
-本專案使用 httpOnly cookie 進行驗證：
+本專案使用 NextAuth.js 與後端 API 整合進行驗證：
 
-- **Access Token**: 短效 (15 分鐘)，存於 httpOnly cookie
-- **Refresh Token**: 長效 (7 天)，存於 httpOnly cookie
+- **Google OAuth**: 使用 NextAuth.js 處理 Google 登入流程
+- **Session 管理**: NextAuth.js 管理前端 session（JWT strategy）
+- **Token 管理**: 後端發放的 tokens 儲存在 httpOnly cookies 中
+  - **Access Token**: 短效 (15 分鐘)
+  - **Refresh Token**: 長效 (7 天)
 - **Token 續期**: 前端自動處理 (401 → refresh → retry)
+
+詳細說明請參考 [NEXTAUTH_GUIDE.md](./NEXTAUTH_GUIDE.md)
 
 ### 同源部署
 

@@ -1,23 +1,23 @@
 /**
  * Thread Page - Shows messages in a conversation thread
  */
-"use client";
+'use client'
 
-import { useParams, useRouter } from "next/navigation";
-import { MessageList } from "@/features/inbox/components/MessageList";
-import { SendMessageForm } from "@/features/inbox/components/SendMessageForm";
-import { Button } from "@/components/ui/button";
+import { useParams, useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { MessageList } from '@/features/inbox/components/MessageList'
+import { SendMessageForm } from '@/features/inbox/components/SendMessageForm'
 
 export default function ThreadPage() {
-  const params = useParams();
-  const router = useRouter();
-  const threadId = params.threadId as string;
+  const params = useParams()
+  const router = useRouter()
+  const threadId = params.threadId as string
 
   return (
     <div className="h-[calc(100vh-120px)] flex flex-col max-w-2xl mx-auto">
       {/* Header */}
       <div className="px-6 py-3 bg-card border-b border-border/30 flex items-center justify-between">
-        <button 
+        <button
           onClick={() => router.push('/inbox')}
           className="text-[11px] font-black text-primary-500 hover:text-primary-500/80"
         >
@@ -39,5 +39,5 @@ export default function ThreadPage() {
         </p>
       </div>
     </div>
-  );
+  )
 }
