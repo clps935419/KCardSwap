@@ -11,29 +11,16 @@ interface LikeButtonProps {
   disabled?: boolean
 }
 
-export function LikeButton({
-  liked,
-  likeCount,
-  onToggle,
-  disabled = false,
-}: LikeButtonProps) {
+export function LikeButton({ liked, likeCount, onToggle, disabled = false }: LikeButtonProps) {
   return (
     <Button
       variant="ghost"
       size="sm"
       onClick={onToggle}
       disabled={disabled}
-      className={cn(
-        'flex items-center gap-1',
-        liked && 'text-red-500 hover:text-red-600'
-      )}
+      className={cn('flex items-center gap-1', liked && 'text-red-500 hover:text-red-600')}
     >
-      <Heart
-        className={cn(
-          'h-4 w-4',
-          liked && 'fill-current'
-        )}
-      />
+      <Heart className={cn('h-4 w-4', liked && 'fill-current')} />
       <span className="text-sm">{likeCount}</span>
     </Button>
   )

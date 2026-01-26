@@ -1,25 +1,25 @@
 /**
  * Custom hook for sending messages
- * 
+ *
  * TODO: Replace with generated SDK mutation after OpenAPI generation
  */
-"use client";
+'use client'
 
-import { useState } from "react";
+import { useState } from 'react'
 
 interface SendMessageParams {
-  threadId: string;
-  content: string;
-  postId?: string;
+  threadId: string
+  content: string
+  postId?: string
 }
 
 export function useSendMessage() {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<Error | null>(null)
 
   const sendMessage = async (params: SendMessageParams) => {
-    setLoading(true);
-    setError(null);
+    setLoading(true)
+    setError(null)
 
     try {
       // TODO: Replace with generated SDK call
@@ -30,28 +30,28 @@ export function useSendMessage() {
       //     post_id: params.postId,
       //   },
       // });
-      
+
       // For now, return mock response
       return {
-        id: "mock-id",
+        id: 'mock-id',
         thread_id: params.threadId,
-        sender_id: "current-user",
+        sender_id: 'current-user',
         content: params.content,
         post_id: params.postId,
         created_at: new Date().toISOString(),
-      };
+      }
     } catch (err) {
-      const error = err as Error;
-      setError(error);
-      throw error;
+      const error = err as Error
+      setError(error)
+      throw error
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return {
     sendMessage,
     loading,
     error,
-  };
+  }
 }

@@ -1,15 +1,15 @@
 'use client'
 
-import { useState } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
-import { Card } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Spinner } from '@/components/ui/spinner'
 import { Loader2 } from 'lucide-react'
-import { usePostsList } from '@/features/posts/hooks/usePostsList'
-import { useCreateMessageRequest } from '@/features/inbox/hooks/useCreateMessageRequest'
-import { useToggleLike } from '@/features/posts/hooks/useToggleLike'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { Spinner } from '@/components/ui/spinner'
 import { useToast } from '@/components/ui/use-toast'
+import { useCreateMessageRequest } from '@/features/inbox/hooks/useCreateMessageRequest'
+import { usePostsList } from '@/features/posts/hooks/usePostsList'
+import { useToggleLike } from '@/features/posts/hooks/useToggleLike'
 import type { PostCategory, PostResponse } from '@/shared/api/generated'
 
 function formatTimeAgo(dateString: string) {
@@ -19,7 +19,7 @@ function formatTimeAgo(dateString: string) {
   const minutes = Math.floor(diff / 60000)
   const hours = Math.floor(diff / 3600000)
   const days = Math.floor(diff / 86400000)
-  
+
   if (minutes < 60) return `${minutes} 分`
   if (hours < 24) return `${hours} 小時`
   return `${days} 天`
@@ -55,31 +55,31 @@ export function PostsList() {
     cityCode: city === 'ALL' ? undefined : city,
     category,
   })
-  
+
   const { createRequest, loading: creatingRequest } = useCreateMessageRequest()
   const toggleLikeMutation = useToggleLike()
 
   const handleMessageAuthor = async (post: PostResponse) => {
     setMessagingPostId(post.id)
-    
+
     try {
       await createRequest({
         recipientId: post.owner_id,
         initialMessage: `Hi! I'm interested in your post "${post.title}"`,
         postId: post.id,
       })
-      
+
       toast({
-        title: "訊息請求已送出",
-        description: "作者將會在信箱中看到您的訊息",
+        title: '訊息請求已送出',
+        description: '作者將會在信箱中看到您的訊息',
       })
-      
+
       router.push('/inbox?tab=requests')
     } catch (err) {
       toast({
-        title: "錯誤",
-        description: "無法送出訊息請求，請稍後再試",
-        variant: "destructive",
+        title: '錯誤',
+        description: '無法送出訊息請求，請稍後再試',
+        variant: 'destructive',
       })
     } finally {
       setMessagingPostId(null)
@@ -91,9 +91,9 @@ export function PostsList() {
       await toggleLikeMutation.mutateAsync(postId)
     } catch (err) {
       toast({
-        title: "錯誤",
-        description: "無法更新按讚狀態，請稍後再試",
-        variant: "destructive",
+        title: '錯誤',
+        description: '無法更新按讚狀態，請稍後再試',
+        variant: 'destructive',
       })
     }
   }
@@ -120,11 +120,7 @@ export function PostsList() {
   const posts = data?.data?.posts || []
 
   if (posts.length === 0) {
-    return (
-      <div className="text-center text-muted-foreground text-sm py-12">
-        沒有符合篩選的貼文
-      </div>
-    )
+    return <div className="text-center text-muted-foreground text-sm py-12">沒有符合篩選的貼文</div>
   }
 
   return (
@@ -132,7 +128,7 @@ export function PostsList() {
       {posts.map((post: PostResponse) => {
         const liked = post.liked_by_me ?? false
         const likeCount = post.like_count ?? 0
-        
+
         return (
           <Card key={post.id} className="p-4 rounded-2xl shadow-sm border border-border/30 bg-card">
             {/* Post Header */}
@@ -151,7 +147,9 @@ export function PostsList() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <span className={`${CATEGORY_COLORS[post.category as PostCategory]} text-[10px] px-2 py-1 rounded-full font-black`}>
+                <span
+                  className={`${CATEGORY_COLORS[post.category as PostCategory]} text-[10px] px-2 py-1 rounded-full font-black`}
+                >
                   {CATEGORY_LABELS[post.category as PostCategory]}
                 </span>
                 {post.scope === 'global' ? (
@@ -167,7 +165,7 @@ export function PostsList() {
             </div>
 
             {/* Post Content */}
-            <button 
+            <button
               onClick={() => router.push(`/posts/${post.id}`)}
               className="w-full text-left mt-1 group"
             >

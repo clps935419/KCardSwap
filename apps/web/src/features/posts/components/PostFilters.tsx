@@ -59,7 +59,7 @@ export function PostFilters() {
 
       {/* City Filters */}
       <div className="flex flex-wrap gap-2">
-        {CITIES.map((city) => (
+        {CITIES.map(city => (
           <Button
             key={city.value}
             variant="outline"
@@ -78,7 +78,7 @@ export function PostFilters() {
 
       {/* Category Filters */}
       <div className="flex flex-wrap gap-2">
-        {CATEGORIES.map((category) => (
+        {CATEGORIES.map(category => (
           <Button
             key={category.value}
             variant="outline"

@@ -1,14 +1,12 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { useForm } from 'react-hook-form'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { PostsService } from '@/shared/api/generated/services.gen'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
 import {
   Select,
   SelectContent,
@@ -17,8 +15,10 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Spinner } from '@/components/ui/spinner'
-import { executeUploadFlow, attachMediaToPost } from '@/lib/media/uploadFlow'
-import type { PostCategory, PostScope, CityCode } from '@/shared/api/generated'
+import { Textarea } from '@/components/ui/textarea'
+import { attachMediaToPost, executeUploadFlow } from '@/lib/media/uploadFlow'
+import type { CityCode, PostCategory, PostScope } from '@/shared/api/generated'
+import { PostsService } from '@/shared/api/generated/services.gen'
 
 const CATEGORIES: { value: PostCategory; label: string }[] = [
   { value: 'trade', label: '交換' },
@@ -98,7 +98,7 @@ export function CreatePostForm() {
         setErrorMessage('請選擇圖片檔案')
         return
       }
-      
+
       // Create preview
       const reader = new FileReader()
       reader.onloadend = () => {
@@ -116,7 +116,7 @@ export function CreatePostForm() {
   const onSubmit = async (data: FormData) => {
     setErrorMessage('')
     setUploadProgress(0)
-    
+
     if (data.scope === 'city' && !data.city_code) {
       setErrorMessage('當範圍為「指定城市」時，必須選擇城市')
       return
@@ -183,7 +183,7 @@ export function CreatePostForm() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {CATEGORIES.map((category) => (
+              {CATEGORIES.map(category => (
                 <SelectItem key={category.value} value={category.value}>
                   {category.label}
                 </SelectItem>
@@ -210,13 +210,13 @@ export function CreatePostForm() {
               <SelectItem value="city">城市（指定城市）</SelectItem>
             </SelectContent>
           </Select>
-          
+
           {/* 城市 - 僅在 scope=city 時顯示 */}
           {scope === 'city' && (
             <Input
               placeholder="城市代碼（例如 TPE）"
               className="mt-2 bg-card border-border rounded-xl font-bold"
-              onChange={(e) => setValue('city_code', e.target.value as CityCode)}
+              onChange={e => setValue('city_code', e.target.value as CityCode)}
             />
           )}
         </div>
@@ -250,7 +250,9 @@ export function CreatePostForm() {
             minLength: { value: 1, message: '內容至少需要 1 個字' },
           })}
         />
-        {errors.content && <p className="text-xs text-destructive mt-1">{errors.content.message}</p>}
+        {errors.content && (
+          <p className="text-xs text-destructive mt-1">{errors.content.message}</p>
+        )}
       </div>
 
       {/* 圖片上傳 (T054) */}
@@ -261,7 +263,7 @@ export function CreatePostForm() {
             <p className="text-[11px] text-muted-foreground">每則貼文最多 1 張（免費方案）</p>
           </div>
         </div>
-        
+
         <Input
           id="image"
           type="file"
@@ -271,7 +273,7 @@ export function CreatePostForm() {
           })}
           className="bg-card border-border rounded-xl"
         />
-        
+
         {imagePreview && (
           <div className="relative mt-3">
             <img
@@ -290,7 +292,7 @@ export function CreatePostForm() {
             </Button>
           </div>
         )}
-        
+
         {uploadProgress > 0 && uploadProgress < 100 && (
           <div className="mt-3">
             <div className="h-2 w-full rounded-full bg-muted">
@@ -302,10 +304,12 @@ export function CreatePostForm() {
             <p className="mt-1 text-[11px] text-muted-foreground">上傳中... {uploadProgress}%</p>
           </div>
         )}
-        
+
         <div className="mt-3 bg-card border border-border rounded-xl p-3">
           <p className="text-[11px] font-black text-foreground">上傳流程（示意）</p>
-          <p className="text-[11px] text-muted-foreground">授權 → PUT 上傳 → 確認（confirm）→ 附加（attach）</p>
+          <p className="text-[11px] text-muted-foreground">
+            授權 → PUT 上傳 → 確認（confirm）→ 附加（attach）
+          </p>
         </div>
       </div>
 
@@ -327,8 +331,8 @@ export function CreatePostForm() {
         >
           取消
         </Button>
-        <Button 
-          type="submit" 
+        <Button
+          type="submit"
           disabled={createPostMutation.isPending}
           className="h-12 rounded-2xl bg-slate-900 text-white font-black shadow-xl hover:bg-slate-800"
         >

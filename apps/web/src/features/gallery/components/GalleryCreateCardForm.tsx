@@ -1,11 +1,8 @@
-"use client";
+'use client'
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { Button } from '@/components/ui/button'
 import {
   Form,
   FormControl,
@@ -13,71 +10,74 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { executeUploadFlow } from "@/lib/media/uploadFlow";
-import { attachMediaToGalleryCard } from "@/shared/api/hooks/media";
-import { useCreateGalleryCard } from "@/shared/api/hooks/gallery";
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { executeUploadFlow } from '@/lib/media/uploadFlow'
+import { useCreateGalleryCard } from '@/shared/api/hooks/gallery'
+import { attachMediaToGalleryCard } from '@/shared/api/hooks/media'
 
 interface GalleryCreateCardFormProps {
-  onSuccess?: () => void;
+  onSuccess?: () => void
 }
 
 interface CreateCardFormData {
-  title: string;
-  idol_name: string;
-  era?: string;
-  description?: string;
-  image?: FileList;
+  title: string
+  idol_name: string
+  era?: string
+  description?: string
+  image?: FileList
 }
 
 export function GalleryCreateCardForm({ onSuccess }: GalleryCreateCardFormProps) {
   const form = useForm<CreateCardFormData>({
     defaultValues: {
-      title: "",
-      idol_name: "",
-      era: "",
-      description: "",
+      title: '',
+      idol_name: '',
+      era: '',
+      description: '',
     },
-  });
+  })
 
-  const [uploadProgress, setUploadProgress] = useState<number>(0);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  
-  const createCardMutation = useCreateGalleryCard();
+  const [uploadProgress, setUploadProgress] = useState<number>(0)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+
+  const createCardMutation = useCreateGalleryCard()
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+    const file = e.target.files?.[0]
     if (file) {
-      if (!file.type.startsWith("image/")) {
-        form.setError("root", { message: "Please select an image file" });
-        return;
+      if (!file.type.startsWith('image/')) {
+        form.setError('root', { message: 'Please select an image file' })
+        return
       }
-      
-      const reader = new FileReader();
+
+      const reader = new FileReader()
       reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+        setImagePreview(reader.result as string)
+      }
+      reader.readAsDataURL(file)
     }
-  };
+  }
 
   const removeImage = () => {
-    setImagePreview(null);
-    form.setValue("image", undefined);
-  };
+    setImagePreview(null)
+    form.setValue('image', undefined)
+  }
 
   const onSubmit = async (data: CreateCardFormData) => {
     try {
-      setUploadProgress(0);
-      let mediaId: string | undefined;
+      setUploadProgress(0)
+      let mediaId: string | undefined
 
       // Step 1: Upload image if selected (T055)
       if (data.image && data.image.length > 0) {
-        const file = data.image[0];
+        const file = data.image[0]
         mediaId = await executeUploadFlow({
           file,
           onProgress: setUploadProgress,
-        });
+        })
       }
 
       // Step 2: Create gallery card using SDK
@@ -86,27 +86,27 @@ export function GalleryCreateCardForm({ onSuccess }: GalleryCreateCardFormProps)
         idol_name: data.idol_name,
         era: data.era || undefined,
         description: data.description || undefined,
-      });
+      })
 
-      const cardData = response as any;
-      const cardId = cardData.data?.id;
+      const cardData = response as any
+      const cardId = cardData.data?.id
 
       // Step 3: Attach media to gallery card if uploaded
       if (mediaId && cardId) {
-        await attachMediaToGalleryCard(cardId, mediaId);
+        await attachMediaToGalleryCard(cardId, mediaId)
       }
 
-      onSuccess?.();
-      form.reset();
-      setImagePreview(null);
-      setUploadProgress(0);
+      onSuccess?.()
+      form.reset()
+      setImagePreview(null)
+      setUploadProgress(0)
     } catch (error) {
-      console.error("Error creating card:", error);
-      form.setError("root", {
-        message: error instanceof Error ? error.message : "Failed to create card",
-      });
+      console.error('Error creating card:', error)
+      form.setError('root', {
+        message: error instanceof Error ? error.message : 'Failed to create card',
+      })
     }
-  };
+  }
 
   return (
     <Form {...form}>
@@ -114,7 +114,10 @@ export function GalleryCreateCardForm({ onSuccess }: GalleryCreateCardFormProps)
         <FormField
           control={form.control}
           name="title"
-          rules={{ required: "Title is required", maxLength: { value: 200, message: "Title is too long" } }}
+          rules={{
+            required: 'Title is required',
+            maxLength: { value: 200, message: 'Title is too long' },
+          }}
           render={({ field }) => (
             <FormItem>
               <FormLabel>Title *</FormLabel>
@@ -129,7 +132,10 @@ export function GalleryCreateCardForm({ onSuccess }: GalleryCreateCardFormProps)
         <FormField
           control={form.control}
           name="idol_name"
-          rules={{ required: "Idol name is required", maxLength: { value: 100, message: "Idol name is too long" } }}
+          rules={{
+            required: 'Idol name is required',
+            maxLength: { value: 100, message: 'Idol name is too long' },
+          }}
           render={({ field }) => (
             <FormItem>
               <FormLabel>Idol Name *</FormLabel>
@@ -144,7 +150,7 @@ export function GalleryCreateCardForm({ onSuccess }: GalleryCreateCardFormProps)
         <FormField
           control={form.control}
           name="era"
-          rules={{ maxLength: { value: 100, message: "Era is too long" } }}
+          rules={{ maxLength: { value: 100, message: 'Era is too long' } }}
           render={({ field }) => (
             <FormItem>
               <FormLabel>Era (Optional)</FormLabel>
@@ -159,16 +165,12 @@ export function GalleryCreateCardForm({ onSuccess }: GalleryCreateCardFormProps)
         <FormField
           control={form.control}
           name="description"
-          rules={{ maxLength: { value: 1000, message: "Description is too long" } }}
+          rules={{ maxLength: { value: 1000, message: 'Description is too long' } }}
           render={({ field }) => (
             <FormItem>
               <FormLabel>Description (Optional)</FormLabel>
               <FormControl>
-                <Textarea 
-                  placeholder="Add a description..."
-                  rows={3}
-                  {...field} 
-                />
+                <Textarea placeholder="Add a description..." rows={3} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -182,7 +184,7 @@ export function GalleryCreateCardForm({ onSuccess }: GalleryCreateCardFormProps)
             id="image"
             type="file"
             accept="image/*"
-            {...form.register("image", {
+            {...form.register('image', {
               onChange: handleImageChange,
             })}
           />
@@ -218,20 +220,15 @@ export function GalleryCreateCardForm({ onSuccess }: GalleryCreateCardFormProps)
         </div>
 
         {form.formState.errors.root && (
-          <div className="text-sm text-destructive">
-            {form.formState.errors.root.message}
-          </div>
+          <div className="text-sm text-destructive">{form.formState.errors.root.message}</div>
         )}
 
         <div className="flex justify-end gap-2">
-          <Button
-            type="submit"
-            disabled={form.formState.isSubmitting}
-          >
-            {form.formState.isSubmitting ? "Creating..." : "Create Card"}
+          <Button type="submit" disabled={form.formState.isSubmitting}>
+            {form.formState.isSubmitting ? 'Creating...' : 'Create Card'}
           </Button>
         </div>
       </form>
     </Form>
-  );
+  )
 }
