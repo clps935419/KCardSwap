@@ -38,6 +38,29 @@ AI 執行專案相關任務時，請先讀取 `apps` 目錄下各服務的 `READ
 - `@/` 路徑別名
 - Tailwind CSS className
 
+## Web 開發規範
+
+### 必須遵守的規則
+
+1. **流程**:
+    - Step 1: 閱讀 `apps/web/README.md` 確認運行方式與技術棧
+    - Step 2: 閱讀 `apps/web/TECH_STACK.md`（若存在）了解開發規範
+    - Step 3: 參考現有 `apps/web` 內的 page/component 程式碼風格
+
+2. **React/Next.js 效能規範**:
+    - 需優先遵循已安裝的 `vercel-react-best-practices` skill 內容。
+    - 若需查詢完整規範，請參考：
+       https://github.com/vercel-labs/agent-skills/tree/main/skills/react-best-practices
+    - 重要方向包含（依影響度）：
+       - Eliminating Waterfalls（`async-*`）
+       - Bundle Size Optimization（`bundle-*`）
+       - Server-Side Performance（`server-*`）
+       - Client-Side Data Fetching（`client-*`）
+       - Re-render Optimization（`rerender-*`）
+       - Rendering Performance（`rendering-*`）
+       - JavaScript Performance（`js-*`）
+       - Advanced Patterns（`advanced-*`）
+
 ## 後端開發規範
 
 ### OpenAPI 規格生成
