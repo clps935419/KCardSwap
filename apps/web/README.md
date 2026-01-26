@@ -146,7 +146,7 @@ poetry run python scripts/init_admin.py --email admin@example.com --password Sec
   - **Access Token**: 短效 (15 分鐘)
   - **Refresh Token**: 長效 (7 天)
 - **Token 續期**: 前端自動處理 (401 → refresh → retry)
-- **路由保護**: 使用 Next.js middleware 檢查 cookie 存在性
+- **路由保護**: 使用 Next.js 16 proxy 檢查 cookie 存在性
 
 ### 登入流程
 

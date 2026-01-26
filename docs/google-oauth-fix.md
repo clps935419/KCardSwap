@@ -48,7 +48,7 @@
 核心功能模組，包含：
 
 - `initGoogleOAuth()`: 載入 Google Identity Services SDK
-- `loginWithGoogle()`: 處理 Google OAuth 登入（使用 One Tap 或 popup）
+- `loginWithGoogle()`: 處理 Google OAuth 登入（使用 One Tap）
 - `handleGoogleCallback()`: 將 ID token 發送到後端
 - `checkAuth()`: 檢查使用者是否已登入（透過呼叫 `/api/v1/users/me`）
 - `logout()`: 登出並清除 cookies
@@ -62,15 +62,15 @@
 - 使用 `useEffect` 在頁面載入時初始化 Google OAuth
 - 登入成功後使用 `window.location.href = '/posts'` 重定向
 
-### 3. 新增 Middleware `src/middleware.ts`
+### 3. 更新 Proxy `src/proxy.ts` (Next.js 16)
 
-取代 NextAuth 的路由保護：
+取代 NextAuth session 檢查為 cookie-based 認證：
 
 - 檢查 `access_token` cookie 是否存在
 - 未認證使用者訪問受保護路徑 → 重定向到 `/login`
 - 已認證使用者訪問 `/login` → 重定向到 `/posts`
 
-**注意**: Middleware 只檢查 cookie 存在性，完整的 JWT 驗證在後端進行。
+**注意**: Next.js 16 使用 `proxy.ts` 而非 `middleware.ts`。Proxy 只檢查 cookie 存在性，完整的 JWT 驗證在後端進行。
 
 ### 4. 移除 NextAuth Session 依賴
 
@@ -205,4 +205,4 @@ npm run dev
 
 - [Google Identity Services Documentation](https://developers.google.com/identity/gsi/web)
 - [HTTP Cookies (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies)
-- [Next.js Middleware](https://nextjs.org/docs/app/building-your-application/routing/middleware)
+- [Next.js 16 Proxy](https://nextjs.org/docs/app/building-your-application/routing/middleware)
