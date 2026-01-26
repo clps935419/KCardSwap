@@ -34,7 +34,3 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-
-# Generated API SDK
-/src/shared/api/generated/*
-!/src/shared/api/generated/.gitkeep
