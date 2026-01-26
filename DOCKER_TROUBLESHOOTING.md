@@ -135,9 +135,12 @@ UserWarning: Revision 013_add_card_upload_confirmation referenced from ... is no
 
 ### 解決方案
 
-**方法 1: 重啟容器 (最快)**
+**方法 1: 重建 backend 映像檔（推薦）**
 ```bash
-make down
+# 重建 backend 映像以包含最新的 start.sh
+docker compose build backend
+
+# 啟動容器
 make dev
 ```
 
@@ -146,12 +149,18 @@ make dev
 # 停止並移除所有容器和 volumes
 make clean
 
-# 清理 Python 快取
-find apps/backend/alembic -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
-find apps/backend/alembic -type f -name "*.pyc" -delete 2>/dev/null || true
+# 重建所有映像
+docker compose build
 
 # 重新建立環境
 make setup
+```
+
+**方法 3: 只重啟容器（如果 alembic 檔案已更新）**
+```bash
+# 只適用於 alembic 目錄中的檔案變更（因為有 volume mount）
+make down
+make dev
 ```
 
 **方法 3: 強制重建 backend 映像**
@@ -162,7 +171,8 @@ make dev
 
 ### 預防措施
 - 現在 `start.sh` 會在執行 migrations 前自動清理 Python 快取
-- 如果更新 migration 檔案，建議重啟容器
+- **重要**: `start.sh` 不是 volume mount，所以更新後需要重建映像檔：`docker compose build backend`
+- 如果更新 migration 檔案（在 `alembic/versions/`），只需重啟容器（因為 alembic 目錄有 volume mount）
 
 ---
 
