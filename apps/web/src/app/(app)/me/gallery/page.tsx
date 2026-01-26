@@ -1,5 +1,6 @@
 'use client'
 
+import { signOut } from 'next-auth/react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
@@ -126,6 +127,23 @@ export default function MyGalleryPage() {
           )}
         </>
       )}
+
+      {/* Logout Section */}
+      <Card className="p-5 rounded-2xl border border-border/30 bg-card shadow-sm">
+        <div className="space-y-3">
+          <div>
+            <p className="text-sm font-black text-foreground">帳號管理</p>
+            <p className="text-[11px] text-muted-foreground">登出後需重新登入才能使用</p>
+          </div>
+          <Button
+            onClick={() => signOut({ callbackUrl: '/login' })}
+            variant="outline"
+            className="w-full h-12 rounded-2xl border-border bg-card font-black hover:bg-muted hover:text-destructive"
+          >
+            登出
+          </Button>
+        </div>
+      </Card>
 
       {/* Create Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>

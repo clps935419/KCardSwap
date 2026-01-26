@@ -61,16 +61,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 'U'}
             </button>
           </Link>
-
-          {/* Logout Button */}
-          <Button
-            onClick={() => signOut({ callbackUrl: '/login' })}
-            variant="outline"
-            size="sm"
-            className="px-3 py-2 rounded-xl text-[10px] font-black"
-          >
-            登出
-          </Button>
         </div>
       </header>
 
