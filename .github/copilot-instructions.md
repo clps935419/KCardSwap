@@ -7,6 +7,10 @@
 
 AI 執行專案相關任務時，請先讀取 `apps` 目錄下各服務的 `README.md`，以取得該服務的運行與設定說明。
 
+## Speckit 報告位置
+
+Speckit 在 implement 階段產生的報告，請直接寫入 `reports/` 目錄。
+
 ## Mobile 開發規範
 
 ### 必須遵守的規則
