@@ -14,7 +14,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { executeUploadFlow, attachMediaToGalleryCard } from "@/src/lib/media/uploadFlow";
+import { executeUploadFlow, attachMediaToGalleryCard } from "@/lib/media/uploadFlow";
 
 interface GalleryCreateCardFormProps {
   onSuccess?: () => void;

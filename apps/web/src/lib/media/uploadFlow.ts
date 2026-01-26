@@ -6,7 +6,7 @@
  * @module lib/media/uploadFlow
  */
 
-import { axiosInstance } from '@/src/lib/api/axios';
+import { axiosInstance } from '@/lib/api/axios';
 
 export interface UploadFlowOptions {
   file: File;

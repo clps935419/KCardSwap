@@ -8,12 +8,12 @@
  * 4. Generate TanStack Query hooks for React
  */
 
-export default {
+import { defineConfig } from '@hey-api/openapi-ts'
+
+export default defineConfig({
   client: '@hey-api/client-axios',
   input: '../../openapi/openapi.json',
-  output: {
-    path: './src/shared/api/generated',
-  },
+  output: './src/shared/api/generated',
   plugins: [
     '@hey-api/typescript',
     '@hey-api/sdk',
@@ -24,4 +24,4 @@ export default {
       queryOptions: true,
     },
   ],
-}
+})

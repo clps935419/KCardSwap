@@ -14,7 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 
 // TODO: Replace with generated SDK hooks once OpenAPI is updated
 async function fetchMyGalleryCards() {

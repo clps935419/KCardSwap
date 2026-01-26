@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Spinner } from '@/components/ui/spinner'
-import { executeUploadFlow, attachMediaToPost } from '@/src/lib/media/uploadFlow'
+import { executeUploadFlow, attachMediaToPost } from '@/lib/media/uploadFlow'
 import type { PostCategory, PostScope, CityCode } from '@/shared/api/generated'
 
 const CATEGORIES: { value: PostCategory; label: string }[] = [
