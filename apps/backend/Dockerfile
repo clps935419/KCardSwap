@@ -23,9 +23,8 @@ ENV POETRY_NO_INTERACTION=1 \
 # 複製依賴定義檔案
 COPY pyproject.toml poetry.lock ./
 
-# 設定 Poetry 使用傳統的 pip installer並僅安裝生產依賴（包含 alembic）
-RUN poetry config experimental.new-installer false && \
-    poetry install --only main --no-root && rm -rf $POETRY_CACHE_DIR
+# 僅安裝生產依賴（包含 alembic）
+RUN poetry install --only main --no-root && rm -rf $POETRY_CACHE_DIR
 
 # Stage 2: Runtime - 執行階段輕量映像
 FROM python:3.11-slim
