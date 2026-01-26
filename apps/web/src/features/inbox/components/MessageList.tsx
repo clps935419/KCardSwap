@@ -49,15 +49,15 @@ export function MessageList({ threadId }: MessageListProps) {
 
   if (messages.length === 0) {
     return (
-      <div className="text-center py-12 text-muted-foreground">
-        <p>No messages yet</p>
-        <p className="text-sm mt-2">Start the conversation below</p>
+      <div className="text-center py-12 text-muted-foreground text-sm">
+        <p>目前沒有訊息</p>
+        <p className="text-[11px] mt-2">在下方開始對話</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {messages.map((message) => {
         const isOwnMessage = message.sender_id === currentUserId;
         
@@ -71,16 +71,18 @@ export function MessageList({ threadId }: MessageListProps) {
           >
             <div
               className={cn(
-                "max-w-[70%] rounded-lg px-4 py-2",
+                "max-w-[75%] rounded-2xl px-4 py-3",
                 isOwnMessage
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted"
+                  ? "bg-slate-900 text-white"
+                  : "bg-card border border-border text-foreground"
               )}
             >
-              <p className="text-sm">{message.content}</p>
-              <p className="text-xs opacity-70 mt-1">
-                {new Date(message.created_at).toLocaleTimeString()}
-              </p>
+              <p className="text-sm font-bold">{message.content}</p>
+              {message.post_id && (
+                <p className="text-[10px] opacity-70 mt-1">
+                  引用貼文：{message.post_id}
+                </p>
+              )}
             </div>
           </div>
         );
