@@ -120,7 +120,53 @@ docker compose down -v
 
 ---
 
-## 問題 4: Database Connection Failed
+## 問題 4: Alembic Migration Error - Revision Not Present
+
+### 症狀
+容器啟動時出現 Alembic 警告：
+```
+UserWarning: Revision 013_add_card_upload_confirmation referenced from ... is not present
+```
+
+### 原因
+- Python bytecode 快取 (`.pyc` 檔案) 已過時
+- 容器需要重新啟動以載入更新的 migration 檔案
+- Volume 掛載的檔案未正確同步
+
+### 解決方案
+
+**方法 1: 重啟容器 (最快)**
+```bash
+make down
+make dev
+```
+
+**方法 2: 完全清理並重建**
+```bash
+# 停止並移除所有容器和 volumes
+make clean
+
+# 清理 Python 快取
+find apps/backend/alembic -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
+find apps/backend/alembic -type f -name "*.pyc" -delete 2>/dev/null || true
+
+# 重新建立環境
+make setup
+```
+
+**方法 3: 強制重建 backend 映像**
+```bash
+docker compose build --no-cache backend
+make dev
+```
+
+### 預防措施
+- 現在 `start.sh` 會在執行 migrations 前自動清理 Python 快取
+- 如果更新 migration 檔案，建議重啟容器
+
+---
+
+## 問題 5: Database Connection Failed
 
 ### 症狀
 Backend 無法連接到資料庫
@@ -145,7 +191,7 @@ make setup    # 重新建立環境
 
 ---
 
-## 問題 5: Image Build is Too Slow
+## 問題 6: Image Build is Too Slow
 
 ### 解決方案
 

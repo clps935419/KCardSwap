@@ -11,6 +11,11 @@ else
   poetry install --no-root --only main
 fi
 
+# Clear Python bytecode cache to ensure fresh migration files are loaded
+echo "Clearing Python cache..."
+find /app/alembic -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
+find /app/alembic -type f -name "*.pyc" -delete 2>/dev/null || true
+
 echo "Running database migrations on main database..."
 alembic upgrade head
 
