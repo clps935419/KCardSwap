@@ -24,20 +24,21 @@ export default function AuthTestPage() {
   // Check auth status and fetch user info on mount
   useEffect(() => {
     initGoogleOAuth()
-    checkAuthStatus()
-  }, [checkAuthStatus])
+    
+    const initAuth = async () => {
+      setIsLoading(true)
+      const authenticated = await checkAuth()
+      setIsAuthenticated(authenticated)
 
-  const checkAuthStatus = async () => {
-    setIsLoading(true)
-    const authenticated = await checkAuth()
-    setIsAuthenticated(authenticated)
+      if (authenticated) {
+        await fetchUserInfo()
+      }
 
-    if (authenticated) {
-      await fetchUserInfo()
+      setIsLoading(false)
     }
-
-    setIsLoading(false)
-  }
+    
+    initAuth()
+  }, [])
 
   const fetchUserInfo = async () => {
     try {
@@ -61,12 +62,28 @@ export default function AuthTestPage() {
 
     try {
       await loginWithGoogle()
-      await checkAuthStatus()
+      // Re-check auth status after login
+      const authenticated = await checkAuth()
+      setIsAuthenticated(authenticated)
+      if (authenticated) {
+        await fetchUserInfo()
+      }
+      setIsLoading(false)
     } catch (err: unknown) {
       const error = err as Error
       setError(error.message || 'Google 登入失敗')
       setIsLoading(false)
     }
+  }
+
+  const handleCheckStatus = async () => {
+    setIsLoading(true)
+    const authenticated = await checkAuth()
+    setIsAuthenticated(authenticated)
+    if (authenticated) {
+      await fetchUserInfo()
+    }
+    setIsLoading(false)
   }
 
   const handleLogout = async () => {
@@ -147,7 +164,7 @@ export default function AuthTestPage() {
                 <Button onClick={handleLogout} variant="destructive">
                   登出
                 </Button>
-                <Button onClick={checkAuthStatus} variant="outline">
+                <Button onClick={handleCheckStatus} variant="outline">
                   重新檢查狀態
                 </Button>
               </>

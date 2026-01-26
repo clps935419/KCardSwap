@@ -29,8 +29,11 @@ export function initGoogleOAuth() {
 }
 
 /**
- * Google OAuth login using One Tap or popup
+ * Google OAuth login using One Tap
  * Browser receives the ID token and sends it to backend
+ * 
+ * Note: This implementation only supports One Tap flow.
+ * If One Tap is not available, user should try again or check browser settings.
  */
 export async function loginWithGoogle(): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -66,9 +69,8 @@ export async function loginWithGoogle(): Promise<void> {
         // Show One Tap prompt
         google.accounts.id.prompt((notification: any) => {
           if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-            // One Tap not shown, fall back to popup
-            console.log('[Google OAuth] One Tap not shown, using popup')
-            showGooglePopup(clientId).then(resolve).catch(reject)
+            // One Tap not available
+            reject(new Error('Google One Tap 無法使用，請檢查瀏覽器設定或稍後再試'))
           }
         })
       }
@@ -79,33 +81,6 @@ export async function loginWithGoogle(): Promise<void> {
       clearInterval(checkGoogleLoaded)
       reject(new Error('Google Identity Services failed to load'))
     }, 5000)
-  })
-}
-
-/**
- * Show Google OAuth popup as fallback
- */
-async function showGooglePopup(clientId: string): Promise<void> {
-  return new Promise((_resolve, reject) => {
-    const google = (window as any).google
-
-    const client = google.accounts.oauth2.initCodeClient({
-      client_id: clientId,
-      scope: 'email profile',
-      ux_mode: 'popup',
-      callback: async (response: any) => {
-        if (response.error) {
-          reject(new Error(response.error))
-          return
-        }
-
-        // We get authorization code, need to exchange it for ID token
-        // For simplicity, we'll use the implicit flow with ID token
-        reject(new Error('Code flow not implemented, please use One Tap'))
-      },
-    })
-
-    client.requestCode()
   })
 }
 

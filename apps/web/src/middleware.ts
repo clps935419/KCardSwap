@@ -48,6 +48,10 @@ export function middleware(request: NextRequest) {
 }
 
 // Configure which routes use this middleware
+// Match all paths except static files and Next.js internals
+const STATIC_FILES_PATTERN = /\.(?:svg|png|jpg|jpeg|gif|webp)$/
+const EXCLUDED_PATHS = ['/_next/static', '/_next/image', '/favicon.ico']
+
 export const config = {
   matcher: [
     /*
@@ -55,7 +59,7 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization)
      * - favicon.ico (favicon)
-     * - public files (public folder)
+     * - public files (images, etc.)
      */
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
