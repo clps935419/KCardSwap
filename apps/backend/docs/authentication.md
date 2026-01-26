@@ -164,7 +164,111 @@ Mobile app uses Expo AuthSession to start OAuth flow:
 
 ---
 
-### Flow 2: Implicit Flow with ID Token (Legacy/Web Support)
+### Flow 2: Admin Login with Email/Password
+
+This flow is for **administrator authentication only** using email and password credentials.
+
+#### Architecture
+
+```
+┌─────────────┐         ┌──────────────┐         ┌─────────────┐
+│   Admin     │         │     Kong     │         │   Backend   │
+│   Client    │         │   Gateway    │         │     API     │
+└──────┬──────┘         └──────┬───────┘         └──────┬──────┘
+       │                       │                        │
+       │ 1. Admin Login        │                        │
+       ├──────────────────────>│                        │
+       │  (email + password)   │ 2. Forward Request     │
+       │                       ├───────────────────────>│
+       │                       │                        │
+       │                       │                        │ 3. Verify Email
+       │                       │                        │    Verify Password
+       │                       │                        │    Check Admin Role
+       │                       │                        │    Generate JWT
+       │                       │                        │
+       │                       │ 4. Return Tokens       │
+       │<──────────────────────┤<───────────────────────┤
+       │   Access + Refresh    │                        │
+```
+
+**Endpoint**: `POST /api/v1/auth/admin-login`
+
+**Request**:
+```json
+{
+  "email": "admin@example.com",
+  "password": "SecurePassword123"
+}
+```
+
+**Response** (Success - 200):
+```json
+{
+  "data": {
+    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "token_type": "bearer",
+    "expires_in": 900,
+    "user_id": "123e4567-e89b-12d3-a456-426614174000",
+    "email": "admin@example.com",
+    "role": "admin"
+  },
+  "error": null
+}
+```
+
+**Response** (Error - 401):
+```json
+{
+  "data": null,
+  "error": {
+    "code": "UNAUTHORIZED",
+    "message": "Invalid credentials or not an admin"
+  }
+}
+```
+
+#### Backend Processing:
+1. Get user by email from database
+2. Verify user has password_hash (not a Google OAuth user)
+3. Verify password using secure password hashing (bcrypt)
+4. Check if user has admin role (`admin` or `super_admin`)
+5. Generate JWT tokens:
+   - Access Token (15 minutes expiry)
+   - Refresh Token (7 days expiry)
+6. Store refresh token in database
+7. Return tokens with role information
+
+#### Creating Admin Users
+
+Admin users can be created using provided scripts:
+
+**Method 1: Using init_admin.py (Idempotent)**
+```bash
+cd apps/backend
+poetry run python scripts/init_admin.py --email admin@example.com --password SecurePass123
+```
+
+**Method 2: Using create_admin.py (Fail-fast)**
+```bash
+cd apps/backend
+poetry run python scripts/create_admin.py --email admin@example.com --password SecurePass123 --role admin
+```
+
+**Method 3: Using Docker**
+```bash
+docker compose exec backend python scripts/init_admin.py --email admin@example.com --password SecurePass123
+```
+
+**Security Considerations:**
+- Passwords are hashed using bcrypt before storage
+- Minimum password length: 8 characters (recommended in scripts)
+- Admin role verification ensures only authorized users can access admin endpoints
+- Failed login attempts return generic error message to prevent user enumeration
+
+---
+
+### Flow 3: Implicit Flow with ID Token (Legacy/Web Support)
 
 This flow is **maintained for backward compatibility** and web applications. For new mobile implementations, use Flow 1 (PKCE) instead.
 
@@ -385,7 +489,14 @@ Authorization: Bearer {access_token}
 - Validates token signature using Google's public keys
 - Ensures token hasn't expired
 
-### 5. Rate Limiting
+### 5. Admin Password Security
+- Passwords are hashed using bcrypt (adaptive hashing algorithm)
+- Password verification uses constant-time comparison to prevent timing attacks
+- Minimum password length of 8 characters recommended
+- Failed login attempts return generic error messages to prevent user enumeration
+- Admin users cannot use Google OAuth (must use email/password)
+
+### 6. Rate Limiting
 - Kong Gateway can enforce rate limits on auth endpoints
 - Prevents brute force attacks
 - Recommended: 10 login attempts per minute per IP
@@ -469,21 +580,28 @@ GOOGLE_REDIRECT_URI=your-redirect-uri
 
 ### Manual Testing with curl
 
-#### 1. Login with Google (requires valid Google ID token)
+#### 1. Admin Login with Email/Password
+```bash
+curl -X POST http://localhost:8000/api/v1/auth/admin-login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "admin@example.com", "password": "SecurePass123"}'
+```
+
+#### 2. Login with Google (requires valid Google ID token)
 ```bash
 curl -X POST http://localhost:8000/api/v1/auth/google-login \
   -H "Content-Type: application/json" \
   -d '{"google_token": "YOUR_GOOGLE_ID_TOKEN"}'
 ```
 
-#### 2. Refresh Token
+#### 3. Refresh Token
 ```bash
 curl -X POST http://localhost:8000/api/v1/auth/refresh \
   -H "Content-Type: application/json" \
   -d '{"refresh_token": "YOUR_REFRESH_TOKEN"}'
 ```
 
-#### 3. Authenticated Request (Get Profile)
+#### 4. Authenticated Request (Get Profile)
 ```bash
 curl -X GET http://localhost:8000/api/v1/profile/me \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
