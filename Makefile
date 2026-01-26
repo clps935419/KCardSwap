@@ -7,6 +7,11 @@ help: ## Show this help message
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  %-15s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
 dev: ## Start development environment
+	@if [ ! -f .env ]; then \
+		echo "Error: .env file not found!"; \
+		echo "Please run 'make setup' first or manually copy .env.example to .env"; \
+		exit 1; \
+	fi
 	docker compose up -d
 
 up: dev ## Alias for dev
