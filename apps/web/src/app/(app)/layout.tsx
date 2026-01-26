@@ -2,24 +2,37 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { signOut, useSession } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
+
+// Constants for page titles
+const PAGE_TITLES = {
+  POSTS: '貼文',
+  INBOX: '信箱',
+  PROFILE: '我的檔案',
+  DEFAULT: '貼文',
+} as const
+
+// Get page title based on current pathname
+// Note: Uses prefix matching since nested routes should inherit parent section titles
+function getPageTitle(pathname: string): string {
+  if (pathname === '/posts' || pathname.startsWith('/posts/')) return PAGE_TITLES.POSTS
+  if (pathname === '/inbox' || pathname.startsWith('/inbox/')) return PAGE_TITLES.INBOX
+  if (pathname === '/me' || pathname.startsWith('/me/')) return PAGE_TITLES.PROFILE
+  return PAGE_TITLES.DEFAULT
+}
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const { data: session } = useSession()
+  const pageTitle = getPageTitle(pathname)
 
   return (
     <div className="min-h-screen bg-background flex flex-col relative">
       {/* Header */}
       <header className="px-6 py-4 flex justify-between items-center bg-card shadow-sm z-10 sticky top-0">
         <div className="flex flex-col">
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl font-black text-primary-500">
-              KCardSwap
-              <span className="text-secondary-500">.</span>
-            </h1>
-          </div>
+          <p className="text-sm font-black text-foreground">{pageTitle}</p>
           <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">
             V2 貼文優先
           </p>
@@ -35,33 +48,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             方案：<span className="text-foreground">免費</span>
           </Button>
 
-          {/* User Avatar with Dropdown */}
-          <div className="relative group">
-            <Link href="/me/gallery">
-              <button
-                type="button"
-                className="w-9 h-9 bg-primary-500 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-white text-xs font-black transition-transform active:scale-95 hover:scale-105"
-                aria-label="前往我的檔案"
-                title={session?.user?.email || '使用者'}
-              >
-                {session?.user?.name?.[0]?.toUpperCase() ||
-                  session?.user?.email?.[0]?.toUpperCase() ||
-                  'U'}
-              </button>
-            </Link>
-
-            {/* Logout on hover */}
-            <div className="absolute right-0 top-full mt-2 hidden group-hover:block">
-              <Button
-                onClick={() => signOut({ callbackUrl: '/login' })}
-                variant="outline"
-                size="sm"
-                className="whitespace-nowrap text-xs"
-              >
-                登出
-              </Button>
-            </div>
-          </div>
+          {/* User Avatar */}
+          <Link href="/me/gallery">
+            <button
+              type="button"
+              className="w-9 h-9 bg-primary-500 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-white text-xs font-black transition-transform active:scale-95 hover:scale-105"
+              aria-label="前往我的檔案"
+              title={session?.user?.email || '使用者'}
+            >
+              {session?.user?.name?.[0]?.toUpperCase() ||
+                session?.user?.email?.[0]?.toUpperCase() ||
+                'U'}
+            </button>
+          </Link>
         </div>
       </header>
 
@@ -72,10 +71,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <nav className="fixed bottom-6 left-6 right-6 md:left-1/2 md:-translate-x-1/2 md:max-w-md h-[74px] bg-card/90 backdrop-blur-md border border-border shadow-2xl rounded-[28px] px-3 z-20">
         <div className="grid grid-cols-3 items-center h-full">
           {/* Home */}
-          <Link href="/posts">
+          <Link href="/posts" className="w-full">
             <button
               type="button"
-              className={`h-14 rounded-2xl flex flex-col items-center justify-center gap-1 transition-all active:scale-95 ${
+              className={`w-full h-14 rounded-2xl flex flex-col items-center justify-center gap-1 transition-all active:scale-95 ${
                 pathname === '/posts'
                   ? 'text-primary-500 bg-accent shadow-sm'
                   : 'text-muted-foreground hover:text-foreground hover:bg-muted'
@@ -99,10 +98,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </Link>
 
           {/* Inbox */}
-          <Link href="/inbox">
+          <Link href="/inbox" className="w-full">
             <button
               type="button"
-              className={`h-14 rounded-2xl flex flex-col items-center justify-center gap-1 transition-all active:scale-95 ${
+              className={`w-full h-14 rounded-2xl flex flex-col items-center justify-center gap-1 transition-all active:scale-95 ${
                 pathname === '/inbox'
                   ? 'text-primary-500 bg-accent shadow-sm'
                   : 'text-muted-foreground hover:text-foreground hover:bg-muted'

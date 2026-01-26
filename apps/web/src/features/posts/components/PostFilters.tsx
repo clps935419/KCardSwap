@@ -46,7 +46,6 @@ export function PostFilters() {
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-sm font-black text-foreground">全域列表（顯示全部貼文）</p>
-          <p className="text-[11px] text-muted-foreground">城市列表在這裡用 chip 篩選模擬</p>
         </div>
         <Button
           variant="ghost"
