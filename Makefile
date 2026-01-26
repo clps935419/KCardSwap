@@ -1,4 +1,4 @@
-.PHONY: help dev up down logs test lint clean build
+.PHONY: help dev dev-build up down logs test lint clean build
 
 help: ## Show this help message
 	@echo 'Usage: make [target]'
@@ -13,6 +13,14 @@ dev: ## Start development environment
 		exit 1; \
 	fi
 	docker compose up -d
+
+dev-build: ## Rebuild images and start development environment
+	@if [ ! -f .env ]; then \
+		echo "Error: .env file not found!"; \
+		echo "Please run 'make setup' first or manually copy .env.example to .env"; \
+		exit 1; \
+	fi
+	docker compose up -d --build
 
 up: dev ## Alias for dev
 
