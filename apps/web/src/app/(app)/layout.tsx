@@ -48,33 +48,29 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             方案：<span className="text-foreground">免費</span>
           </Button>
 
-          {/* User Avatar with Dropdown */}
-          <div className="relative group">
-            <Link href="/me/gallery">
-              <button
-                type="button"
-                className="w-9 h-9 bg-primary-500 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-white text-xs font-black transition-transform active:scale-95 hover:scale-105"
-                aria-label="前往我的檔案"
-                title={session?.user?.email || '使用者'}
-              >
-                {session?.user?.name?.[0]?.toUpperCase() ||
-                  session?.user?.email?.[0]?.toUpperCase() ||
-                  'U'}
-              </button>
-            </Link>
+          {/* User Avatar */}
+          <Link href="/me/gallery">
+            <button
+              type="button"
+              className="w-9 h-9 bg-primary-500 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-white text-xs font-black transition-transform active:scale-95 hover:scale-105"
+              aria-label="前往我的檔案"
+              title={session?.user?.email || '使用者'}
+            >
+              {session?.user?.name?.[0]?.toUpperCase() ||
+                session?.user?.email?.[0]?.toUpperCase() ||
+                'U'}
+            </button>
+          </Link>
 
-            {/* Logout on hover */}
-            <div className="absolute right-0 top-full mt-2 hidden group-hover:block">
-              <Button
-                onClick={() => signOut({ callbackUrl: '/login' })}
-                variant="outline"
-                size="sm"
-                className="whitespace-nowrap text-xs"
-              >
-                登出
-              </Button>
-            </div>
-          </div>
+          {/* Logout Button */}
+          <Button
+            onClick={() => signOut({ callbackUrl: '/login' })}
+            variant="outline"
+            size="sm"
+            className="px-3 py-2 rounded-xl text-[10px] font-black"
+          >
+            登出
+          </Button>
         </div>
       </header>
 
@@ -85,10 +81,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <nav className="fixed bottom-6 left-6 right-6 md:left-1/2 md:-translate-x-1/2 md:max-w-md h-[74px] bg-card/90 backdrop-blur-md border border-border shadow-2xl rounded-[28px] px-3 z-20">
         <div className="grid grid-cols-3 items-center h-full">
           {/* Home */}
-          <Link href="/posts">
+          <Link href="/posts" className="w-full">
             <button
               type="button"
-              className={`h-14 rounded-2xl flex flex-col items-center justify-center gap-1 transition-all active:scale-95 ${
+              className={`w-full h-14 rounded-2xl flex flex-col items-center justify-center gap-1 transition-all active:scale-95 ${
                 pathname === '/posts'
                   ? 'text-primary-500 bg-accent shadow-sm'
                   : 'text-muted-foreground hover:text-foreground hover:bg-muted'
@@ -112,10 +108,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </Link>
 
           {/* Inbox */}
-          <Link href="/inbox">
+          <Link href="/inbox" className="w-full">
             <button
               type="button"
-              className={`h-14 rounded-2xl flex flex-col items-center justify-center gap-1 transition-all active:scale-95 ${
+              className={`w-full h-14 rounded-2xl flex flex-col items-center justify-center gap-1 transition-all active:scale-95 ${
                 pathname === '/inbox'
                   ? 'text-primary-500 bg-accent shadow-sm'
                   : 'text-muted-foreground hover:text-foreground hover:bg-muted'
