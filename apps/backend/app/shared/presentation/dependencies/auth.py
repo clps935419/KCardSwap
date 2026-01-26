@@ -16,6 +16,7 @@ from app.config import settings
 from app.shared.infrastructure.security.jwt_service import JWTService
 
 # HTTP Bearer security scheme (optional for backward compatibility)
+# auto_error=False allows checking cookie first, then falling back to Bearer token
 security = HTTPBearer(auto_error=False)
 
 

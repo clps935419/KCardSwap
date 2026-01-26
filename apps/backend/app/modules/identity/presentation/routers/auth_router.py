@@ -288,7 +288,7 @@ async def refresh_token(
     response: Response,
     use_case: Annotated[RefreshTokenUseCase, Depends(get_refresh_token_use_case)],
     jwt_service: JWTService = Depends(lambda: JWTService()),
-    refresh_token_cookie: str | None = Cookie(None, alias=settings.REFRESH_COOKIE_NAME),
+    refresh_token_cookie: Optional[str] = Cookie(None, alias=settings.REFRESH_COOKIE_NAME),
 ) -> RefreshSuccessResponse:
     """
     Refresh access token using refresh token from httpOnly cookie.
