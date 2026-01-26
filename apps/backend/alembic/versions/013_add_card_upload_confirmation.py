@@ -1,6 +1,6 @@
 """add card upload confirmation fields
 
-Revision ID: 013
+Revision ID: 013_add_card_upload_confirmation
 Revises: 012
 Create Date: 2025-12-29 04:30:00.000000
 
@@ -15,7 +15,7 @@ import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "013"
+revision: str = "013_add_card_upload_confirmation"
 down_revision: Union[str, None] = "012"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
