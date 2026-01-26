@@ -23,7 +23,7 @@ Posts-first POC 的 Web 客戶端，使用 Next.js App Router 實作。
 
 ```bash
 cd apps/web
-npm install
+npm install --legacy-peer-deps  # 需要使用 legacy-peer-deps 解決 peer dependency 衝突
 ```
 
 ### 環境變數設定
@@ -96,13 +96,39 @@ npm run sdk:generate
 這個指令會：
 1. 讀取 repo root 的 `openapi/openapi.json`
 2. 生成 TypeScript SDK 到 `src/shared/api/generated/`
-3. 包含 TanStack Query hooks
+3. 使用 axios client
+4. 包含完整的型別定義
 
 ### 何時需要重新生成
 
 當後端 API 有變更時：
 1. 後端執行 `python3 scripts/generate_openapi.py` 更新 `openapi/openapi.json`
 2. 前端執行 `npm run sdk:generate` 重新生成 SDK
+
+## 開發環境管理員登入
+
+在開發環境下，登入頁面會顯示管理員帳密登入表單。
+
+### 前置條件
+
+1. 創建管理員帳號（在後端執行）：
+```bash
+cd apps/backend
+poetry run python scripts/init_admin.py --email admin@example.com --password SecurePass123
+```
+
+2. 確保 `NODE_ENV` 設定為 `development`（預設就是）
+
+### 使用方式
+
+1. 啟動開發伺服器：`npm run dev`
+2. 訪問登入頁面：http://localhost:3000/login
+3. 會看到琥珀色的「開發模式：管理員登入」區塊
+4. 輸入管理員 email 和密碼
+5. 點擊「管理員登入」
+6. 成功後會儲存 tokens 並重定向到首頁
+
+**注意**：此功能只在開發環境顯示（`NODE_ENV === 'development'`），生產環境不會出現。
 
 ## Cookie 與驗證
 
