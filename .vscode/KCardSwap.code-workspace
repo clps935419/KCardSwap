@@ -31,6 +31,10 @@
     {
       "name": "specs",
       "path": "../specs"
+    },
+    {
+      "name": "web",
+      "path": "../apps/web"
     }
   ],
   "settings": {
