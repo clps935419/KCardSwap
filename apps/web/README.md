@@ -83,7 +83,7 @@ apps/web/
 │   ├── shared/          # 共用型別與常數
 │   │   └── api/         # 生成的 API SDK
 │   │       └── generated/
-│   └── middleware.ts    # NextAuth 中介軟體（路由保護）
+│   └── proxy.ts         # 路由保護（Next.js 16）
 ├── public/              # 靜態資源
 ├── .env.example         # 環境變數範例
 ├── NEXTAUTH_GUIDE.md    # NextAuth 整合指南

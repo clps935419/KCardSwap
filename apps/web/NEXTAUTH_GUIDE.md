@@ -37,7 +37,7 @@ apps/web/
 │   │       ├── utils.ts                  # Auth 工具函式
 │   │       ├── types.ts                  # 型別定義
 │   │       └── index.ts                  # 匯出
-│   └── middleware.ts                     # 路由保護
+│   └── proxy.ts                          # 路由保護（Next.js 16+）
 ```
 
 ## 環境變數
@@ -122,9 +122,11 @@ export async function GET() {
 
 ### 路由保護
 
-`middleware.ts` 已設定為保護所有路由（除了 `/login` 和公開頁面）。
+`proxy.ts` 已設定為保護所有路由（除了 `/login` 和公開頁面）。
 
-如需調整受保護的路由，編輯 `src/middleware.ts` 中的 `matcher` 設定。
+**注意**: Next.js 16 將 `middleware.ts` 重新命名為 `proxy.ts`。這是一個輕量級的認證檢查層，僅檢查 session token 的存在，完整的 session 驗證仍在 Server Components 和 API routes 中進行。
+
+如需調整受保護的路由，編輯 `src/proxy.ts` 中的 `matcher` 設定。
 
 ## API 呼叫
 
