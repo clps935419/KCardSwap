@@ -1,6 +1,5 @@
 'use client'
 
-import { logout } from '@/lib/google-oauth'
 import { useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
@@ -10,6 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/use-toast'
 import { GalleryCreateCardForm } from '@/features/gallery/components/GalleryCreateCardForm'
 import { GalleryGrid } from '@/features/gallery/components/GalleryGrid'
+import { logout } from '@/lib/google-oauth'
 import { useDeleteGalleryCard, useMyGalleryCards } from '@/shared/api/hooks/gallery'
 
 export default function MyGalleryPage() {
@@ -30,7 +30,7 @@ export default function MyGalleryPage() {
     onError: error => {
       toast({
         title: '錯誤',
-        description: '無法刪除: ' + error.message,
+        description: `無法刪除: ${error.message}`,
         variant: 'destructive',
       })
     },
@@ -118,15 +118,12 @@ export default function MyGalleryPage() {
       )}
 
       {/* Gallery Cards */}
-      {data && (
-        <>
-          {data.items && data.items.length > 0 ? (
-            <GalleryGrid cards={data.items || []} isOwner={true} onDelete={handleDelete} />
-          ) : (
-            <div className="text-center text-muted-foreground text-sm py-12">相簿目前沒有內容</div>
-          )}
-        </>
-      )}
+      {data &&
+        (data.items && data.items.length > 0 ? (
+          <GalleryGrid cards={data.items || []} isOwner={true} onDelete={handleDelete} />
+        ) : (
+          <div className="text-center text-muted-foreground text-sm py-12">相簿目前沒有內容</div>
+        ))}
 
       {/* Logout Section */}
       <Card className="p-5 rounded-2xl border border-border/30 bg-card shadow-sm">

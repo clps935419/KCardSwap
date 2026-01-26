@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { initGoogleOAuth, loginWithGoogle } from '@/lib/google-oauth'
 
 export default function LoginPage() {

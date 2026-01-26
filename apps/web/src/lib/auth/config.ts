@@ -28,7 +28,7 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     /**
      * JWT callback - Called when creating/updating JWT
-     * 
+     *
      * NOTE: This callback is no longer used for backend authentication.
      * Frontend now directly calls backend /api/v1/auth/google-login
      * to receive httpOnly cookies. This callback is kept for backward

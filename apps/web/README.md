@@ -139,16 +139,34 @@ poetry run python scripts/init_admin.py --email admin@example.com --password Sec
 
 ## Cookie 與驗證
 
-本專案使用 NextAuth.js 與後端 API 整合進行驗證：
+本專案使用 **後端 httpOnly cookies** 作為唯一的登入來源：
 
-- **Google OAuth**: 使用 NextAuth.js 處理 Google 登入流程
-- **Session 管理**: NextAuth.js 管理前端 session（JWT strategy）
+- **Google OAuth**: 瀏覽器端直接使用 Google Identity Services 取得 ID token
 - **Token 管理**: 後端發放的 tokens 儲存在 httpOnly cookies 中
   - **Access Token**: 短效 (15 分鐘)
   - **Refresh Token**: 長效 (7 天)
 - **Token 續期**: 前端自動處理 (401 → refresh → retry)
+- **路由保護**: 使用 Next.js middleware 檢查 cookie 存在性
 
-詳細說明請參考 [NEXTAUTH_GUIDE.md](./NEXTAUTH_GUIDE.md)
+### 登入流程
+
+1. 使用者點擊「使用 Google 登入」
+2. 瀏覽器載入 Google Identity Services
+3. Google 驗證成功後，ID token 直接返回瀏覽器
+4. 瀏覽器呼叫後端 `/api/v1/auth/google-login` 傳送 ID token
+5. 後端驗證 token 並設定 httpOnly cookies (access_token, refresh_token)
+6. 瀏覽器重定向到首頁
+
+**重要**: 所有 cookies 必須由後端設定，前端 JavaScript 無法直接存取這些 cookies（安全性考量）。
+
+### NextAuth 狀態
+
+NextAuth 目前僅用於向後相容，主要認證邏輯已改為：
+- 前端直接呼叫後端 Google OAuth endpoint
+- 使用後端 httpOnly cookies 作為認證來源
+- Middleware 基於 cookie 檢查進行路由保護
+
+未來版本可完全移除 NextAuth 依賴。
 
 ### 同源部署
 

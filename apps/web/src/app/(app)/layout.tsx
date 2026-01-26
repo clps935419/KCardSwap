@@ -2,8 +2,8 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { useState, useEffect } from 'react'
 
 // Get user email from backend API
 async function fetchUserEmail(): Promise<string> {
@@ -12,7 +12,7 @@ async function fetchUserEmail(): Promise<string> {
     const response = await fetch(`${backendUrl}/api/v1/users/me`, {
       credentials: 'include',
     })
-    
+
     if (response.ok) {
       const data = await response.json()
       return data.data?.email || ''
@@ -20,7 +20,7 @@ async function fetchUserEmail(): Promise<string> {
   } catch (error) {
     console.error('Failed to fetch user:', error)
   }
-  
+
   return ''
 }
 

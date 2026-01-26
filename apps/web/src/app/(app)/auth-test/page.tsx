@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { loginWithGoogle, logout, checkAuth, initGoogleOAuth } from '@/lib/google-oauth'
+import { checkAuth, initGoogleOAuth, loginWithGoogle, logout } from '@/lib/google-oauth'
 
 /**
  * Auth Test Page
@@ -18,14 +18,14 @@ import { loginWithGoogle, logout, checkAuth, initGoogleOAuth } from '@/lib/googl
 export default function AuthTestPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [userInfo, setUserInfo] = useState<any>(null)
+  const [userInfo, setUserInfo] = useState<{ id?: string; email?: string } | null>(null)
   const [error, setError] = useState('')
 
   // Check auth status and fetch user info on mount
   useEffect(() => {
     initGoogleOAuth()
     checkAuthStatus()
-  }, [])
+  }, [checkAuthStatus])
 
   const checkAuthStatus = async () => {
     setIsLoading(true)
@@ -62,8 +62,9 @@ export default function AuthTestPage() {
     try {
       await loginWithGoogle()
       await checkAuthStatus()
-    } catch (err: any) {
-      setError(err.message || 'Google 登入失敗')
+    } catch (err: unknown) {
+      const error = err as Error
+      setError(error.message || 'Google 登入失敗')
       setIsLoading(false)
     }
   }
@@ -151,11 +152,9 @@ export default function AuthTestPage() {
                 </Button>
               </>
             ) : (
-              <>
-                <Button onClick={handleLogin} disabled={isLoading}>
-                  使用 Google 登入
-                </Button>
-              </>
+              <Button onClick={handleLogin} disabled={isLoading}>
+                使用 Google 登入
+              </Button>
             )}
           </div>
         </div>
