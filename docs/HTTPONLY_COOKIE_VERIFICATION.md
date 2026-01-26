@@ -47,27 +47,26 @@
 
 ## 驗證方法
 
-### 方法 1: 手動測試腳本
+### 方法 1: 整合測試
 
-使用提供的 Python 測試腳本：
+執行現有的整合測試來驗證 httpOnly cookie 功能：
 
 ```bash
 cd apps/backend
 
-# 1. 確保後端服務執行中
-# docker compose up -d  # 或
-# poetry run uvicorn app.main:app --reload
+# 執行認證相關的整合測試
+poetry run pytest tests/integration/modules/identity/test_auth_refresh_cookie.py -v
 
-# 2. 執行測試腳本
-python3 test_httponly_manual.py
+# 或執行所有認證測試
+poetry run pytest tests/integration/modules/identity/ -v -k auth
 ```
 
-測試腳本會驗證：
+測試涵蓋：
 - ✓ 登入設置 cookies
 - ✓ 使用 cookie 進行認證請求
 - ✓ Token refresh 更新 cookies
 - ✓ 登出清除 cookies
-- ✓ 登出後請求被拒絕
+- ✓ 無效 token 處理
 
 ### 方法 2: 瀏覽器開發者工具
 
@@ -83,7 +82,7 @@ python3 test_httponly_manual.py
 6. 前往 Application > Cookies 查看已設置的 cookies
 7. 確認 `HttpOnly` 欄位為 ✓
 
-### 方法 3: cURL 測試
+### 方法 3: cURL 手動測試
 
 ```bash
 # 1. 登入並儲存 cookies

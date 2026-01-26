@@ -219,20 +219,20 @@ COOKIE_DOMAIN=
 
 ## 測試工具
 
-### 1. 手動測試腳本
-**檔案**: `apps/backend/test_httponly_manual.py`
+### 1. 整合測試
+**檔案**: `tests/integration/modules/identity/test_auth_refresh_cookie.py`
 
-提供自動化測試腳本，驗證：
+現有整合測試驗證：
 - ✓ 登入設置 cookies
 - ✓ 使用 cookie 進行認證請求
 - ✓ Token refresh 更新 cookies
 - ✓ 登出清除 cookies
-- ✓ 登出後請求被拒絕
+- ✓ 無效 token 處理
 
-**使用方法**：
+**執行方法**：
 ```bash
 cd apps/backend
-python3 test_httponly_manual.py
+poetry run pytest tests/integration/modules/identity/test_auth_refresh_cookie.py -v
 ```
 
 ### 2. 驗證文檔
@@ -240,7 +240,7 @@ python3 test_httponly_manual.py
 
 完整的驗證指南，包含：
 - 實作摘要
-- 三種驗證方法（腳本、瀏覽器、cURL）
+- 三種驗證方法（整合測試、瀏覽器、cURL）
 - 安全檢查清單
 - 環境變數配置
 - 故障排除指南
@@ -300,7 +300,7 @@ python3 test_httponly_manual.py
 
 ### 開發者測試（需人工執行）
 - [ ] 啟動 backend 和 web 服務
-- [ ] 執行測試腳本：`python3 apps/backend/test_httponly_manual.py`
+- [ ] 執行整合測試：`poetry run pytest tests/integration/modules/identity/test_auth_refresh_cookie.py -v`
 - [ ] 使用瀏覽器開發者工具驗證 cookie 屬性
 - [ ] 測試完整流程：登入 → 請求 → refresh → 登出
 
@@ -314,7 +314,7 @@ python3 test_httponly_manual.py
 
 ### 內部文件
 1. `docs/HTTPONLY_COOKIE_VERIFICATION.md` - 驗證指南
-2. `apps/backend/test_httponly_manual.py` - 測試腳本
+2. `tests/integration/modules/identity/test_auth_refresh_cookie.py` - 整合測試
 3. `apps/backend/README.md` - 後端開發指南
 4. `apps/backend/app/config.py` - 配置說明
 
@@ -333,7 +333,7 @@ python3 test_httponly_manual.py
 1. **安全性提升**：使用 HttpOnly cookies 防止 XSS 攻擊
 2. **完整實作**：登入、refresh、登出端點全部支援 cookie
 3. **向後相容**：保留 Bearer token 支援，不影響現有客戶端
-4. **完善文檔**：提供測試腳本和驗證指南
+4. **完善文檔**：提供驗證指南和整合測試
 5. **通過檢查**：Code review 和 CodeQL 安全掃描全部通過
 
 建議在合併前進行人工測試驗證，確保在實際環境中運作正常。
