@@ -1,7 +1,7 @@
 'use client'
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { apiClient } from '@/lib/api/axios'
+import { PostsService } from '@/shared/api/generated'
 import type { PostResponse } from '@/shared/api/generated'
 
 interface ToggleLikeResponse {
@@ -16,10 +16,10 @@ export function useToggleLike() {
 
   const mutation = useMutation({
     mutationFn: async (postId: string) => {
-      const response = await apiClient.post<ToggleLikeResponse>(
-        `/api/v1/posts/${postId}/like`
-      )
-      return response.data
+      const response = await PostsService.toggleLikeApiV1PostsPostIdLikePost({
+        postId,
+      })
+      return response as unknown as ToggleLikeResponse
     },
     onMutate: async (postId) => {
       // Cancel any outgoing refetches
