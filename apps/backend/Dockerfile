@@ -2,21 +2,30 @@
 # Stage 1: Builder - 安裝依賴
 FROM python:3.11-slim AS builder
 
-# 安裝 Poetry
-RUN pip install --no-cache-dir poetry==1.7.1
+# 安裝 ca-certificates 來處理 SSL 憑證
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+# 安裝 Poetry (使用 trusted-host 來處理可能的 SSL 問題)
+RUN pip install --no-cache-dir --trusted-host pypi.org --trusted-host files.pythonhosted.org poetry==1.7.1
 
 WORKDIR /app
 
 # 設定 Poetry 不建立虛擬環境（因為已在容器中）
+# 並設定 pip 使用 trusted-host 來處理可能的 SSL 問題
 ENV POETRY_NO_INTERACTION=1 \
     POETRY_VIRTUALENVS_CREATE=false \
-    POETRY_CACHE_DIR=/tmp/poetry_cache
+    POETRY_CACHE_DIR=/tmp/poetry_cache \
+    POETRY_INSTALLER_MODERN_INSTALLATION=false \
+    PIP_TRUSTED_HOST="pypi.org files.pythonhosted.org pypi.python.org"
 
 # 複製依賴定義檔案
 COPY pyproject.toml poetry.lock ./
 
-# 僅安裝生產依賴（包含 alembic）
-RUN poetry install --only main --no-root && rm -rf $POETRY_CACHE_DIR
+# 設定 Poetry 使用傳統的 pip installer並僅安裝生產依賴（包含 alembic）
+RUN poetry config experimental.new-installer false && \
+    poetry install --only main --no-root && rm -rf $POETRY_CACHE_DIR
 
 # Stage 2: Runtime - 執行階段輕量映像
 FROM python:3.11-slim
