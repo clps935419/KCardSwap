@@ -90,10 +90,6 @@ export default function MyGalleryPage() {
             新增小卡
           </Button>
         </div>
-
-        <p className="text-[10px] text-muted-foreground mt-3">
-          提示：POC 規則是「所有瀏覽需登入」，因此此頁只在登入後可見。
-        </p>
       </Card>
 
       {/* Loading State */}

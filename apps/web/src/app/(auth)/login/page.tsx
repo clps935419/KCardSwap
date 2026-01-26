@@ -32,8 +32,8 @@ export default function LoginPage() {
       if (response.data) {
         localStorage.setItem('access_token', response.data.access_token)
         localStorage.setItem('refresh_token', response.data.refresh_token)
-        // Redirect to home or dashboard
-        window.location.href = '/'
+        // Redirect to posts feed after login
+        window.location.href = '/posts'
       }
     } catch (err: unknown) {
       const error = err as { response?: { data?: { error?: { message?: string } } } }
@@ -109,7 +109,7 @@ export default function LoginPage() {
         {/* Google Login Button */}
         <button
           type="button"
-          onClick={() => signIn('google', { callbackUrl: '/' })}
+          onClick={() => signIn('google', { callbackUrl: '/posts' })}
           className="w-full h-16 bg-gradient-to-r from-secondary-50 to-rose-50 border-2 border-secondary-300 rounded-2xl flex items-center justify-center px-6 hover:from-secondary-50/80 hover:to-rose-50/80 transition-all shadow-md"
         >
           <div className="flex items-center gap-3">

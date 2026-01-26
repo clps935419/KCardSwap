@@ -1,10 +1,16 @@
-export default function HomePage() {
-  return (
-    <div className="flex min-h-screen items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold">KCardSwap POC</h1>
-        <p className="mt-4 text-muted-foreground">Posts-first Web POC</p>
-      </div>
-    </div>
-  )
+import { redirect } from 'next/navigation'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth/config'
+
+export default async function HomePage() {
+  const session = await getServerSession(authOptions)
+
+  // Redirect based on authentication status
+  if (session) {
+    // User is logged in, redirect to posts feed
+    redirect('/posts')
+  } else {
+    // User is not logged in, redirect to login page
+    redirect('/login')
+  }
 }
