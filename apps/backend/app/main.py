@@ -111,9 +111,17 @@ def create_application() -> FastAPI:
     from .modules.identity.presentation.routers.profile_router import (
         router as profile_router,
     )
+    from .modules.identity.presentation.routers.idols_router import (
+        router as idols_router,
+    )
+    from .modules.identity.presentation.routers.subscription_router import (
+        router as subscription_router,
+    )
 
     app.include_router(auth_router, prefix=settings.API_PREFIX)
     app.include_router(profile_router, prefix=settings.API_PREFIX)
+    app.include_router(idols_router, prefix=settings.API_PREFIX)
+    app.include_router(subscription_router, prefix=settings.API_PREFIX)
 
     # Phase 6: Social module (Reports and Blocking)
     from .modules.social.presentation.routers.friends_router import (
@@ -122,10 +130,18 @@ def create_application() -> FastAPI:
     from .modules.social.presentation.routers.report_router import (
         router as report_router,
     )
+    from .modules.social.presentation.routers.cards_router import (
+        router as cards_router,
+    )
+    from .modules.social.presentation.routers.chat_router import (
+        router as chat_router,
+    )
 
     # Note: friends_router kept only for block/unblock endpoints (FR-025)
     app.include_router(friends_router, prefix=settings.API_PREFIX)
     app.include_router(report_router, prefix=settings.API_PREFIX)
+    app.include_router(cards_router, prefix=settings.API_PREFIX)
+    app.include_router(chat_router, prefix=settings.API_PREFIX)
 
     # Phase 8.5: Posts module (City Board Posts)
     from .modules.posts.presentation.routers.posts_router import (
