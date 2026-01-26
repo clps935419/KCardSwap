@@ -2,9 +2,8 @@
 
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
 import { GalleryGrid } from "@/features/gallery/components/GalleryGrid";
 import { GalleryCreateCardForm } from "@/features/gallery/components/GalleryCreateCardForm";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -14,7 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 
 // TODO: Replace with generated SDK hooks once OpenAPI is updated
 async function fetchMyGalleryCards() {
@@ -44,6 +43,7 @@ async function deleteGalleryCard(cardId: string) {
 
 export default function MyGalleryPage() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [allowStrangerDM, setAllowStrangerDM] = useState(true);
   const queryClient = useQueryClient();
   const { toast } = useToast();
   
@@ -57,21 +57,21 @@ export default function MyGalleryPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["my-gallery"] });
       toast({
-        title: "Success",
-        description: "Card deleted successfully",
+        title: "已刪除",
+        description: "相簿小卡已移除",
       });
     },
     onError: (error) => {
       toast({
-        title: "Error",
-        description: "Failed to delete card: " + error.message,
+        title: "錯誤",
+        description: "無法刪除: " + error.message,
         variant: "destructive",
       });
     },
   });
 
   const handleDelete = (cardId: string) => {
-    if (confirm("Are you sure you want to delete this card?")) {
+    if (confirm("確定要刪除這張小卡嗎？")) {
       deleteMutation.mutate(cardId);
     }
   };
@@ -80,59 +80,101 @@ export default function MyGalleryPage() {
     setIsCreateDialogOpen(false);
     queryClient.invalidateQueries({ queryKey: ["my-gallery"] });
     toast({
-      title: "Success",
-      description: "Card created successfully",
+      title: "已新增",
+      description: "相簿小卡已加入清單",
+    });
+  };
+
+  const toggleStrangerDM = () => {
+    setAllowStrangerDM(!allowStrangerDM);
+    toast({
+      title: "隱私設定",
+      description: `陌生人私訊：${!allowStrangerDM ? '開啟' : '關閉'}`,
     });
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-2xl">My Gallery</CardTitle>
-          <Button onClick={() => setIsCreateDialogOpen(true)}>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Card
+    <div className="mx-auto max-w-2xl space-y-4">
+      {/* Header Card */}
+      <Card className="p-5 rounded-2xl border border-border/30 bg-card shadow-sm">
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-sm font-black text-foreground">相簿小卡</p>
+            <p className="text-[11px] text-muted-foreground">可新增 / 刪除 / 排序；不含交換狀態</p>
+          </div>
+          <span className="bg-primary-50 text-primary-700 text-[10px] px-2 py-1 rounded-full font-black">V2</span>
+        </div>
+
+        <div className="mt-4 grid grid-cols-2 gap-3">
+          <Button
+            onClick={toggleStrangerDM}
+            variant="outline"
+            className="h-12 rounded-2xl border-border bg-card font-black hover:bg-muted"
+          >
+            陌生人私訊：
+            <span className={allowStrangerDM ? 'text-emerald-600' : 'text-rose-600'}>
+              {allowStrangerDM ? '開' : '關'}
+            </span>
           </Button>
-        </CardHeader>
-        <CardContent>
-          {isLoading && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {[...Array(8)].map((_, i) => (
-                <div key={i} className="space-y-2">
-                  <Skeleton className="aspect-[3/4] w-full" />
+          <Button
+            onClick={() => setIsCreateDialogOpen(true)}
+            className="h-12 rounded-2xl bg-slate-900 text-white font-black shadow-xl hover:bg-slate-800"
+          >
+            新增小卡
+          </Button>
+        </div>
+
+        <p className="text-[10px] text-muted-foreground mt-3">
+          提示：POC 規則是「所有瀏覽需登入」，因此此頁只在登入後可見。
+        </p>
+      </Card>
+
+      {/* Loading State */}
+      {isLoading && (
+        <div className="space-y-4">
+          {[...Array(3)].map((_, i) => (
+            <Card key={i} className="p-4 rounded-2xl">
+              <div className="flex items-start gap-3">
+                <Skeleton className="w-11 h-11 rounded-2xl" />
+                <div className="flex-1 space-y-2">
                   <Skeleton className="h-4 w-3/4" />
                   <Skeleton className="h-3 w-1/2" />
                 </div>
-              ))}
-            </div>
-          )}
-
-          {error && (
-            <div className="text-center py-8 text-destructive">
-              <p>Failed to load gallery cards. Please try again later.</p>
-            </div>
-          )}
-
-          {data && (
-            <>
-              <div className="mb-4 text-sm text-muted-foreground">
-                Total cards: {data.total || 0}
               </div>
-              <GalleryGrid 
-                cards={data.items || []} 
-                isOwner={true}
-                onDelete={handleDelete}
-              />
-            </>
-          )}
-        </CardContent>
-      </Card>
+            </Card>
+          ))}
+        </div>
+      )}
 
+      {/* Error State */}
+      {error && (
+        <div className="text-center py-8 text-destructive">
+          <p>載入相簿卡片時發生錯誤，請稍後再試</p>
+        </div>
+      )}
+
+      {/* Gallery Cards */}
+      {data && (
+        <>
+          {data.items && data.items.length > 0 ? (
+            <GalleryGrid 
+              cards={data.items || []} 
+              isOwner={true}
+              onDelete={handleDelete}
+            />
+          ) : (
+            <div className="text-center text-muted-foreground text-sm py-12">
+              相簿目前沒有內容
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Create Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-[500px] rounded-2xl">
           <DialogHeader>
-            <DialogTitle>Add New Card</DialogTitle>
+            <DialogTitle>新增相簿小卡</DialogTitle>
           </DialogHeader>
           <GalleryCreateCardForm onSuccess={handleCreateSuccess} />
         </DialogContent>

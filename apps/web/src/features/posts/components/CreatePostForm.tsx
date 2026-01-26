@@ -4,7 +4,7 @@ import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { createPostApiV1PostsPostMutation, listPostsApiV1PostsGetQueryKey } from '@/shared/api/generated/@tanstack/react-query.gen'
+import { PostsService } from '@/shared/api/generated/services.gen'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Spinner } from '@/components/ui/spinner'
-import { executeUploadFlow, attachMediaToPost } from '@/src/lib/media/uploadFlow'
+import { executeUploadFlow, attachMediaToPost } from '@/lib/media/uploadFlow'
 import type { PostCategory, PostScope, CityCode } from '@/shared/api/generated'
 
 const CATEGORIES: { value: PostCategory; label: string }[] = [
@@ -69,9 +69,9 @@ export function CreatePostForm() {
   })
 
   const createPostMutation = useMutation({
-    ...createPostApiV1PostsPostMutation(),
+    mutationFn: (data: any) => PostsService.createPostApiV1PostsPost(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: listPostsApiV1PostsGetQueryKey() })
+      queryClient.invalidateQueries({ queryKey: ['posts'] })
       router.push('/posts')
     },
     onError: (error: any) => {
@@ -139,7 +139,7 @@ export function CreatePostForm() {
 
       // Step 2: Create post
       const postResponse = await createPostMutation.mutateAsync({
-        body: {
+        requestBody: {
           title: data.title,
           content: data.content,
           scope: data.scope,
@@ -172,109 +172,102 @@ export function CreatePostForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      {/* 標題 */}
-      <div className="space-y-2">
-        <Label htmlFor="title">
-          標題 <span className="text-destructive">*</span>
-        </Label>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      {/* Category and Scope in 2-column grid */}
+      <div className="grid grid-cols-2 gap-3">
+        {/* 分類 */}
+        <div className="bg-muted/50 border border-border/30 rounded-2xl p-4">
+          <p className="text-[10px] font-bold text-muted-foreground uppercase mb-2">分類</p>
+          <Select
+            defaultValue="showcase"
+            onValueChange={(value: string) => setValue('category', value as PostCategory)}
+          >
+            <SelectTrigger id="category" className="bg-card border-border rounded-xl font-bold">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {CATEGORIES.map((category) => (
+                <SelectItem key={category.value} value={category.value}>
+                  {category.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* 範圍 */}
+        <div className="bg-muted/50 border border-border/30 rounded-2xl p-4">
+          <p className="text-[10px] font-bold text-muted-foreground uppercase mb-2">範圍</p>
+          <Select
+            value={scope}
+            onValueChange={(value: string) => {
+              setScope(value as PostScope)
+              setValue('scope', value as PostScope)
+            }}
+          >
+            <SelectTrigger id="scope" className="bg-card border-border rounded-xl font-bold">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="global">全域（不限）</SelectItem>
+              <SelectItem value="city">城市（指定城市）</SelectItem>
+            </SelectContent>
+          </Select>
+          
+          {/* 城市 - 僅在 scope=city 時顯示 */}
+          {scope === 'city' && (
+            <Input
+              placeholder="城市代碼（例如 TPE）"
+              className="mt-2 bg-card border-border rounded-xl font-bold"
+              onChange={(e) => setValue('city_code', e.target.value as CityCode)}
+            />
+          )}
+        </div>
+      </div>
+
+      {/* 標題與內容 */}
+      <div className="bg-muted/50 border border-border/30 rounded-2xl p-4 space-y-2">
+        <p className="text-[10px] font-bold text-muted-foreground uppercase">標題</p>
         <Input
           id="title"
-          placeholder="輸入貼文標題"
+          placeholder="想分享什麼？"
+          className="bg-card border-border rounded-xl"
           {...register('title', {
             required: '請輸入標題',
             minLength: { value: 1, message: '標題至少需要 1 個字' },
             maxLength: { value: 100, message: '標題最多 100 個字' },
           })}
         />
-        {errors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
+        {errors.title && <p className="text-xs text-destructive mt-1">{errors.title.message}</p>}
       </div>
 
-      {/* 內容 */}
-      <div className="space-y-2">
-        <Label htmlFor="content">
-          內容 <span className="text-destructive">*</span>
-        </Label>
+      <div className="bg-muted/50 border border-border/30 rounded-2xl p-4 space-y-2">
+        <p className="text-[10px] font-bold text-muted-foreground uppercase">內容</p>
         <Textarea
           id="content"
-          placeholder="分享您的想法..."
-          rows={6}
+          placeholder="分享更多細節..."
+          rows={4}
+          className="bg-card border-border rounded-xl"
           {...register('content', {
             required: '請輸入內容',
             minLength: { value: 1, message: '內容至少需要 1 個字' },
           })}
         />
-        {errors.content && <p className="text-sm text-destructive">{errors.content.message}</p>}
+        {errors.content && <p className="text-xs text-destructive mt-1">{errors.content.message}</p>}
       </div>
-
-      {/* 範圍 */}
-      <div className="space-y-2">
-        <Label htmlFor="scope">
-          發布範圍 <span className="text-destructive">*</span>
-        </Label>
-        <Select
-          value={scope}
-          onValueChange={(value: string) => {
-            setScope(value as PostScope)
-            setValue('scope', value as PostScope)
-          }}
-        >
-          <SelectTrigger id="scope">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="global">不限（全域）</SelectItem>
-            <SelectItem value="city">指定城市</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* 城市 - 僅在 scope=city 時顯示 */}
-      {scope === 'city' && (
-        <div className="space-y-2">
-          <Label htmlFor="city_code">
-            城市 <span className="text-destructive">*</span>
-          </Label>
-          <Select onValueChange={(value: string) => setValue('city_code', value as CityCode)}>
-            <SelectTrigger id="city_code">
-              <SelectValue placeholder="選擇城市" />
-            </SelectTrigger>
-            <SelectContent>
-              {CITIES.map((city) => (
-                <SelectItem key={city.value} value={city.value}>
-                  {city.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      )}
-
-      {/* 分類 */}
-      <div className="space-y-2">
-        <Label htmlFor="category">
-          分類 <span className="text-destructive">*</span>
-        </Label>
-        <Select
-          defaultValue="showcase"
-          onValueChange={(value: string) => setValue('category', value as PostCategory)}
-        >
-          <SelectTrigger id="category">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {CATEGORIES.map((category) => (
-              <SelectItem key={category.value} value={category.value}>
-                {category.label}
-              </SelectItem>
-            ))}
           </SelectContent>
         </Select>
       </div>
 
       {/* 圖片上傳 (T054) */}
-      <div className="space-y-2">
-        <Label htmlFor="image">圖片 (選填)</Label>
+      <div className="bg-muted/50 border border-border/30 rounded-2xl p-4">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <p className="text-[10px] font-bold text-muted-foreground uppercase">圖片</p>
+            <p className="text-[11px] text-muted-foreground">每則貼文最多 1 張（免費方案）</p>
+          </div>
+        </div>
+        
         <Input
           id="image"
           type="file"
@@ -282,64 +275,77 @@ export function CreatePostForm() {
           ref={fileInputRef}
           {...register('image')}
           onChange={handleImageChange}
+          className="bg-card border-border rounded-xl"
         />
+        
         {imagePreview && (
-          <div className="relative mt-2">
+          <div className="relative mt-3">
             <img
               src={imagePreview}
               alt="預覽"
-              className="max-h-48 rounded-md border object-contain"
+              className="max-h-48 rounded-2xl border border-border object-contain w-full"
             />
             <Button
               type="button"
               variant="destructive"
               size="sm"
-              className="absolute right-2 top-2"
+              className="absolute right-2 top-2 rounded-xl"
               onClick={removeImage}
             >
               移除
             </Button>
           </div>
         )}
+        
         {uploadProgress > 0 && uploadProgress < 100 && (
-          <div className="mt-2">
-            <div className="h-2 w-full rounded-full bg-secondary">
+          <div className="mt-3">
+            <div className="h-2 w-full rounded-full bg-muted">
               <div
-                className="h-2 rounded-full bg-primary transition-all"
+                className="h-2 rounded-full bg-primary-500 transition-all"
                 style={{ width: `${uploadProgress}%` }}
               />
             </div>
-            <p className="mt-1 text-xs text-muted-foreground">上傳中... {uploadProgress}%</p>
+            <p className="mt-1 text-[11px] text-muted-foreground">上傳中... {uploadProgress}%</p>
           </div>
         )}
+        
+        <div className="mt-3 bg-card border border-border rounded-xl p-3">
+          <p className="text-[11px] font-black text-foreground">上傳流程（示意）</p>
+          <p className="text-[11px] text-muted-foreground">授權 → PUT 上傳 → 確認（confirm）→ 附加（attach）</p>
+        </div>
       </div>
 
       {/* 錯誤訊息 */}
       {errorMessage && (
-        <div className="rounded-md bg-destructive/10 p-4">
-          <p className="text-sm text-destructive">{errorMessage}</p>
+        <div className="rounded-2xl bg-destructive/10 border border-destructive/20 p-4">
+          <p className="text-sm text-destructive font-bold">{errorMessage}</p>
         </div>
       )}
 
       {/* 按鈕 */}
-      <div className="flex gap-4">
-        <Button type="submit" disabled={createPostMutation.isPending}>
+      <div className="grid grid-cols-2 gap-3">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => router.back()}
+          disabled={createPostMutation.isPending}
+          className="h-12 rounded-2xl border-border bg-card font-black hover:bg-muted"
+        >
+          取消
+        </Button>
+        <Button 
+          type="submit" 
+          disabled={createPostMutation.isPending}
+          className="h-12 rounded-2xl bg-slate-900 text-white font-black shadow-xl hover:bg-slate-800"
+        >
           {createPostMutation.isPending ? (
             <>
               <Spinner className="mr-2 h-4 w-4" />
               發布中...
             </>
           ) : (
-            '發布貼文'
+            '發布'
           )}
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => router.back()}
-          disabled={createPostMutation.isPending}
-        >
-          取消
         </Button>
       </div>
     </form>

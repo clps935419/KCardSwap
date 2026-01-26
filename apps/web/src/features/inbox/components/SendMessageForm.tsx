@@ -5,8 +5,8 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Send, Loader2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Loader2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 interface SendMessageFormProps {
@@ -39,12 +39,12 @@ export function SendMessageForm({ threadId }: SendMessageFormProps) {
       // queryClient.invalidateQueries(['thread-messages', threadId]);
       
       toast({
-        title: "Message sent",
+        title: "訊息已送出",
       });
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to send message",
+        title: "錯誤",
+        description: "無法送出訊息",
         variant: "destructive",
       });
     } finally {
@@ -54,13 +54,12 @@ export function SendMessageForm({ threadId }: SendMessageFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="flex gap-2">
-      <Textarea
-        placeholder="Type your message..."
+      <Input
+        placeholder="輸入訊息..."
         value={content}
         onChange={(e) => setContent(e.target.value)}
-        className="resize-none"
-        rows={2}
         disabled={loading}
+        className="flex-1 bg-muted/50 border-border rounded-2xl px-4 py-3"
         onKeyDown={(e) => {
           if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
@@ -68,8 +67,12 @@ export function SendMessageForm({ threadId }: SendMessageFormProps) {
           }
         }}
       />
-      <Button type="submit" disabled={loading || !content.trim()}>
-        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+      <Button 
+        type="submit" 
+        disabled={loading || !content.trim()}
+        className="w-14 rounded-2xl bg-slate-900 text-white font-black hover:bg-slate-800"
+      >
+        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : '送'}
       </Button>
     </form>
   );

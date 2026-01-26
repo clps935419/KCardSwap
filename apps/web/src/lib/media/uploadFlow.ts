@@ -6,7 +6,7 @@
  * @module lib/media/uploadFlow
  */
 
-import { axiosInstance } from '@/src/lib/api/axios';
+import { apiClient } from '@/lib/api/axios';
 
 export interface UploadFlowOptions {
   file: File;
@@ -35,7 +35,7 @@ export async function executeUploadFlow(
   // Step 1: Get presigned upload URL
   onProgress?.(10);
   
-  const presignResponse = await axiosInstance.post('/api/v1/media/upload-url', {
+  const presignResponse = await apiClient.post('/api/v1/media/upload-url', {
     content_type: file.type,
     file_size_bytes: file.size,
     filename: file.name,
@@ -55,7 +55,7 @@ export async function executeUploadFlow(
   // Step 3: Confirm upload (applies quota)
   onProgress?.(80);
   
-  await axiosInstance.post(`/api/v1/media/${media_id}/confirm`);
+  await apiClient.post(`/api/v1/media/${media_id}/confirm`);
 
   onProgress?.(100);
 
@@ -118,7 +118,7 @@ export async function attachMediaToPost(
   mediaId: string,
   postId: string
 ): Promise<void> {
-  await axiosInstance.post(`/api/v1/media/posts/${postId}/attach`, {
+  await apiClient.post(`/api/v1/media/posts/${postId}/attach`, {
     media_id: mediaId,
   });
 }
@@ -133,7 +133,7 @@ export async function attachMediaToGalleryCard(
   mediaId: string,
   cardId: string
 ): Promise<void> {
-  await axiosInstance.post(`/api/v1/media/gallery/cards/${cardId}/attach`, {
+  await apiClient.post(`/api/v1/media/gallery/cards/${cardId}/attach`, {
     media_id: mediaId,
   });
 }
