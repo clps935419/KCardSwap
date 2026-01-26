@@ -3,7 +3,7 @@ Authentication Router for Identity Module
 Handles Google login, token refresh, and logout
 """
 
-from typing import Annotated
+from typing import Annotated, Optional
 
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Response, status
 
