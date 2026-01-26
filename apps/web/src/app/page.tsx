@@ -1,9 +1,8 @@
 import { redirect } from 'next/navigation'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth/config'
+import { getSession } from '@/lib/auth/utils'
 
 export default async function HomePage() {
-  const session = await getServerSession(authOptions)
+  const session = await getSession()
 
   // Redirect based on authentication status
   if (session) {

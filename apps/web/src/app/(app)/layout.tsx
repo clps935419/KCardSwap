@@ -14,10 +14,11 @@ const PAGE_TITLES = {
 } as const
 
 // Get page title based on current pathname
+// Note: Uses prefix matching since nested routes should inherit parent section titles
 function getPageTitle(pathname: string): string {
-  if (pathname.startsWith('/posts')) return PAGE_TITLES.POSTS
-  if (pathname.startsWith('/inbox')) return PAGE_TITLES.INBOX
-  if (pathname.startsWith('/me')) return PAGE_TITLES.PROFILE
+  if (pathname === '/posts' || pathname.startsWith('/posts/')) return PAGE_TITLES.POSTS
+  if (pathname === '/inbox' || pathname.startsWith('/inbox/')) return PAGE_TITLES.INBOX
+  if (pathname === '/me' || pathname.startsWith('/me/')) return PAGE_TITLES.PROFILE
   return PAGE_TITLES.DEFAULT
 }
 
