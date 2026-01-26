@@ -5,21 +5,25 @@ import { usePathname } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
 
+// Get page title based on current pathname
+function getPageTitle(pathname: string): string {
+  if (pathname.startsWith('/posts')) return '貼文'
+  if (pathname.startsWith('/inbox')) return '信箱'
+  if (pathname.startsWith('/me')) return '我的檔案'
+  return '貼文'
+}
+
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const { data: session } = useSession()
+  const pageTitle = getPageTitle(pathname)
 
   return (
     <div className="min-h-screen bg-background flex flex-col relative">
       {/* Header */}
       <header className="px-6 py-4 flex justify-between items-center bg-card shadow-sm z-10 sticky top-0">
         <div className="flex flex-col">
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl font-black text-primary-500">
-              KCardSwap
-              <span className="text-secondary-500">.</span>
-            </h1>
-          </div>
+          <p className="text-sm font-black text-foreground">{pageTitle}</p>
           <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">
             V2 貼文優先
           </p>
