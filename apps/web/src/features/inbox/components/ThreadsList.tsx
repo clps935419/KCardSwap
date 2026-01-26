@@ -7,7 +7,6 @@
 
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
-import { MessageCircle } from "lucide-react";
 import Link from "next/link";
 
 // TODO: Replace with generated SDK types after OpenAPI generation
@@ -18,6 +17,8 @@ interface MessageThread {
   created_at: string;
   updated_at: string;
   last_message_at?: string;
+  last_message?: string;
+  peer_name?: string;
 }
 
 export function ThreadsList() {
@@ -28,10 +29,8 @@ export function ThreadsList() {
 
   if (threads.length === 0) {
     return (
-      <div className="text-center py-12 text-muted-foreground">
-        <MessageCircle className="mx-auto h-12 w-12 mb-4 opacity-50" />
-        <p>No conversations yet</p>
-        <p className="text-sm mt-2">Start a conversation by messaging someone from a post</p>
+      <div className="text-center text-muted-foreground text-sm py-12">
+        目前沒有聊天
       </div>
     );
   }
@@ -40,18 +39,21 @@ export function ThreadsList() {
     <div className="space-y-2">
       {threads.map((thread) => (
         <Link key={thread.id} href={`/inbox/threads/${thread.id}`}>
-          <Card className="p-4 hover:bg-accent transition-colors cursor-pointer">
-            <div className="flex items-center justify-between">
+          <Card className="p-4 rounded-2xl shadow-sm border border-border/30 flex items-center justify-between hover:bg-muted cursor-pointer transition-colors bg-card">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-primary-50 rounded-2xl flex items-center justify-center">
+                💬
+              </div>
               <div>
-                <p className="font-medium">Conversation</p>
-                <p className="text-sm text-muted-foreground">
-                  {thread.last_message_at
-                    ? new Date(thread.last_message_at).toLocaleDateString()
-                    : "No messages yet"}
+                <p className="text-sm font-black text-foreground">
+                  {thread.peer_name || `User ${thread.user_b_id.slice(0, 8)}`}
+                </p>
+                <p className="text-[11px] text-muted-foreground">
+                  {thread.last_message || '無訊息'}
                 </p>
               </div>
-              <MessageCircle className="h-5 w-5 text-muted-foreground" />
             </div>
+            <span className="text-muted-foreground/30 font-black">›</span>
           </Card>
         </Link>
       ))}
