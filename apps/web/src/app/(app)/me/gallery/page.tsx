@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { GalleryGrid } from "@/features/gallery/components/GalleryGrid";
@@ -14,32 +13,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
-
-// TODO: Replace with generated SDK hooks once OpenAPI is updated
-async function fetchMyGalleryCards() {
-  const response = await fetch("/api/v1/gallery/cards/me", {
-    credentials: "include",
-  });
-  
-  if (!response.ok) {
-    throw new Error("Failed to fetch gallery cards");
-  }
-  
-  return response.json();
-}
-
-async function deleteGalleryCard(cardId: string) {
-  const response = await fetch(`/api/v1/gallery/cards/${cardId}`, {
-    method: "DELETE",
-    credentials: "include",
-  });
-  
-  if (!response.ok) {
-    throw new Error("Failed to delete gallery card");
-  }
-  
-  return true;
-}
+import { useMyGalleryCards, useDeleteGalleryCard } from "@/shared/api/hooks/gallery";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function MyGalleryPage() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -47,15 +22,10 @@ export default function MyGalleryPage() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["my-gallery"],
-    queryFn: fetchMyGalleryCards,
-  });
+  const { data, isLoading, error } = useMyGalleryCards();
 
-  const deleteMutation = useMutation({
-    mutationFn: deleteGalleryCard,
+  const deleteMutation = useDeleteGalleryCard({
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["my-gallery"] });
       toast({
         title: "已刪除",
         description: "相簿小卡已移除",

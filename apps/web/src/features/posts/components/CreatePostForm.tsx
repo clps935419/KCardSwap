@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -53,7 +53,6 @@ export function CreatePostForm() {
   const [errorMessage, setErrorMessage] = useState<string>('')
   const [uploadProgress, setUploadProgress] = useState<number>(0)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const {
     register,
@@ -111,9 +110,7 @@ export function CreatePostForm() {
 
   const removeImage = () => {
     setImagePreview(null)
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ''
-    }
+    setValue('image', undefined)
   }
 
   const onSubmit = async (data: FormData) => {
@@ -255,9 +252,6 @@ export function CreatePostForm() {
         />
         {errors.content && <p className="text-xs text-destructive mt-1">{errors.content.message}</p>}
       </div>
-          </SelectContent>
-        </Select>
-      </div>
 
       {/* 圖片上傳 (T054) */}
       <div className="bg-muted/50 border border-border/30 rounded-2xl p-4">
@@ -272,9 +266,9 @@ export function CreatePostForm() {
           id="image"
           type="file"
           accept="image/*"
-          ref={fileInputRef}
-          {...register('image')}
-          onChange={handleImageChange}
+          {...register('image', {
+            onChange: handleImageChange,
+          })}
           className="bg-card border-border rounded-xl"
         />
         

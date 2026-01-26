@@ -6,7 +6,7 @@
  * @module lib/media/uploadFlow
  */
 
-import { apiClient } from '@/lib/api/axios';
+import { createUploadUrl, confirmUpload } from '@/shared/api/hooks/media';
 
 export interface UploadFlowOptions {
   file: File;
@@ -32,16 +32,17 @@ export async function executeUploadFlow(
 ): Promise<string> {
   const { file, onProgress } = options;
 
-  // Step 1: Get presigned upload URL
+  // Step 1: Get presigned upload URL using SDK
   onProgress?.(10);
   
-  const presignResponse = await apiClient.post('/api/v1/media/upload-url', {
+  const presignResponse = await createUploadUrl({
     content_type: file.type,
     file_size_bytes: file.size,
     filename: file.name,
   });
 
-  const { media_id, upload_url } = presignResponse.data;
+  const responseData = presignResponse as any;
+  const { media_id, upload_url } = responseData;
 
   // Step 2: Upload file to GCS using presigned URL
   onProgress?.(30);
@@ -52,10 +53,10 @@ export async function executeUploadFlow(
     onProgress?.(overallProgress);
   });
 
-  // Step 3: Confirm upload (applies quota)
+  // Step 3: Confirm upload (applies quota) using SDK
   onProgress?.(80);
   
-  await apiClient.post(`/api/v1/media/${media_id}/confirm`);
+  await confirmUpload(media_id);
 
   onProgress?.(100);
 
@@ -118,9 +119,8 @@ export async function attachMediaToPost(
   mediaId: string,
   postId: string
 ): Promise<void> {
-  await apiClient.post(`/api/v1/media/posts/${postId}/attach`, {
-    media_id: mediaId,
-  });
+  const { attachMediaToPost: sdkAttachToPost } = await import('@/shared/api/hooks/media');
+  await sdkAttachToPost(postId, mediaId);
 }
 
 /**
@@ -133,7 +133,6 @@ export async function attachMediaToGalleryCard(
   mediaId: string,
   cardId: string
 ): Promise<void> {
-  await apiClient.post(`/api/v1/media/gallery/cards/${cardId}/attach`, {
-    media_id: mediaId,
-  });
+  const { attachMediaToGalleryCard: sdkAttachToCard } = await import('@/shared/api/hooks/media');
+  await sdkAttachToCard(cardId, mediaId);
 }

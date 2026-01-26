@@ -1,32 +1,16 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { GalleryGrid } from "@/features/gallery/components/GalleryGrid";
 import { Skeleton } from "@/components/ui/skeleton";
-
-// TODO: Replace with generated SDK hooks once OpenAPI is updated
-async function fetchUserGalleryCards(userId: string) {
-  const response = await fetch(`/api/v1/users/${userId}/gallery/cards`, {
-    credentials: "include",
-  });
-  
-  if (!response.ok) {
-    throw new Error("Failed to fetch gallery cards");
-  }
-  
-  return response.json();
-}
+import { useUserGalleryCards } from "@/shared/api/hooks/gallery";
 
 export default function UserProfilePage() {
   const params = useParams();
   const userId = params.userId as string;
   
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["user-gallery", userId],
-    queryFn: () => fetchUserGalleryCards(userId),
-  });
+  const { data, isLoading, error } = useUserGalleryCards(userId);
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
