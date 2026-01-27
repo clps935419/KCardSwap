@@ -118,7 +118,7 @@ export async function checkAuth(): Promise<boolean> {
   try {
     // Try to fetch a protected endpoint using SDK
     // If we get 401, user is not authenticated
-    await ProfileService.getMyProfileApiV1UsersProfileGet()
+    await ProfileService.getMyProfileApiV1ProfileMeGet()
     return true
   } catch (_error) {
     return false

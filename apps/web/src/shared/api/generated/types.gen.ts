@@ -4,2410 +4,2454 @@
  * Response for accepting a request
  */
 export type AcceptRequestResponse = {
-  message_request: MessageRequestResponse
-  thread: ThreadResponse
-}
+    message_request: MessageRequestResponse;
+    thread: ThreadResponse;
+};
 
 /**
  * Request schema for admin login with email/password
  */
 export type AdminLoginRequest = {
-  /**
-   * Admin email address
-   */
-  email: string
-  /**
-   * Admin password
-   */
-  password: string
-}
+    /**
+     * Admin email address
+     */
+    email: string;
+    /**
+     * Admin password
+     */
+    password: string;
+};
 
 /**
  * Response schema after attaching media.
  */
 export type AttachMediaResponseSchema = {
-  media_id: string
-  /**
-   * Media status after attachment
-   */
-  status: string
-  /**
-   * Type of entity attached to
-   */
-  attached_to: string
-  /**
-   * ID of the entity media was attached to
-   */
-  target_id: string
-}
+    media_id: string;
+    /**
+     * Media status after attachment
+     */
+    status: string;
+    /**
+     * Type of entity attached to
+     */
+    attached_to: string;
+    /**
+     * ID of the entity media was attached to
+     */
+    target_id: string;
+};
 
 /**
  * Request schema for attaching media to gallery card.
  */
 export type AttachMediaToGalleryCardRequestSchema = {
-  /**
-   * ID of confirmed media to attach
-   */
-  media_id: string
-}
+    /**
+     * ID of confirmed media to attach
+     */
+    media_id: string;
+};
 
 /**
  * Request schema for attaching media to post.
  */
 export type AttachMediaToPostRequestSchema = {
-  /**
-   * ID of confirmed media to attach
-   */
-  media_id: string
-}
+    /**
+     * ID of confirmed media to attach
+     */
+    media_id: string;
+};
 
 /**
  * Request schema for blocking a user
  */
 export type BlockUserRequest = {
-  /**
-   * ID of user to block
-   */
-  user_id: string
-}
+    /**
+     * ID of user to block
+     */
+    user_id: string;
+};
 
 /**
  * Response wrapper for card list (standardized envelope)
  */
 export type CardListResponseWrapper = {
-  data: Array<CardResponse>
-  meta?: null
-  error?: null
-}
+    data: Array<CardResponse>;
+    meta?: null;
+    error?: null;
+};
 
 /**
  * Response schema for card details
  */
 export type CardResponse = {
-  /**
-   * Card ID
-   */
-  id: string
-  /**
-   * Owner user ID
-   */
-  owner_id: string
-  /**
-   * Idol name
-   */
-  idol?: string | null
-  /**
-   * Idol group
-   */
-  idol_group?: string | null
-  /**
-   * Album name
-   */
-  album?: string | null
-  /**
-   * Version
-   */
-  version?: string | null
-  /**
-   * Card rarity
-   */
-  rarity?: string | null
-  /**
-   * Card status
-   */
-  status: string
-  /**
-   * Image URL
-   */
-  image_url?: string | null
-  /**
-   * Image size in bytes
-   */
-  size_bytes?: number | null
-  /**
-   * Creation timestamp
-   */
-  created_at: string
-  /**
-   * Last update timestamp
-   */
-  updated_at: string
-}
+    /**
+     * Card ID
+     */
+    id: string;
+    /**
+     * Owner user ID
+     */
+    owner_id: string;
+    /**
+     * Idol name
+     */
+    idol?: string | null;
+    /**
+     * Idol group
+     */
+    idol_group?: string | null;
+    /**
+     * Album name
+     */
+    album?: string | null;
+    /**
+     * Version
+     */
+    version?: string | null;
+    /**
+     * Card rarity
+     */
+    rarity?: string | null;
+    /**
+     * Card status
+     */
+    status: string;
+    /**
+     * Image URL
+     */
+    image_url?: string | null;
+    /**
+     * Image size in bytes
+     */
+    size_bytes?: number | null;
+    /**
+     * Creation timestamp
+     */
+    created_at: string;
+    /**
+     * Last update timestamp
+     */
+    updated_at: string;
+};
 
 /**
  * Response schema for list of chat rooms
  */
 export type ChatRoomListResponse = {
-  /**
-   * List of chat rooms
-   */
-  rooms: Array<ChatRoomResponse>
-  /**
-   * Total number of chat rooms
-   */
-  total: number
-}
+    /**
+     * List of chat rooms
+     */
+    rooms: Array<ChatRoomResponse>;
+    /**
+     * Total number of chat rooms
+     */
+    total: number;
+};
 
 /**
  * Response wrapper for chat room list (standardized envelope)
  */
 export type ChatRoomListResponseWrapper = {
-  data: ChatRoomListResponse
-  meta?: null
-  error?: null
-}
+    data: ChatRoomListResponse;
+    meta?: null;
+    error?: null;
+};
 
 /**
  * Response schema for chat room participant
  */
 export type ChatRoomParticipantResponse = {
-  /**
-   * User ID
-   */
-  user_id: string
-  /**
-   * User's nickname
-   */
-  nickname?: string | null
-  /**
-   * User's avatar URL
-   */
-  avatar_url?: string | null
-}
+    /**
+     * User ID
+     */
+    user_id: string;
+    /**
+     * User's nickname
+     */
+    nickname?: string | null;
+    /**
+     * User's avatar URL
+     */
+    avatar_url?: string | null;
+};
 
 /**
  * Response schema for chat room details
  */
 export type ChatRoomResponse = {
-  /**
-   * Chat room ID
-   */
-  id: string
-  /**
-   * Room participants
-   */
-  participants: Array<ChatRoomParticipantResponse>
-  /**
-   * Last message in the room
-   */
-  last_message?: MessageResponse | null
-  /**
-   * Number of unread messages for current user
-   */
-  unread_count?: number
-  /**
-   * Creation timestamp
-   */
-  created_at: string
-}
+    /**
+     * Chat room ID
+     */
+    id: string;
+    /**
+     * Room participants
+     */
+    participants: Array<ChatRoomParticipantResponse>;
+    /**
+     * Last message in the room
+     */
+    last_message?: MessageResponse | null;
+    /**
+     * Number of unread messages for current user
+     */
+    unread_count?: number;
+    /**
+     * Creation timestamp
+     */
+    created_at: string;
+};
 
 /**
  * Valid Taiwan city codes for post filtering
  */
-export type CityCode =
-  | 'TPE'
-  | 'NTP'
-  | 'TAO'
-  | 'TXG'
-  | 'TNN'
-  | 'KHH'
-  | 'KEE'
-  | 'HSZ'
-  | 'CYI'
-  | 'HSQ'
-  | 'MIA'
-  | 'CHA'
-  | 'NAN'
-  | 'YUN'
-  | 'CYQ'
-  | 'PIF'
-  | 'ILA'
-  | 'HUA'
-  | 'TTT'
-  | 'PEN'
-  | 'KIN'
-  | 'LIE'
+export type CityCode = 'TPE' | 'NTP' | 'TAO' | 'TXG' | 'TNN' | 'KHH' | 'KEE' | 'HSZ' | 'CYI' | 'HSQ' | 'MIA' | 'CHA' | 'NAN' | 'YUN' | 'CYQ' | 'PIF' | 'ILA' | 'HUA' | 'TTT' | 'PEN' | 'KIN' | 'LIE';
 
 /**
  * Response schema for list of all cities.
  */
 export type CityListResponse = {
-  /**
-   * List of all available Taiwan cities/counties
-   */
-  cities: Array<CityResponse>
-}
+    /**
+     * List of all available Taiwan cities/counties
+     */
+    cities: Array<CityResponse>;
+};
 
 /**
  * Response wrapper for city list (standardized envelope)
  */
 export type CityListResponseWrapper = {
-  data: CityListResponse
-  meta?: null
-  error?: null
-}
+    data: CityListResponse;
+    meta?: null;
+    error?: null;
+};
 
 /**
  * Response schema for a single city.
  */
 export type CityResponse = {
-  /**
-   * City code (e.g., TPE, NTP, TAO)
-   */
-  code: string
-  /**
-   * English name (e.g., Taipei City)
-   */
-  name: string
-  /**
-   * Chinese name (e.g., 台北市)
-   */
-  name_zh: string
-}
+    /**
+     * City code (e.g., TPE, NTP, TAO)
+     */
+    code: string;
+    /**
+     * English name (e.g., Taipei City)
+     */
+    name: string;
+    /**
+     * Chinese name (e.g., 台北市)
+     */
+    name_zh: string;
+};
 
 /**
  * Response schema after confirming upload.
  */
 export type ConfirmUploadResponseSchema = {
-  media_id: string
-  /**
-   * Media status after confirmation
-   */
-  status: string
-  file_size_bytes: number
-}
+    media_id: string;
+    /**
+     * Media status after confirmation
+     */
+    status: string;
+    file_size_bytes: number;
+};
 
 /**
  * Request to create a gallery card.
  */
 export type CreateGalleryCardRequest = {
-  title: string
-  idol_name: string
-  era?: string | null
-  description?: string | null
-}
+    title: string;
+    idol_name: string;
+    era?: string | null;
+    description?: string | null;
+};
 
 /**
  * Request to create a message request
  */
 export type CreateMessageRequestRequest = {
-  /**
-   * ID of the recipient user
-   */
-  recipient_id: string
-  /**
-   * Initial message content
-   */
-  initial_message: string
-  /**
-   * Optional post ID being referenced
-   */
-  post_id?: string | null
-}
+    /**
+     * ID of the recipient user
+     */
+    recipient_id: string;
+    /**
+     * Initial message content
+     */
+    initial_message: string;
+    /**
+     * Optional post ID being referenced
+     */
+    post_id?: string | null;
+};
 
 /**
  * Request schema for creating a post (V2: with scope/category)
  */
 export type CreatePostRequest = {
-  /**
-   * Post scope: global (visible everywhere) or city (city-specific)
-   */
-  scope: PostScope
-  /**
-   * City code - required when scope=city, must be empty when scope=global
-   */
-  city_code?: CityCode | null
-  /**
-   * Post category
-   */
-  category: PostCategory
-  /**
-   * Post title
-   */
-  title: string
-  /**
-   * Post content
-   */
-  content: string
-  /**
-   * Idol name for filtering
-   */
-  idol?: string | null
-  /**
-   * Idol group for filtering
-   */
-  idol_group?: string | null
-  /**
-   * Expiry datetime (defaults to 14 days from now)
-   */
-  expires_at?: string | null
-}
+    /**
+     * Post scope: global (visible everywhere) or city (city-specific)
+     */
+    scope: PostScope;
+    /**
+     * City code - required when scope=city, must be empty when scope=global
+     */
+    city_code?: CityCode | null;
+    /**
+     * Post category
+     */
+    category: PostCategory;
+    /**
+     * Post title
+     */
+    title: string;
+    /**
+     * Post content
+     */
+    content: string;
+    /**
+     * Idol name for filtering
+     */
+    idol?: string | null;
+    /**
+     * Idol group for filtering
+     */
+    idol_group?: string | null;
+    /**
+     * Expiry datetime (defaults to 14 days from now)
+     */
+    expires_at?: string | null;
+};
 
 /**
  * Request schema for creating upload URL.
  */
 export type CreateUploadUrlRequestSchema = {
-  /**
-   * Content type of the file (e.g., image/jpeg)
-   */
-  content_type: string
-  /**
-   * File size in bytes
-   */
-  file_size_bytes: number
-  /**
-   * Original filename
-   */
-  filename?: string | null
-}
+    /**
+     * Content type of the file (e.g., image/jpeg)
+     */
+    content_type: string;
+    /**
+     * File size in bytes
+     */
+    file_size_bytes: number;
+    /**
+     * Original filename
+     */
+    filename?: string | null;
+};
 
 /**
  * Response schema for upload URL.
  */
 export type CreateUploadUrlResponseSchema = {
-  /**
-   * Media asset ID for confirmation
-   */
-  media_id: string
-  /**
-   * Presigned URL for uploading file
-   */
-  upload_url: string
-  /**
-   * URL expiration time in minutes
-   */
-  expires_in_minutes: number
-}
+    /**
+     * Media asset ID for confirmation
+     */
+    media_id: string;
+    /**
+     * Presigned URL for uploading file
+     */
+    upload_url: string;
+    /**
+     * URL expiration time in minutes
+     */
+    expires_in_minutes: number;
+};
 
 /**
  * Success response for delete operations
  */
 export type DeleteSuccessResponse = {
-  /**
-   * Operation success status
-   */
-  success?: boolean
-  /**
-   * Success message
-   */
-  message: string
-}
+    /**
+     * Operation success status
+     */
+    success?: boolean;
+    /**
+     * Success message
+     */
+    message: string;
+};
 
 /**
  * Response wrapper for delete success (standardized envelope)
  */
 export type DeleteSuccessResponseWrapper = {
-  data: DeleteSuccessResponse
-  meta?: null
-  error?: null
-}
+    data: DeleteSuccessResponse;
+    meta?: null;
+    error?: null;
+};
 
 /**
  * Data schema for expire subscriptions job
  */
 export type ExpireSubscriptionsData = {
-  /**
-   * Number of subscriptions expired
-   */
-  expired_count: number
-  /**
-   * Processing timestamp (ISO format)
-   */
-  processed_at: string
-}
+    /**
+     * Number of subscriptions expired
+     */
+    expired_count: number;
+    /**
+     * Processing timestamp (ISO format)
+     */
+    processed_at: string;
+};
 
 /**
  * Response wrapper for expire subscriptions (standardized envelope)
  */
 export type ExpireSubscriptionsResponse = {
-  data: ExpireSubscriptionsData
-  meta?: null
-  error?: null
-}
+    data: ExpireSubscriptionsData;
+    meta?: null;
+    error?: null;
+};
 
 /**
  * Response for a list of gallery cards.
  */
 export type GalleryCardListResponse = {
-  items: Array<GalleryCardResponse>
-  total: number
-}
+    items: Array<GalleryCardResponse>;
+    total: number;
+};
 
 /**
  * Response for a single gallery card.
  */
 export type GalleryCardResponse = {
-  id: string
-  user_id: string
-  title: string
-  idol_name: string
-  era?: string | null
-  description?: string | null
-  media_asset_id?: string | null
-  display_order: number
-  created_at: string
-  updated_at: string
-}
+    id: string;
+    user_id: string;
+    title: string;
+    idol_name: string;
+    era?: string | null;
+    description?: string | null;
+    media_asset_id?: string | null;
+    display_order: number;
+    created_at: string;
+    updated_at: string;
+};
 
 /**
  * Request schema for Google OAuth callback with PKCE (Expo AuthSession)
  */
 export type GoogleCallbackRequest = {
-  /**
-   * Authorization code from Google OAuth
-   */
-  code: string
-  /**
-   * PKCE code verifier used during authorization request
-   */
-  code_verifier: string
-  /**
-   * Redirect URI used during authorization (must match the one used in auth request)
-   */
-  redirect_uri?: string | null
-}
+    /**
+     * Authorization code from Google OAuth
+     */
+    code: string;
+    /**
+     * PKCE code verifier used during authorization request
+     */
+    code_verifier: string;
+    /**
+     * Redirect URI used during authorization (must match the one used in auth request)
+     */
+    redirect_uri?: string | null;
+};
 
 /**
  * Request schema for Google login
  */
 export type GoogleLoginRequest = {
-  /**
-   * Google ID token received from Google OAuth
-   */
-  google_token: string
-}
+    /**
+     * Google ID token received from Google OAuth
+     */
+    google_token: string;
+};
 
 export type HTTPValidationError = {
-  detail?: Array<ValidationError>
-}
+    detail?: Array<ValidationError>;
+};
 
 /**
  * Response schema for list of all idol groups.
  */
 export type IdolGroupListResponse = {
-  /**
-   * List of all available idol groups for onboarding
-   */
-  groups: Array<IdolGroupResponse>
-}
+    /**
+     * List of all available idol groups for onboarding
+     */
+    groups: Array<IdolGroupResponse>;
+};
 
 /**
  * Response wrapper for idol group list (standardized envelope)
  */
 export type IdolGroupListResponseWrapper = {
-  data: IdolGroupListResponse
-  meta?: null
-  error?: null
-}
+    data: IdolGroupListResponse;
+    meta?: null;
+    error?: null;
+};
 
 /**
  * Response schema for a single idol group.
  */
 export type IdolGroupResponse = {
-  /**
-   * Idol group ID (e.g., newjeans, ive, aespa)
-   */
-  id: string
-  /**
-   * Idol group name (e.g., NewJeans, IVE, aespa)
-   */
-  name: string
-  /**
-   * Emoji representing the idol group (e.g., 👖, 🦢, 🦋)
-   */
-  emoji: string
-}
+    /**
+     * Idol group ID (e.g., newjeans, ive, aespa)
+     */
+    id: string;
+    /**
+     * Idol group name (e.g., NewJeans, IVE, aespa)
+     */
+    name: string;
+    /**
+     * Emoji representing the idol group (e.g., 👖, 🦢, 🦋)
+     */
+    emoji: string;
+};
 
 /**
  * Response wrapper for successful login (standardized envelope)
  */
 export type LoginResponse = {
-  data: TokenResponse
-  meta?: null
-  error?: null
-}
+    data: TokenResponse;
+    meta?: null;
+    error?: null;
+};
 
 /**
  * Response for a message request
  */
 export type MessageRequestResponse = {
-  id: string
-  sender_id: string
-  recipient_id: string
-  initial_message: string
-  post_id: string | null
-  status: string
-  thread_id: string | null
-  created_at: string
-  updated_at: string
-}
+    id: string;
+    sender_id: string;
+    recipient_id: string;
+    initial_message: string;
+    post_id: string | null;
+    status: string;
+    thread_id: string | null;
+    created_at: string;
+    updated_at: string;
+};
 
 /**
  * Response schema for a single message
  */
 export type MessageResponse = {
-  /**
-   * Message ID
-   */
-  id: string
-  /**
-   * Chat room ID
-   */
-  room_id: string
-  /**
-   * Sender user ID
-   */
-  sender_id: string
-  /**
-   * Message content
-   */
-  content: string
-  /**
-   * Message status
-   */
-  status: string
-  /**
-   * Creation timestamp
-   */
-  created_at: string
-}
+    /**
+     * Message ID
+     */
+    id: string;
+    /**
+     * Chat room ID
+     */
+    room_id: string;
+    /**
+     * Sender user ID
+     */
+    sender_id: string;
+    /**
+     * Message content
+     */
+    content: string;
+    /**
+     * Message status
+     */
+    status: string;
+    /**
+     * Creation timestamp
+     */
+    created_at: string;
+};
 
 /**
  * Response wrapper for single message (standardized envelope)
  */
 export type MessageResponseWrapper = {
-  data: MessageResponse
-  meta?: null
-  error?: null
-}
+    data: MessageResponse;
+    meta?: null;
+    error?: null;
+};
 
 /**
  * Response schema for list of messages
  */
 export type MessagesListResponse = {
-  /**
-   * List of messages
-   */
-  messages: Array<MessageResponse>
-  /**
-   * Total number of messages
-   */
-  total: number
-  /**
-   * Whether there are more messages to fetch
-   */
-  has_more: boolean
-}
+    /**
+     * List of messages
+     */
+    messages: Array<MessageResponse>;
+    /**
+     * Total number of messages
+     */
+    total: number;
+    /**
+     * Whether there are more messages to fetch
+     */
+    has_more: boolean;
+};
 
 /**
  * Response wrapper for message list (standardized envelope)
  */
 export type MessagesListResponseWrapper = {
-  data: MessagesListResponse
-  meta?: null
-  error?: null
-}
+    data: MessagesListResponse;
+    meta?: null;
+    error?: null;
+};
 
 /**
  * Post category enumeration (FR-002)
  */
-export type PostCategory = 'trade' | 'giveaway' | 'group' | 'showcase' | 'help' | 'announcement'
+export type PostCategory = 'trade' | 'giveaway' | 'group' | 'showcase' | 'help' | 'announcement';
 
 /**
  * Response schema for post list
  */
 export type PostListResponse = {
-  /**
-   * List of posts
-   */
-  posts: Array<PostResponse>
-  /**
-   * Total number of posts
-   */
-  total: number
-}
+    /**
+     * List of posts
+     */
+    posts: Array<PostResponse>;
+    /**
+     * Total number of posts
+     */
+    total: number;
+};
 
 /**
  * Response wrapper for post list (standardized envelope)
  */
 export type PostListResponseWrapper = {
-  data: PostListResponse
-  meta?: null
-  error?: null
-}
+    data: PostListResponse;
+    meta?: null;
+    error?: null;
+};
 
 /**
  * Response schema for post details (V2: with scope/category + like fields)
  */
 export type PostResponse = {
-  /**
-   * Post ID
-   */
-  id: string
-  /**
-   * Owner user ID
-   */
-  owner_id: string
-  /**
-   * Post scope (global/city)
-   */
-  scope: string
-  /**
-   * City code (if scope=city)
-   */
-  city_code?: string | null
-  /**
-   * Post category
-   */
-  category: string
-  /**
-   * Post title
-   */
-  title: string
-  /**
-   * Post content
-   */
-  content: string
-  /**
-   * Idol name
-   */
-  idol?: string | null
-  /**
-   * Idol group
-   */
-  idol_group?: string | null
-  /**
-   * Post status
-   */
-  status: string
-  /**
-   * Total number of likes on this post
-   */
-  like_count?: number
-  /**
-   * Whether the current user has liked this post
-   */
-  liked_by_me?: boolean
-  /**
-   * Expiry datetime
-   */
-  expires_at: string
-  /**
-   * Creation timestamp
-   */
-  created_at: string
-  /**
-   * Last update timestamp
-   */
-  updated_at: string
-}
+    /**
+     * Post ID
+     */
+    id: string;
+    /**
+     * Owner user ID
+     */
+    owner_id: string;
+    /**
+     * Post scope (global/city)
+     */
+    scope: string;
+    /**
+     * City code (if scope=city)
+     */
+    city_code?: string | null;
+    /**
+     * Post category
+     */
+    category: string;
+    /**
+     * Post title
+     */
+    title: string;
+    /**
+     * Post content
+     */
+    content: string;
+    /**
+     * Idol name
+     */
+    idol?: string | null;
+    /**
+     * Idol group
+     */
+    idol_group?: string | null;
+    /**
+     * Post status
+     */
+    status: string;
+    /**
+     * Total number of likes on this post
+     */
+    like_count?: number;
+    /**
+     * Whether the current user has liked this post
+     */
+    liked_by_me?: boolean;
+    /**
+     * Expiry datetime
+     */
+    expires_at: string;
+    /**
+     * Creation timestamp
+     */
+    created_at: string;
+    /**
+     * Last update timestamp
+     */
+    updated_at: string;
+};
 
 /**
  * Response wrapper for single post (standardized envelope)
  */
 export type PostResponseWrapper = {
-  data: PostResponse
-  meta?: null
-  error?: null
-}
+    data: PostResponse;
+    meta?: null;
+    error?: null;
+};
 
 /**
  * Post scope enumeration (FR-003)
  */
-export type PostScope = 'global' | 'city'
+export type PostScope = 'global' | 'city';
 
 /**
  * Response schema for user profile
  */
 export type ProfileResponse = {
-  /**
-   * Profile ID
-   */
-  id: string
-  /**
-   * User ID
-   */
-  user_id: string
-  /**
-   * User nickname
-   */
-  nickname?: string | null
-  /**
-   * Avatar image URL
-   */
-  avatar_url?: string | null
-  /**
-   * User bio/description
-   */
-  bio?: string | null
-  /**
-   * User region
-   */
-  region?: string | null
-  /**
-   * User preferences (JSON)
-   */
-  preferences?: {
-    [key: string]: unknown
-  } | null
-  /**
-   * Privacy settings
-   */
-  privacy_flags?: {
-    [key: string]: boolean
-  } | null
-  /**
-   * Profile creation timestamp
-   */
-  created_at: string
-  /**
-   * Profile last update timestamp
-   */
-  updated_at: string
-}
+    /**
+     * Profile ID
+     */
+    id: string;
+    /**
+     * User ID
+     */
+    user_id: string;
+    /**
+     * User nickname
+     */
+    nickname?: string | null;
+    /**
+     * Avatar image URL
+     */
+    avatar_url?: string | null;
+    /**
+     * User bio/description
+     */
+    bio?: string | null;
+    /**
+     * User region
+     */
+    region?: string | null;
+    /**
+     * User preferences (JSON)
+     */
+    preferences?: {
+    [key: string]: unknown;
+} | null;
+    /**
+     * Privacy settings
+     */
+    privacy_flags?: {
+    [key: string]: (boolean);
+} | null;
+    /**
+     * Profile creation timestamp
+     */
+    created_at: string;
+    /**
+     * Profile last update timestamp
+     */
+    updated_at: string;
+};
 
 /**
  * Response wrapper for profile data (standardized envelope)
  */
 export type ProfileResponseWrapper = {
-  data: ProfileResponse
-  meta?: null
-  error?: null
-}
+    data: ProfileResponse;
+    meta?: null;
+    error?: null;
+};
 
 /**
  * Response schema for quota status
  */
 export type QuotaStatusResponse = {
-  /**
-   * Number of uploads today
-   */
-  uploads_today: number
-  /**
-   * Daily upload limit
-   */
-  daily_limit: number
-  /**
-   * Remaining uploads for today
-   */
-  remaining_uploads: number
-  /**
-   * Total storage used in bytes
-   */
-  storage_used_bytes: number
-  /**
-   * Storage limit in bytes
-   */
-  storage_limit_bytes: number
-  /**
-   * Remaining storage in bytes
-   */
-  remaining_storage_bytes: number
-  /**
-   * Storage used in MB
-   */
-  storage_used_mb: number
-  /**
-   * Storage limit in MB
-   */
-  storage_limit_mb: number
-  /**
-   * Remaining storage in MB
-   */
-  remaining_storage_mb: number
-}
+    /**
+     * Number of uploads today
+     */
+    uploads_today: number;
+    /**
+     * Daily upload limit
+     */
+    daily_limit: number;
+    /**
+     * Remaining uploads for today
+     */
+    remaining_uploads: number;
+    /**
+     * Total storage used in bytes
+     */
+    storage_used_bytes: number;
+    /**
+     * Storage limit in bytes
+     */
+    storage_limit_bytes: number;
+    /**
+     * Remaining storage in bytes
+     */
+    remaining_storage_bytes: number;
+    /**
+     * Storage used in MB
+     */
+    storage_used_mb: number;
+    /**
+     * Storage limit in MB
+     */
+    storage_limit_mb: number;
+    /**
+     * Remaining storage in MB
+     */
+    remaining_storage_mb: number;
+};
 
 /**
  * Response wrapper for quota status (standardized envelope)
  */
 export type QuotaStatusResponseWrapper = {
-  data: QuotaStatusResponse
-  meta?: null
-  error?: null
-}
+    data: QuotaStatusResponse;
+    meta?: null;
+    error?: null;
+};
 
 /**
  * Response for successful token refresh (cookie-based)
  */
 export type RefreshSuccessResponse = {
-  /**
-   * Indicates successful refresh
-   */
-  success?: boolean
-  /**
-   * Success message
-   */
-  message?: string
-}
+    /**
+     * Indicates successful refresh
+     */
+    success?: boolean;
+    /**
+     * Success message
+     */
+    message?: string;
+};
 
 /**
  * Request to reorder gallery cards.
  */
 export type ReorderGalleryCardsRequest = {
-  card_ids: Array<string>
-}
+    card_ids: Array<(string)>;
+};
 
 /**
  * Response after reordering gallery cards.
  */
 export type ReorderGalleryCardsResponse = {
-  message?: string
-  updated_count: number
-}
+    message?: string;
+    updated_count: number;
+};
 
 /**
  * Response schema for list of reports
  */
 export type ReportListResponse = {
-  /**
-   * List of reports
-   */
-  reports: Array<ReportResponse>
-  /**
-   * Total number of reports
-   */
-  total: number
-}
+    /**
+     * List of reports
+     */
+    reports: Array<ReportResponse>;
+    /**
+     * Total number of reports
+     */
+    total: number;
+};
 
 /**
  * Response wrapper for report list (standardized envelope)
  */
 export type ReportListResponseWrapper = {
-  data: ReportListResponse
-  meta?: null
-  error?: null
-}
+    data: ReportListResponse;
+    meta?: null;
+    error?: null;
+};
 
 /**
  * Report reason enumeration
  */
-export type ReportReason =
-  | 'fraud'
-  | 'fake_card'
-  | 'harassment'
-  | 'inappropriate_content'
-  | 'spam'
-  | 'other'
+export type ReportReason = 'fraud' | 'fake_card' | 'harassment' | 'inappropriate_content' | 'spam' | 'other';
 
 /**
  * Request schema for submitting a report
  */
 export type ReportRequest = {
-  /**
-   * ID of user being reported
-   */
-  reported_user_id: string
-  /**
-   * Reason for report (must be one of: fraud, fake_card, harassment, inappropriate_content, spam, other)
-   */
-  reason: ReportReason
-  /**
-   * Detailed description of the issue
-   */
-  detail?: string | null
-}
+    /**
+     * ID of user being reported
+     */
+    reported_user_id: string;
+    /**
+     * Reason for report (must be one of: fraud, fake_card, harassment, inappropriate_content, spam, other)
+     */
+    reason: ReportReason;
+    /**
+     * Detailed description of the issue
+     */
+    detail?: string | null;
+};
 
 /**
  * Response schema for a report
  */
 export type ReportResponse = {
-  /**
-   * Report ID
-   */
-  id: string
-  /**
-   * User who filed the report
-   */
-  reporter_id: string
-  /**
-   * User who was reported
-   */
-  reported_user_id: string
-  /**
-   * Reason for report
-   */
-  reason: ReportReason
-  /**
-   * Detailed description
-   */
-  detail?: string | null
-  /**
-   * Report status
-   */
-  status: string
-  /**
-   * Creation timestamp
-   */
-  created_at: string
-}
+    /**
+     * Report ID
+     */
+    id: string;
+    /**
+     * User who filed the report
+     */
+    reporter_id: string;
+    /**
+     * User who was reported
+     */
+    reported_user_id: string;
+    /**
+     * Reason for report
+     */
+    reason: ReportReason;
+    /**
+     * Detailed description
+     */
+    detail?: string | null;
+    /**
+     * Report status
+     */
+    status: string;
+    /**
+     * Creation timestamp
+     */
+    created_at: string;
+};
 
 /**
  * Response wrapper for single report (standardized envelope)
  */
 export type ReportResponseWrapper = {
-  data: ReportResponse
-  meta?: null
-  error?: null
-}
+    data: ReportResponse;
+    meta?: null;
+    error?: null;
+};
 
 /**
- * Request to send a message in a thread
+ * Request schema for sending a message
  */
 export type SendMessageRequest = {
-  /**
-   * Message content
-   */
-  content: string
-  /**
-   * Optional post ID to reference
-   */
-  post_id?: string | null
-}
+    /**
+     * Message content
+     */
+    content: string;
+};
 
 /**
  * Data schema for subscription status
  */
 export type SubscriptionStatusData = {
-  /**
-   * Subscription plan: 'free' or 'premium'
-   */
-  plan: string
-  /**
-   * Subscription status: 'active', 'inactive', 'expired', 'pending'
-   */
-  status: string
-  /**
-   * Expiry datetime (ISO format)
-   */
-  expires_at?: string | null
-  /**
-   * Whether user has active premium entitlement
-   */
-  entitlement_active: boolean
-  /**
-   * Subscription source: 'google_play'
-   */
-  source: string
-}
+    /**
+     * Subscription plan: 'free' or 'premium'
+     */
+    plan: string;
+    /**
+     * Subscription status: 'active', 'inactive', 'expired', 'pending'
+     */
+    status: string;
+    /**
+     * Expiry datetime (ISO format)
+     */
+    expires_at?: string | null;
+    /**
+     * Whether user has active premium entitlement
+     */
+    entitlement_active: boolean;
+    /**
+     * Subscription source: 'google_play'
+     */
+    source: string;
+};
 
 /**
  * Response wrapper for subscription status (standardized envelope)
  */
 export type SubscriptionStatusResponse = {
-  data: SubscriptionStatusData
-  meta?: null
-  error?: null
-}
+    data: SubscriptionStatusData;
+    meta?: null;
+    error?: null;
+};
 
 /**
  * Response for list of threads
  */
 export type ThreadListResponse = {
-  threads: Array<ThreadResponse>
-  total: number
-}
+    threads: Array<ThreadResponse>;
+    total: number;
+};
 
 /**
  * Response for a thread message
  */
 export type ThreadMessageResponse = {
-  id: string
-  thread_id: string
-  sender_id: string
-  content: string
-  post_id: string | null
-  created_at: string
-}
+    id: string;
+    thread_id: string;
+    sender_id: string;
+    content: string;
+    post_id: string | null;
+    created_at: string;
+};
 
 /**
  * Response for list of messages in a thread
  */
 export type ThreadMessagesResponse = {
-  messages: Array<ThreadMessageResponse>
-  total: number
-}
+    messages: Array<ThreadMessageResponse>;
+    total: number;
+};
 
 /**
  * Response for a message thread
  */
 export type ThreadResponse = {
-  id: string
-  user_a_id: string
-  user_b_id: string
-  created_at: string
-  updated_at: string
-  last_message_at: string | null
-}
+    id: string;
+    user_a_id: string;
+    user_b_id: string;
+    created_at: string;
+    updated_at: string;
+    last_message_at: string | null;
+};
 
 /**
  * Response schema for toggle like action
  */
 export type ToggleLikeResponse = {
-  /**
-   * Whether the post is now liked by the user
-   */
-  liked: boolean
-  /**
-   * Current total like count for the post
-   */
-  like_count: number
-}
+    /**
+     * Whether the post is now liked by the user
+     */
+    liked: boolean;
+    /**
+     * Current total like count for the post
+     */
+    like_count: number;
+};
 
 /**
  * Response wrapper for toggle like response (standardized envelope)
  */
 export type ToggleLikeResponseWrapper = {
-  data: ToggleLikeResponse
-  meta?: null
-  error?: null
-}
+    data: ToggleLikeResponse;
+    meta?: null;
+    error?: null;
+};
 
 /**
  * Response schema for authentication tokens
  */
 export type TokenResponse = {
-  /**
-   * JWT access token
-   */
-  access_token: string
-  /**
-   * JWT refresh token
-   */
-  refresh_token: string
-  /**
-   * Token type
-   */
-  token_type?: string
-  /**
-   * Access token expiration in seconds
-   */
-  expires_in: number
-  /**
-   * User ID
-   */
-  user_id: string
-  /**
-   * User email
-   */
-  email: string
-  /**
-   * User role (only for admin users)
-   */
-  role?: string | null
-}
+    /**
+     * JWT access token
+     */
+    access_token: string;
+    /**
+     * JWT refresh token
+     */
+    refresh_token: string;
+    /**
+     * Token type
+     */
+    token_type?: string;
+    /**
+     * Access token expiration in seconds
+     */
+    expires_in: number;
+    /**
+     * User ID
+     */
+    user_id: string;
+    /**
+     * User email
+     */
+    email: string;
+    /**
+     * User role (only for admin users)
+     */
+    role?: string | null;
+};
 
 /**
  * Request schema for unblocking a user
  */
 export type UnblockUserRequest = {
-  /**
-   * ID of user to unblock
-   */
-  user_id: string
-}
+    /**
+     * ID of user to unblock
+     */
+    user_id: string;
+};
 
 /**
  * Request schema for updating user profile
  */
 export type UpdateProfileRequest = {
-  /**
-   * User nickname
-   */
-  nickname?: string | null
-  /**
-   * Avatar image URL
-   */
-  avatar_url?: string | null
-  /**
-   * User bio/description
-   */
-  bio?: string | null
-  /**
-   * User region
-   */
-  region?: string | null
-  /**
-   * User preferences (JSON)
-   */
-  preferences?: {
-    [key: string]: unknown
-  } | null
-  /**
-   * Privacy settings
-   */
-  privacy_flags?: {
-    [key: string]: boolean
-  } | null
-}
+    /**
+     * User nickname
+     */
+    nickname?: string | null;
+    /**
+     * Avatar image URL
+     */
+    avatar_url?: string | null;
+    /**
+     * User bio/description
+     */
+    bio?: string | null;
+    /**
+     * User region
+     */
+    region?: string | null;
+    /**
+     * User preferences (JSON)
+     */
+    preferences?: {
+    [key: string]: unknown;
+} | null;
+    /**
+     * Privacy settings
+     */
+    privacy_flags?: {
+    [key: string]: (boolean);
+} | null;
+};
 
 /**
  * Request schema for getting upload signed URL
  */
 export type UploadCardRequest = {
-  /**
-   * MIME type of the file (image/jpeg or image/png)
-   */
-  content_type: string
-  /**
-   * Size of file in bytes
-   */
-  file_size_bytes: number
-  /**
-   * Idol name
-   */
-  idol?: string | null
-  /**
-   * Idol group
-   */
-  idol_group?: string | null
-  /**
-   * Album name
-   */
-  album?: string | null
-  /**
-   * Version
-   */
-  version?: string | null
-  /**
-   * Card rarity
-   */
-  rarity?: string | null
-}
+    /**
+     * MIME type of the file (image/jpeg or image/png)
+     */
+    content_type: string;
+    /**
+     * Size of file in bytes
+     */
+    file_size_bytes: number;
+    /**
+     * Idol name
+     */
+    idol?: string | null;
+    /**
+     * Idol group
+     */
+    idol_group?: string | null;
+    /**
+     * Album name
+     */
+    album?: string | null;
+    /**
+     * Version
+     */
+    version?: string | null;
+    /**
+     * Card rarity
+     */
+    rarity?: string | null;
+};
 
 /**
  * Response schema for upload signed URL
  */
 export type UploadUrlResponse = {
-  /**
-   * Signed URL for uploading
-   */
-  upload_url: string
-  /**
-   * HTTP method to use
-   */
-  method: string
-  /**
-   * Required headers for upload
-   */
-  required_headers: {
-    [key: string]: string
-  }
-  /**
-   * Public URL of the image after upload
-   */
-  image_url: string
-  /**
-   * When the signed URL expires
-   */
-  expires_at: string
-  /**
-   * ID of the created card
-   */
-  card_id: string
-}
+    /**
+     * Signed URL for uploading
+     */
+    upload_url: string;
+    /**
+     * HTTP method to use
+     */
+    method: string;
+    /**
+     * Required headers for upload
+     */
+    required_headers: {
+        [key: string]: (string);
+    };
+    /**
+     * Public URL of the image after upload
+     */
+    image_url: string;
+    /**
+     * When the signed URL expires
+     */
+    expires_at: string;
+    /**
+     * ID of the created card
+     */
+    card_id: string;
+};
 
 /**
  * Response wrapper for upload URL (standardized envelope)
  */
 export type UploadUrlResponseWrapper = {
-  data: UploadUrlResponse
-  meta?: null
-  error?: null
-}
+    data: UploadUrlResponse;
+    meta?: null;
+    error?: null;
+};
 
 export type ValidationError = {
-  loc: Array<string | number>
-  msg: string
-  type: string
-}
+    loc: Array<(string | number)>;
+    msg: string;
+    type: string;
+};
 
 /**
  * Request schema for verifying purchase receipt
  */
 export type VerifyReceiptRequest = {
-  /**
-   * Platform: 'android' or 'ios'
-   */
-  platform: string
-  /**
-   * Purchase token from Google Play
-   */
-  purchase_token: string
-  /**
-   * Product/SKU ID
-   */
-  product_id: string
-}
+    /**
+     * Platform: 'android' or 'ios'
+     */
+    platform: string;
+    /**
+     * Purchase token from Google Play
+     */
+    purchase_token: string;
+    /**
+     * Product/SKU ID
+     */
+    product_id: string;
+};
 
 /**
- * Request schema for sending a message
+ * Request to send a message in a thread
  */
-export type app__modules__social__presentation__schemas__chat_schemas__SendMessageRequest = {
-  /**
-   * Message content
-   */
-  content: string
-}
+export type app__modules__social__presentation__schemas__message_schemas__SendMessageRequest = {
+    /**
+     * Message content
+     */
+    content: string;
+    /**
+     * Optional post ID to reference
+     */
+    post_id?: string | null;
+};
 
-export type HealthCheckHealthGetResponse = unknown
+export type HealthCheckHealthGetResponse = unknown;
 
-export type ApiHealthCheckApiV1HealthGetResponse = unknown
+export type ApiHealthCheckApiV1HealthGetResponse = unknown;
 
-export type RootGetResponse = unknown
+export type RootGetResponse = unknown;
 
 export type AdminLoginApiV1AuthAdminLoginPostData = {
-  requestBody: AdminLoginRequest
-}
+    requestBody: AdminLoginRequest;
+};
 
-export type AdminLoginApiV1AuthAdminLoginPostResponse = LoginResponse
+export type AdminLoginApiV1AuthAdminLoginPostResponse = LoginResponse;
 
 export type GoogleLoginApiV1AuthGoogleLoginPostData = {
-  requestBody: GoogleLoginRequest
-}
+    requestBody: GoogleLoginRequest;
+};
 
-export type GoogleLoginApiV1AuthGoogleLoginPostResponse = LoginResponse
+export type GoogleLoginApiV1AuthGoogleLoginPostResponse = LoginResponse;
 
 export type GoogleCallbackApiV1AuthGoogleCallbackPostData = {
-  requestBody: GoogleCallbackRequest
-}
+    requestBody: GoogleCallbackRequest;
+};
 
-export type GoogleCallbackApiV1AuthGoogleCallbackPostResponse = LoginResponse
+export type GoogleCallbackApiV1AuthGoogleCallbackPostResponse = LoginResponse;
 
 export type RefreshTokenApiV1AuthRefreshPostData = {
-  refreshToken?: string | null
-}
+    refreshToken?: string | null;
+};
 
-export type RefreshTokenApiV1AuthRefreshPostResponse = RefreshSuccessResponse
+export type RefreshTokenApiV1AuthRefreshPostResponse = RefreshSuccessResponse;
 
-export type GetMyProfileApiV1ProfileMeGetResponse = ProfileResponseWrapper
+export type LogoutApiV1AuthLogoutPostResponse = RefreshSuccessResponse;
+
+export type GetMyProfileApiV1ProfileMeGetResponse = ProfileResponseWrapper;
 
 export type UpdateMyProfileApiV1ProfileMePutData = {
-  requestBody: UpdateProfileRequest
-}
+    requestBody: UpdateProfileRequest;
+};
 
-export type UpdateMyProfileApiV1ProfileMePutResponse = ProfileResponseWrapper
+export type UpdateMyProfileApiV1ProfileMePutResponse = ProfileResponseWrapper;
 
-export type GetIdolGroupsApiV1IdolsGroupsGetResponse = IdolGroupListResponseWrapper
+export type GetIdolGroupsApiV1IdolsGroupsGetResponse = IdolGroupListResponseWrapper;
 
 export type VerifyReceiptApiV1SubscriptionsVerifyReceiptPostData = {
-  requestBody: VerifyReceiptRequest
-}
+    requestBody: VerifyReceiptRequest;
+};
 
-export type VerifyReceiptApiV1SubscriptionsVerifyReceiptPostResponse = SubscriptionStatusResponse
+export type VerifyReceiptApiV1SubscriptionsVerifyReceiptPostResponse = SubscriptionStatusResponse;
 
-export type GetSubscriptionStatusApiV1SubscriptionsStatusGetResponse = SubscriptionStatusResponse
+export type GetSubscriptionStatusApiV1SubscriptionsStatusGetResponse = SubscriptionStatusResponse;
 
-export type ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostResponse =
-  ExpireSubscriptionsResponse
+export type ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostResponse = ExpireSubscriptionsResponse;
 
 export type BlockUserApiV1FriendsBlockPostData = {
-  requestBody: BlockUserRequest
-}
+    accessToken?: string | null;
+    requestBody: BlockUserRequest;
+};
 
 export type BlockUserApiV1FriendsBlockPostResponse = {
-  [key: string]: unknown
-}
+    [key: string]: unknown;
+};
 
 export type UnblockUserApiV1FriendsUnblockPostData = {
-  requestBody: UnblockUserRequest
-}
+    accessToken?: string | null;
+    requestBody: UnblockUserRequest;
+};
 
 export type UnblockUserApiV1FriendsUnblockPostResponse = {
-  [key: string]: unknown
-}
-
-export type GetMyReportsApiV1ReportsGetResponse = ReportListResponseWrapper
+    [key: string]: unknown;
+};
 
 export type SubmitReportApiV1ReportsPostData = {
-  requestBody: ReportRequest
-}
+    accessToken?: string | null;
+    requestBody: ReportRequest;
+};
 
-export type SubmitReportApiV1ReportsPostResponse = ReportResponseWrapper
+export type SubmitReportApiV1ReportsPostResponse = ReportResponseWrapper;
+
+export type GetMyReportsApiV1ReportsGetData = {
+    accessToken?: string | null;
+};
+
+export type GetMyReportsApiV1ReportsGetResponse = ReportListResponseWrapper;
 
 export type GetUploadUrlApiV1CardsUploadUrlPostData = {
-  requestBody: UploadCardRequest
-}
+    accessToken?: string | null;
+    requestBody: UploadCardRequest;
+};
 
-export type GetUploadUrlApiV1CardsUploadUrlPostResponse = UploadUrlResponseWrapper
+export type GetUploadUrlApiV1CardsUploadUrlPostResponse = UploadUrlResponseWrapper;
 
 export type GetMyCardsApiV1CardsMeGetData = {
-  /**
-   * Filter by status (available/trading/traded)
-   */
-  status?: string | null
-}
+    accessToken?: string | null;
+    /**
+     * Filter by status (available/trading/traded)
+     */
+    status?: string | null;
+};
 
-export type GetMyCardsApiV1CardsMeGetResponse = CardListResponseWrapper
+export type GetMyCardsApiV1CardsMeGetResponse = CardListResponseWrapper;
 
 export type DeleteCardApiV1CardsCardIdDeleteData = {
-  cardId: string
-}
+    accessToken?: string | null;
+    cardId: string;
+};
 
-export type DeleteCardApiV1CardsCardIdDeleteResponse = DeleteSuccessResponseWrapper
+export type DeleteCardApiV1CardsCardIdDeleteResponse = DeleteSuccessResponseWrapper;
 
-export type GetQuotaStatusApiV1CardsQuotaStatusGetResponse = QuotaStatusResponseWrapper
+export type GetQuotaStatusApiV1CardsQuotaStatusGetData = {
+    accessToken?: string | null;
+};
+
+export type GetQuotaStatusApiV1CardsQuotaStatusGetResponse = QuotaStatusResponseWrapper;
 
 export type ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostData = {
-  cardId: string
-}
+    accessToken?: string | null;
+    cardId: string;
+};
 
-export type ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostResponse =
-  DeleteSuccessResponseWrapper
+export type ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostResponse = DeleteSuccessResponseWrapper;
 
-export type GetChatRoomsApiV1ChatsGetResponse = ChatRoomListResponseWrapper
+export type GetChatRoomsApiV1ChatsGetData = {
+    accessToken?: string | null;
+};
+
+export type GetChatRoomsApiV1ChatsGetResponse = ChatRoomListResponseWrapper;
 
 export type GetMessagesApiV1ChatsRoomIdMessagesGetData = {
-  /**
-   * Get messages after this message ID
-   */
-  afterMessageId?: string | null
-  /**
-   * Maximum number of messages
-   */
-  limit?: number
-  roomId: string
-}
+    accessToken?: string | null;
+    /**
+     * Get messages after this message ID
+     */
+    afterMessageId?: string | null;
+    /**
+     * Maximum number of messages
+     */
+    limit?: number;
+    roomId: string;
+};
 
-export type GetMessagesApiV1ChatsRoomIdMessagesGetResponse = MessagesListResponseWrapper
+export type GetMessagesApiV1ChatsRoomIdMessagesGetResponse = MessagesListResponseWrapper;
 
 export type SendMessageApiV1ChatsRoomIdMessagesPostData = {
-  requestBody: app__modules__social__presentation__schemas__chat_schemas__SendMessageRequest
-  roomId: string
-}
+    accessToken?: string | null;
+    requestBody: SendMessageRequest;
+    roomId: string;
+};
 
-export type SendMessageApiV1ChatsRoomIdMessagesPostResponse = MessageResponseWrapper
+export type SendMessageApiV1ChatsRoomIdMessagesPostResponse = MessageResponseWrapper;
 
 export type MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostData = {
-  messageId: string
-  roomId: string
-}
+    accessToken?: string | null;
+    messageId: string;
+    roomId: string;
+};
 
-export type MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostResponse = void
+export type MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostResponse = void;
 
 export type CreatePostApiV1PostsPostData = {
-  requestBody: CreatePostRequest
-}
+    accessToken?: string | null;
+    requestBody: CreatePostRequest;
+};
 
-export type CreatePostApiV1PostsPostResponse = PostResponseWrapper
+export type CreatePostApiV1PostsPostResponse = PostResponseWrapper;
 
 export type ListPostsApiV1PostsGetData = {
-  /**
-   * Optional category filter
-   */
-  category?: PostCategory | null
-  /**
-   * Optional city filter (omit for global view)
-   */
-  cityCode?: string | null
-  /**
-   * Maximum results
-   */
-  limit?: number
-  /**
-   * Pagination offset
-   */
-  offset?: number
-}
+    accessToken?: string | null;
+    /**
+     * Optional category filter
+     */
+    category?: PostCategory | null;
+    /**
+     * Optional city filter (omit for global view)
+     */
+    cityCode?: string | null;
+    /**
+     * Maximum results
+     */
+    limit?: number;
+    /**
+     * Pagination offset
+     */
+    offset?: number;
+};
 
-export type ListPostsApiV1PostsGetResponse = PostListResponseWrapper
+export type ListPostsApiV1PostsGetResponse = PostListResponseWrapper;
 
 export type ClosePostApiV1PostsPostIdClosePostData = {
-  postId: string
-}
+    accessToken?: string | null;
+    postId: string;
+};
 
-export type ClosePostApiV1PostsPostIdClosePostResponse = void
+export type ClosePostApiV1PostsPostIdClosePostResponse = void;
 
 export type ToggleLikeApiV1PostsPostIdLikePostData = {
-  postId: string
-}
+    accessToken?: string | null;
+    postId: string;
+};
 
-export type ToggleLikeApiV1PostsPostIdLikePostResponse = ToggleLikeResponseWrapper
+export type ToggleLikeApiV1PostsPostIdLikePostResponse = ToggleLikeResponseWrapper;
 
-export type GetCitiesApiV1LocationsCitiesGetResponse = CityListResponseWrapper
+export type GetCitiesApiV1LocationsCitiesGetResponse = CityListResponseWrapper;
 
 export type GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetData = {
-  userId: string
-}
+    accessToken?: string | null;
+    userId: string;
+};
 
-export type GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetResponse = GalleryCardListResponse
+export type GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetResponse = GalleryCardListResponse;
 
-export type GetMyGalleryCardsApiV1GalleryCardsMeGetResponse = GalleryCardListResponse
+export type GetMyGalleryCardsApiV1GalleryCardsMeGetData = {
+    accessToken?: string | null;
+};
+
+export type GetMyGalleryCardsApiV1GalleryCardsMeGetResponse = GalleryCardListResponse;
 
 export type CreateGalleryCardApiV1GalleryCardsPostData = {
-  requestBody: CreateGalleryCardRequest
-}
+    accessToken?: string | null;
+    requestBody: CreateGalleryCardRequest;
+};
 
-export type CreateGalleryCardApiV1GalleryCardsPostResponse = GalleryCardResponse
+export type CreateGalleryCardApiV1GalleryCardsPostResponse = GalleryCardResponse;
 
 export type DeleteGalleryCardApiV1GalleryCardsCardIdDeleteData = {
-  cardId: string
-}
+    accessToken?: string | null;
+    cardId: string;
+};
 
-export type DeleteGalleryCardApiV1GalleryCardsCardIdDeleteResponse = void
+export type DeleteGalleryCardApiV1GalleryCardsCardIdDeleteResponse = void;
 
 export type ReorderGalleryCardsApiV1GalleryCardsReorderPutData = {
-  requestBody: ReorderGalleryCardsRequest
-}
+    accessToken?: string | null;
+    requestBody: ReorderGalleryCardsRequest;
+};
 
-export type ReorderGalleryCardsApiV1GalleryCardsReorderPutResponse = ReorderGalleryCardsResponse
+export type ReorderGalleryCardsApiV1GalleryCardsReorderPutResponse = ReorderGalleryCardsResponse;
 
 export type CreateUploadUrlApiV1MediaUploadUrlPostData = {
-  requestBody: CreateUploadUrlRequestSchema
-}
+    accessToken?: string | null;
+    requestBody: CreateUploadUrlRequestSchema;
+};
 
-export type CreateUploadUrlApiV1MediaUploadUrlPostResponse = CreateUploadUrlResponseSchema
+export type CreateUploadUrlApiV1MediaUploadUrlPostResponse = CreateUploadUrlResponseSchema;
 
 export type ConfirmUploadApiV1MediaMediaIdConfirmPostData = {
-  mediaId: string
-}
+    accessToken?: string | null;
+    mediaId: string;
+};
 
-export type ConfirmUploadApiV1MediaMediaIdConfirmPostResponse = ConfirmUploadResponseSchema
+export type ConfirmUploadApiV1MediaMediaIdConfirmPostResponse = ConfirmUploadResponseSchema;
 
 export type AttachMediaToPostApiV1MediaPostsPostIdAttachPostData = {
-  postId: string
-  requestBody: AttachMediaToPostRequestSchema
-}
+    accessToken?: string | null;
+    postId: string;
+    requestBody: AttachMediaToPostRequestSchema;
+};
 
-export type AttachMediaToPostApiV1MediaPostsPostIdAttachPostResponse = AttachMediaResponseSchema
+export type AttachMediaToPostApiV1MediaPostsPostIdAttachPostResponse = AttachMediaResponseSchema;
 
 export type AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostData = {
-  cardId: string
-  requestBody: AttachMediaToGalleryCardRequestSchema
-}
+    accessToken?: string | null;
+    cardId: string;
+    requestBody: AttachMediaToGalleryCardRequestSchema;
+};
 
-export type AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostResponse =
-  AttachMediaResponseSchema
+export type AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostResponse = AttachMediaResponseSchema;
 
 export type CreateMessageRequestApiV1MessageRequestsPostData = {
-  requestBody: CreateMessageRequestRequest
-}
+    accessToken?: string | null;
+    requestBody: CreateMessageRequestRequest;
+};
 
-export type CreateMessageRequestApiV1MessageRequestsPostResponse = MessageRequestResponse
+export type CreateMessageRequestApiV1MessageRequestsPostResponse = MessageRequestResponse;
 
 export type GetMyMessageRequestsApiV1MessageRequestsInboxGetData = {
-  statusFilter?: string
-}
+    accessToken?: string | null;
+    statusFilter?: string;
+};
 
-export type GetMyMessageRequestsApiV1MessageRequestsInboxGetResponse = Array<MessageRequestResponse>
+export type GetMyMessageRequestsApiV1MessageRequestsInboxGetResponse = Array<MessageRequestResponse>;
 
 export type AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostData = {
-  requestId: string
-}
+    accessToken?: string | null;
+    requestId: string;
+};
 
-export type AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostResponse =
-  AcceptRequestResponse
+export type AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostResponse = AcceptRequestResponse;
 
 export type DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostData = {
-  requestId: string
-}
+    accessToken?: string | null;
+    requestId: string;
+};
 
-export type DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostResponse =
-  MessageRequestResponse
+export type DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostResponse = MessageRequestResponse;
 
 export type GetMyThreadsApiV1ThreadsGetData = {
-  limit?: number
-  offset?: number
-}
+    accessToken?: string | null;
+    limit?: number;
+    offset?: number;
+};
 
-export type GetMyThreadsApiV1ThreadsGetResponse = ThreadListResponse
+export type GetMyThreadsApiV1ThreadsGetResponse = ThreadListResponse;
 
 export type GetThreadMessagesApiV1ThreadsThreadIdMessagesGetData = {
-  limit?: number
-  offset?: number
-  threadId: string
-}
+    accessToken?: string | null;
+    limit?: number;
+    offset?: number;
+    threadId: string;
+};
 
-export type GetThreadMessagesApiV1ThreadsThreadIdMessagesGetResponse = ThreadMessagesResponse
+export type GetThreadMessagesApiV1ThreadsThreadIdMessagesGetResponse = ThreadMessagesResponse;
 
 export type SendMessageApiV1ThreadsThreadIdMessagesPostData = {
-  requestBody: SendMessageRequest
-  threadId: string
-}
+    accessToken?: string | null;
+    requestBody: app__modules__social__presentation__schemas__message_schemas__SendMessageRequest;
+    threadId: string;
+};
 
-export type SendMessageApiV1ThreadsThreadIdMessagesPostResponse = ThreadMessageResponse
+export type SendMessageApiV1ThreadsThreadIdMessagesPostResponse = ThreadMessageResponse;
 
 export type $OpenApiTs = {
-  '/health': {
-    get: {
-      res: {
-        /**
-         * Successful Response
-         */
-        200: unknown
-      }
-    }
-  }
-  '/api/v1/health': {
-    get: {
-      res: {
-        /**
-         * Successful Response
-         */
-        200: unknown
-      }
-    }
-  }
-  '/': {
-    get: {
-      res: {
-        /**
-         * Successful Response
-         */
-        200: unknown
-      }
-    }
-  }
-  '/api/v1/auth/admin-login': {
-    post: {
-      req: AdminLoginApiV1AuthAdminLoginPostData
-      res: {
-        /**
-         * Successfully authenticated as admin
-         */
-        200: LoginResponse
-        /**
-         * Validation error
-         */
-        400: unknown
-        /**
-         * Invalid credentials or not an admin
-         */
-        401: unknown
-        /**
-         * Validation Error
-         */
-        422: HTTPValidationError
-      }
-    }
-  }
-  '/api/v1/auth/google-login': {
-    post: {
-      req: GoogleLoginApiV1AuthGoogleLoginPostData
-      res: {
-        /**
-         * Successfully authenticated
-         */
-        200: LoginResponse
-        /**
-         * Validation error
-         */
-        400: unknown
-        /**
-         * Invalid Google token
-         */
-        401: unknown
-        /**
-         * Validation Error
-         */
-        422: HTTPValidationError
-      }
-    }
-  }
-  '/api/v1/auth/google-callback': {
-    post: {
-      req: GoogleCallbackApiV1AuthGoogleCallbackPostData
-      res: {
-        /**
-         * Successfully authenticated
-         */
-        200: LoginResponse
-        /**
-         * Validation error
-         */
-        400: unknown
-        /**
-         * Invalid authorization code or code_verifier
-         */
-        401: unknown
-        /**
-         * Token exchange failed
-         */
-        422: unknown
-      }
-    }
-  }
-  '/api/v1/auth/refresh': {
-    post: {
-      req: RefreshTokenApiV1AuthRefreshPostData
-      res: {
-        /**
-         * Successfully refreshed tokens
-         */
-        200: RefreshSuccessResponse
-        /**
-         * Invalid or expired refresh token
-         */
-        401: unknown
-        /**
-         * Validation Error
-         */
-        422: HTTPValidationError
-      }
-    }
-  }
-  '/api/v1/profile/me': {
-    get: {
-      res: {
-        /**
-         * Successfully retrieved profile
-         */
-        200: ProfileResponseWrapper
-        /**
-         * Unauthorized
-         */
-        401: unknown
-        /**
-         * Profile not found
-         */
-        404: unknown
-      }
-    }
-    put: {
-      req: UpdateMyProfileApiV1ProfileMePutData
-      res: {
-        /**
-         * Successfully updated profile
-         */
-        200: ProfileResponseWrapper
-        /**
-         * Validation error
-         */
-        400: unknown
-        /**
-         * Unauthorized
-         */
-        401: unknown
-        /**
-         * Validation Error
-         */
-        422: HTTPValidationError
-      }
-    }
-  }
-  '/api/v1/idols/groups': {
-    get: {
-      res: {
-        /**
-         * List of all idol groups retrieved successfully
-         */
-        200: IdolGroupListResponseWrapper
-      }
-    }
-  }
-  '/api/v1/subscriptions/verify-receipt': {
-    post: {
-      req: VerifyReceiptApiV1SubscriptionsVerifyReceiptPostData
-      res: {
-        /**
-         * Successful Response
-         */
-        200: SubscriptionStatusResponse
-        /**
-         * Validation Error
-         */
-        422: HTTPValidationError
-      }
-    }
-  }
-  '/api/v1/subscriptions/status': {
-    get: {
-      res: {
-        /**
-         * Successful Response
-         */
-        200: SubscriptionStatusResponse
-      }
-    }
-  }
-  '/api/v1/subscriptions/expire-subscriptions': {
-    post: {
-      res: {
-        /**
-         * Successful Response
-         */
-        200: ExpireSubscriptionsResponse
-      }
-    }
-  }
-  '/api/v1/friends/block': {
-    post: {
-      req: BlockUserApiV1FriendsBlockPostData
-      res: {
-        /**
-         * Successful Response
-         */
-        200: {
-          [key: string]: unknown
-        }
-        /**
-         * Invalid request
-         */
-        400: unknown
-        /**
-         * Unauthorized
-         */
-        401: unknown
-        /**
-         * Validation Error
-         */
-        422: HTTPValidationError
-        /**
-         * Internal server error
-         */
-        500: unknown
-      }
-    }
-  }
-  '/api/v1/friends/unblock': {
-    post: {
-      req: UnblockUserApiV1FriendsUnblockPostData
-      res: {
-        /**
-         * Successful Response
-         */
-        200: {
-          [key: string]: unknown
-        }
-        /**
-         * Invalid request
-         */
-        400: unknown
-        /**
-         * Unauthorized
-         */
-        401: unknown
-        /**
-         * Validation Error
-         */
-        422: HTTPValidationError
-        /**
-         * Internal server error
-         */
-        500: unknown
-      }
-    }
-  }
-  '/api/v1/reports': {
-    get: {
-      res: {
-        /**
-         * Reports retrieved successfully
-         */
-        200: ReportListResponseWrapper
-        /**
-         * Unauthorized (not logged in)
-         */
-        401: unknown
-        /**
-         * Internal server error
-         */
-        500: unknown
-      }
-    }
-    post: {
-      req: SubmitReportApiV1ReportsPostData
-      res: {
-        /**
-         * Report submitted successfully
-         */
-        201: ReportResponseWrapper
-        /**
-         * Bad request (validation failed)
-         */
-        400: unknown
-        /**
-         * Unauthorized (not logged in)
-         */
-        401: unknown
-        /**
-         * Unprocessable entity (cannot report user)
-         */
-        422: unknown
-        /**
-         * Internal server error
-         */
-        500: unknown
-      }
-    }
-  }
-  '/api/v1/cards/upload-url': {
-    post: {
-      req: GetUploadUrlApiV1CardsUploadUrlPostData
-      res: {
-        /**
-         * Upload URL generated successfully
-         */
-        200: UploadUrlResponseWrapper
-        /**
-         * Invalid request (file type/size)
-         */
-        400: unknown
-        /**
-         * Unauthorized
-         */
-        401: unknown
-        /**
-         * Quota exceeded
-         */
-        422: unknown
-      }
-    }
-  }
-  '/api/v1/cards/me': {
-    get: {
-      req: GetMyCardsApiV1CardsMeGetData
-      res: {
-        /**
-         * Cards retrieved successfully
-         */
-        200: CardListResponseWrapper
-        /**
-         * Unauthorized
-         */
-        401: unknown
-        /**
-         * Validation Error
-         */
-        422: HTTPValidationError
-      }
-    }
-  }
-  '/api/v1/cards/{card_id}': {
-    delete: {
-      req: DeleteCardApiV1CardsCardIdDeleteData
-      res: {
-        /**
-         * Card deleted successfully
-         */
-        200: DeleteSuccessResponseWrapper
-        /**
-         * Unauthorized
-         */
-        401: unknown
-        /**
-         * Not the card owner
-         */
-        403: unknown
-        /**
-         * Card not found
-         */
-        404: unknown
-        /**
-         * Validation Error
-         */
-        422: HTTPValidationError
-      }
-    }
-  }
-  '/api/v1/cards/quota/status': {
-    get: {
-      res: {
-        /**
-         * Quota status retrieved successfully
-         */
-        200: QuotaStatusResponseWrapper
-        /**
-         * Unauthorized
-         */
-        401: unknown
-      }
-    }
-  }
-  '/api/v1/cards/{card_id}/confirm-upload': {
-    post: {
-      req: ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostData
-      res: {
-        /**
-         * Upload confirmed successfully
-         */
-        200: DeleteSuccessResponseWrapper
-        /**
-         * Invalid request (already confirmed, no image, etc.)
-         */
-        400: unknown
-        /**
-         * Unauthorized
-         */
-        401: unknown
-        /**
-         * Not the card owner
-         */
-        403: unknown
-        /**
-         * Card not found or image not found in storage
-         */
-        404: unknown
-        /**
-         * Validation Error
-         */
-        422: HTTPValidationError
-      }
-    }
-  }
-  '/api/v1/chats': {
-    get: {
-      res: {
-        /**
-         * Chat rooms retrieved successfully
-         */
-        200: ChatRoomListResponseWrapper
-        /**
-         * Unauthorized (not logged in)
-         */
-        401: unknown
-        /**
-         * Internal server error
-         */
-        500: unknown
-      }
-    }
-  }
-  '/api/v1/chats/{room_id}/messages': {
-    get: {
-      req: GetMessagesApiV1ChatsRoomIdMessagesGetData
-      res: {
-        /**
-         * Messages retrieved successfully
-         */
-        200: MessagesListResponseWrapper
-        /**
-         * Unauthorized (not logged in)
-         */
-        401: unknown
-        /**
-         * Forbidden (not a participant of this room)
-         */
-        403: unknown
-        /**
-         * Chat room not found
-         */
-        404: unknown
-        /**
-         * Validation Error
-         */
-        422: HTTPValidationError
-        /**
-         * Internal server error
-         */
-        500: unknown
-      }
-    }
-    post: {
-      req: SendMessageApiV1ChatsRoomIdMessagesPostData
-      res: {
-        /**
-         * Message sent successfully
-         */
-        201: MessageResponseWrapper
-        /**
-         * Bad request (validation failed)
-         */
-        400: unknown
-        /**
-         * Unauthorized (not logged in)
-         */
-        401: unknown
-        /**
-         * Forbidden (not authorized to send message)
-         */
-        403: unknown
-        /**
-         * Chat room not found
-         */
-        404: unknown
-        /**
-         * Unprocessable entity (blocked or not friends)
-         */
-        422: unknown
-        /**
-         * Internal server error
-         */
-        500: unknown
-      }
-    }
-  }
-  '/api/v1/chats/{room_id}/messages/{message_id}/read': {
-    post: {
-      req: MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostData
-      res: {
-        /**
-         * Message marked as read
-         */
-        204: void
-        /**
-         * Unauthorized (not logged in)
-         */
-        401: unknown
-        /**
-         * Forbidden (not authorized)
-         */
-        403: unknown
-        /**
-         * Message not found
-         */
-        404: unknown
-        /**
-         * Validation Error
-         */
-        422: HTTPValidationError
-        /**
-         * Internal server error
-         */
-        500: unknown
-      }
-    }
-  }
-  '/api/v1/posts': {
-    post: {
-      req: CreatePostApiV1PostsPostData
-      res: {
-        /**
-         * Post created successfully
-         */
-        201: PostResponseWrapper
-        /**
-         * Bad request (validation failed)
-         */
-        400: unknown
-        /**
-         * Unauthorized (not logged in)
-         */
-        401: unknown
-        /**
-         * Unprocessable entity (daily limit exceeded or validation failed)
-         */
-        422: unknown
-        /**
-         * Internal server error
-         */
-        500: unknown
-      }
-    }
-    get: {
-      req: ListPostsApiV1PostsGetData
-      res: {
-        /**
-         * Posts retrieved successfully
-         */
-        200: PostListResponseWrapper
-        /**
-         * Bad request
-         */
-        400: unknown
-        /**
-         * Unauthorized (not logged in)
-         */
-        401: unknown
-        /**
-         * Validation Error
-         */
-        422: HTTPValidationError
-        /**
-         * Internal server error
-         */
-        500: unknown
-      }
-    }
-  }
-  '/api/v1/posts/{post_id}/close': {
-    post: {
-      req: ClosePostApiV1PostsPostIdClosePostData
-      res: {
-        /**
-         * Post closed successfully
-         */
-        204: void
-        /**
-         * Unauthorized (not logged in)
-         */
-        401: unknown
-        /**
-         * Forbidden (not post owner)
-         */
-        403: unknown
-        /**
-         * Post not found
-         */
-        404: unknown
-        /**
-         * Unprocessable entity (post not open)
-         */
-        422: unknown
-        /**
-         * Internal server error
-         */
-        500: unknown
-      }
-    }
-  }
-  '/api/v1/posts/{post_id}/like': {
-    post: {
-      req: ToggleLikeApiV1PostsPostIdLikePostData
-      res: {
-        /**
-         * Like toggled successfully
-         */
-        200: ToggleLikeResponseWrapper
-        /**
-         * Unauthorized (not logged in)
-         */
-        401: unknown
-        /**
-         * Post not found
-         */
-        404: unknown
-        /**
-         * Validation Error
-         */
-        422: HTTPValidationError
-        /**
-         * Internal server error
-         */
-        500: unknown
-      }
-    }
-  }
-  '/api/v1/locations/cities': {
-    get: {
-      res: {
-        /**
-         * List of all Taiwan cities retrieved successfully
-         */
-        200: CityListResponseWrapper
-      }
-    }
-  }
-  '/api/v1/users/{user_id}/gallery/cards': {
-    get: {
-      req: GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetData
-      res: {
-        /**
-         * Successful Response
-         */
-        200: GalleryCardListResponse
-        /**
-         * Validation Error
-         */
-        422: HTTPValidationError
-      }
-    }
-  }
-  '/api/v1/gallery/cards/me': {
-    get: {
-      res: {
-        /**
-         * Successful Response
-         */
-        200: GalleryCardListResponse
-      }
-    }
-  }
-  '/api/v1/gallery/cards': {
-    post: {
-      req: CreateGalleryCardApiV1GalleryCardsPostData
-      res: {
-        /**
-         * Successful Response
-         */
-        201: GalleryCardResponse
-        /**
-         * Validation Error
-         */
-        422: HTTPValidationError
-      }
-    }
-  }
-  '/api/v1/gallery/cards/{card_id}': {
-    delete: {
-      req: DeleteGalleryCardApiV1GalleryCardsCardIdDeleteData
-      res: {
-        /**
-         * Successful Response
-         */
-        204: void
-        /**
-         * Validation Error
-         */
-        422: HTTPValidationError
-      }
-    }
-  }
-  '/api/v1/gallery/cards/reorder': {
-    put: {
-      req: ReorderGalleryCardsApiV1GalleryCardsReorderPutData
-      res: {
-        /**
-         * Successful Response
-         */
-        200: ReorderGalleryCardsResponse
-        /**
-         * Validation Error
-         */
-        422: HTTPValidationError
-      }
-    }
-  }
-  '/api/v1/media/upload-url': {
-    post: {
-      req: CreateUploadUrlApiV1MediaUploadUrlPostData
-      res: {
-        /**
-         * Successful Response
-         */
-        201: CreateUploadUrlResponseSchema
-        /**
-         * Validation Error
-         */
-        422: HTTPValidationError
-      }
-    }
-  }
-  '/api/v1/media/{media_id}/confirm': {
-    post: {
-      req: ConfirmUploadApiV1MediaMediaIdConfirmPostData
-      res: {
-        /**
-         * Successful Response
-         */
-        200: ConfirmUploadResponseSchema
-        /**
-         * Validation Error
-         */
-        422: HTTPValidationError
-      }
-    }
-  }
-  '/api/v1/media/posts/{post_id}/attach': {
-    post: {
-      req: AttachMediaToPostApiV1MediaPostsPostIdAttachPostData
-      res: {
-        /**
-         * Successful Response
-         */
-        200: AttachMediaResponseSchema
-        /**
-         * Validation Error
-         */
-        422: HTTPValidationError
-      }
-    }
-  }
-  '/api/v1/media/gallery/cards/{card_id}/attach': {
-    post: {
-      req: AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostData
-      res: {
-        /**
-         * Successful Response
-         */
-        200: AttachMediaResponseSchema
-        /**
-         * Validation Error
-         */
-        422: HTTPValidationError
-      }
-    }
-  }
-  '/api/v1/message-requests': {
-    post: {
-      req: CreateMessageRequestApiV1MessageRequestsPostData
-      res: {
-        /**
-         * Successful Response
-         */
-        201: MessageRequestResponse
-        /**
-         * Validation Error
-         */
-        422: HTTPValidationError
-      }
-    }
-  }
-  '/api/v1/message-requests/inbox': {
-    get: {
-      req: GetMyMessageRequestsApiV1MessageRequestsInboxGetData
-      res: {
-        /**
-         * Successful Response
-         */
-        200: Array<MessageRequestResponse>
-        /**
-         * Validation Error
-         */
-        422: HTTPValidationError
-      }
-    }
-  }
-  '/api/v1/message-requests/{request_id}/accept': {
-    post: {
-      req: AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostData
-      res: {
-        /**
-         * Successful Response
-         */
-        200: AcceptRequestResponse
-        /**
-         * Validation Error
-         */
-        422: HTTPValidationError
-      }
-    }
-  }
-  '/api/v1/message-requests/{request_id}/decline': {
-    post: {
-      req: DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostData
-      res: {
-        /**
-         * Successful Response
-         */
-        200: MessageRequestResponse
-        /**
-         * Validation Error
-         */
-        422: HTTPValidationError
-      }
-    }
-  }
-  '/api/v1/threads': {
-    get: {
-      req: GetMyThreadsApiV1ThreadsGetData
-      res: {
-        /**
-         * Successful Response
-         */
-        200: ThreadListResponse
-        /**
-         * Validation Error
-         */
-        422: HTTPValidationError
-      }
-    }
-  }
-  '/api/v1/threads/{thread_id}/messages': {
-    get: {
-      req: GetThreadMessagesApiV1ThreadsThreadIdMessagesGetData
-      res: {
-        /**
-         * Successful Response
-         */
-        200: ThreadMessagesResponse
-        /**
-         * Validation Error
-         */
-        422: HTTPValidationError
-      }
-    }
-    post: {
-      req: SendMessageApiV1ThreadsThreadIdMessagesPostData
-      res: {
-        /**
-         * Successful Response
-         */
-        201: ThreadMessageResponse
-        /**
-         * Validation Error
-         */
-        422: HTTPValidationError
-      }
-    }
-  }
-}
+    '/health': {
+        get: {
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: unknown;
+            };
+        };
+    };
+    '/api/v1/health': {
+        get: {
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: unknown;
+            };
+        };
+    };
+    '/': {
+        get: {
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: unknown;
+            };
+        };
+    };
+    '/api/v1/auth/admin-login': {
+        post: {
+            req: AdminLoginApiV1AuthAdminLoginPostData;
+            res: {
+                /**
+                 * Successfully authenticated as admin
+                 */
+                200: LoginResponse;
+                /**
+                 * Validation error
+                 */
+                400: unknown;
+                /**
+                 * Invalid credentials or not an admin
+                 */
+                401: unknown;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/api/v1/auth/google-login': {
+        post: {
+            req: GoogleLoginApiV1AuthGoogleLoginPostData;
+            res: {
+                /**
+                 * Successfully authenticated
+                 */
+                200: LoginResponse;
+                /**
+                 * Validation error
+                 */
+                400: unknown;
+                /**
+                 * Invalid Google token
+                 */
+                401: unknown;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/api/v1/auth/google-callback': {
+        post: {
+            req: GoogleCallbackApiV1AuthGoogleCallbackPostData;
+            res: {
+                /**
+                 * Successfully authenticated
+                 */
+                200: LoginResponse;
+                /**
+                 * Validation error
+                 */
+                400: unknown;
+                /**
+                 * Invalid authorization code or code_verifier
+                 */
+                401: unknown;
+                /**
+                 * Token exchange failed
+                 */
+                422: unknown;
+            };
+        };
+    };
+    '/api/v1/auth/refresh': {
+        post: {
+            req: RefreshTokenApiV1AuthRefreshPostData;
+            res: {
+                /**
+                 * Successfully refreshed tokens
+                 */
+                200: RefreshSuccessResponse;
+                /**
+                 * Invalid or expired refresh token
+                 */
+                401: unknown;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/api/v1/auth/logout': {
+        post: {
+            res: {
+                /**
+                 * Successfully logged out
+                 */
+                200: RefreshSuccessResponse;
+            };
+        };
+    };
+    '/api/v1/profile/me': {
+        get: {
+            res: {
+                /**
+                 * Successfully retrieved profile
+                 */
+                200: ProfileResponseWrapper;
+                /**
+                 * Unauthorized
+                 */
+                401: unknown;
+                /**
+                 * Profile not found
+                 */
+                404: unknown;
+            };
+        };
+        put: {
+            req: UpdateMyProfileApiV1ProfileMePutData;
+            res: {
+                /**
+                 * Successfully updated profile
+                 */
+                200: ProfileResponseWrapper;
+                /**
+                 * Validation error
+                 */
+                400: unknown;
+                /**
+                 * Unauthorized
+                 */
+                401: unknown;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/api/v1/idols/groups': {
+        get: {
+            res: {
+                /**
+                 * List of all idol groups retrieved successfully
+                 */
+                200: IdolGroupListResponseWrapper;
+            };
+        };
+    };
+    '/api/v1/subscriptions/verify-receipt': {
+        post: {
+            req: VerifyReceiptApiV1SubscriptionsVerifyReceiptPostData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: SubscriptionStatusResponse;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/api/v1/subscriptions/status': {
+        get: {
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: SubscriptionStatusResponse;
+            };
+        };
+    };
+    '/api/v1/subscriptions/expire-subscriptions': {
+        post: {
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: ExpireSubscriptionsResponse;
+            };
+        };
+    };
+    '/api/v1/friends/block': {
+        post: {
+            req: BlockUserApiV1FriendsBlockPostData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: {
+                    [key: string]: unknown;
+                };
+                /**
+                 * Invalid request
+                 */
+                400: unknown;
+                /**
+                 * Unauthorized
+                 */
+                401: unknown;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+                /**
+                 * Internal server error
+                 */
+                500: unknown;
+            };
+        };
+    };
+    '/api/v1/friends/unblock': {
+        post: {
+            req: UnblockUserApiV1FriendsUnblockPostData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: {
+                    [key: string]: unknown;
+                };
+                /**
+                 * Invalid request
+                 */
+                400: unknown;
+                /**
+                 * Unauthorized
+                 */
+                401: unknown;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+                /**
+                 * Internal server error
+                 */
+                500: unknown;
+            };
+        };
+    };
+    '/api/v1/reports': {
+        post: {
+            req: SubmitReportApiV1ReportsPostData;
+            res: {
+                /**
+                 * Report submitted successfully
+                 */
+                201: ReportResponseWrapper;
+                /**
+                 * Bad request (validation failed)
+                 */
+                400: unknown;
+                /**
+                 * Unauthorized (not logged in)
+                 */
+                401: unknown;
+                /**
+                 * Unprocessable entity (cannot report user)
+                 */
+                422: unknown;
+                /**
+                 * Internal server error
+                 */
+                500: unknown;
+            };
+        };
+        get: {
+            req: GetMyReportsApiV1ReportsGetData;
+            res: {
+                /**
+                 * Reports retrieved successfully
+                 */
+                200: ReportListResponseWrapper;
+                /**
+                 * Unauthorized (not logged in)
+                 */
+                401: unknown;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+                /**
+                 * Internal server error
+                 */
+                500: unknown;
+            };
+        };
+    };
+    '/api/v1/cards/upload-url': {
+        post: {
+            req: GetUploadUrlApiV1CardsUploadUrlPostData;
+            res: {
+                /**
+                 * Upload URL generated successfully
+                 */
+                200: UploadUrlResponseWrapper;
+                /**
+                 * Invalid request (file type/size)
+                 */
+                400: unknown;
+                /**
+                 * Unauthorized
+                 */
+                401: unknown;
+                /**
+                 * Quota exceeded
+                 */
+                422: unknown;
+            };
+        };
+    };
+    '/api/v1/cards/me': {
+        get: {
+            req: GetMyCardsApiV1CardsMeGetData;
+            res: {
+                /**
+                 * Cards retrieved successfully
+                 */
+                200: CardListResponseWrapper;
+                /**
+                 * Unauthorized
+                 */
+                401: unknown;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/api/v1/cards/{card_id}': {
+        delete: {
+            req: DeleteCardApiV1CardsCardIdDeleteData;
+            res: {
+                /**
+                 * Card deleted successfully
+                 */
+                200: DeleteSuccessResponseWrapper;
+                /**
+                 * Unauthorized
+                 */
+                401: unknown;
+                /**
+                 * Not the card owner
+                 */
+                403: unknown;
+                /**
+                 * Card not found
+                 */
+                404: unknown;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/api/v1/cards/quota/status': {
+        get: {
+            req: GetQuotaStatusApiV1CardsQuotaStatusGetData;
+            res: {
+                /**
+                 * Quota status retrieved successfully
+                 */
+                200: QuotaStatusResponseWrapper;
+                /**
+                 * Unauthorized
+                 */
+                401: unknown;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/api/v1/cards/{card_id}/confirm-upload': {
+        post: {
+            req: ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostData;
+            res: {
+                /**
+                 * Upload confirmed successfully
+                 */
+                200: DeleteSuccessResponseWrapper;
+                /**
+                 * Invalid request (already confirmed, no image, etc.)
+                 */
+                400: unknown;
+                /**
+                 * Unauthorized
+                 */
+                401: unknown;
+                /**
+                 * Not the card owner
+                 */
+                403: unknown;
+                /**
+                 * Card not found or image not found in storage
+                 */
+                404: unknown;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/api/v1/chats': {
+        get: {
+            req: GetChatRoomsApiV1ChatsGetData;
+            res: {
+                /**
+                 * Chat rooms retrieved successfully
+                 */
+                200: ChatRoomListResponseWrapper;
+                /**
+                 * Unauthorized (not logged in)
+                 */
+                401: unknown;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+                /**
+                 * Internal server error
+                 */
+                500: unknown;
+            };
+        };
+    };
+    '/api/v1/chats/{room_id}/messages': {
+        get: {
+            req: GetMessagesApiV1ChatsRoomIdMessagesGetData;
+            res: {
+                /**
+                 * Messages retrieved successfully
+                 */
+                200: MessagesListResponseWrapper;
+                /**
+                 * Unauthorized (not logged in)
+                 */
+                401: unknown;
+                /**
+                 * Forbidden (not a participant of this room)
+                 */
+                403: unknown;
+                /**
+                 * Chat room not found
+                 */
+                404: unknown;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+                /**
+                 * Internal server error
+                 */
+                500: unknown;
+            };
+        };
+        post: {
+            req: SendMessageApiV1ChatsRoomIdMessagesPostData;
+            res: {
+                /**
+                 * Message sent successfully
+                 */
+                201: MessageResponseWrapper;
+                /**
+                 * Bad request (validation failed)
+                 */
+                400: unknown;
+                /**
+                 * Unauthorized (not logged in)
+                 */
+                401: unknown;
+                /**
+                 * Forbidden (not authorized to send message)
+                 */
+                403: unknown;
+                /**
+                 * Chat room not found
+                 */
+                404: unknown;
+                /**
+                 * Unprocessable entity (blocked or not friends)
+                 */
+                422: unknown;
+                /**
+                 * Internal server error
+                 */
+                500: unknown;
+            };
+        };
+    };
+    '/api/v1/chats/{room_id}/messages/{message_id}/read': {
+        post: {
+            req: MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostData;
+            res: {
+                /**
+                 * Message marked as read
+                 */
+                204: void;
+                /**
+                 * Unauthorized (not logged in)
+                 */
+                401: unknown;
+                /**
+                 * Forbidden (not authorized)
+                 */
+                403: unknown;
+                /**
+                 * Message not found
+                 */
+                404: unknown;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+                /**
+                 * Internal server error
+                 */
+                500: unknown;
+            };
+        };
+    };
+    '/api/v1/posts': {
+        post: {
+            req: CreatePostApiV1PostsPostData;
+            res: {
+                /**
+                 * Post created successfully
+                 */
+                201: PostResponseWrapper;
+                /**
+                 * Bad request (validation failed)
+                 */
+                400: unknown;
+                /**
+                 * Unauthorized (not logged in)
+                 */
+                401: unknown;
+                /**
+                 * Unprocessable entity (daily limit exceeded or validation failed)
+                 */
+                422: unknown;
+                /**
+                 * Internal server error
+                 */
+                500: unknown;
+            };
+        };
+        get: {
+            req: ListPostsApiV1PostsGetData;
+            res: {
+                /**
+                 * Posts retrieved successfully
+                 */
+                200: PostListResponseWrapper;
+                /**
+                 * Bad request
+                 */
+                400: unknown;
+                /**
+                 * Unauthorized (not logged in)
+                 */
+                401: unknown;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+                /**
+                 * Internal server error
+                 */
+                500: unknown;
+            };
+        };
+    };
+    '/api/v1/posts/{post_id}/close': {
+        post: {
+            req: ClosePostApiV1PostsPostIdClosePostData;
+            res: {
+                /**
+                 * Post closed successfully
+                 */
+                204: void;
+                /**
+                 * Unauthorized (not logged in)
+                 */
+                401: unknown;
+                /**
+                 * Forbidden (not post owner)
+                 */
+                403: unknown;
+                /**
+                 * Post not found
+                 */
+                404: unknown;
+                /**
+                 * Unprocessable entity (post not open)
+                 */
+                422: unknown;
+                /**
+                 * Internal server error
+                 */
+                500: unknown;
+            };
+        };
+    };
+    '/api/v1/posts/{post_id}/like': {
+        post: {
+            req: ToggleLikeApiV1PostsPostIdLikePostData;
+            res: {
+                /**
+                 * Like toggled successfully
+                 */
+                200: ToggleLikeResponseWrapper;
+                /**
+                 * Unauthorized (not logged in)
+                 */
+                401: unknown;
+                /**
+                 * Post not found
+                 */
+                404: unknown;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+                /**
+                 * Internal server error
+                 */
+                500: unknown;
+            };
+        };
+    };
+    '/api/v1/locations/cities': {
+        get: {
+            res: {
+                /**
+                 * List of all Taiwan cities retrieved successfully
+                 */
+                200: CityListResponseWrapper;
+            };
+        };
+    };
+    '/api/v1/users/{user_id}/gallery/cards': {
+        get: {
+            req: GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: GalleryCardListResponse;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/api/v1/gallery/cards/me': {
+        get: {
+            req: GetMyGalleryCardsApiV1GalleryCardsMeGetData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: GalleryCardListResponse;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/api/v1/gallery/cards': {
+        post: {
+            req: CreateGalleryCardApiV1GalleryCardsPostData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                201: GalleryCardResponse;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/api/v1/gallery/cards/{card_id}': {
+        delete: {
+            req: DeleteGalleryCardApiV1GalleryCardsCardIdDeleteData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                204: void;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/api/v1/gallery/cards/reorder': {
+        put: {
+            req: ReorderGalleryCardsApiV1GalleryCardsReorderPutData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: ReorderGalleryCardsResponse;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/api/v1/media/upload-url': {
+        post: {
+            req: CreateUploadUrlApiV1MediaUploadUrlPostData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                201: CreateUploadUrlResponseSchema;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/api/v1/media/{media_id}/confirm': {
+        post: {
+            req: ConfirmUploadApiV1MediaMediaIdConfirmPostData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: ConfirmUploadResponseSchema;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/api/v1/media/posts/{post_id}/attach': {
+        post: {
+            req: AttachMediaToPostApiV1MediaPostsPostIdAttachPostData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: AttachMediaResponseSchema;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/api/v1/media/gallery/cards/{card_id}/attach': {
+        post: {
+            req: AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: AttachMediaResponseSchema;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/api/v1/message-requests': {
+        post: {
+            req: CreateMessageRequestApiV1MessageRequestsPostData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                201: MessageRequestResponse;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/api/v1/message-requests/inbox': {
+        get: {
+            req: GetMyMessageRequestsApiV1MessageRequestsInboxGetData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: Array<MessageRequestResponse>;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/api/v1/message-requests/{request_id}/accept': {
+        post: {
+            req: AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: AcceptRequestResponse;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/api/v1/message-requests/{request_id}/decline': {
+        post: {
+            req: DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: MessageRequestResponse;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/api/v1/threads': {
+        get: {
+            req: GetMyThreadsApiV1ThreadsGetData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: ThreadListResponse;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/api/v1/threads/{thread_id}/messages': {
+        get: {
+            req: GetThreadMessagesApiV1ThreadsThreadIdMessagesGetData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: ThreadMessagesResponse;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+        post: {
+            req: SendMessageApiV1ThreadsThreadIdMessagesPostData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                201: ThreadMessageResponse;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+};

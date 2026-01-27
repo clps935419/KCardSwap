@@ -63,7 +63,7 @@
           "Authentication"
         ],
         "summary": "Admin login with email/password",
-        "description": "Authenticate admin user with email and password and receive JWT tokens",
+        "description": "Authenticate admin user with email and password and receive JWT tokens via httpOnly cookies",
         "operationId": "admin_login_api_v1_auth_admin_login_post",
         "requestBody": {
           "content": {
@@ -111,7 +111,7 @@
           "Authentication"
         ],
         "summary": "Login with Google",
-        "description": "Authenticate user with Google OAuth token and receive JWT tokens",
+        "description": "Authenticate user with Google OAuth token and receive JWT tokens via httpOnly cookies",
         "operationId": "google_login_api_v1_auth_google_login_post",
         "requestBody": {
           "content": {
@@ -240,6 +240,28 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/logout": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Logout and clear authentication cookies",
+        "description": "Clear access and refresh token cookies to log out the user",
+        "operationId": "logout_api_v1_auth_logout_post",
+        "responses": {
+          "200": {
+            "description": "Successfully logged out",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefreshSuccessResponse"
                 }
               }
             }
@@ -478,15 +500,38 @@
         "summary": "Block a user",
         "description": "Block a user to prevent interaction. Required for FR-025 (blocking support).",
         "operationId": "block_user_api_v1_friends_block_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/BlockUserRequest"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
@@ -494,8 +539,8 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
                   "type": "object",
+                  "additionalProperties": true,
                   "title": "Response Block User Api V1 Friends Block Post"
                 }
               }
@@ -520,12 +565,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ]
+        }
       }
     },
     "/api/v1/friends/unblock": {
@@ -536,15 +576,38 @@
         "summary": "Unblock a user",
         "description": "Unblock a previously blocked user. Required for FR-025.",
         "operationId": "unblock_user_api_v1_friends_unblock_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/UnblockUserRequest"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
@@ -552,8 +615,8 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
                   "type": "object",
+                  "additionalProperties": true,
                   "title": "Response Unblock User Api V1 Friends Unblock Post"
                 }
               }
@@ -578,46 +641,10 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ]
+        }
       }
     },
     "/api/v1/reports": {
-      "get": {
-        "tags": [
-          "Reports"
-        ],
-        "summary": "Get my reports",
-        "description": "Get reports submitted by the current user",
-        "operationId": "get_my_reports_api_v1_reports_get",
-        "responses": {
-          "200": {
-            "description": "Reports retrieved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ReportListResponseWrapper"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized (not logged in)"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ]
-      },
       "post": {
         "tags": [
           "Reports"
@@ -625,15 +652,38 @@
         "summary": "Submit report",
         "description": "Submit a report for inappropriate behavior or content",
         "operationId": "submit_report_api_v1_reports_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/ReportRequest"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "201": {
@@ -658,12 +708,66 @@
           "500": {
             "description": "Internal server error"
           }
-        },
+        }
+      },
+      "get": {
+        "tags": [
+          "Reports"
+        ],
+        "summary": "Get my reports",
+        "description": "Get reports submitted by the current user",
+        "operationId": "get_my_reports_api_v1_reports_get",
         "security": [
           {
             "HTTPBearer": []
           }
-        ]
+        ],
+        "parameters": [
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reports retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportListResponseWrapper"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (not logged in)"
+          },
+          "500": {
+            "description": "Internal server error"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/v1/cards/upload-url": {
@@ -674,15 +778,38 @@
         "summary": "Get upload signed URL",
         "description": "Generate a signed URL for uploading a card image to GCS",
         "operationId": "get_upload_url_api_v1_cards_upload_url_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/UploadCardRequest"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
@@ -704,12 +831,7 @@
           "422": {
             "description": "Quota exceeded"
           }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ]
+        }
       }
     },
     "/api/v1/cards/me": {
@@ -743,6 +865,22 @@
               "title": "Status"
             },
             "description": "Filter by status (available/trading/traded)"
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
           }
         ],
         "responses": {
@@ -795,6 +933,22 @@
               "format": "uuid",
               "title": "Card Id"
             }
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
           }
         ],
         "responses": {
@@ -838,6 +992,29 @@
         "summary": "Get quota status",
         "description": "Check current upload quota usage",
         "operationId": "get_quota_status_api_v1_cards_quota_status_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Quota status retrieved successfully",
@@ -851,13 +1028,18 @@
           },
           "401": {
             "description": "Unauthorized"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
           }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ]
+        }
       }
     },
     "/api/v1/cards/{card_id}/confirm-upload": {
@@ -882,6 +1064,22 @@
               "type": "string",
               "format": "uuid",
               "title": "Card Id"
+            }
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
             }
           }
         ],
@@ -929,6 +1127,29 @@
         "summary": "Get chat rooms",
         "description": "Get all chat rooms for the current user",
         "operationId": "get_chat_rooms_api_v1_chats_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Chat rooms retrieved successfully",
@@ -945,13 +1166,18 @@
           },
           "500": {
             "description": "Internal server error"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
           }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ]
+        }
       }
     },
     "/api/v1/chats/{room_id}/messages": {
@@ -1010,6 +1236,22 @@
               "title": "Limit"
             },
             "description": "Maximum number of messages"
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
           }
         ],
         "responses": {
@@ -1069,6 +1311,22 @@
               "format": "uuid",
               "title": "Room Id"
             }
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
           }
         ],
         "requestBody": {
@@ -1076,7 +1334,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/app__modules__social__presentation__schemas__chat_schemas__SendMessageRequest"
+                "$ref": "#/components/schemas/SendMessageRequest"
               }
             }
           }
@@ -1146,6 +1404,22 @@
               "format": "uuid",
               "title": "Message Id"
             }
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
           }
         ],
         "responses": {
@@ -1188,6 +1462,24 @@
         "security": [
           {
             "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
           }
         ],
         "requestBody": {
@@ -1300,6 +1592,22 @@
               "title": "Offset"
             },
             "description": "Pagination offset"
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
           }
         ],
         "responses": {
@@ -1358,6 +1666,22 @@
               "format": "uuid",
               "title": "Post Id"
             }
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
           }
         ],
         "responses": {
@@ -1404,6 +1728,22 @@
               "type": "string",
               "format": "uuid",
               "title": "Post Id"
+            }
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
             }
           }
         ],
@@ -1504,6 +1844,22 @@
               "format": "uuid",
               "title": "User Id"
             }
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
           }
         ],
         "responses": {
@@ -1538,6 +1894,29 @@
         "summary": "Get my gallery cards",
         "description": "Get the authenticated user's own gallery cards.",
         "operationId": "get_my_gallery_cards_api_v1_gallery_cards_me_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -1548,13 +1927,18 @@
                 }
               }
             }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
           }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ]
+        }
       }
     },
     "/api/v1/gallery/cards": {
@@ -1565,15 +1949,38 @@
         "summary": "Create gallery card",
         "description": "Create a new gallery card in the user's personal album.",
         "operationId": "create_gallery_card_api_v1_gallery_cards_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateGalleryCardRequest"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "201": {
@@ -1596,12 +2003,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ]
+        }
       }
     },
     "/api/v1/gallery/cards/{card_id}": {
@@ -1626,6 +2028,22 @@
               "type": "string",
               "format": "uuid",
               "title": "Card Id"
+            }
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
             }
           }
         ],
@@ -1654,15 +2072,38 @@
         "summary": "Reorder gallery cards",
         "description": "Update the display order of gallery cards.",
         "operationId": "reorder_gallery_cards_api_v1_gallery_cards_reorder_put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/ReorderGalleryCardsRequest"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
@@ -1685,12 +2126,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ]
+        }
       }
     },
     "/api/v1/media/upload-url": {
@@ -1701,15 +2137,38 @@
         "summary": "Generate presigned upload URL",
         "description": "Step 1: Generate a presigned URL for uploading media to GCS. FR-006.",
         "operationId": "create_upload_url_api_v1_media_upload_url_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateUploadUrlRequestSchema"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "201": {
@@ -1732,12 +2191,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ]
+        }
       }
     },
     "/api/v1/media/{media_id}/confirm": {
@@ -1762,6 +2216,22 @@
               "type": "string",
               "format": "uuid",
               "title": "Media Id"
+            }
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
             }
           }
         ],
@@ -1811,6 +2281,22 @@
               "type": "string",
               "format": "uuid",
               "title": "Post Id"
+            }
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
             }
           }
         ],
@@ -1871,6 +2357,22 @@
               "format": "uuid",
               "title": "Card Id"
             }
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
           }
         ],
         "requestBody": {
@@ -1915,15 +2417,38 @@
         "summary": "Create Message Request",
         "description": "Create a message request to another user.\n\nImplements FR-011: Message Requests for strangers.\nImplements FR-013: Privacy setting to block stranger messages.\nImplements FR-014: One unique thread per user pair.",
         "operationId": "create_message_request_api_v1_message_requests_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateMessageRequestRequest"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "201": {
@@ -1946,12 +2471,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ]
+        }
       }
     },
     "/api/v1/message-requests/inbox": {
@@ -1976,6 +2496,22 @@
               "type": "string",
               "default": "pending",
               "title": "Status Filter"
+            }
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
             }
           }
         ],
@@ -2029,6 +2565,22 @@
               "type": "string",
               "title": "Request Id"
             }
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
           }
         ],
         "responses": {
@@ -2076,6 +2628,22 @@
             "schema": {
               "type": "string",
               "title": "Request Id"
+            }
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
             }
           }
         ],
@@ -2138,6 +2706,22 @@
               "minimum": 0,
               "default": 0,
               "title": "Offset"
+            }
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
             }
           }
         ],
@@ -2210,6 +2794,22 @@
               "default": 0,
               "title": "Offset"
             }
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
           }
         ],
         "responses": {
@@ -2256,6 +2856,22 @@
               "type": "string",
               "title": "Thread Id"
             }
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
           }
         ],
         "requestBody": {
@@ -2263,7 +2879,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SendMessageRequest"
+                "$ref": "#/components/schemas/app__modules__social__presentation__schemas__message_schemas__SendMessageRequest"
               }
             }
           }
@@ -4449,22 +5065,13 @@
         "properties": {
           "content": {
             "type": "string",
-            "maxLength": 5000,
+            "maxLength": 2000,
             "minLength": 1,
             "title": "Content",
-            "description": "Message content"
-          },
-          "post_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Post Id",
-            "description": "Optional post ID to reference"
+            "description": "Message content",
+            "examples": [
+              "Hello! I'm interested in trading cards."
+            ]
           }
         },
         "type": "object",
@@ -4472,7 +5079,10 @@
           "content"
         ],
         "title": "SendMessageRequest",
-        "description": "Request to send a message in a thread"
+        "description": "Request schema for sending a message",
+        "example": {
+          "content": "Hello! I'm interested in trading cards."
+        }
       },
       "SubscriptionStatusData": {
         "properties": {
@@ -5173,17 +5783,26 @@
           "purchase_token": "abc123xyz..."
         }
       },
-      "app__modules__social__presentation__schemas__chat_schemas__SendMessageRequest": {
+      "app__modules__social__presentation__schemas__message_schemas__SendMessageRequest": {
         "properties": {
           "content": {
             "type": "string",
-            "maxLength": 2000,
+            "maxLength": 5000,
             "minLength": 1,
             "title": "Content",
-            "description": "Message content",
-            "examples": [
-              "Hello! I'm interested in trading cards."
-            ]
+            "description": "Message content"
+          },
+          "post_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Post Id",
+            "description": "Optional post ID to reference"
           }
         },
         "type": "object",
@@ -5191,10 +5810,7 @@
           "content"
         ],
         "title": "SendMessageRequest",
-        "description": "Request schema for sending a message",
-        "example": {
-          "content": "Hello! I'm interested in trading cards."
-        }
+        "description": "Request to send a message in a thread"
       }
     },
     "securitySchemes": {
