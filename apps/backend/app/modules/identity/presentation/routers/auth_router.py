@@ -17,18 +17,23 @@ from app.modules.identity.application.use_cases.auth.google_callback import (
 from app.modules.identity.application.use_cases.auth.login_with_google import (
     GoogleLoginUseCase,
 )
+from app.modules.identity.application.use_cases.auth.login_with_google_code import (
+    GoogleCodeLoginUseCase,
+)
 from app.modules.identity.application.use_cases.auth.refresh_token import (
     RefreshTokenUseCase,
 )
 from app.modules.identity.presentation.dependencies.use_case_deps import (
     get_admin_login_use_case,
     get_google_callback_use_case,
+    get_google_code_login_use_case,
     get_google_login_use_case,
     get_refresh_token_use_case,
 )
 from app.modules.identity.presentation.schemas.auth_schemas import (
     AdminLoginRequest,
     GoogleCallbackRequest,
+    GoogleCodeLoginRequest,
     GoogleLoginRequest,
     LoginResponse,
     RefreshSuccessResponse,
@@ -232,6 +237,89 @@ async def google_callback(
             detail={
                 "code": "UNAUTHORIZED",
                 "message": "Invalid authorization code or code_verifier. Token exchange failed.",
+            },
+        )
+
+    access_token, refresh_token, user = result
+
+    # Set tokens as httpOnly cookies
+    response.set_cookie(
+        key=settings.ACCESS_COOKIE_NAME,
+        value=access_token,
+        max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        httponly=settings.COOKIE_HTTPONLY,
+        samesite=settings.COOKIE_SAMESITE,
+        secure=settings.COOKIE_SECURE,
+        domain=settings.COOKIE_DOMAIN,
+        path=settings.COOKIE_PATH,
+    )
+
+    response.set_cookie(
+        key=settings.REFRESH_COOKIE_NAME,
+        value=refresh_token,
+        max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60,
+        httponly=settings.COOKIE_HTTPONLY,
+        samesite=settings.COOKIE_SAMESITE,
+        secure=settings.COOKIE_SECURE,
+        domain=settings.COOKIE_DOMAIN,
+        path=settings.COOKIE_PATH,
+    )
+
+    # Build response (tokens still included for compatibility, but clients should use cookies)
+    token_response = TokenResponse(
+        access_token=access_token,
+        refresh_token=refresh_token,
+        token_type="bearer",
+        expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,  # Convert to seconds
+        user_id=user.id,
+        email=user.email,
+    )
+
+    return LoginResponse(data=token_response, meta=None, error=None)
+
+
+@router.post(
+    "/google-login-code",
+    response_model=LoginResponse,
+    status_code=status.HTTP_200_OK,
+    responses={
+        200: {"description": "Successfully authenticated"},
+        400: {"description": "Validation error"},
+        401: {"description": "Invalid authorization code"},
+        422: {"description": "Token exchange failed"},
+    },
+    summary="Login with Google authorization code",
+    description="Authenticate user with Google OAuth authorization code (Web flow without PKCE)",
+)
+async def google_login_code(
+    request: GoogleCodeLoginRequest,
+    response: Response,
+    use_case: Annotated[GoogleCodeLoginUseCase, Depends(get_google_code_login_use_case)],
+) -> LoginResponse:
+    """
+    Login with Google OAuth authorization code (Recommended for Web).
+
+    - Exchanges authorization code for ID token using client_secret
+    - Verifies Google ID token
+    - Creates user and profile if new user
+    - Sets JWT access and refresh tokens as httpOnly cookies
+    - Returns token info in response body (for compatibility)
+
+    This endpoint implements Authorization Code Flow without PKCE,
+    which is suitable for web applications using @react-oauth/google.
+    """
+    # Execute use case
+    result = await use_case.execute(
+        code=request.code,
+        redirect_uri=request.redirect_uri,
+    )
+
+    if result is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail={
+                "code": "UNAUTHORIZED",
+                "message": "Invalid authorization code. Token exchange failed.",
             },
         )
 

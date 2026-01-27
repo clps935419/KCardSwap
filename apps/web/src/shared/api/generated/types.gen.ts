@@ -446,6 +446,20 @@ export type GoogleCallbackRequest = {
 };
 
 /**
+ * Request schema for Google OAuth with authorization code (Web flow)
+ */
+export type GoogleCodeLoginRequest = {
+    /**
+     * Authorization code from Google OAuth
+     */
+    code: string;
+    /**
+     * Redirect URI used during authorization (must match the one used in auth request)
+     */
+    redirect_uri?: string | null;
+};
+
+/**
  * Request schema for Google login
  */
 export type GoogleLoginRequest = {
@@ -923,13 +937,17 @@ export type ReportResponseWrapper = {
 };
 
 /**
- * Request schema for sending a message
+ * Request to send a message in a thread
  */
 export type SendMessageRequest = {
     /**
      * Message content
      */
     content: string;
+    /**
+     * Optional post ID to reference
+     */
+    post_id?: string | null;
 };
 
 /**
@@ -1208,17 +1226,13 @@ export type VerifyReceiptRequest = {
 };
 
 /**
- * Request to send a message in a thread
+ * Request schema for sending a message
  */
-export type app__modules__social__presentation__schemas__message_schemas__SendMessageRequest = {
+export type app__modules__social__presentation__schemas__chat_schemas__SendMessageRequest = {
     /**
      * Message content
      */
     content: string;
-    /**
-     * Optional post ID to reference
-     */
-    post_id?: string | null;
 };
 
 export type HealthCheckHealthGetResponse = unknown;
@@ -1245,6 +1259,12 @@ export type GoogleCallbackApiV1AuthGoogleCallbackPostData = {
 
 export type GoogleCallbackApiV1AuthGoogleCallbackPostResponse = LoginResponse;
 
+export type GoogleLoginCodeApiV1AuthGoogleLoginCodePostData = {
+    requestBody: GoogleCodeLoginRequest;
+};
+
+export type GoogleLoginCodeApiV1AuthGoogleLoginCodePostResponse = LoginResponse;
+
 export type RefreshTokenApiV1AuthRefreshPostData = {
     refreshToken?: string | null;
 };
@@ -1253,9 +1273,14 @@ export type RefreshTokenApiV1AuthRefreshPostResponse = RefreshSuccessResponse;
 
 export type LogoutApiV1AuthLogoutPostResponse = RefreshSuccessResponse;
 
+export type GetMyProfileApiV1ProfileMeGetData = {
+    accessToken?: string | null;
+};
+
 export type GetMyProfileApiV1ProfileMeGetResponse = ProfileResponseWrapper;
 
 export type UpdateMyProfileApiV1ProfileMePutData = {
+    accessToken?: string | null;
     requestBody: UpdateProfileRequest;
 };
 
@@ -1264,10 +1289,15 @@ export type UpdateMyProfileApiV1ProfileMePutResponse = ProfileResponseWrapper;
 export type GetIdolGroupsApiV1IdolsGroupsGetResponse = IdolGroupListResponseWrapper;
 
 export type VerifyReceiptApiV1SubscriptionsVerifyReceiptPostData = {
+    accessToken?: string | null;
     requestBody: VerifyReceiptRequest;
 };
 
 export type VerifyReceiptApiV1SubscriptionsVerifyReceiptPostResponse = SubscriptionStatusResponse;
+
+export type GetSubscriptionStatusApiV1SubscriptionsStatusGetData = {
+    accessToken?: string | null;
+};
 
 export type GetSubscriptionStatusApiV1SubscriptionsStatusGetResponse = SubscriptionStatusResponse;
 
@@ -1364,7 +1394,7 @@ export type GetMessagesApiV1ChatsRoomIdMessagesGetResponse = MessagesListRespons
 
 export type SendMessageApiV1ChatsRoomIdMessagesPostData = {
     accessToken?: string | null;
-    requestBody: SendMessageRequest;
+    requestBody: app__modules__social__presentation__schemas__chat_schemas__SendMessageRequest;
     roomId: string;
 };
 
@@ -1534,7 +1564,7 @@ export type GetThreadMessagesApiV1ThreadsThreadIdMessagesGetResponse = ThreadMes
 
 export type SendMessageApiV1ThreadsThreadIdMessagesPostData = {
     accessToken?: string | null;
-    requestBody: app__modules__social__presentation__schemas__message_schemas__SendMessageRequest;
+    requestBody: SendMessageRequest;
     threadId: string;
 };
 
@@ -1640,6 +1670,29 @@ export type $OpenApiTs = {
             };
         };
     };
+    '/api/v1/auth/google-login-code': {
+        post: {
+            req: GoogleLoginCodeApiV1AuthGoogleLoginCodePostData;
+            res: {
+                /**
+                 * Successfully authenticated
+                 */
+                200: LoginResponse;
+                /**
+                 * Validation error
+                 */
+                400: unknown;
+                /**
+                 * Invalid authorization code
+                 */
+                401: unknown;
+                /**
+                 * Token exchange failed
+                 */
+                422: unknown;
+            };
+        };
+    };
     '/api/v1/auth/refresh': {
         post: {
             req: RefreshTokenApiV1AuthRefreshPostData;
@@ -1671,6 +1724,7 @@ export type $OpenApiTs = {
     };
     '/api/v1/profile/me': {
         get: {
+            req: GetMyProfileApiV1ProfileMeGetData;
             res: {
                 /**
                  * Successfully retrieved profile
@@ -1684,6 +1738,10 @@ export type $OpenApiTs = {
                  * Profile not found
                  */
                 404: unknown;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
             };
         };
         put: {
@@ -1735,11 +1793,16 @@ export type $OpenApiTs = {
     };
     '/api/v1/subscriptions/status': {
         get: {
+            req: GetSubscriptionStatusApiV1SubscriptionsStatusGetData;
             res: {
                 /**
                  * Successful Response
                  */
                 200: SubscriptionStatusResponse;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
             };
         };
     };

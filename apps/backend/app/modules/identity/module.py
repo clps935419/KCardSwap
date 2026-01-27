@@ -25,6 +25,9 @@ from app.modules.identity.application.use_cases.auth.google_callback import (
 from app.modules.identity.application.use_cases.auth.login_with_google import (
     GoogleLoginUseCase,
 )
+from app.modules.identity.application.use_cases.auth.login_with_google_code import (
+    GoogleCodeLoginUseCase,
+)
 from app.modules.identity.application.use_cases.auth.logout import LogoutUseCase
 from app.modules.identity.application.use_cases.auth.refresh_token import (
     RefreshTokenUseCase,
@@ -120,6 +123,25 @@ class IdentityModule(Module):
         profile_repo = ProfileRepositoryImpl(session)
         refresh_token_repo = RefreshTokenRepositoryImpl(session)
         return GoogleCallbackUseCase(
+            user_repo=user_repo,
+            profile_repo=profile_repo,
+            refresh_token_repo=refresh_token_repo,
+            google_oauth_service=google_oauth_service,
+            jwt_service=jwt_service,
+        )
+
+    @provider
+    def provide_google_code_login_use_case(
+        self,
+        session: AsyncSession,
+        google_oauth_service: GoogleOAuthService,
+        jwt_service: JWTService,
+    ) -> GoogleCodeLoginUseCase:
+        """Provide GoogleCodeLoginUseCase with dependencies."""
+        user_repo = UserRepositoryImpl(session)
+        profile_repo = ProfileRepositoryImpl(session)
+        refresh_token_repo = RefreshTokenRepositoryImpl(session)
+        return GoogleCodeLoginUseCase(
             user_repo=user_repo,
             profile_repo=profile_repo,
             refresh_token_repo=refresh_token_repo,
