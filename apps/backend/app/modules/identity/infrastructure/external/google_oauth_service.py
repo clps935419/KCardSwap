@@ -28,10 +28,18 @@ class GoogleOAuthService:
         Returns None if token is invalid
         """
         try:
+            logger.info("Verifying Google ID token")
+            logger.info("  - client_id configured: %s", bool(self.client_id))
+            logger.info("  - token length: %s", len(token) if token else 0)
+
             # Verify the token
             idinfo = id_token.verify_oauth2_token(
-                token, requests.Request(), self.client_id
+                token, requests.Request(), self.client_id, clock_skew_in_seconds=5
             )
+
+            logger.info("  - token aud: %s", idinfo.get("aud"))
+            logger.info("  - token iss: %s", idinfo.get("iss"))
+            logger.info("  - token email_verified: %s", idinfo.get("email_verified"))
 
             # Verify issuer
             valid_issuers = [
@@ -39,6 +47,7 @@ class GoogleOAuthService:
                 "https://accounts.google.com",
             ]
             if idinfo["iss"] not in valid_issuers:
+                logger.warning("Invalid token issuer: %s", idinfo.get("iss"))
                 return None
 
             return {
@@ -48,8 +57,9 @@ class GoogleOAuthService:
                 "picture": idinfo.get("picture"),
                 "email_verified": idinfo.get("email_verified", False),
             }
-        except ValueError:
+        except ValueError as exc:
             # Invalid token
+            logger.error("Google token verification failed: %s", exc)
             return None
 
     async def exchange_code_for_token(self, code: str) -> Optional[str]:

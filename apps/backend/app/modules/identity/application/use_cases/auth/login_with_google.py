@@ -5,6 +5,7 @@ Follows DDD: Uses domain entities and repository interfaces
 """
 
 from datetime import datetime, timedelta
+import logging
 from typing import Optional, Tuple
 
 from app.modules.identity.domain.entities.profile import Profile
@@ -46,6 +47,7 @@ class GoogleLoginUseCase:
         self._refresh_token_repo = refresh_token_repo
         self._google_oauth = google_oauth_service
         self._jwt_service = jwt_service
+        self._logger = logging.getLogger(__name__)
 
     async def execute(self, google_token: str) -> Optional[Tuple[str, str, User]]:
         """
@@ -60,12 +62,20 @@ class GoogleLoginUseCase:
         # Step 1: Verify Google token
         user_info = await self._google_oauth.verify_google_token(google_token)
         if not user_info:
+            self._logger.warning(
+                "Google login failed: token verification returned no user info"
+            )
             return None
 
         google_id = user_info.get("google_id")
         email = user_info.get("email")
 
         if not email or not google_id:
+            self._logger.warning(
+                "Google login failed: missing email or google_id (email=%s, google_id=%s)",
+                bool(email),
+                bool(google_id),
+            )
             return None
 
         # Step 2: Check if user exists, or create new user

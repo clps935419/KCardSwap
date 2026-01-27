@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { initGoogleOAuth, loginWithGoogle } from '@/lib/google-oauth'
+import { initGoogleOAuth, renderGoogleButton } from '@/lib/google-oauth'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -12,11 +12,6 @@ export default function LoginPage() {
 
   // Check if running in development mode
   const isDev = process.env.NODE_ENV === 'development'
-
-  // Initialize Google OAuth on mount
-  useEffect(() => {
-    initGoogleOAuth()
-  }, [])
 
   const handleAdminLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -48,21 +43,18 @@ export default function LoginPage() {
     }
   }
 
-  const handleGoogleLogin = async () => {
-    setGoogleError('')
-    setIsLoading(true)
-
-    try {
-      await loginWithGoogle()
-      // Login successful, redirect to posts feed
-      window.location.href = '/posts'
-    } catch (err: unknown) {
-      const error = err as Error
-      setGoogleError(error.message || 'Google 登入失敗，請稍後再試')
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  useEffect(() => {
+    initGoogleOAuth()
+    void renderGoogleButton(
+      'google-signin-button',
+      () => {
+        window.location.href = '/posts'
+      },
+      (error) => {
+        setGoogleError(error.message || 'Google 登入失敗，請稍後再試')
+      }
+    )
+  }, [])
 
   return (
     <div className="flex min-h-screen items-center justify-between flex-col bg-gradient-to-b from-slate-50 to-white p-8 py-20">
@@ -129,22 +121,7 @@ export default function LoginPage() {
 
         {/* Google Login Button */}
         <div className="space-y-2">
-          <button
-            type="button"
-            onClick={handleGoogleLogin}
-            disabled={isLoading}
-            className="w-full h-16 bg-gradient-to-r from-secondary-50 to-rose-50 border-2 border-secondary-300 rounded-2xl flex items-center justify-center px-6 hover:from-secondary-50/80 hover:to-rose-50/80 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white rounded-xl shadow flex items-center justify-center font-black">
-                G
-              </div>
-              <div className="text-left">
-                <p className="text-sm font-black text-foreground">使用 Google 登入</p>
-                <p className="text-[10px] text-muted-foreground">登入後才能瀏覽貼文、相簿與信箱</p>
-              </div>
-            </div>
-          </button>
+          <div id="google-signin-button" className="w-full flex justify-center" />
           {googleError && (
             <div className="bg-red-50 border-2 border-red-300 rounded-2xl p-4">
               <div className="flex items-start gap-2">
