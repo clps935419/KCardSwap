@@ -25,7 +25,7 @@ export default function AuthTestPage() {
   // Check auth status and fetch user info on mount
   useEffect(() => {
     initGoogleOAuth()
-    
+
     const initAuth = async () => {
       setIsLoading(true)
       const authenticated = await checkAuth()
@@ -37,7 +37,7 @@ export default function AuthTestPage() {
 
       setIsLoading(false)
     }
-    
+
     initAuth()
   }, [])
 
