@@ -14,7 +14,7 @@ from app.modules.identity.application.use_cases.profile.get_profile import (
 from app.modules.identity.application.use_cases.profile.update_profile import (
     UpdateProfileUseCase,
 )
-from app.modules.identity.presentation.dependencies.auth_deps import get_current_user
+from app.shared.presentation.dependencies.auth import get_current_user
 from app.modules.identity.presentation.dependencies.use_case_deps import (
     get_get_profile_use_case,
     get_update_profile_use_case,

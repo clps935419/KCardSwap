@@ -17,7 +17,7 @@ from app.modules.identity.application.use_cases.subscription.expire_subscription
 from app.modules.identity.application.use_cases.subscription.verify_receipt_use_case import (
     VerifyReceiptUseCase,
 )
-from app.modules.identity.presentation.dependencies.auth_deps import get_current_user_id
+from app.shared.presentation.dependencies.auth import get_current_user_id
 from app.modules.identity.presentation.dependencies.use_case_deps import (
     get_check_subscription_status_use_case,
     get_expire_subscriptions_use_case,
