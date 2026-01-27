@@ -37,8 +37,30 @@ export default function LoginPage() {
         window.location.href = '/posts'
       }
     } catch (err: unknown) {
-      const error = err as { response?: { data?: { error?: { message?: string } } } }
-      setError(error.response?.data?.error?.message || '登入失敗，請檢查帳號密碼')
+      // More robust error parsing
+      let errorMessage = '登入失敗，請檢查帳號密碼'
+      
+      if (err && typeof err === 'object') {
+        const error = err as { 
+          response?: { 
+            data?: { 
+              error?: { message?: string }
+              detail?: { message?: string }
+              message?: string
+            }
+          }
+          message?: string
+        }
+        
+        errorMessage = 
+          error.response?.data?.error?.message ||
+          error.response?.data?.detail?.message ||
+          error.response?.data?.message ||
+          error.message ||
+          errorMessage
+      }
+      
+      setError(errorMessage)
     } finally {
       setIsLoading(false)
     }
@@ -117,8 +139,30 @@ function LoginPageContent({
           window.location.href = '/posts'
         }
       } catch (err: unknown) {
-        const error = err as { response?: { data?: { error?: { message?: string } } } }
-        setGoogleError(error.response?.data?.error?.message || 'Google 登入失敗，請稍後再試')
+        // More robust error parsing
+        let errorMessage = 'Google 登入失敗，請稍後再試'
+        
+        if (err && typeof err === 'object') {
+          const error = err as { 
+            response?: { 
+              data?: { 
+                error?: { message?: string }
+                detail?: { message?: string }
+                message?: string
+              }
+            }
+            message?: string
+          }
+          
+          errorMessage = 
+            error.response?.data?.error?.message ||
+            error.response?.data?.detail?.message ||
+            error.response?.data?.message ||
+            error.message ||
+            errorMessage
+        }
+        
+        setGoogleError(errorMessage)
       } finally {
         setIsGoogleLoading(false)
       }
