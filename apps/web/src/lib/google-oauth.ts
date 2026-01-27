@@ -43,10 +43,10 @@ export async function loginWithGoogle(): Promise<void> {
         clearInterval(checkGoogleLoaded)
 
         const google = (window as any).google
-        const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID
+        const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
 
         if (!clientId) {
-          reject(new Error('Google Client ID not configured'))
+          reject(new Error('Google Client ID not configured. Please set NEXT_PUBLIC_GOOGLE_CLIENT_ID'))
           return
         }
 

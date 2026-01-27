@@ -103,13 +103,19 @@
 
 ```env
 # Google OAuth (Client-side)
-# 只需要 NEXT_PUBLIC_GOOGLE_CLIENT_ID 用於瀏覽器端 OAuth
+# Used by browser-side Google Identity Services for OAuth login
 NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-google-client-id
 
-# Legacy (可選，NextAuth 向後相容用)
+# Legacy: NextAuth still requires these for backward compatibility
+# These can use the same value as NEXT_PUBLIC_GOOGLE_CLIENT_ID
 GOOGLE_CLIENT_ID=your-google-client-id
 GOOGLE_CLIENT_SECRET=your-google-client-secret
 ```
+
+**說明**:
+- **`NEXT_PUBLIC_GOOGLE_CLIENT_ID`**: 新的客戶端 OAuth 流程使用（必需）
+- **`GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET`**: NextAuth 向後相容所需（可使用相同的 Client ID）
+- 兩個 Client ID 可以使用相同的值，因為是同一個 Google OAuth 應用程式
 
 ## Cookie 設定
 
