@@ -1,4 +1,4 @@
-import { apiClient } from './axios'
+import { AuthenticationService } from '@/shared/api/generated'
 
 /**
  * Auth Refresh Module
@@ -18,14 +18,10 @@ import { apiClient } from './axios'
  */
 export async function refreshAccessToken(): Promise<void> {
   try {
-    // Call refresh endpoint
+    // Call refresh endpoint using SDK
     // Backend will read refresh_token from httpOnly cookie
     // and set new access_token in httpOnly cookie
-    const response = await apiClient.post('/api/v1/auth/refresh', {})
-
-    if (response.status !== 200) {
-      throw new Error('Failed to refresh access token')
-    }
+    await AuthenticationService.refreshTokenApiV1AuthRefreshPost()
 
     // Success - new access token is now in cookie
     return
@@ -40,8 +36,8 @@ export async function refreshAccessToken(): Promise<void> {
  */
 export async function logout(): Promise<void> {
   try {
-    // Call logout endpoint to clear cookies on server side
-    await apiClient.post('/api/v1/auth/logout', {})
+    // Call logout endpoint to clear cookies on server side using SDK
+    await AuthenticationService.logoutApiV1AuthLogoutPost()
   } catch (error) {
     console.error('[Auth] Logout error:', error)
   } finally {

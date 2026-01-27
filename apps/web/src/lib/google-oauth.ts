@@ -49,7 +49,7 @@ export async function loginWithGoogle(): Promise<void> {
 
         if (!clientId) {
           reject(
-            new Error('Google Client ID not configured. Please set NEXT_PUBLIC_GOOGLE_CLIENT_ID')
+            new Error('Google Client ID 未設定，請聯絡管理員')
           )
           return
         }
@@ -74,7 +74,7 @@ export async function loginWithGoogle(): Promise<void> {
         google.accounts.id.prompt((notification: any) => {
           if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
             // One Tap not available
-            reject(new Error('Google One Tap 無法使用，請檢查瀏覽器設定或稍後再試'))
+            reject(new Error('Google One Tap 無法使用。請確認：\n1. 瀏覽器允許第三方 Cookie\n2. 未封鎖彈出視窗\n3. 使用 Chrome、Edge 或 Safari 瀏覽器'))
           }
         })
       }
@@ -83,7 +83,7 @@ export async function loginWithGoogle(): Promise<void> {
     // Timeout after 5 seconds
     setTimeout(() => {
       clearInterval(checkGoogleLoaded)
-      reject(new Error('Google Identity Services failed to load'))
+      reject(new Error('Google 登入服務載入逾時，請重新整理頁面後再試'))
     }, 5000)
   })
 }
@@ -107,7 +107,24 @@ async function handleGoogleCallback(idToken: string): Promise<void> {
     // Browser will automatically include them in future requests
   } catch (error: any) {
     console.error('[Google OAuth] Backend login failed:', error)
-    throw new Error('登入失敗，請稍後再試')
+    
+    // Extract detailed error message from backend response
+    const errorMessage = 
+      error?.body?.error?.message ||
+      error?.response?.data?.error?.message ||
+      error?.message ||
+      '登入失敗，請稍後再試'
+    
+    // Provide specific error messages for common issues
+    if (errorMessage.includes('token') || errorMessage.includes('invalid')) {
+      throw new Error('Google 驗證失敗，請重新嘗試登入')
+    } else if (errorMessage.includes('network') || errorMessage.includes('timeout')) {
+      throw new Error('網路連線問題，請檢查您的網路連線')
+    } else if (errorMessage.includes('not found') || errorMessage.includes('user')) {
+      throw new Error('無法找到使用者資訊，請聯絡管理員')
+    } else {
+      throw new Error(`登入失敗：${errorMessage}`)
+    }
   }
 }
 
@@ -118,7 +135,7 @@ export async function checkAuth(): Promise<boolean> {
   try {
     // Try to fetch a protected endpoint using SDK
     // If we get 401, user is not authenticated
-    await ProfileService.getMyProfileApiV1UsersProfileGet()
+    await ProfileService.getMyProfileApiV1ProfileMeGet()
     return true
   } catch (_error) {
     return false

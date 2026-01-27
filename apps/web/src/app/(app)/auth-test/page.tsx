@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { checkAuth, initGoogleOAuth, loginWithGoogle, logout } from '@/lib/google-oauth'
+import { ProfileService } from '@/shared/api/generated'
 
 /**
  * Auth Test Page
@@ -42,15 +43,8 @@ export default function AuthTestPage() {
 
   const fetchUserInfo = async () => {
     try {
-      const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
-      const response = await fetch(`${backendUrl}/api/v1/users/me`, {
-        credentials: 'include',
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        setUserInfo(data.data)
-      }
+      const response = await ProfileService.getMyProfileApiV1ProfileMeGet()
+      setUserInfo(response.data)
     } catch (err) {
       console.error('Failed to fetch user info:', err)
     }
@@ -184,7 +178,7 @@ export default function AuthTestPage() {
             <p>✅ 確保已設定正確的環境變數（NEXT_PUBLIC_GOOGLE_CLIENT_ID）</p>
             <p>✅ 後端使用 httpOnly cookies 儲存 access_token 和 refresh_token</p>
             <p>✅ 前端直接呼叫後端 /api/v1/auth/google-login 取得 cookies</p>
-            <p>✅ 成功登入後，使用者資料會從後端 /api/v1/users/me 取得</p>
+            <p>✅ 成功登入後，使用者資料會從後端 /api/v1/profile/me 取得</p>
           </div>
         </div>
       </div>

@@ -145,7 +145,17 @@ export default function LoginPage() {
               </div>
             </div>
           </button>
-          {googleError && <p className="text-xs text-red-600 font-medium">{googleError}</p>}
+          {googleError && (
+            <div className="bg-red-50 border-2 border-red-300 rounded-2xl p-4">
+              <div className="flex items-start gap-2">
+                <div className="text-lg">⚠️</div>
+                <div className="flex-1">
+                  <p className="text-xs font-black text-red-900 mb-1">登入錯誤</p>
+                  <p className="text-xs text-red-700 whitespace-pre-line">{googleError}</p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* POC Info */}
