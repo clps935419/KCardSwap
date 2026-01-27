@@ -54,7 +54,32 @@ This will automatically create the `.env` file and start all services.
    make health
    ```
 
-**Troubleshooting:** If you encounter any issues, see [DOCKER_TROUBLESHOOTING.md](./DOCKER_TROUBLESHOOTING.md)
+5. **Initialize Admin User (Important for API testing)**:
+   
+   The default `.env` is configured to automatically create an admin user on startup:
+   ```
+   Email: admin@kcardswap.local
+   Password: Admin123!@#DevOnly
+   ```
+   
+   To verify admin login works:
+   ```bash
+   curl -X POST http://localhost:8000/api/v1/auth/admin-login \
+     -H "Content-Type: application/json" \
+     -d '{"email": "admin@kcardswap.local", "password": "Admin123!@#DevOnly"}'
+   ```
+   
+   Or manually create an admin:
+   ```bash
+   docker compose exec backend python scripts/init_admin.py \
+     --email your@email.com --password YourPassword123
+   ```
+   
+   ⚠️ **Note**: For production, always disable auto-initialization and use strong passwords. See [docs/ADMIN_LOGIN_401_FIX.md](./docs/ADMIN_LOGIN_401_FIX.md) for details.
+
+**Troubleshooting:** 
+- General issues: see [DOCKER_TROUBLESHOOTING.md](./DOCKER_TROUBLESHOOTING.md)
+- Admin login 401 errors: see [docs/ADMIN_LOGIN_401_FIX.md](./docs/ADMIN_LOGIN_401_FIX.md)
 
 Access points:
 - Backend API: http://localhost:8000
