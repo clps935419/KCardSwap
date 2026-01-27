@@ -10,6 +10,8 @@
  * 6. Browser redirects to app
  */
 
+import { AuthenticationService, ProfileService } from '@/shared/api/generated'
+
 /**
  * Initialize Google OAuth client
  * This should be called once when the app loads
@@ -31,7 +33,7 @@ export function initGoogleOAuth() {
 /**
  * Google OAuth login using One Tap
  * Browser receives the ID token and sends it to backend
- * 
+ *
  * Note: This implementation only supports One Tap flow.
  * If One Tap is not available, user should try again or check browser settings.
  */
@@ -46,7 +48,9 @@ export async function loginWithGoogle(): Promise<void> {
         const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
 
         if (!clientId) {
-          reject(new Error('Google Client ID not configured. Please set NEXT_PUBLIC_GOOGLE_CLIENT_ID'))
+          reject(
+            new Error('Google Client ID not configured. Please set NEXT_PUBLIC_GOOGLE_CLIENT_ID')
+          )
           return
         }
 
@@ -85,67 +89,51 @@ export async function loginWithGoogle(): Promise<void> {
 }
 
 /**
- * Send Google ID token to backend
+ * Send Google ID token to backend using SDK
  */
 async function handleGoogleCallback(idToken: string): Promise<void> {
-  const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
-
   console.log('[Google OAuth] Sending ID token to backend')
 
-  const response = await fetch(`${backendUrl}/api/v1/auth/google-login`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include', // Important: includes cookies in request/response
-    body: JSON.stringify({
-      google_token: idToken,
-    }),
-  })
+  try {
+    const response = await AuthenticationService.googleLoginApiV1AuthGoogleLoginPost({
+      requestBody: {
+        google_token: idToken,
+      },
+    })
 
-  if (!response.ok) {
-    const error = await response.text()
+    console.log('[Google OAuth] Login successful:', response.data?.email)
+
+    // Backend has set httpOnly cookies (access_token, refresh_token)
+    // Browser will automatically include them in future requests
+  } catch (error: any) {
     console.error('[Google OAuth] Backend login failed:', error)
     throw new Error('登入失敗，請稍後再試')
   }
-
-  const data = await response.json()
-  console.log('[Google OAuth] Login successful:', data.data?.email)
-
-  // Backend has set httpOnly cookies (access_token, refresh_token)
-  // Browser will automatically include them in future requests
 }
 
 /**
  * Check if user is authenticated by testing if cookies work
  */
 export async function checkAuth(): Promise<boolean> {
-  const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
-
   try {
-    // Try to fetch a protected endpoint
+    // Try to fetch a protected endpoint using SDK
     // If we get 401, user is not authenticated
-    const response = await fetch(`${backendUrl}/api/v1/users/me`, {
-      method: 'GET',
-      credentials: 'include',
-    })
-
-    return response.ok
+    await ProfileService.getMyProfileApiV1UsersProfileGet()
+    return true
   } catch (_error) {
     return false
   }
 }
 
 /**
- * Logout by calling backend logout endpoint
+ * Logout by calling backend logout endpoint using SDK
  */
 export async function logout(): Promise<void> {
-  const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
-
-  await fetch(`${backendUrl}/api/v1/auth/logout`, {
-    method: 'POST',
-    credentials: 'include',
-  })
+  try {
+    await AuthenticationService.logoutApiV1AuthLogoutPost()
+  } catch (_error) {
+    // Ignore errors on logout
+  }
 
   // Redirect to login page
   window.location.href = '/login'
