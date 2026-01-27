@@ -2,19 +2,19 @@
 
 ## 問題背景
 
-原先的實作中，NextAuth.js 在**伺服器端** (Next.js Route Handler) 呼叫後端的 `/api/v1/auth/google-login`，這導致以下問題：
+原先的實作使用 NextAuth.js，但因為 NextAuth 在**伺服器端** (Next.js Route Handler) 呼叫後端的 `/api/v1/auth/google-login`，這導致以下問題：
 
 1. 後端設定的 `Set-Cookie` header 無法傳遞到**瀏覽器**
 2. 瀏覽器後續請求缺少 `access_token` 和 `refresh_token` cookies
 3. 所有需要認證的 API 請求都收到 401 Unauthorized
 
-**根本原因**: 在 NextAuth JWT callback 中，fetch 請求是在 Next.js 伺服器端執行的，不是在瀏覽器端。即使使用 `credentials: 'include'`，cookies 也只會在 Next.js server 和 backend server 之間傳遞，不會到達使用者的瀏覽器。
+**根本原因**: NextAuth JWT callback 中的 fetch 請求是在 Next.js 伺服器端執行的，不是在瀏覽器端。即使使用 `credentials: 'include'`，cookies 也只會在 Next.js server 和 backend server 之間傳遞，不會到達使用者的瀏覽器。
 
 ## 解決方案
 
 ### 核心改變
 
-**將 Google OAuth 登入改為完全在瀏覽器端執行**，確保後端設定的 httpOnly cookies 能正確傳遞到瀏覽器。
+**將 Google OAuth 登入改為完全在瀏覽器端執行**，不使用 NextAuth，直接使用 Google Identity Services，確保後端設定的 httpOnly cookies 能正確傳遞到瀏覽器。
 
 ### 新的登入流程
 
@@ -64,7 +64,7 @@
 
 ### 3. 更新 Proxy `src/proxy.ts` (Next.js 16)
 
-取代 NextAuth session 檢查為 cookie-based 認證：
+改用 cookie-based 認證取代 session 檢查：
 
 - 檢查 `access_token` cookie 是否存在
 - 未認證使用者訪問受保護路徑 → 重定向到 `/login`
@@ -72,30 +72,30 @@
 
 **注意**: Next.js 16 使用 `proxy.ts` 而非 `middleware.ts`。Proxy 只檢查 cookie 存在性，完整的 JWT 驗證在後端進行。
 
-### 4. 移除 NextAuth Session 依賴
+### 4. 移除 NextAuth 依賴
+
+完全移除 NextAuth 相關檔案和依賴：
+
+#### 刪除的檔案
+- `src/lib/auth/` - 整個目錄（config.ts, utils.ts, types.ts, index.ts）
+- `src/app/api/auth/` - 整個目錄（NextAuth API routes）
+- 從 `package.json` 移除 `next-auth` 依賴
 
 #### `src/app/providers.tsx`
 - 移除 `<SessionProvider>`，只保留 `<QueryClientProvider>`
 
 #### `src/app/(app)/layout.tsx`
-- 移除 `useSession()` hook
-- 改用 `fetch('/api/v1/users/me')` 取得使用者資訊
+- 改用 `fetch('/api/v1/users/me')` 取得使用者資訊（不依賴 session）
 
 #### `src/app/page.tsx`
-- 移除 `getSession()` 呼叫
 - 改用 `cookies().get('access_token')` 檢查認證狀態
 
 #### `src/app/(app)/me/gallery/page.tsx`
-- 移除 `signOut()` from next-auth
 - 改用 `logout()` from google-oauth
 
 #### `src/app/(app)/auth-test/page.tsx`
 - 完全改寫，使用新的認證檢查方式
-- 測試 cookie-based 認證而非 NextAuth session
-
-### 5. 清理 NextAuth Config
-
-`src/lib/auth/config.ts` 中的 JWT callback 已被簡化，不再呼叫後端。NextAuth 目前僅保留作為向後相容，未來可完全移除。
+- 測試 cookie-based 認證
 
 ## 環境變數更新
 
@@ -105,17 +105,11 @@
 # Google OAuth (Client-side)
 # Used by browser-side Google Identity Services for OAuth login
 NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-google-client-id
-
-# Legacy: NextAuth still requires these for backward compatibility
-# These can use the same value as NEXT_PUBLIC_GOOGLE_CLIENT_ID
-GOOGLE_CLIENT_ID=your-google-client-id
-GOOGLE_CLIENT_SECRET=your-google-client-secret
 ```
 
 **說明**:
-- **`NEXT_PUBLIC_GOOGLE_CLIENT_ID`**: 新的客戶端 OAuth 流程使用（必需）
-- **`GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET`**: NextAuth 向後相容所需（可使用相同的 Client ID）
-- 兩個 Client ID 可以使用相同的值，因為是同一個 Google OAuth 應用程式
+- **`NEXT_PUBLIC_GOOGLE_CLIENT_ID`**: 瀏覽器端 OAuth 使用（必需）
+- 不再需要 `GOOGLE_CLIENT_SECRET`（因為不使用 server-side OAuth）
 
 ## Cookie 設定
 
@@ -179,30 +173,27 @@ npm run dev
 - 顯示使用者資訊（從後端 API 取得）
 - 可測試登入/登出功能
 
-## 向後相容性
+## 完成的清理
 
-- NextAuth 相關檔案保留但不再使用
-- `/api/auth/[...nextauth]/route.ts` 仍存在但前端不再呼叫
-- 可在未來版本完全移除 NextAuth 依賴
+1. **已移除 NextAuth 相關內容**: 
+   - ✅ 移除 `next-auth` 套件（從 package.json）
+   - ✅ 刪除 `/api/auth` 路由
+   - ✅ 刪除 `lib/auth/` 目錄（config.ts, utils.ts, types.ts, index.ts）
+   - ✅ 更新環境變數（移除 NextAuth 相關變數）
 
 ## 後續優化建議
 
-1. **完全移除 NextAuth**: 
-   - 移除 `next-auth` 套件
-   - 刪除 `/api/auth` 路由
-   - 刪除 `lib/auth/config.ts`, `utils.ts`, `types.ts`
-
-2. **改善錯誤處理**:
+1. **改善錯誤處理**:
    - 在 `google-oauth.ts` 加入更詳細的錯誤訊息
    - 處理 token 過期的情況
    - 加入 refresh token 自動續期邏輯
 
-3. **改善 UX**:
+2. **改善 UX**:
    - 在登入按鈕加入 loading 狀態
    - 改善 Google One Tap 的顯示方式
    - 加入「記住我」功能
 
-4. **安全性增強**:
+3. **安全性增強**:
    - 生產環境啟用 `COOKIE_SECURE=true`
    - 考慮使用 `COOKIE_SAMESITE=strict`
    - 加入 CSRF protection

@@ -9,7 +9,7 @@ Posts-first POC 的 Web 客戶端，使用 Next.js App Router 實作。
 - **表單**: react-hook-form
 - **資料抓取**: TanStack Query
 - **API SDK**: hey-api (從 `openapi/openapi.json` 生成)
-- **驗證**: NextAuth.js v4 + Google OAuth (詳見 [NEXTAUTH_GUIDE.md](./NEXTAUTH_GUIDE.md))
+- **驗證**: Google Identity Services (client-side OAuth)
 - **代碼品質**: Biome (linting & formatting)
 
 ## 快速開始
@@ -36,12 +36,7 @@ cp .env.example .env.local
 
 必要的環境變數：
 - `NEXT_PUBLIC_API_URL`: 後端 API 的 URL (例如: `http://localhost:8000`)
-- `NEXTAUTH_SECRET`: NextAuth 的密鑰 (可用 `openssl rand -base64 32` 生成)
-- `NEXTAUTH_URL`: 前端的 URL (例如: `http://localhost:3000`)
-- `GOOGLE_CLIENT_ID`: Google OAuth 客戶端 ID
-- `GOOGLE_CLIENT_SECRET`: Google OAuth 客戶端密鑰
-
-**Google OAuth 設定**: 請參考 [NEXTAUTH_GUIDE.md](./NEXTAUTH_GUIDE.md) 了解如何設定 Google OAuth。
+- `NEXT_PUBLIC_GOOGLE_CLIENT_ID`: Google OAuth 客戶端 ID（用於瀏覽器端認證）
 
 ### 開發模式
 
@@ -64,12 +59,10 @@ npm run start
 apps/web/
 ├── src/
 │   ├── app/              # Next.js App Router 路由
-│   │   ├── api/          # API routes
-│   │   │   └── auth/     # NextAuth API routes
 │   │   ├── (auth)/       # 登入相關頁面
 │   │   ├── (app)/        # 已登入的應用頁面
 │   │   ├── layout.tsx    # 根 layout
-│   │   └── providers.tsx # React providers (SessionProvider, QueryClient)
+│   │   └── providers.tsx # React providers (QueryClient)
 │   ├── components/       # 共用元件
 │   │   └── ui/          # shadcn/ui 元件
 │   ├── features/        # 功能模組
@@ -78,7 +71,7 @@ apps/web/
 │   │   └── inbox/       # 訊息功能
 │   ├── lib/             # 工具函式
 │   │   ├── api/         # API 客戶端
-│   │   ├── auth/        # NextAuth 設定與工具
+│   │   ├── google-oauth.ts # Google OAuth 客戶端邏輯
 │   │   └── query-client.ts # TanStack Query 設定
 │   ├── shared/          # 共用型別與常數
 │   │   └── api/         # 生成的 API SDK
@@ -86,7 +79,6 @@ apps/web/
 │   └── proxy.ts         # 路由保護（Next.js 16）
 ├── public/              # 靜態資源
 ├── .env.example         # 環境變數範例
-├── NEXTAUTH_GUIDE.md    # NextAuth 整合指南
 └── package.json
 ```
 
@@ -158,15 +150,6 @@ poetry run python scripts/init_admin.py --email admin@example.com --password Sec
 6. 瀏覽器重定向到首頁
 
 **重要**: 所有 cookies 必須由後端設定，前端 JavaScript 無法直接存取這些 cookies（安全性考量）。
-
-### NextAuth 狀態
-
-NextAuth 目前僅用於向後相容，主要認證邏輯已改為：
-- 前端直接呼叫後端 Google OAuth endpoint
-- 使用後端 httpOnly cookies 作為認證來源
-- Middleware 基於 cookie 檢查進行路由保護
-
-未來版本可完全移除 NextAuth 依賴。
 
 ### 同源部署
 
