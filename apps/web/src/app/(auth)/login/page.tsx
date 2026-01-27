@@ -100,10 +100,15 @@ function LoginPageContent({
         // Import SDK dynamically to avoid build issues
         const { AuthenticationService } = await import('@/shared/api/generated')
 
-        // Send authorization code to backend
+        // Get the redirect_uri that was used in the authorization request
+        // @react-oauth/google uses window.location.origin by default
+        const redirectUri = window.location.origin
+
+        // Send authorization code to backend with redirect_uri for OAuth 2.0 validation
         const response = await AuthenticationService.googleLoginCodeApiV1AuthGoogleLoginCodePost({
           requestBody: {
             code: codeResponse.code,
+            redirect_uri: redirectUri,
           },
         })
 

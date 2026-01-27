@@ -69,10 +69,10 @@ class GoogleCodeLoginUseCase:
         # Step 1: Exchange authorization code for ID token
         self._logger.info("Exchanging authorization code for ID token")
         
-        # Note: redirect_uri parameter is accepted but GoogleOAuthService.exchange_code_for_token
-        # currently uses the configured GOOGLE_REDIRECT_URI from environment
-        # For web flow, this should typically be: http://localhost:3000 or your web domain
-        id_token = await self._google_oauth.exchange_code_for_token(code)
+        # Pass redirect_uri to token exchange for OAuth 2.0 security validation
+        id_token = await self._google_oauth.exchange_code_for_token(
+            code=code, redirect_uri=redirect_uri
+        )
 
         if not id_token:
             self._logger.warning("Failed to exchange authorization code for ID token")

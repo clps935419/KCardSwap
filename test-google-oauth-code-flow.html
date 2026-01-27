@@ -137,8 +137,13 @@
     </div>
 
     <script>
-        // 請替換為你的 Google Client ID
+        // ⚠️ 請在此處設定你的 Google Client ID
+        // 可從 Google Cloud Console 取得：https://console.cloud.google.com/apis/credentials
         const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com';
+        
+        // 或從環境變數載入（需要建置工具支援）
+        // const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com';
+        
         const BACKEND_URL = 'http://localhost:8000';
         const REDIRECT_URI = window.location.origin;
 
