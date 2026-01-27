@@ -4,19 +4,14 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { ProfileService } from '@/shared/api/generated'
 
-// Get user email from backend API
+// Get user info from backend API using SDK
 async function fetchUserEmail(): Promise<string> {
   try {
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
-    const response = await fetch(`${backendUrl}/api/v1/users/me`, {
-      credentials: 'include',
-    })
-
-    if (response.ok) {
-      const data = await response.json()
-      return data.data?.email || ''
-    }
+    const response = await ProfileService.getMyProfileApiV1ProfileMeGet()
+    // Profile doesn't have email, use nickname or first letter of user_id
+    return response.data?.nickname || response.data?.user_id?.substring(0, 1) || ''
   } catch (error) {
     console.error('Failed to fetch user:', error)
   }
@@ -43,12 +38,12 @@ function getPageTitle(pathname: string): string {
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  const [userEmail, setUserEmail] = useState<string>('')
+  const [userDisplay, setUserDisplay] = useState<string>('')
   const pageTitle = getPageTitle(pathname)
 
-  // Fetch user email on mount
+  // Fetch user display name on mount
   useEffect(() => {
-    fetchUserEmail().then(setUserEmail)
+    fetchUserEmail().then(setUserDisplay)
   }, [])
 
   return (
@@ -78,9 +73,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               type="button"
               className="w-9 h-9 bg-primary-500 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-white text-xs font-black transition-transform active:scale-95 hover:scale-105"
               aria-label="前往我的檔案"
-              title={userEmail || '使用者'}
+              title={userDisplay || '使用者'}
             >
-              {userEmail?.[0]?.toUpperCase() || 'U'}
+              {userDisplay?.[0]?.toUpperCase() || 'U'}
             </button>
           </Link>
         </div>
