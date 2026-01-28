@@ -31,7 +31,7 @@ export default function UserProfilePage() {
           {isLoading && (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {[...Array(8)].map((_, i) => (
-                <div key={i} className="space-y-2">
+                <div key={`skeleton-${i}`} className="space-y-2">
                   <Skeleton className="aspect-[3/4] w-full" />
                   <Skeleton className="h-4 w-3/4" />
                   <Skeleton className="h-3 w-1/2" />

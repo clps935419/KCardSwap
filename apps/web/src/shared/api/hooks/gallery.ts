@@ -14,10 +14,8 @@ import {
 import type {
   CreateGalleryCardApiV1GalleryCardsPostData,
   CreateGalleryCardApiV1GalleryCardsPostResponse,
-  DeleteGalleryCardApiV1GalleryCardsCardIdDeleteData,
   GetMyGalleryCardsApiV1GalleryCardsMeGetResponse,
   GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetResponse,
-  ReorderGalleryCardsApiV1GalleryCardsReorderPutData,
   ReorderGalleryCardsApiV1GalleryCardsReorderPutResponse,
 } from '../generated'
 import { GalleryService } from '../generated'
@@ -35,7 +33,7 @@ export function useMyGalleryCards(
   return useQuery({
     queryKey: ['my-gallery'],
     queryFn: async () => {
-      const axiosClient = getAxiosClient()
+      getAxiosClient()
       const response = await GalleryService.getMyGalleryCardsApiV1GalleryCardsMeGet()
       return response
     },
@@ -56,7 +54,7 @@ export function useUserGalleryCards(
   return useQuery({
     queryKey: ['user-gallery', userId],
     queryFn: async () => {
-      const axiosClient = getAxiosClient()
+      getAxiosClient()
       const response = await GalleryService.getUserGalleryCardsApiV1UsersUserIdGalleryCardsGet({
         userId,
       })
@@ -81,7 +79,7 @@ export function useCreateGalleryCard(
 
   return useMutation({
     mutationFn: async (data: CreateGalleryCardApiV1GalleryCardsPostData['requestBody']) => {
-      const axiosClient = getAxiosClient()
+      getAxiosClient()
       const response = await GalleryService.createGalleryCardApiV1GalleryCardsPost({
         requestBody: data,
       })
@@ -102,7 +100,7 @@ export function useDeleteGalleryCard(options?: UseMutationOptions<void, Error, s
 
   return useMutation({
     mutationFn: async (cardId: string) => {
-      const axiosClient = getAxiosClient()
+      getAxiosClient()
       await GalleryService.deleteGalleryCardApiV1GalleryCardsCardIdDelete({
         cardId,
       })
@@ -128,7 +126,7 @@ export function useReorderGalleryCards(
 
   return useMutation({
     mutationFn: async (cardIds: string[]) => {
-      const axiosClient = getAxiosClient()
+      getAxiosClient()
       const response = await GalleryService.reorderGalleryCardsApiV1GalleryCardsReorderPut({
         requestBody: {
           card_ids: cardIds,

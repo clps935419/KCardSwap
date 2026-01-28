@@ -58,7 +58,7 @@ export function useToggleLike() {
 
       return { previousPosts }
     },
-    onError: (err, postId, context) => {
+    onError: (_err, _postId, context) => {
       // Rollback on error
       if (context?.previousPosts) {
         queryClient.setQueryData(['posts'], context.previousPosts)

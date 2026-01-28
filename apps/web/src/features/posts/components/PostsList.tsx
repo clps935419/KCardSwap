@@ -75,7 +75,7 @@ export function PostsList() {
       })
 
       router.push('/inbox?tab=requests')
-    } catch (err) {
+    } catch (_err) {
       toast({
         title: '錯誤',
         description: '無法送出訊息請求，請稍後再試',
@@ -89,7 +89,7 @@ export function PostsList() {
   const handleToggleLike = async (postId: string) => {
     try {
       await toggleLikeMutation.mutateAsync(postId)
-    } catch (err) {
+    } catch (_err) {
       toast({
         title: '錯誤',
         description: '無法更新按讚狀態，請稍後再試',
@@ -166,6 +166,7 @@ export function PostsList() {
 
             {/* Post Content */}
             <button
+              type="button"
               onClick={() => router.push(`/posts/${post.id}`)}
               className="w-full text-left mt-1 group"
             >

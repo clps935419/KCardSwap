@@ -24,13 +24,13 @@ interface MessageRequest {
 
 export function MessageRequestsList() {
   const { toast } = useToast()
-  const [requests, setRequests] = useState<MessageRequest[]>([])
+  const [requests, _setRequests] = useState<MessageRequest[]>([])
   const [loading, setLoading] = useState(false)
 
   // TODO: Replace with generated SDK hook
   // const { data, isLoading } = useGetMyMessageRequests({ status_filter: "pending" });
 
-  const handleAccept = async (requestId: string) => {
+  const handleAccept = async (_requestId: string) => {
     setLoading(true)
     try {
       // TODO: Call accept endpoint using generated SDK
@@ -43,7 +43,7 @@ export function MessageRequestsList() {
 
       // Refresh list
       // queryClient.invalidateQueries(['message-requests']);
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: '錯誤',
         description: '無法接受請求',
@@ -54,7 +54,7 @@ export function MessageRequestsList() {
     }
   }
 
-  const handleDecline = async (requestId: string) => {
+  const handleDecline = async (_requestId: string) => {
     setLoading(true)
     try {
       // TODO: Call decline endpoint using generated SDK
@@ -67,7 +67,7 @@ export function MessageRequestsList() {
 
       // Refresh list
       // queryClient.invalidateQueries(['message-requests']);
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: '錯誤',
         description: '無法拒絕請求',

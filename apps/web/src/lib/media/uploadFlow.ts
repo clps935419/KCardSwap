@@ -39,8 +39,7 @@ export async function executeUploadFlow(options: UploadFlowOptions): Promise<str
     filename: file.name,
   })
 
-  const responseData = presignResponse as any
-  const { media_id, upload_url } = responseData
+  const { media_id, upload_url } = presignResponse
 
   // Step 2: Upload file to GCS using presigned URL
   onProgress?.(30)

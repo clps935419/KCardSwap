@@ -41,7 +41,7 @@ export function SendMessageForm({ threadId }: SendMessageFormProps) {
       toast({
         title: '訊息已送出',
       })
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: '錯誤',
         description: '無法送出訊息',

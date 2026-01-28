@@ -20,7 +20,7 @@ export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Check if path is public
-  const isPublicPath = PUBLIC_PATHS.some(path => pathname.startsWith(path))
+  const _isPublicPath = PUBLIC_PATHS.some(path => pathname.startsWith(path))
 
   // Check if path needs protection
   const isProtectedPath = PROTECTED_PATHS.some(path => pathname.startsWith(path))

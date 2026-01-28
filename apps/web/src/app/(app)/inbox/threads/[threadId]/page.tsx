@@ -17,6 +17,7 @@ export default function ThreadPage() {
       {/* Header */}
       <div className="px-6 py-3 bg-card border-b border-border/30 flex items-center justify-between">
         <button
+          type="button"
           onClick={() => router.push('/inbox')}
           className="text-[11px] font-black text-primary-500 hover:text-primary-500/80"
         >
