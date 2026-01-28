@@ -166,6 +166,7 @@ export function PostsList() {
 
             {/* Post Content */}
             <button
+              type="button"
               onClick={() => router.push(`/posts/${post.id}`)}
               className="w-full text-left mt-1 group"
             >
