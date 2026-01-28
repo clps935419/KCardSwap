@@ -32,6 +32,7 @@ services:
       # - ./apps/backend/start.sh:/app/start.sh:ro
       - ./apps/backend/pyproject.toml:/app/pyproject.toml:ro
       - ./apps/backend/poetry.lock:/app/poetry.lock:ro
+      - C:/Users/user/Documents/leonard/my-gcp-456214-82e0f4046f1c.json:/secrets/gcp-sa.json:ro
       - backend-site-packages:/usr/local/lib/python3.11/site-packages
 
 volumes:
