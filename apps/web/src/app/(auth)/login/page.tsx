@@ -183,21 +183,10 @@ function LoginPageContent({
           </div>
         </div>
         <h2 className="text-2xl font-black text-secondary-500">小卡Show!</h2>
-        <p className="text-xs text-muted-foreground mt-1 tracking-wide font-medium">
-          貼文優先 POC • Web 流程
-        </p>
       </div>
 
       {/* Content Section */}
       <div className="w-full max-w-md space-y-3">
-        {/* Info Card */}
-        <div className="bg-card border border-border/30 rounded-2xl p-4">
-          <p className="text-xs text-muted-foreground">
-            <span className="font-black text-foreground">所有瀏覽需登入（V2 決策）</span>
-          </p>
-          <p className="text-[11px] text-muted-foreground mt-1">登入後才能瀏覽貼文、相簿與信箱</p>
-        </div>
-
         {/* Admin Login Form (Dev Only) */}
         {isDev && (
           <div className="bg-amber-50 border-2 border-amber-300 rounded-2xl p-4">
@@ -241,7 +230,7 @@ function LoginPageContent({
           <button
             onClick={() => googleLogin()}
             disabled={isGoogleLoading}
-            className="w-full h-16 bg-gradient-to-r from-pink-50 to-rose-50 border-2 border-pink-200 rounded-2xl hover:from-pink-100 hover:to-rose-100 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 px-6"
+            className="w-full h-14 bg-gradient-to-r from-pink-50 to-rose-50 border-2 border-pink-200 rounded-2xl hover:from-pink-100 hover:to-rose-100 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 px-6"
           >
             {isGoogleLoading ? (
               <>
@@ -302,14 +291,6 @@ function LoginPageContent({
               </div>
             </div>
           )}
-        </div>
-
-        {/* POC Info */}
-        <div className="bg-slate-900 text-slate-200 rounded-2xl p-4">
-          <p className="text-xs font-bold text-white">POC 互動路徑</p>
-          <p className="text-[11px] mt-1 opacity-80">
-            貼文 → 私信作者（送出請求）→ 收件者接受 → 信箱對話
-          </p>
         </div>
       </div>
     </div>
