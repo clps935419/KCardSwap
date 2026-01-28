@@ -88,8 +88,7 @@ export function GalleryCreateCardForm({ onSuccess }: GalleryCreateCardFormProps)
         description: data.description || undefined,
       })
 
-      const cardData = response as any
-      const cardId = cardData.data?.id
+      const cardId = response.id
 
       // Step 3: Attach media to gallery card if uploaded
       if (mediaId && cardId) {

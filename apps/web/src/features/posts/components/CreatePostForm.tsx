@@ -16,7 +16,12 @@ import {
 import { Spinner } from '@/components/ui/spinner'
 import { Textarea } from '@/components/ui/textarea'
 import { attachMediaToPost, executeUploadFlow } from '@/lib/media/uploadFlow'
-import type { CityCode, PostCategory, PostScope } from '@/shared/api/generated'
+import type {
+  CityCode,
+  CreatePostApiV1PostsPostData,
+  PostCategory,
+  PostScope,
+} from '@/shared/api/generated'
 import { PostsService } from '@/shared/api/generated/services.gen'
 
 const CATEGORIES: { value: PostCategory; label: string }[] = [
@@ -67,18 +72,27 @@ export function CreatePostForm() {
   })
 
   const createPostMutation = useMutation({
-    mutationFn: (data: any) => PostsService.createPostApiV1PostsPost(data),
+    mutationFn: (data: CreatePostApiV1PostsPostData) => PostsService.createPostApiV1PostsPost(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['posts'] })
       router.push('/posts')
     },
-    onError: (error: any) => {
-      if (error?.response?.status === 422) {
-        const errorData = error.response.data
+    onError: (error: unknown) => {
+      const err = error as { response?: { status?: number; data?: unknown } }
+      if (err?.response?.status === 422) {
+        const errorData = err.response.data as {
+          detail?: {
+            error_code?: string
+            limit_key?: string
+            limit_value?: number
+            current_value?: number
+            reset_at?: string
+          }
+        }
         if (errorData?.detail?.error_code === 'LIMIT_EXCEEDED') {
           const limitInfo = errorData.detail
           setErrorMessage(
-            `已達配額上限：${limitInfo.limit_key}（上限：${limitInfo.limit_value}，目前：${limitInfo.current_value}）。重置時間：${new Date(limitInfo.reset_at).toLocaleString('zh-TW')}`
+            `已達配額上限：${limitInfo.limit_key}（上限：${limitInfo.limit_value}，目前：${limitInfo.current_value}）。重置時間：${new Date(limitInfo.reset_at || '').toLocaleString('zh-TW')}`
           )
         } else {
           setErrorMessage('資料驗證失敗，請檢查欄位是否正確')
@@ -150,19 +164,28 @@ export function CreatePostForm() {
       }
 
       // Success - mutations will handle navigation
-    } catch (error: any) {
-      if (error?.response?.status === 422) {
-        const errorData = error.response.data
+    } catch (error: unknown) {
+      const err = error as { response?: { status?: number; data?: unknown }; message?: string }
+      if (err?.response?.status === 422) {
+        const errorData = err.response.data as {
+          detail?: {
+            error_code?: string
+            limit_key?: string
+            limit_value?: number
+            current_value?: number
+            reset_at?: string
+          }
+        }
         if (errorData?.detail?.error_code === 'LIMIT_EXCEEDED') {
           const limitInfo = errorData.detail
           setErrorMessage(
-            `已達配額上限：${limitInfo.limit_key}（上限：${limitInfo.limit_value}，目前：${limitInfo.current_value}）。重置時間：${new Date(limitInfo.reset_at).toLocaleString('zh-TW')}`
+            `已達配額上限：${limitInfo.limit_key}（上限：${limitInfo.limit_value}，目前：${limitInfo.current_value}）。重置時間：${new Date(limitInfo.reset_at || '').toLocaleString('zh-TW')}`
           )
         } else {
           setErrorMessage('資料驗證失敗，請檢查欄位是否正確')
         }
       } else {
-        setErrorMessage(error.message || '發文失敗，請稍後再試')
+        setErrorMessage(err.message || '發文失敗，請稍後再試')
       }
     }
   }
