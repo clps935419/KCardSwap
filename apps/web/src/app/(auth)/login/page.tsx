@@ -1,7 +1,7 @@
 'use client'
 
 import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -39,11 +39,11 @@ export default function LoginPage() {
     } catch (err: unknown) {
       // More robust error parsing
       let errorMessage = '登入失敗，請檢查帳號密碼'
-      
+
       if (err && typeof err === 'object') {
-        const error = err as { 
-          response?: { 
-            data?: { 
+        const error = err as {
+          response?: {
+            data?: {
               error?: { message?: string }
               detail?: { message?: string }
               message?: string
@@ -51,15 +51,15 @@ export default function LoginPage() {
           }
           message?: string
         }
-        
-        errorMessage = 
+
+        errorMessage =
           error.response?.data?.error?.message ||
           error.response?.data?.detail?.message ||
           error.response?.data?.message ||
           error.message ||
           errorMessage
       }
-      
+
       setError(errorMessage)
     } finally {
       setIsLoading(false)
@@ -141,11 +141,11 @@ function LoginPageContent({
       } catch (err: unknown) {
         // More robust error parsing
         let errorMessage = 'Google 登入失敗，請稍後再試'
-        
+
         if (err && typeof err === 'object') {
-          const error = err as { 
-            response?: { 
-              data?: { 
+          const error = err as {
+            response?: {
+              data?: {
                 error?: { message?: string }
                 detail?: { message?: string }
                 message?: string
@@ -153,15 +153,15 @@ function LoginPageContent({
             }
             message?: string
           }
-          
-          errorMessage = 
+
+          errorMessage =
             error.response?.data?.error?.message ||
             error.response?.data?.detail?.message ||
             error.response?.data?.message ||
             error.message ||
             errorMessage
         }
-        
+
         setGoogleError(errorMessage)
       } finally {
         setIsGoogleLoading(false)
@@ -228,6 +228,7 @@ function LoginPageContent({
         {/* Custom Google Login Button */}
         <div className="space-y-2">
           <button
+            type="button"
             onClick={() => googleLogin()}
             disabled={isGoogleLoading}
             className="w-full h-14 bg-gradient-to-r from-pink-50 to-rose-50 border-2 border-pink-200 rounded-2xl hover:from-pink-100 hover:to-rose-100 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 px-6"
@@ -239,6 +240,8 @@ function LoginPageContent({
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
+                  role="img"
+                  aria-label="Loading"
                 >
                   <circle
                     className="opacity-25"
@@ -258,7 +261,7 @@ function LoginPageContent({
               </>
             ) : (
               <>
-                <svg className="w-6 h-6" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <svg className="w-6 h-6" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Google logo">
                   <path
                     fill="#4285F4"
                     d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"

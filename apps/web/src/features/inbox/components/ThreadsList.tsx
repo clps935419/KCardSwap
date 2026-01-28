@@ -22,7 +22,7 @@ interface MessageThread {
 }
 
 export function ThreadsList() {
-  const [threads, setThreads] = useState<MessageThread[]>([])
+  const [threads, _setThreads] = useState<MessageThread[]>([])
 
   // TODO: Replace with generated SDK hook
   // const { data, isLoading } = useGetMyThreads();

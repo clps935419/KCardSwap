@@ -6,7 +6,6 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
@@ -29,7 +28,7 @@ const CATEGORIES: { value: PostCategory; label: string }[] = [
   { value: 'announcement', label: '公告' },
 ]
 
-const CITIES: { value: CityCode; label: string }[] = [
+const _CITIES: { value: CityCode; label: string }[] = [
   { value: 'TPE', label: '台北市' },
   { value: 'NTP', label: '新北市' },
   { value: 'TXG', label: '台中市' },

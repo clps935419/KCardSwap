@@ -6,44 +6,44 @@
   :root {
     /* Korean Minimalist Girl Aesthetic Theme
        Based on apps/mobile/COLOR_THEME.md and ui_prototype.html */
-    
+
     /* Primary - Soft Lavender */
     --primary: 169 142 216; /* #A98ED8 */
     --primary-foreground: 255 255 255;
-    
+
     /* Secondary - Blush Pink */
     --secondary: 254 197 229; /* #FEC5E5 */
     --secondary-foreground: 38 35 32;
-    
+
     /* Background - Warm neutrals */
     --background: 250 248 246; /* #FAF8F6 - Warm muted */
     --foreground: 38 35 32; /* #262320 - Typography 900 */
-    
+
     /* Card - Creamy white */
     --card: 252 251 249; /* #FCFBF9 */
     --card-foreground: 38 35 32;
-    
+
     /* Popover */
     --popover: 255 255 255;
     --popover-foreground: 38 35 32;
-    
+
     /* Muted */
     --muted: 250 248 246;
     --muted-foreground: 133 127 126; /* #857F7E - Typography 500 */
-    
+
     /* Accent */
     --accent: 252 248 255; /* #FCF8FF - Primary 50 */
     --accent-foreground: 38 35 32;
-    
+
     /* Destructive - Soft Coral */
     --destructive: 242 106 91; /* #F26A5B */
     --destructive-foreground: 255 255 255;
-    
+
     /* Border & Input */
     --border: 165 162 159; /* #A5A29F - Outline 500 */
     --input: 165 162 159;
     --ring: 169 142 216; /* Primary color */
-    
+
     --radius: 0.5rem;
   }
 
@@ -77,7 +77,8 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: 'rlig' 1, 'calt' 1;
+    font-feature-settings:
+      "rlig" 1,
+      "calt" 1;
   }
 }
-

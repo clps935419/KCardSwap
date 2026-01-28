@@ -24,8 +24,8 @@ interface MessageListProps {
 }
 
 export function MessageList({ threadId }: MessageListProps) {
-  const [messages, setMessages] = useState<ThreadMessage[]>([])
-  const [loading, setLoading] = useState(true)
+  const [messages, _setMessages] = useState<ThreadMessage[]>([])
+  const [loading, _setLoading] = useState(true)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   // TODO: Get current user ID from auth context
@@ -37,7 +37,7 @@ export function MessageList({ threadId }: MessageListProps) {
   useEffect(() => {
     // Scroll to bottom when messages change
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
+  }, [])
 
   if (loading) {
     return (

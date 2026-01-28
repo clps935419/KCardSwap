@@ -97,7 +97,7 @@ export default function MyGalleryPage() {
       {isLoading && (
         <div className="space-y-4">
           {[...Array(3)].map((_, i) => (
-            <Card key={i} className="p-4 rounded-2xl">
+            <Card key={`skeleton-${i}`} className="p-4 rounded-2xl">
               <div className="flex items-start gap-3">
                 <Skeleton className="w-11 h-11 rounded-2xl" />
                 <div className="flex-1 space-y-2">

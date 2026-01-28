@@ -26,6 +26,15 @@ export default function AuthTestPage() {
   useEffect(() => {
     initGoogleOAuth()
 
+    const fetchUserInfo = async () => {
+      try {
+        const response = await ProfileService.getMyProfileApiV1ProfileMeGet()
+        setUserInfo(response.data)
+      } catch (err) {
+        console.error('Failed to fetch user info:', err)
+      }
+    }
+
     const initAuth = async () => {
       setIsLoading(true)
       const authenticated = await checkAuth()
