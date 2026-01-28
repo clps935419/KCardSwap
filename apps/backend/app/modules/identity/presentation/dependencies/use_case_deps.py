@@ -16,6 +16,9 @@ from app.modules.identity.application.use_cases.auth.google_callback import (
 from app.modules.identity.application.use_cases.auth.login_with_google import (
     GoogleLoginUseCase,
 )
+from app.modules.identity.application.use_cases.auth.login_with_google_code import (
+    GoogleCodeLoginUseCase,
+)
 from app.modules.identity.application.use_cases.auth.logout import LogoutUseCase
 from app.modules.identity.application.use_cases.auth.refresh_token import (
     RefreshTokenUseCase,
@@ -64,6 +67,17 @@ async def get_google_callback_use_case(
     child = injector.create_child_injector()
     child.binder.bind(AsyncSession, to=session)
     return child.get(GoogleCallbackUseCase)
+
+
+async def get_google_code_login_use_case(
+    session: Annotated[AsyncSession, Depends(get_db_session)],
+    request: Request = None,
+) -> GoogleCodeLoginUseCase:
+    """Get GoogleCodeLoginUseCase from injector with request-scoped session."""
+    injector = _get_injector(request)
+    child = injector.create_child_injector()
+    child.binder.bind(AsyncSession, to=session)
+    return child.get(GoogleCodeLoginUseCase)
 
 
 async def get_refresh_token_use_case(

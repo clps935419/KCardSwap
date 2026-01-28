@@ -3,7 +3,7 @@
 import type { CancelablePromise } from './core/CancelablePromise';
 import { OpenAPI } from './core/OpenAPI';
 import { request as __request } from './core/request';
-import type { HealthCheckHealthGetResponse, ApiHealthCheckApiV1HealthGetResponse, RootGetResponse, AdminLoginApiV1AuthAdminLoginPostData, AdminLoginApiV1AuthAdminLoginPostResponse, GoogleLoginApiV1AuthGoogleLoginPostData, GoogleLoginApiV1AuthGoogleLoginPostResponse, GoogleCallbackApiV1AuthGoogleCallbackPostData, GoogleCallbackApiV1AuthGoogleCallbackPostResponse, RefreshTokenApiV1AuthRefreshPostData, RefreshTokenApiV1AuthRefreshPostResponse, LogoutApiV1AuthLogoutPostResponse, GetMyProfileApiV1ProfileMeGetResponse, UpdateMyProfileApiV1ProfileMePutData, UpdateMyProfileApiV1ProfileMePutResponse, GetIdolGroupsApiV1IdolsGroupsGetResponse, VerifyReceiptApiV1SubscriptionsVerifyReceiptPostData, VerifyReceiptApiV1SubscriptionsVerifyReceiptPostResponse, GetSubscriptionStatusApiV1SubscriptionsStatusGetResponse, ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostResponse, BlockUserApiV1FriendsBlockPostData, BlockUserApiV1FriendsBlockPostResponse, UnblockUserApiV1FriendsUnblockPostData, UnblockUserApiV1FriendsUnblockPostResponse, SubmitReportApiV1ReportsPostData, SubmitReportApiV1ReportsPostResponse, GetMyReportsApiV1ReportsGetData, GetMyReportsApiV1ReportsGetResponse, GetUploadUrlApiV1CardsUploadUrlPostData, GetUploadUrlApiV1CardsUploadUrlPostResponse, GetMyCardsApiV1CardsMeGetData, GetMyCardsApiV1CardsMeGetResponse, DeleteCardApiV1CardsCardIdDeleteData, DeleteCardApiV1CardsCardIdDeleteResponse, GetQuotaStatusApiV1CardsQuotaStatusGetData, GetQuotaStatusApiV1CardsQuotaStatusGetResponse, ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostData, ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostResponse, GetChatRoomsApiV1ChatsGetData, GetChatRoomsApiV1ChatsGetResponse, GetMessagesApiV1ChatsRoomIdMessagesGetData, GetMessagesApiV1ChatsRoomIdMessagesGetResponse, SendMessageApiV1ChatsRoomIdMessagesPostData, SendMessageApiV1ChatsRoomIdMessagesPostResponse, MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostData, MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostResponse, CreatePostApiV1PostsPostData, CreatePostApiV1PostsPostResponse, ListPostsApiV1PostsGetData, ListPostsApiV1PostsGetResponse, ClosePostApiV1PostsPostIdClosePostData, ClosePostApiV1PostsPostIdClosePostResponse, ToggleLikeApiV1PostsPostIdLikePostData, ToggleLikeApiV1PostsPostIdLikePostResponse, GetCitiesApiV1LocationsCitiesGetResponse, GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetData, GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetResponse, GetMyGalleryCardsApiV1GalleryCardsMeGetData, GetMyGalleryCardsApiV1GalleryCardsMeGetResponse, CreateGalleryCardApiV1GalleryCardsPostData, CreateGalleryCardApiV1GalleryCardsPostResponse, DeleteGalleryCardApiV1GalleryCardsCardIdDeleteData, DeleteGalleryCardApiV1GalleryCardsCardIdDeleteResponse, ReorderGalleryCardsApiV1GalleryCardsReorderPutData, ReorderGalleryCardsApiV1GalleryCardsReorderPutResponse, CreateUploadUrlApiV1MediaUploadUrlPostData, CreateUploadUrlApiV1MediaUploadUrlPostResponse, ConfirmUploadApiV1MediaMediaIdConfirmPostData, ConfirmUploadApiV1MediaMediaIdConfirmPostResponse, AttachMediaToPostApiV1MediaPostsPostIdAttachPostData, AttachMediaToPostApiV1MediaPostsPostIdAttachPostResponse, AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostData, AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostResponse, CreateMessageRequestApiV1MessageRequestsPostData, CreateMessageRequestApiV1MessageRequestsPostResponse, GetMyMessageRequestsApiV1MessageRequestsInboxGetData, GetMyMessageRequestsApiV1MessageRequestsInboxGetResponse, AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostData, AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostResponse, DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostData, DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostResponse, GetMyThreadsApiV1ThreadsGetData, GetMyThreadsApiV1ThreadsGetResponse, GetThreadMessagesApiV1ThreadsThreadIdMessagesGetData, GetThreadMessagesApiV1ThreadsThreadIdMessagesGetResponse, SendMessageApiV1ThreadsThreadIdMessagesPostData, SendMessageApiV1ThreadsThreadIdMessagesPostResponse } from './types.gen';
+import type { HealthCheckHealthGetResponse, ApiHealthCheckApiV1HealthGetResponse, RootGetResponse, AdminLoginApiV1AuthAdminLoginPostData, AdminLoginApiV1AuthAdminLoginPostResponse, GoogleLoginApiV1AuthGoogleLoginPostData, GoogleLoginApiV1AuthGoogleLoginPostResponse, GoogleCallbackApiV1AuthGoogleCallbackPostData, GoogleCallbackApiV1AuthGoogleCallbackPostResponse, GoogleLoginCodeApiV1AuthGoogleLoginCodePostData, GoogleLoginCodeApiV1AuthGoogleLoginCodePostResponse, RefreshTokenApiV1AuthRefreshPostData, RefreshTokenApiV1AuthRefreshPostResponse, LogoutApiV1AuthLogoutPostResponse, GetMyProfileApiV1ProfileMeGetData, GetMyProfileApiV1ProfileMeGetResponse, UpdateMyProfileApiV1ProfileMePutData, UpdateMyProfileApiV1ProfileMePutResponse, GetIdolGroupsApiV1IdolsGroupsGetResponse, VerifyReceiptApiV1SubscriptionsVerifyReceiptPostData, VerifyReceiptApiV1SubscriptionsVerifyReceiptPostResponse, GetSubscriptionStatusApiV1SubscriptionsStatusGetData, GetSubscriptionStatusApiV1SubscriptionsStatusGetResponse, ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostResponse, BlockUserApiV1FriendsBlockPostData, BlockUserApiV1FriendsBlockPostResponse, UnblockUserApiV1FriendsUnblockPostData, UnblockUserApiV1FriendsUnblockPostResponse, SubmitReportApiV1ReportsPostData, SubmitReportApiV1ReportsPostResponse, GetMyReportsApiV1ReportsGetData, GetMyReportsApiV1ReportsGetResponse, GetUploadUrlApiV1CardsUploadUrlPostData, GetUploadUrlApiV1CardsUploadUrlPostResponse, GetMyCardsApiV1CardsMeGetData, GetMyCardsApiV1CardsMeGetResponse, DeleteCardApiV1CardsCardIdDeleteData, DeleteCardApiV1CardsCardIdDeleteResponse, GetQuotaStatusApiV1CardsQuotaStatusGetData, GetQuotaStatusApiV1CardsQuotaStatusGetResponse, ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostData, ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostResponse, GetChatRoomsApiV1ChatsGetData, GetChatRoomsApiV1ChatsGetResponse, GetMessagesApiV1ChatsRoomIdMessagesGetData, GetMessagesApiV1ChatsRoomIdMessagesGetResponse, SendMessageApiV1ChatsRoomIdMessagesPostData, SendMessageApiV1ChatsRoomIdMessagesPostResponse, MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostData, MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostResponse, CreatePostApiV1PostsPostData, CreatePostApiV1PostsPostResponse, ListPostsApiV1PostsGetData, ListPostsApiV1PostsGetResponse, ClosePostApiV1PostsPostIdClosePostData, ClosePostApiV1PostsPostIdClosePostResponse, ToggleLikeApiV1PostsPostIdLikePostData, ToggleLikeApiV1PostsPostIdLikePostResponse, GetCitiesApiV1LocationsCitiesGetResponse, GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetData, GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetResponse, GetMyGalleryCardsApiV1GalleryCardsMeGetData, GetMyGalleryCardsApiV1GalleryCardsMeGetResponse, CreateGalleryCardApiV1GalleryCardsPostData, CreateGalleryCardApiV1GalleryCardsPostResponse, DeleteGalleryCardApiV1GalleryCardsCardIdDeleteData, DeleteGalleryCardApiV1GalleryCardsCardIdDeleteResponse, ReorderGalleryCardsApiV1GalleryCardsReorderPutData, ReorderGalleryCardsApiV1GalleryCardsReorderPutResponse, CreateUploadUrlApiV1MediaUploadUrlPostData, CreateUploadUrlApiV1MediaUploadUrlPostResponse, ConfirmUploadApiV1MediaMediaIdConfirmPostData, ConfirmUploadApiV1MediaMediaIdConfirmPostResponse, AttachMediaToPostApiV1MediaPostsPostIdAttachPostData, AttachMediaToPostApiV1MediaPostsPostIdAttachPostResponse, AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostData, AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostResponse, CreateMessageRequestApiV1MessageRequestsPostData, CreateMessageRequestApiV1MessageRequestsPostResponse, GetMyMessageRequestsApiV1MessageRequestsInboxGetData, GetMyMessageRequestsApiV1MessageRequestsInboxGetResponse, AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostData, AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostResponse, DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostData, DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostResponse, GetMyThreadsApiV1ThreadsGetData, GetMyThreadsApiV1ThreadsGetResponse, GetThreadMessagesApiV1ThreadsThreadIdMessagesGetData, GetThreadMessagesApiV1ThreadsThreadIdMessagesGetResponse, SendMessageApiV1ThreadsThreadIdMessagesPostData, SendMessageApiV1ThreadsThreadIdMessagesPostResponse } from './types.gen';
 
 export class DefaultService {
     /**
@@ -115,6 +115,28 @@ export class AuthenticationService {
     }
     
     /**
+     * Login with Google authorization code
+     * Authenticate user with Google OAuth authorization code (Web flow without PKCE)
+     * @param data The data for the request.
+     * @param data.requestBody
+     * @returns LoginResponse Successfully authenticated
+     * @throws ApiError
+     */
+    public static googleLoginCodeApiV1AuthGoogleLoginCodePost(data: GoogleLoginCodeApiV1AuthGoogleLoginCodePostData): CancelablePromise<GoogleLoginCodeApiV1AuthGoogleLoginCodePostResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/auth/google-login-code',
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                400: 'Validation error',
+                401: 'Invalid authorization code',
+                422: 'Token exchange failed'
+            }
+        });
+    }
+    
+    /**
      * Refresh access token (cookie-based)
      * Use refresh token from httpOnly cookie to obtain new access and refresh tokens
      * @param data The data for the request.
@@ -155,16 +177,22 @@ export class ProfileService {
     /**
      * Get my profile
      * Retrieve the authenticated user's profile information
+     * @param data The data for the request.
+     * @param data.accessToken
      * @returns ProfileResponseWrapper Successfully retrieved profile
      * @throws ApiError
      */
-    public static getMyProfileApiV1ProfileMeGet(): CancelablePromise<GetMyProfileApiV1ProfileMeGetResponse> {
+    public static getMyProfileApiV1ProfileMeGet(data: GetMyProfileApiV1ProfileMeGetData = {}): CancelablePromise<GetMyProfileApiV1ProfileMeGetResponse> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/v1/profile/me',
+            cookies: {
+                access_token: data.accessToken
+            },
             errors: {
                 401: 'Unauthorized',
-                404: 'Profile not found'
+                404: 'Profile not found',
+                422: 'Validation Error'
             }
         });
     }
@@ -174,6 +202,7 @@ export class ProfileService {
      * Update the authenticated user's profile information
      * @param data The data for the request.
      * @param data.requestBody
+     * @param data.accessToken
      * @returns ProfileResponseWrapper Successfully updated profile
      * @throws ApiError
      */
@@ -181,6 +210,9 @@ export class ProfileService {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/api/v1/profile/me',
+            cookies: {
+                access_token: data.accessToken
+            },
             body: data.requestBody,
             mediaType: 'application/json',
             errors: {
@@ -237,6 +269,7 @@ export class SubscriptionsService {
      * - 503_SERVICE_UNAVAILABLE: Google Play API unavailable
      * @param data The data for the request.
      * @param data.requestBody
+     * @param data.accessToken
      * @returns SubscriptionStatusResponse Successful Response
      * @throws ApiError
      */
@@ -244,6 +277,9 @@ export class SubscriptionsService {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/v1/subscriptions/verify-receipt',
+            cookies: {
+                access_token: data.accessToken
+            },
             body: data.requestBody,
             mediaType: 'application/json',
             errors: {
@@ -262,13 +298,21 @@ export class SubscriptionsService {
      * Error codes:
      * - 401_UNAUTHORIZED: Not logged in
      * - 503_SERVICE_UNAVAILABLE: Database unavailable
+     * @param data The data for the request.
+     * @param data.accessToken
      * @returns SubscriptionStatusResponse Successful Response
      * @throws ApiError
      */
-    public static getSubscriptionStatusApiV1SubscriptionsStatusGet(): CancelablePromise<GetSubscriptionStatusApiV1SubscriptionsStatusGetResponse> {
+    public static getSubscriptionStatusApiV1SubscriptionsStatusGet(data: GetSubscriptionStatusApiV1SubscriptionsStatusGetData = {}): CancelablePromise<GetSubscriptionStatusApiV1SubscriptionsStatusGetResponse> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/api/v1/subscriptions/status'
+            url: '/api/v1/subscriptions/status',
+            cookies: {
+                access_token: data.accessToken
+            },
+            errors: {
+                422: 'Validation Error'
+            }
         });
     }
     

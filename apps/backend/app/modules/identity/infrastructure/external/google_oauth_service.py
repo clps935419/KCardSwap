@@ -62,18 +62,28 @@ class GoogleOAuthService:
             logger.error("Google token verification failed: %s", exc)
             return None
 
-    async def exchange_code_for_token(self, code: str) -> Optional[str]:
+    async def exchange_code_for_token(
+        self, code: str, redirect_uri: Optional[str] = None
+    ) -> Optional[str]:
         """
         Exchange authorization code for ID token
+        
+        Args:
+            code: Authorization code from Google OAuth
+            redirect_uri: Optional redirect URI (must match the one used in auth request)
+        
         Returns ID token or None if exchange fails
         """
         token_url = "https://oauth2.googleapis.com/token"
+
+        # Use provided redirect_uri or fallback to configured one
+        uri = redirect_uri or self.redirect_uri
 
         data = {
             "code": code,
             "client_id": self.client_id,
             "client_secret": self.client_secret,
-            "redirect_uri": self.redirect_uri,
+            "redirect_uri": uri,
             "grant_type": "authorization_code",
         }
 

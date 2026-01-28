@@ -194,6 +194,47 @@
         }
       }
     },
+    "/api/v1/auth/google-login-code": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Login with Google authorization code",
+        "description": "Authenticate user with Google OAuth authorization code (Web flow without PKCE)",
+        "operationId": "google_login_code_api_v1_auth_google_login_code_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GoogleCodeLoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error"
+          },
+          "401": {
+            "description": "Invalid authorization code"
+          },
+          "422": {
+            "description": "Token exchange failed"
+          }
+        }
+      }
+    },
     "/api/v1/auth/refresh": {
       "post": {
         "tags": [
@@ -277,6 +318,29 @@
         "summary": "Get my profile",
         "description": "Retrieve the authenticated user's profile information",
         "operationId": "get_my_profile_api_v1_profile_me_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successfully retrieved profile",
@@ -293,13 +357,18 @@
           },
           "404": {
             "description": "Profile not found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
           }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ]
+        }
       },
       "put": {
         "tags": [
@@ -308,15 +377,38 @@
         "summary": "Update my profile",
         "description": "Update the authenticated user's profile information",
         "operationId": "update_my_profile_api_v1_profile_me_put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/UpdateProfileRequest"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
@@ -345,12 +437,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ]
+        }
       }
     },
     "/api/v1/idols/groups": {
@@ -404,15 +491,38 @@
         "summary": "Verify Receipt",
         "description": "Verify Google Play purchase receipt and update subscription.\n\nFeatures:\n- Idempotent: Same token + same user returns current status\n- Token binding: Prevents cross-user replay attacks\n- Auto-acknowledge: Acknowledges purchase after verification\n\nError codes:\n- 400_VALIDATION_FAILED: Invalid platform or missing fields\n- 401_UNAUTHORIZED: Not logged in\n- 409_CONFLICT: Purchase token already used by another user\n- 503_SERVICE_UNAVAILABLE: Google Play API unavailable",
         "operationId": "verify_receipt_api_v1_subscriptions_verify_receipt_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/VerifyReceiptRequest"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
@@ -435,12 +545,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ]
+        }
       }
     },
     "/api/v1/subscriptions/status": {
@@ -451,6 +556,29 @@
         "summary": "Get Subscription Status",
         "description": "Get current subscription status for authenticated user.\n\nReturns server-side subscription state.\nCalled by app when opening or returning to foreground.\n\nError codes:\n- 401_UNAUTHORIZED: Not logged in\n- 503_SERVICE_UNAVAILABLE: Database unavailable",
         "operationId": "get_subscription_status_api_v1_subscriptions_status_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -461,13 +589,18 @@
                 }
               }
             }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
           }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ]
+        }
       }
     },
     "/api/v1/subscriptions/expire-subscriptions": {
@@ -1334,7 +1467,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SendMessageRequest"
+                "$ref": "#/components/schemas/app__modules__social__presentation__schemas__chat_schemas__SendMessageRequest"
               }
             }
           }
@@ -2879,7 +3012,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/app__modules__social__presentation__schemas__message_schemas__SendMessageRequest"
+                "$ref": "#/components/schemas/SendMessageRequest"
               }
             }
           }
@@ -3981,6 +4114,34 @@
         "title": "GoogleCallbackRequest",
         "description": "Request schema for Google OAuth callback with PKCE (Expo AuthSession)"
       },
+      "GoogleCodeLoginRequest": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Code",
+            "description": "Authorization code from Google OAuth"
+          },
+          "redirect_uri": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Redirect Uri",
+            "description": "Redirect URI used during authorization (must match the one used in auth request)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code"
+        ],
+        "title": "GoogleCodeLoginRequest",
+        "description": "Request schema for Google OAuth with authorization code (Web flow)"
+      },
       "GoogleLoginRequest": {
         "properties": {
           "google_token": {
@@ -5065,13 +5226,22 @@
         "properties": {
           "content": {
             "type": "string",
-            "maxLength": 2000,
+            "maxLength": 5000,
             "minLength": 1,
             "title": "Content",
-            "description": "Message content",
-            "examples": [
-              "Hello! I'm interested in trading cards."
-            ]
+            "description": "Message content"
+          },
+          "post_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Post Id",
+            "description": "Optional post ID to reference"
           }
         },
         "type": "object",
@@ -5079,10 +5249,7 @@
           "content"
         ],
         "title": "SendMessageRequest",
-        "description": "Request schema for sending a message",
-        "example": {
-          "content": "Hello! I'm interested in trading cards."
-        }
+        "description": "Request to send a message in a thread"
       },
       "SubscriptionStatusData": {
         "properties": {
@@ -5783,26 +5950,17 @@
           "purchase_token": "abc123xyz..."
         }
       },
-      "app__modules__social__presentation__schemas__message_schemas__SendMessageRequest": {
+      "app__modules__social__presentation__schemas__chat_schemas__SendMessageRequest": {
         "properties": {
           "content": {
             "type": "string",
-            "maxLength": 5000,
+            "maxLength": 2000,
             "minLength": 1,
             "title": "Content",
-            "description": "Message content"
-          },
-          "post_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Post Id",
-            "description": "Optional post ID to reference"
+            "description": "Message content",
+            "examples": [
+              "Hello! I'm interested in trading cards."
+            ]
           }
         },
         "type": "object",
@@ -5810,7 +5968,10 @@
           "content"
         ],
         "title": "SendMessageRequest",
-        "description": "Request to send a message in a thread"
+        "description": "Request schema for sending a message",
+        "example": {
+          "content": "Hello! I'm interested in trading cards."
+        }
       }
     },
     "securitySchemes": {

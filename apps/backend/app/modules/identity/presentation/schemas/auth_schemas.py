@@ -42,6 +42,18 @@ class GoogleCallbackRequest(BaseModel):
     )
 
 
+class GoogleCodeLoginRequest(BaseModel):
+    """Request schema for Google OAuth with authorization code (Web flow)"""
+
+    code: str = Field(
+        ..., description="Authorization code from Google OAuth", min_length=1
+    )
+    redirect_uri: Optional[str] = Field(
+        None,
+        description="Redirect URI used during authorization (must match the one used in auth request)",
+    )
+
+
 class TokenResponse(BaseModel):
     """Response schema for authentication tokens"""
 

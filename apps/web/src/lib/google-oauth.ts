@@ -32,7 +32,9 @@ async function waitForGoogleIdentityServices(timeoutMs = 8000): Promise<any> {
         }
         resolve((window as any).google)
       } else if (checkCount % 10 === 0) {
-        console.log(`[Google OAuth] ⏳ 等待 Google Identity Services 載入... (已檢查 ${checkCount} 次)`)
+        console.log(
+          `[Google OAuth] ⏳ 等待 Google Identity Services 載入... (已檢查 ${checkCount} 次)`
+        )
       }
     }, 100)
 
@@ -49,7 +51,7 @@ async function waitForGoogleIdentityServices(timeoutMs = 8000): Promise<any> {
  */
 export function initGoogleOAuth() {
   console.log('[Google OAuth] 🚀 Step 1: 開始初始化 Google OAuth...')
-  
+
   // Load Google Identity Services script if not already loaded
   if (typeof window === 'undefined') {
     console.log('[Google OAuth] ⚠️ window 不存在（可能在 SSR 環境）')
@@ -65,15 +67,15 @@ export function initGoogleOAuth() {
     script.src = 'https://accounts.google.com/gsi/client'
     script.async = true
     script.defer = true
-    
+
     script.onload = () => {
       console.log('[Google OAuth] ✅ Google Identity Services script 載入成功')
     }
-    
+
     script.onerror = () => {
       console.error('[Google OAuth] ❌ Google Identity Services script 載入失敗')
     }
-    
+
     document.head.appendChild(script)
   } else {
     console.log('[Google OAuth] ℹ️ Google Identity Services script 已存在')
@@ -91,18 +93,20 @@ export async function loginWithGoogle(): Promise<void> {
   console.log('[Google OAuth] 🔐 Step 2: 開始 Google 登入流程...')
   console.log('[Google OAuth] 🌐 當前 URL:', window.location.href)
   console.log('[Google OAuth] 🌐 當前 origin:', window.location.origin)
-  
+
   return new Promise((resolve, reject) => {
     let checkCount = 0
     let isSettled = false
     let timeoutId: ReturnType<typeof setTimeout> | null = null
-    
+
     // Wait for Google Identity Services to load
     const checkGoogleLoaded = setInterval(() => {
       checkCount++
-      
+
       if (typeof window !== 'undefined' && (window as any).google) {
-        console.log(`[Google OAuth] ✅ Step 3: Google Identity Services 已載入 (檢查了 ${checkCount} 次)`)
+        console.log(
+          `[Google OAuth] ✅ Step 3: Google Identity Services 已載入 (檢查了 ${checkCount} 次)`
+        )
         clearInterval(checkGoogleLoaded)
         if (timeoutId) {
           clearTimeout(timeoutId)
@@ -112,18 +116,19 @@ export async function loginWithGoogle(): Promise<void> {
         const google = (window as any).google
         const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
 
-        console.log('[Google OAuth] 📋 Client ID:', clientId ? `${clientId.substring(0, 20)}...` : '未設定')
+        console.log(
+          '[Google OAuth] 📋 Client ID:',
+          clientId ? `${clientId.substring(0, 20)}...` : '未設定'
+        )
 
         if (!clientId) {
           console.error('[Google OAuth] ❌ Step 3-FAIL: Client ID 未設定')
-          reject(
-            new Error('Google Client ID 未設定，請聯絡管理員')
-          )
+          reject(new Error('Google Client ID 未設定，請聯絡管理員'))
           return
         }
 
         console.log('[Google OAuth] 🔧 Step 4: 初始化 Google OAuth client...')
-        
+
         // Initialize Google OAuth client
         google.accounts.id.initialize({
           client_id: clientId,
@@ -131,11 +136,11 @@ export async function loginWithGoogle(): Promise<void> {
           callback: async (response: any) => {
             console.log('[Google OAuth] 📞 Step 5: 收到 Google 回調')
             console.log('[Google OAuth] 🔑 Credential 存在:', !!response.credential)
-            
+
             if (response.credential) {
               console.log('[Google OAuth] 🔑 Credential 長度:', response.credential.length)
             }
-            
+
             try {
               console.log('[Google OAuth] 📤 Step 6: 發送 token 到後端...')
               // Send ID token to backend
@@ -166,23 +171,32 @@ export async function loginWithGoogle(): Promise<void> {
             isDisplayed: !notification.isNotDisplayed(),
             isSkipped: notification.isSkippedMoment(),
             notDisplayedReason: notification.getNotDisplayedReason?.(),
-            skippedReason: notification.getSkippedReason?.()
+            skippedReason: notification.getSkippedReason?.(),
           })
-          
+
           if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
             console.error('[Google OAuth] ❌ Step 5-FAIL: One Tap 無法顯示')
-            console.error('[Google OAuth] 原因:', notification.getNotDisplayedReason?.() || notification.getSkippedReason?.())
+            console.error(
+              '[Google OAuth] 原因:',
+              notification.getNotDisplayedReason?.() || notification.getSkippedReason?.()
+            )
             // One Tap not available
             if (!isSettled) {
               isSettled = true
-              reject(new Error('Google One Tap 無法使用。請確認：\n1. 瀏覽器允許第三方 Cookie\n2. 未封鎖彈出視窗\n3. 使用 Chrome、Edge 或 Safari 瀏覽器'))
+              reject(
+                new Error(
+                  'Google One Tap 無法使用。請確認：\n1. 瀏覽器允許第三方 Cookie\n2. 未封鎖彈出視窗\n3. 使用 Chrome、Edge 或 Safari 瀏覽器'
+                )
+              )
             }
           } else {
             console.log('[Google OAuth] ✅ Step 5: One Tap 提示已顯示，等待使用者操作...')
           }
         })
       } else if (checkCount % 10 === 0) {
-        console.log(`[Google OAuth] ⏳ 等待 Google Identity Services 載入... (已檢查 ${checkCount} 次)`)
+        console.log(
+          `[Google OAuth] ⏳ 等待 Google Identity Services 載入... (已檢查 ${checkCount} 次)`
+        )
       }
     }, 100)
 
@@ -221,8 +235,7 @@ export async function renderGoogleButton(
       return
     }
 
-    const rawWidth =
-      container.parentElement?.clientWidth || container.clientWidth || 320
+    const rawWidth = container.parentElement?.clientWidth || container.clientWidth || 320
     const buttonWidth = Math.max(200, Math.min(rawWidth, 400))
 
     google.accounts.id.initialize({
@@ -268,7 +281,7 @@ async function handleGoogleCallback(idToken: string): Promise<void> {
 
   try {
     console.log('[Google OAuth] 🌐 呼叫 /api/v1/auth/google-login...')
-    
+
     const response = await AuthenticationService.googleLoginApiV1AuthGoogleLoginPost({
       requestBody: {
         google_token: idToken,
@@ -289,16 +302,16 @@ async function handleGoogleCallback(idToken: string): Promise<void> {
     console.error('[Google OAuth] 錯誤 response:', error?.response)
     console.error('[Google OAuth] 錯誤 message:', error?.message)
     console.error('[Google OAuth] 錯誤 status:', error?.status)
-    
+
     // Extract detailed error message from backend response
-    const errorMessage = 
+    const errorMessage =
       error?.body?.error?.message ||
       error?.response?.data?.error?.message ||
       error?.message ||
       '登入失敗，請稍後再試'
-    
+
     console.error('[Google OAuth] 解析後的錯誤訊息:', errorMessage)
-    
+
     // Provide specific error messages for common issues
     if (errorMessage.includes('token') || errorMessage.includes('invalid')) {
       throw new Error('Google 驗證失敗，請重新嘗試登入')
