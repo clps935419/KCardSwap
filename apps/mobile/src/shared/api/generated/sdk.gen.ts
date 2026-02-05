@@ -74,6 +74,9 @@ import type {
   GetMyThreadsApiV1ThreadsGetData,
   GetMyThreadsApiV1ThreadsGetErrors,
   GetMyThreadsApiV1ThreadsGetResponses,
+  GetPostApiV1PostsPostIdGetData,
+  GetPostApiV1PostsPostIdGetErrors,
+  GetPostApiV1PostsPostIdGetResponses,
   GetSubscriptionStatusApiV1SubscriptionsStatusGetData,
   GetSubscriptionStatusApiV1SubscriptionsStatusGetErrors,
   GetSubscriptionStatusApiV1SubscriptionsStatusGetResponses,
@@ -651,6 +654,24 @@ export const createPostApiV1PostsPost = <ThrowOnError extends boolean = false>(
       'Content-Type': 'application/json',
       ...options.headers,
     },
+  });
+
+/**
+ * Get a single post by ID
+ *
+ * Retrieve a post by its ID. Phase 9: Includes media_asset_ids for image display.
+ */
+export const getPostApiV1PostsPostIdGet = <ThrowOnError extends boolean = false>(
+  options: Options<GetPostApiV1PostsPostIdGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    GetPostApiV1PostsPostIdGetResponses,
+    GetPostApiV1PostsPostIdGetErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/posts/{post_id}',
+    ...options,
   });
 
 /**

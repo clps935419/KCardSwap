@@ -1399,7 +1399,7 @@ export type ReportResponseWrapper = {
 /**
  * SendMessageRequest
  *
- * Request schema for sending a message
+ * Request to send a message in a thread
  */
 export type SendMessageRequest = {
   /**
@@ -1408,6 +1408,12 @@ export type SendMessageRequest = {
    * Message content
    */
   content: string;
+  /**
+   * Post Id
+   *
+   * Optional post ID to reference
+   */
+  post_id?: string | null;
 };
 
 /**
@@ -1767,21 +1773,15 @@ export type VerifyReceiptRequest = {
 /**
  * SendMessageRequest
  *
- * Request to send a message in a thread
+ * Request schema for sending a message
  */
-export type AppModulesSocialPresentationSchemasMessageSchemasSendMessageRequest = {
+export type AppModulesSocialPresentationSchemasChatSchemasSendMessageRequest = {
   /**
    * Content
    *
    * Message content
    */
   content: string;
-  /**
-   * Post Id
-   *
-   * Optional post ID to reference
-   */
-  post_id?: string | null;
 };
 
 export type HealthCheckHealthGetData = {
@@ -2420,7 +2420,7 @@ export type GetMessagesApiV1ChatsRoomIdMessagesGetResponse =
   GetMessagesApiV1ChatsRoomIdMessagesGetResponses[keyof GetMessagesApiV1ChatsRoomIdMessagesGetResponses];
 
 export type SendMessageApiV1ChatsRoomIdMessagesPostData = {
-  body: SendMessageRequest;
+  body: AppModulesSocialPresentationSchemasChatSchemasSendMessageRequest;
   path: {
     /**
      * Room Id
@@ -2619,6 +2619,50 @@ export type CreatePostApiV1PostsPostResponses = {
 
 export type CreatePostApiV1PostsPostResponse =
   CreatePostApiV1PostsPostResponses[keyof CreatePostApiV1PostsPostResponses];
+
+export type GetPostApiV1PostsPostIdGetData = {
+  body?: never;
+  path: {
+    /**
+     * Post Id
+     */
+    post_id: string;
+  };
+  query?: never;
+  url: '/api/v1/posts/{post_id}';
+};
+
+export type GetPostApiV1PostsPostIdGetErrors = {
+  /**
+   * Unauthorized (not logged in)
+   */
+  401: unknown;
+  /**
+   * Post not found
+   */
+  404: unknown;
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+  /**
+   * Internal server error
+   */
+  500: unknown;
+};
+
+export type GetPostApiV1PostsPostIdGetError =
+  GetPostApiV1PostsPostIdGetErrors[keyof GetPostApiV1PostsPostIdGetErrors];
+
+export type GetPostApiV1PostsPostIdGetResponses = {
+  /**
+   * Post retrieved successfully
+   */
+  200: PostResponseWrapper;
+};
+
+export type GetPostApiV1PostsPostIdGetResponse =
+  GetPostApiV1PostsPostIdGetResponses[keyof GetPostApiV1PostsPostIdGetResponses];
 
 export type ClosePostApiV1PostsPostIdClosePostData = {
   body?: never;
@@ -3224,7 +3268,7 @@ export type GetThreadMessagesApiV1ThreadsThreadIdMessagesGetResponse =
   GetThreadMessagesApiV1ThreadsThreadIdMessagesGetResponses[keyof GetThreadMessagesApiV1ThreadsThreadIdMessagesGetResponses];
 
 export type SendMessageApiV1ThreadsThreadIdMessagesPostData = {
-  body: AppModulesSocialPresentationSchemasMessageSchemasSendMessageRequest;
+  body: SendMessageRequest;
   path: {
     /**
      * Thread Id

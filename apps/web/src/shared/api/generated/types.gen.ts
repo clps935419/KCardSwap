@@ -839,13 +839,17 @@ export type ReportResponseWrapper = {
 };
 
 /**
- * Request schema for sending a message
+ * Request to send a message in a thread
  */
 export type SendMessageRequest = {
     /**
      * Message content
      */
     content: string;
+    /**
+     * Optional post ID to reference
+     */
+    post_id?: string | null;
 };
 
 /**
@@ -1053,17 +1057,13 @@ export type VerifyReceiptRequest = {
 };
 
 /**
- * Request to send a message in a thread
+ * Request schema for sending a message
  */
-export type app__modules__social__presentation__schemas__message_schemas__SendMessageRequest = {
+export type app__modules__social__presentation__schemas__chat_schemas__SendMessageRequest = {
     /**
      * Message content
      */
     content: string;
-    /**
-     * Optional post ID to reference
-     */
-    post_id?: string | null;
 };
 
 export type HealthCheckHealthGetResponse = unknown;
@@ -1188,7 +1188,7 @@ export type GetMessagesApiV1ChatsRoomIdMessagesGetResponse = MessagesListRespons
 
 export type SendMessageApiV1ChatsRoomIdMessagesPostData = {
     accessToken?: string | null;
-    requestBody: SendMessageRequest;
+    requestBody: app__modules__social__presentation__schemas__chat_schemas__SendMessageRequest;
     roomId: string;
 };
 
@@ -1230,6 +1230,13 @@ export type ListPostsApiV1PostsGetData = {
 };
 
 export type ListPostsApiV1PostsGetResponse = PostListResponseWrapper;
+
+export type GetPostApiV1PostsPostIdGetData = {
+    accessToken?: string | null;
+    postId: string;
+};
+
+export type GetPostApiV1PostsPostIdGetResponse = PostResponseWrapper;
 
 export type ClosePostApiV1PostsPostIdClosePostData = {
     accessToken?: string | null;
@@ -1365,7 +1372,7 @@ export type GetThreadMessagesApiV1ThreadsThreadIdMessagesGetResponse = ThreadMes
 
 export type SendMessageApiV1ThreadsThreadIdMessagesPostData = {
     accessToken?: string | null;
-    requestBody: app__modules__social__presentation__schemas__message_schemas__SendMessageRequest;
+    requestBody: SendMessageRequest;
     threadId: string;
 };
 
@@ -1882,6 +1889,33 @@ export type $OpenApiTs = {
                  * Unauthorized (not logged in)
                  */
                 401: unknown;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+                /**
+                 * Internal server error
+                 */
+                500: unknown;
+            };
+        };
+    };
+    '/api/v1/posts/{post_id}': {
+        get: {
+            req: GetPostApiV1PostsPostIdGetData;
+            res: {
+                /**
+                 * Post retrieved successfully
+                 */
+                200: PostResponseWrapper;
+                /**
+                 * Unauthorized (not logged in)
+                 */
+                401: unknown;
+                /**
+                 * Post not found
+                 */
+                404: unknown;
                 /**
                  * Validation Error
                  */

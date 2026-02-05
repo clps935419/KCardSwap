@@ -1768,20 +1768,28 @@ export const $SendMessageRequest = {
     properties: {
         content: {
             type: 'string',
-            maxLength: 2000,
+            maxLength: 5000,
             minLength: 1,
             title: 'Content',
-            description: 'Message content',
-            examples: ["Hello! I'm interested in trading cards."]
+            description: 'Message content'
+        },
+        post_id: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Post Id',
+            description: 'Optional post ID to reference'
         }
     },
     type: 'object',
     required: ['content'],
     title: 'SendMessageRequest',
-    description: 'Request schema for sending a message',
-    example: {
-        content: "Hello! I'm interested in trading cards."
-    }
+    description: 'Request to send a message in a thread'
 } as const;
 
 export const $SubscriptionStatusData = {
@@ -2261,30 +2269,22 @@ export const $VerifyReceiptRequest = {
     }
 } as const;
 
-export const $app__modules__social__presentation__schemas__message_schemas__SendMessageRequest = {
+export const $app__modules__social__presentation__schemas__chat_schemas__SendMessageRequest = {
     properties: {
         content: {
             type: 'string',
-            maxLength: 5000,
+            maxLength: 2000,
             minLength: 1,
             title: 'Content',
-            description: 'Message content'
-        },
-        post_id: {
-            anyOf: [
-                {
-                    type: 'string'
-                },
-                {
-                    type: 'null'
-                }
-            ],
-            title: 'Post Id',
-            description: 'Optional post ID to reference'
+            description: 'Message content',
+            examples: ["Hello! I'm interested in trading cards."]
         }
     },
     type: 'object',
     required: ['content'],
     title: 'SendMessageRequest',
-    description: 'Request to send a message in a thread'
+    description: 'Request schema for sending a message',
+    example: {
+        content: "Hello! I'm interested in trading cards."
+    }
 } as const;

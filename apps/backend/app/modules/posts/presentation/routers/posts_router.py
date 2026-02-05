@@ -17,6 +17,7 @@ from app.modules.posts.application.use_cases.close_post_use_case import ClosePos
 from app.modules.posts.application.use_cases.create_post_use_case import (
     CreatePostUseCase,
 )
+from app.modules.posts.application.use_cases.get_post_use_case import GetPostUseCase
 from app.modules.posts.application.use_cases.list_posts_v2_use_case import (
     ListPostsV2UseCase,
 )
@@ -25,6 +26,7 @@ from app.modules.posts.domain.entities.post_enums import PostCategory
 from app.modules.posts.presentation.dependencies.use_case_deps import (
     get_close_post_use_case,
     get_create_post_use_case,
+    get_get_post_use_case,
     get_list_posts_v2_use_case,
     get_toggle_like_use_case,
 )
@@ -205,6 +207,64 @@ async def list_posts(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to list posts",
+        )
+
+
+@router.get(
+    "/{post_id}",
+    response_model=PostResponseWrapper,
+    responses={
+        200: {"description": "Post retrieved successfully"},
+        401: {"description": "Unauthorized (not logged in)"},
+        404: {"description": "Post not found"},
+        500: {"description": "Internal server error"},
+    },
+    summary="Get a single post by ID",
+    description="Retrieve a post by its ID. Phase 9: Includes media_asset_ids for image display.",
+)
+async def get_post(
+    post_id: UUID,
+    current_user_id: Annotated[UUID, Depends(require_user)],
+    session: Annotated[AsyncSession, Depends(get_db_session)],
+    use_case: Annotated[GetPostUseCase, Depends(get_get_post_use_case)],
+) -> PostResponseWrapper:
+    """
+    Get a single post by ID.
+    
+    Phase 9: Returns post with media_asset_ids for image display.
+    Includes like count and current user's like status.
+    """
+    try:
+        post = await use_case.execute(
+            post_id=str(post_id),
+            current_user_id=str(current_user_id),
+        )
+        
+        if not post:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Post not found",
+            )
+        
+        # Get like count and liked_by_me from post attributes
+        like_count = getattr(post, '_like_count', 0)
+        liked_by_me = getattr(post, '_liked_by_me', False)
+        
+        data = await _post_to_response(
+            post,
+            session,
+            like_count=like_count,
+            liked_by_me=liked_by_me,
+        )
+        return PostResponseWrapper(data=data, meta=None, error=None)
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting post {post_id}: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to get post",
         )
 
 

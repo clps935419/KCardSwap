@@ -10,6 +10,7 @@ import { useToast } from '@/components/ui/use-toast'
 import { PostImages } from '@/features/media/components/PostImages'
 import { useToggleLike } from '@/features/posts/hooks/useToggleLike'
 import { useCreateMessageRequest } from '@/features/inbox/hooks/useCreateMessageRequest'
+import { usePost } from '@/features/posts/hooks/usePost'
 import type { PostCategory } from '@/shared/api/generated'
 
 const CATEGORY_LABELS: Record<PostCategory, string> = {
@@ -50,43 +51,23 @@ export default function PostDetailPage() {
   const postId = params.id as string
   const [messagingPost, setMessagingPost] = useState(false)
 
-  // TODO: Implement usePost hook to fetch single post
-  // For now using placeholder data
-  const isLoading = false
-  const error = null
-  
-  const post = {
-    id: postId,
-    owner_id: 'placeholder-owner-id',
-    scope: 'global' as const,
-    city_code: null,
-    category: 'trade' as PostCategory,
-    title: '徵求 BTS Jungkook 小卡',
-    content: '我想用我的 IU 小卡交換 BTS Jungkook 的小卡。我有多個版本，歡迎聊聊交換細節。誠徵可信賴的交換夥伴！',
-    idol: 'Jungkook',
-    idol_group: 'BTS',
-    status: 'open' as const,
-    like_count: 5,
-    liked_by_me: false,
-    // Phase 9: Empty array for placeholder data - will be populated from API
-    // TODO: Fetch real post data with actual media_asset_ids from backend
-    media_asset_ids: [] as string[],
-    expires_at: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  }
+  // Fetch post data from API
+  const { data, isLoading, error } = usePost(postId)
+  const post = data?.data
 
   const { createRequest } = useCreateMessageRequest()
   const toggleLikeMutation = useToggleLike()
 
   const handleMessageAuthor = async () => {
+    if (!post) return
+    
     setMessagingPost(true)
 
     try {
       await createRequest({
-        recipientId: post.owner_id,
+        recipientId: post.owner_id.toString(),
         initialMessage: `Hi! I'm interested in your post "${post.title}"`,
-        postId: post.id,
+        postId: post.id.toString(),
       })
 
       toast({

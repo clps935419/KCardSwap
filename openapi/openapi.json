@@ -1118,7 +1118,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SendMessageRequest"
+                "$ref": "#/components/schemas/app__modules__social__presentation__schemas__chat_schemas__SendMessageRequest"
               }
             }
           }
@@ -1410,6 +1410,80 @@
           },
           "400": {
             "description": "Bad request"
+          },
+          "500": {
+            "description": "Internal server error"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/posts/{post_id}": {
+      "get": {
+        "tags": [
+          "Posts"
+        ],
+        "summary": "Get a single post by ID",
+        "description": "Retrieve a post by its ID. Phase 9: Includes media_asset_ids for image display.",
+        "operationId": "get_post_api_v1_posts__post_id__get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "post_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Post Id"
+            }
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Post retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostResponseWrapper"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (not logged in)"
+          },
+          "404": {
+            "description": "Post not found"
           },
           "500": {
             "description": "Internal server error"
@@ -2728,7 +2802,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/app__modules__social__presentation__schemas__message_schemas__SendMessageRequest"
+                "$ref": "#/components/schemas/SendMessageRequest"
               }
             }
           }
@@ -4725,13 +4799,22 @@
         "properties": {
           "content": {
             "type": "string",
-            "maxLength": 2000,
+            "maxLength": 5000,
             "minLength": 1,
             "title": "Content",
-            "description": "Message content",
-            "examples": [
-              "Hello! I'm interested in trading cards."
-            ]
+            "description": "Message content"
+          },
+          "post_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Post Id",
+            "description": "Optional post ID to reference"
           }
         },
         "type": "object",
@@ -4739,10 +4822,7 @@
           "content"
         ],
         "title": "SendMessageRequest",
-        "description": "Request schema for sending a message",
-        "example": {
-          "content": "Hello! I'm interested in trading cards."
-        }
+        "description": "Request to send a message in a thread"
       },
       "SubscriptionStatusData": {
         "properties": {
@@ -5258,26 +5338,17 @@
           "purchase_token": "abc123xyz..."
         }
       },
-      "app__modules__social__presentation__schemas__message_schemas__SendMessageRequest": {
+      "app__modules__social__presentation__schemas__chat_schemas__SendMessageRequest": {
         "properties": {
           "content": {
             "type": "string",
-            "maxLength": 5000,
+            "maxLength": 2000,
             "minLength": 1,
             "title": "Content",
-            "description": "Message content"
-          },
-          "post_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Post Id",
-            "description": "Optional post ID to reference"
+            "description": "Message content",
+            "examples": [
+              "Hello! I'm interested in trading cards."
+            ]
           }
         },
         "type": "object",
@@ -5285,7 +5356,10 @@
           "content"
         ],
         "title": "SendMessageRequest",
-        "description": "Request to send a message in a thread"
+        "description": "Request schema for sending a message",
+        "example": {
+          "content": "Hello! I'm interested in trading cards."
+        }
       }
     },
     "securitySchemes": {

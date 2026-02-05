@@ -35,6 +35,7 @@ import {
   getMyProfileApiV1ProfileMeGet,
   getMyReportsApiV1ReportsGet,
   getMyThreadsApiV1ThreadsGet,
+  getPostApiV1PostsPostIdGet,
   getSubscriptionStatusApiV1SubscriptionsStatusGet,
   getThreadMessagesApiV1ThreadsThreadIdMessagesGet,
   getUserGalleryCardsApiV1UsersUserIdGalleryCardsGet,
@@ -126,6 +127,9 @@ import type {
   GetMyThreadsApiV1ThreadsGetData,
   GetMyThreadsApiV1ThreadsGetError,
   GetMyThreadsApiV1ThreadsGetResponse,
+  GetPostApiV1PostsPostIdGetData,
+  GetPostApiV1PostsPostIdGetError,
+  GetPostApiV1PostsPostIdGetResponse,
   GetSubscriptionStatusApiV1SubscriptionsStatusGetData,
   GetSubscriptionStatusApiV1SubscriptionsStatusGetError,
   GetSubscriptionStatusApiV1SubscriptionsStatusGetResponse,
@@ -1055,6 +1059,36 @@ export const createPostApiV1PostsPostMutation = (
   };
   return mutationOptions;
 };
+
+export const getPostApiV1PostsPostIdGetQueryKey = (
+  options: Options<GetPostApiV1PostsPostIdGetData>
+) => createQueryKey('getPostApiV1PostsPostIdGet', options);
+
+/**
+ * Get a single post by ID
+ *
+ * Retrieve a post by its ID. Phase 9: Includes media_asset_ids for image display.
+ */
+export const getPostApiV1PostsPostIdGetOptions = (
+  options: Options<GetPostApiV1PostsPostIdGetData>
+) =>
+  queryOptions<
+    GetPostApiV1PostsPostIdGetResponse,
+    GetPostApiV1PostsPostIdGetError,
+    GetPostApiV1PostsPostIdGetResponse,
+    ReturnType<typeof getPostApiV1PostsPostIdGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getPostApiV1PostsPostIdGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getPostApiV1PostsPostIdGetQueryKey(options),
+  });
 
 /**
  * Close a post
