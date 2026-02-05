@@ -23,9 +23,6 @@ import type {
   ClosePostApiV1PostsPostIdClosePostData,
   ClosePostApiV1PostsPostIdClosePostErrors,
   ClosePostApiV1PostsPostIdClosePostResponses,
-  ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostData,
-  ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostErrors,
-  ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostResponses,
   ConfirmUploadApiV1MediaMediaIdConfirmPostData,
   ConfirmUploadApiV1MediaMediaIdConfirmPostErrors,
   ConfirmUploadApiV1MediaMediaIdConfirmPostResponses,
@@ -44,9 +41,6 @@ import type {
   DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostData,
   DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostErrors,
   DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostResponses,
-  DeleteCardApiV1CardsCardIdDeleteData,
-  DeleteCardApiV1CardsCardIdDeleteErrors,
-  DeleteCardApiV1CardsCardIdDeleteResponses,
   DeleteGalleryCardApiV1GalleryCardsCardIdDeleteData,
   DeleteGalleryCardApiV1GalleryCardsCardIdDeleteErrors,
   DeleteGalleryCardApiV1GalleryCardsCardIdDeleteResponses,
@@ -59,13 +53,14 @@ import type {
   GetCitiesApiV1LocationsCitiesGetResponses,
   GetIdolGroupsApiV1IdolsGroupsGetData,
   GetIdolGroupsApiV1IdolsGroupsGetResponses,
+  GetMediaReadUrlsApiV1MediaReadUrlsPostData,
+  GetMediaReadUrlsApiV1MediaReadUrlsPostErrors,
+  GetMediaReadUrlsApiV1MediaReadUrlsPostResponses,
   GetMessagesApiV1ChatsRoomIdMessagesGetData,
   GetMessagesApiV1ChatsRoomIdMessagesGetErrors,
   GetMessagesApiV1ChatsRoomIdMessagesGetResponses,
-  GetMyCardsApiV1CardsMeGetData,
-  GetMyCardsApiV1CardsMeGetErrors,
-  GetMyCardsApiV1CardsMeGetResponses,
   GetMyGalleryCardsApiV1GalleryCardsMeGetData,
+  GetMyGalleryCardsApiV1GalleryCardsMeGetErrors,
   GetMyGalleryCardsApiV1GalleryCardsMeGetResponses,
   GetMyMessageRequestsApiV1MessageRequestsInboxGetData,
   GetMyMessageRequestsApiV1MessageRequestsInboxGetErrors,
@@ -79,17 +74,12 @@ import type {
   GetMyThreadsApiV1ThreadsGetData,
   GetMyThreadsApiV1ThreadsGetErrors,
   GetMyThreadsApiV1ThreadsGetResponses,
-  GetQuotaStatusApiV1CardsQuotaStatusGetData,
-  GetQuotaStatusApiV1CardsQuotaStatusGetErrors,
-  GetQuotaStatusApiV1CardsQuotaStatusGetResponses,
   GetSubscriptionStatusApiV1SubscriptionsStatusGetData,
+  GetSubscriptionStatusApiV1SubscriptionsStatusGetErrors,
   GetSubscriptionStatusApiV1SubscriptionsStatusGetResponses,
   GetThreadMessagesApiV1ThreadsThreadIdMessagesGetData,
   GetThreadMessagesApiV1ThreadsThreadIdMessagesGetErrors,
   GetThreadMessagesApiV1ThreadsThreadIdMessagesGetResponses,
-  GetUploadUrlApiV1CardsUploadUrlPostData,
-  GetUploadUrlApiV1CardsUploadUrlPostErrors,
-  GetUploadUrlApiV1CardsUploadUrlPostResponses,
   GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetData,
   GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetErrors,
   GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetResponses,
@@ -99,11 +89,16 @@ import type {
   GoogleLoginApiV1AuthGoogleLoginPostData,
   GoogleLoginApiV1AuthGoogleLoginPostErrors,
   GoogleLoginApiV1AuthGoogleLoginPostResponses,
+  GoogleLoginCodeApiV1AuthGoogleLoginCodePostData,
+  GoogleLoginCodeApiV1AuthGoogleLoginCodePostErrors,
+  GoogleLoginCodeApiV1AuthGoogleLoginCodePostResponses,
   HealthCheckHealthGetData,
   HealthCheckHealthGetResponses,
   ListPostsApiV1PostsGetData,
   ListPostsApiV1PostsGetErrors,
   ListPostsApiV1PostsGetResponses,
+  LogoutApiV1AuthLogoutPostData,
+  LogoutApiV1AuthLogoutPostResponses,
   MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostData,
   MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostErrors,
   MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostResponses,
@@ -197,7 +192,7 @@ export const rootGet = <ThrowOnError extends boolean = false>(
 /**
  * Admin login with email/password
  *
- * Authenticate admin user with email and password and receive JWT tokens
+ * Authenticate admin user with email and password and receive JWT tokens via httpOnly cookies
  */
 export const adminLoginApiV1AuthAdminLoginPost = <ThrowOnError extends boolean = false>(
   options: Options<AdminLoginApiV1AuthAdminLoginPostData, ThrowOnError>
@@ -218,7 +213,7 @@ export const adminLoginApiV1AuthAdminLoginPost = <ThrowOnError extends boolean =
 /**
  * Login with Google
  *
- * Authenticate user with Google OAuth token and receive JWT tokens
+ * Authenticate user with Google OAuth token and receive JWT tokens via httpOnly cookies
  */
 export const googleLoginApiV1AuthGoogleLoginPost = <ThrowOnError extends boolean = false>(
   options: Options<GoogleLoginApiV1AuthGoogleLoginPostData, ThrowOnError>
@@ -258,6 +253,27 @@ export const googleCallbackApiV1AuthGoogleCallbackPost = <ThrowOnError extends b
   });
 
 /**
+ * Login with Google authorization code
+ *
+ * Authenticate user with Google OAuth authorization code (Web flow without PKCE)
+ */
+export const googleLoginCodeApiV1AuthGoogleLoginCodePost = <ThrowOnError extends boolean = false>(
+  options: Options<GoogleLoginCodeApiV1AuthGoogleLoginCodePostData, ThrowOnError>
+) =>
+  (options.client ?? client).post<
+    GoogleLoginCodeApiV1AuthGoogleLoginCodePostResponses,
+    GoogleLoginCodeApiV1AuthGoogleLoginCodePostErrors,
+    ThrowOnError
+  >({
+    url: '/api/v1/auth/google-login-code',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
  * Refresh access token (cookie-based)
  *
  * Use refresh token from httpOnly cookie to obtain new access and refresh tokens
@@ -270,6 +286,19 @@ export const refreshTokenApiV1AuthRefreshPost = <ThrowOnError extends boolean = 
     RefreshTokenApiV1AuthRefreshPostErrors,
     ThrowOnError
   >({ url: '/api/v1/auth/refresh', ...options });
+
+/**
+ * Logout and clear authentication cookies
+ *
+ * Clear access and refresh token cookies to log out the user
+ */
+export const logoutApiV1AuthLogoutPost = <ThrowOnError extends boolean = false>(
+  options?: Options<LogoutApiV1AuthLogoutPostData, ThrowOnError>
+) =>
+  (options?.client ?? client).post<LogoutApiV1AuthLogoutPostResponses, unknown, ThrowOnError>({
+    url: '/api/v1/auth/logout',
+    ...options,
+  });
 
 /**
  * Get my profile
@@ -388,7 +417,7 @@ export const getSubscriptionStatusApiV1SubscriptionsStatusGet = <
 ) =>
   (options?.client ?? client).get<
     GetSubscriptionStatusApiV1SubscriptionsStatusGetResponses,
-    unknown,
+    GetSubscriptionStatusApiV1SubscriptionsStatusGetErrors,
     ThrowOnError
   >({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -504,102 +533,6 @@ export const submitReportApiV1ReportsPost = <ThrowOnError extends boolean = fals
       'Content-Type': 'application/json',
       ...options.headers,
     },
-  });
-
-/**
- * Get upload signed URL
- *
- * Generate a signed URL for uploading a card image to GCS
- */
-export const getUploadUrlApiV1CardsUploadUrlPost = <ThrowOnError extends boolean = false>(
-  options: Options<GetUploadUrlApiV1CardsUploadUrlPostData, ThrowOnError>
-) =>
-  (options.client ?? client).post<
-    GetUploadUrlApiV1CardsUploadUrlPostResponses,
-    GetUploadUrlApiV1CardsUploadUrlPostErrors,
-    ThrowOnError
-  >({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/cards/upload-url',
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-  });
-
-/**
- * Get my cards
- *
- * Retrieve all cards owned by the authenticated user
- */
-export const getMyCardsApiV1CardsMeGet = <ThrowOnError extends boolean = false>(
-  options?: Options<GetMyCardsApiV1CardsMeGetData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    GetMyCardsApiV1CardsMeGetResponses,
-    GetMyCardsApiV1CardsMeGetErrors,
-    ThrowOnError
-  >({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/cards/me',
-    ...options,
-  });
-
-/**
- * Delete a card
- *
- * Delete a card owned by the authenticated user
- */
-export const deleteCardApiV1CardsCardIdDelete = <ThrowOnError extends boolean = false>(
-  options: Options<DeleteCardApiV1CardsCardIdDeleteData, ThrowOnError>
-) =>
-  (options.client ?? client).delete<
-    DeleteCardApiV1CardsCardIdDeleteResponses,
-    DeleteCardApiV1CardsCardIdDeleteErrors,
-    ThrowOnError
-  >({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/cards/{card_id}',
-    ...options,
-  });
-
-/**
- * Get quota status
- *
- * Check current upload quota usage
- */
-export const getQuotaStatusApiV1CardsQuotaStatusGet = <ThrowOnError extends boolean = false>(
-  options?: Options<GetQuotaStatusApiV1CardsQuotaStatusGetData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    GetQuotaStatusApiV1CardsQuotaStatusGetResponses,
-    GetQuotaStatusApiV1CardsQuotaStatusGetErrors,
-    ThrowOnError
-  >({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/cards/quota/status',
-    ...options,
-  });
-
-/**
- * Confirm card upload
- *
- * Confirm that the card image has been successfully uploaded to GCS after using the signed URL
- */
-export const confirmCardUploadApiV1CardsCardIdConfirmUploadPost = <
-  ThrowOnError extends boolean = false,
->(
-  options: Options<ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostData, ThrowOnError>
-) =>
-  (options.client ?? client).post<
-    ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostResponses,
-    ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostErrors,
-    ThrowOnError
-  >({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/cards/{card_id}/confirm-upload',
-    ...options,
   });
 
 /**
@@ -811,7 +744,7 @@ export const getMyGalleryCardsApiV1GalleryCardsMeGet = <ThrowOnError extends boo
 ) =>
   (options?.client ?? client).get<
     GetMyGalleryCardsApiV1GalleryCardsMeGetResponses,
-    unknown,
+    GetMyGalleryCardsApiV1GalleryCardsMeGetErrors,
     ThrowOnError
   >({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -966,6 +899,28 @@ export const attachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPost = <
   >({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/api/v1/media/gallery/cards/{card_id}/attach',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Get signed read URLs for media assets (Phase 9)
+ *
+ * Batch retrieve signed download URLs for media. Login required. T083-T085.
+ */
+export const getMediaReadUrlsApiV1MediaReadUrlsPost = <ThrowOnError extends boolean = false>(
+  options: Options<GetMediaReadUrlsApiV1MediaReadUrlsPostData, ThrowOnError>
+) =>
+  (options.client ?? client).post<
+    GetMediaReadUrlsApiV1MediaReadUrlsPostResponses,
+    GetMediaReadUrlsApiV1MediaReadUrlsPostErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/media/read-urls',
     ...options,
     headers: {
       'Content-Type': 'application/json',
