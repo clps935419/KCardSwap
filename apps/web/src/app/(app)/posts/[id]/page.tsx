@@ -68,13 +68,9 @@ export default function PostDetailPage() {
     status: 'open' as const,
     like_count: 5,
     liked_by_me: false,
-    // Phase 9: Placeholder media IDs for demonstration (same as list page would show)
-    // TODO: Replace with actual media_asset_ids from API when fetching real post data
-    media_asset_ids: [
-      'demo-media-1',
-      'demo-media-2',
-      'demo-media-3',
-    ] as string[],
+    // Phase 9: Empty array for placeholder data - will be populated from API
+    // TODO: Fetch real post data with actual media_asset_ids from backend
+    media_asset_ids: [] as string[],
     expires_at: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
