@@ -12,18 +12,6 @@ from app.modules.social.application.services.chat_room_service_impl import (
 from app.modules.social.application.services.friendship_service_impl import (
     FriendshipServiceImpl,
 )
-from app.modules.social.application.use_cases.cards.check_quota import (
-    CheckUploadQuotaUseCase,
-)
-from app.modules.social.application.use_cases.cards.delete_card import (
-    DeleteCardUseCase,
-)
-from app.modules.social.application.use_cases.cards.get_my_cards import (
-    GetMyCardsUseCase,
-)
-from app.modules.social.application.use_cases.cards.upload_card import (
-    UploadCardUseCase,
-)
 from app.modules.social.application.use_cases.chat.get_messages_use_case import (
     GetMessagesUseCase,
 )
@@ -42,12 +30,6 @@ from app.modules.social.application.use_cases.friends.send_friend_request_use_ca
 from app.modules.social.application.use_cases.reports.report_user_use_case import (
     ReportUserUseCase,
 )
-from app.modules.social.domain.services.card_validation_service import (
-    CardValidationService,
-)
-from app.modules.social.infrastructure.repositories.card_repository_impl import (
-    CardRepositoryImpl,
-)
 from app.modules.social.infrastructure.repositories.chat_room_repository_impl import (
     ChatRoomRepositoryImpl,
 )
@@ -59,10 +41,6 @@ from app.modules.social.infrastructure.repositories.report_repository_impl impor
 )
 from app.shared.domain.contracts.i_chat_room_service import IChatRoomService
 from app.shared.domain.contracts.i_friendship_service import IFriendshipService
-from app.shared.domain.contracts.i_subscription_query_service import (
-    ISubscriptionQueryService,
-)
-from app.shared.infrastructure.external.gcs_storage_service import GCSStorageService
 
 
 class SocialModule(Module):
@@ -70,48 +48,6 @@ class SocialModule(Module):
 
     Provides social features related dependencies.
     """
-
-    # Card Use Cases
-    @provider
-    def provide_upload_card_use_case(
-        self,
-        session: AsyncSession,
-        gcs_storage: GCSStorageService,
-        subscription_query_service: ISubscriptionQueryService,
-    ) -> UploadCardUseCase:
-        """Provide UploadCardUseCase with dependencies."""
-        card_repo = CardRepositoryImpl(session)
-        card_validation_service = CardValidationService()
-        return UploadCardUseCase(
-            card_repository=card_repo,
-            subscription_repository=subscription_query_service,
-            storage_service=gcs_storage,
-            validation_service=card_validation_service,
-        )
-
-    @provider
-    def provide_get_my_cards_use_case(self, session: AsyncSession) -> GetMyCardsUseCase:
-        """Provide GetMyCardsUseCase with dependencies."""
-        card_repo = CardRepositoryImpl(session)
-        return GetMyCardsUseCase(card_repository=card_repo)
-
-    @provider
-    def provide_delete_card_use_case(
-        self, session: AsyncSession, gcs_storage: GCSStorageService
-    ) -> DeleteCardUseCase:
-        """Provide DeleteCardUseCase with dependencies."""
-        card_repo = CardRepositoryImpl(session)
-        return DeleteCardUseCase(card_repository=card_repo, storage_service=gcs_storage)
-
-    @provider
-    def provide_check_quota_use_case(
-        self, session: AsyncSession, subscription_query_service: ISubscriptionQueryService
-    ) -> CheckUploadQuotaUseCase:
-        """Provide CheckUploadQuotaUseCase with dependencies."""
-        card_repo = CardRepositoryImpl(session)
-        return CheckUploadQuotaUseCase(
-            card_repository=card_repo, subscription_repository=subscription_query_service
-        )
 
     # Friend Use Cases
     @provider

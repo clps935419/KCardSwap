@@ -1,8 +1,5 @@
 """Social infrastructure repositories"""
 
-from app.modules.social.infrastructure.repositories.card_repository_impl import (
-    CardRepositoryImpl,
-)
 from app.modules.social.infrastructure.repositories.chat_room_repository_impl import (
     ChatRoomRepositoryImpl,
 )
@@ -17,7 +14,6 @@ from app.modules.social.infrastructure.repositories.report_repository_impl impor
 )
 
 __all__ = [
-    "CardRepositoryImpl",
     "FriendshipRepositoryImpl",
     "ChatRoomRepositoryImpl",
     "MessageRepositoryImpl",

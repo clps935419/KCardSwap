@@ -124,9 +124,6 @@ def create_application() -> FastAPI:
     app.include_router(subscription_router, prefix=settings.API_PREFIX)
 
     # Phase 6: Social module (Reports and Blocking)
-    from .modules.social.presentation.routers.cards_router import (
-        router as cards_router,
-    )
     from .modules.social.presentation.routers.chat_router import (
         router as chat_router,
     )
@@ -140,7 +137,6 @@ def create_application() -> FastAPI:
     # Note: friends_router kept only for block/unblock endpoints (FR-025)
     app.include_router(friends_router, prefix=settings.API_PREFIX)
     app.include_router(report_router, prefix=settings.API_PREFIX)
-    app.include_router(cards_router, prefix=settings.API_PREFIX)
     app.include_router(chat_router, prefix=settings.API_PREFIX)
 
     # Phase 8.5: Posts module (City Board Posts)

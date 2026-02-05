@@ -24,6 +24,7 @@ services:
       db-init:
         condition: service_completed_successfully
     volumes:
+      - ./openapi:/openapi
       - ./apps/backend/app:/app/app
       - ./apps/backend/alembic:/app/alembic
       - ./apps/backend/scripts:/app/scripts
