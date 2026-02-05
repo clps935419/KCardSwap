@@ -27,7 +27,7 @@ class TestLocationsRouterE2E:
         data = response.json()["data"]
         assert "cities" in data
         assert isinstance(data["cities"], list)
-        
+
         # Should have 22 Taiwan cities/counties
         # Verify response structure if cities exist
         if len(data["cities"]) > 0:
@@ -42,16 +42,16 @@ class TestLocationsRouterE2E:
 
         assert response.status_code == 200
         response_data = response.json()
-        
+
         # Verify envelope format
         assert "data" in response_data
         assert "meta" in response_data
         assert "error" in response_data
-        
+
         # Verify data structure
         data = response_data["data"]
         assert "cities" in data
-        
+
         # Verify each city has required fields
         for city in data["cities"]:
             assert isinstance(city["code"], str)
@@ -68,14 +68,11 @@ class TestLocationsRouterE2E:
         assert response.status_code == 200
         data = response.json()["data"]
         cities = data["cities"]
-        
-        # Get city codes
-        city_codes = [city["code"] for city in cities]
-        
+
         # Should contain major cities
         # Note: Exact codes depend on implementation
         assert len(cities) > 0, "Should have at least some cities"
-        
+
         # Verify all cities have valid structure
         for city in cities:
             assert len(city["code"]) > 0

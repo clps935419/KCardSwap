@@ -521,7 +521,7 @@ class TestChatRouter:
             mock_fcm_service.return_value = mock_fcm
 
             # Act
-            response = await send_message(
+            await send_message(
                 room_id=sample_room_id,
                 request=request,
                 current_user_id=sample_user_id,

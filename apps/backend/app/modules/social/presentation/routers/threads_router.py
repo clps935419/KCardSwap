@@ -5,30 +5,30 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.shared.infrastructure.database.connection import get_db_session
-from app.shared.presentation.deps.require_user import require_user
-from app.modules.social.application.use_cases.messages.get_threads import (
-    GetThreadsUseCase,
-)
 from app.modules.social.application.use_cases.messages.get_messages import (
     GetThreadMessagesUseCase,
+)
+from app.modules.social.application.use_cases.messages.get_threads import (
+    GetThreadsUseCase,
 )
 from app.modules.social.application.use_cases.messages.send_message import (
     SendMessageUseCase,
 )
-from app.modules.social.infrastructure.repositories.thread_repository import (
-    ThreadRepository,
-)
 from app.modules.social.infrastructure.repositories.thread_message_repository import (
     ThreadMessageRepository,
 )
-from app.modules.social.presentation.schemas.message_schemas import (
-    ThreadListResponse,
-    ThreadResponse,
-    ThreadMessagesResponse,
-    ThreadMessageResponse,
-    SendMessageRequest,
+from app.modules.social.infrastructure.repositories.thread_repository import (
+    ThreadRepository,
 )
+from app.modules.social.presentation.schemas.message_schemas import (
+    SendMessageRequest,
+    ThreadListResponse,
+    ThreadMessageResponse,
+    ThreadMessagesResponse,
+    ThreadResponse,
+)
+from app.shared.infrastructure.database.connection import get_db_session
+from app.shared.presentation.deps.require_user import require_user
 
 router = APIRouter(prefix="/threads", tags=["threads"])
 
@@ -42,17 +42,17 @@ async def get_my_threads(
 ):
     """
     Get all threads for the current user.
-    
+
     Supports FR-016: Inbox clearly separates Requests vs Threads.
     Returns threads ordered by last_message_at descending.
     """
     thread_repo = ThreadRepository(session)
     use_case = GetThreadsUseCase(thread_repo)
-    
+
     threads = await use_case.execute(
         user_id=str(user_id), limit=limit, offset=offset
     )
-    
+
     return ThreadListResponse(
         threads=[
             ThreadResponse(
@@ -79,15 +79,15 @@ async def get_thread_messages(
 ):
     """
     Get messages in a thread.
-    
+
     Returns messages ordered by created_at ascending (oldest first).
     User must be part of the thread to view messages.
     """
     thread_repo = ThreadRepository(session)
     thread_message_repo = ThreadMessageRepository(session)
-    
+
     use_case = GetThreadMessagesUseCase(thread_repo, thread_message_repo)
-    
+
     try:
         messages = await use_case.execute(
             thread_id=thread_id,
@@ -95,7 +95,7 @@ async def get_thread_messages(
             limit=limit,
             offset=offset,
         )
-        
+
         return ThreadMessagesResponse(
             messages=[
                 ThreadMessageResponse(
@@ -123,15 +123,15 @@ async def send_message(
 ):
     """
     Send a message in a thread.
-    
+
     Supports FR-015: Messages can reference post_id.
     User must be part of the thread to send messages.
     """
     thread_repo = ThreadRepository(session)
     thread_message_repo = ThreadMessageRepository(session)
-    
+
     use_case = SendMessageUseCase(thread_repo, thread_message_repo)
-    
+
     try:
         message = await use_case.execute(
             thread_id=thread_id,
@@ -139,7 +139,7 @@ async def send_message(
             content=request.content,
             post_id=request.post_id,
         )
-        
+
         return ThreadMessageResponse(
             id=message.id,
             thread_id=message.thread_id,

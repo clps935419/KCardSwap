@@ -75,6 +75,7 @@ class TestReportFlowIntegration:
     @pytest.fixture
     def mock_auth_reporter(self, test_user_ids):
         """Mock authentication for reporter using dependency override"""
+
         async def override_get_current_user_id() -> UUID:
             return test_user_ids["reporter"]
 

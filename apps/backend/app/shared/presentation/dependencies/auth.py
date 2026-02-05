@@ -27,7 +27,7 @@ async def get_current_user_id(
 ) -> UUID:
     """
     Dependency to get current authenticated user ID from JWT token.
-    
+
     Priority:
     1. First checks httpOnly cookie for access_token (recommended)
     2. Falls back to Bearer token in Authorization header (for backward compatibility)
@@ -45,7 +45,7 @@ async def get_current_user_id(
     """
     # Priority 1: Check httpOnly cookie first (most secure)
     token = access_token_cookie
-    
+
     # Priority 2: Fallback to Bearer token (backward compatibility)
     if not token and credentials:
         token = credentials.credentials
@@ -110,7 +110,7 @@ async def get_optional_current_user_id(
     Dependency to optionally get current user ID from JWT token.
     Returns None if no token is provided or token is invalid.
     Useful for endpoints that work both with and without authentication.
-    
+
     Priority:
     1. First checks httpOnly cookie for access_token
     2. Falls back to Bearer token in Authorization header
@@ -125,7 +125,7 @@ async def get_optional_current_user_id(
     """
     # Priority 1: Check httpOnly cookie first
     token = access_token_cookie
-    
+
     # Priority 2: Fallback to Bearer token
     if not token and credentials:
         token = credentials.credentials

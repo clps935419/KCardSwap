@@ -34,11 +34,11 @@ from app.modules.posts.application.use_cases.toggle_like import ToggleLikeUseCas
 from app.modules.posts.infrastructure.repositories.post_interest_repository_impl import (
     PostInterestRepositoryImpl,
 )
-from app.modules.posts.infrastructure.repositories.post_repository_impl import (
-    PostRepositoryImpl,
-)
 from app.modules.posts.infrastructure.repositories.post_like_repository_impl import (
     PostLikeRepositoryImpl,
+)
+from app.modules.posts.infrastructure.repositories.post_repository_impl import (
+    PostRepositoryImpl,
 )
 from app.shared.domain.contracts.i_chat_room_service import IChatRoomService
 from app.shared.domain.contracts.i_friendship_service import IFriendshipService

@@ -6,7 +6,6 @@ Tests the location router endpoints:
 """
 
 from unittest.mock import AsyncMock, MagicMock
-from uuid import uuid4
 
 import pytest
 
@@ -28,7 +27,7 @@ class TestLocationRouter:
     def mock_cities_list(self):
         """Mock list of cities"""
         cities = []
-        
+
         # Taipei City
         city1 = MagicMock()
         city1.code = MagicMock()
@@ -36,7 +35,7 @@ class TestLocationRouter:
         city1.name = "Taipei City"
         city1.name_zh = "台北市"
         cities.append(city1)
-        
+
         # New Taipei City
         city2 = MagicMock()
         city2.code = MagicMock()
@@ -44,7 +43,7 @@ class TestLocationRouter:
         city2.name = "New Taipei City"
         city2.name_zh = "新北市"
         cities.append(city2)
-        
+
         # Taoyuan City
         city3 = MagicMock()
         city3.code = MagicMock()
@@ -52,7 +51,7 @@ class TestLocationRouter:
         city3.name = "Taoyuan City"
         city3.name_zh = "桃園市"
         cities.append(city3)
-        
+
         return cities
 
     @pytest.fixture
@@ -73,7 +72,9 @@ class TestLocationRouter:
     ):
         """Test successfully retrieving all Taiwan cities"""
         # Arrange
-        from app.modules.locations.presentation.routers.location_router import get_cities
+        from app.modules.locations.presentation.routers.location_router import (
+            get_cities,
+        )
 
         mock_container.get.return_value = mock_use_case
         mock_use_case.execute.return_value = mock_cities_list
@@ -98,7 +99,9 @@ class TestLocationRouter:
     ):
         """Test retrieving a single city"""
         # Arrange
-        from app.modules.locations.presentation.routers.location_router import get_cities
+        from app.modules.locations.presentation.routers.location_router import (
+            get_cities,
+        )
 
         mock_container.get.return_value = mock_use_case
         mock_use_case.execute.return_value = [mock_city_entity]
@@ -116,7 +119,9 @@ class TestLocationRouter:
     async def test_get_cities_empty_list(self, mock_use_case, mock_container):
         """Test retrieving cities when no cities exist (edge case)"""
         # Arrange
-        from app.modules.locations.presentation.routers.location_router import get_cities
+        from app.modules.locations.presentation.routers.location_router import (
+            get_cities,
+        )
 
         mock_container.get.return_value = mock_use_case
         mock_use_case.execute.return_value = []
@@ -132,7 +137,9 @@ class TestLocationRouter:
     async def test_get_cities_all_22_cities(self, mock_use_case, mock_container):
         """Test retrieving all 22 Taiwan cities/counties"""
         # Arrange
-        from app.modules.locations.presentation.routers.location_router import get_cities
+        from app.modules.locations.presentation.routers.location_router import (
+            get_cities,
+        )
 
         # Create all 22 Taiwan cities
         all_cities = []
@@ -187,7 +194,9 @@ class TestLocationRouter:
     ):
         """Test that response has correct structure with data/meta/error envelope"""
         # Arrange
-        from app.modules.locations.presentation.routers.location_router import get_cities
+        from app.modules.locations.presentation.routers.location_router import (
+            get_cities,
+        )
 
         mock_container.get.return_value = mock_use_case
         mock_use_case.execute.return_value = mock_cities_list
@@ -209,9 +218,11 @@ class TestLocationRouter:
     ):
         """Test that endpoint properly uses dependency injection container"""
         # Arrange
-        from app.modules.locations.presentation.routers.location_router import get_cities
         from app.modules.locations.application.use_cases.get_all_cities_use_case import (
             GetAllCitiesUseCase,
+        )
+        from app.modules.locations.presentation.routers.location_router import (
+            get_cities,
         )
 
         mock_container.get.return_value = mock_use_case
@@ -229,7 +240,9 @@ class TestLocationRouter:
     ):
         """Test that endpoint calls use case execute method"""
         # Arrange
-        from app.modules.locations.presentation.routers.location_router import get_cities
+        from app.modules.locations.presentation.routers.location_router import (
+            get_cities,
+        )
 
         mock_container.get.return_value = mock_use_case
         mock_use_case.execute.return_value = mock_cities_list
@@ -246,7 +259,9 @@ class TestLocationRouter:
     ):
         """Test that each city response has all required fields"""
         # Arrange
-        from app.modules.locations.presentation.routers.location_router import get_cities
+        from app.modules.locations.presentation.routers.location_router import (
+            get_cities,
+        )
 
         mock_container.get.return_value = mock_use_case
         mock_use_case.execute.return_value = [mock_city_entity]

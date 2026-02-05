@@ -8,9 +8,9 @@ import pytest
 from pydantic import ValidationError
 
 from app.modules.identity.presentation.schemas.idol_schemas import (
-    IdolGroupResponse,
     IdolGroupListResponse,
     IdolGroupListResponseWrapper,
+    IdolGroupResponse,
 )
 
 

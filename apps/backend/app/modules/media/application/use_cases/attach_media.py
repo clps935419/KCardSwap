@@ -25,9 +25,9 @@ class AttachMediaResponse:
 
 class AttachMediaUseCase:
     """Use case for attaching confirmed media to posts or gallery cards.
-    
+
     This is step 3 of the media upload flow: presign → upload → confirm → attach.
-    
+
     FR-007: System must only allow attaching confirmed media owned by the user.
     """
 
@@ -39,13 +39,13 @@ class AttachMediaUseCase:
 
     async def execute(self, request: AttachMediaRequest) -> AttachMediaResponse:
         """Attach confirmed media to target entity.
-        
+
         Args:
             request: Attach request
-            
+
         Returns:
             Attached media details
-            
+
         Raises:
             ValueError: If media not found, not owned, or not confirmed
         """

@@ -92,7 +92,7 @@ class TestThreadsRouter:
                 mock_use_case = AsyncMock()
                 mock_use_case.execute.return_value = [sample_thread]
                 mock_use_case_class.return_value = mock_use_case
-                
+
                 # Act
                 response = await get_my_threads(
                     limit=50,
@@ -117,7 +117,7 @@ class TestThreadsRouter:
                 mock_use_case = AsyncMock()
                 mock_use_case.execute.return_value = []
                 mock_use_case_class.return_value = mock_use_case
-                
+
                 # Act
                 response = await get_my_threads(
                     limit=50,
@@ -137,13 +137,13 @@ class TestThreadsRouter:
         """Test retrieval of threads with pagination"""
         # Arrange
         threads = [sample_thread]
-        
+
         with patch("app.modules.social.presentation.routers.threads_router.ThreadRepository"):
             with patch("app.modules.social.presentation.routers.threads_router.GetThreadsUseCase") as mock_use_case_class:
                 mock_use_case = AsyncMock()
                 mock_use_case.execute.return_value = threads
                 mock_use_case_class.return_value = mock_use_case
-                
+
                 # Act
                 response = await get_my_threads(
                     limit=10,
@@ -180,13 +180,13 @@ class TestThreadsRouter:
             updated_at=datetime.now(timezone.utc),
             last_message_at=datetime.now(timezone.utc),
         )
-        
+
         with patch("app.modules.social.presentation.routers.threads_router.ThreadRepository"):
             with patch("app.modules.social.presentation.routers.threads_router.GetThreadsUseCase") as mock_use_case_class:
                 mock_use_case = AsyncMock()
                 mock_use_case.execute.return_value = [thread1, thread2]
                 mock_use_case_class.return_value = mock_use_case
-                
+
                 # Act
                 response = await get_my_threads(
                     limit=50,
@@ -211,7 +211,7 @@ class TestThreadsRouter:
                     mock_use_case = AsyncMock()
                     mock_use_case.execute.return_value = [sample_thread_message]
                     mock_use_case_class.return_value = mock_use_case
-                    
+
                     # Act
                     response = await get_thread_messages(
                         thread_id=sample_thread_id,
@@ -238,7 +238,7 @@ class TestThreadsRouter:
                     mock_use_case = AsyncMock()
                     mock_use_case.execute.return_value = []
                     mock_use_case_class.return_value = mock_use_case
-                    
+
                     # Act
                     response = await get_thread_messages(
                         thread_id=sample_thread_id,
@@ -263,7 +263,7 @@ class TestThreadsRouter:
                     mock_use_case = AsyncMock()
                     mock_use_case.execute.side_effect = ValueError("User not part of thread")
                     mock_use_case_class.return_value = mock_use_case
-                    
+
                     # Act & Assert
                     with pytest.raises(HTTPException) as exc_info:
                         await get_thread_messages(
@@ -287,9 +287,9 @@ class TestThreadsRouter:
                     mock_use_case = AsyncMock()
                     mock_use_case.execute.return_value = [sample_thread_message]
                     mock_use_case_class.return_value = mock_use_case
-                    
+
                     # Act
-                    response = await get_thread_messages(
+                    await get_thread_messages(
                         thread_id=sample_thread_id,
                         limit=20,
                         offset=10,
@@ -320,7 +320,7 @@ class TestThreadsRouter:
                     mock_use_case = AsyncMock()
                     mock_use_case.execute.return_value = sample_thread_message
                     mock_use_case_class.return_value = mock_use_case
-                    
+
                     # Act
                     response = await send_message(
                         thread_id=sample_thread_id,
@@ -356,7 +356,7 @@ class TestThreadsRouter:
                     mock_use_case = AsyncMock()
                     mock_use_case.execute.return_value = message
                     mock_use_case_class.return_value = mock_use_case
-                    
+
                     # Act
                     response = await send_message(
                         thread_id=sample_thread_id,
@@ -382,7 +382,7 @@ class TestThreadsRouter:
                     mock_use_case = AsyncMock()
                     mock_use_case.execute.side_effect = ValueError("User not part of thread")
                     mock_use_case_class.return_value = mock_use_case
-                    
+
                     # Act & Assert
                     with pytest.raises(HTTPException) as exc_info:
                         await send_message(
@@ -407,7 +407,7 @@ class TestThreadsRouter:
                     mock_use_case = AsyncMock()
                     mock_use_case.execute.side_effect = ValueError("Content cannot be empty")
                     mock_use_case_class.return_value = mock_use_case
-                    
+
                     # Act & Assert
                     with pytest.raises(HTTPException) as exc_info:
                         await send_message(
@@ -432,7 +432,7 @@ class TestThreadsRouter:
                     mock_use_case = AsyncMock()
                     mock_use_case.execute.side_effect = ValueError("Thread not found")
                     mock_use_case_class.return_value = mock_use_case
-                    
+
                     # Act & Assert
                     with pytest.raises(HTTPException) as exc_info:
                         await send_message(

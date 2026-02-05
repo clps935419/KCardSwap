@@ -4,7 +4,7 @@ SQLAlchemy implementation of GalleryCard repository.
 from typing import List, Optional
 from uuid import UUID
 
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.social.domain.entities.gallery_card import GalleryCard
@@ -55,12 +55,12 @@ class GalleryCardRepository(IGalleryCardRepository):
             .where(GalleryCardModel.user_id == user_id)
             .order_by(GalleryCardModel.display_order, GalleryCardModel.created_at)
         )
-        
+
         if offset is not None:
             stmt = stmt.offset(offset)
         if limit is not None:
             stmt = stmt.limit(limit)
-            
+
         result = await self._session.execute(stmt)
         models = result.scalars().all()
         return [self._to_entity(model) for model in models]
@@ -70,10 +70,10 @@ class GalleryCardRepository(IGalleryCardRepository):
         stmt = select(GalleryCardModel).where(GalleryCardModel.id == gallery_card.id)
         result = await self._session.execute(stmt)
         model = result.scalar_one_or_none()
-        
+
         if not model:
             raise ValueError(f"GalleryCard with id {gallery_card.id} not found")
-        
+
         model.title = gallery_card.title
         model.idol_name = gallery_card.idol_name
         model.era = gallery_card.era
@@ -81,7 +81,7 @@ class GalleryCardRepository(IGalleryCardRepository):
         model.media_asset_id = gallery_card.media_asset_id
         model.display_order = gallery_card.display_order
         model.updated_at = gallery_card.updated_at
-        
+
         await self._session.flush()
         await self._session.refresh(model)
         return self._to_entity(model)
@@ -91,10 +91,10 @@ class GalleryCardRepository(IGalleryCardRepository):
         stmt = select(GalleryCardModel).where(GalleryCardModel.id == card_id)
         result = await self._session.execute(stmt)
         model = result.scalar_one_or_none()
-        
+
         if not model:
             return False
-        
+
         await self._session.delete(model)
         await self._session.flush()
         return True

@@ -10,11 +10,12 @@ Tests FR-003, FR-004, FR-005:
 """
 
 import datetime
+from uuid import UUID
+
 import pytest
 import pytest_asyncio
 from fastapi.testclient import TestClient
 from sqlalchemy import text
-from uuid import UUID
 
 from app.main import app
 from app.shared.infrastructure.database.connection import get_db_session
@@ -28,14 +29,17 @@ class TestPostsCreateAndListV2:
     async def test_user(self, db_session) -> UUID:
         """Create test user and return user ID"""
         import uuid
+
         unique_id = str(uuid.uuid4())
         user_id = str(uuid.uuid4())
         result = await db_session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO users (id, google_id, email, role)
                 VALUES (:id, :google_id, :email, :role)
                 RETURNING id
-            """),
+            """
+            ),
             {
                 "id": user_id,
                 "google_id": f"test_posts_v2_{unique_id}",
@@ -50,6 +54,7 @@ class TestPostsCreateAndListV2:
     @pytest.fixture
     def authenticated_client(self, test_user, app_db_session_override):
         """Provide authenticated test client"""
+
         def override_get_current_user_id():
             return test_user
 
@@ -158,7 +163,7 @@ class TestPostsCreateAndListV2:
         assert response.status_code == 200
         data = response.json()["data"]
         assert data["total"] >= 2
-        
+
         # Should include both global and city posts
         scopes = [post["scope"] for post in data["posts"]]
         assert "global" in scopes
@@ -194,7 +199,7 @@ class TestPostsCreateAndListV2:
 
         assert response.status_code == 200
         data = response.json()["data"]
-        
+
         # Should only include TPE posts
         for post in data["posts"]:
             assert post["city_code"] == "TPE"
@@ -228,7 +233,7 @@ class TestPostsCreateAndListV2:
 
         assert response.status_code == 200
         data = response.json()["data"]
-        
+
         # Should only include trade posts
         for post in data["posts"]:
             assert post["category"] == "trade"
@@ -237,7 +242,7 @@ class TestPostsCreateAndListV2:
         """Test that listing posts requires login (FR-001)"""
         client = TestClient(app)
         response = client.get("/api/v1/posts")
-        
+
         assert response.status_code == 401
 
     def test_create_post_requires_authentication(self):
@@ -251,7 +256,7 @@ class TestPostsCreateAndListV2:
         }
 
         response = client.post("/api/v1/posts", json=payload)
-        
+
         assert response.status_code == 401
 
     @pytest_asyncio.fixture
@@ -274,8 +279,7 @@ class TestPostsCreateAndListV2:
                 "user_id": str(test_user),
                 "plan": "premium",
                 "status": "active",
-                "expires_at": datetime.datetime.utcnow()
-                + datetime.timedelta(days=30),
+                "expires_at": datetime.datetime.utcnow() + datetime.timedelta(days=30),
                 "created_at": now,
                 "updated_at": now,
             },
@@ -285,7 +289,7 @@ class TestPostsCreateAndListV2:
     def test_all_categories_are_valid(self, authenticated_client, premium_subscription):
         """Test that all defined categories are accepted (FR-002)"""
         categories = ["trade", "giveaway", "group", "showcase", "help", "announcement"]
-        
+
         for category in categories:
             payload = {
                 "scope": "global",

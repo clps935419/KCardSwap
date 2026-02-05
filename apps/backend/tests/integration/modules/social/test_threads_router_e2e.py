@@ -7,15 +7,18 @@ Tests the threads management endpoints:
 - POST /threads/{thread_id}/messages - Send message in thread
 """
 
+from uuid import UUID, uuid4
+
 import pytest
 import pytest_asyncio
 from fastapi.testclient import TestClient
 from sqlalchemy import text
-from uuid import UUID, uuid4
 
 from app.main import app
 from app.shared.infrastructure.database.connection import get_db_session
-from app.shared.presentation.deps.require_user import require_user as get_current_user_id_alias
+from app.shared.presentation.deps.require_user import (
+    require_user as get_current_user_id_alias,
+)
 
 
 class TestThreadsRouterE2E:
@@ -25,14 +28,17 @@ class TestThreadsRouterE2E:
     async def test_user1(self, db_session) -> UUID:
         """Create first test user"""
         import uuid
+
         unique_id = str(uuid.uuid4())
         user_id = str(uuid4())
         result = await db_session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO users (id, google_id, email, role)
                 VALUES (:id, :google_id, :email, :role)
                 RETURNING id
-            """),
+            """
+            ),
             {
                 "id": user_id,
                 "google_id": f"test_thread1_{unique_id}",
@@ -48,14 +54,17 @@ class TestThreadsRouterE2E:
     async def test_user2(self, db_session) -> UUID:
         """Create second test user"""
         import uuid
+
         unique_id = str(uuid.uuid4())
         user_id = str(uuid4())
         result = await db_session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO users (id, google_id, email, role)
                 VALUES (:id, :google_id, :email, :role)
                 RETURNING id
-            """),
+            """
+            ),
             {
                 "id": user_id,
                 "google_id": f"test_thread2_{unique_id}",
@@ -70,6 +79,7 @@ class TestThreadsRouterE2E:
     @pytest.fixture
     def authenticated_client_user1(self, test_user1, app_db_session_override):
         """Provide authenticated test client for user1"""
+
         def override_require_user():
             return test_user1
 
@@ -120,15 +130,17 @@ class TestThreadsRouterE2E:
         """Create a test thread between user1 and user2"""
         thread_id = str(uuid4())
         await db_session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO message_threads (id, user_a_id, user_b_id, created_at, updated_at)
                 VALUES (:id, :user_a_id, :user_b_id, NOW(), NOW())
-            """),
+            """
+            ),
             {
                 "id": thread_id,
                 "user_a_id": str(test_user1),
-                "user_b_id": str(test_user2)
-            }
+                "user_b_id": str(test_user2),
+            },
         )
         await db_session.commit()
         return thread_id
@@ -145,11 +157,15 @@ class TestThreadsRouterE2E:
     def test_get_thread_messages_not_found(self, authenticated_client_user1):
         """Test getting messages from non-existent thread"""
         fake_thread_id = str(uuid4())
-        response = authenticated_client_user1.get(f"/api/v1/threads/{fake_thread_id}/messages")
+        response = authenticated_client_user1.get(
+            f"/api/v1/threads/{fake_thread_id}/messages"
+        )
 
         assert response.status_code in [403, 404]
 
-    def test_get_thread_messages_unauthorized(self, unauthenticated_client, test_thread):
+    def test_get_thread_messages_unauthorized(
+        self, unauthenticated_client, test_thread
+    ):
         """Test getting thread messages without authentication"""
         response = unauthenticated_client.get(f"/api/v1/threads/{test_thread}/messages")
 
@@ -157,7 +173,9 @@ class TestThreadsRouterE2E:
 
     def test_get_thread_messages_success(self, authenticated_client_user1, test_thread):
         """Test getting messages from a thread successfully"""
-        response = authenticated_client_user1.get(f"/api/v1/threads/{test_thread}/messages")
+        response = authenticated_client_user1.get(
+            f"/api/v1/threads/{test_thread}/messages"
+        )
 
         assert response.status_code == 200
         data = response.json()
@@ -180,36 +198,27 @@ class TestThreadsRouterE2E:
     def test_send_message_thread_not_found(self, authenticated_client_user1):
         """Test sending message to non-existent thread"""
         fake_thread_id = str(uuid4())
-        payload = {
-            "content": "Hello"
-        }
+        payload = {"content": "Hello"}
         response = authenticated_client_user1.post(
-            f"/api/v1/threads/{fake_thread_id}/messages",
-            json=payload
+            f"/api/v1/threads/{fake_thread_id}/messages", json=payload
         )
 
         assert response.status_code == 403
 
     def test_send_message_unauthorized(self, unauthenticated_client, test_thread):
         """Test sending message without authentication"""
-        payload = {
-            "content": "Hello"
-        }
+        payload = {"content": "Hello"}
         response = unauthenticated_client.post(
-            f"/api/v1/threads/{test_thread}/messages",
-            json=payload
+            f"/api/v1/threads/{test_thread}/messages", json=payload
         )
 
         assert response.status_code == 401
 
     def test_send_message_success(self, authenticated_client_user1, test_thread):
         """Test sending message in thread successfully"""
-        payload = {
-            "content": "This is a test message in thread"
-        }
+        payload = {"content": "This is a test message in thread"}
         response = authenticated_client_user1.post(
-            f"/api/v1/threads/{test_thread}/messages",
-            json=payload
+            f"/api/v1/threads/{test_thread}/messages", json=payload
         )
 
         assert response.status_code == 201
@@ -226,11 +235,10 @@ class TestThreadsRouterE2E:
         """Test sending message with post reference"""
         payload = {
             "content": "Check out this post",
-            "post_id": str(test_post_for_user2)
+            "post_id": str(test_post_for_user2),
         }
         response = authenticated_client_user1.post(
-            f"/api/v1/threads/{test_thread}/messages",
-            json=payload
+            f"/api/v1/threads/{test_thread}/messages", json=payload
         )
 
         assert response.status_code == 201
@@ -243,6 +251,7 @@ class TestThreadsRouterE2E:
         """Create a test post for user2 to reference in thread messages."""
         post_id = str(uuid4())
         from datetime import datetime, timedelta, timezone
+
         expires_at = datetime.now(timezone.utc) + timedelta(days=14)
         await db_session.execute(
             text(
@@ -273,44 +282,46 @@ class TestThreadsRouterE2E:
 
     def test_send_message_empty_content(self, authenticated_client_user1, test_thread):
         """Test sending message with empty content"""
-        payload = {
-            "content": ""
-        }
+        payload = {"content": ""}
         response = authenticated_client_user1.post(
-            f"/api/v1/threads/{test_thread}/messages",
-            json=payload
+            f"/api/v1/threads/{test_thread}/messages", json=payload
         )
 
         assert response.status_code in [400, 422]
 
-    def test_send_message_missing_content(self, authenticated_client_user1, test_thread):
+    def test_send_message_missing_content(
+        self, authenticated_client_user1, test_thread
+    ):
         """Test sending message without content field"""
         payload = {}
         response = authenticated_client_user1.post(
-            f"/api/v1/threads/{test_thread}/messages",
-            json=payload
+            f"/api/v1/threads/{test_thread}/messages", json=payload
         )
 
         assert response.status_code == 400
 
     @pytest_asyncio.fixture
-    async def test_thread_with_messages(self, test_user1, test_user2, test_thread, db_session):
+    async def test_thread_with_messages(
+        self, test_user1, test_user2, test_thread, db_session
+    ):
         """Create test messages in the thread"""
         for i in range(3):
             message_id = str(uuid4())
             await db_session.execute(
-                text("""
+                text(
+                    """
                     INSERT INTO thread_messages (
                         id, thread_id, sender_id, content, created_at
                     )
                     VALUES (:id, :thread_id, :sender_id, :content, NOW())
-                """),
+                """
+                ),
                 {
                     "id": message_id,
                     "thread_id": test_thread,
                     "sender_id": str(test_user1),
-                    "content": f"Test message {i+1}"
-                }
+                    "content": f"Test message {i+1}",
+                },
             )
         await db_session.commit()
 
@@ -318,13 +329,15 @@ class TestThreadsRouterE2E:
         self, authenticated_client_user1, test_thread, test_thread_with_messages
     ):
         """Test getting thread messages with actual content"""
-        response = authenticated_client_user1.get(f"/api/v1/threads/{test_thread}/messages")
+        response = authenticated_client_user1.get(
+            f"/api/v1/threads/{test_thread}/messages"
+        )
 
         assert response.status_code == 200
         data = response.json()
         assert "messages" in data
         assert len(data["messages"]) >= 3
-        
+
         # Verify message structure
         message = data["messages"][0]
         assert "id" in message

@@ -6,7 +6,7 @@ Tests the refresh token repository implementation with mocked database session.
 
 from datetime import datetime, timedelta
 from unittest.mock import AsyncMock, MagicMock
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession

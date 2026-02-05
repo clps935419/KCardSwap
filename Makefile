@@ -1,5 +1,5 @@
 .PHONY: help dev dev-build up down logs logs-backend logs-kong logs-db \
-	test-unit-docker test-integration-docker test-docker clean build restart ps \
+	test-unit-docker test-integration-docker test-docker ruff-docker clean build restart ps \
 	shell-backend shell-db init-db health seed init-admin-docker setup generate-openapi-docker
 
 help: ## 顯示可用指令
@@ -49,6 +49,9 @@ test-integration-docker: ## 在 Docker 中執行整合測試
 
 test-docker: ## 在 Docker 中執行全部測試
 	docker compose exec backend python -m pytest -v
+
+ruff-docker: ## 在 Docker 中執行 Ruff 檢查（含自動修正）
+	docker compose exec backend python -m ruff check . --fix
 
 clean: ## 停止服務並移除 volumes
 	docker compose down -v

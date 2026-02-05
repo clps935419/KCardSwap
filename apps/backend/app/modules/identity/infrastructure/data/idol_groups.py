@@ -10,14 +10,14 @@ from dataclasses import dataclass
 @dataclass(frozen=True)
 class IdolGroup:
     """Idol group data class.
-    
+
     Attributes:
         id: Unique identifier for the idol group (e.g., 'newjeans', 'ive')
         name: Display name of the idol group (e.g., 'NewJeans', 'IVE')
         emoji: Emoji representing the idol group (e.g., '👖', '🦢')
         sort_order: Display order in the UI (lower values appear first)
     """
-    
+
     id: str
     name: str
     emoji: str
@@ -44,7 +44,7 @@ IDOL_GROUPS: list[IdolGroup] = [
 
 def get_all_idol_groups() -> list[IdolGroup]:
     """Get all available idol groups.
-    
+
     Returns:
         List of all idol groups sorted by sort_order
     """
@@ -53,10 +53,10 @@ def get_all_idol_groups() -> list[IdolGroup]:
 
 def get_idol_group_by_id(group_id: str) -> IdolGroup | None:
     """Get a specific idol group by ID.
-    
+
     Args:
         group_id: The idol group ID to lookup
-        
+
     Returns:
         The idol group if found, None otherwise
     """

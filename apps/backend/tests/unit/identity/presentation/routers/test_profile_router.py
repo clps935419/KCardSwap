@@ -4,11 +4,11 @@ Unit tests for Profile Router
 Tests for GET /profile/me and PUT /profile/me endpoints.
 """
 
-import pytest
 from datetime import datetime
 from unittest.mock import AsyncMock
 from uuid import uuid4
 
+import pytest
 from fastapi import HTTPException, status
 
 from app.modules.identity.domain.entities.profile import Profile
@@ -70,7 +70,7 @@ class TestGetMyProfile:
         assert response.data.privacy_flags["show_online"] is True
         assert response.data.privacy_flags["allow_stranger_chat"] is True
         assert response.error is None
-        
+
         # Verify use case was called correctly
         mock_use_case.execute.assert_called_once_with(mock_current_user)
 
@@ -87,7 +87,7 @@ class TestGetMyProfile:
                 current_user_id=mock_current_user,
                 use_case=mock_use_case,
             )
-        
+
         assert exc_info.value.status_code == status.HTTP_404_NOT_FOUND
         assert "NOT_FOUND" in str(exc_info.value.detail)
 
@@ -214,7 +214,7 @@ class TestUpdateMyProfile:
         assert response.data.privacy_flags["show_online"] is False
         assert response.data.privacy_flags["allow_stranger_chat"] is False
         assert response.error is None
-        
+
         # Verify use case was called correctly
         mock_use_case.execute.assert_called_once()
         call_kwargs = mock_use_case.execute.call_args.kwargs
@@ -271,7 +271,7 @@ class TestUpdateMyProfile:
                 current_user_id=mock_current_user,
                 use_case=mock_use_case,
             )
-        
+
         assert exc_info.value.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
         assert "INTERNAL_ERROR" in str(exc_info.value.detail)
 
@@ -358,7 +358,7 @@ class TestUpdateMyProfile:
             "notifications": {"email": True, "push": False},
             "display": {"density": "comfortable", "items_per_page": 20},
         }
-        
+
         updated_profile = Profile(
             id=uuid4(),
             user_id=mock_current_user,

@@ -7,7 +7,7 @@ from datetime import datetime
 from typing import Any, Dict, Optional
 
 
-class LimitExceededException(Exception):
+class LimitExceededError(Exception):
     """Exception raised when a quota or limit is exceeded.
 
     This exception provides structured information about:
@@ -25,7 +25,7 @@ class LimitExceededException(Exception):
         reset_at: datetime,
         message: Optional[str] = None,
     ) -> None:
-        """Initialize LimitExceededException.
+        """Initialize LimitExceededError.
 
         Args:
             limit_key: Identifier for the limit (e.g., 'posts_per_day', 'media_bytes_per_month')

@@ -6,15 +6,16 @@ Tests the profile management endpoints:
 - PUT /profile/me - Update current user's profile
 """
 
+from uuid import UUID
+
 import pytest
 import pytest_asyncio
 from fastapi.testclient import TestClient
 from sqlalchemy import text
-from uuid import UUID
 
 from app.main import app
-from app.shared.infrastructure.database.connection import get_db_session
 from app.modules.identity.presentation.dependencies.auth_deps import get_current_user
+from app.shared.infrastructure.database.connection import get_db_session
 
 
 class TestProfileRouterE2E:
@@ -24,16 +25,19 @@ class TestProfileRouterE2E:
     async def test_user_with_profile(self, db_session) -> UUID:
         """Create test user with profile and return user ID"""
         import uuid
+
         unique_id = str(uuid.uuid4())
-        
+
         # Create user
         user_id = str(uuid.uuid4())
         result = await db_session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO users (id, google_id, email, role)
                 VALUES (:id, :google_id, :email, :role)
                 RETURNING id
-            """),
+            """
+            ),
             {
                 "id": user_id,
                 "google_id": f"test_profile_{unique_id}",
@@ -43,11 +47,12 @@ class TestProfileRouterE2E:
         )
         user_id = result.scalar()
         await db_session.commit()
-        
+
         # Create profile
         profile_id = str(uuid.uuid4())
         await db_session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO profiles (
                     id, user_id, nickname, avatar_url, bio, region,
                     preferences, privacy_flags
@@ -56,7 +61,8 @@ class TestProfileRouterE2E:
                     :id, :user_id, :nickname, :avatar_url, :bio, :region,
                     :preferences, :privacy_flags
                 )
-            """),
+            """
+            ),
             {
                 "id": profile_id,
                 "user_id": str(user_id),
@@ -65,16 +71,17 @@ class TestProfileRouterE2E:
                 "bio": "Test bio",
                 "region": "TW",
                 "preferences": "{}",
-                "privacy_flags": '{"show_online": true, "allow_stranger_chat": true}'
-            }
+                "privacy_flags": '{"show_online": true, "allow_stranger_chat": true}',
+            },
         )
         await db_session.commit()
-        
+
         return user_id
 
     @pytest.fixture
     def authenticated_client(self, test_user_with_profile, app_db_session_override):
         """Provide authenticated test client"""
+
         def override_get_current_user():
             return test_user_with_profile
 
@@ -119,9 +126,7 @@ class TestProfileRouterE2E:
 
     def test_update_my_profile_nickname(self, authenticated_client):
         """Test updating profile nickname"""
-        payload = {
-            "nickname": "Updated Nickname"
-        }
+        payload = {"nickname": "Updated Nickname"}
 
         response = authenticated_client.put("/api/v1/profile/me", json=payload)
 
@@ -131,11 +136,7 @@ class TestProfileRouterE2E:
 
     def test_update_my_profile_multiple_fields(self, authenticated_client):
         """Test updating multiple profile fields at once"""
-        payload = {
-            "nickname": "New Nickname",
-            "bio": "New bio text",
-            "region": "KR"
-        }
+        payload = {"nickname": "New Nickname", "bio": "New bio text", "region": "KR"}
 
         response = authenticated_client.put("/api/v1/profile/me", json=payload)
 
@@ -147,9 +148,7 @@ class TestProfileRouterE2E:
 
     def test_update_my_profile_unauthorized(self, unauthenticated_client):
         """Test updating profile without authentication"""
-        payload = {
-            "nickname": "Should Fail"
-        }
+        payload = {"nickname": "Should Fail"}
 
         response = unauthenticated_client.put("/api/v1/profile/me", json=payload)
 
@@ -157,12 +156,7 @@ class TestProfileRouterE2E:
 
     def test_update_my_profile_with_preferences(self, authenticated_client):
         """Test updating profile with preferences"""
-        payload = {
-            "preferences": {
-                "language": "zh-TW",
-                "theme": "dark"
-            }
-        }
+        payload = {"preferences": {"language": "zh-TW", "theme": "dark"}}
 
         response = authenticated_client.put("/api/v1/profile/me", json=payload)
 
@@ -174,10 +168,7 @@ class TestProfileRouterE2E:
     def test_update_my_profile_with_privacy_flags(self, authenticated_client):
         """Test updating profile with privacy flags"""
         payload = {
-            "privacy_flags": {
-                "show_online": False,
-                "allow_stranger_chat": False
-            }
+            "privacy_flags": {"show_online": False, "allow_stranger_chat": False}
         }
 
         response = authenticated_client.put("/api/v1/profile/me", json=payload)

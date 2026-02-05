@@ -4,7 +4,7 @@ Unit tests for Subscription Router
 Tests the subscription router endpoints.
 """
 
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock
 from uuid import uuid4
 
 import pytest

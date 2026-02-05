@@ -30,9 +30,9 @@ class CreateUploadUrlResponse:
 
 class CreateUploadUrlUseCase:
     """Use case for generating presigned upload URLs.
-    
+
     This is step 1 of the media upload flow: presign → upload → confirm → attach.
-    
+
     FR-006: System must support media upload through presigned URL flow.
     FR-022: Quota is NOT applied at this stage (only on confirm).
     """
@@ -47,19 +47,19 @@ class CreateUploadUrlUseCase:
 
     async def execute(self, request: CreateUploadUrlRequest) -> CreateUploadUrlResponse:
         """Generate presigned upload URL for user.
-        
+
         Args:
             request: Upload URL request
-            
+
         Returns:
             Presigned URL and media ID for subsequent confirmation
         """
         # Generate unique media ID and blob name
         media_id = uuid.uuid4()
-        
+
         # Determine file extension from content type
         extension = self._get_extension_from_content_type(request.content_type)
-        
+
         # Create GCS blob name: media/{user_id}/{media_id}.{ext}
         blob_name = f"media/{request.user_id}/{media_id}{extension}"
 

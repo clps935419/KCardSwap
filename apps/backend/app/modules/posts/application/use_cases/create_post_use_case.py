@@ -12,7 +12,6 @@ from app.modules.posts.domain.repositories.i_post_repository import IPostReposit
 from app.shared.domain.contracts.i_subscription_query_service import (
     ISubscriptionQueryService,
 )
-from app.shared.presentation.errors.limit_exceeded import LimitExceededException
 
 
 class CreatePostUseCase:
@@ -88,7 +87,7 @@ class CreatePostUseCase:
         # Check daily post limit using quota service
         user_uuid = UUID(owner_id) if isinstance(owner_id, str) else owner_id
         posts_today = await self.post_repository.count_user_posts_today(owner_id)
-        
+
         await self.quota_service.check_posts_per_day(user_uuid, posts_today)
 
         # Set default expiry if not provided

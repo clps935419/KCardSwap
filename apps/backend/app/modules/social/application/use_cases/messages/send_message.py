@@ -5,16 +5,16 @@ from datetime import datetime
 from typing import Optional
 
 from app.modules.social.domain.entities.thread_message import ThreadMessage
-from app.modules.social.domain.repositories.i_thread_repository import IThreadRepository
 from app.modules.social.domain.repositories.i_thread_message_repository import (
     IThreadMessageRepository,
 )
+from app.modules.social.domain.repositories.i_thread_repository import IThreadRepository
 
 
 class SendMessageUseCase:
     """
     Use case for sending a message in a thread.
-    
+
     Supports FR-015: Messages can reference post_id.
     """
 
@@ -35,16 +35,16 @@ class SendMessageUseCase:
     ) -> ThreadMessage:
         """
         Send a message in a thread.
-        
+
         Args:
             thread_id: ID of the thread
             sender_id: ID of the user sending the message
             content: Message content
             post_id: Optional post ID to reference
-        
+
         Returns:
             Created ThreadMessage entity
-        
+
         Raises:
             ValueError: If thread not found or user not authorized
         """

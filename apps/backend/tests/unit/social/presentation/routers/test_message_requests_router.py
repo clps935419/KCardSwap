@@ -97,14 +97,14 @@ class TestMessageRequestsRouter:
             initial_message="Hello!",
         )
 
-        with MagicMock() as mock_repo_class:
+        with MagicMock():
             mock_use_case = AsyncMock()
             mock_use_case.execute.return_value = sample_message_request
-            
-            with MagicMock() as mock_profile_repo:
+
+            with MagicMock():
                 mock_profile = MagicMock()
                 mock_profile.privacy_flags = {"allow_stranger_chat": True}
-                
+
                 from unittest.mock import patch
                 with patch("app.modules.social.presentation.routers.message_requests_router.MessageRequestRepository"):
                     with patch("app.modules.social.presentation.routers.message_requests_router.ThreadRepository"):
@@ -115,9 +115,9 @@ class TestMessageRequestsRouter:
                                         mock_profile_repo_inst = AsyncMock()
                                         mock_profile_repo_inst.get_by_user_id.return_value = mock_profile
                                         mock_profile_repo_class.return_value = mock_profile_repo_inst
-                                        
+
                                         mock_use_case_class.return_value = mock_use_case
-                                        
+
                                         # Act
                                         response = await create_message_request(
                                             request=request,
@@ -166,11 +166,11 @@ class TestMessageRequestsRouter:
                                 mock_profile.privacy_flags = {"allow_stranger_chat": True}
                                 mock_profile_repo_inst.get_by_user_id.return_value = mock_profile
                                 mock_profile_repo_class.return_value = mock_profile_repo_inst
-                                
+
                                 mock_use_case = AsyncMock()
                                 mock_use_case.execute.return_value = message_request
                                 mock_use_case_class.return_value = mock_use_case
-                                
+
                                 # Act
                                 response = await create_message_request(
                                     request=request,
@@ -204,13 +204,13 @@ class TestMessageRequestsRouter:
                                 mock_profile.privacy_flags = {"allow_stranger_chat": False}
                                 mock_profile_repo_inst.get_by_user_id.return_value = mock_profile
                                 mock_profile_repo_class.return_value = mock_profile_repo_inst
-                                
+
                                 mock_use_case = AsyncMock()
                                 mock_use_case.execute.side_effect = ValueError(
                                     "Recipient does not allow stranger messages"
                                 )
                                 mock_use_case_class.return_value = mock_use_case
-                                
+
                                 # Act & Assert
                                 with pytest.raises(HTTPException) as exc_info:
                                     await create_message_request(
@@ -233,7 +233,7 @@ class TestMessageRequestsRouter:
                 mock_use_case = AsyncMock()
                 mock_use_case.execute.return_value = [sample_message_request]
                 mock_use_case_class.return_value = mock_use_case
-                
+
                 # Act
                 response = await get_my_message_requests(
                     status_filter="pending",
@@ -257,7 +257,7 @@ class TestMessageRequestsRouter:
                 mock_use_case = AsyncMock()
                 mock_use_case.execute.return_value = []
                 mock_use_case_class.return_value = mock_use_case
-                
+
                 # Act
                 response = await get_my_message_requests(
                     status_filter="all",
@@ -285,7 +285,7 @@ class TestMessageRequestsRouter:
                     mock_use_case = AsyncMock()
                     mock_use_case.execute.return_value = (sample_message_request, sample_thread)
                     mock_use_case_class.return_value = mock_use_case
-                    
+
                     # Act
                     response = await accept_message_request(
                         request_id=sample_request_id,
@@ -310,7 +310,7 @@ class TestMessageRequestsRouter:
                     mock_use_case = AsyncMock()
                     mock_use_case.execute.side_effect = ValueError("Request not found")
                     mock_use_case_class.return_value = mock_use_case
-                    
+
                     # Act & Assert
                     with pytest.raises(HTTPException) as exc_info:
                         await accept_message_request(
@@ -333,7 +333,7 @@ class TestMessageRequestsRouter:
                     mock_use_case = AsyncMock()
                     mock_use_case.execute.side_effect = ValueError("Not the recipient")
                     mock_use_case_class.return_value = mock_use_case
-                    
+
                     # Act & Assert
                     with pytest.raises(HTTPException) as exc_info:
                         await accept_message_request(
@@ -358,7 +358,7 @@ class TestMessageRequestsRouter:
                 mock_use_case = AsyncMock()
                 mock_use_case.execute.return_value = sample_message_request
                 mock_use_case_class.return_value = mock_use_case
-                
+
                 # Act
                 response = await decline_message_request(
                     request_id=sample_request_id,
@@ -381,7 +381,7 @@ class TestMessageRequestsRouter:
                 mock_use_case = AsyncMock()
                 mock_use_case.execute.side_effect = ValueError("Request not found")
                 mock_use_case_class.return_value = mock_use_case
-                
+
                 # Act & Assert
                 with pytest.raises(HTTPException) as exc_info:
                     await decline_message_request(
@@ -403,7 +403,7 @@ class TestMessageRequestsRouter:
                 mock_use_case = AsyncMock()
                 mock_use_case.execute.side_effect = ValueError("Not the recipient")
                 mock_use_case_class.return_value = mock_use_case
-                
+
                 # Act & Assert
                 with pytest.raises(HTTPException) as exc_info:
                     await decline_message_request(

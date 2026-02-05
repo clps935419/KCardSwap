@@ -4,9 +4,7 @@ Unit tests for Geolocation utilities
 Tests the haversine distance calculation.
 """
 
-import math
 
-import pytest
 
 from app.modules.social.infrastructure.utils.geolocation import haversine_distance
 

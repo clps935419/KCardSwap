@@ -265,7 +265,11 @@ class TestMessagingInThread:
     """Test sending and receiving messages in threads"""
 
     async def test_send_message_in_thread(
-        self, thread_repository, thread_message_repository, test_user_a_id, test_user_b_id
+        self,
+        thread_repository,
+        thread_message_repository,
+        test_user_a_id,
+        test_user_b_id,
     ):
         """Test sending messages in an accepted thread"""
         from app.modules.social.domain.entities.thread import MessageThread
@@ -300,7 +304,11 @@ class TestMessagingInThread:
         assert created_message.content == "Hello from A!"
 
     async def test_list_messages_in_thread(
-        self, thread_repository, thread_message_repository, test_user_a_id, test_user_b_id
+        self,
+        thread_repository,
+        thread_message_repository,
+        test_user_a_id,
+        test_user_b_id,
     ):
         """Test listing messages in a thread"""
         from app.modules.social.domain.entities.thread import MessageThread
@@ -352,10 +360,12 @@ class TestMessagingInThread:
         db_session,
     ):
         """Test message can reference a post_id"""
+        from datetime import datetime, timedelta, timezone
+
+        from sqlalchemy import text
+
         from app.modules.social.domain.entities.thread import MessageThread
         from app.modules.social.domain.entities.thread_message import ThreadMessage
-        from sqlalchemy import text
-        from datetime import datetime, timedelta, timezone
 
         # Create thread
         thread_id = str(uuid.uuid4())
@@ -413,7 +423,11 @@ class TestPrivacyAndBlocking:
     """Test privacy settings and blocking rules for messaging"""
 
     async def test_blocked_user_cannot_send_request(
-        self, message_request_repository, friendship_repository, test_user_a_id, test_user_b_id
+        self,
+        message_request_repository,
+        friendship_repository,
+        test_user_a_id,
+        test_user_b_id,
     ):
         """Test blocked users cannot send message requests"""
         # User B blocks User A
@@ -435,7 +449,7 @@ class TestPrivacyAndBlocking:
 
     async def test_stranger_messages_can_be_disabled(self, test_user_b_id):
         """Test privacy setting can disable stranger messages
-        
+
         Note: This is a placeholder test. The actual privacy settings
         enforcement will be implemented in the privacy service (T062).
         """

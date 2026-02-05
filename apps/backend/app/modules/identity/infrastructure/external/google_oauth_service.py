@@ -67,11 +67,11 @@ class GoogleOAuthService:
     ) -> Optional[str]:
         """
         Exchange authorization code for ID token
-        
+
         Args:
             code: Authorization code from Google OAuth
             redirect_uri: Optional redirect URI (must match the one used in auth request)
-        
+
         Returns ID token or None if exchange fails
         """
         token_url = "https://oauth2.googleapis.com/token"

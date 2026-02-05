@@ -207,14 +207,14 @@ class TestVerifyToken:
         """Test verifying expired token"""
         # Create a token with past expiration
         past_time = datetime.utcnow() - timedelta(hours=1)
-        
+
         payload = {
             "sub": "user_123",
             "exp": past_time,
             "iat": past_time - timedelta(hours=2),
             "type": "access",
         }
-        
+
         expired_token = jwt.encode(payload, "test_secret", algorithm="HS256")
 
         with pytest.raises(JWTError):

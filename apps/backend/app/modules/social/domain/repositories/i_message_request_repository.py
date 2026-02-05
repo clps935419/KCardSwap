@@ -7,7 +7,10 @@ Domain layer repository interface - defines contract for message request persist
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
-from app.modules.social.domain.entities.message_request import MessageRequest, RequestStatus
+from app.modules.social.domain.entities.message_request import (
+    MessageRequest,
+    RequestStatus,
+)
 
 
 class IMessageRequestRepository(ABC):
@@ -29,7 +32,7 @@ class IMessageRequestRepository(ABC):
     ) -> Optional[MessageRequest]:
         """
         Find pending message request between two users (either direction)
-        
+
         Returns the pending request if exists, None otherwise.
         """
         pass
@@ -40,11 +43,11 @@ class IMessageRequestRepository(ABC):
     ) -> List[MessageRequest]:
         """
         Get all message requests for a recipient
-        
+
         Args:
             recipient_id: ID of the recipient user
             status: Optional status filter (PENDING, ACCEPTED, DECLINED)
-        
+
         Returns:
             List of message requests ordered by created_at descending
         """

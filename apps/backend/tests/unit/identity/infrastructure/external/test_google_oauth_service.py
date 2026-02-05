@@ -7,7 +7,6 @@ and Google auth library.
 
 import os
 from unittest.mock import AsyncMock, MagicMock, patch
-from uuid import uuid4
 
 import pytest
 

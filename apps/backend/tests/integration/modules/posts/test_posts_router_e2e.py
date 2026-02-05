@@ -8,11 +8,12 @@ Tests the posts management endpoints:
 - POST /posts/{post_id}/like - Toggle like
 """
 
+from uuid import UUID, uuid4
+
 import pytest
 import pytest_asyncio
 from fastapi.testclient import TestClient
 from sqlalchemy import text
-from uuid import UUID, uuid4
 
 from app.main import app
 from app.shared.infrastructure.database.connection import get_db_session
@@ -26,14 +27,17 @@ class TestPostsRouterE2E:
     async def test_user(self, db_session) -> UUID:
         """Create test user and return user ID"""
         import uuid
+
         unique_id = str(uuid.uuid4())
         user_id = str(uuid.uuid4())
         result = await db_session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO users (id, google_id, email, role)
                 VALUES (:id, :google_id, :email, :role)
                 RETURNING id
-            """),
+            """
+            ),
             {
                 "id": user_id,
                 "google_id": f"test_posts_{unique_id}",
@@ -48,6 +52,7 @@ class TestPostsRouterE2E:
     @pytest.fixture
     def authenticated_client(self, test_user, app_db_session_override):
         """Provide authenticated test client"""
+
         def override_require_user():
             return test_user
 
@@ -79,7 +84,7 @@ class TestPostsRouterE2E:
             "title": "Looking for BTS cards",
             "content": "I have extra Jungkook cards to trade",
             "idol": "Jungkook",
-            "idol_group": "BTS"
+            "idol_group": "BTS",
         }
 
         response = authenticated_client.post("/api/v1/posts", json=payload)
@@ -100,7 +105,7 @@ class TestPostsRouterE2E:
             "title": "Selling IU photocards",
             "content": "Brand new IU photocards for sale",
             "idol": "IU",
-            "idol_group": "Solo"
+            "idol_group": "Solo",
         }
 
         response = authenticated_client.post("/api/v1/posts", json=payload)
@@ -129,7 +134,7 @@ class TestPostsRouterE2E:
             # Missing city_code
             "category": "trade",
             "title": "Test post",
-            "content": "Content"
+            "content": "Content",
         }
 
         response = authenticated_client.post("/api/v1/posts", json=payload)
@@ -144,7 +149,7 @@ class TestPostsRouterE2E:
             "city_code": "TPE",  # Should not be allowed for global
             "category": "trade",
             "title": "Test post",
-            "content": "Content"
+            "content": "Content",
         }
 
         response = authenticated_client.post("/api/v1/posts", json=payload)
@@ -158,7 +163,7 @@ class TestPostsRouterE2E:
             "scope": "global",
             "category": "trade",
             "title": "Test",
-            "content": "Test"
+            "content": "Test",
         }
 
         response = unauthenticated_client.post("/api/v1/posts", json=payload)
@@ -214,18 +219,21 @@ class TestPostsRouterE2E:
         """Create a test post"""
         post_id = uuid4()
         from datetime import datetime, timedelta, timezone
+
         expires_at = datetime.now(timezone.utc) + timedelta(days=14)
         await db_session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO posts (
-                    id, owner_id, scope, category, title, content, 
+                    id, owner_id, scope, category, title, content,
                     status, expires_at, created_at, updated_at
                 )
                 VALUES (
                     :id, :owner_id, :scope, :category, :title, :content,
                     :status, :expires_at, NOW(), NOW()
                 )
-            """),
+            """
+            ),
             {
                 "id": str(post_id),
                 "owner_id": str(test_user),
@@ -235,7 +243,7 @@ class TestPostsRouterE2E:
                 "content": "Test Content",
                 "status": "open",
                 "expires_at": expires_at,
-            }
+            },
         )
         await db_session.commit()
         return post_id
@@ -263,14 +271,17 @@ class TestPostsRouterE2E:
     async def test_user2(self, db_session) -> UUID:
         """Create second test user"""
         import uuid
+
         unique_id = str(uuid.uuid4())
         user_id = str(uuid.uuid4())
         result = await db_session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO users (id, google_id, email, role)
                 VALUES (:id, :google_id, :email, :role)
                 RETURNING id
-            """),
+            """
+            ),
             {
                 "id": user_id,
                 "google_id": f"test_posts2_{unique_id}",
@@ -284,6 +295,7 @@ class TestPostsRouterE2E:
 
     def test_close_post_not_owner(self, test_user2, test_post, app_db_session_override):
         """Test closing post by non-owner (should fail)"""
+
         def override_require_user():
             return test_user2
 

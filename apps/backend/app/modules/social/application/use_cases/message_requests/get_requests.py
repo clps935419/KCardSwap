@@ -14,7 +14,7 @@ from app.modules.social.domain.repositories.i_message_request_repository import 
 class GetMessageRequestsUseCase:
     """
     Use case for getting message requests for a recipient.
-    
+
     Supports FR-016: Inbox clearly separates Requests vs Threads.
     """
 
@@ -29,11 +29,11 @@ class GetMessageRequestsUseCase:
     ) -> List[MessageRequest]:
         """
         Get message requests for a recipient.
-        
+
         Args:
             recipient_id: ID of the recipient user
             status_filter: Status to filter ("pending", "accepted", "declined", "all")
-        
+
         Returns:
             List of MessageRequest entities
         """

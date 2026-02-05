@@ -5,10 +5,10 @@ from typing import List, Optional
 
 from app.modules.posts.domain.entities.post import Post, PostStatus
 from app.modules.posts.domain.entities.post_enums import PostCategory
-from app.modules.posts.domain.repositories.i_post_repository import IPostRepository
 from app.modules.posts.domain.repositories.i_post_like_repository import (
     IPostLikeRepository,
 )
+from app.modules.posts.domain.repositories.i_post_repository import IPostRepository
 
 
 @dataclass
@@ -34,7 +34,7 @@ class ListPostsV2UseCase:
     """
 
     def __init__(
-        self, 
+        self,
         post_repository: IPostRepository,
         like_repository: IPostLikeRepository,
     ):
@@ -84,7 +84,7 @@ class ListPostsV2UseCase:
                     post.id, current_user_id
                 )
                 liked_by_me = existing_like is not None
-            
+
             posts_with_likes.append(
                 PostWithLikes(
                     post=post,

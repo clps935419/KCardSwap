@@ -165,7 +165,7 @@ class TestGalleryRouter:
         )
         card2.created_at = datetime.now(timezone.utc)
         card2.updated_at = datetime.now(timezone.utc)
-        
+
         mock_repository.find_by_user_id.return_value = [sample_gallery_card, card2]
         mock_repository.count_by_user_id.return_value = 2
 
@@ -194,7 +194,7 @@ class TestGalleryRouter:
         )
 
         mock_repository.find_by_user_id.return_value = []
-        
+
         created_card = GalleryCard(
             id=sample_card_id,
             user_id=sample_user_id,
@@ -206,7 +206,7 @@ class TestGalleryRouter:
         )
         created_card.created_at = datetime.now(timezone.utc)
         created_card.updated_at = datetime.now(timezone.utc)
-        
+
         mock_repository.create.return_value = created_card
 
         # Act
@@ -236,7 +236,7 @@ class TestGalleryRouter:
         )
 
         mock_repository.find_by_user_id.return_value = [sample_gallery_card]
-        
+
         created_card = GalleryCard(
             id=uuid4(),
             user_id=sample_user_id,
@@ -248,7 +248,7 @@ class TestGalleryRouter:
         )
         created_card.created_at = datetime.now(timezone.utc)
         created_card.updated_at = datetime.now(timezone.utc)
-        
+
         mock_repository.create.return_value = created_card
 
         # Act

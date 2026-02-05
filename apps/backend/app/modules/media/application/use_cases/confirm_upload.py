@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from datetime import datetime
 from uuid import UUID
 
-from app.modules.media.domain.entities.media_asset import MediaAsset
 from app.modules.media.domain.repositories.i_media_repository import IMediaRepository
 from app.shared.domain.quota.media_quota_service import MediaQuotaService
 from app.shared.infrastructure.external.gcs_storage_service import GCSStorageService
@@ -27,9 +26,9 @@ class ConfirmUploadResponse:
 
 class ConfirmUploadUseCase:
     """Use case for confirming media upload.
-    
+
     This is step 2 of the media upload flow: presign → upload → confirm → attach.
-    
+
     FR-007: Only confirmed media can be attached.
     FR-022: Quota is applied ONLY at this stage (not at presign).
     T052: Apply media quota in confirm use case.
@@ -47,13 +46,13 @@ class ConfirmUploadUseCase:
 
     async def execute(self, request: ConfirmUploadRequest) -> ConfirmUploadResponse:
         """Confirm media upload and apply quota.
-        
+
         Args:
             request: Confirmation request
-            
+
         Returns:
             Confirmed media details
-            
+
         Raises:
             ValueError: If media not found or not owned by user
             LimitExceededException: If quota is exceeded
@@ -85,7 +84,7 @@ class ConfirmUploadUseCase:
             year=now.year,
             month=now.month,
         )
-        
+
         await self.media_quota_service.check_monthly_bytes(
             user_id=request.user_id,
             current_bytes_used=current_month_bytes,

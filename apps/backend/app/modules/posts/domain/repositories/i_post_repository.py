@@ -58,11 +58,11 @@ class IPostRepository(ABC):
     ) -> List[Post]:
         """
         List posts with flexible filtering (V2: supports global/city filtering)
-        
-        FR-005: 
+
+        FR-005:
         - When city_code is None: returns all posts (global + city)
         - When city_code is provided: returns only posts with that city_code
-        
+
         Args:
             city_code: Optional city filter (None = global view, includes all posts)
             category: Optional category filter

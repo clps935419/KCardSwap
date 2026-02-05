@@ -10,7 +10,7 @@ from uuid import UUID
 class GalleryCard:
     """
     Domain entity representing a gallery card.
-    
+
     Gallery cards are display-only items in a user's personal album.
     They do not have trading status (持有/欲交換/已交換).
     """

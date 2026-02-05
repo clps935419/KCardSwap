@@ -13,7 +13,7 @@ from app.modules.social.domain.repositories.i_thread_repository import IThreadRe
 class AcceptMessageRequestUseCase:
     """
     Use case for accepting a message request.
-    
+
     Implements FR-012: Recipient can accept/decline requests.
     Creates a unique thread when accepted (FR-014).
     """
@@ -31,14 +31,14 @@ class AcceptMessageRequestUseCase:
     ) -> tuple[object, MessageThread]:
         """
         Accept a message request and create thread.
-        
+
         Args:
             request_id: ID of the message request
             accepting_user_id: ID of user accepting (must be recipient)
-        
+
         Returns:
             tuple: (updated_request, created_thread)
-        
+
         Raises:
             ValueError: If request not found, not recipient, or already processed
         """
@@ -61,7 +61,7 @@ class AcceptMessageRequestUseCase:
         existing_thread = await self.thread_repository.find_by_users(
             message_request.sender_id, message_request.recipient_id
         )
-        
+
         if existing_thread:
             # Thread already exists, just update request
             message_request.accept(existing_thread.id)
@@ -72,7 +72,7 @@ class AcceptMessageRequestUseCase:
 
         # Create new thread
         thread_id = str(uuid.uuid4())
-        
+
         # Normalize user order for thread (smaller UUID first)
         user_a_id = message_request.sender_id
         user_b_id = message_request.recipient_id

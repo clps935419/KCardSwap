@@ -18,12 +18,12 @@ from app.shared.domain.quota.quota_service import (
     SubscriptionTier,
     get_next_reset_time,
 )
-from app.shared.presentation.errors.limit_exceeded import LimitExceededException
+from app.shared.presentation.errors.limit_exceeded import LimitExceededError
 
 
 class MediaQuotaService:
     """Service for checking media-related quotas.
-    
+
     This service checks:
     1. Individual file size limit (media_file_bytes_max)
     2. Monthly total upload bytes limit (media_bytes_per_month)
@@ -66,7 +66,7 @@ class MediaQuotaService:
             file_size_bytes: Size of the file in bytes
 
         Raises:
-            LimitExceededException: If file size exceeds limit
+            LimitExceededError: If file size exceeds limit
         """
         tier = await self._get_user_tier(user_id)
         limit = QUOTA_LIMITS[QuotaKey.MEDIA_FILE_BYTES_MAX][tier]
@@ -75,7 +75,7 @@ class MediaQuotaService:
             # No periodic reset for file size limit - use far future with UTC timezone
             from zoneinfo import ZoneInfo
             reset_at = datetime.max.replace(tzinfo=ZoneInfo("UTC"))
-            raise LimitExceededException(
+            raise LimitExceededError(
                 limit_key=QuotaKey.MEDIA_FILE_BYTES_MAX.value,
                 limit_value=limit,
                 current_value=file_size_bytes,
@@ -97,7 +97,7 @@ class MediaQuotaService:
             additional_bytes: Bytes to be added
 
         Raises:
-            LimitExceededException: If monthly quota would be exceeded
+            LimitExceededError: If monthly quota would be exceeded
         """
         tier = await self._get_user_tier(user_id)
         limit = QUOTA_LIMITS[QuotaKey.MEDIA_BYTES_PER_MONTH][tier]
@@ -106,7 +106,7 @@ class MediaQuotaService:
         new_total = current_bytes_used + additional_bytes
 
         if new_total > limit:
-            raise LimitExceededException(
+            raise LimitExceededError(
                 limit_key=QuotaKey.MEDIA_BYTES_PER_MONTH.value,
                 limit_value=limit,
                 current_value=current_bytes_used,

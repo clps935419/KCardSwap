@@ -8,7 +8,7 @@ Tests the report router endpoints:
 
 from datetime import datetime
 from unittest.mock import AsyncMock, patch
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 import pytest
 from fastapi import HTTPException
@@ -294,7 +294,7 @@ class TestReportRouter:
         from app.modules.social.presentation.routers.report_router import get_my_reports
 
         mock_session = AsyncMock()
-        
+
         # Create multiple report entities
         mock_report_entity2 = AsyncMock()
         mock_report_entity2.id = str(uuid4())

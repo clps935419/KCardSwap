@@ -142,7 +142,7 @@ class TestEmailEquality:
 
         assert email != "test@example.com"
         assert email != 123
-        assert email != None
+        assert email is not None
 
     def test_email_hash(self):
         """Test that email can be hashed"""

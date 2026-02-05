@@ -9,7 +9,7 @@ from app.modules.social.domain.repositories.i_message_request_repository import 
 class DeclineMessageRequestUseCase:
     """
     Use case for declining a message request.
-    
+
     Implements FR-012: Recipient can accept/decline requests.
     """
 
@@ -24,14 +24,14 @@ class DeclineMessageRequestUseCase:
     ) -> MessageRequest:
         """
         Decline a message request.
-        
+
         Args:
             request_id: ID of the message request
             declining_user_id: ID of user declining (must be recipient)
-        
+
         Returns:
             Updated MessageRequest entity
-        
+
         Raises:
             ValueError: If request not found, not recipient, or already processed
         """

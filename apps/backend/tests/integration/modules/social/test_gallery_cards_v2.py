@@ -2,8 +2,10 @@
 Integration tests for Gallery Cards CRUD and reorder operations.
 Tests for User Story 2: Manage personal gallery cards and view others' galleries.
 """
-import pytest
+
 from uuid import uuid4
+
+import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -58,7 +60,7 @@ class TestGalleryCardsCRUD:
             {"title": f"Card {i}", "idol_name": "IU", "era": f"Era {i}"}
             for i in range(1, 4)
         ]
-        
+
         for card_data in cards_data:
             await async_client.post(
                 "/api/v1/gallery/cards",
@@ -76,7 +78,9 @@ class TestGalleryCardsCRUD:
         assert response.status_code == 200
         data = response.json()
         assert len(data["items"]) == 3
-        assert all(card["title"] in ["Card 1", "Card 2", "Card 3"] for card in data["items"])
+        assert all(
+            card["title"] in ["Card 1", "Card 2", "Card 3"] for card in data["items"]
+        )
 
     async def test_get_user_gallery_cards(
         self,
@@ -212,7 +216,7 @@ class TestGalleryCardsReorder:
         )
         assert get_response.status_code == 200
         cards = get_response.json()["items"]
-        
+
         # Cards should be in the new order (reversed)
         returned_ids = [card["id"] for card in cards]
         assert returned_ids[:3] == list(reversed(card_ids))
@@ -255,7 +259,7 @@ class TestGalleryCardsReorder:
         assert get_response.status_code == 200
         cards = get_response.json()["items"]
         returned_ids = [card["id"] for card in cards]
-        
+
         # First two should be swapped
         assert returned_ids[0] == card_ids[1]
         assert returned_ids[1] == card_ids[0]

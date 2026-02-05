@@ -3,9 +3,10 @@ Integration tests for post likes (T067: create/delete/idempotent behavior)
 Tests FR-008, FR-009 - Like functionality with accurate count and no duplicate counting
 """
 
+from uuid import uuid4
+
 import pytest
 from httpx import AsyncClient
-from uuid import uuid4
 
 
 @pytest.mark.asyncio
@@ -20,7 +21,7 @@ async def test_like_post_success(
         f"/api/v1/posts/{sample_post_id}/like",
         headers=auth_headers_user1,
     )
-    
+
     assert response.status_code == 200
     data = response.json()["data"]
     assert data["liked"] is True
@@ -39,13 +40,13 @@ async def test_unlike_post_success(
         f"/api/v1/posts/{sample_post_id}/like",
         headers=auth_headers_user1,
     )
-    
+
     # Then unlike it
     response = await client.post(
         f"/api/v1/posts/{sample_post_id}/like",
         headers=auth_headers_user1,
     )
-    
+
     assert response.status_code == 200
     data = response.json()["data"]
     assert data["liked"] is False
@@ -70,7 +71,7 @@ async def test_like_unlike_like_idempotent(
     assert response1.status_code == 200
     assert response1.json()["data"]["liked"] is True
     assert response1.json()["data"]["like_count"] == 1
-    
+
     # Unlike
     response2 = await client.post(
         f"/api/v1/posts/{sample_post_id}/like",
@@ -79,7 +80,7 @@ async def test_like_unlike_like_idempotent(
     assert response2.status_code == 200
     assert response2.json()["data"]["liked"] is False
     assert response2.json()["data"]["like_count"] == 0
-    
+
     # Like again
     response3 = await client.post(
         f"/api/v1/posts/{sample_post_id}/like",
@@ -105,7 +106,7 @@ async def test_multiple_users_like_same_post(
     )
     assert response1.status_code == 200
     assert response1.json()["data"]["like_count"] == 1
-    
+
     # User 2 likes
     response2 = await client.post(
         f"/api/v1/posts/{sample_post_id}/like",
@@ -113,7 +114,7 @@ async def test_multiple_users_like_same_post(
     )
     assert response2.status_code == 200
     assert response2.json()["data"]["like_count"] == 2
-    
+
     # User 1 unlikes
     response3 = await client.post(
         f"/api/v1/posts/{sample_post_id}/like",
@@ -136,13 +137,13 @@ async def test_like_count_in_post_list(
         f"/api/v1/posts/{sample_post_id}/like",
         headers=auth_headers_user1,
     )
-    
+
     # User 2 likes the post
     await client.post(
         f"/api/v1/posts/{sample_post_id}/like",
         headers=auth_headers_user2,
     )
-    
+
     # User 1 lists posts - should see liked_by_me=True and like_count=2
     response1 = await client.get(
         "/api/v1/posts",
@@ -154,7 +155,7 @@ async def test_like_count_in_post_list(
     assert post1 is not None
     assert post1["like_count"] == 2
     assert post1["liked_by_me"] is True
-    
+
     # User 2 lists posts - should see liked_by_me=True and like_count=2
     response2 = await client.get(
         "/api/v1/posts",
@@ -210,20 +211,20 @@ async def test_like_does_not_duplicate_count(
         headers=auth_headers_user1,
     )
     assert response1.json()["data"]["like_count"] == 1
-    
+
     # Unlike
     await client.post(
         f"/api/v1/posts/{sample_post_id}/like",
         headers=auth_headers_user1,
     )
-    
+
     # Like again
     response2 = await client.post(
         f"/api/v1/posts/{sample_post_id}/like",
         headers=auth_headers_user1,
     )
     assert response2.json()["data"]["like_count"] == 1
-    
+
     # Count should still be 1 (not 2)
     response3 = await client.get(
         "/api/v1/posts",

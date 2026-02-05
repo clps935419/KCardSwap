@@ -2,8 +2,9 @@
 
 Tests User Story 3 - Media Upload & Attach (T045).
 """
-import pytest
 from uuid import uuid4
+
+import pytest
 
 from app.modules.media.application.use_cases.attach_media import (
     AttachMediaRequest,
@@ -20,7 +21,7 @@ from app.modules.media.application.use_cases.create_upload_url import (
 from app.modules.media.domain.entities.media_asset import MediaStatus
 from app.modules.media.domain.repositories.i_media_repository import IMediaRepository
 from app.shared.infrastructure.external.gcs_storage_service import GCSStorageService
-from app.shared.presentation.errors.limit_exceeded import LimitExceededException
+from app.shared.presentation.errors.limit_exceeded import LimitExceededError
 
 
 @pytest.mark.asyncio
@@ -140,7 +141,7 @@ class TestMediaUploadConfirmAttach:
             media_id=presign_result.media_id,
         )
 
-        with pytest.raises(LimitExceededException) as exc_info:
+        with pytest.raises(LimitExceededError) as exc_info:
             await confirm_upload_use_case.execute(confirm_request)
 
         assert exc_info.value.limit_key == "media_file_bytes_max"

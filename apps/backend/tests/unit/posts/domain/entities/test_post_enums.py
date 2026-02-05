@@ -160,4 +160,4 @@ class TestPostEnumsIntegration:
         """Test that PostCategory and PostScope are different types"""
         # Assert
         assert PostCategory.TRADE != PostScope.GLOBAL
-        assert type(PostCategory.TRADE) != type(PostScope.GLOBAL)
+        assert type(PostCategory.TRADE) is not type(PostScope.GLOBAL)

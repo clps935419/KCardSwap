@@ -37,7 +37,6 @@ from app.modules.identity.presentation.schemas.auth_schemas import (
     GoogleLoginRequest,
     LoginResponse,
     RefreshSuccessResponse,
-    RefreshTokenRequest,
     TokenResponse,
 )
 from app.shared.infrastructure.security.jwt_service import JWTService

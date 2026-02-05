@@ -13,11 +13,19 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 # This is the declarative base that all ORM models inherit from
 # Import all models to ensure they're registered with Base.metadata
 # This is required for Alembic autogenerate to work properly
+from app.modules.identity.infrastructure.database import (
+    models as identity_models,  # noqa: E402,F401
+)
+from app.modules.media.infrastructure.database import (
+    models as media_models,  # noqa: E402,F401
+)
+from app.modules.posts.infrastructure.database import (
+    models as posts_models,  # noqa: E402,F401
+)
+from app.modules.social.infrastructure.database import (
+    models as social_models,  # noqa: E402,F401
+)
 from app.shared.infrastructure.database.connection import Base  # noqa: E402
-from app.modules.identity.infrastructure.database import models as identity_models  # noqa: E402,F401
-from app.modules.media.infrastructure.database import models as media_models  # noqa: E402,F401
-from app.modules.posts.infrastructure.database import models as posts_models  # noqa: E402,F401
-from app.modules.social.infrastructure.database import models as social_models  # noqa: E402,F401
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

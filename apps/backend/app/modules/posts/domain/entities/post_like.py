@@ -5,22 +5,22 @@ Represents a user's like on a post (FR-008, FR-009)
 
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 
 @dataclass
 class PostLike:
     """
     PostLike entity - represents a user's like on a post
-    
+
     FR-009: Each user can like a post at most once (enforced by unique constraint)
     """
-    
+
     id: str
     post_id: str
     user_id: str
     created_at: datetime
-    
+
     @staticmethod
     def create(
         post_id: str,

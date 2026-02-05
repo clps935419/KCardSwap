@@ -26,7 +26,7 @@ class ToggleLikeResult:
 class ToggleLikeUseCase:
     """
     Use case for toggling like on a post
-    
+
     Implements idempotent toggle pattern:
     - If user has liked the post, unlike it
     - If user has not liked the post, like it
@@ -43,14 +43,14 @@ class ToggleLikeUseCase:
     async def execute(self, post_id: str, user_id: str) -> ToggleLikeResult:
         """
         Toggle like on a post
-        
+
         Args:
             post_id: Post ID to like/unlike
             user_id: User ID performing the action
-            
+
         Returns:
             ToggleLikeResult with liked status and current like count
-            
+
         Raises:
             ValueError: If post not found
         """

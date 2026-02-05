@@ -3,10 +3,10 @@
 from typing import List
 
 from app.modules.social.domain.entities.thread_message import ThreadMessage
-from app.modules.social.domain.repositories.i_thread_repository import IThreadRepository
 from app.modules.social.domain.repositories.i_thread_message_repository import (
     IThreadMessageRepository,
 )
+from app.modules.social.domain.repositories.i_thread_repository import IThreadRepository
 
 
 class GetThreadMessagesUseCase:
@@ -27,16 +27,16 @@ class GetThreadMessagesUseCase:
     ) -> List[ThreadMessage]:
         """
         Get messages in a thread.
-        
+
         Args:
             thread_id: ID of the thread
             user_id: ID of the requesting user (must be part of thread)
             limit: Maximum number of messages to return
             offset: Pagination offset
-        
+
         Returns:
             List of ThreadMessage entities ordered by created_at ascending
-        
+
         Raises:
             ValueError: If thread not found or user not authorized
         """

@@ -163,9 +163,9 @@ class VerifyReceiptUseCase:
         return {
             "plan": subscription.plan,
             "status": subscription.status,
-            "expires_at": subscription.expires_at.isoformat()
-            if subscription.expires_at
-            else None,
+            "expires_at": (
+                subscription.expires_at.isoformat() if subscription.expires_at else None
+            ),
             "entitlement_active": entitlement_active,
             "source": "google_play",
         }

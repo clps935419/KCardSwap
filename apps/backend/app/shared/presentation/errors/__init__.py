@@ -1,5 +1,5 @@
 """Shared presentation errors."""
 
-from .limit_exceeded import LimitExceededException
+from .limit_exceeded import LimitExceededError
 
-__all__ = ["LimitExceededException"]
+__all__ = ["LimitExceededError"]

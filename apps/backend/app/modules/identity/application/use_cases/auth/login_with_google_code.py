@@ -5,8 +5,8 @@ Follows DDD: Uses domain entities and repository interfaces
 Supports Web OAuth with Authorization Code Flow (without PKCE)
 """
 
-from datetime import datetime, timedelta
 import logging
+from datetime import datetime, timedelta
 from typing import Optional, Tuple
 
 from app.modules.identity.domain.entities.profile import Profile
@@ -68,7 +68,7 @@ class GoogleCodeLoginUseCase:
         """
         # Step 1: Exchange authorization code for ID token
         self._logger.info("Exchanging authorization code for ID token")
-        
+
         # Pass redirect_uri to token exchange for OAuth 2.0 security validation
         id_token = await self._google_oauth.exchange_code_for_token(
             code=code, redirect_uri=redirect_uri

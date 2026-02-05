@@ -12,7 +12,7 @@ from app.modules.social.domain.repositories.i_thread_repository import IThreadRe
 class ThreadUniquenessService:
     """
     Service to enforce FR-014: One unique thread per user pair.
-    
+
     Prevents duplicate threads and ensures proper routing to existing conversations.
     """
 
@@ -29,7 +29,7 @@ class ThreadUniquenessService:
     ) -> tuple[Optional[MessageThread], Optional[object]]:
         """
         Find existing thread or pending request between two users.
-        
+
         Returns:
             tuple: (existing_thread, pending_request)
             - If thread exists: (Thread, None)
@@ -53,7 +53,7 @@ class ThreadUniquenessService:
     async def can_create_new_request(self, sender_id: str, recipient_id: str) -> bool:
         """
         Check if a new message request can be created.
-        
+
         Returns:
             True if no thread or pending request exists, False otherwise.
         """
@@ -65,9 +65,9 @@ class ThreadUniquenessService:
     async def get_or_fail(self, user_a_id: str, user_b_id: str) -> MessageThread:
         """
         Get existing thread or raise error if not found.
-        
+
         Used when sending messages - thread must already exist.
-        
+
         Raises:
             ValueError: If thread does not exist
         """

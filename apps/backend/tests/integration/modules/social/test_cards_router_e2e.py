@@ -9,11 +9,12 @@ Tests the cards management endpoints:
 - GET /cards/quota/status - Get quota status
 """
 
+from uuid import UUID, uuid4
+
 import pytest
 import pytest_asyncio
 from fastapi.testclient import TestClient
 from sqlalchemy import text
-from uuid import UUID, uuid4
 
 from app.main import app
 from app.shared.infrastructure.database.connection import get_db_session
@@ -27,14 +28,17 @@ class TestCardsRouterE2E:
     async def test_user(self, db_session) -> UUID:
         """Create test user and return user ID"""
         import uuid
+
         unique_id = str(uuid.uuid4())
         user_id = str(uuid.uuid4())
         result = await db_session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO users (id, google_id, email, role)
                 VALUES (:id, :google_id, :email, :role)
                 RETURNING id
-            """),
+            """
+            ),
             {
                 "id": user_id,
                 "google_id": f"test_cards_{unique_id}",
@@ -49,6 +53,7 @@ class TestCardsRouterE2E:
     @pytest.fixture
     def authenticated_client(self, test_user, app_db_session_override):
         """Provide authenticated test client"""
+
         def override_get_current_user_id():
             return test_user
 
@@ -94,14 +99,14 @@ class TestCardsRouterE2E:
             "idol_group": "BTS",
             "album": "BE",
             "version": "Deluxe",
-            "rarity": "rare"
+            "rarity": "rare",
         }
 
         response = authenticated_client.post("/api/v1/cards/upload-url", json=payload)
 
         # Should succeed or fail based on GCS configuration
         assert response.status_code in [200, 422]
-        
+
         if response.status_code == 200:
             data = response.json()["data"]
             assert "upload_url" in data
@@ -119,7 +124,7 @@ class TestCardsRouterE2E:
             "idol_group": "BTS",
             "album": "BE",
             "version": "Deluxe",
-            "rarity": "rare"
+            "rarity": "rare",
         }
 
         response = authenticated_client.post("/api/v1/cards/upload-url", json=payload)
@@ -135,7 +140,7 @@ class TestCardsRouterE2E:
             "idol_group": "BTS",
             "album": "BE",
             "version": "Deluxe",
-            "rarity": "rare"
+            "rarity": "rare",
         }
 
         response = authenticated_client.post("/api/v1/cards/upload-url", json=payload)
@@ -162,7 +167,7 @@ class TestCardsRouterE2E:
             "idol_group": "BTS",
             "album": "BE",
             "version": "Deluxe",
-            "rarity": "rare"
+            "rarity": "rare",
         }
 
         response = unauthenticated_client.post("/api/v1/cards/upload-url", json=payload)
@@ -191,7 +196,8 @@ class TestCardsRouterE2E:
         """Create a test card for the user"""
         card_id = uuid4()
         await db_session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO cards (
                     id, owner_id, idol, idol_group, album, version, rarity,
                     status, image_url, size_bytes
@@ -200,7 +206,8 @@ class TestCardsRouterE2E:
                     :id, :owner_id, :idol, :idol_group, :album, :version, :rarity,
                     :status, :image_url, :size_bytes
                 )
-            """),
+            """
+            ),
             {
                 "id": str(card_id),
                 "owner_id": str(test_user),
@@ -211,8 +218,8 @@ class TestCardsRouterE2E:
                 "rarity": "common",
                 "status": "available",
                 "image_url": "https://example.com/card.jpg",
-                "size_bytes": 1024000
-            }
+                "size_bytes": 1024000,
+            },
         )
         await db_session.commit()
         return card_id
@@ -225,7 +232,7 @@ class TestCardsRouterE2E:
         data = response.json()["data"]
         assert isinstance(data, list)
         assert len(data) > 0
-        
+
         card = data[0]
         assert "id" in card
         assert "idol" in card
@@ -262,6 +269,8 @@ class TestCardsRouterE2E:
 
     def test_confirm_upload_unauthorized(self, unauthenticated_client, test_card):
         """Test confirming upload without authentication"""
-        response = unauthenticated_client.post(f"/api/v1/cards/{test_card}/confirm-upload")
+        response = unauthenticated_client.post(
+            f"/api/v1/cards/{test_card}/confirm-upload"
+        )
 
         assert response.status_code == 401

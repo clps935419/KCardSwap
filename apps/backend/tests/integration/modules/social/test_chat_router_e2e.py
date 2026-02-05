@@ -8,11 +8,12 @@ Tests the chat management endpoints:
 - POST /chats/{room_id}/messages/{message_id}/read - Mark message as read
 """
 
+from uuid import UUID, uuid4
+
 import pytest
 import pytest_asyncio
 from fastapi.testclient import TestClient
 from sqlalchemy import text
-from uuid import UUID, uuid4
 
 from app.main import app
 from app.modules.social.infrastructure.database.models.chat_room_model import (
@@ -29,14 +30,17 @@ class TestChatRouterE2E:
     async def test_user1(self, db_session) -> UUID:
         """Create first test user"""
         import uuid
+
         unique_id = str(uuid.uuid4())
         user_id = str(uuid.uuid4())
         result = await db_session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO users (id, google_id, email, role)
                 VALUES (:id, :google_id, :email, :role)
                 RETURNING id
-            """),
+            """
+            ),
             {
                 "id": user_id,
                 "google_id": f"test_chat1_{unique_id}",
@@ -52,14 +56,17 @@ class TestChatRouterE2E:
     async def test_user2(self, db_session) -> UUID:
         """Create second test user"""
         import uuid
+
         unique_id = str(uuid.uuid4())
         user_id = str(uuid.uuid4())
         result = await db_session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO users (id, google_id, email, role)
                 VALUES (:id, :google_id, :email, :role)
                 RETURNING id
-            """),
+            """
+            ),
             {
                 "id": user_id,
                 "google_id": f"test_chat2_{unique_id}",
@@ -74,6 +81,7 @@ class TestChatRouterE2E:
     @pytest.fixture
     def authenticated_client_user1(self, test_user1, app_db_session_override):
         """Provide authenticated test client for user1"""
+
         def override_get_current_user_id():
             return test_user1
 
@@ -115,9 +123,7 @@ class TestChatRouterE2E:
         """Create a test chat room between user1 and user2"""
         room_id = uuid4()
         participants = sorted([test_user1, test_user2], key=str)
-        db_session.add(
-            ChatRoomModel(id=room_id, participant_ids=participants)
-        )
+        db_session.add(ChatRoomModel(id=room_id, participant_ids=participants))
         await db_session.commit()
         return room_id
 
@@ -126,16 +132,18 @@ class TestChatRouterE2E:
         """Create a friendship between user1 and user2"""
         friendship_id = uuid4()
         await db_session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO friendships (id, user_id, friend_id, status)
                 VALUES (:id, :user_id, :friend_id, :status)
-            """),
+            """
+            ),
             {
                 "id": str(friendship_id),
                 "user_id": str(test_user1),
                 "friend_id": str(test_user2),
-                "status": "accepted"
-            }
+                "status": "accepted",
+            },
         )
         await db_session.commit()
 
@@ -151,13 +159,17 @@ class TestChatRouterE2E:
     def test_get_messages_room_not_found(self, authenticated_client_user1):
         """Test getting messages from non-existent room"""
         fake_room_id = uuid4()
-        response = authenticated_client_user1.get(f"/api/v1/chats/{fake_room_id}/messages")
+        response = authenticated_client_user1.get(
+            f"/api/v1/chats/{fake_room_id}/messages"
+        )
 
         assert response.status_code == 404
 
     def test_get_messages_unauthorized(self, unauthenticated_client, test_chat_room):
         """Test getting messages without authentication"""
-        response = unauthenticated_client.get(f"/api/v1/chats/{test_chat_room}/messages")
+        response = unauthenticated_client.get(
+            f"/api/v1/chats/{test_chat_room}/messages"
+        )
 
         assert response.status_code == 401
 
@@ -165,11 +177,13 @@ class TestChatRouterE2E:
         self, authenticated_client_user1, test_chat_room, test_friendship
     ):
         """Test getting messages from a room successfully"""
-        response = authenticated_client_user1.get(f"/api/v1/chats/{test_chat_room}/messages")
+        response = authenticated_client_user1.get(
+            f"/api/v1/chats/{test_chat_room}/messages"
+        )
 
         # Should succeed or return 403 if not participant
         assert response.status_code in [200, 403]
-        
+
         if response.status_code == 200:
             data = response.json()["data"]
             assert "messages" in data
@@ -178,46 +192,40 @@ class TestChatRouterE2E:
     def test_send_message_room_not_found(self, authenticated_client_user1):
         """Test sending message to non-existent room"""
         fake_room_id = uuid4()
-        payload = {
-            "content": "Hello"
-        }
+        payload = {"content": "Hello"}
         response = authenticated_client_user1.post(
-            f"/api/v1/chats/{fake_room_id}/messages",
-            json=payload
+            f"/api/v1/chats/{fake_room_id}/messages", json=payload
         )
 
         assert response.status_code == 404
 
     def test_send_message_unauthorized(self, unauthenticated_client, test_chat_room):
         """Test sending message without authentication"""
-        payload = {
-            "content": "Hello"
-        }
+        payload = {"content": "Hello"}
         response = unauthenticated_client.post(
-            f"/api/v1/chats/{test_chat_room}/messages",
-            json=payload
+            f"/api/v1/chats/{test_chat_room}/messages", json=payload
         )
 
         assert response.status_code == 401
 
-    def test_send_message_empty_content(self, authenticated_client_user1, test_chat_room):
+    def test_send_message_empty_content(
+        self, authenticated_client_user1, test_chat_room
+    ):
         """Test sending message with empty content"""
-        payload = {
-            "content": ""
-        }
+        payload = {"content": ""}
         response = authenticated_client_user1.post(
-            f"/api/v1/chats/{test_chat_room}/messages",
-            json=payload
+            f"/api/v1/chats/{test_chat_room}/messages", json=payload
         )
 
         assert response.status_code in [400, 422]
 
-    def test_send_message_missing_content(self, authenticated_client_user1, test_chat_room):
+    def test_send_message_missing_content(
+        self, authenticated_client_user1, test_chat_room
+    ):
         """Test sending message without content field"""
         payload = {}
         response = authenticated_client_user1.post(
-            f"/api/v1/chats/{test_chat_room}/messages",
-            json=payload
+            f"/api/v1/chats/{test_chat_room}/messages", json=payload
         )
 
         assert response.status_code == 400
@@ -226,17 +234,14 @@ class TestChatRouterE2E:
         self, authenticated_client_user1, test_chat_room, test_friendship
     ):
         """Test sending message successfully"""
-        payload = {
-            "content": "Hello, this is a test message"
-        }
+        payload = {"content": "Hello, this is a test message"}
         response = authenticated_client_user1.post(
-            f"/api/v1/chats/{test_chat_room}/messages",
-            json=payload
+            f"/api/v1/chats/{test_chat_room}/messages", json=payload
         )
 
         # Should succeed or return 403/422 if not authorized or not friends
         assert response.status_code in [201, 403, 422]
-        
+
         if response.status_code == 201:
             data = response.json()["data"]
             assert data["content"] == payload["content"]
@@ -244,7 +249,9 @@ class TestChatRouterE2E:
             assert "sender_id" in data
             assert "created_at" in data
 
-    def test_mark_message_read_not_found(self, authenticated_client_user1, test_chat_room):
+    def test_mark_message_read_not_found(
+        self, authenticated_client_user1, test_chat_room
+    ):
         """Test marking non-existent message as read"""
         fake_message_id = uuid4()
         response = authenticated_client_user1.post(
@@ -274,7 +281,7 @@ class TestChatRouterE2E:
 
         # Should succeed or return 403 if not participant
         assert response.status_code in [200, 403]
-        
+
         if response.status_code == 200:
             data = response.json()["data"]
             assert "messages" in data

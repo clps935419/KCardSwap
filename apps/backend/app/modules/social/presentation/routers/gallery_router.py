@@ -58,7 +58,7 @@ async def get_user_gallery_cards(
     try:
         cards = await repository.find_by_user_id(user_id)
         total = await repository.count_by_user_id(user_id)
-        
+
         return GalleryCardListResponse(
             items=[
                 GalleryCardResponse(
@@ -98,11 +98,11 @@ async def get_my_gallery_cards(
 ) -> GalleryCardListResponse:
     """Get the current user's gallery cards."""
     user_id = current_user_id
-    
+
     try:
         cards = await repository.find_by_user_id(user_id)
         total = await repository.count_by_user_id(user_id)
-        
+
         return GalleryCardListResponse(
             items=[
                 GalleryCardResponse(
@@ -143,12 +143,12 @@ async def create_gallery_card(
 ) -> GalleryCardResponse:
     """Create a new gallery card."""
     user_id = current_user_id
-    
+
     try:
         # Get current max display_order for this user
         existing_cards = await repository.find_by_user_id(user_id)
         next_order = len(existing_cards)
-        
+
         # Create new card
         new_card = GalleryCard(
             id=uuid4(),
@@ -159,9 +159,9 @@ async def create_gallery_card(
             description=request.description,
             display_order=next_order,
         )
-        
+
         created_card = await repository.create(new_card)
-        
+
         return GalleryCardResponse(
             id=created_card.id,
             user_id=created_card.user_id,
@@ -195,32 +195,32 @@ async def delete_gallery_card(
 ):
     """Delete a gallery card."""
     user_id = current_user_id
-    
+
     try:
         # Check if card exists and belongs to user
         card = await repository.find_by_id(card_id)
-        
+
         if not card:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Gallery card not found",
             )
-        
+
         if card.user_id != user_id:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="You can only delete your own gallery cards",
             )
-        
+
         # Delete the card
         deleted = await repository.delete(card_id)
-        
+
         if not deleted:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Gallery card not found",
             )
-        
+
     except HTTPException:
         raise
     except Exception as e:
@@ -245,11 +245,11 @@ async def reorder_gallery_cards(
 ) -> ReorderGalleryCardsResponse:
     """Reorder gallery cards."""
     user_id = current_user_id
-    
+
     try:
         use_case = ReorderGalleryCardsUseCase(repository)
         updated_cards = await use_case.execute(user_id, request.card_ids)
-        
+
         return ReorderGalleryCardsResponse(
             message="Gallery cards reordered successfully",
             updated_count=len(updated_cards),

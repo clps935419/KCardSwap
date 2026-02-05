@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from typing import List, Optional
 from uuid import UUID
 
-from sqlalchemy import and_, func, or_, select
+from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.posts.domain.entities.post import Post, PostStatus
@@ -31,7 +31,11 @@ class PostRepositoryImpl(IPostRepository):
             ),
             scope=post.scope.value if isinstance(post.scope, PostScope) else post.scope,
             city_code=post.city_code,
-            category=post.category.value if isinstance(post.category, PostCategory) else post.category,
+            category=(
+                post.category.value
+                if isinstance(post.category, PostCategory)
+                else post.category
+            ),
             title=post.title,
             content=post.content,
             idol=post.idol,
@@ -68,38 +72,40 @@ class PostRepositoryImpl(IPostRepository):
     ) -> List[Post]:
         """
         List posts with flexible filtering (V2: supports global/city filtering)
-        
+
         FR-005:
         - When city_code is None: returns all posts (both scope=global and scope=city)
         - When city_code is provided: returns only posts with that city_code AND scope=city
         """
         query = select(PostModel)
-        
+
         # FR-005: City filtering
         if city_code:
             # City-specific view: only show posts for this city
             query = query.where(
                 and_(
                     PostModel.scope == PostScope.CITY.value,
-                    PostModel.city_code == city_code
+                    PostModel.city_code == city_code,
                 )
             )
         # else: Global view includes all posts (both scope=global and scope=city)
-        
+
         # Category filter
         if category:
-            category_value = category.value if isinstance(category, PostCategory) else category
+            category_value = (
+                category.value if isinstance(category, PostCategory) else category
+            )
             query = query.where(PostModel.category == category_value)
-        
+
         # Status filter (defaults to OPEN if not specified)
         if status:
             status_value = status.value if isinstance(status, PostStatus) else status
             query = query.where(PostModel.status == status_value)
         else:
             query = query.where(PostModel.status == PostStatus.OPEN.value)
-        
+
         query = query.order_by(PostModel.created_at.desc()).limit(limit).offset(offset)
-        
+
         result = await self.session.execute(query)
         models = result.scalars().all()
         return [self._to_entity(model) for model in models]
@@ -168,9 +174,15 @@ class PostRepositoryImpl(IPostRepository):
         if not model:
             raise ValueError(f"Post with id {post.id} not found")
 
-        model.scope = post.scope.value if isinstance(post.scope, PostScope) else post.scope
+        model.scope = (
+            post.scope.value if isinstance(post.scope, PostScope) else post.scope
+        )
         model.city_code = post.city_code
-        model.category = post.category.value if isinstance(post.category, PostCategory) else post.category
+        model.category = (
+            post.category.value
+            if isinstance(post.category, PostCategory)
+            else post.category
+        )
         model.title = post.title
         model.content = post.content
         model.idol = post.idol

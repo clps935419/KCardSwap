@@ -9,7 +9,7 @@ from app.modules.social.domain.repositories.i_thread_repository import IThreadRe
 class GetThreadsUseCase:
     """
     Use case for getting all threads for a user.
-    
+
     Supports FR-016: Inbox clearly separates Requests vs Threads.
     """
 
@@ -24,12 +24,12 @@ class GetThreadsUseCase:
     ) -> List[MessageThread]:
         """
         Get all threads for a user.
-        
+
         Args:
             user_id: ID of the user
             limit: Maximum number of threads to return
             offset: Pagination offset
-        
+
         Returns:
             List of MessageThread entities ordered by last_message_at descending
         """

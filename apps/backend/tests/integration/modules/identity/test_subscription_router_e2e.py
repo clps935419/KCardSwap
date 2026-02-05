@@ -7,16 +7,17 @@ Tests the subscription management endpoints:
 - POST /subscriptions/expire-subscriptions - Expire subscriptions
 """
 
+from unittest.mock import AsyncMock, patch
+from uuid import UUID
+
 import pytest
 import pytest_asyncio
 from fastapi.testclient import TestClient
 from sqlalchemy import text
-from unittest.mock import AsyncMock, patch
-from uuid import UUID
 
 from app.main import app
-from app.shared.infrastructure.database.connection import get_db_session
 from app.modules.identity.presentation.dependencies.auth_deps import get_current_user_id
+from app.shared.infrastructure.database.connection import get_db_session
 
 
 class TestSubscriptionRouterE2E:
@@ -26,14 +27,17 @@ class TestSubscriptionRouterE2E:
     async def test_user(self, db_session) -> UUID:
         """Create test user and return user ID"""
         import uuid
+
         unique_id = str(uuid.uuid4())
         user_id = str(uuid.uuid4())
         result = await db_session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO users (id, google_id, email, role)
                 VALUES (:id, :google_id, :email, :role)
                 RETURNING id
-            """),
+            """
+            ),
             {
                 "id": user_id,
                 "google_id": f"test_subscription_{unique_id}",
@@ -48,6 +52,7 @@ class TestSubscriptionRouterE2E:
     @pytest.fixture
     def authenticated_client(self, test_user, app_db_session_override):
         """Provide authenticated test client"""
+
         def override_get_current_user_id():
             return test_user
 
@@ -84,7 +89,9 @@ class TestSubscriptionRouterE2E:
 
         assert response.status_code == 401
 
-    @patch("app.modules.identity.application.use_cases.subscription.verify_receipt_use_case.GooglePlayBillingService")
+    @patch(
+        "app.modules.identity.application.use_cases.subscription.verify_receipt_use_case.GooglePlayBillingService"
+    )
     def test_verify_receipt_success(self, mock_google_play, authenticated_client):
         """Test successful receipt verification"""
         # Mock Google Play verification
@@ -102,12 +109,11 @@ class TestSubscriptionRouterE2E:
         payload = {
             "platform": "android",
             "purchase_token": "test_token_123",
-            "product_id": "monthly_premium"
+            "product_id": "monthly_premium",
         }
 
         response = authenticated_client.post(
-            "/api/v1/subscriptions/verify-receipt",
-            json=payload
+            "/api/v1/subscriptions/verify-receipt", json=payload
         )
 
         # Should succeed or return service unavailable if Google Play is not configured
@@ -122,8 +128,7 @@ class TestSubscriptionRouterE2E:
         }
 
         response = authenticated_client.post(
-            "/api/v1/subscriptions/verify-receipt",
-            json=payload
+            "/api/v1/subscriptions/verify-receipt", json=payload
         )
 
         assert response.status_code == 400
@@ -138,8 +143,7 @@ class TestSubscriptionRouterE2E:
         }
 
         response = authenticated_client.post(
-            "/api/v1/subscriptions/verify-receipt",
-            json=payload
+            "/api/v1/subscriptions/verify-receipt", json=payload
         )
 
         assert response.status_code == 400
@@ -151,19 +155,20 @@ class TestSubscriptionRouterE2E:
         payload = {
             "platform": "android",
             "purchase_token": "test_token_123",
-            "product_id": "monthly_premium"
+            "product_id": "monthly_premium",
         }
 
         response = unauthenticated_client.post(
-            "/api/v1/subscriptions/verify-receipt",
-            json=payload
+            "/api/v1/subscriptions/verify-receipt", json=payload
         )
 
         assert response.status_code == 401
 
     def test_expire_subscriptions_success(self, authenticated_client):
         """Test expiring subscriptions endpoint"""
-        response = authenticated_client.post("/api/v1/subscriptions/expire-subscriptions")
+        response = authenticated_client.post(
+            "/api/v1/subscriptions/expire-subscriptions"
+        )
 
         assert response.status_code == 200
         data = response.json()["data"]
@@ -176,17 +181,19 @@ class TestSubscriptionRouterE2E:
         """Create test user with an active subscription"""
         import uuid
         from datetime import datetime, timedelta
-        
+
         unique_id = str(uuid.uuid4())
-        
+
         # Create user
         user_id = str(uuid.uuid4())
         result = await db_session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO users (id, google_id, email, role)
                 VALUES (:id, :google_id, :email, :role)
                 RETURNING id
-            """),
+            """
+            ),
             {
                 "id": user_id,
                 "google_id": f"test_sub_user_{unique_id}",
@@ -196,19 +203,21 @@ class TestSubscriptionRouterE2E:
         )
         user_id = result.scalar()
         await db_session.flush()
-        
+
         # Create subscription (match current schema)
         now = datetime.utcnow()
         expires_at = now + timedelta(days=30)
         await db_session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO subscriptions (
                     user_id, plan, status, expires_at, created_at, updated_at
                 )
                 VALUES (
                     :user_id, :plan, :status, :expires_at, :created_at, :updated_at
                 )
-            """),
+            """
+            ),
             {
                 "user_id": str(user_id),
                 "plan": "premium",
@@ -216,16 +225,17 @@ class TestSubscriptionRouterE2E:
                 "expires_at": expires_at,
                 "created_at": now,
                 "updated_at": now,
-            }
+            },
         )
         await db_session.commit()
-        
+
         return user_id
 
     def test_get_subscription_status_with_active_subscription(
         self, test_user_with_subscription, app_db_session_override
     ):
         """Test getting subscription status when user has active subscription"""
+
         def override_get_current_user_id():
             return test_user_with_subscription
 
@@ -233,7 +243,7 @@ class TestSubscriptionRouterE2E:
         app.dependency_overrides[get_db_session] = app_db_session_override
 
         client = TestClient(app)
-        
+
         try:
             response = client.get("/api/v1/subscriptions/status")
 

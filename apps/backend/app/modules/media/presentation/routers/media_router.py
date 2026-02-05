@@ -1,9 +1,9 @@
 """Media router - API endpoints for media upload and attachment."""
+
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, status
-from fastapi import HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.media.application.use_cases.attach_media import (
@@ -39,7 +39,7 @@ from app.shared.infrastructure.external.storage_service_factory import (
 )
 from app.shared.presentation.dependencies.services import get_subscription_service
 from app.shared.presentation.deps.require_user import get_current_user_id
-from app.shared.presentation.errors.limit_exceeded import LimitExceededException
+from app.shared.presentation.errors.limit_exceeded import LimitExceededError
 
 router = APIRouter(prefix="/media", tags=["media"])
 
@@ -57,9 +57,9 @@ async def create_upload_url(
     user_id: UUID = Depends(get_current_user_id),
 ):
     """Generate presigned upload URL for media.
-    
+
     Flow: presign → upload (client to GCS) → confirm → attach
-    
+
     Returns:
         Presigned URL and media_id for subsequent confirmation
     """
@@ -69,7 +69,7 @@ async def create_upload_url(
         media_repository=media_repository,
         storage_service=storage_service,
     )
-    
+
     result = await use_case.execute(
         CreateUploadUrlRequest(
             user_id=user_id,
@@ -102,11 +102,11 @@ async def confirm_upload(
     user_id: UUID = Depends(get_current_user_id),
 ):
     """Confirm media upload and apply quota.
-    
+
     Flow: presign → upload (client to GCS) → confirm → attach
-    
+
     Raises:
-        LimitExceededException: If quota is exceeded (422)
+        LimitExceededError: If quota is exceeded (422)
         ValueError: If media not found or not owned by user (400)
     """
     media_repository = MediaRepositoryImpl(session)
@@ -117,7 +117,7 @@ async def confirm_upload(
         media_quota_service=media_quota_service,
         storage_service=storage_service,
     )
-    
+
     try:
         result = await use_case.execute(
             ConfirmUploadRequest(
@@ -125,8 +125,10 @@ async def confirm_upload(
                 media_id=media_id,
             )
         )
-    except LimitExceededException as exc:
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=exc.message)
+    except LimitExceededError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=exc.message
+        )
     except ValueError as exc:
         error_message = str(exc).lower()
         if "not found" in error_message:
@@ -156,14 +158,14 @@ async def attach_media_to_post(
     user_id: UUID = Depends(get_current_user_id),
 ):
     """Attach confirmed media to post.
-    
+
     Flow: presign → upload (client to GCS) → confirm → attach
-    
+
     Only confirmed media owned by the user can be attached.
     """
     media_repository = MediaRepositoryImpl(session)
     use_case = AttachMediaUseCase(media_repository=media_repository)
-    
+
     try:
         result = await use_case.execute(
             AttachMediaRequest(
@@ -203,14 +205,14 @@ async def attach_media_to_gallery_card(
     user_id: UUID = Depends(get_current_user_id),
 ):
     """Attach confirmed media to gallery card.
-    
+
     Flow: presign → upload (client to GCS) → confirm → attach
-    
+
     Only confirmed media owned by the user can be attached.
     """
     media_repository = MediaRepositoryImpl(session)
     use_case = AttachMediaUseCase(media_repository=media_repository)
-    
+
     try:
         result = await use_case.execute(
             AttachMediaRequest(

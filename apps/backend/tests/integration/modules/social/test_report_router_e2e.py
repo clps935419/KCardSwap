@@ -6,11 +6,12 @@ Tests the report management endpoints:
 - GET /reports/types - Get report types (if exists)
 """
 
+from uuid import UUID, uuid4
+
 import pytest
 import pytest_asyncio
 from fastapi.testclient import TestClient
 from sqlalchemy import text
-from uuid import UUID, uuid4
 
 from app.main import app
 from app.shared.infrastructure.database.connection import get_db_session
@@ -26,11 +27,13 @@ class TestReportRouterE2E:
         unique_id = str(uuid4())
         user_id = str(uuid4())
         result = await db_session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO users (id, google_id, email, role)
                 VALUES (:id, :google_id, :email, :role)
                 RETURNING id
-            """),
+            """
+            ),
             {
                 "id": user_id,
                 "google_id": f"test_reporter_{unique_id}",
@@ -48,11 +51,13 @@ class TestReportRouterE2E:
         unique_id = str(uuid4())
         user_id = str(uuid4())
         result = await db_session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO users (id, google_id, email, role)
                 VALUES (:id, :google_id, :email, :role)
                 RETURNING id
-            """),
+            """
+            ),
             {
                 "id": user_id,
                 "google_id": f"test_reported_{unique_id}",
@@ -67,6 +72,7 @@ class TestReportRouterE2E:
     @pytest.fixture
     def authenticated_client(self, test_user1, app_db_session_override):
         """Provide authenticated test client"""
+
         def override_get_current_user_id():
             return test_user1
 
@@ -95,7 +101,7 @@ class TestReportRouterE2E:
         payload = {
             "reported_user_id": str(test_user2),
             "reason": "spam",
-            "detail": "User is sending spam messages"
+            "detail": "User is sending spam messages",
         }
 
         response = authenticated_client.post("/api/v1/reports", json=payload)
@@ -111,7 +117,7 @@ class TestReportRouterE2E:
         payload = {
             "reported_user_id": str(test_user2),
             "reason": "harassment",
-            "detail": "User sent threatening messages"
+            "detail": "User sent threatening messages",
         }
 
         response = authenticated_client.post("/api/v1/reports", json=payload)
@@ -125,7 +131,7 @@ class TestReportRouterE2E:
         payload = {
             "reported_user_id": str(test_user1),
             "reason": "spam",
-            "detail": "Testing"
+            "detail": "Testing",
         }
 
         response = authenticated_client.post("/api/v1/reports", json=payload)
@@ -137,7 +143,7 @@ class TestReportRouterE2E:
         payload = {
             "reported_user_id": str(test_user2),
             "reason": "invalid_reason",
-            "detail": "Test"
+            "detail": "Test",
         }
 
         response = authenticated_client.post("/api/v1/reports", json=payload)
@@ -146,10 +152,7 @@ class TestReportRouterE2E:
 
     def test_submit_report_missing_reason(self, authenticated_client, test_user2):
         """Test submitting report without reason"""
-        payload = {
-            "reported_user_id": str(test_user2),
-            "detail": "Test"
-        }
+        payload = {"reported_user_id": str(test_user2), "detail": "Test"}
 
         response = authenticated_client.post("/api/v1/reports", json=payload)
 
@@ -157,10 +160,7 @@ class TestReportRouterE2E:
 
     def test_submit_report_missing_user_id(self, authenticated_client):
         """Test submitting report without reported_user_id"""
-        payload = {
-            "reason": "spam",
-            "detail": "Test"
-        }
+        payload = {"reason": "spam", "detail": "Test"}
 
         response = authenticated_client.post("/api/v1/reports", json=payload)
 
@@ -171,7 +171,7 @@ class TestReportRouterE2E:
         payload = {
             "reported_user_id": str(test_user2),
             "reason": "spam",
-            "detail": "Test"
+            "detail": "Test",
         }
 
         response = unauthenticated_client.post("/api/v1/reports", json=payload)
@@ -186,7 +186,7 @@ class TestReportRouterE2E:
 
         # Should return 200 if endpoint exists, or 404 if not implemented
         assert response.status_code in [200, 404, 405]
-        
+
         if response.status_code == 200:
             data = response.json()
             assert isinstance(data, (list, dict))

@@ -5,9 +5,7 @@ Tests dependency injection with real app state and database sessions.
 """
 
 import pytest
-import pytest_asyncio
 from fastapi import FastAPI, Request
-from fastapi.testclient import TestClient
 from injector import Injector, Module, provider, singleton
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -39,6 +37,9 @@ from app.modules.identity.domain.repositories.i_subscription_repository import (
 from app.modules.identity.domain.repositories.i_user_repository import (
     IUserRepository,
 )
+from app.modules.identity.infrastructure.external.google_oauth_service import (
+    GoogleOAuthService,
+)
 from app.modules.identity.infrastructure.repositories.profile_repository_impl import (
     ProfileRepositoryImpl,
 )
@@ -50,9 +51,6 @@ from app.modules.identity.infrastructure.repositories.subscription_repository_im
 )
 from app.modules.identity.infrastructure.repositories.user_repository_impl import (
     UserRepositoryImpl,
-)
-from app.modules.identity.infrastructure.external.google_oauth_service import (
-    GoogleOAuthService,
 )
 from app.modules.identity.presentation.dependencies.use_case_deps import (
     get_get_profile_use_case,
@@ -201,9 +199,7 @@ class TestIdentityUseCaseDependenciesIntegration:
         return app
 
     @pytest.mark.asyncio
-    async def test_get_google_login_use_case(
-        self, test_app_with_injector, db_session
-    ):
+    async def test_get_google_login_use_case(self, test_app_with_injector, db_session):
         """Test get_google_login_use_case dependency"""
         # Arrange
         from unittest.mock import MagicMock
@@ -237,9 +233,7 @@ class TestIdentityUseCaseDependenciesIntegration:
         assert isinstance(use_case, GoogleCallbackUseCase)
 
     @pytest.mark.asyncio
-    async def test_get_refresh_token_use_case(
-        self, test_app_with_injector, db_session
-    ):
+    async def test_get_refresh_token_use_case(self, test_app_with_injector, db_session):
         """Test get_refresh_token_use_case dependency"""
         # Arrange
         from unittest.mock import MagicMock
@@ -271,9 +265,7 @@ class TestIdentityUseCaseDependenciesIntegration:
         assert isinstance(use_case, LogoutUseCase)
 
     @pytest.mark.asyncio
-    async def test_get_get_profile_use_case(
-        self, test_app_with_injector, db_session
-    ):
+    async def test_get_get_profile_use_case(self, test_app_with_injector, db_session):
         """Test get_get_profile_use_case dependency"""
         # Arrange
         from unittest.mock import MagicMock
@@ -325,9 +317,7 @@ class TestIdentityUseCaseDependenciesIntegration:
         assert use_case.profile_repo is not None
 
     @pytest.mark.asyncio
-    async def test_child_injector_isolation(
-        self, test_app_with_injector, db_session
-    ):
+    async def test_child_injector_isolation(self, test_app_with_injector, db_session):
         """Test that each request gets isolated child injector"""
         # Arrange
         from unittest.mock import MagicMock

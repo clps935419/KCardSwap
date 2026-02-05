@@ -8,16 +8,12 @@ Tests the complete cookie-based refresh flow:
 4. Rejects invalid or missing refresh_token
 """
 
-from datetime import datetime, timedelta
-from unittest.mock import AsyncMock, Mock, patch
-from uuid import uuid4
+from unittest.mock import AsyncMock, Mock
 
-import pytest
 from fastapi.testclient import TestClient
 
 from app.config import settings
 from app.main import app
-from app.modules.identity.domain.entities.refresh_token import RefreshToken
 from app.modules.identity.presentation.dependencies.use_case_deps import (
     get_refresh_token_use_case,
 )
@@ -192,5 +188,3 @@ class TestRefreshTokenCookie:
         assert settings.COOKIE_PATH == "/"
         # COOKIE_SECURE should be True in production
         # COOKIE_DOMAIN may be None for same-origin
-
-

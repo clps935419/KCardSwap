@@ -5,13 +5,10 @@ Tests database connection management, pooling, and session lifecycle.
 """
 
 import pytest
-import pytest_asyncio
 from sqlalchemy import text
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.shared.infrastructure.database.connection import (
     DatabaseConnection,
-    get_db_session,
 )
 
 
@@ -37,7 +34,7 @@ class TestDatabaseConnectionIntegration:
             # Assert
             assert engine is not None
             assert engine.pool is not None
-            
+
             # Test connection works
             async with engine.connect() as connection:
                 result = await connection.execute(text("SELECT 1"))
@@ -64,7 +61,7 @@ class TestDatabaseConnectionIntegration:
 
             # Assert
             assert factory is not None
-            
+
             # Test session works
             async with factory() as session:
                 result = await session.execute(text("SELECT 1"))
@@ -194,7 +191,7 @@ class TestDatabaseConnectionIntegration:
                 text("INSERT INTO test_rollback (id) VALUES (1)")
             )
             await db_session.flush()
-            
+
             # Try to insert duplicate - this should fail
             await db_session.execute(
                 text("INSERT INTO test_rollback (id) VALUES (1)")

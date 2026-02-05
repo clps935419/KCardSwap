@@ -10,7 +10,7 @@ from app.shared.infrastructure.database.connection import Base
 
 class MediaAssetModel(Base):
     """MediaAsset ORM model.
-    
+
     Represents uploaded media files (images) that can be attached to posts or gallery cards.
     """
 

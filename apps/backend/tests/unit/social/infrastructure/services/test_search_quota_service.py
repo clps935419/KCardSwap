@@ -4,7 +4,7 @@ Unit tests for SearchQuotaService
 Tests the search quota service for daily search limits.
 """
 
-from datetime import date, datetime, timezone
+from datetime import date, timezone
 from unittest.mock import AsyncMock, MagicMock, patch
 from uuid import uuid4
 
@@ -14,7 +14,6 @@ from app.modules.social.infrastructure.services.search_quota_service import (
     SearchQuotaModel,
     SearchQuotaService,
 )
-
 
 DATETIME_PATCH_PATH = (
     "app.modules.social.infrastructure.services.search_quota_service.datetime"

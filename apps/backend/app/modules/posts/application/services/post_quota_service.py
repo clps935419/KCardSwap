@@ -3,7 +3,6 @@
 This service implements quota checking for post creation according to POC spec FR-023.
 """
 
-from datetime import datetime
 from uuid import UUID
 
 from app.shared.domain.contracts.i_subscription_query_service import (
@@ -15,7 +14,7 @@ from app.shared.domain.quota.quota_service import (
     SubscriptionTier,
     get_next_reset_time,
 )
-from app.shared.presentation.errors.limit_exceeded import LimitExceededException
+from app.shared.presentation.errors.limit_exceeded import LimitExceededError
 
 
 class PostQuotaService:
@@ -58,14 +57,14 @@ class PostQuotaService:
             current_count: Current number of posts today
 
         Raises:
-            LimitExceededException: If daily post limit exceeded
+            LimitExceededError: If daily post limit exceeded
         """
         tier = await self._get_user_tier(user_id)
         limit = QUOTA_LIMITS[QuotaKey.POSTS_PER_DAY][tier]
         reset_at = get_next_reset_time(QuotaKey.POSTS_PER_DAY)
 
         if current_count >= limit:
-            raise LimitExceededException(
+            raise LimitExceededError(
                 limit_key=QuotaKey.POSTS_PER_DAY.value,
                 limit_value=limit,
                 current_value=current_count,

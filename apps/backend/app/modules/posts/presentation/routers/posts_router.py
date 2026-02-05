@@ -10,46 +10,23 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.posts.application.use_cases.accept_interest_use_case import (
-    AcceptInterestUseCase,
-)
 from app.modules.posts.application.use_cases.close_post_use_case import ClosePostUseCase
 from app.modules.posts.application.use_cases.create_post_use_case import (
     CreatePostUseCase,
 )
-from app.modules.posts.application.use_cases.express_interest_use_case import (
-    ExpressInterestUseCase,
-)
 from app.modules.posts.application.use_cases.list_posts_v2_use_case import (
     ListPostsV2UseCase,
 )
-from app.modules.posts.application.use_cases.list_post_interests_use_case import (
-    ListPostInterestsUseCase,
-)
-from app.modules.posts.application.use_cases.reject_interest_use_case import (
-    RejectInterestUseCase,
-)
 from app.modules.posts.application.use_cases.toggle_like import ToggleLikeUseCase
-from app.modules.posts.domain.entities.post_enums import PostCategory, PostScope
+from app.modules.posts.domain.entities.post_enums import PostCategory
 from app.modules.posts.presentation.dependencies.use_case_deps import (
-    get_accept_interest_use_case,
     get_close_post_use_case,
     get_create_post_use_case,
-    get_express_interest_use_case,
-    get_list_board_posts_use_case,
-    get_list_post_interests_use_case,
     get_list_posts_v2_use_case,
-    get_reject_interest_use_case,
     get_toggle_like_use_case,
 )
 from app.modules.posts.presentation.schemas.post_schemas import (
-    AcceptInterestResponse,
-    AcceptInterestResponseWrapper,
     CreatePostRequest,
-    PostInterestListResponse,
-    PostInterestListResponseWrapper,
-    PostInterestResponse,
-    PostInterestResponseWrapper,
     PostListResponse,
     PostListResponseWrapper,
     PostResponse,
@@ -171,11 +148,11 @@ async def list_posts(
 ) -> PostListResponseWrapper:
     """
     List posts (V2: supports global/city filtering).
-    
+
     FR-005:
     - Global view (city_code=None): shows all posts (scope=global + scope=city)
     - City view (city_code provided): shows only posts for that city
-    
+
     Only shows posts with status=open and not expired.
     Results ordered by created_at DESC (newest first).
     """
@@ -287,11 +264,11 @@ async def toggle_like(
 ) -> ToggleLikeResponseWrapper:
     """
     Toggle like on a post (FR-008, FR-009).
-    
+
     Idempotent operation:
     - If user has already liked the post, this will unlike it
     - If user has not liked the post, this will like it
-    
+
     Returns the new like state (liked/unliked) and the current total like count.
     """
     try:

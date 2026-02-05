@@ -1,5 +1,4 @@
 """SQLAlchemy Media Repository Implementation."""
-from datetime import datetime, timezone
 from typing import Optional
 from uuid import UUID
 
@@ -64,7 +63,7 @@ class MediaRepositoryImpl(IMediaRepository):
 
     async def get_monthly_bytes_used(self, user_id: UUID, year: int, month: int) -> int:
         """Get total bytes used by user in a given month.
-        
+
         FR-022: Only count confirmed media for quota.
         """
         result = await self.session.execute(

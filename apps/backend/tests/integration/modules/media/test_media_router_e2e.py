@@ -8,11 +8,12 @@ Tests the media management endpoints:
 - POST /media/gallery/cards/{card_id}/attach - Attach media to gallery card
 """
 
+from uuid import UUID, uuid4
+
 import pytest
 import pytest_asyncio
 from fastapi.testclient import TestClient
 from sqlalchemy import text
-from uuid import UUID, uuid4
 
 from app.main import app
 from app.shared.infrastructure.database.connection import get_db_session
@@ -26,14 +27,17 @@ class TestMediaRouterE2E:
     async def test_user(self, db_session) -> UUID:
         """Create test user and return user ID"""
         import uuid
+
         unique_id = str(uuid.uuid4())
         user_id = str(uuid.uuid4())
         result = await db_session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO users (id, google_id, email, role)
                 VALUES (:id, :google_id, :email, :role)
                 RETURNING id
-            """),
+            """
+            ),
             {
                 "id": user_id,
                 "google_id": f"test_media_{unique_id}",
@@ -48,6 +52,7 @@ class TestMediaRouterE2E:
     @pytest.fixture
     def authenticated_client(self, test_user, app_db_session_override):
         """Provide authenticated test client"""
+
         def override_get_current_user_id():
             return test_user
 
@@ -76,7 +81,7 @@ class TestMediaRouterE2E:
         payload = {
             "content_type": "image/jpeg",
             "file_size_bytes": 1024000,  # 1MB
-            "filename": "test_image.jpg"
+            "filename": "test_image.jpg",
         }
 
         response = authenticated_client.post("/api/v1/media/upload-url", json=payload)
@@ -93,7 +98,7 @@ class TestMediaRouterE2E:
         payload = {
             "content_type": "text/plain",  # Invalid
             "file_size_bytes": 1024000,
-            "filename": "test.txt"
+            "filename": "test.txt",
         }
 
         response = authenticated_client.post("/api/v1/media/upload-url", json=payload)
@@ -105,7 +110,7 @@ class TestMediaRouterE2E:
         payload = {
             "content_type": "image/jpeg",
             "file_size_bytes": 50 * 1024 * 1024,  # 50MB
-            "filename": "large.jpg"
+            "filename": "large.jpg",
         }
 
         response = authenticated_client.post("/api/v1/media/upload-url", json=payload)
@@ -128,7 +133,7 @@ class TestMediaRouterE2E:
         payload = {
             "content_type": "image/jpeg",
             "file_size_bytes": 1024000,
-            "filename": "test.jpg"
+            "filename": "test.jpg",
         }
 
         response = unauthenticated_client.post("/api/v1/media/upload-url", json=payload)
@@ -158,9 +163,11 @@ class TestMediaRouterE2E:
         """Create a test post"""
         post_id = uuid4()
         from datetime import datetime, timedelta, timezone
+
         expires_at = datetime.now(timezone.utc) + timedelta(days=14)
         await db_session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO posts (
                     id, owner_id, scope, category, title, content,
                     status, expires_at, created_at, updated_at
@@ -169,7 +176,8 @@ class TestMediaRouterE2E:
                     :id, :owner_id, :scope, :category, :title, :content,
                     :status, :expires_at, NOW(), NOW()
                 )
-            """),
+            """
+            ),
             {
                 "id": str(post_id),
                 "owner_id": str(test_user),
@@ -179,21 +187,20 @@ class TestMediaRouterE2E:
                 "content": "Test Content",
                 "status": "open",
                 "expires_at": expires_at,
-            }
+            },
         )
         await db_session.commit()
         return post_id
 
-    def test_attach_media_to_post_media_not_found(self, authenticated_client, test_post):
+    def test_attach_media_to_post_media_not_found(
+        self, authenticated_client, test_post
+    ):
         """Test attaching non-existent media to post"""
         fake_media_id = uuid4()
-        payload = {
-            "media_id": str(fake_media_id)
-        }
+        payload = {"media_id": str(fake_media_id)}
 
         response = authenticated_client.post(
-            f"/api/v1/media/posts/{test_post}/attach",
-            json=payload
+            f"/api/v1/media/posts/{test_post}/attach", json=payload
         )
 
         assert response.status_code in [400, 404]
@@ -201,24 +208,22 @@ class TestMediaRouterE2E:
     def test_attach_media_to_post_unauthorized(self, unauthenticated_client, test_post):
         """Test attaching media without authentication"""
         fake_media_id = uuid4()
-        payload = {
-            "media_id": str(fake_media_id)
-        }
+        payload = {"media_id": str(fake_media_id)}
 
         response = unauthenticated_client.post(
-            f"/api/v1/media/posts/{test_post}/attach",
-            json=payload
+            f"/api/v1/media/posts/{test_post}/attach", json=payload
         )
 
         assert response.status_code == 401
 
-    def test_attach_media_to_post_missing_media_id(self, authenticated_client, test_post):
+    def test_attach_media_to_post_missing_media_id(
+        self, authenticated_client, test_post
+    ):
         """Test attaching media without providing media_id"""
         payload = {}
 
         response = authenticated_client.post(
-            f"/api/v1/media/posts/{test_post}/attach",
-            json=payload
+            f"/api/v1/media/posts/{test_post}/attach", json=payload
         )
 
         assert response.status_code == 400
@@ -230,7 +235,8 @@ class TestMediaRouterE2E:
         """Create a test gallery card"""
         card_id = uuid4()
         await db_session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO gallery_cards (
                     id, user_id, title, idol_name, era, display_order,
                     created_at, updated_at
@@ -239,15 +245,16 @@ class TestMediaRouterE2E:
                     :id, :user_id, :title, :idol_name, :era, :display_order,
                     NOW(), NOW()
                 )
-            """),
+            """
+            ),
             {
                 "id": str(card_id),
                 "user_id": str(test_user),
                 "title": "Test Card",
                 "idol_name": "Test Idol",
                 "era": "Test Era",
-                "display_order": 0
-            }
+                "display_order": 0,
+            },
         )
         await db_session.commit()
         return card_id
@@ -257,13 +264,10 @@ class TestMediaRouterE2E:
     ):
         """Test attaching non-existent media to gallery card"""
         fake_media_id = uuid4()
-        payload = {
-            "media_id": str(fake_media_id)
-        }
+        payload = {"media_id": str(fake_media_id)}
 
         response = authenticated_client.post(
-            f"/api/v1/media/gallery/cards/{test_gallery_card}/attach",
-            json=payload
+            f"/api/v1/media/gallery/cards/{test_gallery_card}/attach", json=payload
         )
 
         assert response.status_code in [400, 404]
@@ -273,13 +277,10 @@ class TestMediaRouterE2E:
     ):
         """Test attaching media to gallery card without authentication"""
         fake_media_id = uuid4()
-        payload = {
-            "media_id": str(fake_media_id)
-        }
+        payload = {"media_id": str(fake_media_id)}
 
         response = unauthenticated_client.post(
-            f"/api/v1/media/gallery/cards/{test_gallery_card}/attach",
-            json=payload
+            f"/api/v1/media/gallery/cards/{test_gallery_card}/attach", json=payload
         )
 
         assert response.status_code == 401
@@ -291,8 +292,7 @@ class TestMediaRouterE2E:
         payload = {}
 
         response = authenticated_client.post(
-            f"/api/v1/media/gallery/cards/{test_gallery_card}/attach",
-            json=payload
+            f"/api/v1/media/gallery/cards/{test_gallery_card}/attach", json=payload
         )
 
         assert response.status_code == 400

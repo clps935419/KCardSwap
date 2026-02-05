@@ -4,7 +4,7 @@ Unit tests for Storage Service Factory
 Tests the storage service factory that switches between real and mock GCS.
 """
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 

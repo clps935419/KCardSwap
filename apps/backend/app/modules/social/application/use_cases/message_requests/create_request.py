@@ -4,6 +4,9 @@ import uuid
 from datetime import datetime
 from typing import Optional
 
+from app.modules.social.application.services.thread_uniqueness_service import (
+    ThreadUniquenessService,
+)
 from app.modules.social.domain.entities.message_request import (
     MessageRequest,
     RequestStatus,
@@ -14,15 +17,12 @@ from app.modules.social.domain.repositories.i_friendship_repository import (
 from app.modules.social.domain.repositories.i_message_request_repository import (
     IMessageRequestRepository,
 )
-from app.modules.social.application.services.thread_uniqueness_service import (
-    ThreadUniquenessService,
-)
 
 
 class CreateMessageRequestUseCase:
     """
     Use case for creating a message request from a stranger.
-    
+
     Implements FR-011: Message Requests for strangers.
     Implements FR-013: Privacy setting to block stranger messages.
     Implements FR-014: One unique thread per user pair.
@@ -48,17 +48,17 @@ class CreateMessageRequestUseCase:
     ) -> MessageRequest:
         """
         Create a message request from sender to recipient.
-        
+
         Args:
             sender_id: ID of user sending the request
             recipient_id: ID of user receiving the request
             initial_message: Initial message content
             post_id: Optional post ID being referenced
             recipient_allows_stranger_messages: Privacy setting from recipient
-        
+
         Returns:
             Created MessageRequest entity
-        
+
         Raises:
             ValueError: If request is invalid
         """

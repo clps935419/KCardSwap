@@ -9,11 +9,12 @@ Tests the gallery cards management endpoints:
 - PUT /gallery/cards/reorder - Reorder gallery cards
 """
 
+from uuid import UUID, uuid4
+
 import pytest
 import pytest_asyncio
 from fastapi.testclient import TestClient
 from sqlalchemy import text
-from uuid import UUID, uuid4
 
 from app.main import app
 from app.shared.infrastructure.database.connection import get_db_session
@@ -27,14 +28,17 @@ class TestGalleryRouterE2E:
     async def test_user(self, db_session) -> UUID:
         """Create test user and return user ID"""
         import uuid
+
         unique_id = str(uuid.uuid4())
         user_id = str(uuid.uuid4())
         result = await db_session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO users (id, google_id, email, role)
                 VALUES (:id, :google_id, :email, :role)
                 RETURNING id
-            """),
+            """
+            ),
             {
                 "id": user_id,
                 "google_id": f"test_gallery_{unique_id}",
@@ -50,14 +54,17 @@ class TestGalleryRouterE2E:
     async def test_user2(self, db_session) -> UUID:
         """Create second test user"""
         import uuid
+
         unique_id = str(uuid.uuid4())
         user_id = str(uuid.uuid4())
         result = await db_session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO users (id, google_id, email, role)
                 VALUES (:id, :google_id, :email, :role)
                 RETURNING id
-            """),
+            """
+            ),
             {
                 "id": user_id,
                 "google_id": f"test_gallery2_{unique_id}",
@@ -72,6 +79,7 @@ class TestGalleryRouterE2E:
     @pytest.fixture
     def authenticated_client(self, test_user, app_db_session_override):
         """Provide authenticated test client"""
+
         def override_require_user():
             return test_user
 
@@ -120,7 +128,7 @@ class TestGalleryRouterE2E:
             "title": "IU Love Poem Photocard",
             "idol_name": "IU",
             "era": "Love Poem",
-            "description": "Limited edition photocard from Love Poem era"
+            "description": "Limited edition photocard from Love Poem era",
         }
 
         response = authenticated_client.post("/api/v1/gallery/cards", json=payload)
@@ -147,11 +155,7 @@ class TestGalleryRouterE2E:
 
     def test_create_gallery_card_unauthorized(self, unauthenticated_client):
         """Test creating gallery card without authentication"""
-        payload = {
-            "title": "Test Card",
-            "idol_name": "IU",
-            "era": "Test"
-        }
+        payload = {"title": "Test Card", "idol_name": "IU", "era": "Test"}
 
         response = unauthenticated_client.post("/api/v1/gallery/cards", json=payload)
 
@@ -168,9 +172,13 @@ class TestGalleryRouterE2E:
         assert "items" in data
         assert "total" in data
 
-    def test_get_user_gallery_cards_unauthorized(self, unauthenticated_client, test_user):
+    def test_get_user_gallery_cards_unauthorized(
+        self, unauthenticated_client, test_user
+    ):
         """Test getting user's gallery cards without authentication"""
-        response = unauthenticated_client.get(f"/api/v1/users/{test_user}/gallery/cards")
+        response = unauthenticated_client.get(
+            f"/api/v1/users/{test_user}/gallery/cards"
+        )
 
         assert response.status_code == 401
 
@@ -181,7 +189,8 @@ class TestGalleryRouterE2E:
         """Create a test gallery card"""
         card_id = uuid4()
         await db_session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO gallery_cards (
                     id, user_id, title, idol_name, era, display_order,
                     created_at, updated_at
@@ -190,22 +199,25 @@ class TestGalleryRouterE2E:
                     :id, :user_id, :title, :idol_name, :era, :display_order,
                     NOW(), NOW()
                 )
-            """),
+            """
+            ),
             {
                 "id": str(card_id),
                 "user_id": str(test_user),
                 "title": "Test Gallery Card",
                 "idol_name": "Test Idol",
                 "era": "Test Era",
-                "display_order": 0
-            }
+                "display_order": 0,
+            },
         )
         await db_session.commit()
         return card_id
 
     def test_delete_gallery_card_success(self, authenticated_client, test_gallery_card):
         """Test deleting a gallery card successfully"""
-        response = authenticated_client.delete(f"/api/v1/gallery/cards/{test_gallery_card}")
+        response = authenticated_client.delete(
+            f"/api/v1/gallery/cards/{test_gallery_card}"
+        )
 
         assert response.status_code == 204
 
@@ -216,9 +228,13 @@ class TestGalleryRouterE2E:
 
         assert response.status_code == 404
 
-    def test_delete_gallery_card_unauthorized(self, unauthenticated_client, test_gallery_card):
+    def test_delete_gallery_card_unauthorized(
+        self, unauthenticated_client, test_gallery_card
+    ):
         """Test deleting gallery card without authentication"""
-        response = unauthenticated_client.delete(f"/api/v1/gallery/cards/{test_gallery_card}")
+        response = unauthenticated_client.delete(
+            f"/api/v1/gallery/cards/{test_gallery_card}"
+        )
 
         assert response.status_code == 401
 
@@ -226,6 +242,7 @@ class TestGalleryRouterE2E:
         self, test_user2, test_gallery_card, app_db_session_override
     ):
         """Test deleting gallery card by non-owner"""
+
         def override_require_user():
             return test_user2
 
@@ -244,22 +261,22 @@ class TestGalleryRouterE2E:
 
     def test_reorder_gallery_cards_success(self, authenticated_client):
         """Test reordering gallery cards"""
-        payload = {
-            "card_orders": []  # Empty list is valid
-        }
+        payload = {"card_orders": []}  # Empty list is valid
 
-        response = authenticated_client.put("/api/v1/gallery/cards/reorder", json=payload)
+        response = authenticated_client.put(
+            "/api/v1/gallery/cards/reorder", json=payload
+        )
 
         # Should succeed or return 400/422 based on implementation
         assert response.status_code in [200, 400, 422]
 
     def test_reorder_gallery_cards_unauthorized(self, unauthenticated_client):
         """Test reordering gallery cards without authentication"""
-        payload = {
-            "card_orders": []
-        }
+        payload = {"card_orders": []}
 
-        response = unauthenticated_client.put("/api/v1/gallery/cards/reorder", json=payload)
+        response = unauthenticated_client.put(
+            "/api/v1/gallery/cards/reorder", json=payload
+        )
 
         assert response.status_code == 401
 
@@ -267,6 +284,8 @@ class TestGalleryRouterE2E:
         """Test reordering with invalid data"""
         payload = {}  # Missing card_orders
 
-        response = authenticated_client.put("/api/v1/gallery/cards/reorder", json=payload)
+        response = authenticated_client.put(
+            "/api/v1/gallery/cards/reorder", json=payload
+        )
 
         assert response.status_code == 400

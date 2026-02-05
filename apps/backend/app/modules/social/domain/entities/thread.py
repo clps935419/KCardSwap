@@ -14,7 +14,7 @@ class MessageThread:
 
     Represents a unique conversation thread between two users.
     Ensures FR-014: One unique thread per user pair.
-    
+
     Implementation note: user_a_id and user_b_id are stored in normalized order
     (smaller UUID first) to ensure uniqueness constraint at DB level.
     """

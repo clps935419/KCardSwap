@@ -27,7 +27,7 @@ class TestIdolsRouterE2E:
         data = response.json()["data"]
         assert "groups" in data
         assert isinstance(data["groups"], list)
-        
+
         # Verify response structure if groups exist
         if len(data["groups"]) > 0:
             group = data["groups"][0]
@@ -41,16 +41,16 @@ class TestIdolsRouterE2E:
 
         assert response.status_code == 200
         response_data = response.json()
-        
+
         # Verify envelope format
         assert "data" in response_data
         assert "meta" in response_data
         assert "error" in response_data
-        
+
         # Verify data structure
         data = response_data["data"]
         assert "groups" in data
-        
+
         # Verify each group has required fields
         for group in data["groups"]:
             assert isinstance(group["id"], str)
@@ -65,14 +65,11 @@ class TestIdolsRouterE2E:
         assert response.status_code == 200
         data = response.json()["data"]
         groups = data["groups"]
-        
-        # Get group IDs
-        group_ids = [group["id"] for group in groups]
-        
+
         # Should contain some well-known K-pop groups (based on the router implementation)
         # Note: This test may need adjustment based on actual data
         assert len(groups) > 0, "Should have at least some idol groups"
-        
+
         # Verify all groups have valid structure
         for group in groups:
             assert len(group["id"]) > 0

@@ -57,7 +57,7 @@ class Post:
         self.expires_at = expires_at
         self.created_at = created_at or datetime.now(timezone.utc)
         self.updated_at = updated_at or self.created_at
-        
+
         # FR-004: Validate scope and city_code relationship
         if self.scope == PostScope.CITY and not self.city_code:
             raise ValueError("city_code is required when scope is 'city'")

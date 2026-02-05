@@ -5,18 +5,13 @@ Tests error handling middleware with real FastAPI app.
 """
 
 import pytest
-from fastapi import FastAPI, HTTPException, Request
-from fastapi.exceptions import RequestValidationError
+from fastapi import FastAPI, HTTPException
 from fastapi.testclient import TestClient
 from pydantic import BaseModel, Field
 
 from app.shared.presentation.exceptions.api_exceptions import APIError
 from app.shared.presentation.middleware.error_handler import (
-    api_exception_handler,
-    general_exception_handler,
-    http_exception_handler,
     register_exception_handlers,
-    validation_exception_handler,
 )
 
 
@@ -28,28 +23,28 @@ class TestErrorHandlerMiddlewareIntegration:
         """Create test FastAPI app with error handlers"""
         app = FastAPI()
         register_exception_handlers(app)
-        
+
         @app.get("/test-api-error")
         async def test_api_error():
             raise APIError(
                 status_code=404,
                 error_code="404_NOT_FOUND",
                 message="Resource not found",
-                details={"resource_id": "123"}
+                details={"resource_id": "123"},
             )
-        
+
         @app.get("/test-http-error")
         async def test_http_error():
             raise HTTPException(status_code=403, detail="Forbidden")
-        
+
         @app.get("/test-validation-error")
         async def test_validation_error(value: int):
             return {"value": value}
-        
+
         @app.get("/test-general-error")
         async def test_general_error():
             raise ValueError("Unexpected error")
-        
+
         return app
 
     def test_api_exception_handler_integration(self, test_app):
@@ -124,21 +119,20 @@ class TestErrorHandlerMiddlewareIntegration:
         # Arrange
         app = FastAPI()
         register_exception_handlers(app)
-        
+
         class TestModel(BaseModel):
             email: str = Field(..., pattern=r"^[\w\.-]+@[\w\.-]+\.\w+$")
             age: int = Field(..., gt=0, lt=150)
-        
+
         @app.post("/test-multi-validation")
         async def test_endpoint(data: TestModel):
             return data
-        
+
         client = TestClient(app, raise_server_exceptions=False)
 
         # Act - Send data with multiple validation errors
         response = client.post(
-            "/test-multi-validation",
-            json={"email": "invalid-email", "age": -5}
+            "/test-multi-validation", json={"email": "invalid-email", "age": -5}
         )
 
         # Assert
@@ -152,15 +146,15 @@ class TestErrorHandlerMiddlewareIntegration:
         # Arrange
         app = FastAPI()
         register_exception_handlers(app)
-        
+
         class RequiredModel(BaseModel):
             name: str
             email: str
-        
+
         @app.post("/test-required")
         async def test_endpoint(data: RequiredModel):
             return data
-        
+
         client = TestClient(app, raise_server_exceptions=False)
 
         # Act - Send incomplete data
@@ -176,15 +170,15 @@ class TestErrorHandlerMiddlewareIntegration:
         # Arrange
         app = FastAPI()
         register_exception_handlers(app)
-        
+
         @app.get("/test-401")
         async def test_401():
             raise HTTPException(status_code=401, detail="Unauthorized")
-        
+
         @app.get("/test-500")
         async def test_500():
             raise Exception("Internal error")
-        
+
         client = TestClient(app, raise_server_exceptions=False)
 
         # Act & Assert
@@ -201,16 +195,16 @@ class TestErrorHandlerMiddlewareIntegration:
         # Arrange
         app = FastAPI()
         register_exception_handlers(app)
-        
+
         @app.get("/test-no-details")
         async def test_endpoint():
             raise APIError(
                 status_code=400,
                 error_code="400_BAD_REQUEST",
                 message="Bad request",
-                details={}
+                details={},
             )
-        
+
         client = TestClient(app, raise_server_exceptions=False)
 
         # Act

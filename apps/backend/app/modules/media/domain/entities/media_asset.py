@@ -18,12 +18,12 @@ class MediaStatus(str, Enum):
 
 class MediaAsset:
     """Domain entity representing a media asset.
-    
+
     Media assets follow a strict lifecycle:
     1. PENDING: Presigned URL created, user uploads to GCS
     2. CONFIRMED: User confirms upload, quota applied
     3. ATTACHED: Media attached to post or gallery card
-    
+
     FR-007: Only confirmed media owned by the user can be attached.
     FR-022: Quota is only applied on confirmation, not on presign.
     """
@@ -52,7 +52,7 @@ class MediaAsset:
 
     def confirm(self) -> None:
         """Confirm the upload - moves from PENDING to CONFIRMED.
-        
+
         FR-022: Quota is applied when this method is called.
         """
         if self.status != MediaStatus.PENDING:
@@ -63,7 +63,7 @@ class MediaAsset:
 
     def attach(self) -> None:
         """Mark media as attached to a post or gallery card.
-        
+
         FR-007: Only confirmed media can be attached.
         """
         if self.status != MediaStatus.CONFIRMED:
@@ -77,7 +77,7 @@ class MediaAsset:
 
     def is_owned_by(self, user_id: UUID) -> bool:
         """Check if media is owned by the given user.
-        
+
         FR-007: Media can only be attached by its owner.
         """
         return self.owner_id == user_id

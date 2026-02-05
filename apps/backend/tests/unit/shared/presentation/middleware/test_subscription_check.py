@@ -3,7 +3,6 @@ Unit tests for Subscription Check Middleware
 Testing subscription permission enforcement and request state injection
 """
 
-from typing import AsyncGenerator
 from unittest.mock import AsyncMock, Mock, patch
 from uuid import uuid4
 
@@ -228,7 +227,7 @@ class TestRequireSubscriptionPlan:
         """Test that missing subscription info raises 500 error"""
         mock_request = Mock(spec=Request)
         mock_request.state = Mock(spec=[])  # Empty spec means no attributes
-        
+
         # Use spec_set to prevent Mock from auto-creating subscription attribute
         delattr(mock_request.state, "subscription") if hasattr(mock_request.state, "subscription") else None
 
@@ -277,11 +276,11 @@ class TestGetSubscriptionFromRequest:
     def test_get_subscription_without_subscription_returns_default(self):
         """Test getting subscription returns default when not present"""
         mock_request = Mock(spec=Request)
-        
+
         # Create a mock state without subscription attribute
         class MockState:
             pass
-        
+
         mock_request.state = MockState()
 
         subscription = get_subscription_from_request(mock_request)

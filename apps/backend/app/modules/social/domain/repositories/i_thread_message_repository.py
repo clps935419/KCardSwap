@@ -29,12 +29,12 @@ class IThreadMessageRepository(ABC):
     ) -> List[ThreadMessage]:
         """
         Get messages for a thread
-        
+
         Args:
             thread_id: Thread ID
             limit: Maximum number of messages to return
             offset: Pagination offset
-        
+
         Returns:
             List of messages ordered by created_at ascending (oldest first)
         """

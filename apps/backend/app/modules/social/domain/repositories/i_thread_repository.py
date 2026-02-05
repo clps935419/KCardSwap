@@ -29,7 +29,7 @@ class IThreadRepository(ABC):
     ) -> Optional[MessageThread]:
         """
         Find thread between two users (order-independent)
-        
+
         Returns the unique thread if exists, None otherwise.
         This supports FR-014: One unique thread per user pair.
         """
@@ -41,12 +41,12 @@ class IThreadRepository(ABC):
     ) -> List[MessageThread]:
         """
         Get all threads for a user
-        
+
         Args:
             user_id: ID of the user
             limit: Maximum number of threads to return
             offset: Pagination offset
-        
+
         Returns:
             List of threads ordered by last_message_at descending
         """

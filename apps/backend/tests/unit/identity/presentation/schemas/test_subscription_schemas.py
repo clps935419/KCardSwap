@@ -8,11 +8,11 @@ import pytest
 from pydantic import ValidationError
 
 from app.modules.identity.presentation.schemas.subscription_schemas import (
+    ExpireSubscriptionsData,
+    ExpireSubscriptionsResponse,
     SubscriptionStatusData,
     SubscriptionStatusResponse,
     VerifyReceiptRequest,
-    ExpireSubscriptionsData,
-    ExpireSubscriptionsResponse,
 )
 
 

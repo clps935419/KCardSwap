@@ -17,7 +17,6 @@ from app.modules.identity.application.use_cases.subscription.expire_subscription
 from app.modules.identity.application.use_cases.subscription.verify_receipt_use_case import (
     VerifyReceiptUseCase,
 )
-from app.shared.presentation.dependencies.auth import get_current_user_id
 from app.modules.identity.presentation.dependencies.use_case_deps import (
     get_check_subscription_status_use_case,
     get_expire_subscriptions_use_case,
@@ -31,6 +30,7 @@ from app.modules.identity.presentation.schemas.subscription_schemas import (
     VerifyReceiptRequest,
 )
 from app.shared.infrastructure.database.connection import get_db_session
+from app.shared.presentation.dependencies.auth import get_current_user_id
 
 router = APIRouter(prefix="/subscriptions", tags=["Subscriptions"])
 

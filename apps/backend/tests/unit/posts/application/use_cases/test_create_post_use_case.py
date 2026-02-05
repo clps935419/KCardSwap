@@ -143,9 +143,9 @@ class TestCreatePostUseCase:
         mock_post_repository.count_user_posts_today.return_value = 2
 
         # Act & Assert
-        from app.shared.presentation.errors.limit_exceeded import LimitExceededException
-        
-        with pytest.raises(LimitExceededException):
+        from app.shared.presentation.errors.limit_exceeded import LimitExceededError
+
+        with pytest.raises(LimitExceededError):
             await use_case.execute(
                 owner_id=owner_id,
                 scope=PostScope.CITY,

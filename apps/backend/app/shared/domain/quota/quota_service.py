@@ -8,8 +8,6 @@ from datetime import datetime, timedelta
 from enum import Enum
 from typing import Protocol
 
-from app.shared.presentation.errors.limit_exceeded import LimitExceededException
-
 
 class QuotaKey(str, Enum):
     """Quota limit keys as defined in POC spec."""

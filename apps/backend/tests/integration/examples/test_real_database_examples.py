@@ -35,11 +35,13 @@ class TestProfileFlowWithRealDatabase:
         """
         user_id = str(uuid4())
         result = await db_session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO users (id, google_id, email, role)
                 VALUES (:id, :google_id, :email, :role)
                 RETURNING id
-            """),
+            """
+            ),
             {
                 "id": user_id,
                 "google_id": "test_integration_user",
@@ -61,11 +63,13 @@ class TestProfileFlowWithRealDatabase:
         # 建立用戶
         user_id = str(uuid4())
         result = await db_session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO users (id, google_id, email, role)
                 VALUES (:id, :google_id, :email, :role)
                 RETURNING id
-            """),
+            """
+            ),
             {
                 "id": user_id,
                 "google_id": "test_user_with_profile",
@@ -79,18 +83,20 @@ class TestProfileFlowWithRealDatabase:
         # 建立個人檔案
         profile_id = str(uuid4())
         result = await db_session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO profiles (id, user_id, nickname, bio, region)
                 VALUES (:id, :user_id, :nickname, :bio, :region)
                 RETURNING id
-            """),
+            """
+            ),
             {
                 "id": profile_id,
                 "user_id": user_id,
                 "nickname": "TestNickname",
                 "bio": "Test bio",
-                "region": "TPE"
-            }
+                "region": "TPE",
+            },
         )
         profile_id = result.scalar()
         await db_session.commit()
@@ -105,6 +111,7 @@ class TestProfileFlowWithRealDatabase:
         1. 模擬已認證的用戶 (get_current_user_id)
         2. 注入真實的資料庫 session (get_db_session)
         """
+
         async def override_get_current_user_id():
             return test_user
 
@@ -128,11 +135,13 @@ class TestProfileFlowWithRealDatabase:
         # 插入測試用戶
         user_id = str(uuid4())
         result = await db_session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO users (id, google_id, email, role)
                 VALUES (:id, :google_id, :email, :role)
                 RETURNING id
-            """),
+            """
+            ),
             {
                 "id": user_id,
                 "google_id": "rollback_test_user",
@@ -145,8 +154,7 @@ class TestProfileFlowWithRealDatabase:
 
         # 驗證資料存在
         result = await db_session.execute(
-            text("SELECT COUNT(*) FROM users WHERE id = :user_id"),
-            {"user_id": user_id}
+            text("SELECT COUNT(*) FROM users WHERE id = :user_id"), {"user_id": user_id}
         )
         count = result.scalar()
         assert count == 1
@@ -162,13 +170,15 @@ class TestProfileFlowWithRealDatabase:
         """
         result = await db_session.execute(
             text("SELECT COUNT(*) FROM users WHERE google_id = :google_id"),
-            {"google_id": "rollback_test_user"}
+            {"google_id": "rollback_test_user"},
         )
         count = result.scalar()
         assert count == 0, "前一個測試的資料應該已被回滾"
 
     @pytest.mark.asyncio
-    async def test_query_user_profile_from_database(self, test_user_with_profile, db_session):
+    async def test_query_user_profile_from_database(
+        self, test_user_with_profile, db_session
+    ):
         """測試直接從資料庫查詢用戶個人檔案
 
         此測試示範如何：
@@ -179,23 +189,23 @@ class TestProfileFlowWithRealDatabase:
 
         # 查詢個人檔案
         result = await db_session.execute(
-            text("""
+            text(
+                """
                 SELECT p.id, p.nickname, p.bio, p.region, u.email
                 FROM profiles p
                 JOIN users u ON p.user_id = u.id
                 WHERE p.id = :profile_id
-            """),
-            {"profile_id": profile_id}
+            """
+            ),
+            {"profile_id": profile_id},
         )
         row = result.fetchone()
 
         assert row is not None
         assert row[1] == "TestNickname"  # nickname
-        assert row[2] == "Test bio"       # bio
-        assert row[3] == "TPE"            # region
+        assert row[2] == "Test bio"  # bio
+        assert row[3] == "TPE"  # region
         assert row[4] == "withprofile@test.com"  # email
-
-
 
 
 class TestAuthenticationFlowWithRealDatabase:
@@ -213,11 +223,13 @@ class TestAuthenticationFlowWithRealDatabase:
         # 插入新用戶
         user_id = str(uuid4())
         result = await db_session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO users (id, google_id, email, role, created_at)
                 VALUES (:id, :google_id, :email, :role, NOW())
                 RETURNING id, google_id, email, role, created_at
-            """),
+            """
+            ),
             {
                 "id": user_id,
                 "google_id": "google_oauth_123",
@@ -243,9 +255,9 @@ class TestAuthenticationFlowWithRealDatabase:
         # 驗證插入結果
         assert row is not None
         assert row[1] == "google_oauth_123"  # google_id
-        assert row[2] == "oauth@test.com"    # email
-        assert row[3] == "user"              # role
-        assert row[4] is not None            # created_at
+        assert row[2] == "oauth@test.com"  # email
+        assert row[3] == "user"  # role
+        assert row[4] is not None  # created_at
 
     @pytest.mark.asyncio
     async def test_duplicate_email_constraint(self, db_session):
@@ -256,10 +268,12 @@ class TestAuthenticationFlowWithRealDatabase:
         """
         # 插入第一個用戶
         await db_session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO users (id, google_id, email, role)
                 VALUES (:id, :google_id, :email, :role)
-            """),
+            """
+            ),
             {
                 "id": str(uuid4()),
                 "google_id": "user1",
@@ -272,10 +286,12 @@ class TestAuthenticationFlowWithRealDatabase:
         # 嘗試插入相同 email 的第二個用戶（應該失敗）
         with pytest.raises(Exception) as exc_info:
             await db_session.execute(
-                text("""
+                text(
+                    """
                     INSERT INTO users (id, google_id, email, role)
                     VALUES (:id, :google_id, :email, :role)
-                """),
+                """
+                ),
                 {
                     "id": str(uuid4()),
                     "google_id": "user2",
@@ -286,7 +302,10 @@ class TestAuthenticationFlowWithRealDatabase:
             await db_session.flush()
 
         # 驗證錯誤訊息包含 unique constraint
-        assert "unique" in str(exc_info.value).lower() or "duplicate" in str(exc_info.value).lower()
+        assert (
+            "unique" in str(exc_info.value).lower()
+            or "duplicate" in str(exc_info.value).lower()
+        )
 
 
 class TestDataRelationshipsWithRealDatabase:
@@ -304,11 +323,13 @@ class TestDataRelationshipsWithRealDatabase:
         # 建立用戶
         user_id = str(uuid4())
         result = await db_session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO users (id, google_id, email, role)
                 VALUES (:id, :google_id, :email, :role)
                 RETURNING id
-            """),
+            """
+            ),
             {
                 "id": user_id,
                 "google_id": "relation_test_user",
@@ -322,29 +343,29 @@ class TestDataRelationshipsWithRealDatabase:
         # 建立個人檔案
         profile_id = str(uuid4())
         result = await db_session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO profiles (id, user_id, nickname)
                 VALUES (:id, :user_id, :nickname)
                 RETURNING id
-            """),
-            {
-                "id": profile_id,
-                "user_id": user_id,
-                "nickname": "RelationTest"
-            }
+            """
+            ),
+            {"id": profile_id, "user_id": user_id, "nickname": "RelationTest"},
         )
         _profile_id = result.scalar()
         await db_session.commit()
 
         # 透過 JOIN 查詢驗證關聯
         result = await db_session.execute(
-            text("""
+            text(
+                """
                 SELECT u.email, p.nickname
                 FROM users u
                 JOIN profiles p ON u.id = p.user_id
                 WHERE u.id = :user_id
-            """),
-            {"user_id": user_id}
+            """
+            ),
+            {"user_id": user_id},
         )
         row = result.fetchone()
 
@@ -362,11 +383,13 @@ class TestDataRelationshipsWithRealDatabase:
         # 建立用戶與個人檔案
         user_id = str(uuid4())
         result = await db_session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO users (id, google_id, email, role)
                 VALUES (:id, :google_id, :email, :role)
                 RETURNING id
-            """),
+            """
+            ),
             {
                 "id": user_id,
                 "google_id": "cascade_test",
@@ -379,29 +402,26 @@ class TestDataRelationshipsWithRealDatabase:
 
         profile_id = str(uuid4())
         await db_session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO profiles (id, user_id, nickname)
                 VALUES (:id, :user_id, :nickname)
-            """),
-            {
-                "id": profile_id,
-                "user_id": user_id,
-                "nickname": "CascadeTest"
-            }
+            """
+            ),
+            {"id": profile_id, "user_id": user_id, "nickname": "CascadeTest"},
         )
         await db_session.commit()
 
         # 刪除用戶
         await db_session.execute(
-            text("DELETE FROM users WHERE id = :user_id"),
-            {"user_id": user_id}
+            text("DELETE FROM users WHERE id = :user_id"), {"user_id": user_id}
         )
         await db_session.commit()
 
         # 檢查個人檔案是否也被刪除
         result = await db_session.execute(
             text("SELECT COUNT(*) FROM profiles WHERE user_id = :user_id"),
-            {"user_id": user_id}
+            {"user_id": user_id},
         )
         count = result.scalar()
 

@@ -101,7 +101,7 @@ class TestMockGCSStorageService:
         """Test deleting a blob"""
         # Arrange - Add a blob first
         service._add_mock_blob("cards/user123/card456.jpg")
-        
+
         # Act
         result = service.delete_blob(blob_name="cards/user123/card456.jpg")
 
@@ -112,7 +112,7 @@ class TestMockGCSStorageService:
         """Test blob_exists returns True for existing blob"""
         # Arrange
         service._add_mock_blob("cards/user123/card456.jpg")
-        
+
         # Act
         exists = service.blob_exists(blob_name="cards/user123/card456.jpg")
 

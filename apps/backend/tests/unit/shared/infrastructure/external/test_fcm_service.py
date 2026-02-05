@@ -5,8 +5,7 @@ Tests the Firebase Cloud Messaging service implementation with mocked
 Firebase Admin SDK.
 """
 
-from unittest.mock import AsyncMock, MagicMock, patch
-from uuid import uuid4
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -238,12 +237,12 @@ class TestFCMService:
         ):
             mock_config.FCM_CREDENTIALS_PATH = mock_credentials_path
             # Create exception classes first
-            UnregisteredError = type("UnregisteredError", (Exception,), {})
-            SenderIdMismatchError = type("SenderIdMismatchError", (Exception,), {})
-            mock_messaging.UnregisteredError = UnregisteredError
-            mock_messaging.SenderIdMismatchError = SenderIdMismatchError
-            
-            mock_messaging.send.side_effect = UnregisteredError(
+            unregistered_error = type("UnregisteredError", (Exception,), {})
+            sender_id_mismatch_error = type("SenderIdMismatchError", (Exception,), {})
+            mock_messaging.UnregisteredError = unregistered_error
+            mock_messaging.SenderIdMismatchError = sender_id_mismatch_error
+
+            mock_messaging.send.side_effect = unregistered_error(
                 "Token is unregistered"
             )
             service = FCMService()
@@ -279,12 +278,12 @@ class TestFCMService:
         ):
             mock_config.FCM_CREDENTIALS_PATH = mock_credentials_path
             # Create exception classes first
-            UnregisteredError = type("UnregisteredError", (Exception,), {})
-            SenderIdMismatchError = type("SenderIdMismatchError", (Exception,), {})
-            mock_messaging.UnregisteredError = UnregisteredError
-            mock_messaging.SenderIdMismatchError = SenderIdMismatchError
-            
-            mock_messaging.send.side_effect = SenderIdMismatchError(
+            unregistered_error = type("UnregisteredError", (Exception,), {})
+            sender_id_mismatch_error = type("SenderIdMismatchError", (Exception,), {})
+            mock_messaging.UnregisteredError = unregistered_error
+            mock_messaging.SenderIdMismatchError = sender_id_mismatch_error
+
+            mock_messaging.send.side_effect = sender_id_mismatch_error(
                 "Sender ID mismatch"
             )
             service = FCMService()
