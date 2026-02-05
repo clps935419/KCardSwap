@@ -66,7 +66,7 @@ class AttachMediaUseCase:
             )
 
         # Mark as attached
-        media.attach()
+        media.attach(target_type=request.target_type, target_id=request.target_id)
 
         # Update in database
         await self.media_repository.update(media)

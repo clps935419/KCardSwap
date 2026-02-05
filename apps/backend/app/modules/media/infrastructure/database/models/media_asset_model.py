@@ -32,6 +32,8 @@ class MediaAssetModel(Base):
         default="pending",
         index=True,
     )  # pending, confirmed, attached
+    target_type = Column(String(50), nullable=True)  # post, gallery_card (Phase 9)
+    target_id = Column(UUID(as_uuid=True), nullable=True)  # ID of post or gallery_card (Phase 9)
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False)
     updated_at = Column(
         DateTime(timezone=True),

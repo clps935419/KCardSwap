@@ -39,6 +39,8 @@ class MediaAsset:
         created_at: Optional[datetime] = None,
         updated_at: Optional[datetime] = None,
         confirmed_at: Optional[datetime] = None,
+        target_type: Optional[str] = None,
+        target_id: Optional[UUID] = None,
     ):
         self.id = id
         self.owner_id = owner_id
@@ -49,6 +51,8 @@ class MediaAsset:
         self.created_at = created_at or datetime.now(timezone.utc)
         self.updated_at = updated_at or datetime.now(timezone.utc)
         self.confirmed_at = confirmed_at
+        self.target_type = target_type
+        self.target_id = target_id
 
     def confirm(self) -> None:
         """Confirm the upload - moves from PENDING to CONFIRMED.
@@ -61,14 +65,20 @@ class MediaAsset:
         self.confirmed_at = datetime.now(timezone.utc)
         self.updated_at = datetime.now(timezone.utc)
 
-    def attach(self) -> None:
+    def attach(self, target_type: str, target_id: UUID) -> None:
         """Mark media as attached to a post or gallery card.
 
         FR-007: Only confirmed media can be attached.
+        
+        Args:
+            target_type: Type of target entity ("post" or "gallery_card")
+            target_id: ID of the target entity
         """
         if self.status != MediaStatus.CONFIRMED:
             raise ValueError(f"Cannot attach media with status {self.status}. Media must be confirmed first.")
         self.status = MediaStatus.ATTACHED
+        self.target_type = target_type
+        self.target_id = target_id
         self.updated_at = datetime.now(timezone.utc)
 
     def is_confirmed(self) -> bool:

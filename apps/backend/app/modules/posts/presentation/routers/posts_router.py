@@ -4,12 +4,15 @@ Handles city board posts and interest management (V2: with scope/category/requir
 """
 
 import logging
-from typing import Annotated, Optional
+from typing import Annotated, List, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.modules.media.infrastructure.repositories.media_repository_impl import (
+    MediaRepositoryImpl,
+)
 from app.modules.posts.application.use_cases.close_post_use_case import ClosePostUseCase
 from app.modules.posts.application.use_cases.create_post_use_case import (
     CreatePostUseCase,
@@ -43,8 +46,23 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/posts", tags=["Posts"])
 
 
-def _post_to_response(post, like_count: int = 0, liked_by_me: bool = False) -> PostResponse:
-    """Helper to convert Post entity to PostResponse"""
+async def _post_to_response(
+    post,
+    session: AsyncSession,
+    like_count: int = 0,
+    liked_by_me: bool = False,
+    media_asset_ids: Optional[List[UUID]] = None,
+) -> PostResponse:
+    """Helper to convert Post entity to PostResponse with media_asset_ids.
+    
+    Phase 9: Includes media_asset_ids for image display.
+    """
+    # If media_asset_ids not provided, fetch from database
+    if media_asset_ids is None:
+        media_repo = MediaRepositoryImpl(session)
+        media_list = await media_repo.get_by_target("post", UUID(post.id))
+        media_asset_ids = [media.id for media in media_list]
+    
     return PostResponse(
         id=UUID(post.id),
         owner_id=UUID(post.owner_id),
@@ -58,6 +76,7 @@ def _post_to_response(post, like_count: int = 0, liked_by_me: bool = False) -> P
         status=post.status.value,
         like_count=like_count,
         liked_by_me=liked_by_me,
+        media_asset_ids=media_asset_ids,
         expires_at=post.expires_at,
         created_at=post.created_at,
         updated_at=post.updated_at,
@@ -109,7 +128,7 @@ async def create_post(
             expires_at=request.expires_at,
         )
 
-        data = _post_to_response(post)
+        data = await _post_to_response(post, session)
         return PostResponseWrapper(data=data, meta=None, error=None)
 
     except ValueError as e:
@@ -166,8 +185,9 @@ async def list_posts(
         )
 
         post_responses = [
-            _post_to_response(
+            await _post_to_response(
                 pwl.post,
+                session,
                 like_count=pwl.like_count,
                 liked_by_me=pwl.liked_by_me,
             )

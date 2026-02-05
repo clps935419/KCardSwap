@@ -103,6 +103,10 @@ class PostResponse(BaseModel):
     )
     like_count: int = Field(0, description="Total number of likes on this post")
     liked_by_me: bool = Field(False, description="Whether the current user has liked this post")
+    media_asset_ids: List[UUID] = Field(
+        default_factory=list,
+        description="List of media asset IDs attached to this post (Phase 9)",
+    )
     expires_at: datetime = Field(..., description="Expiry datetime")
     created_at: datetime = Field(..., description="Creation timestamp")
     updated_at: datetime = Field(..., description="Last update timestamp")
