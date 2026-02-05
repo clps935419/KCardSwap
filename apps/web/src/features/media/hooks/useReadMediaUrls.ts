@@ -3,7 +3,7 @@
  * Phase 9: Login-only access to images with 10-minute TTL
  */
 import { useQuery } from '@tanstack/react-query'
-import { postApiV1MediaReadUrls } from '@/shared/api/generated'
+import { MediaService } from '@/shared/api/generated'
 
 /**
  * Hook to batch fetch signed read URLs for media assets
@@ -36,8 +36,8 @@ export function useReadMediaUrls(
         }
       }
 
-      const response = await postApiV1MediaReadUrls({
-        body: {
+      const response = await MediaService.getMediaReadUrlsApiV1MediaReadUrlsPost({
+        requestBody: {
           media_asset_ids: mediaAssetIds,
         },
       })

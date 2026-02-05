@@ -117,166 +117,6 @@ export const $BlockUserRequest = {
     }
 } as const;
 
-export const $CardListResponseWrapper = {
-    properties: {
-        data: {
-            items: {
-                '$ref': '#/components/schemas/CardResponse'
-            },
-            type: 'array',
-            title: 'Data'
-        },
-        meta: {
-            type: 'null',
-            title: 'Meta'
-        },
-        error: {
-            type: 'null',
-            title: 'Error'
-        }
-    },
-    type: 'object',
-    required: ['data'],
-    title: 'CardListResponseWrapper',
-    description: 'Response wrapper for card list (standardized envelope)'
-} as const;
-
-export const $CardResponse = {
-    properties: {
-        id: {
-            type: 'string',
-            format: 'uuid',
-            title: 'Id',
-            description: 'Card ID'
-        },
-        owner_id: {
-            type: 'string',
-            format: 'uuid',
-            title: 'Owner Id',
-            description: 'Owner user ID'
-        },
-        idol: {
-            anyOf: [
-                {
-                    type: 'string'
-                },
-                {
-                    type: 'null'
-                }
-            ],
-            title: 'Idol',
-            description: 'Idol name'
-        },
-        idol_group: {
-            anyOf: [
-                {
-                    type: 'string'
-                },
-                {
-                    type: 'null'
-                }
-            ],
-            title: 'Idol Group',
-            description: 'Idol group'
-        },
-        album: {
-            anyOf: [
-                {
-                    type: 'string'
-                },
-                {
-                    type: 'null'
-                }
-            ],
-            title: 'Album',
-            description: 'Album name'
-        },
-        version: {
-            anyOf: [
-                {
-                    type: 'string'
-                },
-                {
-                    type: 'null'
-                }
-            ],
-            title: 'Version',
-            description: 'Version'
-        },
-        rarity: {
-            anyOf: [
-                {
-                    type: 'string'
-                },
-                {
-                    type: 'null'
-                }
-            ],
-            title: 'Rarity',
-            description: 'Card rarity'
-        },
-        status: {
-            type: 'string',
-            title: 'Status',
-            description: 'Card status'
-        },
-        image_url: {
-            anyOf: [
-                {
-                    type: 'string'
-                },
-                {
-                    type: 'null'
-                }
-            ],
-            title: 'Image Url',
-            description: 'Image URL'
-        },
-        size_bytes: {
-            anyOf: [
-                {
-                    type: 'integer'
-                },
-                {
-                    type: 'null'
-                }
-            ],
-            title: 'Size Bytes',
-            description: 'Image size in bytes'
-        },
-        created_at: {
-            type: 'string',
-            format: 'date-time',
-            title: 'Created At',
-            description: 'Creation timestamp'
-        },
-        updated_at: {
-            type: 'string',
-            format: 'date-time',
-            title: 'Updated At',
-            description: 'Last update timestamp'
-        }
-    },
-    type: 'object',
-    required: ['id', 'owner_id', 'status', 'created_at', 'updated_at'],
-    title: 'CardResponse',
-    description: 'Response schema for card details',
-    example: {
-        album: 'Love Poem',
-        created_at: '2024-01-01T00:00:00Z',
-        id: '123e4567-e89b-12d3-a456-426614174000',
-        idol: 'IU',
-        idol_group: 'Solo',
-        image_url: 'https://storage.googleapis.com/bucket/cards/user_id/card_id.jpg',
-        owner_id: '987e6543-e21b-12d3-a456-426614174000',
-        rarity: 'rare',
-        size_bytes: 1234567,
-        status: 'available',
-        updated_at: '2024-01-01T00:00:00Z',
-        version: 'Version A'
-    }
-} as const;
-
 export const $ChatRoomListResponse = {
     properties: {
         rooms: {
@@ -751,46 +591,6 @@ export const $CreateUploadUrlResponseSchema = {
     required: ['media_id', 'upload_url', 'expires_in_minutes'],
     title: 'CreateUploadUrlResponseSchema',
     description: 'Response schema for upload URL.'
-} as const;
-
-export const $DeleteSuccessResponse = {
-    properties: {
-        success: {
-            type: 'boolean',
-            title: 'Success',
-            description: 'Operation success status',
-            default: true
-        },
-        message: {
-            type: 'string',
-            title: 'Message',
-            description: 'Success message'
-        }
-    },
-    type: 'object',
-    required: ['message'],
-    title: 'DeleteSuccessResponse',
-    description: 'Success response for delete operations'
-} as const;
-
-export const $DeleteSuccessResponseWrapper = {
-    properties: {
-        data: {
-            '$ref': '#/components/schemas/DeleteSuccessResponse'
-        },
-        meta: {
-            type: 'null',
-            title: 'Meta'
-        },
-        error: {
-            type: 'null',
-            title: 'Error'
-        }
-    },
-    type: 'object',
-    required: ['data'],
-    title: 'DeleteSuccessResponseWrapper',
-    description: 'Response wrapper for delete success (standardized envelope)'
 } as const;
 
 export const $ExpireSubscriptionsData = {
@@ -1453,6 +1253,15 @@ export const $PostResponse = {
             description: 'Whether the current user has liked this post',
             default: false
         },
+        media_asset_ids: {
+            items: {
+                type: 'string',
+                format: 'uuid'
+            },
+            type: 'array',
+            title: 'Media Asset Ids',
+            description: 'List of media asset IDs attached to this post (Phase 9)'
+        },
         expires_at: {
             type: 'string',
             format: 'date-time',
@@ -1671,75 +1480,59 @@ export const $ProfileResponseWrapper = {
     description: 'Response wrapper for profile data (standardized envelope)'
 } as const;
 
-export const $QuotaStatusResponse = {
+export const $ReadMediaUrlsRequest = {
     properties: {
-        uploads_today: {
-            type: 'integer',
-            title: 'Uploads Today',
-            description: 'Number of uploads today'
-        },
-        daily_limit: {
-            type: 'integer',
-            title: 'Daily Limit',
-            description: 'Daily upload limit'
-        },
-        remaining_uploads: {
-            type: 'integer',
-            title: 'Remaining Uploads',
-            description: 'Remaining uploads for today'
-        },
-        storage_used_bytes: {
-            type: 'integer',
-            title: 'Storage Used Bytes',
-            description: 'Total storage used in bytes'
-        },
-        storage_limit_bytes: {
-            type: 'integer',
-            title: 'Storage Limit Bytes',
-            description: 'Storage limit in bytes'
-        },
-        remaining_storage_bytes: {
-            type: 'integer',
-            title: 'Remaining Storage Bytes',
-            description: 'Remaining storage in bytes'
-        },
-        storage_used_mb: {
-            type: 'number',
-            title: 'Storage Used Mb',
-            description: 'Storage used in MB'
-        },
-        storage_limit_mb: {
-            type: 'number',
-            title: 'Storage Limit Mb',
-            description: 'Storage limit in MB'
-        },
-        remaining_storage_mb: {
-            type: 'number',
-            title: 'Remaining Storage Mb',
-            description: 'Remaining storage in MB'
+        media_asset_ids: {
+            items: {
+                type: 'string',
+                format: 'uuid'
+            },
+            type: 'array',
+            maxItems: 50,
+            minItems: 1,
+            title: 'Media Asset Ids',
+            description: 'List of media asset IDs to get read URLs for',
+            examples: [['123e4567-e89b-12d3-a456-426614174000']]
         }
     },
     type: 'object',
-    required: ['uploads_today', 'daily_limit', 'remaining_uploads', 'storage_used_bytes', 'storage_limit_bytes', 'remaining_storage_bytes', 'storage_used_mb', 'storage_limit_mb', 'remaining_storage_mb'],
-    title: 'QuotaStatusResponse',
-    description: 'Response schema for quota status',
-    example: {
-        daily_limit: 2,
-        remaining_storage_bytes: 1068498944,
-        remaining_storage_mb: 1019,
-        remaining_uploads: 1,
-        storage_limit_bytes: 1073741824,
-        storage_limit_mb: 1024,
-        storage_used_bytes: 5242880,
-        storage_used_mb: 5,
-        uploads_today: 1
-    }
+    required: ['media_asset_ids'],
+    title: 'ReadMediaUrlsRequest',
+    description: 'Request schema for batch reading media signed URLs.'
 } as const;
 
-export const $QuotaStatusResponseWrapper = {
+export const $ReadMediaUrlsResponse = {
+    properties: {
+        urls: {
+            additionalProperties: {
+                type: 'string'
+            },
+            type: 'object',
+            title: 'Urls',
+            description: 'Mapping of media_id to signed read URL',
+            examples: [
+                {
+                    '123e4567-e89b-12d3-a456-426614174000': 'https://storage.googleapis.com/...'
+                }
+            ]
+        },
+        expires_in_minutes: {
+            type: 'integer',
+            title: 'Expires In Minutes',
+            description: 'URL expiration time in minutes (all URLs have same expiration)',
+            example: 10
+        }
+    },
+    type: 'object',
+    required: ['urls', 'expires_in_minutes'],
+    title: 'ReadMediaUrlsResponse',
+    description: 'Response schema for batch reading media signed URLs.'
+} as const;
+
+export const $ReadMediaUrlsResponseWrapper = {
     properties: {
         data: {
-            '$ref': '#/components/schemas/QuotaStatusResponse'
+            '$ref': '#/components/schemas/ReadMediaUrlsResponse'
         },
         meta: {
             type: 'null',
@@ -1752,8 +1545,8 @@ export const $QuotaStatusResponseWrapper = {
     },
     type: 'object',
     required: ['data'],
-    title: 'QuotaStatusResponseWrapper',
-    description: 'Response wrapper for quota status (standardized envelope)'
+    title: 'ReadMediaUrlsResponseWrapper',
+    description: 'Envelope wrapper for read media URLs response.'
 } as const;
 
 export const $RefreshSuccessResponse = {
@@ -1975,28 +1768,20 @@ export const $SendMessageRequest = {
     properties: {
         content: {
             type: 'string',
-            maxLength: 5000,
+            maxLength: 2000,
             minLength: 1,
             title: 'Content',
-            description: 'Message content'
-        },
-        post_id: {
-            anyOf: [
-                {
-                    type: 'string'
-                },
-                {
-                    type: 'null'
-                }
-            ],
-            title: 'Post Id',
-            description: 'Optional post ID to reference'
+            description: 'Message content',
+            examples: ["Hello! I'm interested in trading cards."]
         }
     },
     type: 'object',
     required: ['content'],
     title: 'SendMessageRequest',
-    description: 'Request to send a message in a thread'
+    description: 'Request schema for sending a message',
+    example: {
+        content: "Hello! I'm interested in trading cards."
+    }
 } as const;
 
 export const $SubscriptionStatusData = {
@@ -2410,177 +2195,6 @@ export const $UpdateProfileRequest = {
     }
 } as const;
 
-export const $UploadCardRequest = {
-    properties: {
-        content_type: {
-            type: 'string',
-            title: 'Content Type',
-            description: 'MIME type of the file (image/jpeg or image/png)',
-            examples: ['image/jpeg', 'image/png']
-        },
-        file_size_bytes: {
-            type: 'integer',
-            exclusiveMinimum: 0,
-            title: 'File Size Bytes',
-            description: 'Size of file in bytes',
-            examples: [1234567]
-        },
-        idol: {
-            anyOf: [
-                {
-                    type: 'string',
-                    maxLength: 100
-                },
-                {
-                    type: 'null'
-                }
-            ],
-            title: 'Idol',
-            description: 'Idol name'
-        },
-        idol_group: {
-            anyOf: [
-                {
-                    type: 'string',
-                    maxLength: 100
-                },
-                {
-                    type: 'null'
-                }
-            ],
-            title: 'Idol Group',
-            description: 'Idol group'
-        },
-        album: {
-            anyOf: [
-                {
-                    type: 'string',
-                    maxLength: 100
-                },
-                {
-                    type: 'null'
-                }
-            ],
-            title: 'Album',
-            description: 'Album name'
-        },
-        version: {
-            anyOf: [
-                {
-                    type: 'string',
-                    maxLength: 100
-                },
-                {
-                    type: 'null'
-                }
-            ],
-            title: 'Version',
-            description: 'Version'
-        },
-        rarity: {
-            anyOf: [
-                {
-                    type: 'string'
-                },
-                {
-                    type: 'null'
-                }
-            ],
-            title: 'Rarity',
-            description: 'Card rarity',
-            examples: ['common', 'rare', 'epic', 'legendary']
-        }
-    },
-    type: 'object',
-    required: ['content_type', 'file_size_bytes'],
-    title: 'UploadCardRequest',
-    description: 'Request schema for getting upload signed URL',
-    example: {
-        album: 'Love Poem',
-        content_type: 'image/jpeg',
-        file_size_bytes: 1234567,
-        idol: 'IU',
-        idol_group: 'Solo',
-        rarity: 'rare',
-        version: 'Version A'
-    }
-} as const;
-
-export const $UploadUrlResponse = {
-    properties: {
-        upload_url: {
-            type: 'string',
-            title: 'Upload Url',
-            description: 'Signed URL for uploading'
-        },
-        method: {
-            type: 'string',
-            title: 'Method',
-            description: 'HTTP method to use',
-            examples: ['PUT']
-        },
-        required_headers: {
-            additionalProperties: {
-                type: 'string'
-            },
-            type: 'object',
-            title: 'Required Headers',
-            description: 'Required headers for upload'
-        },
-        image_url: {
-            type: 'string',
-            title: 'Image Url',
-            description: 'Public URL of the image after upload'
-        },
-        expires_at: {
-            type: 'string',
-            format: 'date-time',
-            title: 'Expires At',
-            description: 'When the signed URL expires'
-        },
-        card_id: {
-            type: 'string',
-            format: 'uuid',
-            title: 'Card Id',
-            description: 'ID of the created card'
-        }
-    },
-    type: 'object',
-    required: ['upload_url', 'method', 'required_headers', 'image_url', 'expires_at', 'card_id'],
-    title: 'UploadUrlResponse',
-    description: 'Response schema for upload signed URL',
-    example: {
-        card_id: '123e4567-e89b-12d3-a456-426614174000',
-        expires_at: '2025-01-01T00:15:00Z',
-        image_url: 'https://storage.googleapis.com/bucket/cards/user_id/card_id.jpg',
-        method: 'PUT',
-        required_headers: {
-            'Content-Type': 'image/jpeg'
-        },
-        upload_url: 'https://storage.googleapis.com/bucket/path?signature=...'
-    }
-} as const;
-
-export const $UploadUrlResponseWrapper = {
-    properties: {
-        data: {
-            '$ref': '#/components/schemas/UploadUrlResponse'
-        },
-        meta: {
-            type: 'null',
-            title: 'Meta'
-        },
-        error: {
-            type: 'null',
-            title: 'Error'
-        }
-    },
-    type: 'object',
-    required: ['data'],
-    title: 'UploadUrlResponseWrapper',
-    description: 'Response wrapper for upload URL (standardized envelope)'
-} as const;
-
 export const $ValidationError = {
     properties: {
         loc: {
@@ -2604,6 +2218,13 @@ export const $ValidationError = {
         type: {
             type: 'string',
             title: 'Error Type'
+        },
+        input: {
+            title: 'Input'
+        },
+        ctx: {
+            type: 'object',
+            title: 'Context'
         }
     },
     type: 'object',
@@ -2640,22 +2261,30 @@ export const $VerifyReceiptRequest = {
     }
 } as const;
 
-export const $app__modules__social__presentation__schemas__chat_schemas__SendMessageRequest = {
+export const $app__modules__social__presentation__schemas__message_schemas__SendMessageRequest = {
     properties: {
         content: {
             type: 'string',
-            maxLength: 2000,
+            maxLength: 5000,
             minLength: 1,
             title: 'Content',
-            description: 'Message content',
-            examples: ["Hello! I'm interested in trading cards."]
+            description: 'Message content'
+        },
+        post_id: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Post Id',
+            description: 'Optional post ID to reference'
         }
     },
     type: 'object',
     required: ['content'],
     title: 'SendMessageRequest',
-    description: 'Request schema for sending a message',
-    example: {
-        content: "Hello! I'm interested in trading cards."
-    }
+    description: 'Request to send a message in a thread'
 } as const;

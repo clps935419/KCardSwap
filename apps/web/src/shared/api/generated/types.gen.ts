@@ -72,69 +72,6 @@ export type BlockUserRequest = {
 };
 
 /**
- * Response wrapper for card list (standardized envelope)
- */
-export type CardListResponseWrapper = {
-    data: Array<CardResponse>;
-    meta?: null;
-    error?: null;
-};
-
-/**
- * Response schema for card details
- */
-export type CardResponse = {
-    /**
-     * Card ID
-     */
-    id: string;
-    /**
-     * Owner user ID
-     */
-    owner_id: string;
-    /**
-     * Idol name
-     */
-    idol?: string | null;
-    /**
-     * Idol group
-     */
-    idol_group?: string | null;
-    /**
-     * Album name
-     */
-    album?: string | null;
-    /**
-     * Version
-     */
-    version?: string | null;
-    /**
-     * Card rarity
-     */
-    rarity?: string | null;
-    /**
-     * Card status
-     */
-    status: string;
-    /**
-     * Image URL
-     */
-    image_url?: string | null;
-    /**
-     * Image size in bytes
-     */
-    size_bytes?: number | null;
-    /**
-     * Creation timestamp
-     */
-    created_at: string;
-    /**
-     * Last update timestamp
-     */
-    updated_at: string;
-};
-
-/**
  * Response schema for list of chat rooms
  */
 export type ChatRoomListResponse = {
@@ -355,29 +292,6 @@ export type CreateUploadUrlResponseSchema = {
      * URL expiration time in minutes
      */
     expires_in_minutes: number;
-};
-
-/**
- * Success response for delete operations
- */
-export type DeleteSuccessResponse = {
-    /**
-     * Operation success status
-     */
-    success?: boolean;
-    /**
-     * Success message
-     */
-    message: string;
-};
-
-/**
- * Response wrapper for delete success (standardized envelope)
- */
-export type DeleteSuccessResponseWrapper = {
-    data: DeleteSuccessResponse;
-    meta?: null;
-    error?: null;
 };
 
 /**
@@ -681,6 +595,10 @@ export type PostResponse = {
      */
     liked_by_me?: boolean;
     /**
+     * List of media asset IDs attached to this post (Phase 9)
+     */
+    media_asset_ids?: Array<(string)>;
+    /**
      * Expiry datetime
      */
     expires_at: string;
@@ -768,52 +686,36 @@ export type ProfileResponseWrapper = {
 };
 
 /**
- * Response schema for quota status
+ * Request schema for batch reading media signed URLs.
  */
-export type QuotaStatusResponse = {
+export type ReadMediaUrlsRequest = {
     /**
-     * Number of uploads today
+     * List of media asset IDs to get read URLs for
      */
-    uploads_today: number;
-    /**
-     * Daily upload limit
-     */
-    daily_limit: number;
-    /**
-     * Remaining uploads for today
-     */
-    remaining_uploads: number;
-    /**
-     * Total storage used in bytes
-     */
-    storage_used_bytes: number;
-    /**
-     * Storage limit in bytes
-     */
-    storage_limit_bytes: number;
-    /**
-     * Remaining storage in bytes
-     */
-    remaining_storage_bytes: number;
-    /**
-     * Storage used in MB
-     */
-    storage_used_mb: number;
-    /**
-     * Storage limit in MB
-     */
-    storage_limit_mb: number;
-    /**
-     * Remaining storage in MB
-     */
-    remaining_storage_mb: number;
+    media_asset_ids: Array<(string)>;
 };
 
 /**
- * Response wrapper for quota status (standardized envelope)
+ * Response schema for batch reading media signed URLs.
  */
-export type QuotaStatusResponseWrapper = {
-    data: QuotaStatusResponse;
+export type ReadMediaUrlsResponse = {
+    /**
+     * Mapping of media_id to signed read URL
+     */
+    urls: {
+        [key: string]: (string);
+    };
+    /**
+     * URL expiration time in minutes (all URLs have same expiration)
+     */
+    expires_in_minutes: number;
+};
+
+/**
+ * Envelope wrapper for read media URLs response.
+ */
+export type ReadMediaUrlsResponseWrapper = {
+    data: ReadMediaUrlsResponse;
     meta?: null;
     error?: null;
 };
@@ -937,17 +839,13 @@ export type ReportResponseWrapper = {
 };
 
 /**
- * Request to send a message in a thread
+ * Request schema for sending a message
  */
 export type SendMessageRequest = {
     /**
      * Message content
      */
     content: string;
-    /**
-     * Optional post ID to reference
-     */
-    post_id?: string | null;
 };
 
 /**
@@ -1126,85 +1024,14 @@ export type UpdateProfileRequest = {
 } | null;
 };
 
-/**
- * Request schema for getting upload signed URL
- */
-export type UploadCardRequest = {
-    /**
-     * MIME type of the file (image/jpeg or image/png)
-     */
-    content_type: string;
-    /**
-     * Size of file in bytes
-     */
-    file_size_bytes: number;
-    /**
-     * Idol name
-     */
-    idol?: string | null;
-    /**
-     * Idol group
-     */
-    idol_group?: string | null;
-    /**
-     * Album name
-     */
-    album?: string | null;
-    /**
-     * Version
-     */
-    version?: string | null;
-    /**
-     * Card rarity
-     */
-    rarity?: string | null;
-};
-
-/**
- * Response schema for upload signed URL
- */
-export type UploadUrlResponse = {
-    /**
-     * Signed URL for uploading
-     */
-    upload_url: string;
-    /**
-     * HTTP method to use
-     */
-    method: string;
-    /**
-     * Required headers for upload
-     */
-    required_headers: {
-        [key: string]: (string);
-    };
-    /**
-     * Public URL of the image after upload
-     */
-    image_url: string;
-    /**
-     * When the signed URL expires
-     */
-    expires_at: string;
-    /**
-     * ID of the created card
-     */
-    card_id: string;
-};
-
-/**
- * Response wrapper for upload URL (standardized envelope)
- */
-export type UploadUrlResponseWrapper = {
-    data: UploadUrlResponse;
-    meta?: null;
-    error?: null;
-};
-
 export type ValidationError = {
     loc: Array<(string | number)>;
     msg: string;
     type: string;
+    input?: unknown;
+    ctx?: {
+        [key: string]: unknown;
+    };
 };
 
 /**
@@ -1226,13 +1053,17 @@ export type VerifyReceiptRequest = {
 };
 
 /**
- * Request schema for sending a message
+ * Request to send a message in a thread
  */
-export type app__modules__social__presentation__schemas__chat_schemas__SendMessageRequest = {
+export type app__modules__social__presentation__schemas__message_schemas__SendMessageRequest = {
     /**
      * Message content
      */
     content: string;
+    /**
+     * Optional post ID to reference
+     */
+    post_id?: string | null;
 };
 
 export type HealthCheckHealthGetResponse = unknown;
@@ -1334,43 +1165,6 @@ export type GetMyReportsApiV1ReportsGetData = {
 
 export type GetMyReportsApiV1ReportsGetResponse = ReportListResponseWrapper;
 
-export type GetUploadUrlApiV1CardsUploadUrlPostData = {
-    accessToken?: string | null;
-    requestBody: UploadCardRequest;
-};
-
-export type GetUploadUrlApiV1CardsUploadUrlPostResponse = UploadUrlResponseWrapper;
-
-export type GetMyCardsApiV1CardsMeGetData = {
-    accessToken?: string | null;
-    /**
-     * Filter by status (available/trading/traded)
-     */
-    status?: string | null;
-};
-
-export type GetMyCardsApiV1CardsMeGetResponse = CardListResponseWrapper;
-
-export type DeleteCardApiV1CardsCardIdDeleteData = {
-    accessToken?: string | null;
-    cardId: string;
-};
-
-export type DeleteCardApiV1CardsCardIdDeleteResponse = DeleteSuccessResponseWrapper;
-
-export type GetQuotaStatusApiV1CardsQuotaStatusGetData = {
-    accessToken?: string | null;
-};
-
-export type GetQuotaStatusApiV1CardsQuotaStatusGetResponse = QuotaStatusResponseWrapper;
-
-export type ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostData = {
-    accessToken?: string | null;
-    cardId: string;
-};
-
-export type ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostResponse = DeleteSuccessResponseWrapper;
-
 export type GetChatRoomsApiV1ChatsGetData = {
     accessToken?: string | null;
 };
@@ -1394,7 +1188,7 @@ export type GetMessagesApiV1ChatsRoomIdMessagesGetResponse = MessagesListRespons
 
 export type SendMessageApiV1ChatsRoomIdMessagesPostData = {
     accessToken?: string | null;
-    requestBody: app__modules__social__presentation__schemas__chat_schemas__SendMessageRequest;
+    requestBody: SendMessageRequest;
     roomId: string;
 };
 
@@ -1517,6 +1311,13 @@ export type AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostData =
 
 export type AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostResponse = AttachMediaResponseSchema;
 
+export type GetMediaReadUrlsApiV1MediaReadUrlsPostData = {
+    accessToken?: string | null;
+    requestBody: ReadMediaUrlsRequest;
+};
+
+export type GetMediaReadUrlsApiV1MediaReadUrlsPostResponse = ReadMediaUrlsResponseWrapper;
+
 export type CreateMessageRequestApiV1MessageRequestsPostData = {
     accessToken?: string | null;
     requestBody: CreateMessageRequestRequest;
@@ -1564,7 +1365,7 @@ export type GetThreadMessagesApiV1ThreadsThreadIdMessagesGetResponse = ThreadMes
 
 export type SendMessageApiV1ThreadsThreadIdMessagesPostData = {
     accessToken?: string | null;
-    requestBody: SendMessageRequest;
+    requestBody: app__modules__social__presentation__schemas__message_schemas__SendMessageRequest;
     threadId: string;
 };
 
@@ -1919,125 +1720,6 @@ export type $OpenApiTs = {
                  * Internal server error
                  */
                 500: unknown;
-            };
-        };
-    };
-    '/api/v1/cards/upload-url': {
-        post: {
-            req: GetUploadUrlApiV1CardsUploadUrlPostData;
-            res: {
-                /**
-                 * Upload URL generated successfully
-                 */
-                200: UploadUrlResponseWrapper;
-                /**
-                 * Invalid request (file type/size)
-                 */
-                400: unknown;
-                /**
-                 * Unauthorized
-                 */
-                401: unknown;
-                /**
-                 * Quota exceeded
-                 */
-                422: unknown;
-            };
-        };
-    };
-    '/api/v1/cards/me': {
-        get: {
-            req: GetMyCardsApiV1CardsMeGetData;
-            res: {
-                /**
-                 * Cards retrieved successfully
-                 */
-                200: CardListResponseWrapper;
-                /**
-                 * Unauthorized
-                 */
-                401: unknown;
-                /**
-                 * Validation Error
-                 */
-                422: HTTPValidationError;
-            };
-        };
-    };
-    '/api/v1/cards/{card_id}': {
-        delete: {
-            req: DeleteCardApiV1CardsCardIdDeleteData;
-            res: {
-                /**
-                 * Card deleted successfully
-                 */
-                200: DeleteSuccessResponseWrapper;
-                /**
-                 * Unauthorized
-                 */
-                401: unknown;
-                /**
-                 * Not the card owner
-                 */
-                403: unknown;
-                /**
-                 * Card not found
-                 */
-                404: unknown;
-                /**
-                 * Validation Error
-                 */
-                422: HTTPValidationError;
-            };
-        };
-    };
-    '/api/v1/cards/quota/status': {
-        get: {
-            req: GetQuotaStatusApiV1CardsQuotaStatusGetData;
-            res: {
-                /**
-                 * Quota status retrieved successfully
-                 */
-                200: QuotaStatusResponseWrapper;
-                /**
-                 * Unauthorized
-                 */
-                401: unknown;
-                /**
-                 * Validation Error
-                 */
-                422: HTTPValidationError;
-            };
-        };
-    };
-    '/api/v1/cards/{card_id}/confirm-upload': {
-        post: {
-            req: ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostData;
-            res: {
-                /**
-                 * Upload confirmed successfully
-                 */
-                200: DeleteSuccessResponseWrapper;
-                /**
-                 * Invalid request (already confirmed, no image, etc.)
-                 */
-                400: unknown;
-                /**
-                 * Unauthorized
-                 */
-                401: unknown;
-                /**
-                 * Not the card owner
-                 */
-                403: unknown;
-                /**
-                 * Card not found or image not found in storage
-                 */
-                404: unknown;
-                /**
-                 * Validation Error
-                 */
-                422: HTTPValidationError;
             };
         };
     };
@@ -2407,6 +2089,21 @@ export type $OpenApiTs = {
                  * Successful Response
                  */
                 200: AttachMediaResponseSchema;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/api/v1/media/read-urls': {
+        post: {
+            req: GetMediaReadUrlsApiV1MediaReadUrlsPostData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: ReadMediaUrlsResponseWrapper;
                 /**
                  * Validation Error
                  */

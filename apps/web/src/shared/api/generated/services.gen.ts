@@ -3,7 +3,7 @@
 import type { CancelablePromise } from './core/CancelablePromise';
 import { OpenAPI } from './core/OpenAPI';
 import { request as __request } from './core/request';
-import type { HealthCheckHealthGetResponse, ApiHealthCheckApiV1HealthGetResponse, RootGetResponse, AdminLoginApiV1AuthAdminLoginPostData, AdminLoginApiV1AuthAdminLoginPostResponse, GoogleLoginApiV1AuthGoogleLoginPostData, GoogleLoginApiV1AuthGoogleLoginPostResponse, GoogleCallbackApiV1AuthGoogleCallbackPostData, GoogleCallbackApiV1AuthGoogleCallbackPostResponse, GoogleLoginCodeApiV1AuthGoogleLoginCodePostData, GoogleLoginCodeApiV1AuthGoogleLoginCodePostResponse, RefreshTokenApiV1AuthRefreshPostData, RefreshTokenApiV1AuthRefreshPostResponse, LogoutApiV1AuthLogoutPostResponse, GetMyProfileApiV1ProfileMeGetData, GetMyProfileApiV1ProfileMeGetResponse, UpdateMyProfileApiV1ProfileMePutData, UpdateMyProfileApiV1ProfileMePutResponse, GetIdolGroupsApiV1IdolsGroupsGetResponse, VerifyReceiptApiV1SubscriptionsVerifyReceiptPostData, VerifyReceiptApiV1SubscriptionsVerifyReceiptPostResponse, GetSubscriptionStatusApiV1SubscriptionsStatusGetData, GetSubscriptionStatusApiV1SubscriptionsStatusGetResponse, ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostResponse, BlockUserApiV1FriendsBlockPostData, BlockUserApiV1FriendsBlockPostResponse, UnblockUserApiV1FriendsUnblockPostData, UnblockUserApiV1FriendsUnblockPostResponse, SubmitReportApiV1ReportsPostData, SubmitReportApiV1ReportsPostResponse, GetMyReportsApiV1ReportsGetData, GetMyReportsApiV1ReportsGetResponse, GetUploadUrlApiV1CardsUploadUrlPostData, GetUploadUrlApiV1CardsUploadUrlPostResponse, GetMyCardsApiV1CardsMeGetData, GetMyCardsApiV1CardsMeGetResponse, DeleteCardApiV1CardsCardIdDeleteData, DeleteCardApiV1CardsCardIdDeleteResponse, GetQuotaStatusApiV1CardsQuotaStatusGetData, GetQuotaStatusApiV1CardsQuotaStatusGetResponse, ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostData, ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostResponse, GetChatRoomsApiV1ChatsGetData, GetChatRoomsApiV1ChatsGetResponse, GetMessagesApiV1ChatsRoomIdMessagesGetData, GetMessagesApiV1ChatsRoomIdMessagesGetResponse, SendMessageApiV1ChatsRoomIdMessagesPostData, SendMessageApiV1ChatsRoomIdMessagesPostResponse, MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostData, MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostResponse, CreatePostApiV1PostsPostData, CreatePostApiV1PostsPostResponse, ListPostsApiV1PostsGetData, ListPostsApiV1PostsGetResponse, ClosePostApiV1PostsPostIdClosePostData, ClosePostApiV1PostsPostIdClosePostResponse, ToggleLikeApiV1PostsPostIdLikePostData, ToggleLikeApiV1PostsPostIdLikePostResponse, GetCitiesApiV1LocationsCitiesGetResponse, GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetData, GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetResponse, GetMyGalleryCardsApiV1GalleryCardsMeGetData, GetMyGalleryCardsApiV1GalleryCardsMeGetResponse, CreateGalleryCardApiV1GalleryCardsPostData, CreateGalleryCardApiV1GalleryCardsPostResponse, DeleteGalleryCardApiV1GalleryCardsCardIdDeleteData, DeleteGalleryCardApiV1GalleryCardsCardIdDeleteResponse, ReorderGalleryCardsApiV1GalleryCardsReorderPutData, ReorderGalleryCardsApiV1GalleryCardsReorderPutResponse, CreateUploadUrlApiV1MediaUploadUrlPostData, CreateUploadUrlApiV1MediaUploadUrlPostResponse, ConfirmUploadApiV1MediaMediaIdConfirmPostData, ConfirmUploadApiV1MediaMediaIdConfirmPostResponse, AttachMediaToPostApiV1MediaPostsPostIdAttachPostData, AttachMediaToPostApiV1MediaPostsPostIdAttachPostResponse, AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostData, AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostResponse, CreateMessageRequestApiV1MessageRequestsPostData, CreateMessageRequestApiV1MessageRequestsPostResponse, GetMyMessageRequestsApiV1MessageRequestsInboxGetData, GetMyMessageRequestsApiV1MessageRequestsInboxGetResponse, AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostData, AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostResponse, DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostData, DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostResponse, GetMyThreadsApiV1ThreadsGetData, GetMyThreadsApiV1ThreadsGetResponse, GetThreadMessagesApiV1ThreadsThreadIdMessagesGetData, GetThreadMessagesApiV1ThreadsThreadIdMessagesGetResponse, SendMessageApiV1ThreadsThreadIdMessagesPostData, SendMessageApiV1ThreadsThreadIdMessagesPostResponse } from './types.gen';
+import type { HealthCheckHealthGetResponse, ApiHealthCheckApiV1HealthGetResponse, RootGetResponse, AdminLoginApiV1AuthAdminLoginPostData, AdminLoginApiV1AuthAdminLoginPostResponse, GoogleLoginApiV1AuthGoogleLoginPostData, GoogleLoginApiV1AuthGoogleLoginPostResponse, GoogleCallbackApiV1AuthGoogleCallbackPostData, GoogleCallbackApiV1AuthGoogleCallbackPostResponse, GoogleLoginCodeApiV1AuthGoogleLoginCodePostData, GoogleLoginCodeApiV1AuthGoogleLoginCodePostResponse, RefreshTokenApiV1AuthRefreshPostData, RefreshTokenApiV1AuthRefreshPostResponse, LogoutApiV1AuthLogoutPostResponse, GetMyProfileApiV1ProfileMeGetData, GetMyProfileApiV1ProfileMeGetResponse, UpdateMyProfileApiV1ProfileMePutData, UpdateMyProfileApiV1ProfileMePutResponse, GetIdolGroupsApiV1IdolsGroupsGetResponse, VerifyReceiptApiV1SubscriptionsVerifyReceiptPostData, VerifyReceiptApiV1SubscriptionsVerifyReceiptPostResponse, GetSubscriptionStatusApiV1SubscriptionsStatusGetData, GetSubscriptionStatusApiV1SubscriptionsStatusGetResponse, ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostResponse, BlockUserApiV1FriendsBlockPostData, BlockUserApiV1FriendsBlockPostResponse, UnblockUserApiV1FriendsUnblockPostData, UnblockUserApiV1FriendsUnblockPostResponse, SubmitReportApiV1ReportsPostData, SubmitReportApiV1ReportsPostResponse, GetMyReportsApiV1ReportsGetData, GetMyReportsApiV1ReportsGetResponse, GetChatRoomsApiV1ChatsGetData, GetChatRoomsApiV1ChatsGetResponse, GetMessagesApiV1ChatsRoomIdMessagesGetData, GetMessagesApiV1ChatsRoomIdMessagesGetResponse, SendMessageApiV1ChatsRoomIdMessagesPostData, SendMessageApiV1ChatsRoomIdMessagesPostResponse, MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostData, MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostResponse, CreatePostApiV1PostsPostData, CreatePostApiV1PostsPostResponse, ListPostsApiV1PostsGetData, ListPostsApiV1PostsGetResponse, ClosePostApiV1PostsPostIdClosePostData, ClosePostApiV1PostsPostIdClosePostResponse, ToggleLikeApiV1PostsPostIdLikePostData, ToggleLikeApiV1PostsPostIdLikePostResponse, GetCitiesApiV1LocationsCitiesGetResponse, GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetData, GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetResponse, GetMyGalleryCardsApiV1GalleryCardsMeGetData, GetMyGalleryCardsApiV1GalleryCardsMeGetResponse, CreateGalleryCardApiV1GalleryCardsPostData, CreateGalleryCardApiV1GalleryCardsPostResponse, DeleteGalleryCardApiV1GalleryCardsCardIdDeleteData, DeleteGalleryCardApiV1GalleryCardsCardIdDeleteResponse, ReorderGalleryCardsApiV1GalleryCardsReorderPutData, ReorderGalleryCardsApiV1GalleryCardsReorderPutResponse, CreateUploadUrlApiV1MediaUploadUrlPostData, CreateUploadUrlApiV1MediaUploadUrlPostResponse, ConfirmUploadApiV1MediaMediaIdConfirmPostData, ConfirmUploadApiV1MediaMediaIdConfirmPostResponse, AttachMediaToPostApiV1MediaPostsPostIdAttachPostData, AttachMediaToPostApiV1MediaPostsPostIdAttachPostResponse, AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostData, AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostResponse, GetMediaReadUrlsApiV1MediaReadUrlsPostData, GetMediaReadUrlsApiV1MediaReadUrlsPostResponse, CreateMessageRequestApiV1MessageRequestsPostData, CreateMessageRequestApiV1MessageRequestsPostResponse, GetMyMessageRequestsApiV1MessageRequestsInboxGetData, GetMyMessageRequestsApiV1MessageRequestsInboxGetResponse, AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostData, AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostResponse, DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostData, DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostResponse, GetMyThreadsApiV1ThreadsGetData, GetMyThreadsApiV1ThreadsGetResponse, GetThreadMessagesApiV1ThreadsThreadIdMessagesGetData, GetThreadMessagesApiV1ThreadsThreadIdMessagesGetResponse, SendMessageApiV1ThreadsThreadIdMessagesPostData, SendMessageApiV1ThreadsThreadIdMessagesPostResponse } from './types.gen';
 
 export class DefaultService {
     /**
@@ -445,140 +445,6 @@ export class ReportsService {
                 401: 'Unauthorized (not logged in)',
                 422: 'Validation Error',
                 500: 'Internal server error'
-            }
-        });
-    }
-    
-}
-
-export class CardsService {
-    /**
-     * Get upload signed URL
-     * Generate a signed URL for uploading a card image to GCS
-     * @param data The data for the request.
-     * @param data.requestBody
-     * @param data.accessToken
-     * @returns UploadUrlResponseWrapper Upload URL generated successfully
-     * @throws ApiError
-     */
-    public static getUploadUrlApiV1CardsUploadUrlPost(data: GetUploadUrlApiV1CardsUploadUrlPostData): CancelablePromise<GetUploadUrlApiV1CardsUploadUrlPostResponse> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/api/v1/cards/upload-url',
-            cookies: {
-                access_token: data.accessToken
-            },
-            body: data.requestBody,
-            mediaType: 'application/json',
-            errors: {
-                400: 'Invalid request (file type/size)',
-                401: 'Unauthorized',
-                422: 'Quota exceeded'
-            }
-        });
-    }
-    
-    /**
-     * Get my cards
-     * Retrieve all cards owned by the authenticated user
-     * @param data The data for the request.
-     * @param data.status Filter by status (available/trading/traded)
-     * @param data.accessToken
-     * @returns CardListResponseWrapper Cards retrieved successfully
-     * @throws ApiError
-     */
-    public static getMyCardsApiV1CardsMeGet(data: GetMyCardsApiV1CardsMeGetData = {}): CancelablePromise<GetMyCardsApiV1CardsMeGetResponse> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/api/v1/cards/me',
-            cookies: {
-                access_token: data.accessToken
-            },
-            query: {
-                status: data.status
-            },
-            errors: {
-                401: 'Unauthorized',
-                422: 'Validation Error'
-            }
-        });
-    }
-    
-    /**
-     * Delete a card
-     * Delete a card owned by the authenticated user
-     * @param data The data for the request.
-     * @param data.cardId
-     * @param data.accessToken
-     * @returns DeleteSuccessResponseWrapper Card deleted successfully
-     * @throws ApiError
-     */
-    public static deleteCardApiV1CardsCardIdDelete(data: DeleteCardApiV1CardsCardIdDeleteData): CancelablePromise<DeleteCardApiV1CardsCardIdDeleteResponse> {
-        return __request(OpenAPI, {
-            method: 'DELETE',
-            url: '/api/v1/cards/{card_id}',
-            path: {
-                card_id: data.cardId
-            },
-            cookies: {
-                access_token: data.accessToken
-            },
-            errors: {
-                401: 'Unauthorized',
-                403: 'Not the card owner',
-                404: 'Card not found',
-                422: 'Validation Error'
-            }
-        });
-    }
-    
-    /**
-     * Get quota status
-     * Check current upload quota usage
-     * @param data The data for the request.
-     * @param data.accessToken
-     * @returns QuotaStatusResponseWrapper Quota status retrieved successfully
-     * @throws ApiError
-     */
-    public static getQuotaStatusApiV1CardsQuotaStatusGet(data: GetQuotaStatusApiV1CardsQuotaStatusGetData = {}): CancelablePromise<GetQuotaStatusApiV1CardsQuotaStatusGetResponse> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/api/v1/cards/quota/status',
-            cookies: {
-                access_token: data.accessToken
-            },
-            errors: {
-                401: 'Unauthorized',
-                422: 'Validation Error'
-            }
-        });
-    }
-    
-    /**
-     * Confirm card upload
-     * Confirm that the card image has been successfully uploaded to GCS after using the signed URL
-     * @param data The data for the request.
-     * @param data.cardId
-     * @param data.accessToken
-     * @returns DeleteSuccessResponseWrapper Upload confirmed successfully
-     * @throws ApiError
-     */
-    public static confirmCardUploadApiV1CardsCardIdConfirmUploadPost(data: ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostData): CancelablePromise<ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostResponse> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/api/v1/cards/{card_id}/confirm-upload',
-            path: {
-                card_id: data.cardId
-            },
-            cookies: {
-                access_token: data.accessToken
-            },
-            errors: {
-                400: 'Invalid request (already confirmed, no image, etc.)',
-                401: 'Unauthorized',
-                403: 'Not the card owner',
-                404: 'Card not found or image not found in storage',
-                422: 'Validation Error'
             }
         });
     }
@@ -1077,6 +943,30 @@ export class MediaService {
             path: {
                 card_id: data.cardId
             },
+            cookies: {
+                access_token: data.accessToken
+            },
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Get signed read URLs for media assets (Phase 9)
+     * Batch retrieve signed download URLs for media. Login required. T083-T085.
+     * @param data The data for the request.
+     * @param data.requestBody
+     * @param data.accessToken
+     * @returns ReadMediaUrlsResponseWrapper Successful Response
+     * @throws ApiError
+     */
+    public static getMediaReadUrlsApiV1MediaReadUrlsPost(data: GetMediaReadUrlsApiV1MediaReadUrlsPostData): CancelablePromise<GetMediaReadUrlsApiV1MediaReadUrlsPostResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/media/read-urls',
             cookies: {
                 access_token: data.accessToken
             },
