@@ -73,7 +73,8 @@ class TestFriendsRouter:
         # Assert
         assert result == {"message": "User blocked successfully", "error": None}
         mock_block_use_case.execute.assert_called_once_with(
-            blocker_id=str(current_user_id), blocked_id=str(target_user_id)
+            blocker_user_id=str(current_user_id),
+            blocked_user_id=str(target_user_id),
         )
 
     @pytest.mark.asyncio
@@ -170,7 +171,8 @@ class TestFriendsRouter:
         # Assert
         assert result == {"message": "User unblocked successfully", "error": None}
         mock_unblock_use_case.execute.assert_called_once_with(
-            blocker_id=str(current_user_id), blocked_id=str(target_user_id)
+            unblocker_user_id=str(current_user_id),
+            unblocked_user_id=str(target_user_id),
         )
 
     @pytest.mark.asyncio

@@ -4,10 +4,11 @@ Unit tests for Media Router
 Tests the media router endpoints with mocked use cases.
 """
 
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock, MagicMock, patch
 from uuid import uuid4
 
 import pytest
+from fastapi import HTTPException
 
 from app.modules.media.presentation.routers.media_router import (
     attach_media_to_gallery_card,
@@ -20,6 +21,7 @@ from app.modules.media.presentation.schemas.media_schemas import (
     AttachMediaToPostRequestSchema,
     CreateUploadUrlRequestSchema,
 )
+from app.shared.presentation.errors.limit_exceeded import LimitExceededError
 
 
 class TestMediaRouter:
@@ -46,14 +48,14 @@ class TestMediaRouter:
         return uuid4()
 
     @pytest.fixture
-    def mock_injector(self):
-        """Create mock injector"""
-        return MagicMock()
+    def mock_session(self):
+        """Create mock session"""
+        return AsyncMock()
 
     # Tests for POST /media/upload-url
     @pytest.mark.asyncio
     async def test_create_upload_url_success(
-        self, sample_user_id, sample_media_id, mock_injector
+        self, sample_user_id, sample_media_id, mock_session
     ):
         """Test successful upload URL creation"""
         # Arrange
@@ -70,14 +72,23 @@ class TestMediaRouter:
 
         mock_use_case = AsyncMock()
         mock_use_case.execute.return_value = mock_result
-        mock_injector.get.return_value = mock_use_case
 
         # Act
-        response = await create_upload_url(
-            request=request,
-            user_id=sample_user_id,
-            injector=mock_injector,
-        )
+        with (
+            patch(
+                "app.modules.media.presentation.routers.media_router.CreateUploadUrlUseCase",
+                return_value=mock_use_case,
+            ),
+            patch(
+                "app.modules.media.presentation.routers.media_router.get_storage_service",
+                return_value=MagicMock(),
+            ),
+        ):
+            response = await create_upload_url(
+                request=request,
+                session=mock_session,
+                user_id=sample_user_id,
+            )
 
         # Assert
         assert response.media_id == sample_media_id
@@ -87,7 +98,7 @@ class TestMediaRouter:
 
     @pytest.mark.asyncio
     async def test_create_upload_url_invalid_content_type(
-        self, sample_user_id, mock_injector
+        self, sample_user_id, mock_session
     ):
         """Test upload URL creation with invalid content type"""
         # Arrange
@@ -99,20 +110,27 @@ class TestMediaRouter:
 
         mock_use_case = AsyncMock()
         mock_use_case.execute.side_effect = ValueError("Invalid content type")
-        mock_injector.get.return_value = mock_use_case
 
         # Act & Assert
-        with pytest.raises(ValueError):
-            await create_upload_url(
-                request=request,
-                user_id=sample_user_id,
-                injector=mock_injector,
-            )
+        with (
+            patch(
+                "app.modules.media.presentation.routers.media_router.CreateUploadUrlUseCase",
+                return_value=mock_use_case,
+            ),
+            patch(
+                "app.modules.media.presentation.routers.media_router.get_storage_service",
+                return_value=MagicMock(),
+            ),
+        ):
+            with pytest.raises(ValueError):
+                await create_upload_url(
+                    request=request,
+                    session=mock_session,
+                    user_id=sample_user_id,
+                )
 
     @pytest.mark.asyncio
-    async def test_create_upload_url_file_too_large(
-        self, sample_user_id, mock_injector
-    ):
+    async def test_create_upload_url_file_too_large(self, sample_user_id, mock_session):
         """Test upload URL creation with file size exceeding limit"""
         # Arrange
         request = CreateUploadUrlRequestSchema(
@@ -123,20 +141,29 @@ class TestMediaRouter:
 
         mock_use_case = AsyncMock()
         mock_use_case.execute.side_effect = ValueError("File size exceeds limit")
-        mock_injector.get.return_value = mock_use_case
 
         # Act & Assert
-        with pytest.raises(ValueError):
-            await create_upload_url(
-                request=request,
-                user_id=sample_user_id,
-                injector=mock_injector,
-            )
+        with (
+            patch(
+                "app.modules.media.presentation.routers.media_router.CreateUploadUrlUseCase",
+                return_value=mock_use_case,
+            ),
+            patch(
+                "app.modules.media.presentation.routers.media_router.get_storage_service",
+                return_value=MagicMock(),
+            ),
+        ):
+            with pytest.raises(ValueError):
+                await create_upload_url(
+                    request=request,
+                    session=mock_session,
+                    user_id=sample_user_id,
+                )
 
     # Tests for POST /media/{media_id}/confirm
     @pytest.mark.asyncio
     async def test_confirm_upload_success(
-        self, sample_user_id, sample_media_id, mock_injector
+        self, sample_user_id, sample_media_id, mock_session
     ):
         """Test successful upload confirmation"""
         # Arrange
@@ -147,14 +174,25 @@ class TestMediaRouter:
 
         mock_use_case = AsyncMock()
         mock_use_case.execute.return_value = mock_result
-        mock_injector.get.return_value = mock_use_case
+        mock_subscription_service = AsyncMock()
 
         # Act
-        response = await confirm_upload(
-            media_id=sample_media_id,
-            user_id=sample_user_id,
-            injector=mock_injector,
-        )
+        with (
+            patch(
+                "app.modules.media.presentation.routers.media_router.ConfirmUploadUseCase",
+                return_value=mock_use_case,
+            ),
+            patch(
+                "app.modules.media.presentation.routers.media_router.get_storage_service",
+                return_value=MagicMock(),
+            ),
+        ):
+            response = await confirm_upload(
+                media_id=sample_media_id,
+                session=mock_session,
+                subscription_service=mock_subscription_service,
+                user_id=sample_user_id,
+            )
 
         # Assert
         assert response.media_id == sample_media_id
@@ -164,62 +202,106 @@ class TestMediaRouter:
 
     @pytest.mark.asyncio
     async def test_confirm_upload_media_not_found(
-        self, sample_user_id, sample_media_id, mock_injector
+        self, sample_user_id, sample_media_id, mock_session
     ):
         """Test upload confirmation with non-existent media"""
         # Arrange
         mock_use_case = AsyncMock()
         mock_use_case.execute.side_effect = ValueError("Media not found")
-        mock_injector.get.return_value = mock_use_case
+        mock_subscription_service = AsyncMock()
 
         # Act & Assert
-        with pytest.raises(ValueError):
-            await confirm_upload(
-                media_id=sample_media_id,
-                user_id=sample_user_id,
-                injector=mock_injector,
-            )
+        with (
+            patch(
+                "app.modules.media.presentation.routers.media_router.ConfirmUploadUseCase",
+                return_value=mock_use_case,
+            ),
+            patch(
+                "app.modules.media.presentation.routers.media_router.get_storage_service",
+                return_value=MagicMock(),
+            ),
+        ):
+            with pytest.raises(HTTPException) as exc_info:
+                await confirm_upload(
+                    media_id=sample_media_id,
+                    session=mock_session,
+                    subscription_service=mock_subscription_service,
+                    user_id=sample_user_id,
+                )
+
+        assert exc_info.value.status_code == 404
 
     @pytest.mark.asyncio
     async def test_confirm_upload_not_owned(
-        self, sample_user_id, sample_media_id, mock_injector
+        self, sample_user_id, sample_media_id, mock_session
     ):
         """Test upload confirmation for media not owned by user"""
         # Arrange
         mock_use_case = AsyncMock()
         mock_use_case.execute.side_effect = ValueError("Media not owned by user")
-        mock_injector.get.return_value = mock_use_case
+        mock_subscription_service = AsyncMock()
 
         # Act & Assert
-        with pytest.raises(ValueError):
-            await confirm_upload(
-                media_id=sample_media_id,
-                user_id=sample_user_id,
-                injector=mock_injector,
-            )
+        with (
+            patch(
+                "app.modules.media.presentation.routers.media_router.ConfirmUploadUseCase",
+                return_value=mock_use_case,
+            ),
+            patch(
+                "app.modules.media.presentation.routers.media_router.get_storage_service",
+                return_value=MagicMock(),
+            ),
+        ):
+            with pytest.raises(HTTPException) as exc_info:
+                await confirm_upload(
+                    media_id=sample_media_id,
+                    session=mock_session,
+                    subscription_service=mock_subscription_service,
+                    user_id=sample_user_id,
+                )
+
+        assert exc_info.value.status_code == 403
 
     @pytest.mark.asyncio
     async def test_confirm_upload_quota_exceeded(
-        self, sample_user_id, sample_media_id, mock_injector
+        self, sample_user_id, sample_media_id, mock_session
     ):
         """Test upload confirmation with quota exceeded"""
         # Arrange
         mock_use_case = AsyncMock()
-        mock_use_case.execute.side_effect = Exception("Quota exceeded")
-        mock_injector.get.return_value = mock_use_case
+        mock_use_case.execute.side_effect = LimitExceededError(
+            limit_key="media_file_bytes_max",
+            limit_value=1024,
+            current_value=2048,
+            reset_at=MagicMock(),
+        )
+        mock_subscription_service = AsyncMock()
 
         # Act & Assert
-        with pytest.raises(Exception):
-            await confirm_upload(
-                media_id=sample_media_id,
-                user_id=sample_user_id,
-                injector=mock_injector,
-            )
+        with (
+            patch(
+                "app.modules.media.presentation.routers.media_router.ConfirmUploadUseCase",
+                return_value=mock_use_case,
+            ),
+            patch(
+                "app.modules.media.presentation.routers.media_router.get_storage_service",
+                return_value=MagicMock(),
+            ),
+        ):
+            with pytest.raises(HTTPException) as exc_info:
+                await confirm_upload(
+                    media_id=sample_media_id,
+                    session=mock_session,
+                    subscription_service=mock_subscription_service,
+                    user_id=sample_user_id,
+                )
+
+        assert exc_info.value.status_code == 422
 
     # Tests for POST /media/posts/{post_id}/attach
     @pytest.mark.asyncio
     async def test_attach_media_to_post_success(
-        self, sample_user_id, sample_media_id, sample_post_id, mock_injector
+        self, sample_user_id, sample_media_id, sample_post_id, mock_session
     ):
         """Test successful media attachment to post"""
         # Arrange
@@ -233,15 +315,18 @@ class TestMediaRouter:
 
         mock_use_case = AsyncMock()
         mock_use_case.execute.return_value = mock_result
-        mock_injector.get.return_value = mock_use_case
 
         # Act
-        response = await attach_media_to_post(
-            post_id=sample_post_id,
-            request=request,
-            user_id=sample_user_id,
-            injector=mock_injector,
-        )
+        with patch(
+            "app.modules.media.presentation.routers.media_router.AttachMediaUseCase",
+            return_value=mock_use_case,
+        ):
+            response = await attach_media_to_post(
+                post_id=sample_post_id,
+                request=request,
+                session=mock_session,
+                user_id=sample_user_id,
+            )
 
         # Assert
         assert response.media_id == sample_media_id
@@ -252,7 +337,7 @@ class TestMediaRouter:
 
     @pytest.mark.asyncio
     async def test_attach_media_to_post_not_confirmed(
-        self, sample_user_id, sample_media_id, sample_post_id, mock_injector
+        self, sample_user_id, sample_media_id, sample_post_id, mock_session
     ):
         """Test media attachment to post with unconfirmed media"""
         # Arrange
@@ -260,20 +345,25 @@ class TestMediaRouter:
 
         mock_use_case = AsyncMock()
         mock_use_case.execute.side_effect = ValueError("Media not confirmed")
-        mock_injector.get.return_value = mock_use_case
 
         # Act & Assert
-        with pytest.raises(ValueError):
-            await attach_media_to_post(
-                post_id=sample_post_id,
-                request=request,
-                user_id=sample_user_id,
-                injector=mock_injector,
-            )
+        with patch(
+            "app.modules.media.presentation.routers.media_router.AttachMediaUseCase",
+            return_value=mock_use_case,
+        ):
+            with pytest.raises(HTTPException) as exc_info:
+                await attach_media_to_post(
+                    post_id=sample_post_id,
+                    request=request,
+                    session=mock_session,
+                    user_id=sample_user_id,
+                )
+
+        assert exc_info.value.status_code == 400
 
     @pytest.mark.asyncio
     async def test_attach_media_to_post_not_owned(
-        self, sample_user_id, sample_media_id, sample_post_id, mock_injector
+        self, sample_user_id, sample_media_id, sample_post_id, mock_session
     ):
         """Test media attachment to post with media not owned by user"""
         # Arrange
@@ -281,21 +371,26 @@ class TestMediaRouter:
 
         mock_use_case = AsyncMock()
         mock_use_case.execute.side_effect = ValueError("Media not owned by user")
-        mock_injector.get.return_value = mock_use_case
 
         # Act & Assert
-        with pytest.raises(ValueError):
-            await attach_media_to_post(
-                post_id=sample_post_id,
-                request=request,
-                user_id=sample_user_id,
-                injector=mock_injector,
-            )
+        with patch(
+            "app.modules.media.presentation.routers.media_router.AttachMediaUseCase",
+            return_value=mock_use_case,
+        ):
+            with pytest.raises(HTTPException) as exc_info:
+                await attach_media_to_post(
+                    post_id=sample_post_id,
+                    request=request,
+                    session=mock_session,
+                    user_id=sample_user_id,
+                )
+
+        assert exc_info.value.status_code == 403
 
     # Tests for POST /media/gallery/cards/{card_id}/attach
     @pytest.mark.asyncio
     async def test_attach_media_to_gallery_card_success(
-        self, sample_user_id, sample_media_id, sample_card_id, mock_injector
+        self, sample_user_id, sample_media_id, sample_card_id, mock_session
     ):
         """Test successful media attachment to gallery card"""
         # Arrange
@@ -309,15 +404,18 @@ class TestMediaRouter:
 
         mock_use_case = AsyncMock()
         mock_use_case.execute.return_value = mock_result
-        mock_injector.get.return_value = mock_use_case
 
         # Act
-        response = await attach_media_to_gallery_card(
-            card_id=sample_card_id,
-            request=request,
-            user_id=sample_user_id,
-            injector=mock_injector,
-        )
+        with patch(
+            "app.modules.media.presentation.routers.media_router.AttachMediaUseCase",
+            return_value=mock_use_case,
+        ):
+            response = await attach_media_to_gallery_card(
+                card_id=sample_card_id,
+                request=request,
+                session=mock_session,
+                user_id=sample_user_id,
+            )
 
         # Assert
         assert response.media_id == sample_media_id
@@ -328,7 +426,7 @@ class TestMediaRouter:
 
     @pytest.mark.asyncio
     async def test_attach_media_to_gallery_card_not_confirmed(
-        self, sample_user_id, sample_media_id, sample_card_id, mock_injector
+        self, sample_user_id, sample_media_id, sample_card_id, mock_session
     ):
         """Test media attachment to gallery card with unconfirmed media"""
         # Arrange
@@ -336,20 +434,25 @@ class TestMediaRouter:
 
         mock_use_case = AsyncMock()
         mock_use_case.execute.side_effect = ValueError("Media not confirmed")
-        mock_injector.get.return_value = mock_use_case
 
         # Act & Assert
-        with pytest.raises(ValueError):
-            await attach_media_to_gallery_card(
-                card_id=sample_card_id,
-                request=request,
-                user_id=sample_user_id,
-                injector=mock_injector,
-            )
+        with patch(
+            "app.modules.media.presentation.routers.media_router.AttachMediaUseCase",
+            return_value=mock_use_case,
+        ):
+            with pytest.raises(HTTPException) as exc_info:
+                await attach_media_to_gallery_card(
+                    card_id=sample_card_id,
+                    request=request,
+                    session=mock_session,
+                    user_id=sample_user_id,
+                )
+
+        assert exc_info.value.status_code == 400
 
     @pytest.mark.asyncio
     async def test_attach_media_to_gallery_card_card_not_found(
-        self, sample_user_id, sample_media_id, sample_card_id, mock_injector
+        self, sample_user_id, sample_media_id, sample_card_id, mock_session
     ):
         """Test media attachment to non-existent gallery card"""
         # Arrange
@@ -357,13 +460,18 @@ class TestMediaRouter:
 
         mock_use_case = AsyncMock()
         mock_use_case.execute.side_effect = ValueError("Gallery card not found")
-        mock_injector.get.return_value = mock_use_case
 
         # Act & Assert
-        with pytest.raises(ValueError):
-            await attach_media_to_gallery_card(
-                card_id=sample_card_id,
-                request=request,
-                user_id=sample_user_id,
-                injector=mock_injector,
-            )
+        with patch(
+            "app.modules.media.presentation.routers.media_router.AttachMediaUseCase",
+            return_value=mock_use_case,
+        ):
+            with pytest.raises(HTTPException) as exc_info:
+                await attach_media_to_gallery_card(
+                    card_id=sample_card_id,
+                    request=request,
+                    session=mock_session,
+                    user_id=sample_user_id,
+                )
+
+        assert exc_info.value.status_code == 404

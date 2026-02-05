@@ -7,6 +7,8 @@ This test verifies that:
 3. Multiple tests don't interfere with each other
 """
 
+from uuid import uuid4
+
 import pytest
 from sqlalchemy import text
 
@@ -34,11 +36,12 @@ async def test_transaction_rollback_part1(db_session):
     await db_session.execute(
         text(
             """
-            INSERT INTO users (google_id, email, role)
-            VALUES (:google_id, :email, :role)
+            INSERT INTO users (id, google_id, email, role)
+            VALUES (:id, :google_id, :email, :role)
             """
         ),
         {
+            "id": str(uuid4()),
             "google_id": "test_rollback_123",
             "email": "rollback@test.com",
             "role": "user",

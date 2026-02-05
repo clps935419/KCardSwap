@@ -7,7 +7,7 @@ Tests the report router endpoints:
 """
 
 from datetime import datetime
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 from uuid import uuid4
 
 import pytest
@@ -367,7 +367,7 @@ class TestReportRouter:
         mock_session = AsyncMock()
 
         mock_report_use_case.execute.return_value = mock_report_entity
-        mock_repo_class = AsyncMock()
+        mock_repo_class = MagicMock()
 
         # Act
         with patch(
@@ -397,7 +397,7 @@ class TestReportRouter:
 
         mock_session = AsyncMock()
         mock_report_repo.find_by_reporter.return_value = []
-        mock_repo_class = AsyncMock(return_value=mock_report_repo)
+        mock_repo_class = MagicMock(return_value=mock_report_repo)
 
         # Act
         with patch(

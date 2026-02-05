@@ -76,8 +76,6 @@ class TestListBoardPostsUseCase:
         mock_post_repository.list_by_city.assert_called_once_with(
             city_code=city_code,
             status=PostStatus.OPEN,
-            scope=PostScope.CITY,
-            category=PostCategory.TRADE,
             idol=None,
             idol_group=None,
             limit=50,
@@ -123,8 +121,6 @@ class TestListBoardPostsUseCase:
         mock_post_repository.list_by_city.assert_called_once_with(
             city_code=city_code,
             status=PostStatus.OPEN,
-            scope=PostScope.CITY,
-            category=PostCategory.TRADE,
             idol=idol,
             idol_group=None,
             limit=50,
@@ -150,8 +146,6 @@ class TestListBoardPostsUseCase:
         mock_post_repository.list_by_city.assert_called_once_with(
             city_code=city_code,
             status=PostStatus.OPEN,
-            scope=PostScope.CITY,
-            category=PostCategory.TRADE,
             idol=None,
             idol_group=idol_group,
             limit=50,
@@ -169,17 +163,13 @@ class TestListBoardPostsUseCase:
         mock_post_repository.list_by_city.return_value = posts
 
         # Act
-        result = await use_case.execute(
-            city_code=city_code, limit=limit, offset=offset
-        )
+        result = await use_case.execute(city_code=city_code, limit=limit, offset=offset)
 
         # Assert
         assert len(result) == 1
         mock_post_repository.list_by_city.assert_called_once_with(
             city_code=city_code,
             status=PostStatus.OPEN,
-            scope=PostScope.CITY,
-            category=PostCategory.TRADE,
             idol=None,
             idol_group=None,
             limit=limit,

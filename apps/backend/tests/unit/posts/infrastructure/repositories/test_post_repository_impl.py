@@ -57,6 +57,8 @@ class TestPostRepositoryImpl:
             id=UUID(sample_post.id),
             owner_id=UUID(sample_post.owner_id),
             city_code=sample_post.city_code,
+            scope=sample_post.scope.value,
+            category=sample_post.category.value,
             title=sample_post.title,
             content=sample_post.content,
             idol=sample_post.idol,
@@ -167,7 +169,9 @@ class TestPostRepositoryImpl:
         assert result == expected_count
 
     @pytest.mark.asyncio
-    async def test_update_post(self, repository, mock_session, sample_post, sample_post_model):
+    async def test_update_post(
+        self, repository, mock_session, sample_post, sample_post_model
+    ):
         """Test updating a post"""
         # Arrange
         mock_result = MagicMock()
