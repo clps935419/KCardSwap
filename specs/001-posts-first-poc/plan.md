@@ -81,7 +81,7 @@ gateway/
 - 定義/更新資料模型與端點（以 spec 的 FR 為準）：
   - Posts（含 scope/city_code 與列表篩選）
   - Likes
-  - Media（presign/upload/confirm/attach；貼文與相簿共用）
+  - Media（presign/upload/confirm/attach + read signed URLs；長效 TTL，可在登入後查看貼文與相簿圖片）
   - Message Requests + Threads + Messages（唯一對話規則、post_id 引用）
   - Gallery Cards（CRUD + reorder）
   - Quota（keys/defaults、422_LIMIT_EXCEEDED payload）
