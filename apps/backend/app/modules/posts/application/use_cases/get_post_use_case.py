@@ -52,11 +52,12 @@ class GetPostUseCase:
 
         # Get like count and current user's like status
         like_repo = PostLikeRepositoryImpl(self.session)
-        like_count = await like_repo.count_likes(post_id)
+        like_count = await like_repo.count_by_post(post_id)
 
         liked_by_me = False
         if current_user_id:
-            liked_by_me = await like_repo.has_liked(post_id, current_user_id)
+            like = await like_repo.get_by_post_and_user(post_id, current_user_id)
+            liked_by_me = like is not None
 
         # Add like information to post (stored as attributes, not in entity)
         post._like_count = like_count
