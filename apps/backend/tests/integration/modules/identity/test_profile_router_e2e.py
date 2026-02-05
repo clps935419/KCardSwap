@@ -27,34 +27,38 @@ class TestProfileRouterE2E:
         unique_id = str(uuid.uuid4())
         
         # Create user
+        user_id = str(uuid.uuid4())
         result = await db_session.execute(
             text("""
-                INSERT INTO users (google_id, email, role)
-                VALUES (:google_id, :email, :role)
+                INSERT INTO users (id, google_id, email, role)
+                VALUES (:id, :google_id, :email, :role)
                 RETURNING id
             """),
             {
+                "id": user_id,
                 "google_id": f"test_profile_{unique_id}",
                 "email": f"profile_{unique_id}@test.com",
-                "role": "user"
-            }
+                "role": "user",
+            },
         )
         user_id = result.scalar()
-        await db_session.flush()
+        await db_session.commit()
         
         # Create profile
+        profile_id = str(uuid.uuid4())
         await db_session.execute(
             text("""
                 INSERT INTO profiles (
-                    user_id, nickname, avatar_url, bio, region,
+                    id, user_id, nickname, avatar_url, bio, region,
                     preferences, privacy_flags
                 )
                 VALUES (
-                    :user_id, :nickname, :avatar_url, :bio, :region,
+                    :id, :user_id, :nickname, :avatar_url, :bio, :region,
                     :preferences, :privacy_flags
                 )
             """),
             {
+                "id": profile_id,
                 "user_id": str(user_id),
                 "nickname": "Test User",
                 "avatar_url": "https://example.com/avatar.jpg",
@@ -64,21 +68,18 @@ class TestProfileRouterE2E:
                 "privacy_flags": '{"show_online": true, "allow_stranger_chat": true}'
             }
         )
-        await db_session.flush()
+        await db_session.commit()
         
         return user_id
 
     @pytest.fixture
-    def authenticated_client(self, test_user_with_profile, db_session):
+    def authenticated_client(self, test_user_with_profile, app_db_session_override):
         """Provide authenticated test client"""
         def override_get_current_user():
             return test_user_with_profile
 
-        async def override_get_db_session():
-            yield db_session
-
         app.dependency_overrides[get_current_user] = override_get_current_user
-        app.dependency_overrides[get_db_session] = override_get_db_session
+        app.dependency_overrides[get_db_session] = app_db_session_override
 
         client = TestClient(app)
         yield client
@@ -86,12 +87,9 @@ class TestProfileRouterE2E:
         app.dependency_overrides.clear()
 
     @pytest.fixture
-    def unauthenticated_client(self, db_session):
+    def unauthenticated_client(self, app_db_session_override):
         """Provide unauthenticated test client"""
-        async def override_get_db_session():
-            yield db_session
-
-        app.dependency_overrides[get_db_session] = override_get_db_session
+        app.dependency_overrides[get_db_session] = app_db_session_override
 
         client = TestClient(app)
         yield client

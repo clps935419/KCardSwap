@@ -1,5 +1,6 @@
 """Pytest fixtures for media module integration tests."""
 import pytest
+import pytest_asyncio
 from uuid import uuid4
 
 from app.modules.media.application.use_cases.attach_media import AttachMediaUseCase
@@ -22,10 +23,10 @@ from app.shared.infrastructure.external.mock_gcs_storage_service import (
 )
 
 
-@pytest.fixture
-def test_user_id():
-    """Test user ID fixture."""
-    return uuid4()
+@pytest_asyncio.fixture
+async def test_user_id(create_user):
+    """Test user ID fixture (persisted in DB)."""
+    return await create_user("media")
 
 
 @pytest.fixture
@@ -44,6 +45,20 @@ def media_repository(db_session):
 def media_quota_service(subscription_query_service):
     """Media quota service fixture."""
     return MediaQuotaService(subscription_query_service)
+
+
+@pytest.fixture
+def subscription_query_service(db_session):
+    """Subscription query service fixture for media quota checks."""
+    from app.modules.identity.application.services.subscription_query_service_impl import (
+        SubscriptionQueryServiceImpl,
+    )
+    from app.modules.identity.infrastructure.repositories.subscription_repository_impl import (
+        SubscriptionRepositoryImpl,
+    )
+
+    repo = SubscriptionRepositoryImpl(db_session)
+    return SubscriptionQueryServiceImpl(subscription_repository=repo)
 
 
 @pytest.fixture

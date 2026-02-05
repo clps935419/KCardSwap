@@ -76,8 +76,8 @@ class TestGoogleCallbackPKCE:
         # assert data["data"]["email"] == "test@example.com"
 
         # For now, just verify the endpoint exists
-        # 401 if OAuth service can't connect, 500 if DB not configured
-        assert response.status_code in [200, 401, 500]
+        # 401 if OAuth service can't connect
+        assert response.status_code in [200, 401]
 
     def test_google_callback_validation_error_missing_code(self):
         """
@@ -154,7 +154,7 @@ class TestGoogleCallbackPKCE:
         # assert data["detail"]["code"] == "UNAUTHORIZED"
 
         # For now, just verify the endpoint exists
-        assert response.status_code in [401, 500]  # 500 if DB not configured
+        assert response.status_code == 401
 
     def test_google_callback_with_optional_redirect_uri(
         self, mock_google_oauth_service
@@ -173,9 +173,8 @@ class TestGoogleCallbackPKCE:
         response = client.post("/api/v1/auth/google-callback", json=request_data)
 
         # Verify redirect_uri was passed to the service
-        # Note: This test will fail until database is properly configured
-        # 401 if OAuth service can't connect, 500 if DB not configured
-        assert response.status_code in [200, 401, 500]
+        # 401 if OAuth service can't connect
+        assert response.status_code in [200, 401]
 
     def test_google_callback_existing_user(self, mock_google_oauth_service):
         """
@@ -197,11 +196,10 @@ class TestGoogleCallbackPKCE:
         # Second request should retrieve the existing user
         response2 = client.post("/api/v1/auth/google-callback", json=request_data)
 
-        # Note: This test will fail until database is properly configured
         # Both requests should succeed with same user
-        # 401 if OAuth service can't connect, 500 if DB not configured
-        assert response1.status_code in [200, 401, 500]
-        assert response2.status_code in [200, 401, 500]
+        # 401 if OAuth service can't connect
+        assert response1.status_code in [200, 401]
+        assert response2.status_code in [200, 401]
 
 
 class TestGoogleCallbackPKCEComparison:
@@ -260,5 +258,5 @@ class TestGoogleCallbackPKCETimeout:
 
         response = client.post("/api/v1/auth/google-callback", json=request_data)
 
-        # Timeout should result in 401 or 500
-        assert response.status_code in [401, 500]
+        # Timeout should result in 401
+        assert response.status_code == 401

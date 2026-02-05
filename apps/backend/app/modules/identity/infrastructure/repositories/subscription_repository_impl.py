@@ -4,7 +4,7 @@ Subscription Repository Implementation
 
 from datetime import datetime
 from typing import Optional
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -109,7 +109,7 @@ class SubscriptionRepositoryImpl(ISubscriptionRepository):
         if subscription is None:
             # Create new free subscription
             subscription = Subscription(
-                id=None,
+                id=uuid4(),
                 user_id=user_id,
                 plan="free",
                 status="inactive",

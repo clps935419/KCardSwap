@@ -20,6 +20,7 @@ class ProfileRepositoryImpl(IProfileRepository):
 
     def __init__(self, session: AsyncSession):
         self.session = session
+        self._session = session
 
     async def get_by_user_id(self, user_id: UUID) -> Optional[Profile]:
         """Get profile by user ID"""

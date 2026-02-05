@@ -62,7 +62,8 @@ async def block_user(
         use_case = BlockUserUseCase(friendship_repository=friendship_repo)
 
         await use_case.execute(
-            blocker_id=str(current_user_id), blocked_id=str(request.user_id)
+            blocker_user_id=str(current_user_id),
+            blocked_user_id=str(request.user_id),
         )
 
         return {"message": "User blocked successfully", "error": None}
@@ -104,7 +105,8 @@ async def unblock_user(
         use_case = UnblockUserUseCase(friendship_repository=friendship_repo)
 
         await use_case.execute(
-            blocker_id=str(current_user_id), blocked_id=str(request.user_id)
+            unblocker_user_id=str(current_user_id),
+            unblocked_user_id=str(request.user_id),
         )
 
         return {"message": "User unblocked successfully", "error": None}

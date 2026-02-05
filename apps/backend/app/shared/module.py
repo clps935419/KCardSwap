@@ -10,10 +10,8 @@ from app.shared.infrastructure.database.connection import (
     DatabaseConnection,
     db_connection,
 )
-from app.shared.infrastructure.external.gcs_storage_service import (
-    GCSStorageService,
-    gcs_storage_service,
-)
+from app.shared.infrastructure.external.gcs_storage_service import GCSStorageService
+from app.shared.infrastructure.external import storage_service_factory
 from app.shared.infrastructure.security.jwt_service import JWTService, jwt_service
 from app.shared.infrastructure.security.password_hasher import (
     PasswordHasher,
@@ -55,4 +53,4 @@ class SharedModule(Module):
     @singleton
     def provide_gcs_storage(self) -> GCSStorageService:
         """Provide GCS storage service."""
-        return gcs_storage_service
+        return storage_service_factory.storage_service

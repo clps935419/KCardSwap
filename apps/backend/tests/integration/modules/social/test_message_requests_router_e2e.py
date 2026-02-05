@@ -26,71 +26,74 @@ class TestMessageRequestsRouterE2E:
     async def test_user1(self, db_session) -> UUID:
         """Create first test user"""
         unique_id = str(uuid4())
+        user_id = str(uuid4())
         result = await db_session.execute(
             text("""
-                INSERT INTO users (google_id, email, role)
-                VALUES (:google_id, :email, :role)
+                INSERT INTO users (id, google_id, email, role)
+                VALUES (:id, :google_id, :email, :role)
                 RETURNING id
             """),
             {
+                "id": user_id,
                 "google_id": f"test_msgreq1_{unique_id}",
                 "email": f"msgreq1_{unique_id}@test.com",
-                "role": "user"
-            }
+                "role": "user",
+            },
         )
         user_id = result.scalar()
-        await db_session.flush()
+        await db_session.commit()
         return user_id
 
     @pytest_asyncio.fixture
     async def test_user2(self, db_session) -> UUID:
         """Create second test user"""
         unique_id = str(uuid4())
+        user_id = str(uuid4())
         result = await db_session.execute(
             text("""
-                INSERT INTO users (google_id, email, role)
-                VALUES (:google_id, :email, :role)
+                INSERT INTO users (id, google_id, email, role)
+                VALUES (:id, :google_id, :email, :role)
                 RETURNING id
             """),
             {
+                "id": user_id,
                 "google_id": f"test_msgreq2_{unique_id}",
                 "email": f"msgreq2_{unique_id}@test.com",
-                "role": "user"
-            }
+                "role": "user",
+            },
         )
         user_id = result.scalar()
-        await db_session.flush()
+        await db_session.commit()
         
         # Create profile for user2 with privacy settings
+        profile_id = str(uuid4())
         await db_session.execute(
             text("""
                 INSERT INTO profiles (
-                    user_id, nickname, privacy_flags
+                    id, user_id, nickname, privacy_flags
                 )
                 VALUES (
-                    :user_id, :nickname, :privacy_flags
+                    :id, :user_id, :nickname, :privacy_flags
                 )
             """),
             {
+                "id": profile_id,
                 "user_id": str(user_id),
                 "nickname": "Test User 2",
                 "privacy_flags": '{"allow_stranger_chat": true}'
             }
         )
-        await db_session.flush()
+        await db_session.commit()
         return user_id
 
     @pytest.fixture
-    def authenticated_client_user1(self, test_user1, db_session):
+    def authenticated_client_user1(self, test_user1, app_db_session_override):
         """Provide authenticated test client for user1"""
         def override_require_user():
             return test_user1
 
-        async def override_get_db_session():
-            yield db_session
-
         app.dependency_overrides[require_user] = override_require_user
-        app.dependency_overrides[get_db_session] = override_get_db_session
+        app.dependency_overrides[get_db_session] = app_db_session_override
 
         client = TestClient(app)
         yield client
@@ -98,12 +101,9 @@ class TestMessageRequestsRouterE2E:
         app.dependency_overrides.clear()
 
     @pytest.fixture
-    def unauthenticated_client(self, db_session):
+    def unauthenticated_client(self, app_db_session_override):
         """Provide unauthenticated test client"""
-        async def override_get_db_session():
-            yield db_session
-
-        app.dependency_overrides[get_db_session] = override_get_db_session
+        app.dependency_overrides[get_db_session] = app_db_session_override
 
         client = TestClient(app)
         yield client
@@ -134,20 +134,52 @@ class TestMessageRequestsRouterE2E:
             assert data["initial_message"] == payload["initial_message"]
 
     def test_create_message_request_with_post_reference(
-        self, authenticated_client_user1, test_user2
+        self, authenticated_client_user1, test_user2, test_post_for_user2
     ):
         """Test creating message request with post reference"""
-        fake_post_id = str(uuid4())
         payload = {
             "recipient_id": str(test_user2),
             "initial_message": "About your post",
-            "post_id": fake_post_id
+            "post_id": str(test_post_for_user2)
         }
 
         response = authenticated_client_user1.post("/api/v1/message-requests", json=payload)
 
         # Should succeed or fail based on implementation
         assert response.status_code in [201, 400, 404]
+
+    @pytest_asyncio.fixture
+    async def test_post_for_user2(self, test_user2, db_session) -> UUID:
+        """Create a test post for user2 to reference in message requests."""
+        post_id = uuid4()
+        from datetime import datetime, timedelta, timezone
+        expires_at = datetime.now(timezone.utc) + timedelta(days=14)
+        await db_session.execute(
+            text(
+                """
+                INSERT INTO posts (
+                    id, owner_id, scope, category, title, content,
+                    status, expires_at, created_at, updated_at
+                )
+                VALUES (
+                    :id, :owner_id, :scope, :category, :title, :content,
+                    :status, :expires_at, NOW(), NOW()
+                )
+                """
+            ),
+            {
+                "id": str(post_id),
+                "owner_id": str(test_user2),
+                "scope": "global",
+                "category": "trade",
+                "title": "User2 Post",
+                "content": "User2 Content",
+                "status": "open",
+                "expires_at": expires_at,
+            },
+        )
+        await db_session.commit()
+        return post_id
 
     def test_create_message_request_missing_recipient(
         self, authenticated_client_user1

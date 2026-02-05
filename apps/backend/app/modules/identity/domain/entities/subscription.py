@@ -2,7 +2,7 @@
 Subscription Entity - Represents user subscription status and plan
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 from uuid import UUID
 
@@ -42,7 +42,7 @@ class Subscription:
             return False
         if self.expires_at is None:
             return False
-        return datetime.utcnow() < self.expires_at
+        return self._utc_now() < self._normalize_expires_at()
 
     def is_premium(self) -> bool:
         """Check if user has premium plan"""
@@ -51,8 +51,21 @@ class Subscription:
     def should_expire(self) -> bool:
         """Check if subscription should be marked as expired"""
         if self.status == "active" and self.expires_at is not None:
-            return datetime.utcnow() >= self.expires_at
+            return self._utc_now() >= self._normalize_expires_at()
         return False
+
+    def _normalize_expires_at(self) -> datetime:
+        """Normalize expires_at to naive UTC for safe comparisons."""
+        if self.expires_at is None:
+            return self._utc_now()
+        if self.expires_at.tzinfo is None:
+            return self.expires_at
+        return self.expires_at.astimezone(timezone.utc).replace(tzinfo=None)
+
+    @staticmethod
+    def _utc_now() -> datetime:
+        """Current naive UTC datetime for comparisons."""
+        return datetime.utcnow()
 
     def mark_as_expired(self) -> None:
         """Mark subscription as expired"""

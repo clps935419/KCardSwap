@@ -28,33 +28,32 @@ class TestCardsRouterE2E:
         """Create test user and return user ID"""
         import uuid
         unique_id = str(uuid.uuid4())
+        user_id = str(uuid.uuid4())
         result = await db_session.execute(
             text("""
-                INSERT INTO users (google_id, email, role)
-                VALUES (:google_id, :email, :role)
+                INSERT INTO users (id, google_id, email, role)
+                VALUES (:id, :google_id, :email, :role)
                 RETURNING id
             """),
             {
+                "id": user_id,
                 "google_id": f"test_cards_{unique_id}",
                 "email": f"cards_{unique_id}@test.com",
-                "role": "user"
-            }
+                "role": "user",
+            },
         )
         user_id = result.scalar()
-        await db_session.flush()
+        await db_session.commit()
         return user_id
 
     @pytest.fixture
-    def authenticated_client(self, test_user, db_session):
+    def authenticated_client(self, test_user, app_db_session_override):
         """Provide authenticated test client"""
         def override_get_current_user_id():
             return test_user
 
-        async def override_get_db_session():
-            yield db_session
-
         app.dependency_overrides[get_current_user_id] = override_get_current_user_id
-        app.dependency_overrides[get_db_session] = override_get_db_session
+        app.dependency_overrides[get_db_session] = app_db_session_override
 
         client = TestClient(app)
         yield client
@@ -62,12 +61,9 @@ class TestCardsRouterE2E:
         app.dependency_overrides.clear()
 
     @pytest.fixture
-    def unauthenticated_client(self, db_session):
+    def unauthenticated_client(self, app_db_session_override):
         """Provide unauthenticated test client"""
-        async def override_get_db_session():
-            yield db_session
-
-        app.dependency_overrides[get_db_session] = override_get_db_session
+        app.dependency_overrides[get_db_session] = app_db_session_override
 
         client = TestClient(app)
         yield client
@@ -104,7 +100,7 @@ class TestCardsRouterE2E:
         response = authenticated_client.post("/api/v1/cards/upload-url", json=payload)
 
         # Should succeed or fail based on GCS configuration
-        assert response.status_code in [200, 422, 500]
+        assert response.status_code in [200, 422]
         
         if response.status_code == 200:
             data = response.json()["data"]
@@ -179,9 +175,9 @@ class TestCardsRouterE2E:
 
         assert response.status_code == 200
         data = response.json()["data"]
-        assert "daily_uploads" in data
+        assert "uploads_today" in data
         assert "daily_limit" in data
-        assert "total_storage_bytes" in data
+        assert "storage_used_bytes" in data
         assert "storage_limit_bytes" in data
 
     def test_get_quota_status_unauthorized(self, unauthenticated_client):
@@ -218,7 +214,7 @@ class TestCardsRouterE2E:
                 "size_bytes": 1024000
             }
         )
-        await db_session.flush()
+        await db_session.commit()
         return card_id
 
     def test_get_my_cards_with_cards(self, authenticated_client, test_card):
@@ -242,7 +238,7 @@ class TestCardsRouterE2E:
         response = authenticated_client.delete(f"/api/v1/cards/{test_card}")
 
         # Should succeed or return not found if GCS deletion fails
-        assert response.status_code in [200, 404, 500]
+        assert response.status_code in [200, 404]
 
     def test_delete_card_not_found(self, authenticated_client):
         """Test deleting non-existent card"""

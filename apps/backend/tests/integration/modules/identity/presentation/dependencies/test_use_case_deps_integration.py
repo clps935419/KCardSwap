@@ -40,16 +40,19 @@ from app.modules.identity.domain.repositories.i_user_repository import (
     IUserRepository,
 )
 from app.modules.identity.infrastructure.repositories.profile_repository_impl import (
-    ProfileRepository,
+    ProfileRepositoryImpl,
 )
 from app.modules.identity.infrastructure.repositories.refresh_token_repository_impl import (
-    RefreshTokenRepository,
+    RefreshTokenRepositoryImpl,
 )
 from app.modules.identity.infrastructure.repositories.subscription_repository_impl import (
-    SubscriptionRepository,
+    SubscriptionRepositoryImpl,
 )
 from app.modules.identity.infrastructure.repositories.user_repository_impl import (
-    UserRepository,
+    UserRepositoryImpl,
+)
+from app.modules.identity.infrastructure.external.google_oauth_service import (
+    GoogleOAuthService,
 )
 from app.modules.identity.presentation.dependencies.use_case_deps import (
     get_get_profile_use_case,
@@ -59,7 +62,6 @@ from app.modules.identity.presentation.dependencies.use_case_deps import (
     get_refresh_token_use_case,
     get_update_profile_use_case,
 )
-from app.shared.domain.repositories.i_gcs_storage_service import IGCSStorageService
 from app.shared.infrastructure.external.mock_gcs_storage_service import (
     MockGCSStorageService,
 )
@@ -82,28 +84,105 @@ class IdentityModule(Module):
 
     @singleton
     @provider
-    def provide_gcs_service(self) -> IGCSStorageService:
+    def provide_google_oauth_service(self) -> GoogleOAuthService:
+        return GoogleOAuthService()
+
+    @singleton
+    @provider
+    def provide_gcs_service(self) -> MockGCSStorageService:
         return MockGCSStorageService(bucket_name="test")
 
     @provider
     def provide_user_repository(self, session: AsyncSession) -> IUserRepository:
-        return UserRepository(session)
+        return UserRepositoryImpl(session)
 
     @provider
     def provide_profile_repository(self, session: AsyncSession) -> IProfileRepository:
-        return ProfileRepository(session)
+        return ProfileRepositoryImpl(session)
 
     @provider
     def provide_refresh_token_repository(
         self, session: AsyncSession
     ) -> IRefreshTokenRepository:
-        return RefreshTokenRepository(session)
+        return RefreshTokenRepositoryImpl(session)
 
     @provider
     def provide_subscription_repository(
         self, session: AsyncSession
     ) -> ISubscriptionRepository:
-        return SubscriptionRepository(session)
+        return SubscriptionRepositoryImpl(session)
+
+    @provider
+    def provide_google_login_use_case(
+        self,
+        session: AsyncSession,
+        google_oauth_service: GoogleOAuthService,
+        jwt_service: JWTService,
+    ) -> GoogleLoginUseCase:
+        user_repo = UserRepositoryImpl(session)
+        profile_repo = ProfileRepositoryImpl(session)
+        refresh_token_repo = RefreshTokenRepositoryImpl(session)
+        return GoogleLoginUseCase(
+            user_repo=user_repo,
+            profile_repo=profile_repo,
+            refresh_token_repo=refresh_token_repo,
+            google_oauth_service=google_oauth_service,
+            jwt_service=jwt_service,
+        )
+
+    @provider
+    def provide_google_callback_use_case(
+        self,
+        session: AsyncSession,
+        google_oauth_service: GoogleOAuthService,
+        jwt_service: JWTService,
+    ) -> GoogleCallbackUseCase:
+        user_repo = UserRepositoryImpl(session)
+        profile_repo = ProfileRepositoryImpl(session)
+        refresh_token_repo = RefreshTokenRepositoryImpl(session)
+        return GoogleCallbackUseCase(
+            user_repo=user_repo,
+            profile_repo=profile_repo,
+            refresh_token_repo=refresh_token_repo,
+            google_oauth_service=google_oauth_service,
+            jwt_service=jwt_service,
+        )
+
+    @provider
+    def provide_refresh_token_use_case(
+        self,
+        session: AsyncSession,
+        jwt_service: JWTService,
+    ) -> RefreshTokenUseCase:
+        refresh_token_repo = RefreshTokenRepositoryImpl(session)
+        return RefreshTokenUseCase(
+            refresh_token_repo=refresh_token_repo,
+            jwt_service=jwt_service,
+        )
+
+    @provider
+    def provide_logout_use_case(
+        self,
+        session: AsyncSession,
+    ) -> LogoutUseCase:
+        refresh_token_repo = RefreshTokenRepositoryImpl(session)
+        return LogoutUseCase(refresh_token_repo=refresh_token_repo)
+
+    @provider
+    def provide_get_profile_use_case(
+        self,
+        session: AsyncSession,
+    ) -> GetProfileUseCase:
+        profile_repo = ProfileRepositoryImpl(session)
+        return GetProfileUseCase(profile_repo=profile_repo)
+
+    @provider
+    def provide_update_profile_use_case(
+        self,
+        session: AsyncSession,
+    ) -> UpdateProfileUseCase:
+        profile_repo = ProfileRepositoryImpl(session)
+        return UpdateProfileUseCase(profile_repo=profile_repo)
 
 
 class TestIdentityUseCaseDependenciesIntegration:
@@ -242,8 +321,8 @@ class TestIdentityUseCaseDependenciesIntegration:
         use_case = await get_get_profile_use_case(db_session, mock_request)
 
         # Assert
-        assert hasattr(use_case, "_profile_repository")
-        assert use_case._profile_repository is not None
+        assert hasattr(use_case, "profile_repo")
+        assert use_case.profile_repo is not None
 
     @pytest.mark.asyncio
     async def test_child_injector_isolation(
@@ -280,4 +359,4 @@ class TestIdentityUseCaseDependenciesIntegration:
         use_case = await get_get_profile_use_case(db_session, mock_request)
 
         # Assert - Use case should have repository with correct session
-        assert use_case._profile_repository._session is db_session
+        assert use_case.profile_repo._session is db_session

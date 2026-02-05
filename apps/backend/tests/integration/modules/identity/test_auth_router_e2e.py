@@ -57,8 +57,8 @@ class TestAuthRouterE2E:
 
         response = unauthenticated_client.post("/api/v1/auth/google-login", json=payload)
 
-        # Should succeed or return 500/401 based on actual implementation
-        assert response.status_code in [200, 401, 500]
+        # Should succeed or return 401 based on actual implementation
+        assert response.status_code in [200, 401]
 
     @patch("app.modules.identity.application.use_cases.auth.login_with_google.GoogleOAuthService")
     def test_google_login_success_existing_user(self, mock_google_service, unauthenticated_client):
@@ -80,8 +80,8 @@ class TestAuthRouterE2E:
 
         response = unauthenticated_client.post("/api/v1/auth/google-login", json=payload)
 
-        # Should succeed or return 500/401 based on actual implementation
-        assert response.status_code in [200, 401, 500]
+        # Should succeed or return 401 based on actual implementation
+        assert response.status_code in [200, 401]
 
     def test_google_login_missing_token(self, unauthenticated_client):
         """Test Google login with missing token"""
@@ -101,8 +101,8 @@ class TestAuthRouterE2E:
 
         response = unauthenticated_client.post("/api/v1/auth/google-login", json=payload)
 
-        # Should return 401 or 500 depending on implementation
-        assert response.status_code in [401, 500]
+        # Should return 401 depending on implementation
+        assert response.status_code == 401
 
     # ===== Google Callback (PKCE Flow) Tests =====
 
@@ -131,8 +131,8 @@ class TestAuthRouterE2E:
 
         response = unauthenticated_client.post("/api/v1/auth/google-callback", json=payload)
 
-        # Should succeed or return 500/401 based on actual implementation
-        assert response.status_code in [200, 401, 500]
+        # Should succeed or return 401 based on actual implementation
+        assert response.status_code in [200, 401]
 
     def test_google_callback_missing_code(self, unauthenticated_client):
         """Test Google callback with missing authorization code"""

@@ -26,20 +26,22 @@ class TestThreadsRouterE2E:
         """Create first test user"""
         import uuid
         unique_id = str(uuid.uuid4())
+        user_id = str(uuid4())
         result = await db_session.execute(
             text("""
-                INSERT INTO users (google_id, email, role)
-                VALUES (:google_id, :email, :role)
+                INSERT INTO users (id, google_id, email, role)
+                VALUES (:id, :google_id, :email, :role)
                 RETURNING id
             """),
             {
+                "id": user_id,
                 "google_id": f"test_thread1_{unique_id}",
                 "email": f"thread1_{unique_id}@test.com",
-                "role": "user"
-            }
+                "role": "user",
+            },
         )
         user_id = result.scalar()
-        await db_session.flush()
+        await db_session.commit()
         return user_id
 
     @pytest_asyncio.fixture
@@ -47,33 +49,32 @@ class TestThreadsRouterE2E:
         """Create second test user"""
         import uuid
         unique_id = str(uuid.uuid4())
+        user_id = str(uuid4())
         result = await db_session.execute(
             text("""
-                INSERT INTO users (google_id, email, role)
-                VALUES (:google_id, :email, :role)
+                INSERT INTO users (id, google_id, email, role)
+                VALUES (:id, :google_id, :email, :role)
                 RETURNING id
             """),
             {
+                "id": user_id,
                 "google_id": f"test_thread2_{unique_id}",
                 "email": f"thread2_{unique_id}@test.com",
-                "role": "user"
-            }
+                "role": "user",
+            },
         )
         user_id = result.scalar()
-        await db_session.flush()
+        await db_session.commit()
         return user_id
 
     @pytest.fixture
-    def authenticated_client_user1(self, test_user1, db_session):
+    def authenticated_client_user1(self, test_user1, app_db_session_override):
         """Provide authenticated test client for user1"""
         def override_require_user():
             return test_user1
 
-        async def override_get_db_session():
-            yield db_session
-
         app.dependency_overrides[get_current_user_id_alias] = override_require_user
-        app.dependency_overrides[get_db_session] = override_get_db_session
+        app.dependency_overrides[get_db_session] = app_db_session_override
 
         client = TestClient(app)
         yield client
@@ -81,12 +82,9 @@ class TestThreadsRouterE2E:
         app.dependency_overrides.clear()
 
     @pytest.fixture
-    def unauthenticated_client(self, db_session):
+    def unauthenticated_client(self, app_db_session_override):
         """Provide unauthenticated test client"""
-        async def override_get_db_session():
-            yield db_session
-
-        app.dependency_overrides[get_db_session] = override_get_db_session
+        app.dependency_overrides[get_db_session] = app_db_session_override
 
         client = TestClient(app)
         yield client
@@ -123,7 +121,7 @@ class TestThreadsRouterE2E:
         thread_id = str(uuid4())
         await db_session.execute(
             text("""
-                INSERT INTO threads (id, user_a_id, user_b_id, created_at, updated_at)
+                INSERT INTO message_threads (id, user_a_id, user_b_id, created_at, updated_at)
                 VALUES (:id, :user_a_id, :user_b_id, NOW(), NOW())
             """),
             {
@@ -132,7 +130,7 @@ class TestThreadsRouterE2E:
                 "user_b_id": str(test_user2)
             }
         )
-        await db_session.flush()
+        await db_session.commit()
         return thread_id
 
     def test_get_threads_with_thread(self, authenticated_client_user1, test_thread):
@@ -223,12 +221,12 @@ class TestThreadsRouterE2E:
         assert "created_at" in data
 
     def test_send_message_with_post_reference(
-        self, authenticated_client_user1, test_thread
+        self, authenticated_client_user1, test_thread, test_post_for_user2
     ):
         """Test sending message with post reference"""
         payload = {
             "content": "Check out this post",
-            "post_id": str(uuid4())
+            "post_id": str(test_post_for_user2)
         }
         response = authenticated_client_user1.post(
             f"/api/v1/threads/{test_thread}/messages",
@@ -239,6 +237,39 @@ class TestThreadsRouterE2E:
         data = response.json()
         assert data["content"] == payload["content"]
         assert "post_id" in data
+
+    @pytest_asyncio.fixture
+    async def test_post_for_user2(self, test_user2, db_session) -> str:
+        """Create a test post for user2 to reference in thread messages."""
+        post_id = str(uuid4())
+        from datetime import datetime, timedelta, timezone
+        expires_at = datetime.now(timezone.utc) + timedelta(days=14)
+        await db_session.execute(
+            text(
+                """
+                INSERT INTO posts (
+                    id, owner_id, scope, category, title, content,
+                    status, expires_at, created_at, updated_at
+                )
+                VALUES (
+                    :id, :owner_id, :scope, :category, :title, :content,
+                    :status, :expires_at, NOW(), NOW()
+                )
+                """
+            ),
+            {
+                "id": post_id,
+                "owner_id": str(test_user2),
+                "scope": "global",
+                "category": "trade",
+                "title": "Thread Post",
+                "content": "Thread Content",
+                "status": "open",
+                "expires_at": expires_at,
+            },
+        )
+        await db_session.commit()
+        return post_id
 
     def test_send_message_empty_content(self, authenticated_client_user1, test_thread):
         """Test sending message with empty content"""
@@ -281,7 +312,7 @@ class TestThreadsRouterE2E:
                     "content": f"Test message {i+1}"
                 }
             )
-        await db_session.flush()
+        await db_session.commit()
 
     def test_get_thread_messages_with_content(
         self, authenticated_client_user1, test_thread, test_thread_with_messages

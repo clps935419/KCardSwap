@@ -3,6 +3,7 @@ Integration tests for Gallery Cards CRUD and reorder operations.
 Tests for User Story 2: Manage personal gallery cards and view others' galleries.
 """
 import pytest
+from uuid import uuid4
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -309,7 +310,7 @@ class TestGalleryCardsEdgeCases:
         )
 
         # Assert
-        assert response.status_code == 422
+        assert response.status_code == 400
 
     async def test_get_gallery_cards_requires_authentication(
         self,
@@ -330,7 +331,7 @@ class TestGalleryCardsEdgeCases:
         """Test deleting a card that doesn't exist."""
         # Act
         response = await async_client.delete(
-            "/api/v1/gallery/cards/99999",
+            f"/api/v1/gallery/cards/{uuid4()}",
             headers=auth_headers_user1,
         )
 

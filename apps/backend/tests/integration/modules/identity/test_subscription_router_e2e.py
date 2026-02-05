@@ -27,33 +27,32 @@ class TestSubscriptionRouterE2E:
         """Create test user and return user ID"""
         import uuid
         unique_id = str(uuid.uuid4())
+        user_id = str(uuid.uuid4())
         result = await db_session.execute(
             text("""
-                INSERT INTO users (google_id, email, role)
-                VALUES (:google_id, :email, :role)
+                INSERT INTO users (id, google_id, email, role)
+                VALUES (:id, :google_id, :email, :role)
                 RETURNING id
             """),
             {
+                "id": user_id,
                 "google_id": f"test_subscription_{unique_id}",
                 "email": f"subscription_{unique_id}@test.com",
-                "role": "user"
-            }
+                "role": "user",
+            },
         )
         user_id = result.scalar()
-        await db_session.flush()
+        await db_session.commit()
         return user_id
 
     @pytest.fixture
-    def authenticated_client(self, test_user, db_session):
+    def authenticated_client(self, test_user, app_db_session_override):
         """Provide authenticated test client"""
         def override_get_current_user_id():
             return test_user
 
-        async def override_get_db_session():
-            yield db_session
-
         app.dependency_overrides[get_current_user_id] = override_get_current_user_id
-        app.dependency_overrides[get_db_session] = override_get_db_session
+        app.dependency_overrides[get_db_session] = app_db_session_override
 
         client = TestClient(app)
         yield client
@@ -61,12 +60,9 @@ class TestSubscriptionRouterE2E:
         app.dependency_overrides.clear()
 
     @pytest.fixture
-    def unauthenticated_client(self, db_session):
+    def unauthenticated_client(self, app_db_session_override):
         """Provide unauthenticated test client"""
-        async def override_get_db_session():
-            yield db_session
-
-        app.dependency_overrides[get_db_session] = override_get_db_session
+        app.dependency_overrides[get_db_session] = app_db_session_override
 
         client = TestClient(app)
         yield client
@@ -79,8 +75,8 @@ class TestSubscriptionRouterE2E:
 
         assert response.status_code == 200
         data = response.json()["data"]
-        assert data["is_subscribed"] is False
-        assert data["plan"] is None
+        assert data["entitlement_active"] is False
+        assert data["plan"] == "free"
 
     def test_get_subscription_status_unauthorized(self, unauthenticated_client):
         """Test getting subscription status without authentication returns 401"""
@@ -88,20 +84,23 @@ class TestSubscriptionRouterE2E:
 
         assert response.status_code == 401
 
-    @patch("app.modules.identity.application.use_cases.subscription.verify_receipt_use_case.GooglePlayService")
+    @patch("app.modules.identity.application.use_cases.subscription.verify_receipt_use_case.GooglePlayBillingService")
     def test_verify_receipt_success(self, mock_google_play, authenticated_client):
         """Test successful receipt verification"""
         # Mock Google Play verification
         mock_service = AsyncMock()
-        mock_service.verify_purchase = AsyncMock(return_value={
-            "orderId": "TEST_ORDER_123",
-            "purchaseState": 0,  # Purchased
-            "expiryTimeMillis": "1735689600000",  # Future timestamp
-        })
+        mock_service.verify_subscription_purchase = AsyncMock(
+            return_value={
+                "is_valid": True,
+                "expires_at": "2025-12-31T00:00:00",
+                "payment_state": 1,
+            }
+        )
+        mock_service.acknowledge_subscription_purchase = AsyncMock(return_value=None)
         mock_google_play.return_value = mock_service
 
         payload = {
-            "platform": "google_play",
+            "platform": "android",
             "purchase_token": "test_token_123",
             "product_id": "monthly_premium"
         }
@@ -119,7 +118,7 @@ class TestSubscriptionRouterE2E:
         payload = {
             "platform": "invalid_platform",
             "purchase_token": "test_token_123",
-            "product_id": "monthly_premium"
+            "product_id": "monthly_premium",
         }
 
         response = authenticated_client.post(
@@ -134,7 +133,7 @@ class TestSubscriptionRouterE2E:
     def test_verify_receipt_missing_fields(self, authenticated_client):
         """Test receipt verification with missing required fields"""
         payload = {
-            "platform": "google_play",
+            "platform": "android",
             # Missing purchase_token and product_id
         }
 
@@ -150,7 +149,7 @@ class TestSubscriptionRouterE2E:
     def test_verify_receipt_unauthorized(self, unauthenticated_client):
         """Test receipt verification without authentication"""
         payload = {
-            "platform": "google_play",
+            "platform": "android",
             "purchase_token": "test_token_123",
             "product_id": "monthly_premium"
         }
@@ -181,61 +180,57 @@ class TestSubscriptionRouterE2E:
         unique_id = str(uuid.uuid4())
         
         # Create user
+        user_id = str(uuid.uuid4())
         result = await db_session.execute(
             text("""
-                INSERT INTO users (google_id, email, role)
-                VALUES (:google_id, :email, :role)
+                INSERT INTO users (id, google_id, email, role)
+                VALUES (:id, :google_id, :email, :role)
                 RETURNING id
             """),
             {
+                "id": user_id,
                 "google_id": f"test_sub_user_{unique_id}",
                 "email": f"sub_user_{unique_id}@test.com",
-                "role": "user"
-            }
+                "role": "user",
+            },
         )
         user_id = result.scalar()
         await db_session.flush()
         
-        # Create subscription
-        expires_at = datetime.utcnow() + timedelta(days=30)
+        # Create subscription (match current schema)
+        now = datetime.utcnow()
+        expires_at = now + timedelta(days=30)
         await db_session.execute(
             text("""
                 INSERT INTO subscriptions (
-                    user_id, platform, plan, status, 
-                    started_at, expires_at, purchase_token, product_id
+                    user_id, plan, status, expires_at, created_at, updated_at
                 )
                 VALUES (
-                    :user_id, :platform, :plan, :status,
-                    :started_at, :expires_at, :purchase_token, :product_id
+                    :user_id, :plan, :status, :expires_at, :created_at, :updated_at
                 )
             """),
             {
                 "user_id": str(user_id),
-                "platform": "google_play",
-                "plan": "monthly_premium",
+                "plan": "premium",
                 "status": "active",
-                "started_at": datetime.utcnow(),
                 "expires_at": expires_at,
-                "purchase_token": f"test_token_{unique_id}",
-                "product_id": "monthly_premium"
+                "created_at": now,
+                "updated_at": now,
             }
         )
-        await db_session.flush()
+        await db_session.commit()
         
         return user_id
 
     def test_get_subscription_status_with_active_subscription(
-        self, test_user_with_subscription, db_session
+        self, test_user_with_subscription, app_db_session_override
     ):
         """Test getting subscription status when user has active subscription"""
         def override_get_current_user_id():
             return test_user_with_subscription
 
-        async def override_get_db_session():
-            yield db_session
-
         app.dependency_overrides[get_current_user_id] = override_get_current_user_id
-        app.dependency_overrides[get_db_session] = override_get_db_session
+        app.dependency_overrides[get_db_session] = app_db_session_override
 
         client = TestClient(app)
         
@@ -244,8 +239,8 @@ class TestSubscriptionRouterE2E:
 
             assert response.status_code == 200
             data = response.json()["data"]
-            assert data["is_subscribed"] is True
-            assert data["plan"] == "monthly_premium"
+            assert data["entitlement_active"] is True
+            assert data["plan"] == "premium"
             assert "expires_at" in data
         finally:
             app.dependency_overrides.clear()

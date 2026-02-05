@@ -28,20 +28,22 @@ class TestGalleryRouterE2E:
         """Create test user and return user ID"""
         import uuid
         unique_id = str(uuid.uuid4())
+        user_id = str(uuid.uuid4())
         result = await db_session.execute(
             text("""
-                INSERT INTO users (google_id, email, role)
-                VALUES (:google_id, :email, :role)
+                INSERT INTO users (id, google_id, email, role)
+                VALUES (:id, :google_id, :email, :role)
                 RETURNING id
             """),
             {
+                "id": user_id,
                 "google_id": f"test_gallery_{unique_id}",
                 "email": f"gallery_{unique_id}@test.com",
-                "role": "user"
-            }
+                "role": "user",
+            },
         )
         user_id = result.scalar()
-        await db_session.flush()
+        await db_session.commit()
         return user_id
 
     @pytest_asyncio.fixture
@@ -49,33 +51,32 @@ class TestGalleryRouterE2E:
         """Create second test user"""
         import uuid
         unique_id = str(uuid.uuid4())
+        user_id = str(uuid.uuid4())
         result = await db_session.execute(
             text("""
-                INSERT INTO users (google_id, email, role)
-                VALUES (:google_id, :email, :role)
+                INSERT INTO users (id, google_id, email, role)
+                VALUES (:id, :google_id, :email, :role)
                 RETURNING id
             """),
             {
+                "id": user_id,
                 "google_id": f"test_gallery2_{unique_id}",
                 "email": f"gallery2_{unique_id}@test.com",
-                "role": "user"
-            }
+                "role": "user",
+            },
         )
         user_id = result.scalar()
-        await db_session.flush()
+        await db_session.commit()
         return user_id
 
     @pytest.fixture
-    def authenticated_client(self, test_user, db_session):
+    def authenticated_client(self, test_user, app_db_session_override):
         """Provide authenticated test client"""
         def override_require_user():
             return test_user
 
-        async def override_get_db_session():
-            yield db_session
-
         app.dependency_overrides[require_user] = override_require_user
-        app.dependency_overrides[get_db_session] = override_get_db_session
+        app.dependency_overrides[get_db_session] = app_db_session_override
 
         client = TestClient(app)
         yield client
@@ -83,12 +84,9 @@ class TestGalleryRouterE2E:
         app.dependency_overrides.clear()
 
     @pytest.fixture
-    def unauthenticated_client(self, db_session):
+    def unauthenticated_client(self, app_db_session_override):
         """Provide unauthenticated test client"""
-        async def override_get_db_session():
-            yield db_session
-
-        app.dependency_overrides[get_db_session] = override_get_db_session
+        app.dependency_overrides[get_db_session] = app_db_session_override
 
         client = TestClient(app)
         yield client
@@ -202,7 +200,7 @@ class TestGalleryRouterE2E:
                 "display_order": 0
             }
         )
-        await db_session.flush()
+        await db_session.commit()
         return card_id
 
     def test_delete_gallery_card_success(self, authenticated_client, test_gallery_card):
@@ -224,16 +222,15 @@ class TestGalleryRouterE2E:
 
         assert response.status_code == 401
 
-    def test_delete_gallery_card_not_owner(self, test_user2, test_gallery_card, db_session):
+    def test_delete_gallery_card_not_owner(
+        self, test_user2, test_gallery_card, app_db_session_override
+    ):
         """Test deleting gallery card by non-owner"""
         def override_require_user():
             return test_user2
 
-        async def override_get_db_session():
-            yield db_session
-
         app.dependency_overrides[require_user] = override_require_user
-        app.dependency_overrides[get_db_session] = override_get_db_session
+        app.dependency_overrides[get_db_session] = app_db_session_override
 
         try:
             client = TestClient(app)

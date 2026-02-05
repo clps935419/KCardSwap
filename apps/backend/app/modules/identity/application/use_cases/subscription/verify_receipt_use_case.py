@@ -76,12 +76,16 @@ class VerifyReceiptUseCase:
         # Validate platform
         if platform not in ["android", "ios"]:
             raise ValidationException(
-                "UNSUPPORTED_PLATFORM", f"平台 '{platform}' 不支援"
+                message=f"平台 '{platform}' 不支援",
+                details={"reason": "UNSUPPORTED_PLATFORM"},
             )
 
         # Currently only support Android
         if platform != "android":
-            raise ValidationException("UNSUPPORTED_PLATFORM", "目前僅支援 Android 平台")
+            raise ValidationException(
+                message="目前僅支援 Android 平台",
+                details={"reason": "UNSUPPORTED_PLATFORM"},
+            )
 
         # Check if token is already bound to a different user
         existing_user_id = await self.token_repo.get_user_id_for_token(purchase_token)

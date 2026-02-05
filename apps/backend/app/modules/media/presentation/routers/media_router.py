@@ -1,8 +1,10 @@
 """Media router - API endpoints for media upload and attachment."""
+from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, status
-from injector import Injector
+from fastapi import HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.media.application.use_cases.attach_media import (
     AttachMediaRequest,
@@ -16,6 +18,9 @@ from app.modules.media.application.use_cases.create_upload_url import (
     CreateUploadUrlRequest,
     CreateUploadUrlUseCase,
 )
+from app.modules.media.infrastructure.repositories.media_repository_impl import (
+    MediaRepositoryImpl,
+)
 from app.modules.media.presentation.schemas.media_schemas import (
     AttachMediaResponseSchema,
     AttachMediaToGalleryCardRequestSchema,
@@ -24,8 +29,17 @@ from app.modules.media.presentation.schemas.media_schemas import (
     CreateUploadUrlRequestSchema,
     CreateUploadUrlResponseSchema,
 )
-from app.shared.presentation.deps.injector import get_injector
+from app.shared.domain.contracts.i_subscription_query_service import (
+    ISubscriptionQueryService,
+)
+from app.shared.domain.quota.media_quota_service import MediaQuotaService
+from app.shared.infrastructure.database.connection import get_db_session
+from app.shared.infrastructure.external.storage_service_factory import (
+    get_storage_service,
+)
+from app.shared.presentation.dependencies.services import get_subscription_service
 from app.shared.presentation.deps.require_user import get_current_user_id
+from app.shared.presentation.errors.limit_exceeded import LimitExceededException
 
 router = APIRouter(prefix="/media", tags=["media"])
 
@@ -39,8 +53,8 @@ router = APIRouter(prefix="/media", tags=["media"])
 )
 async def create_upload_url(
     request: CreateUploadUrlRequestSchema,
+    session: Annotated[AsyncSession, Depends(get_db_session)],
     user_id: UUID = Depends(get_current_user_id),
-    injector: Injector = Depends(get_injector),
 ):
     """Generate presigned upload URL for media.
     
@@ -49,7 +63,12 @@ async def create_upload_url(
     Returns:
         Presigned URL and media_id for subsequent confirmation
     """
-    use_case = injector.get(CreateUploadUrlUseCase)
+    media_repository = MediaRepositoryImpl(session)
+    storage_service = get_storage_service()
+    use_case = CreateUploadUrlUseCase(
+        media_repository=media_repository,
+        storage_service=storage_service,
+    )
     
     result = await use_case.execute(
         CreateUploadUrlRequest(
@@ -76,8 +95,11 @@ async def create_upload_url(
 )
 async def confirm_upload(
     media_id: UUID,
+    session: Annotated[AsyncSession, Depends(get_db_session)],
+    subscription_service: Annotated[
+        ISubscriptionQueryService, Depends(get_subscription_service)
+    ],
     user_id: UUID = Depends(get_current_user_id),
-    injector: Injector = Depends(get_injector),
 ):
     """Confirm media upload and apply quota.
     
@@ -87,14 +109,31 @@ async def confirm_upload(
         LimitExceededException: If quota is exceeded (422)
         ValueError: If media not found or not owned by user (400)
     """
-    use_case = injector.get(ConfirmUploadUseCase)
-    
-    result = await use_case.execute(
-        ConfirmUploadRequest(
-            user_id=user_id,
-            media_id=media_id,
-        )
+    media_repository = MediaRepositoryImpl(session)
+    storage_service = get_storage_service()
+    media_quota_service = MediaQuotaService(subscription_service)
+    use_case = ConfirmUploadUseCase(
+        media_repository=media_repository,
+        media_quota_service=media_quota_service,
+        storage_service=storage_service,
     )
+    
+    try:
+        result = await use_case.execute(
+            ConfirmUploadRequest(
+                user_id=user_id,
+                media_id=media_id,
+            )
+        )
+    except LimitExceededException as exc:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=exc.message)
+    except ValueError as exc:
+        error_message = str(exc).lower()
+        if "not found" in error_message:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc))
+        if "not owned" in error_message or "only owner" in error_message:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(exc))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
 
     return ConfirmUploadResponseSchema(
         media_id=result.media_id,
@@ -113,8 +152,8 @@ async def confirm_upload(
 async def attach_media_to_post(
     post_id: UUID,
     request: AttachMediaToPostRequestSchema,
+    session: Annotated[AsyncSession, Depends(get_db_session)],
     user_id: UUID = Depends(get_current_user_id),
-    injector: Injector = Depends(get_injector),
 ):
     """Attach confirmed media to post.
     
@@ -122,16 +161,25 @@ async def attach_media_to_post(
     
     Only confirmed media owned by the user can be attached.
     """
-    use_case = injector.get(AttachMediaUseCase)
+    media_repository = MediaRepositoryImpl(session)
+    use_case = AttachMediaUseCase(media_repository=media_repository)
     
-    result = await use_case.execute(
-        AttachMediaRequest(
-            user_id=user_id,
-            media_id=request.media_id,
-            target_type="post",
-            target_id=post_id,
+    try:
+        result = await use_case.execute(
+            AttachMediaRequest(
+                user_id=user_id,
+                media_id=request.media_id,
+                target_type="post",
+                target_id=post_id,
+            )
         )
-    )
+    except ValueError as exc:
+        error_message = str(exc).lower()
+        if "not found" in error_message:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc))
+        if "not owned" in error_message or "only owner" in error_message:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(exc))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
 
     return AttachMediaResponseSchema(
         media_id=result.media_id,
@@ -151,8 +199,8 @@ async def attach_media_to_post(
 async def attach_media_to_gallery_card(
     card_id: UUID,
     request: AttachMediaToGalleryCardRequestSchema,
+    session: Annotated[AsyncSession, Depends(get_db_session)],
     user_id: UUID = Depends(get_current_user_id),
-    injector: Injector = Depends(get_injector),
 ):
     """Attach confirmed media to gallery card.
     
@@ -160,16 +208,25 @@ async def attach_media_to_gallery_card(
     
     Only confirmed media owned by the user can be attached.
     """
-    use_case = injector.get(AttachMediaUseCase)
+    media_repository = MediaRepositoryImpl(session)
+    use_case = AttachMediaUseCase(media_repository=media_repository)
     
-    result = await use_case.execute(
-        AttachMediaRequest(
-            user_id=user_id,
-            media_id=request.media_id,
-            target_type="gallery_card",
-            target_id=card_id,
+    try:
+        result = await use_case.execute(
+            AttachMediaRequest(
+                user_id=user_id,
+                media_id=request.media_id,
+                target_type="gallery_card",
+                target_id=card_id,
+            )
         )
-    )
+    except ValueError as exc:
+        error_message = str(exc).lower()
+        if "not found" in error_message:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc))
+        if "not owned" in error_message or "only owner" in error_message:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(exc))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
 
     return AttachMediaResponseSchema(
         media_id=result.media_id,

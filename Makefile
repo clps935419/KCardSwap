@@ -1,136 +1,96 @@
-.PHONY: help dev dev-build up down logs test lint clean build
+.PHONY: help dev dev-build up down logs logs-backend logs-kong logs-db \
+	test-unit-docker test-integration-docker test-docker clean build restart ps \
+	shell-backend shell-db init-db health seed init-admin-docker setup generate-openapi-docker
 
-help: ## Show this help message
-	@echo 'Usage: make [target]'
+help: ## 顯示可用指令
+	@echo '用法: make [target]'
 	@echo ''
-	@echo 'Available targets:'
-	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  %-15s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@echo '可用指令:'
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  %-22s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-dev: ## Start development environment
+dev: ## 啟動開發環境（背景執行）
 	@if [ ! -f .env ]; then \
-		echo "Error: .env file not found!"; \
-		echo "Please run 'make setup' first or manually copy .env.example to .env"; \
+		echo "錯誤: 找不到 .env 檔案"; \
+		echo "請先執行 'make setup' 或手動從 .env.example 複製"; \
 		exit 1; \
 	fi
 	docker compose up -d
 
-dev-build: ## Rebuild images and start development environment
+dev-build: ## 重新建置並啟動開發環境
 	@if [ ! -f .env ]; then \
-		echo "Error: .env file not found!"; \
-		echo "Please run 'make setup' first or manually copy .env.example to .env"; \
+		echo "錯誤: 找不到 .env 檔案"; \
+		echo "請先執行 'make setup' 或手動從 .env.example 複製"; \
 		exit 1; \
 	fi
 	docker compose up -d --build
 
-up: dev ## Alias for dev
+up: dev ## dev 的別名
 
-down: ## Stop all services
+down: ## 停止所有服務
 	docker compose down
 
-logs: ## View logs from all services
+logs: ## 查看所有服務日誌
 	docker compose logs -f
 
-logs-backend: ## View backend logs only
+logs-backend: ## 查看後端日誌
 	docker compose logs -f backend
 
-logs-kong: ## View Kong logs only
+logs-kong: ## 查看 Kong 日誌
 	docker compose logs -f kong
 
-logs-db: ## View database logs only
+logs-db: ## 查看資料庫日誌
 	docker compose logs -f db
 
-test: ## Run all backend tests
-	cd apps/backend && poetry run pytest -v
+test-unit-docker: ## 在 Docker 中執行單元測試
+	docker compose exec backend python -m pytest -v tests/unit
 
-test-unit: ## Run unit tests only
-	cd apps/backend && poetry run pytest -v tests/unit
-
-test-integration: ## Run integration tests only (needs Docker)
-	cd apps/backend && TEST_DATABASE_URL=$${TEST_DATABASE_URL:-postgresql+asyncpg://kcardswap:kcardswap@localhost:5432/kcardswap_test} poetry run pytest -v tests/integration
-
-test-integration-docker: ## Run integration tests in Docker container
+test-integration-docker: ## 在 Docker 中執行整合測試
 	docker compose exec backend python -m pytest -v tests/integration
 
-test-integration-fast: ## Run integration tests with mocks (no DB needed)
-	cd apps/backend && poetry run pytest -v tests/integration -k "not real_database_examples"
-
-test-docker: ## Run all backend tests in Docker container
+test-docker: ## 在 Docker 中執行全部測試
 	docker compose exec backend python -m pytest -v
 
-init-test-db: ## Initialize test database schema
-	cd apps/backend && TEST_DATABASE_URL=$${TEST_DATABASE_URL:-postgresql://kcardswap:kcardswap@localhost:5432/kcardswap_test} poetry run alembic upgrade head
-
-test-coverage: ## Run tests with coverage report
-	cd apps/backend && poetry run pytest -v --cov=app --cov-report=term-missing --cov-report=html
-
-test-coverage-integration: ## Run integration tests with coverage
-	cd apps/backend && TEST_DATABASE_URL=$${TEST_DATABASE_URL:-postgresql+asyncpg://kcardswap:kcardswap@localhost:5432/kcardswap_test} poetry run pytest -v tests/integration --cov=app --cov-report=term-missing
-
-test-integration-identity: ## Run Identity module integration tests
-	cd apps/backend && TEST_DATABASE_URL=$${TEST_DATABASE_URL:-postgresql+asyncpg://kcardswap:kcardswap@localhost:5432/kcardswap_test} poetry run pytest -v tests/integration/modules/identity
-
-test-integration-social: ## Run Social module integration tests
-	cd apps/backend && TEST_DATABASE_URL=$${TEST_DATABASE_URL:-postgresql+asyncpg://kcardswap:kcardswap@localhost:5432/kcardswap_test} poetry run pytest -v tests/integration/modules/social
-
-test-integration-locations: ## Run Locations module integration tests
-	cd apps/backend && TEST_DATABASE_URL=$${TEST_DATABASE_URL:-postgresql+asyncpg://kcardswap:kcardswap@localhost:5432/kcardswap_test} poetry run pytest -v tests/integration/modules/locations
-
-test-integration-examples: ## Run integration test examples (needs DB)
-	cd apps/backend && TEST_DATABASE_URL=$${TEST_DATABASE_URL:-postgresql+asyncpg://kcardswap:kcardswap@localhost:5432/kcardswap_test} poetry run pytest -v tests/integration/examples
-
-lint: ## Run linter on backend code
-	cd apps/backend && flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-
-clean: ## Stop services and remove volumes
+clean: ## 停止服務並移除 volumes
 	docker compose down -v
 
-build: ## Rebuild all containers
+build: ## 重新建置所有容器
 	docker compose build
 
-restart: ## Restart all services
+restart: ## 重啟所有服務
 	docker compose restart
 
-ps: ## Show running containers
+ps: ## 顯示容器狀態
 	docker compose ps
 
-shell-backend: ## Open shell in backend container
+shell-backend: ## 進入後端容器 shell
 	docker compose exec backend bash
 
-shell-db: ## Open psql in database container
+shell-db: ## 進入資料庫 psql
 	docker compose exec db psql -U kcardswap -d kcardswap
 
-init-db: ## Initialize database schema
+init-db: ## 初始化資料庫 schema
 	docker compose exec db psql -U kcardswap -d kcardswap -f /docker-entrypoint-initdb.d/init.sql
 
-health: ## Check health of all services
-	@echo "Checking health endpoints..."
+health: ## 檢查服務健康狀態
+	@echo "檢查健康端點..."
 	@curl -s http://localhost:8000/health || echo "Backend: DOWN"
 	@echo ""
 	@curl -s http://localhost:8080/api/v1/health || echo "Kong Proxy: DOWN"
 	@echo ""
 	@docker compose ps
 
-seed: ## Seed database with test data (Phase 10)
-	@echo "Seed functionality not yet implemented (Phase 10)"
+seed: ## 填入測試資料（尚未實作）
+	@echo "Seed 功能尚未實作"
 
-init-admin: ## Initialize default admin user (idempotent)
-	cd apps/backend && python scripts/init_admin.py
-
-init-admin-docker: ## Initialize default admin in Docker container
+init-admin-docker: ## 在 Docker 中初始化預設管理員
 	docker compose exec backend python scripts/init_admin.py
 
-create-admin: ## Create a new admin user (interactive)
-	cd apps/backend && python scripts/create_admin.py
-
-setup: ## Initial setup - copy env and start services
-	@if [ ! -f .env ]; then cp .env.example .env; echo "Created .env file - please update with your values"; fi
+setup: ## 初始設定：複製 env 並啟動服務
+	@if [ ! -f .env ]; then cp .env.example .env; echo "已建立 .env，請更新內容"; fi
 	@make dev
-	@echo "Waiting for services to start..."
+	@echo "等待服務啟動..."
 	@sleep 10
 	@make health
 
-generate-openapi: ## Generate OpenAPI spec from backend code
-	cd apps/backend && poetry run python scripts/generate_openapi.py
-
-generate-openapi-docker: ## Generate OpenAPI spec using Docker container
+generate-openapi-docker: ## 在 Docker 中產生 OpenAPI 規格
 	docker compose exec backend python scripts/generate_openapi.py

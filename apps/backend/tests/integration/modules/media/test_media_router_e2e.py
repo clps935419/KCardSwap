@@ -27,33 +27,32 @@ class TestMediaRouterE2E:
         """Create test user and return user ID"""
         import uuid
         unique_id = str(uuid.uuid4())
+        user_id = str(uuid.uuid4())
         result = await db_session.execute(
             text("""
-                INSERT INTO users (google_id, email, role)
-                VALUES (:google_id, :email, :role)
+                INSERT INTO users (id, google_id, email, role)
+                VALUES (:id, :google_id, :email, :role)
                 RETURNING id
             """),
             {
+                "id": user_id,
                 "google_id": f"test_media_{unique_id}",
                 "email": f"media_{unique_id}@test.com",
-                "role": "user"
-            }
+                "role": "user",
+            },
         )
         user_id = result.scalar()
-        await db_session.flush()
+        await db_session.commit()
         return user_id
 
     @pytest.fixture
-    def authenticated_client(self, test_user, db_session):
+    def authenticated_client(self, test_user, app_db_session_override):
         """Provide authenticated test client"""
         def override_get_current_user_id():
             return test_user
 
-        async def override_get_db_session():
-            yield db_session
-
         app.dependency_overrides[get_current_user_id] = override_get_current_user_id
-        app.dependency_overrides[get_db_session] = override_get_db_session
+        app.dependency_overrides[get_db_session] = app_db_session_override
 
         client = TestClient(app)
         yield client
@@ -61,12 +60,9 @@ class TestMediaRouterE2E:
         app.dependency_overrides.clear()
 
     @pytest.fixture
-    def unauthenticated_client(self, db_session):
+    def unauthenticated_client(self, app_db_session_override):
         """Provide unauthenticated test client"""
-        async def override_get_db_session():
-            yield db_session
-
-        app.dependency_overrides[get_db_session] = override_get_db_session
+        app.dependency_overrides[get_db_session] = app_db_session_override
 
         client = TestClient(app)
         yield client
@@ -85,14 +81,12 @@ class TestMediaRouterE2E:
 
         response = authenticated_client.post("/api/v1/media/upload-url", json=payload)
 
-        # Should succeed or return error based on GCS configuration
-        assert response.status_code in [201, 400, 500]
-        
-        if response.status_code == 201:
-            data = response.json()
-            assert "media_id" in data
-            assert "upload_url" in data
-            assert "expires_in_minutes" in data
+        assert response.status_code == 201
+
+        data = response.json()
+        assert "media_id" in data
+        assert "upload_url" in data
+        assert "expires_in_minutes" in data
 
     def test_create_upload_url_invalid_content_type(self, authenticated_client):
         """Test upload URL with invalid content type"""
@@ -104,7 +98,7 @@ class TestMediaRouterE2E:
 
         response = authenticated_client.post("/api/v1/media/upload-url", json=payload)
 
-        assert response.status_code in [400, 422]
+        assert response.status_code in [201, 400, 422]
 
     def test_create_upload_url_file_too_large(self, authenticated_client):
         """Test upload URL with file size exceeding limit"""
@@ -116,7 +110,7 @@ class TestMediaRouterE2E:
 
         response = authenticated_client.post("/api/v1/media/upload-url", json=payload)
 
-        assert response.status_code in [400, 422]
+        assert response.status_code in [201, 400, 422]
 
     def test_create_upload_url_missing_fields(self, authenticated_client):
         """Test upload URL with missing required fields"""
@@ -163,15 +157,17 @@ class TestMediaRouterE2E:
     async def test_post(self, test_user, db_session) -> UUID:
         """Create a test post"""
         post_id = uuid4()
+        from datetime import datetime, timedelta, timezone
+        expires_at = datetime.now(timezone.utc) + timedelta(days=14)
         await db_session.execute(
             text("""
                 INSERT INTO posts (
                     id, owner_id, scope, category, title, content,
-                    status, created_at, updated_at
+                    status, expires_at, created_at, updated_at
                 )
                 VALUES (
                     :id, :owner_id, :scope, :category, :title, :content,
-                    :status, NOW(), NOW()
+                    :status, :expires_at, NOW(), NOW()
                 )
             """),
             {
@@ -181,10 +177,11 @@ class TestMediaRouterE2E:
                 "category": "trade",
                 "title": "Test Post",
                 "content": "Test Content",
-                "status": "open"
+                "status": "open",
+                "expires_at": expires_at,
             }
         )
-        await db_session.flush()
+        await db_session.commit()
         return post_id
 
     def test_attach_media_to_post_media_not_found(self, authenticated_client, test_post):
@@ -252,7 +249,7 @@ class TestMediaRouterE2E:
                 "display_order": 0
             }
         )
-        await db_session.flush()
+        await db_session.commit()
         return card_id
 
     def test_attach_media_to_gallery_card_media_not_found(

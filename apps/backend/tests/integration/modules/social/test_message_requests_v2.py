@@ -12,6 +12,7 @@ import uuid
 from datetime import datetime
 
 import pytest
+import pytest_asyncio
 
 from app.modules.social.domain.entities.friendship import Friendship, FriendshipStatus
 
@@ -90,8 +91,20 @@ class TestMessageRequestFlow:
         )
         await message_request_repository.create(message_request)
 
-        # Accept request (this should create thread)
-        message_request.accept()
+        # Accept request (use case would create thread and pass thread_id)
+        from app.modules.social.domain.entities.thread import MessageThread
+
+        thread_id = str(uuid.uuid4())
+        thread = MessageThread(
+            id=thread_id,
+            user_a_id=str(test_user_a_id),
+            user_b_id=str(test_user_b_id),
+            created_at=datetime.utcnow(),
+            updated_at=datetime.utcnow(),
+        )
+        await thread_repository.create(thread)
+
+        message_request.accept(thread_id)
         await message_request_repository.update(message_request)
 
         # Verify thread exists
@@ -331,11 +344,18 @@ class TestMessagingInThread:
         assert len(messages) == 2
 
     async def test_message_with_post_reference(
-        self, thread_repository, thread_message_repository, test_user_a_id, test_user_b_id
+        self,
+        thread_repository,
+        thread_message_repository,
+        test_user_a_id,
+        test_user_b_id,
+        db_session,
     ):
         """Test message can reference a post_id"""
         from app.modules.social.domain.entities.thread import MessageThread
         from app.modules.social.domain.entities.thread_message import ThreadMessage
+        from sqlalchemy import text
+        from datetime import datetime, timedelta, timezone
 
         # Create thread
         thread_id = str(uuid.uuid4())
@@ -350,6 +370,32 @@ class TestMessagingInThread:
 
         # Send message with post reference
         post_id = str(uuid.uuid4())
+        expires_at = datetime.now(timezone.utc) + timedelta(days=14)
+        await db_session.execute(
+            text(
+                """
+                INSERT INTO posts (
+                    id, owner_id, scope, category, title, content,
+                    status, expires_at, created_at, updated_at
+                )
+                VALUES (
+                    :id, :owner_id, :scope, :category, :title, :content,
+                    :status, :expires_at, NOW(), NOW()
+                )
+                """
+            ),
+            {
+                "id": post_id,
+                "owner_id": str(test_user_b_id),
+                "scope": "global",
+                "category": "trade",
+                "title": "Referenced Post",
+                "content": "Referenced Content",
+                "status": "open",
+                "expires_at": expires_at,
+            },
+        )
+        await db_session.commit()
         message = ThreadMessage(
             id=str(uuid.uuid4()),
             thread_id=thread_id,
@@ -398,26 +444,26 @@ class TestPrivacyAndBlocking:
 
 
 # Fixtures
-@pytest.fixture
-def test_user_a_id():
-    """Test user A"""
-    return uuid.uuid4()
+@pytest_asyncio.fixture
+async def test_user_a_id(create_user):
+    """Test user A (persisted in DB)."""
+    return await create_user("message_a")
+
+
+@pytest_asyncio.fixture
+async def test_user_b_id(create_user):
+    """Test user B (persisted in DB)."""
+    return await create_user("message_b")
+
+
+@pytest_asyncio.fixture
+async def test_user_c_id(create_user):
+    """Test user C (persisted in DB)."""
+    return await create_user("message_c")
 
 
 @pytest.fixture
-def test_user_b_id():
-    """Test user B"""
-    return uuid.uuid4()
-
-
-@pytest.fixture
-def test_user_c_id():
-    """Test user C"""
-    return uuid.uuid4()
-
-
-@pytest.fixture
-async def message_request_repository(db_session):
+def message_request_repository(db_session):
     """Message request repository fixture"""
     from app.modules.social.infrastructure.repositories.message_request_repository import (
         MessageRequestRepository,
@@ -427,7 +473,7 @@ async def message_request_repository(db_session):
 
 
 @pytest.fixture
-async def thread_repository(db_session):
+def thread_repository(db_session):
     """Thread repository fixture"""
     from app.modules.social.infrastructure.repositories.thread_repository import (
         ThreadRepository,
@@ -437,7 +483,7 @@ async def thread_repository(db_session):
 
 
 @pytest.fixture
-async def thread_message_repository(db_session):
+def thread_message_repository(db_session):
     """Thread message repository fixture"""
     from app.modules.social.infrastructure.repositories.thread_message_repository import (
         ThreadMessageRepository,
@@ -447,7 +493,7 @@ async def thread_message_repository(db_session):
 
 
 @pytest.fixture
-async def friendship_repository(db_session):
+def friendship_repository(db_session):
     """Friendship repository fixture"""
     from app.modules.social.infrastructure.repositories.friendship_repository_impl import (
         FriendshipRepositoryImpl,

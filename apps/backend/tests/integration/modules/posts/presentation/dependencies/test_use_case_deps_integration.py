@@ -16,26 +16,36 @@ from app.modules.posts.application.use_cases.list_board_posts_use_case import (
     ListBoardPostsUseCase,
 )
 from app.modules.posts.application.use_cases.toggle_like import ToggleLikeUseCase
-from app.modules.posts.domain.repositories.i_interest_repository import (
-    IInterestRepository,
+from app.modules.posts.domain.repositories.i_post_interest_repository import (
+    IPostInterestRepository,
 )
-from app.modules.posts.domain.repositories.i_like_repository import ILikeRepository
+from app.modules.posts.domain.repositories.i_post_like_repository import (
+    IPostLikeRepository,
+)
 from app.modules.posts.domain.repositories.i_post_repository import IPostRepository
-from app.modules.posts.infrastructure.repositories.interest_repository_impl import (
-    InterestRepository,
+from app.modules.posts.infrastructure.repositories.post_interest_repository_impl import (
+    PostInterestRepositoryImpl,
 )
-from app.modules.posts.infrastructure.repositories.like_repository_impl import (
-    LikeRepository,
+from app.modules.posts.infrastructure.repositories.post_like_repository_impl import (
+    PostLikeRepositoryImpl,
 )
 from app.modules.posts.infrastructure.repositories.post_repository_impl import (
-    PostRepository,
+    PostRepositoryImpl,
 )
 from app.modules.posts.presentation.dependencies.use_case_deps import (
     get_create_post_use_case,
     get_list_board_posts_use_case,
     get_toggle_like_use_case,
 )
-from app.shared.domain.repositories.i_gcs_storage_service import IGCSStorageService
+from app.modules.identity.application.services.subscription_query_service_impl import (
+    SubscriptionQueryServiceImpl,
+)
+from app.modules.identity.infrastructure.repositories.subscription_repository_impl import (
+    SubscriptionRepositoryImpl,
+)
+from app.shared.domain.contracts.i_subscription_query_service import (
+    ISubscriptionQueryService,
+)
 from app.shared.infrastructure.external.mock_gcs_storage_service import (
     MockGCSStorageService,
 )
@@ -46,22 +56,58 @@ class PostsModule(Module):
 
     @singleton
     @provider
-    def provide_gcs_service(self) -> IGCSStorageService:
+    def provide_gcs_service(self) -> MockGCSStorageService:
         return MockGCSStorageService(bucket_name="test")
 
     @provider
     def provide_post_repository(self, session: AsyncSession) -> IPostRepository:
-        return PostRepository(session)
+        return PostRepositoryImpl(session)
 
     @provider
     def provide_interest_repository(
         self, session: AsyncSession
-    ) -> IInterestRepository:
-        return InterestRepository(session)
+    ) -> IPostInterestRepository:
+        return PostInterestRepositoryImpl(session)
 
     @provider
-    def provide_like_repository(self, session: AsyncSession) -> ILikeRepository:
-        return LikeRepository(session)
+    def provide_like_repository(self, session: AsyncSession) -> IPostLikeRepository:
+        return PostLikeRepositoryImpl(session)
+
+    @provider
+    def provide_subscription_query_service(
+        self, session: AsyncSession
+    ) -> ISubscriptionQueryService:
+        subscription_repo = SubscriptionRepositoryImpl(session)
+        return SubscriptionQueryServiceImpl(subscription_repository=subscription_repo)
+
+    @provider
+    def provide_create_post_use_case(
+        self,
+        post_repository: IPostRepository,
+        subscription_repository: ISubscriptionQueryService,
+    ) -> CreatePostUseCase:
+        return CreatePostUseCase(
+            post_repository=post_repository,
+            subscription_repository=subscription_repository,
+        )
+
+    @provider
+    def provide_list_board_posts_use_case(
+        self,
+        post_repository: IPostRepository,
+    ) -> ListBoardPostsUseCase:
+        return ListBoardPostsUseCase(post_repository=post_repository)
+
+    @provider
+    def provide_toggle_like_use_case(
+        self,
+        post_repository: IPostRepository,
+        like_repository: IPostLikeRepository,
+    ) -> ToggleLikeUseCase:
+        return ToggleLikeUseCase(
+            post_repository=post_repository,
+            like_repository=like_repository,
+        )
 
 
 class TestPostsUseCaseDependenciesIntegration:
@@ -148,8 +194,8 @@ class TestPostsUseCaseDependenciesIntegration:
         use_case = await get_create_post_use_case(db_session, mock_request)
 
         # Assert
-        assert hasattr(use_case, "_post_repository")
-        assert use_case._post_repository is not None
+        assert hasattr(use_case, "post_repository")
+        assert use_case.post_repository is not None
 
     @pytest.mark.asyncio
     async def test_session_correctly_bound(
@@ -166,7 +212,7 @@ class TestPostsUseCaseDependenciesIntegration:
         use_case = await get_create_post_use_case(db_session, mock_request)
 
         # Assert
-        assert use_case._post_repository._session is db_session
+        assert use_case.post_repository._session is db_session
 
     @pytest.mark.asyncio
     async def test_multiple_use_cases_isolated(

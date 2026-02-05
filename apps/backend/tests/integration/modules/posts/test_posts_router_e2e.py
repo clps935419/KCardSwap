@@ -27,33 +27,32 @@ class TestPostsRouterE2E:
         """Create test user and return user ID"""
         import uuid
         unique_id = str(uuid.uuid4())
+        user_id = str(uuid.uuid4())
         result = await db_session.execute(
             text("""
-                INSERT INTO users (google_id, email, role)
-                VALUES (:google_id, :email, :role)
+                INSERT INTO users (id, google_id, email, role)
+                VALUES (:id, :google_id, :email, :role)
                 RETURNING id
             """),
             {
+                "id": user_id,
                 "google_id": f"test_posts_{unique_id}",
                 "email": f"posts_{unique_id}@test.com",
-                "role": "user"
-            }
+                "role": "user",
+            },
         )
         user_id = result.scalar()
-        await db_session.flush()
+        await db_session.commit()
         return user_id
 
     @pytest.fixture
-    def authenticated_client(self, test_user, db_session):
+    def authenticated_client(self, test_user, app_db_session_override):
         """Provide authenticated test client"""
         def override_require_user():
             return test_user
 
-        async def override_get_db_session():
-            yield db_session
-
         app.dependency_overrides[require_user] = override_require_user
-        app.dependency_overrides[get_db_session] = override_get_db_session
+        app.dependency_overrides[get_db_session] = app_db_session_override
 
         client = TestClient(app)
         yield client
@@ -61,12 +60,9 @@ class TestPostsRouterE2E:
         app.dependency_overrides.clear()
 
     @pytest.fixture
-    def unauthenticated_client(self, db_session):
+    def unauthenticated_client(self, app_db_session_override):
         """Provide unauthenticated test client"""
-        async def override_get_db_session():
-            yield db_session
-
-        app.dependency_overrides[get_db_session] = override_get_db_session
+        app.dependency_overrides[get_db_session] = app_db_session_override
 
         client = TestClient(app)
         yield client
@@ -100,7 +96,7 @@ class TestPostsRouterE2E:
         payload = {
             "scope": "city",
             "city_code": "TPE",
-            "category": "sale",
+            "category": "trade",
             "title": "Selling IU photocards",
             "content": "Brand new IU photocards for sale",
             "idol": "IU",
@@ -113,7 +109,7 @@ class TestPostsRouterE2E:
         data = response.json()["data"]
         assert data["scope"] == "city"
         assert data["city_code"] == "TPE"
-        assert data["category"] == "sale"
+        assert data["category"] == "trade"
 
     def test_create_post_missing_required_fields(self, authenticated_client):
         """Test creating post with missing required fields"""
@@ -217,15 +213,17 @@ class TestPostsRouterE2E:
     async def test_post(self, test_user, db_session) -> UUID:
         """Create a test post"""
         post_id = uuid4()
+        from datetime import datetime, timedelta, timezone
+        expires_at = datetime.now(timezone.utc) + timedelta(days=14)
         await db_session.execute(
             text("""
                 INSERT INTO posts (
                     id, owner_id, scope, category, title, content, 
-                    status, created_at, updated_at
+                    status, expires_at, created_at, updated_at
                 )
                 VALUES (
                     :id, :owner_id, :scope, :category, :title, :content,
-                    :status, NOW(), NOW()
+                    :status, :expires_at, NOW(), NOW()
                 )
             """),
             {
@@ -235,10 +233,11 @@ class TestPostsRouterE2E:
                 "category": "trade",
                 "title": "Test Post",
                 "content": "Test Content",
-                "status": "open"
+                "status": "open",
+                "expires_at": expires_at,
             }
         )
-        await db_session.flush()
+        await db_session.commit()
         return post_id
 
     def test_close_post_success(self, authenticated_client, test_post):
@@ -265,32 +264,31 @@ class TestPostsRouterE2E:
         """Create second test user"""
         import uuid
         unique_id = str(uuid.uuid4())
+        user_id = str(uuid.uuid4())
         result = await db_session.execute(
             text("""
-                INSERT INTO users (google_id, email, role)
-                VALUES (:google_id, :email, :role)
+                INSERT INTO users (id, google_id, email, role)
+                VALUES (:id, :google_id, :email, :role)
                 RETURNING id
             """),
             {
+                "id": user_id,
                 "google_id": f"test_posts2_{unique_id}",
                 "email": f"posts2_{unique_id}@test.com",
-                "role": "user"
-            }
+                "role": "user",
+            },
         )
         user_id = result.scalar()
-        await db_session.flush()
+        await db_session.commit()
         return user_id
 
-    def test_close_post_not_owner(self, test_user2, test_post, db_session):
+    def test_close_post_not_owner(self, test_user2, test_post, app_db_session_override):
         """Test closing post by non-owner (should fail)"""
         def override_require_user():
             return test_user2
 
-        async def override_get_db_session():
-            yield db_session
-
         app.dependency_overrides[require_user] = override_require_user
-        app.dependency_overrides[get_db_session] = override_get_db_session
+        app.dependency_overrides[get_db_session] = app_db_session_override
 
         try:
             client = TestClient(app)

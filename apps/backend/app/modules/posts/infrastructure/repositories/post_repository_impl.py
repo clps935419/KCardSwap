@@ -20,6 +20,7 @@ class PostRepositoryImpl(IPostRepository):
 
     def __init__(self, session: AsyncSession):
         self.session = session
+        self._session = session
 
     async def create(self, post: Post) -> Post:
         """Create a new post"""

@@ -324,11 +324,10 @@ class TestReportFlowIntegration:
         )
 
         # Assert
-        # Should fail validation either at schema level (400) or use case level (422/500)
+        # Should fail validation either at schema level (400) or use case level (422)
         assert response.status_code in [
             status.HTTP_400_BAD_REQUEST,
             status.HTTP_422_UNPROCESSABLE_ENTITY,
-            status.HTTP_500_INTERNAL_SERVER_ERROR,
         ]
 
     @pytest.mark.asyncio

@@ -25,20 +25,22 @@ class TestFriendsRouterE2E:
         """Create first test user"""
         import uuid
         unique_id = str(uuid.uuid4())
+        user_id = str(uuid.uuid4())
         result = await db_session.execute(
             text("""
-                INSERT INTO users (google_id, email, role)
-                VALUES (:google_id, :email, :role)
+                INSERT INTO users (id, google_id, email, role)
+                VALUES (:id, :google_id, :email, :role)
                 RETURNING id
             """),
             {
+                "id": user_id,
                 "google_id": f"test_friend1_{unique_id}",
                 "email": f"friend1_{unique_id}@test.com",
-                "role": "user"
-            }
+                "role": "user",
+            },
         )
         user_id = result.scalar()
-        await db_session.flush()
+        await db_session.commit()
         return user_id
 
     @pytest_asyncio.fixture
@@ -46,33 +48,32 @@ class TestFriendsRouterE2E:
         """Create second test user"""
         import uuid
         unique_id = str(uuid.uuid4())
+        user_id = str(uuid.uuid4())
         result = await db_session.execute(
             text("""
-                INSERT INTO users (google_id, email, role)
-                VALUES (:google_id, :email, :role)
+                INSERT INTO users (id, google_id, email, role)
+                VALUES (:id, :google_id, :email, :role)
                 RETURNING id
             """),
             {
+                "id": user_id,
                 "google_id": f"test_friend2_{unique_id}",
                 "email": f"friend2_{unique_id}@test.com",
-                "role": "user"
-            }
+                "role": "user",
+            },
         )
         user_id = result.scalar()
-        await db_session.flush()
+        await db_session.commit()
         return user_id
 
     @pytest.fixture
-    def authenticated_client_user1(self, test_user1, db_session):
+    def authenticated_client_user1(self, test_user1, app_db_session_override):
         """Provide authenticated test client for user1"""
         def override_get_current_user_id():
             return test_user1
 
-        async def override_get_db_session():
-            yield db_session
-
         app.dependency_overrides[get_current_user_id] = override_get_current_user_id
-        app.dependency_overrides[get_db_session] = override_get_db_session
+        app.dependency_overrides[get_db_session] = app_db_session_override
 
         client = TestClient(app)
         yield client
@@ -80,12 +81,9 @@ class TestFriendsRouterE2E:
         app.dependency_overrides.clear()
 
     @pytest.fixture
-    def unauthenticated_client(self, db_session):
+    def unauthenticated_client(self, app_db_session_override):
         """Provide unauthenticated test client"""
-        async def override_get_db_session():
-            yield db_session
-
-        app.dependency_overrides[get_db_session] = override_get_db_session
+        app.dependency_overrides[get_db_session] = app_db_session_override
 
         client = TestClient(app)
         yield client
@@ -123,8 +121,8 @@ class TestFriendsRouterE2E:
 
         response = authenticated_client_user1.post("/api/v1/friends/block", json=payload)
 
-        # Should return 400 or 500 depending on validation
-        assert response.status_code in [400, 500]
+        # Should return 400 depending on validation
+        assert response.status_code == 400
 
     def test_block_user_unauthorized(self, unauthenticated_client, test_user2):
         """Test blocking without authentication"""

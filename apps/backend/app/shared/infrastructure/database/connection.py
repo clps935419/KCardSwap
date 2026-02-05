@@ -3,6 +3,7 @@
 This module provides database connection using SQLAlchemy Engine (both sync and async).
 """
 
+from contextlib import asynccontextmanager
 from typing import AsyncGenerator, Generator
 
 from sqlalchemy import Engine, create_engine
@@ -117,6 +118,7 @@ class DatabaseConnection:
         finally:
             session.close()
 
+    @asynccontextmanager
     async def get_async_session(self) -> AsyncGenerator[AsyncSession, None]:
         """Get an async database session (context manager).
 

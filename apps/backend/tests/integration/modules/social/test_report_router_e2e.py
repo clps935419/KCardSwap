@@ -24,53 +24,54 @@ class TestReportRouterE2E:
     async def test_user1(self, db_session) -> UUID:
         """Create first test user"""
         unique_id = str(uuid4())
+        user_id = str(uuid4())
         result = await db_session.execute(
             text("""
-                INSERT INTO users (google_id, email, role)
-                VALUES (:google_id, :email, :role)
+                INSERT INTO users (id, google_id, email, role)
+                VALUES (:id, :google_id, :email, :role)
                 RETURNING id
             """),
             {
-                "google_id": f"test_report1_{unique_id}",
-                "email": f"report1_{unique_id}@test.com",
-                "role": "user"
-            }
+                "id": user_id,
+                "google_id": f"test_reporter_{unique_id}",
+                "email": f"reporter_{unique_id}@test.com",
+                "role": "user",
+            },
         )
         user_id = result.scalar()
-        await db_session.flush()
+        await db_session.commit()
         return user_id
 
     @pytest_asyncio.fixture
     async def test_user2(self, db_session) -> UUID:
         """Create second test user"""
         unique_id = str(uuid4())
+        user_id = str(uuid4())
         result = await db_session.execute(
             text("""
-                INSERT INTO users (google_id, email, role)
-                VALUES (:google_id, :email, :role)
+                INSERT INTO users (id, google_id, email, role)
+                VALUES (:id, :google_id, :email, :role)
                 RETURNING id
             """),
             {
-                "google_id": f"test_report2_{unique_id}",
-                "email": f"report2_{unique_id}@test.com",
-                "role": "user"
-            }
+                "id": user_id,
+                "google_id": f"test_reported_{unique_id}",
+                "email": f"reported_{unique_id}@test.com",
+                "role": "user",
+            },
         )
         user_id = result.scalar()
-        await db_session.flush()
+        await db_session.commit()
         return user_id
 
     @pytest.fixture
-    def authenticated_client(self, test_user1, db_session):
+    def authenticated_client(self, test_user1, app_db_session_override):
         """Provide authenticated test client"""
         def override_get_current_user_id():
             return test_user1
 
-        async def override_get_db_session():
-            yield db_session
-
         app.dependency_overrides[get_current_user_id] = override_get_current_user_id
-        app.dependency_overrides[get_db_session] = override_get_db_session
+        app.dependency_overrides[get_db_session] = app_db_session_override
 
         client = TestClient(app)
         yield client
@@ -78,12 +79,9 @@ class TestReportRouterE2E:
         app.dependency_overrides.clear()
 
     @pytest.fixture
-    def unauthenticated_client(self, db_session):
+    def unauthenticated_client(self, app_db_session_override):
         """Provide unauthenticated test client"""
-        async def override_get_db_session():
-            yield db_session
-
-        app.dependency_overrides[get_db_session] = override_get_db_session
+        app.dependency_overrides[get_db_session] = app_db_session_override
 
         client = TestClient(app)
         yield client

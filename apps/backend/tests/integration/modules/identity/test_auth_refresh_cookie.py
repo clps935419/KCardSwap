@@ -194,20 +194,3 @@ class TestRefreshTokenCookie:
         # COOKIE_DOMAIN may be None for same-origin
 
 
-class TestRefreshTokenCookieIntegration:
-    """Integration tests with real use case (optional, requires DB)"""
-
-    @pytest.mark.skip(reason="Requires database setup")
-    async def test_full_refresh_flow_with_db(self):
-        """
-        Full integration test with database
-
-        This test would:
-        1. Create a user and refresh token in DB
-        2. Call refresh endpoint with cookie
-        3. Verify new tokens are created and old token is revoked
-        4. Verify cookies are set correctly
-
-        Skipped by default - run manually with proper DB setup
-        """
-        pass

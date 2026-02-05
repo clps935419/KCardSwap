@@ -55,7 +55,7 @@ class TestErrorHandlerMiddlewareIntegration:
     def test_api_exception_handler_integration(self, test_app):
         """Test API exception handler returns correct format"""
         # Arrange
-        client = TestClient(test_app)
+        client = TestClient(test_app, raise_server_exceptions=False)
 
         # Act
         response = client.get("/test-api-error")
@@ -72,7 +72,7 @@ class TestErrorHandlerMiddlewareIntegration:
     def test_http_exception_handler_integration(self, test_app):
         """Test HTTP exception handler returns correct format"""
         # Arrange
-        client = TestClient(test_app)
+        client = TestClient(test_app, raise_server_exceptions=False)
 
         # Act
         response = client.get("/test-http-error")
@@ -88,7 +88,7 @@ class TestErrorHandlerMiddlewareIntegration:
     def test_validation_exception_handler_integration(self, test_app):
         """Test validation exception handler returns correct format"""
         # Arrange
-        client = TestClient(test_app)
+        client = TestClient(test_app, raise_server_exceptions=False)
 
         # Act - Send invalid data type
         response = client.get("/test-validation-error?value=invalid")
@@ -106,7 +106,7 @@ class TestErrorHandlerMiddlewareIntegration:
     def test_general_exception_handler_integration(self, test_app):
         """Test general exception handler returns correct format"""
         # Arrange
-        client = TestClient(test_app)
+        client = TestClient(test_app, raise_server_exceptions=False)
 
         # Act
         response = client.get("/test-general-error")
@@ -133,7 +133,7 @@ class TestErrorHandlerMiddlewareIntegration:
         async def test_endpoint(data: TestModel):
             return data
         
-        client = TestClient(app)
+        client = TestClient(app, raise_server_exceptions=False)
 
         # Act - Send data with multiple validation errors
         response = client.post(
@@ -161,7 +161,7 @@ class TestErrorHandlerMiddlewareIntegration:
         async def test_endpoint(data: RequiredModel):
             return data
         
-        client = TestClient(app)
+        client = TestClient(app, raise_server_exceptions=False)
 
         # Act - Send incomplete data
         response = client.post("/test-required", json={"name": "John"})
@@ -185,7 +185,7 @@ class TestErrorHandlerMiddlewareIntegration:
         async def test_500():
             raise Exception("Internal error")
         
-        client = TestClient(app)
+        client = TestClient(app, raise_server_exceptions=False)
 
         # Act & Assert
         response_401 = client.get("/test-401")
@@ -211,7 +211,7 @@ class TestErrorHandlerMiddlewareIntegration:
                 details={}
             )
         
-        client = TestClient(app)
+        client = TestClient(app, raise_server_exceptions=False)
 
         # Act
         response = client.get("/test-no-details")
