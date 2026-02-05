@@ -26,6 +26,7 @@ import {
   Heading,
 } from '@/src/shared/ui/components';
 import { useBoardPosts } from '@/src/features/posts/hooks/usePosts';
+import { PostImages } from '@/src/features/posts/components';
 import type { Post } from '@/src/features/posts/types';
 
 // 台灣城市列表

@@ -220,20 +220,20 @@ description: "Task list for implementing Posts-first POC (V2)"
 
 ### Tests（後端）
 
-- [ ] T082 [P] [US3] 新增 media 讀取 URL 整合測試（新增 apps/backend/tests/integration/modules/media/test_media_read_urls.py）
+- [x] T082 [P] [US3] 新增 media 讀取 URL 整合測試（新增 apps/backend/tests/integration/modules/media/test_media_read_urls.py）
 
 ### Backend（media module）
 
-- [ ] T083 [P] [US3] 定義 read signed URL request/response schema（新增 apps/backend/app/modules/media/presentation/schemas/media_read_url_schemas.py）
-- [ ] T084 [P] [US3] 新增批次 read signed URLs use case（新增 apps/backend/app/modules/media/application/use_cases/get_read_urls.py）
-- [ ] T085 [US3] 新增 media read URLs endpoint（更新 apps/backend/app/modules/media/presentation/routers/media_router.py；POST /api/v1/media/read-urls）
-- [ ] T086 [US3] 加入 media 可見性驗證（更新 apps/backend/app/modules/media/application/services/media_access_service.py 或新增；確認登入即可查看貼文/相簿圖片）
-- [ ] T087 [US3] 後端回傳圖片 ID（更新 apps/backend/app/modules/posts/presentation/schemas/post_schemas.py 與對應 use case；PostResponse/PostListResponse 加入 media_asset_ids: UUID[]，若無圖回空陣列）
+- [x] T083 [P] [US3] 定義 read signed URL request/response schema（新增 apps/backend/app/modules/media/presentation/schemas/media_read_url_schemas.py）
+- [x] T084 [P] [US3] 新增批次 read signed URLs use case（新增 apps/backend/app/modules/media/application/use_cases/get_read_urls.py）
+- [x] T085 [US3] 新增 media read URLs endpoint（更新 apps/backend/app/modules/media/presentation/routers/media_router.py；POST /api/v1/media/read-urls）
+- [x] T086 [US3] 加入 media 可見性驗證（更新 apps/backend/app/modules/media/application/services/media_access_service.py 或新增；確認登入即可查看貼文/相簿圖片）
+- [x] T087 [US3] 後端回傳圖片 ID（更新 apps/backend/app/modules/posts/presentation/schemas/post_schemas.py 與對應 use case；PostResponse/PostListResponse 加入 media_asset_ids: UUID[]，若無圖回空陣列）
 
 ### Web（apps/web）
 
-- [ ] T088 [P] [US3] 建立批次 read URL hook（新增 apps/web/src/features/media/hooks/useReadMediaUrls.ts；輸入 media_asset_ids，回傳 media_id -> url 對照）
-- [ ] T089 [US3] 帖文/相簿列表改用 read URL 顯示圖片（更新 apps/web/src/features/posts/components/PostsList.tsx 與 apps/web/src/features/gallery/components/GalleryGrid.tsx；從 PostResponse.media_asset_ids 蒐集並呼叫 read-urls）
+- [x] T088 [P] [US3] 建立批次 read URL hook（新增 apps/web/src/features/media/hooks/useReadMediaUrls.ts；輸入 media_asset_ids，回傳 media_id -> url 對照）
+- [x] T089 [US3] 帖文/相簿列表改用 read URL 顯示圖片（更新 apps/web/src/features/posts/components/PostsList.tsx 與 apps/web/src/features/gallery/components/GalleryGrid.tsx；從 PostResponse.media_asset_ids 蒐集並呼叫 read-urls）
 
 ---
 
