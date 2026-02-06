@@ -32,10 +32,10 @@ down: ## 停止所有服務
 	docker compose down
 
 prod-up: ## 啟動正式環境（使用 docker-compose.prod.yml）
-	docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+	docker compose --env-file .env.prod -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 
 prod-down: ## 停止正式環境
-	docker compose -f docker-compose.yml -f docker-compose.prod.yml down
+	docker compose --env-file .env.prod -f docker-compose.yml -f docker-compose.prod.yml down
 
 logs: ## 查看所有服務日誌
 	docker compose logs -f
