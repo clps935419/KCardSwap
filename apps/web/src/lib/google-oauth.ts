@@ -10,9 +10,73 @@
  * 6. Browser redirects to app
  */
 
-import { AuthenticationService, ProfileService } from '@/shared/api/generated'
+import {
+  getMyProfileApiV1ProfileMeGet,
+  googleLoginApiV1AuthGoogleLoginPost,
+  logoutApiV1AuthLogoutPost,
+} from '@/shared/api/generated'
 
-async function waitForGoogleIdentityServices(timeoutMs = 8000): Promise<any> {
+type GoogleCredentialResponse = {
+  credential?: string
+}
+
+type GooglePromptNotification = {
+  isNotDisplayed: () => boolean
+  isSkippedMoment: () => boolean
+  getNotDisplayedReason?: () => string
+  getSkippedReason?: () => string
+}
+
+type GoogleButtonOptions = {
+  theme: 'outline' | 'filled_blue' | 'filled_black'
+  size: 'large' | 'medium' | 'small'
+  shape: 'pill' | 'rect' | 'circle' | 'square'
+  text: 'continue_with' | 'signin_with' | 'signup_with'
+  width: number
+}
+
+type GoogleInitializeConfig = {
+  client_id: string
+  callback: (response: GoogleCredentialResponse) => void
+  auto_select?: boolean
+  cancel_on_tap_outside?: boolean
+  use_fedcm_for_prompt?: boolean
+}
+
+type GoogleIdentity = {
+  accounts: {
+    id: {
+      initialize: (config: GoogleInitializeConfig) => void
+      prompt: (callback: (notification: GooglePromptNotification) => void) => void
+      renderButton: (container: HTMLElement, options: GoogleButtonOptions) => void
+    }
+  }
+}
+
+function getGoogleIdentityFromWindow(): GoogleIdentity | null {
+  const maybeWindow = window as unknown as { google?: GoogleIdentity }
+  return maybeWindow.google ?? null
+}
+
+function getErrorMessage(error: unknown): string {
+  if (error && typeof error === 'object') {
+    const err = error as {
+      body?: { error?: { message?: string } }
+      response?: { data?: { error?: { message?: string } } }
+      message?: string
+    }
+    return (
+      err.body?.error?.message ||
+      err.response?.data?.error?.message ||
+      err.message ||
+      '登入失敗，請稍後再試'
+    )
+  }
+
+  return '登入失敗，請稍後再試'
+}
+
+async function waitForGoogleIdentityServices(timeoutMs = 8000): Promise<GoogleIdentity> {
   if (typeof window === 'undefined') {
     throw new Error('window 不存在（可能在 SSR 環境）')
   }
@@ -24,13 +88,14 @@ async function waitForGoogleIdentityServices(timeoutMs = 8000): Promise<any> {
     const checkGoogleLoaded = setInterval(() => {
       checkCount++
 
-      if ((window as any).google) {
+      const googleIdentity = getGoogleIdentityFromWindow()
+      if (googleIdentity) {
         clearInterval(checkGoogleLoaded)
         if (timeoutId) {
           clearTimeout(timeoutId)
           timeoutId = null
         }
-        resolve((window as any).google)
+        resolve(googleIdentity)
       } else if (checkCount % 10 === 0) {
         console.log(
           `[Google OAuth] ⏳ 等待 Google Identity Services 載入... (已檢查 ${checkCount} 次)`
@@ -103,7 +168,7 @@ export async function loginWithGoogle(): Promise<void> {
     const checkGoogleLoaded = setInterval(() => {
       checkCount++
 
-      if (typeof window !== 'undefined' && (window as any).google) {
+      if (typeof window !== 'undefined' && getGoogleIdentityFromWindow()) {
         console.log(
           `[Google OAuth] ✅ Step 3: Google Identity Services 已載入 (檢查了 ${checkCount} 次)`
         )
@@ -113,7 +178,11 @@ export async function loginWithGoogle(): Promise<void> {
           timeoutId = null
         }
 
-        const google = (window as any).google
+        const google = getGoogleIdentityFromWindow()
+        if (!google) {
+          reject(new Error('Google 登入服務載入失敗'))
+          return
+        }
         const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
 
         console.log(
@@ -133,7 +202,7 @@ export async function loginWithGoogle(): Promise<void> {
         google.accounts.id.initialize({
           client_id: clientId,
           use_fedcm_for_prompt: false,
-          callback: async (response: any) => {
+          callback: async (response: GoogleCredentialResponse) => {
             console.log('[Google OAuth] 📞 Step 5: 收到 Google 回調')
             console.log('[Google OAuth] 🔑 Credential 存在:', !!response.credential)
 
@@ -144,6 +213,9 @@ export async function loginWithGoogle(): Promise<void> {
             try {
               console.log('[Google OAuth] 📤 Step 6: 發送 token 到後端...')
               // Send ID token to backend
+              if (!response.credential) {
+                throw new Error('Google 回傳憑證不存在')
+              }
               await handleGoogleCallback(response.credential)
               console.log('[Google OAuth] ✅ Step 7: 登入成功！')
               if (!isSettled) {
@@ -166,7 +238,7 @@ export async function loginWithGoogle(): Promise<void> {
         console.log('[Google OAuth] 🎯 Step 5: 顯示 One Tap 提示...')
 
         // Show One Tap prompt
-        google.accounts.id.prompt((notification: any) => {
+        google.accounts.id.prompt((notification: GooglePromptNotification) => {
           console.log('[Google OAuth] 📢 One Tap 通知:', {
             isDisplayed: !notification.isNotDisplayed(),
             isSkipped: notification.isSkippedMoment(),
@@ -204,7 +276,7 @@ export async function loginWithGoogle(): Promise<void> {
     timeoutId = setTimeout(() => {
       clearInterval(checkGoogleLoaded)
       console.error('[Google OAuth] ❌ Step 3-TIMEOUT: Google Identity Services 載入逾時')
-      console.error('[Google OAuth] window.google 存在:', !!(window as any).google)
+      console.error('[Google OAuth] window.google 存在:', !!getGoogleIdentityFromWindow())
       if (!isSettled) {
         isSettled = true
         reject(new Error('Google 登入服務載入逾時，請重新整理頁面後再試'))
@@ -240,11 +312,14 @@ export async function renderGoogleButton(
 
     google.accounts.id.initialize({
       client_id: clientId,
-      callback: async (response: any) => {
+      callback: async (response: GoogleCredentialResponse) => {
         console.log('[Google OAuth] 📞 Step 5: 收到 Google 回調')
         console.log('[Google OAuth] 🔑 Credential 存在:', !!response.credential)
 
         try {
+          if (!response.credential) {
+            throw new Error('Google 回傳憑證不存在')
+          }
           await handleGoogleCallback(response.credential)
           onSuccess?.()
         } catch (error) {
@@ -282,33 +357,38 @@ async function handleGoogleCallback(idToken: string): Promise<void> {
   try {
     console.log('[Google OAuth] 🌐 呼叫 /api/v1/auth/google-login...')
 
-    const response = await AuthenticationService.googleLoginApiV1AuthGoogleLoginPost({
-      requestBody: {
+    const response = await googleLoginApiV1AuthGoogleLoginPost({
+      body: {
         google_token: idToken,
       },
+      throwOnError: true,
     })
 
     console.log('[Google OAuth] ✅ Step 6: 後端回應成功')
-    console.log('[Google OAuth] 📧 使用者 email:', response.data?.email)
     console.log('[Google OAuth] 👤 使用者資料:', response.data)
 
     // Backend has set httpOnly cookies (access_token, refresh_token)
     // Browser will automatically include them in future requests
     console.log('[Google OAuth] 🍪 後端已設定 httpOnly cookies')
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('[Google OAuth] ❌ Step 6-FAIL: 後端登入失敗')
     console.error('[Google OAuth] 錯誤物件:', error)
-    console.error('[Google OAuth] 錯誤 body:', error?.body)
-    console.error('[Google OAuth] 錯誤 response:', error?.response)
-    console.error('[Google OAuth] 錯誤 message:', error?.message)
-    console.error('[Google OAuth] 錯誤 status:', error?.status)
+
+    if (error && typeof error === 'object') {
+      const err = error as {
+        body?: unknown
+        response?: unknown
+        message?: string
+        status?: unknown
+      }
+      console.error('[Google OAuth] 錯誤 body:', err.body)
+      console.error('[Google OAuth] 錯誤 response:', err.response)
+      console.error('[Google OAuth] 錯誤 message:', err.message)
+      console.error('[Google OAuth] 錯誤 status:', err.status)
+    }
 
     // Extract detailed error message from backend response
-    const errorMessage =
-      error?.body?.error?.message ||
-      error?.response?.data?.error?.message ||
-      error?.message ||
-      '登入失敗，請稍後再試'
+    const errorMessage = getErrorMessage(error)
 
     console.error('[Google OAuth] 解析後的錯誤訊息:', errorMessage)
 
@@ -332,7 +412,9 @@ export async function checkAuth(): Promise<boolean> {
   try {
     // Try to fetch a protected endpoint using SDK
     // If we get 401, user is not authenticated
-    await ProfileService.getMyProfileApiV1ProfileMeGet()
+    await getMyProfileApiV1ProfileMeGet({
+      throwOnError: true,
+    })
     return true
   } catch (_error) {
     return false
@@ -344,7 +426,9 @@ export async function checkAuth(): Promise<boolean> {
  */
 export async function logout(): Promise<void> {
   try {
-    await AuthenticationService.logoutApiV1AuthLogoutPost()
+    await logoutApiV1AuthLogoutPost({
+      throwOnError: true,
+    })
   } catch (_error) {
     // Ignore errors on logout
   }

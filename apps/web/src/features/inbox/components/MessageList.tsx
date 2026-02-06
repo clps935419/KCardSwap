@@ -27,6 +27,7 @@ export function MessageList({ threadId }: MessageListProps) {
   const [messages, _setMessages] = useState<ThreadMessage[]>([])
   const [loading, _setLoading] = useState(true)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  void threadId
 
   // TODO: Get current user ID from auth context
   const currentUserId = 'current-user-id'

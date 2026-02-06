@@ -17,6 +17,7 @@ export function SendMessageForm({ threadId }: SendMessageFormProps) {
   const [content, setContent] = useState('')
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
+  void threadId
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

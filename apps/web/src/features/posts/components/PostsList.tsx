@@ -57,7 +57,7 @@ export function PostsList() {
     category,
   })
 
-  const { createRequest, loading: creatingRequest } = useCreateMessageRequest()
+  const { createRequest } = useCreateMessageRequest()
   const toggleLikeMutation = useToggleLike()
 
   const handleMessageAuthor = async (post: PostResponse) => {

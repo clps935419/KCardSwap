@@ -4,6 +4,7 @@
  */
 'use client'
 
+import Image from 'next/image'
 import { Loader2 } from 'lucide-react'
 import { useReadMediaUrls } from '@/features/media/hooks/useReadMediaUrls'
 
@@ -53,6 +54,9 @@ export function PostImages({ mediaAssetIds, maxDisplay = 4 }: PostImagesProps) {
   const urls = data?.data?.urls || {}
   const imagesToShow = mediaAssetIds.slice(0, maxDisplay)
   const remainingCount = mediaAssetIds.length - maxDisplay
+  const isSingle = imagesToShow.length === 1
+  const imageWidth = isSingle ? 320 : 156
+  const imageHeight = isSingle ? 240 : 120
 
   return (
     <div className="flex flex-wrap gap-2 mt-2">
@@ -69,14 +73,14 @@ export function PostImages({ mediaAssetIds, maxDisplay = 4 }: PostImagesProps) {
 
         return (
           <div key={mediaId} className="relative">
-            <img
+            <Image
               src={imageUrl}
-              alt={`Image ${index + 1}`}
+              alt={`附件 ${index + 1}`}
+              width={imageWidth}
+              height={imageHeight}
+              sizes={isSingle ? '320px' : '156px'}
               className="rounded-lg object-cover"
-              style={{
-                width: imagesToShow.length === 1 ? '320px' : '156px',
-                height: imagesToShow.length === 1 ? '240px' : '120px',
-              }}
+              unoptimized
             />
             {showOverlay && (
               <div className="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center">

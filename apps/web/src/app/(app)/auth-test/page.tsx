@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { checkAuth, initGoogleOAuth, loginWithGoogle, logout } from '@/lib/google-oauth'
-import { ProfileService } from '@/shared/api/generated'
+import { getMyProfileApiV1ProfileMeGet } from '@/shared/api/generated'
 
 /**
  * Auth Test Page
@@ -28,7 +28,7 @@ export default function AuthTestPage() {
 
     const fetchUserInfo = async () => {
       try {
-        const response = await ProfileService.getMyProfileApiV1ProfileMeGet()
+        const response = await getMyProfileApiV1ProfileMeGet()
         setUserInfo(response.data)
       } catch (err) {
         console.error('Failed to fetch user info:', err)
@@ -52,7 +52,7 @@ export default function AuthTestPage() {
 
   const fetchUserInfo = async () => {
     try {
-      const response = await ProfileService.getMyProfileApiV1ProfileMeGet()
+      const response = await getMyProfileApiV1ProfileMeGet()
       setUserInfo(response.data)
     } catch (err) {
       console.error('Failed to fetch user info:', err)
