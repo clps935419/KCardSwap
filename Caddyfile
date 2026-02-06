@@ -1,5 +1,6 @@
 leonardtechsolutions.com {
-  handle_path /projects/kcardswap/api/* {
+  handle /projects/kcardswap/api/* {
+    uri strip_prefix /projects/kcardswap
     reverse_proxy backend:8000
   }
 
