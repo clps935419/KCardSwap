@@ -2,7 +2,7 @@
 .PHONY: help dev dev-build up down logs logs-backend logs-kong logs-db \
 	test-unit-docker test-integration-docker test-docker ruff-docker clean build restart ps \
 	shell-backend shell-db init-db health seed init-admin-docker setup generate-openapi-docker \
-	prod-up prod-down
+	prod-up prod-down prod-web-build
 
 help: ## 顯示可用指令
 	@echo '用法: make [target]'
@@ -36,6 +36,9 @@ prod-up: ## 啟動正式環境（使用 docker-compose.prod.yml）
 
 prod-down: ## 停止正式環境
 	docker compose --env-file .env.prod -f docker-compose.prod.yml down
+
+prod-web-build: ## 只建置正式環境前端映像
+	docker compose --env-file .env.prod -f docker-compose.prod.yml build web
 
 logs: ## 查看所有服務日誌
 	docker compose logs -f
