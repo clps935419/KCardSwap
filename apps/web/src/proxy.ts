@@ -17,13 +17,17 @@ const PUBLIC_PATHS = ['/login', '/api/auth']
 const PROTECTED_PATHS = ['/posts', '/inbox', '/me']
 
 export function proxy(request: NextRequest) {
-  const { pathname } = request.nextUrl
+  const { pathname, basePath } = request.nextUrl
+  const normalizedPath = basePath && pathname.startsWith(basePath)
+    ? pathname.slice(basePath.length) || '/'
+    : pathname
+  const withBasePath = (path: string) => (basePath ? `${basePath}${path}` : path)
 
   // Check if path is public
-  const _isPublicPath = PUBLIC_PATHS.some(path => pathname.startsWith(path))
+  const _isPublicPath = PUBLIC_PATHS.some(path => normalizedPath.startsWith(path))
 
   // Check if path needs protection
-  const isProtectedPath = PROTECTED_PATHS.some(path => pathname.startsWith(path))
+  const isProtectedPath = PROTECTED_PATHS.some(path => normalizedPath.startsWith(path))
 
   // Get access token from cookies (backend httpOnly cookie)
   const accessToken = request.cookies.get('access_token')
@@ -31,13 +35,15 @@ export function proxy(request: NextRequest) {
 
   // If accessing protected path without auth, redirect to login
   if (isProtectedPath && !hasAuth) {
-    const loginUrl = new URL('/login', request.url)
+    const loginUrl = request.nextUrl.clone()
+    loginUrl.pathname = withBasePath('/login')
     return NextResponse.redirect(loginUrl)
   }
 
   // If accessing login page while authenticated, redirect to home
-  if (pathname === '/login' && hasAuth) {
-    const homeUrl = new URL('/posts', request.url)
+  if (normalizedPath === '/login' && hasAuth) {
+    const homeUrl = request.nextUrl.clone()
+    homeUrl.pathname = withBasePath('/posts')
     return NextResponse.redirect(homeUrl)
   }
 
