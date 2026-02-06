@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import type { PostCategory } from '@/shared/api/generated'
-import { PostsService } from '@/shared/api/generated/services.gen'
+import { listPostsApiV1PostsGetOptions } from '@/shared/api/generated/@tanstack/react-query.gen'
 
 interface UsePostsListParams {
   cityCode?: string | null
@@ -8,13 +8,15 @@ interface UsePostsListParams {
 }
 
 export function usePostsList({ cityCode, category }: UsePostsListParams = {}) {
+  const queryOptions = listPostsApiV1PostsGetOptions({
+    query: {
+      city_code: cityCode || undefined,
+      category: category || undefined,
+      limit: 50,
+    },
+  })
+
   return useQuery({
-    queryKey: ['posts', cityCode, category],
-    queryFn: () =>
-      PostsService.listPostsApiV1PostsGet({
-        cityCode: cityCode || undefined,
-        category: category || undefined,
-        limit: 50,
-      }),
+    ...queryOptions,
   })
 }

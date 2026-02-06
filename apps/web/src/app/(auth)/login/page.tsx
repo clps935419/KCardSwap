@@ -21,13 +21,14 @@ export default function LoginPage() {
 
     try {
       // Import SDK dynamically to avoid build issues
-      const { AuthenticationService } = await import('@/shared/api/generated')
+      const { adminLoginApiV1AuthAdminLoginPost } = await import('@/shared/api/generated')
 
-      const response = await AuthenticationService.adminLoginApiV1AuthAdminLoginPost({
-        requestBody: {
+      const response = await adminLoginApiV1AuthAdminLoginPost({
+        body: {
           email,
           password,
         },
+        throwOnError: true,
       })
 
       // Tokens are now stored in httpOnly cookies automatically
@@ -120,18 +121,19 @@ function LoginPageContent({
 
       try {
         // Import SDK dynamically to avoid build issues
-        const { AuthenticationService } = await import('@/shared/api/generated')
+        const { googleLoginCodeApiV1AuthGoogleLoginCodePost } = await import('@/shared/api/generated')
 
         // Get the redirect_uri that was used in the authorization request
         // @react-oauth/google uses window.location.origin by default
         const redirectUri = window.location.origin
 
         // Send authorization code to backend with redirect_uri for OAuth 2.0 validation
-        const response = await AuthenticationService.googleLoginCodeApiV1AuthGoogleLoginCodePost({
-          requestBody: {
+        const response = await googleLoginCodeApiV1AuthGoogleLoginCodePost({
+          body: {
             code: codeResponse.code,
             redirect_uri: redirectUri,
           },
+          throwOnError: true,
         })
 
         if (response.data) {

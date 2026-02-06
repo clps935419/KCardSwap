@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
@@ -14,9 +15,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { executeUploadFlow } from '@/lib/media/uploadFlow'
-import { useCreateGalleryCard } from '@/shared/api/hooks/gallery'
-import { attachMediaToGalleryCard } from '@/shared/api/hooks/media'
+import { useCreateGalleryCardFlowMutation } from '@/shared/api/hooks/flows'
 
 interface GalleryCreateCardFormProps {
   onSuccess?: () => void
@@ -42,8 +41,7 @@ export function GalleryCreateCardForm({ onSuccess }: GalleryCreateCardFormProps)
 
   const [uploadProgress, setUploadProgress] = useState<number>(0)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
-
-  const createCardMutation = useCreateGalleryCard()
+  const createCardFlowMutation = useCreateGalleryCardFlowMutation()
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -69,31 +67,14 @@ export function GalleryCreateCardForm({ onSuccess }: GalleryCreateCardFormProps)
   const onSubmit = async (data: CreateCardFormData) => {
     try {
       setUploadProgress(0)
-      let mediaId: string | undefined
-
-      // Step 1: Upload image if selected (T055)
-      if (data.image && data.image.length > 0) {
-        const file = data.image[0]
-        mediaId = await executeUploadFlow({
-          file,
-          onProgress: setUploadProgress,
-        })
-      }
-
-      // Step 2: Create gallery card using SDK
-      const response = await createCardMutation.mutateAsync({
+      await createCardFlowMutation.mutateAsync({
         title: data.title,
         idol_name: data.idol_name,
         era: data.era || undefined,
         description: data.description || undefined,
+        imageFile: data.image?.[0],
+        onUploadProgress: setUploadProgress,
       })
-
-      const cardId = response.id
-
-      // Step 3: Attach media to gallery card if uploaded
-      if (mediaId && cardId) {
-        await attachMediaToGalleryCard(cardId, mediaId)
-      }
 
       onSuccess?.()
       form.reset()
@@ -189,11 +170,15 @@ export function GalleryCreateCardForm({ onSuccess }: GalleryCreateCardFormProps)
           />
           {imagePreview && (
             <div className="relative mt-2">
-              <img
-                src={imagePreview}
-                alt="Preview"
-                className="max-h-48 rounded-md border object-contain"
-              />
+              <div className="relative h-48 w-full overflow-hidden rounded-md border">
+                <Image
+                  src={imagePreview}
+                  alt="Preview"
+                  fill
+                  className="object-contain"
+                  unoptimized
+                />
+              </div>
               <Button
                 type="button"
                 variant="destructive"
@@ -223,8 +208,17 @@ export function GalleryCreateCardForm({ onSuccess }: GalleryCreateCardFormProps)
         )}
 
         <div className="flex justify-end gap-2">
-          <Button type="submit" disabled={form.formState.isSubmitting}>
-            {form.formState.isSubmitting ? 'Creating...' : 'Create Card'}
+          <Button
+            type="submit"
+            disabled={
+              form.formState.isSubmitting ||
+              createCardFlowMutation.isPending
+            }
+          >
+            {form.formState.isSubmitting ||
+            createCardFlowMutation.isPending
+              ? 'Creating...'
+              : 'Create Card'}
           </Button>
         </div>
       </form>

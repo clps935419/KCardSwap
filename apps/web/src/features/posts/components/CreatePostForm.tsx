@@ -1,6 +1,5 @@
 'use client'
 
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -16,14 +15,12 @@ import {
 } from '@/components/ui/select'
 import { Spinner } from '@/components/ui/spinner'
 import { Textarea } from '@/components/ui/textarea'
-import { attachMediaToPost, executeUploadFlow } from '@/lib/media/uploadFlow'
+import { useCreatePostFlowMutation } from '@/shared/api/hooks/flows'
 import type {
   CityCode,
-  CreatePostApiV1PostsPostData,
   PostCategory,
   PostScope,
 } from '@/shared/api/generated'
-import { PostsService } from '@/shared/api/generated/services.gen'
 
 const CATEGORIES: { value: PostCategory; label: string }[] = [
   { value: 'trade', label: '交換' },
@@ -53,12 +50,12 @@ interface FormData {
 
 export function CreatePostForm() {
   const router = useRouter()
-  const queryClient = useQueryClient()
   const [scope, setScope] = useState<PostScope>('global')
   const [errorMessage, setErrorMessage] = useState<string>('')
   const [uploadProgress, setUploadProgress] = useState<number>(0)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [imageName, setImageName] = useState<string | null>(null)
+  const createPostFlowMutation = useCreatePostFlowMutation()
 
   const {
     register,
@@ -72,37 +69,6 @@ export function CreatePostForm() {
     },
   })
 
-  const createPostMutation = useMutation({
-    mutationFn: (data: CreatePostApiV1PostsPostData) => PostsService.createPostApiV1PostsPost(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['posts'] })
-      router.push('/posts')
-    },
-    onError: (error: unknown) => {
-      const err = error as { response?: { status?: number; data?: unknown } }
-      if (err?.response?.status === 422) {
-        const errorData = err.response.data as {
-          detail?: {
-            error_code?: string
-            limit_key?: string
-            limit_value?: number
-            current_value?: number
-            reset_at?: string
-          }
-        }
-        if (errorData?.detail?.error_code === 'LIMIT_EXCEEDED') {
-          const limitInfo = errorData.detail
-          setErrorMessage(
-            `已達配額上限：${limitInfo.limit_key}（上限：${limitInfo.limit_value}，目前：${limitInfo.current_value}）。重置時間：${new Date(limitInfo.reset_at || '').toLocaleString('zh-TW')}`
-          )
-        } else {
-          setErrorMessage('資料驗證失敗，請檢查欄位是否正確')
-        }
-      } else {
-        setErrorMessage('發文失敗，請稍後再試')
-      }
-    },
-  })
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -140,34 +106,17 @@ export function CreatePostForm() {
     }
 
     try {
-      let mediaId: string | undefined
-
-      // Step 1: Upload image if selected (T054)
-      if (data.image && data.image.length > 0) {
-        const file = data.image[0]
-        mediaId = await executeUploadFlow({
-          file,
-          onProgress: setUploadProgress,
-        })
-      }
-
-      // Step 2: Create post
-      const postResponse = await createPostMutation.mutateAsync({
-        requestBody: {
-          title: data.title,
-          content: data.content,
-          scope: data.scope,
-          city_code: data.scope === 'city' ? data.city_code || null : null,
-          category: data.category,
-        },
+      await createPostFlowMutation.mutateAsync({
+        title: data.title,
+        content: data.content,
+        scope: data.scope,
+        city_code: data.scope === 'city' ? data.city_code || null : null,
+        category: data.category,
+        imageFile: data.image?.[0],
+        onUploadProgress: setUploadProgress,
       })
 
-      // Step 3: Attach media to post if uploaded
-      if (mediaId && postResponse?.data?.id) {
-        await attachMediaToPost(mediaId, postResponse.data.id)
-      }
-
-      // Success - mutations will handle navigation
+      router.push('/posts')
     } catch (error: unknown) {
       const err = error as { response?: { status?: number; data?: unknown }; message?: string }
       if (err?.response?.status === 422) {
@@ -360,17 +309,17 @@ export function CreatePostForm() {
           type="button"
           variant="outline"
           onClick={() => router.back()}
-          disabled={createPostMutation.isPending}
+          disabled={createPostFlowMutation.isPending}
           className="h-12 rounded-2xl border-border bg-card font-black hover:bg-muted"
         >
           取消
         </Button>
         <Button
           type="submit"
-          disabled={createPostMutation.isPending}
+          disabled={createPostFlowMutation.isPending}
           className="h-12 rounded-2xl bg-slate-900 text-white font-black shadow-xl hover:bg-slate-800"
         >
-          {createPostMutation.isPending ? (
+          {createPostFlowMutation.isPending ? (
             <>
               <Spinner className="mr-2 h-4 w-4" />
               發布中...

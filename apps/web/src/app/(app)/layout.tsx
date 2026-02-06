@@ -2,22 +2,9 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
-import { ProfileService } from '@/shared/api/generated'
-
-// Get user info from backend API using SDK
-async function fetchUserEmail(): Promise<string> {
-  try {
-    const response = await ProfileService.getMyProfileApiV1ProfileMeGet()
-    // Profile doesn't have email, use nickname or first letter of user_id
-    return response.data?.nickname || response.data?.user_id?.substring(0, 1) || ''
-  } catch (error) {
-    console.error('Failed to fetch user:', error)
-  }
-
-  return ''
-}
+import { getMyProfileApiV1ProfileMeGetOptions } from '@/shared/api/generated/@tanstack/react-query.gen'
 
 // Constants for page titles
 const PAGE_TITLES = {
@@ -38,13 +25,18 @@ function getPageTitle(pathname: string): string {
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  const [userDisplay, setUserDisplay] = useState<string>('')
   const pageTitle = getPageTitle(pathname)
 
-  // Fetch user display name on mount
-  useEffect(() => {
-    fetchUserEmail().then(setUserDisplay)
-  }, [])
+  const profileQuery = useQuery({
+    ...getMyProfileApiV1ProfileMeGetOptions(),
+    staleTime: 5 * 60 * 1000,
+    retry: false,
+  })
+
+  const userDisplay =
+    profileQuery.data?.data?.nickname ||
+    profileQuery.data?.data?.user_id?.substring(0, 1) ||
+    ''
 
   return (
     <div className="min-h-screen bg-background flex flex-col relative">

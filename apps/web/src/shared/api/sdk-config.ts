@@ -6,7 +6,7 @@
  */
 
 import { apiClient } from '@/lib/api/axios'
-import { OpenAPI } from './generated'
+import { client } from './generated/client.gen'
 
 /**
  * Initialize SDK configuration
@@ -18,17 +18,12 @@ export function initializeSDK() {
   // Get base URL from environment
   const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
-  // Configure OpenAPI SDK
-  OpenAPI.BASE = baseURL
-  OpenAPI.WITH_CREDENTIALS = true
-  OpenAPI.CREDENTIALS = 'include'
-}
-
-/**
- * Get the configured axios client for SDK usage
- */
-export function getAxiosClient() {
-  return apiClient
+  // Configure hey-api client
+  client.setConfig({
+    axios: apiClient,
+    baseURL,
+    withCredentials: true,
+  })
 }
 
 // Initialize SDK on module load

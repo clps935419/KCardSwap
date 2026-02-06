@@ -10,7 +10,7 @@
 import { defineConfig } from '@hey-api/openapi-ts'
 
 export default defineConfig({
-  client: 'axios',
   input: '../../openapi/openapi.json',
   output: './src/shared/api/generated',
+  plugins: ['@hey-api/client-axios', '@tanstack/react-query'],
 })

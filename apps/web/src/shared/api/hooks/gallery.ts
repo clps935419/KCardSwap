@@ -4,22 +4,22 @@
  * TanStack Query hooks for gallery operations using the generated SDK.
  */
 
-import {
-  type UseMutationOptions,
-  type UseQueryOptions,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from '@tanstack/react-query'
+import { type UseMutationOptions, type UseQueryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type {
-  CreateGalleryCardApiV1GalleryCardsPostData,
   CreateGalleryCardApiV1GalleryCardsPostResponse,
+  CreateGalleryCardRequest,
   GetMyGalleryCardsApiV1GalleryCardsMeGetResponse,
   GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetResponse,
   ReorderGalleryCardsApiV1GalleryCardsReorderPutResponse,
 } from '../generated'
-import { GalleryService } from '../generated'
-import { getAxiosClient } from '../sdk-config'
+import {
+  createGalleryCardApiV1GalleryCardsPostMutation,
+  deleteGalleryCardApiV1GalleryCardsCardIdDeleteMutation,
+  getMyGalleryCardsApiV1GalleryCardsMeGetOptions,
+  getMyGalleryCardsApiV1GalleryCardsMeGetQueryKey,
+  getUserGalleryCardsApiV1UsersUserIdGalleryCardsGetOptions,
+  reorderGalleryCardsApiV1GalleryCardsReorderPutMutation,
+} from '../generated/@tanstack/react-query.gen'
 
 /**
  * Hook to fetch current user's gallery cards
@@ -30,13 +30,9 @@ export function useMyGalleryCards(
     'queryKey' | 'queryFn'
   >
 ) {
+  const queryOptions = getMyGalleryCardsApiV1GalleryCardsMeGetOptions()
   return useQuery({
-    queryKey: ['my-gallery'],
-    queryFn: async () => {
-      getAxiosClient()
-      const response = await GalleryService.getMyGalleryCardsApiV1GalleryCardsMeGet()
-      return response
-    },
+    ...queryOptions,
     ...options,
   })
 }
@@ -51,15 +47,13 @@ export function useUserGalleryCards(
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery({
-    queryKey: ['user-gallery', userId],
-    queryFn: async () => {
-      getAxiosClient()
-      const response = await GalleryService.getUserGalleryCardsApiV1UsersUserIdGalleryCardsGet({
-        userId,
-      })
-      return response
+  const queryOptions = getUserGalleryCardsApiV1UsersUserIdGalleryCardsGetOptions({
+    path: {
+      user_id: userId,
     },
+  })
+  return useQuery({
+    ...queryOptions,
     enabled: !!userId,
     ...options,
   })
@@ -72,21 +66,25 @@ export function useCreateGalleryCard(
   options?: UseMutationOptions<
     CreateGalleryCardApiV1GalleryCardsPostResponse,
     Error,
-    CreateGalleryCardApiV1GalleryCardsPostData['requestBody']
+    CreateGalleryCardRequest
   >
 ) {
   const queryClient = useQueryClient()
+  const mutationOptions = createGalleryCardApiV1GalleryCardsPostMutation()
 
   return useMutation({
-    mutationFn: async (data: CreateGalleryCardApiV1GalleryCardsPostData['requestBody']) => {
-      getAxiosClient()
-      const response = await GalleryService.createGalleryCardApiV1GalleryCardsPost({
-        requestBody: data,
+    ...mutationOptions,
+    mutationFn: async (data: CreateGalleryCardRequest) => {
+      const response = await mutationOptions.mutationFn?.({
+        body: data,
       })
-      return response
+      return response as CreateGalleryCardApiV1GalleryCardsPostResponse
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['my-gallery'] })
+    onSuccess: (data, variables, context) => {
+      queryClient.invalidateQueries({
+        queryKey: getMyGalleryCardsApiV1GalleryCardsMeGetQueryKey(),
+      })
+      options?.onSuccess?.(data, variables, context)
     },
     ...options,
   })
@@ -97,16 +95,22 @@ export function useCreateGalleryCard(
  */
 export function useDeleteGalleryCard(options?: UseMutationOptions<void, Error, string>) {
   const queryClient = useQueryClient()
+  const mutationOptions = deleteGalleryCardApiV1GalleryCardsCardIdDeleteMutation()
 
   return useMutation({
+    ...mutationOptions,
     mutationFn: async (cardId: string) => {
-      getAxiosClient()
-      await GalleryService.deleteGalleryCardApiV1GalleryCardsCardIdDelete({
-        cardId,
+      await mutationOptions.mutationFn?.({
+        path: {
+          card_id: cardId,
+        },
       })
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['my-gallery'] })
+    onSuccess: (data, variables, context) => {
+      queryClient.invalidateQueries({
+        queryKey: getMyGalleryCardsApiV1GalleryCardsMeGetQueryKey(),
+      })
+      options?.onSuccess?.(data, variables, context)
     },
     ...options,
   })
@@ -123,19 +127,23 @@ export function useReorderGalleryCards(
   >
 ) {
   const queryClient = useQueryClient()
+  const mutationOptions = reorderGalleryCardsApiV1GalleryCardsReorderPutMutation()
 
   return useMutation({
+    ...mutationOptions,
     mutationFn: async (cardIds: string[]) => {
-      getAxiosClient()
-      const response = await GalleryService.reorderGalleryCardsApiV1GalleryCardsReorderPut({
-        requestBody: {
+      const response = await mutationOptions.mutationFn?.({
+        body: {
           card_ids: cardIds,
         },
       })
-      return response
+      return response as ReorderGalleryCardsApiV1GalleryCardsReorderPutResponse
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['my-gallery'] })
+    onSuccess: (data, variables, context) => {
+      queryClient.invalidateQueries({
+        queryKey: getMyGalleryCardsApiV1GalleryCardsMeGetQueryKey(),
+      })
+      options?.onSuccess?.(data, variables, context)
     },
     ...options,
   })
