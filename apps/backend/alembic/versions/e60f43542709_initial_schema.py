@@ -1,18 +1,18 @@
-"""initial_schema
+"""initial schema
 
-Revision ID: 13c0ed406266
-Revises:
-Create Date: 2026-01-26 07:28:32.784907
+Revision ID: e60f43542709
+Revises: 
+Create Date: 2026-02-06 06:12:26.117061
 
 """
 from typing import Sequence, Union
 
+from alembic import op
 import sqlalchemy as sa
 
-from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = '13c0ed406266'
+revision: str = 'e60f43542709'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -40,27 +40,6 @@ def upgrade() -> None:
     )
     op.create_index(op.f('ix_users_email'), 'users', ['email'], unique=True)
     op.create_index(op.f('ix_users_google_id'), 'users', ['google_id'], unique=True)
-    op.create_table('cards',
-    sa.Column('id', sa.UUID(), nullable=False),
-    sa.Column('owner_id', sa.UUID(), nullable=False),
-    sa.Column('idol', sa.String(length=100), nullable=True),
-    sa.Column('idol_group', sa.String(length=100), nullable=True),
-    sa.Column('album', sa.String(length=100), nullable=True),
-    sa.Column('version', sa.String(length=100), nullable=True),
-    sa.Column('rarity', sa.String(length=50), nullable=True),
-    sa.Column('status', sa.String(length=50), server_default='available', nullable=False),
-    sa.Column('image_url', sa.Text(), nullable=True),
-    sa.Column('size_bytes', sa.Integer(), nullable=True),
-    sa.Column('upload_status', sa.String(length=50), server_default='pending', nullable=False),
-    sa.Column('upload_confirmed_at', sa.DateTime(timezone=True), nullable=True),
-    sa.Column('created_at', sa.DateTime(timezone=True), nullable=True),
-    sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
-    sa.ForeignKeyConstraint(['owner_id'], ['users.id'], ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_index(op.f('ix_cards_owner_id'), 'cards', ['owner_id'], unique=False)
-    op.create_index(op.f('ix_cards_status'), 'cards', ['status'], unique=False)
-    op.create_index(op.f('ix_cards_upload_status'), 'cards', ['upload_status'], unique=False)
     op.create_table('friendships',
     sa.Column('id', sa.UUID(), nullable=False),
     sa.Column('user_id', sa.UUID(), nullable=False),
@@ -77,6 +56,21 @@ def upgrade() -> None:
     op.create_index(op.f('ix_friendships_friend_id'), 'friendships', ['friend_id'], unique=False)
     op.create_index(op.f('ix_friendships_status'), 'friendships', ['status'], unique=False)
     op.create_index(op.f('ix_friendships_user_id'), 'friendships', ['user_id'], unique=False)
+    op.create_table('gallery_cards',
+    sa.Column('id', sa.UUID(), nullable=False),
+    sa.Column('user_id', sa.UUID(), nullable=False),
+    sa.Column('title', sa.String(length=200), nullable=False),
+    sa.Column('idol_name', sa.String(length=100), nullable=False),
+    sa.Column('era', sa.String(length=100), nullable=True),
+    sa.Column('description', sa.Text(), nullable=True),
+    sa.Column('media_asset_id', sa.UUID(), nullable=True),
+    sa.Column('display_order', sa.Integer(), nullable=False),
+    sa.Column('created_at', sa.DateTime(), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_gallery_cards_user_id'), 'gallery_cards', ['user_id'], unique=False)
     op.create_table('media_assets',
     sa.Column('id', sa.UUID(), nullable=False),
     sa.Column('owner_id', sa.UUID(), nullable=False),
@@ -84,6 +78,8 @@ def upgrade() -> None:
     sa.Column('content_type', sa.String(length=100), nullable=False),
     sa.Column('file_size_bytes', sa.Integer(), nullable=False),
     sa.Column('status', sa.String(length=20), nullable=False),
+    sa.Column('target_type', sa.String(length=50), nullable=True),
+    sa.Column('target_id', sa.UUID(), nullable=True),
     sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), nullable=False),
     sa.Column('confirmed_at', sa.DateTime(timezone=True), nullable=True),
@@ -93,6 +89,7 @@ def upgrade() -> None:
     )
     op.create_index(op.f('ix_media_assets_owner_id'), 'media_assets', ['owner_id'], unique=False)
     op.create_index(op.f('ix_media_assets_status'), 'media_assets', ['status'], unique=False)
+    op.create_index('ix_media_assets_target_type_target_id', 'media_assets', ['target_type', 'target_id'], unique=False)
     op.create_table('message_threads',
     sa.Column('id', sa.UUID(), nullable=False),
     sa.Column('user_a_id', sa.UUID(), nullable=False),
@@ -373,19 +370,18 @@ def downgrade() -> None:
     op.drop_index('idx_thread_user_a', table_name='message_threads')
     op.drop_index('idx_thread_last_message', table_name='message_threads')
     op.drop_table('message_threads')
+    op.drop_index('ix_media_assets_target_type_target_id', table_name='media_assets')
     op.drop_index(op.f('ix_media_assets_status'), table_name='media_assets')
     op.drop_index(op.f('ix_media_assets_owner_id'), table_name='media_assets')
     op.drop_table('media_assets')
+    op.drop_index(op.f('ix_gallery_cards_user_id'), table_name='gallery_cards')
+    op.drop_table('gallery_cards')
     op.drop_index(op.f('ix_friendships_user_id'), table_name='friendships')
     op.drop_index(op.f('ix_friendships_status'), table_name='friendships')
     op.drop_index(op.f('ix_friendships_friend_id'), table_name='friendships')
     op.drop_index('idx_friendship_users', table_name='friendships')
     op.drop_index('idx_friendship_status', table_name='friendships')
     op.drop_table('friendships')
-    op.drop_index(op.f('ix_cards_upload_status'), table_name='cards')
-    op.drop_index(op.f('ix_cards_status'), table_name='cards')
-    op.drop_index(op.f('ix_cards_owner_id'), table_name='cards')
-    op.drop_table('cards')
     op.drop_index(op.f('ix_users_google_id'), table_name='users')
     op.drop_index(op.f('ix_users_email'), table_name='users')
     op.drop_table('users')

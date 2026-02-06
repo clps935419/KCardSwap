@@ -144,11 +144,13 @@ export default function MyGalleryPage() {
 
       {/* Create Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="sm:max-w-[500px] rounded-2xl">
-          <DialogHeader>
+        <DialogContent className="sm:max-w-[500px] max-h-[85vh] rounded-2xl p-0 overflow-hidden flex flex-col">
+          <DialogHeader className="px-6 pt-6 pb-3 border-b border-border/30">
             <DialogTitle>新增相簿小卡</DialogTitle>
           </DialogHeader>
-          <GalleryCreateCardForm onSuccess={handleCreateSuccess} />
+          <div className="px-6 pb-6 overflow-y-auto flex-1 min-h-0">
+            <GalleryCreateCardForm onSuccess={handleCreateSuccess} />
+          </div>
         </DialogContent>
       </Dialog>
     </div>

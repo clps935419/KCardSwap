@@ -13,7 +13,7 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { Spinner } from '@/components/ui/spinner'
 import { Textarea } from '@/components/ui/textarea'
 import { useCreateGalleryCardFlowMutation } from '@/shared/api/hooks/flows'
 
@@ -91,134 +91,161 @@ export function GalleryCreateCardForm({ onSuccess }: GalleryCreateCardFormProps)
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="title"
-          rules={{
-            required: 'Title is required',
-            maxLength: { value: 200, message: 'Title is too long' },
-          }}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Title *</FormLabel>
-              <FormControl>
-                <Input placeholder="Card title" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="bg-muted/50 border border-border/30 rounded-2xl p-4 space-y-2">
+          <p className="text-[10px] font-bold text-muted-foreground uppercase">標題</p>
+          <FormField
+            control={form.control}
+            name="title"
+            rules={{
+              required: '請輸入標題',
+              maxLength: { value: 200, message: '標題過長' },
+            }}
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input placeholder="卡片標題" className="bg-card border-border rounded-xl" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
-        <FormField
-          control={form.control}
-          name="idol_name"
-          rules={{
-            required: 'Idol name is required',
-            maxLength: { value: 100, message: 'Idol name is too long' },
-          }}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Idol Name *</FormLabel>
-              <FormControl>
-                <Input placeholder="e.g., IU" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="bg-muted/50 border border-border/30 rounded-2xl p-4 space-y-2">
+          <p className="text-[10px] font-bold text-muted-foreground uppercase">偶像名稱</p>
+          <FormField
+            control={form.control}
+            name="idol_name"
+            rules={{
+              required: '請輸入偶像名稱',
+              maxLength: { value: 100, message: '偶像名稱過長' },
+            }}
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input placeholder="例如：IU" className="bg-card border-border rounded-xl" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
-        <FormField
-          control={form.control}
-          name="era"
-          rules={{ maxLength: { value: 100, message: 'Era is too long' } }}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Era (Optional)</FormLabel>
-              <FormControl>
-                <Input placeholder="e.g., Love Poem" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="bg-muted/50 border border-border/30 rounded-2xl p-4 space-y-2">
+          <p className="text-[10px] font-bold text-muted-foreground uppercase">年代（選填）</p>
+          <FormField
+            control={form.control}
+            name="era"
+            rules={{ maxLength: { value: 100, message: '年代過長' } }}
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input placeholder="例如：Love Poem" className="bg-card border-border rounded-xl" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
-        <FormField
-          control={form.control}
-          name="description"
-          rules={{ maxLength: { value: 1000, message: 'Description is too long' } }}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description (Optional)</FormLabel>
-              <FormControl>
-                <Textarea placeholder="Add a description..." rows={3} {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="bg-muted/50 border border-border/30 rounded-2xl p-4 space-y-2">
+          <p className="text-[10px] font-bold text-muted-foreground uppercase">描述（選填）</p>
+          <FormField
+            control={form.control}
+            name="description"
+            rules={{ maxLength: { value: 1000, message: '描述過長' } }}
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Textarea
+                    placeholder="補充卡片小故事..."
+                    rows={3}
+                    className="bg-card border-border rounded-xl"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
-        {/* Image Upload (T055) */}
-        <div className="space-y-2">
-          <Label htmlFor="image">Image (Optional)</Label>
-          <Input
+        <div className="bg-muted/50 border border-border/30 rounded-2xl p-4">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <p className="text-[10px] font-bold text-muted-foreground uppercase">圖片</p>
+              <p className="text-[11px] text-muted-foreground">選擇 1 張圖片</p>
+            </div>
+          </div>
+
+          <input
             id="image"
             type="file"
             accept="image/*"
             {...form.register('image', {
               onChange: handleImageChange,
             })}
+            className="hidden"
           />
+
+          <div className="space-y-2">
+            <Button type="button" variant="outline" className="h-12 w-full rounded-xl font-black" asChild>
+              <label htmlFor="image">{imagePreview ? '更換圖片' : '選擇圖片'}</label>
+            </Button>
+          </div>
+
           {imagePreview && (
-            <div className="relative mt-2">
-              <div className="relative h-48 w-full overflow-hidden rounded-md border">
-                <Image
-                  src={imagePreview}
-                  alt="Preview"
-                  fill
-                  className="object-contain"
-                  unoptimized
-                />
+            <div className="relative mt-3">
+              <div className="relative h-48 w-full overflow-hidden rounded-2xl border border-border bg-muted">
+                <Image src={imagePreview} alt="預覽" fill className="object-contain" unoptimized />
               </div>
               <Button
                 type="button"
                 variant="destructive"
                 size="sm"
-                className="absolute right-2 top-2"
+                className="absolute right-2 top-2 rounded-xl"
                 onClick={removeImage}
               >
-                Remove
+                移除
               </Button>
             </div>
           )}
+
           {uploadProgress > 0 && uploadProgress < 100 && (
-            <div className="mt-2">
-              <div className="h-2 w-full rounded-full bg-secondary">
+            <div className="mt-3">
+              <div className="h-2 w-full rounded-full bg-muted">
                 <div
-                  className="h-2 rounded-full bg-primary transition-all"
+                  className="h-2 rounded-full bg-primary-500 transition-all"
                   style={{ width: `${uploadProgress}%` }}
                 />
               </div>
-              <p className="mt-1 text-xs text-muted-foreground">Uploading... {uploadProgress}%</p>
+              <p className="mt-1 text-[11px] text-muted-foreground">上傳中... {uploadProgress}%</p>
             </div>
           )}
         </div>
 
         {form.formState.errors.root && (
-          <div className="text-sm text-destructive">{form.formState.errors.root.message}</div>
+          <div className="rounded-2xl bg-destructive/10 border border-destructive/20 p-4">
+            <p className="text-sm text-destructive font-bold">
+              {form.formState.errors.root.message}
+            </p>
+          </div>
         )}
 
-        <div className="flex justify-end gap-2">
+        <div>
           <Button
             type="submit"
-            disabled={
-              form.formState.isSubmitting ||
-              createCardFlowMutation.isPending
-            }
+            disabled={form.formState.isSubmitting || createCardFlowMutation.isPending}
+            className="h-12 w-full rounded-2xl bg-slate-900 text-white font-black shadow-xl hover:bg-slate-800"
           >
-            {form.formState.isSubmitting ||
-            createCardFlowMutation.isPending
-              ? 'Creating...'
-              : 'Create Card'}
+            {form.formState.isSubmitting || createCardFlowMutation.isPending ? (
+              <>
+                <Spinner className="mr-2 h-4 w-4" />
+                建立中...
+              </>
+            ) : (
+              '建立卡片'
+            )}
           </Button>
         </div>
       </form>

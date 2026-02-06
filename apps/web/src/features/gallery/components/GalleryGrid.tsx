@@ -1,7 +1,11 @@
 'use client'
 
+import Image from 'next/image'
+import { useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { useReadMediaUrls } from '@/features/media/hooks/useReadMediaUrls'
 import type { GalleryCardResponse } from '@/shared/api/generated'
 
 interface GalleryGridProps {
@@ -23,66 +27,119 @@ export function GalleryGrid({
     return <div className="text-center text-muted-foreground text-sm py-12">相簿目前沒有內容</div>
   }
 
+  const mediaAssetIds = cards
+    .map(card => card.media_asset_id)
+    .filter((mediaId): mediaId is string => Boolean(mediaId))
+  const mediaUrlsQuery = useReadMediaUrls(mediaAssetIds)
+  const mediaUrls = mediaUrlsQuery.data?.data?.urls ?? {}
+  const [selectedCardId, setSelectedCardId] = useState<string | null>(null)
+  const selectedCard = useMemo(
+    () => cards.find(card => card.id === selectedCardId) || null,
+    [cards, selectedCardId]
+  )
+  const selectedMediaUrl = selectedCard?.media_asset_id
+    ? mediaUrls[selectedCard.media_asset_id]
+    : null
+
   return (
-    <div className="space-y-4">
-      {cards.map((card, idx) => (
-        <Card key={card.id} className="p-4 rounded-2xl shadow-sm border border-border/30 bg-card">
-          <div className="flex items-start justify-between">
-            <div className="flex items-start gap-3">
-              <div className="w-11 h-11 bg-primary-50 rounded-2xl flex items-center justify-center text-xl">
-                {card.media_asset_id ? '🖼️' : '🃏'}
+    <>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        {cards.map((card, idx) => {
+          const thumbnailUrl = card.media_asset_id ? mediaUrls[card.media_asset_id] : null
+          return (
+            <button
+              key={card.id}
+              type="button"
+              onClick={() => setSelectedCardId(card.id)}
+              className="group text-left"
+            >
+              <Card className="rounded-2xl border border-border/30 bg-card shadow-sm overflow-hidden transition-transform duration-200 group-hover:-translate-y-0.5">
+                <div className="relative aspect-square bg-muted/60">
+                  {thumbnailUrl ? (
+                    <Image
+                      src={thumbnailUrl}
+                      alt={card.title}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 640px) 50vw, 33vw"
+                      unoptimized
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center text-2xl text-muted-foreground">
+                      {card.media_asset_id ? '🖼️' : '🃏'}
+                    </div>
+                  )}
+                  <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/60 to-transparent" />
+                  <div className="absolute bottom-2 left-2 right-2">
+                    <p className="text-[11px] font-black text-white truncate">{card.title}</p>
+                    <p className="text-[10px] text-white/70 truncate">{card.idol_name || '—'}</p>
+                  </div>
+                </div>
+                <div className="px-3 py-2 flex items-center justify-between">
+                  <span className="text-[10px] font-bold text-muted-foreground">&nbsp;</span>
+                  {isOwner && onDelete && (
+                    <Button
+                      onClick={event => {
+                        event.stopPropagation()
+                        onDelete(card.id)
+                      }}
+                      variant="outline"
+                      size="sm"
+                      className="h-8 rounded-full border-rose-200 bg-rose-50 px-3 text-[10px] font-black text-rose-700 hover:bg-rose-100"
+                    >
+                      刪除
+                    </Button>
+                  )}
+                </div>
+              </Card>
+            </button>
+          )
+        })}
+      </div>
+
+      {selectedCard && (
+        <Dialog open={!!selectedCard} onOpenChange={() => setSelectedCardId(null)}>
+          <DialogContent className="sm:max-w-[520px] rounded-2xl p-0 overflow-hidden">
+            <DialogHeader className="px-6 pt-6 pb-3 border-b border-border/30">
+              <DialogTitle>{selectedCard.title}</DialogTitle>
+            </DialogHeader>
+            <div className="px-6 pb-6 space-y-4">
+              <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-border/30 bg-muted">
+                {selectedMediaUrl ? (
+                  <Image
+                    src={selectedMediaUrl}
+                    alt={selectedCard.title}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 640px) 100vw, 520px"
+                    unoptimized
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center text-3xl text-muted-foreground">
+                    {selectedCard.media_asset_id ? '🖼️' : '🃏'}
+                  </div>
+                )}
               </div>
-              <div>
-                <p className="text-sm font-black text-foreground">{card.title}</p>
-                <p className="text-[11px] text-muted-foreground">{card.idol_name || '—'}</p>
-                <p className="text-[10px] text-muted-foreground font-bold uppercase mt-1">
-                  順序：{idx + 1}
-                </p>
+
+              <div className="space-y-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="rounded-full bg-slate-900 px-3 py-1 text-[10px] font-black text-white">
+                    {selectedCard.idol_name || '未填偶像'}
+                  </span>
+                  <span className="rounded-full bg-muted px-3 py-1 text-[10px] font-bold text-muted-foreground">
+                    {selectedCard.era || '年代未填'}
+                  </span>
+                </div>
+                {selectedCard.description ? (
+                  <p className="text-sm text-foreground/80 leading-relaxed">{selectedCard.description}</p>
+                ) : (
+                  <p className="text-sm text-muted-foreground">尚未填寫描述</p>
+                )}
               </div>
             </div>
-
-            {isOwner && (onMoveUp || onMoveDown) && (
-              <div className="flex flex-col gap-2">
-                {onMoveUp && (
-                  <Button
-                    onClick={() => onMoveUp(idx)}
-                    disabled={idx === 0}
-                    variant="outline"
-                    size="sm"
-                    className="w-10 h-10 rounded-2xl border-border bg-card font-black p-0"
-                  >
-                    ↑
-                  </Button>
-                )}
-                {onMoveDown && (
-                  <Button
-                    onClick={() => onMoveDown(idx)}
-                    disabled={idx === cards.length - 1}
-                    variant="outline"
-                    size="sm"
-                    className="w-10 h-10 rounded-2xl border-border bg-card font-black p-0"
-                  >
-                    ↓
-                  </Button>
-                )}
-              </div>
-            )}
-          </div>
-
-          {isOwner && onDelete && (
-            <div className="mt-3 flex items-center justify-end">
-              <Button
-                onClick={() => onDelete(card.id)}
-                variant="outline"
-                size="sm"
-                className="px-3 py-2 rounded-xl bg-rose-50 border-rose-200 text-rose-700 text-[11px] font-black hover:bg-rose-100"
-              >
-                刪除
-              </Button>
-            </div>
-          )}
-        </Card>
-      ))}
-    </div>
+          </DialogContent>
+        </Dialog>
+      )}
+    </>
   )
 }

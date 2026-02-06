@@ -38,6 +38,9 @@ from app.modules.media.presentation.schemas.media_read_url_schemas import (
     ReadMediaUrlsResponse,
     ReadMediaUrlsResponseWrapper,
 )
+from app.modules.social.infrastructure.repositories.gallery_card_repository import (
+    GalleryCardRepository,
+)
 from app.shared.domain.contracts.i_subscription_query_service import (
     ISubscriptionQueryService,
 )
@@ -221,6 +224,7 @@ async def attach_media_to_gallery_card(
     """
     media_repository = MediaRepositoryImpl(session)
     use_case = AttachMediaUseCase(media_repository=media_repository)
+    gallery_repository = GalleryCardRepository(session)
 
     try:
         result = await use_case.execute(
@@ -231,6 +235,17 @@ async def attach_media_to_gallery_card(
                 target_id=card_id,
             )
         )
+
+        card = await gallery_repository.find_by_id(card_id)
+        if not card:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Gallery card not found")
+        if card.user_id != user_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You can only attach media to your own gallery cards",
+            )
+        card.attach_media(result.media_id)
+        await gallery_repository.update(card)
     except ValueError as exc:
         error_message = str(exc).lower()
         if "not found" in error_message:

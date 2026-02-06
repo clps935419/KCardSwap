@@ -66,7 +66,7 @@ export function PostFilters() {
             onClick={() => updateFilter('city', city.value)}
             className={`px-3 py-2 rounded-full text-[11px] font-black border transition-all ${
               currentCity === city.value
-                ? 'border-foreground bg-foreground text-card hover:bg-foreground/90'
+                ? 'border-slate-900 bg-slate-900 text-white hover:bg-slate-900/90 hover:text-white'
                 : 'border-border bg-card text-muted-foreground hover:bg-muted hover:text-foreground'
             }`}
           >
