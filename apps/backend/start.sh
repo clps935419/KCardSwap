@@ -4,11 +4,15 @@ set -e
 # Configure Poetry not to create virtualenvs inside container
 poetry config virtualenvs.create false
 
-echo "Installing dependencies..."
-if [ "${POETRY_INSTALL_DEV:-}" = "true" ]; then
-  poetry install --no-root --with dev
+if [ "${POETRY_INSTALL_ON_START:-}" = "true" ]; then
+  echo "Installing dependencies..."
+  if [ "${POETRY_INSTALL_DEV:-}" = "true" ]; then
+    poetry install --no-root --with dev
+  else
+    poetry install --no-root --only main
+  fi
 else
-  poetry install --no-root --only main
+  echo "Skipping dependency install (POETRY_INSTALL_ON_START=false)"
 fi
 
 # Clear Python bytecode cache to ensure fresh migration files are loaded
