@@ -1,5 +1,6 @@
 'use client'
 
+import { useQuery } from '@tanstack/react-query'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -18,9 +19,11 @@ import { Textarea } from '@/components/ui/textarea'
 import { useCreatePostFlowMutation } from '@/shared/api/hooks/flows'
 import type {
   CityCode,
+  CityResponse,
   PostCategory,
   PostScope,
 } from '@/shared/api/generated'
+import { getCitiesApiV1LocationsCitiesGetOptions } from '@/shared/api/generated/@tanstack/react-query.gen'
 
 const CATEGORIES: { value: PostCategory; label: string }[] = [
   { value: 'trade', label: '交換' },
@@ -31,13 +34,6 @@ const CATEGORIES: { value: PostCategory; label: string }[] = [
   { value: 'announcement', label: '公告' },
 ]
 
-const _CITIES: { value: CityCode; label: string }[] = [
-  { value: 'TPE', label: '台北市' },
-  { value: 'NTP', label: '新北市' },
-  { value: 'TXG', label: '台中市' },
-  { value: 'TNN', label: '台南市' },
-  { value: 'KHH', label: '高雄市' },
-]
 
 interface FormData {
   title: string
@@ -61,6 +57,7 @@ export function CreatePostForm() {
     register,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
@@ -68,6 +65,15 @@ export function CreatePostForm() {
       category: 'showcase',
     },
   })
+
+  const selectedCityCode = watch('city_code')
+  const citiesQuery = useQuery({
+    ...getCitiesApiV1LocationsCitiesGetOptions(),
+    staleTime: 1000 * 60 * 60 * 24,
+    gcTime: 1000 * 60 * 60 * 24 * 7,
+  })
+
+  const cities = (citiesQuery.data?.data?.cities ?? []) as CityResponse[]
 
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -175,6 +181,9 @@ export function CreatePostForm() {
             onValueChange={(value: string) => {
               setScope(value as PostScope)
               setValue('scope', value as PostScope)
+              if (value !== 'city') {
+                setValue('city_code', undefined)
+              }
             }}
           >
             <SelectTrigger id="scope" className="bg-card border-border rounded-xl font-bold">
@@ -188,11 +197,35 @@ export function CreatePostForm() {
 
           {/* 城市 - 僅在 scope=city 時顯示 */}
           {scope === 'city' && (
-            <Input
-              placeholder="城市代碼（例如 TPE）"
-              className="mt-2 bg-card border-border rounded-xl font-bold"
-              onChange={e => setValue('city_code', e.target.value as CityCode)}
-            />
+            <Select
+              value={selectedCityCode}
+              onValueChange={(value: string) => setValue('city_code', value as CityCode)}
+            >
+              <SelectTrigger
+                id="city_code"
+                className="mt-2 bg-card border-border rounded-xl font-bold"
+                disabled={citiesQuery.isLoading}
+              >
+                <SelectValue placeholder={citiesQuery.isLoading ? '城市載入中...' : '請選擇城市'} />
+              </SelectTrigger>
+              <SelectContent>
+                {citiesQuery.isError && (
+                  <SelectItem value="__error__" disabled>
+                    城市載入失敗
+                  </SelectItem>
+                )}
+                {!citiesQuery.isError && cities.length === 0 && (
+                  <SelectItem value="__empty__" disabled>
+                    沒有可用城市
+                  </SelectItem>
+                )}
+                {cities.map(city => (
+                  <SelectItem key={city.code} value={city.code}>
+                    {city.name_zh}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           )}
         </div>
       </div>
