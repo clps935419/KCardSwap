@@ -4,16 +4,20 @@ Handles city board posts and interest management (V2: with scope/category/requir
 """
 
 import logging
-from typing import Annotated, Optional
+from typing import Annotated, List, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.modules.media.infrastructure.repositories.media_repository_impl import (
+    MediaRepositoryImpl,
+)
 from app.modules.posts.application.use_cases.close_post_use_case import ClosePostUseCase
 from app.modules.posts.application.use_cases.create_post_use_case import (
     CreatePostUseCase,
 )
+from app.modules.posts.application.use_cases.get_post_use_case import GetPostUseCase
 from app.modules.posts.application.use_cases.list_posts_v2_use_case import (
     ListPostsV2UseCase,
 )
@@ -22,6 +26,7 @@ from app.modules.posts.domain.entities.post_enums import PostCategory
 from app.modules.posts.presentation.dependencies.use_case_deps import (
     get_close_post_use_case,
     get_create_post_use_case,
+    get_get_post_use_case,
     get_list_posts_v2_use_case,
     get_toggle_like_use_case,
 )
@@ -43,8 +48,23 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/posts", tags=["Posts"])
 
 
-def _post_to_response(post, like_count: int = 0, liked_by_me: bool = False) -> PostResponse:
-    """Helper to convert Post entity to PostResponse"""
+async def _post_to_response(
+    post,
+    session: AsyncSession,
+    like_count: int = 0,
+    liked_by_me: bool = False,
+    media_asset_ids: Optional[List[UUID]] = None,
+) -> PostResponse:
+    """Helper to convert Post entity to PostResponse with media_asset_ids.
+    
+    Phase 9: Includes media_asset_ids for image display.
+    """
+    # If media_asset_ids not provided, fetch from database
+    if media_asset_ids is None:
+        media_repo = MediaRepositoryImpl(session)
+        media_list = await media_repo.get_by_target("post", UUID(post.id))
+        media_asset_ids = [media.id for media in media_list]
+    
     return PostResponse(
         id=UUID(post.id),
         owner_id=UUID(post.owner_id),
@@ -58,6 +78,7 @@ def _post_to_response(post, like_count: int = 0, liked_by_me: bool = False) -> P
         status=post.status.value,
         like_count=like_count,
         liked_by_me=liked_by_me,
+        media_asset_ids=media_asset_ids,
         expires_at=post.expires_at,
         created_at=post.created_at,
         updated_at=post.updated_at,
@@ -109,7 +130,7 @@ async def create_post(
             expires_at=request.expires_at,
         )
 
-        data = _post_to_response(post)
+        data = await _post_to_response(post, session)
         return PostResponseWrapper(data=data, meta=None, error=None)
 
     except ValueError as e:
@@ -166,8 +187,9 @@ async def list_posts(
         )
 
         post_responses = [
-            _post_to_response(
+            await _post_to_response(
                 pwl.post,
+                session,
                 like_count=pwl.like_count,
                 liked_by_me=pwl.liked_by_me,
             )
@@ -185,6 +207,64 @@ async def list_posts(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to list posts",
+        )
+
+
+@router.get(
+    "/{post_id}",
+    response_model=PostResponseWrapper,
+    responses={
+        200: {"description": "Post retrieved successfully"},
+        401: {"description": "Unauthorized (not logged in)"},
+        404: {"description": "Post not found"},
+        500: {"description": "Internal server error"},
+    },
+    summary="Get a single post by ID",
+    description="Retrieve a post by its ID. Phase 9: Includes media_asset_ids for image display.",
+)
+async def get_post(
+    post_id: UUID,
+    current_user_id: Annotated[UUID, Depends(require_user)],
+    session: Annotated[AsyncSession, Depends(get_db_session)],
+    use_case: Annotated[GetPostUseCase, Depends(get_get_post_use_case)],
+) -> PostResponseWrapper:
+    """
+    Get a single post by ID.
+    
+    Phase 9: Returns post with media_asset_ids for image display.
+    Includes like count and current user's like status.
+    """
+    try:
+        post = await use_case.execute(
+            post_id=str(post_id),
+            current_user_id=str(current_user_id),
+        )
+        
+        if not post:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Post not found",
+            )
+        
+        # Get like count and liked_by_me from post attributes
+        like_count = getattr(post, '_like_count', 0)
+        liked_by_me = getattr(post, '_liked_by_me', False)
+        
+        data = await _post_to_response(
+            post,
+            session,
+            like_count=like_count,
+            liked_by_me=liked_by_me,
+        )
+        return PostResponseWrapper(data=data, meta=None, error=None)
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting post {post_id}: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to get post",
         )
 
 

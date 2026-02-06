@@ -17,35 +17,34 @@ import {
   attachMediaToPostApiV1MediaPostsPostIdAttachPost,
   blockUserApiV1FriendsBlockPost,
   closePostApiV1PostsPostIdClosePost,
-  confirmCardUploadApiV1CardsCardIdConfirmUploadPost,
   confirmUploadApiV1MediaMediaIdConfirmPost,
   createGalleryCardApiV1GalleryCardsPost,
   createMessageRequestApiV1MessageRequestsPost,
   createPostApiV1PostsPost,
   createUploadUrlApiV1MediaUploadUrlPost,
   declineMessageRequestApiV1MessageRequestsRequestIdDeclinePost,
-  deleteCardApiV1CardsCardIdDelete,
   deleteGalleryCardApiV1GalleryCardsCardIdDelete,
   expireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPost,
   getChatRoomsApiV1ChatsGet,
   getCitiesApiV1LocationsCitiesGet,
   getIdolGroupsApiV1IdolsGroupsGet,
+  getMediaReadUrlsApiV1MediaReadUrlsPost,
   getMessagesApiV1ChatsRoomIdMessagesGet,
-  getMyCardsApiV1CardsMeGet,
   getMyGalleryCardsApiV1GalleryCardsMeGet,
   getMyMessageRequestsApiV1MessageRequestsInboxGet,
   getMyProfileApiV1ProfileMeGet,
   getMyReportsApiV1ReportsGet,
   getMyThreadsApiV1ThreadsGet,
-  getQuotaStatusApiV1CardsQuotaStatusGet,
+  getPostApiV1PostsPostIdGet,
   getSubscriptionStatusApiV1SubscriptionsStatusGet,
   getThreadMessagesApiV1ThreadsThreadIdMessagesGet,
-  getUploadUrlApiV1CardsUploadUrlPost,
   getUserGalleryCardsApiV1UsersUserIdGalleryCardsGet,
   googleCallbackApiV1AuthGoogleCallbackPost,
   googleLoginApiV1AuthGoogleLoginPost,
+  googleLoginCodeApiV1AuthGoogleLoginCodePost,
   healthCheckHealthGet,
   listPostsApiV1PostsGet,
+  logoutApiV1AuthLogoutPost,
   markMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPost,
   type Options,
   refreshTokenApiV1AuthRefreshPost,
@@ -78,9 +77,6 @@ import type {
   BlockUserApiV1FriendsBlockPostResponse,
   ClosePostApiV1PostsPostIdClosePostData,
   ClosePostApiV1PostsPostIdClosePostResponse,
-  ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostData,
-  ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostError,
-  ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostResponse,
   ConfirmUploadApiV1MediaMediaIdConfirmPostData,
   ConfirmUploadApiV1MediaMediaIdConfirmPostError,
   ConfirmUploadApiV1MediaMediaIdConfirmPostResponse,
@@ -98,47 +94,48 @@ import type {
   DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostData,
   DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostError,
   DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostResponse,
-  DeleteCardApiV1CardsCardIdDeleteData,
-  DeleteCardApiV1CardsCardIdDeleteError,
-  DeleteCardApiV1CardsCardIdDeleteResponse,
   DeleteGalleryCardApiV1GalleryCardsCardIdDeleteData,
   DeleteGalleryCardApiV1GalleryCardsCardIdDeleteError,
   DeleteGalleryCardApiV1GalleryCardsCardIdDeleteResponse,
   ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostData,
   ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostResponse,
   GetChatRoomsApiV1ChatsGetData,
+  GetChatRoomsApiV1ChatsGetError,
   GetChatRoomsApiV1ChatsGetResponse,
   GetCitiesApiV1LocationsCitiesGetData,
   GetCitiesApiV1LocationsCitiesGetResponse,
   GetIdolGroupsApiV1IdolsGroupsGetData,
   GetIdolGroupsApiV1IdolsGroupsGetResponse,
+  GetMediaReadUrlsApiV1MediaReadUrlsPostData,
+  GetMediaReadUrlsApiV1MediaReadUrlsPostError,
+  GetMediaReadUrlsApiV1MediaReadUrlsPostResponse,
   GetMessagesApiV1ChatsRoomIdMessagesGetData,
   GetMessagesApiV1ChatsRoomIdMessagesGetError,
   GetMessagesApiV1ChatsRoomIdMessagesGetResponse,
-  GetMyCardsApiV1CardsMeGetData,
-  GetMyCardsApiV1CardsMeGetError,
-  GetMyCardsApiV1CardsMeGetResponse,
   GetMyGalleryCardsApiV1GalleryCardsMeGetData,
+  GetMyGalleryCardsApiV1GalleryCardsMeGetError,
   GetMyGalleryCardsApiV1GalleryCardsMeGetResponse,
   GetMyMessageRequestsApiV1MessageRequestsInboxGetData,
   GetMyMessageRequestsApiV1MessageRequestsInboxGetError,
   GetMyMessageRequestsApiV1MessageRequestsInboxGetResponse,
   GetMyProfileApiV1ProfileMeGetData,
+  GetMyProfileApiV1ProfileMeGetError,
   GetMyProfileApiV1ProfileMeGetResponse,
   GetMyReportsApiV1ReportsGetData,
+  GetMyReportsApiV1ReportsGetError,
   GetMyReportsApiV1ReportsGetResponse,
   GetMyThreadsApiV1ThreadsGetData,
   GetMyThreadsApiV1ThreadsGetError,
   GetMyThreadsApiV1ThreadsGetResponse,
-  GetQuotaStatusApiV1CardsQuotaStatusGetData,
-  GetQuotaStatusApiV1CardsQuotaStatusGetResponse,
+  GetPostApiV1PostsPostIdGetData,
+  GetPostApiV1PostsPostIdGetError,
+  GetPostApiV1PostsPostIdGetResponse,
   GetSubscriptionStatusApiV1SubscriptionsStatusGetData,
+  GetSubscriptionStatusApiV1SubscriptionsStatusGetError,
   GetSubscriptionStatusApiV1SubscriptionsStatusGetResponse,
   GetThreadMessagesApiV1ThreadsThreadIdMessagesGetData,
   GetThreadMessagesApiV1ThreadsThreadIdMessagesGetError,
   GetThreadMessagesApiV1ThreadsThreadIdMessagesGetResponse,
-  GetUploadUrlApiV1CardsUploadUrlPostData,
-  GetUploadUrlApiV1CardsUploadUrlPostResponse,
   GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetData,
   GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetError,
   GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetResponse,
@@ -147,10 +144,14 @@ import type {
   GoogleLoginApiV1AuthGoogleLoginPostData,
   GoogleLoginApiV1AuthGoogleLoginPostError,
   GoogleLoginApiV1AuthGoogleLoginPostResponse,
+  GoogleLoginCodeApiV1AuthGoogleLoginCodePostData,
+  GoogleLoginCodeApiV1AuthGoogleLoginCodePostResponse,
   HealthCheckHealthGetData,
   ListPostsApiV1PostsGetData,
   ListPostsApiV1PostsGetError,
   ListPostsApiV1PostsGetResponse,
+  LogoutApiV1AuthLogoutPostData,
+  LogoutApiV1AuthLogoutPostResponse,
   MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostData,
   MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostError,
   MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostResponse,
@@ -298,7 +299,7 @@ export const rootGetOptions = (options?: Options<RootGetData>) =>
 /**
  * Admin login with email/password
  *
- * Authenticate admin user with email and password and receive JWT tokens
+ * Authenticate admin user with email and password and receive JWT tokens via httpOnly cookies
  */
 export const adminLoginApiV1AuthAdminLoginPostMutation = (
   options?: Partial<Options<AdminLoginApiV1AuthAdminLoginPostData>>
@@ -327,7 +328,7 @@ export const adminLoginApiV1AuthAdminLoginPostMutation = (
 /**
  * Login with Google
  *
- * Authenticate user with Google OAuth token and receive JWT tokens
+ * Authenticate user with Google OAuth token and receive JWT tokens via httpOnly cookies
  */
 export const googleLoginApiV1AuthGoogleLoginPostMutation = (
   options?: Partial<Options<GoogleLoginApiV1AuthGoogleLoginPostData>>
@@ -383,6 +384,35 @@ export const googleCallbackApiV1AuthGoogleCallbackPostMutation = (
 };
 
 /**
+ * Login with Google authorization code
+ *
+ * Authenticate user with Google OAuth authorization code (Web flow without PKCE)
+ */
+export const googleLoginCodeApiV1AuthGoogleLoginCodePostMutation = (
+  options?: Partial<Options<GoogleLoginCodeApiV1AuthGoogleLoginCodePostData>>
+): UseMutationOptions<
+  GoogleLoginCodeApiV1AuthGoogleLoginCodePostResponse,
+  DefaultError,
+  Options<GoogleLoginCodeApiV1AuthGoogleLoginCodePostData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    GoogleLoginCodeApiV1AuthGoogleLoginCodePostResponse,
+    DefaultError,
+    Options<GoogleLoginCodeApiV1AuthGoogleLoginCodePostData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await googleLoginCodeApiV1AuthGoogleLoginCodePost({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
  * Refresh access token (cookie-based)
  *
  * Use refresh token from httpOnly cookie to obtain new access and refresh tokens
@@ -411,6 +441,35 @@ export const refreshTokenApiV1AuthRefreshPostMutation = (
   return mutationOptions;
 };
 
+/**
+ * Logout and clear authentication cookies
+ *
+ * Clear access and refresh token cookies to log out the user
+ */
+export const logoutApiV1AuthLogoutPostMutation = (
+  options?: Partial<Options<LogoutApiV1AuthLogoutPostData>>
+): UseMutationOptions<
+  LogoutApiV1AuthLogoutPostResponse,
+  DefaultError,
+  Options<LogoutApiV1AuthLogoutPostData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    LogoutApiV1AuthLogoutPostResponse,
+    DefaultError,
+    Options<LogoutApiV1AuthLogoutPostData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await logoutApiV1AuthLogoutPost({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
 export const getMyProfileApiV1ProfileMeGetQueryKey = (
   options?: Options<GetMyProfileApiV1ProfileMeGetData>
 ) => createQueryKey('getMyProfileApiV1ProfileMeGet', options);
@@ -425,7 +484,7 @@ export const getMyProfileApiV1ProfileMeGetOptions = (
 ) =>
   queryOptions<
     GetMyProfileApiV1ProfileMeGetResponse,
-    DefaultError,
+    GetMyProfileApiV1ProfileMeGetError,
     GetMyProfileApiV1ProfileMeGetResponse,
     ReturnType<typeof getMyProfileApiV1ProfileMeGetQueryKey>
   >({
@@ -572,7 +631,7 @@ export const getSubscriptionStatusApiV1SubscriptionsStatusGetOptions = (
 ) =>
   queryOptions<
     GetSubscriptionStatusApiV1SubscriptionsStatusGetResponse,
-    DefaultError,
+    GetSubscriptionStatusApiV1SubscriptionsStatusGetError,
     GetSubscriptionStatusApiV1SubscriptionsStatusGetResponse,
     ReturnType<typeof getSubscriptionStatusApiV1SubscriptionsStatusGetQueryKey>
   >({
@@ -699,7 +758,7 @@ export const getMyReportsApiV1ReportsGetOptions = (
 ) =>
   queryOptions<
     GetMyReportsApiV1ReportsGetResponse,
-    DefaultError,
+    GetMyReportsApiV1ReportsGetError,
     GetMyReportsApiV1ReportsGetResponse,
     ReturnType<typeof getMyReportsApiV1ReportsGetQueryKey>
   >({
@@ -744,153 +803,6 @@ export const submitReportApiV1ReportsPostMutation = (
   return mutationOptions;
 };
 
-/**
- * Get upload signed URL
- *
- * Generate a signed URL for uploading a card image to GCS
- */
-export const getUploadUrlApiV1CardsUploadUrlPostMutation = (
-  options?: Partial<Options<GetUploadUrlApiV1CardsUploadUrlPostData>>
-): UseMutationOptions<
-  GetUploadUrlApiV1CardsUploadUrlPostResponse,
-  DefaultError,
-  Options<GetUploadUrlApiV1CardsUploadUrlPostData>
-> => {
-  const mutationOptions: UseMutationOptions<
-    GetUploadUrlApiV1CardsUploadUrlPostResponse,
-    DefaultError,
-    Options<GetUploadUrlApiV1CardsUploadUrlPostData>
-  > = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await getUploadUrlApiV1CardsUploadUrlPost({
-        ...options,
-        ...fnOptions,
-        throwOnError: true,
-      });
-      return data;
-    },
-  };
-  return mutationOptions;
-};
-
-export const getMyCardsApiV1CardsMeGetQueryKey = (
-  options?: Options<GetMyCardsApiV1CardsMeGetData>
-) => createQueryKey('getMyCardsApiV1CardsMeGet', options);
-
-/**
- * Get my cards
- *
- * Retrieve all cards owned by the authenticated user
- */
-export const getMyCardsApiV1CardsMeGetOptions = (
-  options?: Options<GetMyCardsApiV1CardsMeGetData>
-) =>
-  queryOptions<
-    GetMyCardsApiV1CardsMeGetResponse,
-    GetMyCardsApiV1CardsMeGetError,
-    GetMyCardsApiV1CardsMeGetResponse,
-    ReturnType<typeof getMyCardsApiV1CardsMeGetQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getMyCardsApiV1CardsMeGet({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getMyCardsApiV1CardsMeGetQueryKey(options),
-  });
-
-/**
- * Delete a card
- *
- * Delete a card owned by the authenticated user
- */
-export const deleteCardApiV1CardsCardIdDeleteMutation = (
-  options?: Partial<Options<DeleteCardApiV1CardsCardIdDeleteData>>
-): UseMutationOptions<
-  DeleteCardApiV1CardsCardIdDeleteResponse,
-  DeleteCardApiV1CardsCardIdDeleteError,
-  Options<DeleteCardApiV1CardsCardIdDeleteData>
-> => {
-  const mutationOptions: UseMutationOptions<
-    DeleteCardApiV1CardsCardIdDeleteResponse,
-    DeleteCardApiV1CardsCardIdDeleteError,
-    Options<DeleteCardApiV1CardsCardIdDeleteData>
-  > = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await deleteCardApiV1CardsCardIdDelete({
-        ...options,
-        ...fnOptions,
-        throwOnError: true,
-      });
-      return data;
-    },
-  };
-  return mutationOptions;
-};
-
-export const getQuotaStatusApiV1CardsQuotaStatusGetQueryKey = (
-  options?: Options<GetQuotaStatusApiV1CardsQuotaStatusGetData>
-) => createQueryKey('getQuotaStatusApiV1CardsQuotaStatusGet', options);
-
-/**
- * Get quota status
- *
- * Check current upload quota usage
- */
-export const getQuotaStatusApiV1CardsQuotaStatusGetOptions = (
-  options?: Options<GetQuotaStatusApiV1CardsQuotaStatusGetData>
-) =>
-  queryOptions<
-    GetQuotaStatusApiV1CardsQuotaStatusGetResponse,
-    DefaultError,
-    GetQuotaStatusApiV1CardsQuotaStatusGetResponse,
-    ReturnType<typeof getQuotaStatusApiV1CardsQuotaStatusGetQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getQuotaStatusApiV1CardsQuotaStatusGet({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getQuotaStatusApiV1CardsQuotaStatusGetQueryKey(options),
-  });
-
-/**
- * Confirm card upload
- *
- * Confirm that the card image has been successfully uploaded to GCS after using the signed URL
- */
-export const confirmCardUploadApiV1CardsCardIdConfirmUploadPostMutation = (
-  options?: Partial<Options<ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostData>>
-): UseMutationOptions<
-  ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostResponse,
-  ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostError,
-  Options<ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostData>
-> => {
-  const mutationOptions: UseMutationOptions<
-    ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostResponse,
-    ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostError,
-    Options<ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostData>
-  > = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await confirmCardUploadApiV1CardsCardIdConfirmUploadPost({
-        ...options,
-        ...fnOptions,
-        throwOnError: true,
-      });
-      return data;
-    },
-  };
-  return mutationOptions;
-};
-
 export const getChatRoomsApiV1ChatsGetQueryKey = (
   options?: Options<GetChatRoomsApiV1ChatsGetData>
 ) => createQueryKey('getChatRoomsApiV1ChatsGet', options);
@@ -905,7 +817,7 @@ export const getChatRoomsApiV1ChatsGetOptions = (
 ) =>
   queryOptions<
     GetChatRoomsApiV1ChatsGetResponse,
-    DefaultError,
+    GetChatRoomsApiV1ChatsGetError,
     GetChatRoomsApiV1ChatsGetResponse,
     ReturnType<typeof getChatRoomsApiV1ChatsGetQueryKey>
   >({
@@ -1148,6 +1060,36 @@ export const createPostApiV1PostsPostMutation = (
   return mutationOptions;
 };
 
+export const getPostApiV1PostsPostIdGetQueryKey = (
+  options: Options<GetPostApiV1PostsPostIdGetData>
+) => createQueryKey('getPostApiV1PostsPostIdGet', options);
+
+/**
+ * Get a single post by ID
+ *
+ * Retrieve a post by its ID. Phase 9: Includes media_asset_ids for image display.
+ */
+export const getPostApiV1PostsPostIdGetOptions = (
+  options: Options<GetPostApiV1PostsPostIdGetData>
+) =>
+  queryOptions<
+    GetPostApiV1PostsPostIdGetResponse,
+    GetPostApiV1PostsPostIdGetError,
+    GetPostApiV1PostsPostIdGetResponse,
+    ReturnType<typeof getPostApiV1PostsPostIdGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getPostApiV1PostsPostIdGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getPostApiV1PostsPostIdGetQueryKey(options),
+  });
+
 /**
  * Close a post
  *
@@ -1293,7 +1235,7 @@ export const getMyGalleryCardsApiV1GalleryCardsMeGetOptions = (
 ) =>
   queryOptions<
     GetMyGalleryCardsApiV1GalleryCardsMeGetResponse,
-    DefaultError,
+    GetMyGalleryCardsApiV1GalleryCardsMeGetError,
     GetMyGalleryCardsApiV1GalleryCardsMeGetResponse,
     ReturnType<typeof getMyGalleryCardsApiV1GalleryCardsMeGetQueryKey>
   >({
@@ -1502,6 +1444,35 @@ export const attachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostMutat
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await attachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPost({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Get signed read URLs for media assets (Phase 9)
+ *
+ * Batch retrieve signed download URLs for media. Login required. T083-T085.
+ */
+export const getMediaReadUrlsApiV1MediaReadUrlsPostMutation = (
+  options?: Partial<Options<GetMediaReadUrlsApiV1MediaReadUrlsPostData>>
+): UseMutationOptions<
+  GetMediaReadUrlsApiV1MediaReadUrlsPostResponse,
+  GetMediaReadUrlsApiV1MediaReadUrlsPostError,
+  Options<GetMediaReadUrlsApiV1MediaReadUrlsPostData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    GetMediaReadUrlsApiV1MediaReadUrlsPostResponse,
+    GetMediaReadUrlsApiV1MediaReadUrlsPostError,
+    Options<GetMediaReadUrlsApiV1MediaReadUrlsPostData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await getMediaReadUrlsApiV1MediaReadUrlsPost({
         ...options,
         ...fnOptions,
         throwOnError: true,

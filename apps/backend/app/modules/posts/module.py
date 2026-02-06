@@ -31,6 +31,7 @@ from app.modules.posts.application.use_cases.reject_interest_use_case import (
     RejectInterestUseCase,
 )
 from app.modules.posts.application.use_cases.toggle_like import ToggleLikeUseCase
+from app.modules.posts.application.use_cases.get_post_use_case import GetPostUseCase
 from app.modules.posts.infrastructure.repositories.post_interest_repository_impl import (
     PostInterestRepositoryImpl,
 )
@@ -149,3 +150,11 @@ class PostsModule(Module):
         return ToggleLikeUseCase(
             post_repository=post_repo, like_repository=like_repo
         )
+
+    @provider
+    def provide_get_post_use_case(
+        self, session: AsyncSession
+    ) -> GetPostUseCase:
+        """Provide GetPostUseCase with dependencies."""
+        post_repo = PostRepositoryImpl(session)
+        return GetPostUseCase(post_repository=post_repo, session=session)

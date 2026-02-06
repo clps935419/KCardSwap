@@ -22,6 +22,7 @@ import {
   Pressable,
 } from '@/src/shared/ui/components';
 import { useExpressInterest } from '@/src/features/posts/hooks/usePosts';
+import { PostImages } from '@/src/features/posts/components';
 // Note: In real implementation, we need a hook to fetch single post
 // For now, we'll use a placeholder
 
@@ -47,6 +48,7 @@ export function PostDetailScreen() {
     idol: 'Jungkook',
     idol_group: 'BTS',
     status: 'open' as const,
+    media_asset_ids: [] as string[], // Phase 9: Will contain media IDs for image display
     expires_at: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -163,6 +165,16 @@ export function PostDetailScreen() {
             {post.content}
           </Text>
         </Box>
+
+        {/* Phase 9: Display post images using signed read URLs */}
+        {post.media_asset_ids && post.media_asset_ids.length > 0 && (
+          <Box className="mb-6">
+            <PostImages 
+              mediaAssetIds={post.media_asset_ids} 
+              maxDisplay={4}
+            />
+          </Box>
+        )}
 
         {/* 貼文資訊 */}
         <Box className="mb-6 p-4 bg-gray-100 rounded-lg">

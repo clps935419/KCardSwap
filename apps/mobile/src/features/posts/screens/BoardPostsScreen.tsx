@@ -26,6 +26,7 @@ import {
   Heading,
 } from '@/src/shared/ui/components';
 import { useBoardPosts } from '@/src/features/posts/hooks/usePosts';
+import { PostImages } from '@/src/features/posts/components';
 import type { Post } from '@/src/features/posts/types';
 
 // 台灣城市列表
@@ -90,11 +91,14 @@ export function BoardPostsScreen() {
         className="p-4 mb-3 bg-white rounded-3xl shadow-sm border border-gray-100"
         onPress={() => handlePostPress(post)}
       >
-        {/* Mock Image Placeholder - 原型中有圖片 */}
-        <Box className="w-full h-32 bg-gray-100 rounded-2xl mb-3" />
+        {/* Phase 9: Display post images using signed read URLs */}
+        <PostImages 
+          mediaAssetIds={post.media_asset_ids || []} 
+          maxDisplay={1}
+        />
 
         {/* 貼文資訊 */}
-        <Box className="flex-row justify-between items-start">
+        <Box className="flex-row justify-between items-start mt-3">
           <Box className="flex-1 mr-3">
             <Text className="text-sm font-bold text-gray-800 mb-1">
               {post.title}

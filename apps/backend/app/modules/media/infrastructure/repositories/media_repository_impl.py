@@ -1,5 +1,5 @@
 """SQLAlchemy Media Repository Implementation."""
-from typing import Optional
+from typing import List, Optional
 from uuid import UUID
 
 from sqlalchemy import extract, func, select
@@ -30,6 +30,8 @@ class MediaRepositoryImpl(IMediaRepository):
             created_at=media.created_at,
             updated_at=media.updated_at,
             confirmed_at=media.confirmed_at,
+            target_type=media.target_type,
+            target_id=media.target_id,
         )
         self.session.add(model)
         await self.session.flush()
@@ -56,6 +58,8 @@ class MediaRepositoryImpl(IMediaRepository):
         model.status = media.status.value if isinstance(media.status, MediaStatus) else media.status
         model.updated_at = media.updated_at
         model.confirmed_at = media.confirmed_at
+        model.target_type = media.target_type
+        model.target_id = media.target_id
 
         await self.session.flush()
         await self.session.refresh(model)
@@ -77,6 +81,29 @@ class MediaRepositoryImpl(IMediaRepository):
         )
         return result.scalar() or 0
 
+    async def get_by_ids(self, media_ids: List[UUID]) -> List[MediaAsset]:
+        """Get multiple media assets by IDs."""
+        if not media_ids:
+            return []
+
+        result = await self.session.execute(
+            select(MediaAssetModel).where(MediaAssetModel.id.in_(media_ids))
+        )
+        models = result.scalars().all()
+        return [self._to_entity(model) for model in models]
+
+    async def get_by_target(self, target_type: str, target_id: UUID) -> List[MediaAsset]:
+        """Get media assets attached to a specific target."""
+        result = await self.session.execute(
+            select(MediaAssetModel).where(
+                MediaAssetModel.target_type == target_type,
+                MediaAssetModel.target_id == target_id,
+                MediaAssetModel.status == MediaStatus.ATTACHED.value,
+            )
+        )
+        models = result.scalars().all()
+        return [self._to_entity(model) for model in models]
+
     def _to_entity(self, model: MediaAssetModel) -> MediaAsset:
         """Convert ORM model to domain entity."""
         return MediaAsset(
@@ -89,4 +116,6 @@ class MediaRepositoryImpl(IMediaRepository):
             created_at=model.created_at,
             updated_at=model.updated_at,
             confirmed_at=model.confirmed_at,
+            target_type=model.target_type,
+            target_id=model.target_id,
         )

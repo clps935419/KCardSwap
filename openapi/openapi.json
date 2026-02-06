@@ -1427,6 +1427,80 @@
         }
       }
     },
+    "/api/v1/posts/{post_id}": {
+      "get": {
+        "tags": [
+          "Posts"
+        ],
+        "summary": "Get a single post by ID",
+        "description": "Retrieve a post by its ID. Phase 9: Includes media_asset_ids for image display.",
+        "operationId": "get_post_api_v1_posts__post_id__get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "post_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Post Id"
+            }
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Post retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostResponseWrapper"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (not logged in)"
+          },
+          "404": {
+            "description": "Post not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/posts/{post_id}/close": {
       "post": {
         "tags": [
@@ -2193,6 +2267,71 @@
         }
       }
     },
+    "/api/v1/media/read-urls": {
+      "post": {
+        "tags": [
+          "media"
+        ],
+        "summary": "Get signed read URLs for media assets (Phase 9)",
+        "description": "Batch retrieve signed download URLs for media. Login required. T083-T085.",
+        "operationId": "get_media_read_urls_api_v1_media_read_urls_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReadMediaUrlsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadMediaUrlsResponseWrapper"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/message-requests": {
       "post": {
         "tags": [
@@ -2663,7 +2802,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/app__modules__social__presentation__schemas__message_schemas__SendMessageRequest"
+                "$ref": "#/components/schemas/SendMessageRequest"
               }
             }
           }
@@ -4090,6 +4229,15 @@
             "description": "Whether the current user has liked this post",
             "default": false
           },
+          "media_asset_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Media Asset Ids",
+            "description": "List of media asset IDs attached to this post (Phase 9)"
+          },
           "expires_at": {
             "type": "string",
             "format": "date-time",
@@ -4325,6 +4473,83 @@
         ],
         "title": "ProfileResponseWrapper",
         "description": "Response wrapper for profile data (standardized envelope)"
+      },
+      "ReadMediaUrlsRequest": {
+        "properties": {
+          "media_asset_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "maxItems": 50,
+            "minItems": 1,
+            "title": "Media Asset Ids",
+            "description": "List of media asset IDs to get read URLs for",
+            "examples": [
+              [
+                "123e4567-e89b-12d3-a456-426614174000"
+              ]
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "media_asset_ids"
+        ],
+        "title": "ReadMediaUrlsRequest",
+        "description": "Request schema for batch reading media signed URLs."
+      },
+      "ReadMediaUrlsResponse": {
+        "properties": {
+          "urls": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Urls",
+            "description": "Mapping of media_id to signed read URL",
+            "examples": [
+              {
+                "123e4567-e89b-12d3-a456-426614174000": "https://storage.googleapis.com/..."
+              }
+            ]
+          },
+          "expires_in_minutes": {
+            "type": "integer",
+            "title": "Expires In Minutes",
+            "description": "URL expiration time in minutes (all URLs have same expiration)",
+            "example": 10
+          }
+        },
+        "type": "object",
+        "required": [
+          "urls",
+          "expires_in_minutes"
+        ],
+        "title": "ReadMediaUrlsResponse",
+        "description": "Response schema for batch reading media signed URLs."
+      },
+      "ReadMediaUrlsResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ReadMediaUrlsResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "ReadMediaUrlsResponseWrapper",
+        "description": "Envelope wrapper for read media URLs response."
       },
       "RefreshSuccessResponse": {
         "properties": {
@@ -4569,6 +4794,35 @@
         ],
         "title": "ReportResponseWrapper",
         "description": "Response wrapper for single report (standardized envelope)"
+      },
+      "SendMessageRequest": {
+        "properties": {
+          "content": {
+            "type": "string",
+            "maxLength": 5000,
+            "minLength": 1,
+            "title": "Content",
+            "description": "Message content"
+          },
+          "post_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Post Id",
+            "description": "Optional post ID to reference"
+          }
+        },
+        "type": "object",
+        "required": [
+          "content"
+        ],
+        "title": "SendMessageRequest",
+        "description": "Request to send a message in a thread"
       },
       "SubscriptionStatusData": {
         "properties": {
@@ -5035,6 +5289,13 @@
           "type": {
             "type": "string",
             "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
           }
         },
         "type": "object",
@@ -5099,35 +5360,6 @@
         "example": {
           "content": "Hello! I'm interested in trading cards."
         }
-      },
-      "app__modules__social__presentation__schemas__message_schemas__SendMessageRequest": {
-        "properties": {
-          "content": {
-            "type": "string",
-            "maxLength": 5000,
-            "minLength": 1,
-            "title": "Content",
-            "description": "Message content"
-          },
-          "post_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Post Id",
-            "description": "Optional post ID to reference"
-          }
-        },
-        "type": "object",
-        "required": [
-          "content"
-        ],
-        "title": "SendMessageRequest",
-        "description": "Request to send a message in a thread"
       }
     },
     "securitySchemes": {

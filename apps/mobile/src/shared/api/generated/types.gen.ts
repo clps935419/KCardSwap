@@ -107,106 +107,6 @@ export type BlockUserRequest = {
 };
 
 /**
- * CardListResponseWrapper
- *
- * Response wrapper for card list (standardized envelope)
- */
-export type CardListResponseWrapper = {
-  /**
-   * Data
-   */
-  data: CardResponse[];
-  /**
-   * Meta
-   */
-  meta?: null;
-  /**
-   * Error
-   */
-  error?: null;
-};
-
-/**
- * CardResponse
- *
- * Response schema for card details
- */
-export type CardResponse = {
-  /**
-   * Id
-   *
-   * Card ID
-   */
-  id: string;
-  /**
-   * Owner Id
-   *
-   * Owner user ID
-   */
-  owner_id: string;
-  /**
-   * Idol
-   *
-   * Idol name
-   */
-  idol?: string | null;
-  /**
-   * Idol Group
-   *
-   * Idol group
-   */
-  idol_group?: string | null;
-  /**
-   * Album
-   *
-   * Album name
-   */
-  album?: string | null;
-  /**
-   * Version
-   *
-   * Version
-   */
-  version?: string | null;
-  /**
-   * Rarity
-   *
-   * Card rarity
-   */
-  rarity?: string | null;
-  /**
-   * Status
-   *
-   * Card status
-   */
-  status: string;
-  /**
-   * Image Url
-   *
-   * Image URL
-   */
-  image_url?: string | null;
-  /**
-   * Size Bytes
-   *
-   * Image size in bytes
-   */
-  size_bytes?: number | null;
-  /**
-   * Created At
-   *
-   * Creation timestamp
-   */
-  created_at: string;
-  /**
-   * Updated At
-   *
-   * Last update timestamp
-   */
-  updated_at: string;
-};
-
-/**
  * ChatRoomListResponse
  *
  * Response schema for list of chat rooms
@@ -574,43 +474,6 @@ export type CreateUploadUrlResponseSchema = {
 };
 
 /**
- * DeleteSuccessResponse
- *
- * Success response for delete operations
- */
-export type DeleteSuccessResponse = {
-  /**
-   * Success
-   *
-   * Operation success status
-   */
-  success?: boolean;
-  /**
-   * Message
-   *
-   * Success message
-   */
-  message: string;
-};
-
-/**
- * DeleteSuccessResponseWrapper
- *
- * Response wrapper for delete success (standardized envelope)
- */
-export type DeleteSuccessResponseWrapper = {
-  data: DeleteSuccessResponse;
-  /**
-   * Meta
-   */
-  meta?: null;
-  /**
-   * Error
-   */
-  error?: null;
-};
-
-/**
  * ExpireSubscriptionsData
  *
  * Data schema for expire subscriptions job
@@ -729,6 +592,26 @@ export type GoogleCallbackRequest = {
    * PKCE code verifier used during authorization request
    */
   code_verifier: string;
+  /**
+   * Redirect Uri
+   *
+   * Redirect URI used during authorization (must match the one used in auth request)
+   */
+  redirect_uri?: string | null;
+};
+
+/**
+ * GoogleCodeLoginRequest
+ *
+ * Request schema for Google OAuth with authorization code (Web flow)
+ */
+export type GoogleCodeLoginRequest = {
+  /**
+   * Code
+   *
+   * Authorization code from Google OAuth
+   */
+  code: string;
   /**
    * Redirect Uri
    *
@@ -1120,6 +1003,12 @@ export type PostResponse = {
    */
   liked_by_me?: boolean;
   /**
+   * Media Asset Ids
+   *
+   * List of media asset IDs attached to this post (Phase 9)
+   */
+  media_asset_ids?: string[];
+  /**
    * Expires At
    *
    * Expiry datetime
@@ -1260,74 +1149,48 @@ export type ProfileResponseWrapper = {
 };
 
 /**
- * QuotaStatusResponse
+ * ReadMediaUrlsRequest
  *
- * Response schema for quota status
+ * Request schema for batch reading media signed URLs.
  */
-export type QuotaStatusResponse = {
+export type ReadMediaUrlsRequest = {
   /**
-   * Uploads Today
+   * Media Asset Ids
    *
-   * Number of uploads today
+   * List of media asset IDs to get read URLs for
    */
-  uploads_today: number;
-  /**
-   * Daily Limit
-   *
-   * Daily upload limit
-   */
-  daily_limit: number;
-  /**
-   * Remaining Uploads
-   *
-   * Remaining uploads for today
-   */
-  remaining_uploads: number;
-  /**
-   * Storage Used Bytes
-   *
-   * Total storage used in bytes
-   */
-  storage_used_bytes: number;
-  /**
-   * Storage Limit Bytes
-   *
-   * Storage limit in bytes
-   */
-  storage_limit_bytes: number;
-  /**
-   * Remaining Storage Bytes
-   *
-   * Remaining storage in bytes
-   */
-  remaining_storage_bytes: number;
-  /**
-   * Storage Used Mb
-   *
-   * Storage used in MB
-   */
-  storage_used_mb: number;
-  /**
-   * Storage Limit Mb
-   *
-   * Storage limit in MB
-   */
-  storage_limit_mb: number;
-  /**
-   * Remaining Storage Mb
-   *
-   * Remaining storage in MB
-   */
-  remaining_storage_mb: number;
+  media_asset_ids: string[];
 };
 
 /**
- * QuotaStatusResponseWrapper
+ * ReadMediaUrlsResponse
  *
- * Response wrapper for quota status (standardized envelope)
+ * Response schema for batch reading media signed URLs.
  */
-export type QuotaStatusResponseWrapper = {
-  data: QuotaStatusResponse;
+export type ReadMediaUrlsResponse = {
+  /**
+   * Urls
+   *
+   * Mapping of media_id to signed read URL
+   */
+  urls: {
+    [key: string]: string;
+  };
+  /**
+   * Expires In Minutes
+   *
+   * URL expiration time in minutes (all URLs have same expiration)
+   */
+  expires_in_minutes: number;
+};
+
+/**
+ * ReadMediaUrlsResponseWrapper
+ *
+ * Envelope wrapper for read media URLs response.
+ */
+export type ReadMediaUrlsResponseWrapper = {
+  data: ReadMediaUrlsResponse;
   /**
    * Meta
    */
@@ -1854,119 +1717,6 @@ export type UpdateProfileRequest = {
 };
 
 /**
- * UploadCardRequest
- *
- * Request schema for getting upload signed URL
- */
-export type UploadCardRequest = {
-  /**
-   * Content Type
-   *
-   * MIME type of the file (image/jpeg or image/png)
-   */
-  content_type: string;
-  /**
-   * File Size Bytes
-   *
-   * Size of file in bytes
-   */
-  file_size_bytes: number;
-  /**
-   * Idol
-   *
-   * Idol name
-   */
-  idol?: string | null;
-  /**
-   * Idol Group
-   *
-   * Idol group
-   */
-  idol_group?: string | null;
-  /**
-   * Album
-   *
-   * Album name
-   */
-  album?: string | null;
-  /**
-   * Version
-   *
-   * Version
-   */
-  version?: string | null;
-  /**
-   * Rarity
-   *
-   * Card rarity
-   */
-  rarity?: string | null;
-};
-
-/**
- * UploadUrlResponse
- *
- * Response schema for upload signed URL
- */
-export type UploadUrlResponse = {
-  /**
-   * Upload Url
-   *
-   * Signed URL for uploading
-   */
-  upload_url: string;
-  /**
-   * Method
-   *
-   * HTTP method to use
-   */
-  method: string;
-  /**
-   * Required Headers
-   *
-   * Required headers for upload
-   */
-  required_headers: {
-    [key: string]: string;
-  };
-  /**
-   * Image Url
-   *
-   * Public URL of the image after upload
-   */
-  image_url: string;
-  /**
-   * Expires At
-   *
-   * When the signed URL expires
-   */
-  expires_at: string;
-  /**
-   * Card Id
-   *
-   * ID of the created card
-   */
-  card_id: string;
-};
-
-/**
- * UploadUrlResponseWrapper
- *
- * Response wrapper for upload URL (standardized envelope)
- */
-export type UploadUrlResponseWrapper = {
-  data: UploadUrlResponse;
-  /**
-   * Meta
-   */
-  meta?: null;
-  /**
-   * Error
-   */
-  error?: null;
-};
-
-/**
  * ValidationError
  */
 export type ValidationError = {
@@ -1982,6 +1732,16 @@ export type ValidationError = {
    * Error Type
    */
   type: string;
+  /**
+   * Input
+   */
+  input?: unknown;
+  /**
+   * Context
+   */
+  ctx?: {
+    [key: string]: unknown;
+  };
 };
 
 /**
@@ -2168,6 +1928,38 @@ export type GoogleCallbackApiV1AuthGoogleCallbackPostResponses = {
 export type GoogleCallbackApiV1AuthGoogleCallbackPostResponse =
   GoogleCallbackApiV1AuthGoogleCallbackPostResponses[keyof GoogleCallbackApiV1AuthGoogleCallbackPostResponses];
 
+export type GoogleLoginCodeApiV1AuthGoogleLoginCodePostData = {
+  body: GoogleCodeLoginRequest;
+  path?: never;
+  query?: never;
+  url: '/api/v1/auth/google-login-code';
+};
+
+export type GoogleLoginCodeApiV1AuthGoogleLoginCodePostErrors = {
+  /**
+   * Validation error
+   */
+  400: unknown;
+  /**
+   * Invalid authorization code
+   */
+  401: unknown;
+  /**
+   * Token exchange failed
+   */
+  422: unknown;
+};
+
+export type GoogleLoginCodeApiV1AuthGoogleLoginCodePostResponses = {
+  /**
+   * Successfully authenticated
+   */
+  200: LoginResponse;
+};
+
+export type GoogleLoginCodeApiV1AuthGoogleLoginCodePostResponse =
+  GoogleLoginCodeApiV1AuthGoogleLoginCodePostResponses[keyof GoogleLoginCodeApiV1AuthGoogleLoginCodePostResponses];
+
 export type RefreshTokenApiV1AuthRefreshPostData = {
   body?: never;
   path?: never;
@@ -2199,6 +1991,23 @@ export type RefreshTokenApiV1AuthRefreshPostResponses = {
 export type RefreshTokenApiV1AuthRefreshPostResponse =
   RefreshTokenApiV1AuthRefreshPostResponses[keyof RefreshTokenApiV1AuthRefreshPostResponses];
 
+export type LogoutApiV1AuthLogoutPostData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/v1/auth/logout';
+};
+
+export type LogoutApiV1AuthLogoutPostResponses = {
+  /**
+   * Successfully logged out
+   */
+  200: RefreshSuccessResponse;
+};
+
+export type LogoutApiV1AuthLogoutPostResponse =
+  LogoutApiV1AuthLogoutPostResponses[keyof LogoutApiV1AuthLogoutPostResponses];
+
 export type GetMyProfileApiV1ProfileMeGetData = {
   body?: never;
   path?: never;
@@ -2215,7 +2024,14 @@ export type GetMyProfileApiV1ProfileMeGetErrors = {
    * Profile not found
    */
   404: unknown;
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
 };
+
+export type GetMyProfileApiV1ProfileMeGetError =
+  GetMyProfileApiV1ProfileMeGetErrors[keyof GetMyProfileApiV1ProfileMeGetErrors];
 
 export type GetMyProfileApiV1ProfileMeGetResponses = {
   /**
@@ -2312,6 +2128,16 @@ export type GetSubscriptionStatusApiV1SubscriptionsStatusGetData = {
   query?: never;
   url: '/api/v1/subscriptions/status';
 };
+
+export type GetSubscriptionStatusApiV1SubscriptionsStatusGetErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type GetSubscriptionStatusApiV1SubscriptionsStatusGetError =
+  GetSubscriptionStatusApiV1SubscriptionsStatusGetErrors[keyof GetSubscriptionStatusApiV1SubscriptionsStatusGetErrors];
 
 export type GetSubscriptionStatusApiV1SubscriptionsStatusGetResponses = {
   /**
@@ -2439,10 +2265,17 @@ export type GetMyReportsApiV1ReportsGetErrors = {
    */
   401: unknown;
   /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+  /**
    * Internal server error
    */
   500: unknown;
 };
+
+export type GetMyReportsApiV1ReportsGetError =
+  GetMyReportsApiV1ReportsGetErrors[keyof GetMyReportsApiV1ReportsGetErrors];
 
 export type GetMyReportsApiV1ReportsGetResponses = {
   /**
@@ -2490,192 +2323,6 @@ export type SubmitReportApiV1ReportsPostResponses = {
 export type SubmitReportApiV1ReportsPostResponse =
   SubmitReportApiV1ReportsPostResponses[keyof SubmitReportApiV1ReportsPostResponses];
 
-export type GetUploadUrlApiV1CardsUploadUrlPostData = {
-  body: UploadCardRequest;
-  path?: never;
-  query?: never;
-  url: '/api/v1/cards/upload-url';
-};
-
-export type GetUploadUrlApiV1CardsUploadUrlPostErrors = {
-  /**
-   * Invalid request (file type/size)
-   */
-  400: unknown;
-  /**
-   * Unauthorized
-   */
-  401: unknown;
-  /**
-   * Quota exceeded
-   */
-  422: unknown;
-};
-
-export type GetUploadUrlApiV1CardsUploadUrlPostResponses = {
-  /**
-   * Upload URL generated successfully
-   */
-  200: UploadUrlResponseWrapper;
-};
-
-export type GetUploadUrlApiV1CardsUploadUrlPostResponse =
-  GetUploadUrlApiV1CardsUploadUrlPostResponses[keyof GetUploadUrlApiV1CardsUploadUrlPostResponses];
-
-export type GetMyCardsApiV1CardsMeGetData = {
-  body?: never;
-  path?: never;
-  query?: {
-    /**
-     * Status
-     *
-     * Filter by status (available/trading/traded)
-     */
-    status?: string | null;
-  };
-  url: '/api/v1/cards/me';
-};
-
-export type GetMyCardsApiV1CardsMeGetErrors = {
-  /**
-   * Unauthorized
-   */
-  401: unknown;
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type GetMyCardsApiV1CardsMeGetError =
-  GetMyCardsApiV1CardsMeGetErrors[keyof GetMyCardsApiV1CardsMeGetErrors];
-
-export type GetMyCardsApiV1CardsMeGetResponses = {
-  /**
-   * Cards retrieved successfully
-   */
-  200: CardListResponseWrapper;
-};
-
-export type GetMyCardsApiV1CardsMeGetResponse =
-  GetMyCardsApiV1CardsMeGetResponses[keyof GetMyCardsApiV1CardsMeGetResponses];
-
-export type DeleteCardApiV1CardsCardIdDeleteData = {
-  body?: never;
-  path: {
-    /**
-     * Card Id
-     */
-    card_id: string;
-  };
-  query?: never;
-  url: '/api/v1/cards/{card_id}';
-};
-
-export type DeleteCardApiV1CardsCardIdDeleteErrors = {
-  /**
-   * Unauthorized
-   */
-  401: unknown;
-  /**
-   * Not the card owner
-   */
-  403: unknown;
-  /**
-   * Card not found
-   */
-  404: unknown;
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type DeleteCardApiV1CardsCardIdDeleteError =
-  DeleteCardApiV1CardsCardIdDeleteErrors[keyof DeleteCardApiV1CardsCardIdDeleteErrors];
-
-export type DeleteCardApiV1CardsCardIdDeleteResponses = {
-  /**
-   * Card deleted successfully
-   */
-  200: DeleteSuccessResponseWrapper;
-};
-
-export type DeleteCardApiV1CardsCardIdDeleteResponse =
-  DeleteCardApiV1CardsCardIdDeleteResponses[keyof DeleteCardApiV1CardsCardIdDeleteResponses];
-
-export type GetQuotaStatusApiV1CardsQuotaStatusGetData = {
-  body?: never;
-  path?: never;
-  query?: never;
-  url: '/api/v1/cards/quota/status';
-};
-
-export type GetQuotaStatusApiV1CardsQuotaStatusGetErrors = {
-  /**
-   * Unauthorized
-   */
-  401: unknown;
-};
-
-export type GetQuotaStatusApiV1CardsQuotaStatusGetResponses = {
-  /**
-   * Quota status retrieved successfully
-   */
-  200: QuotaStatusResponseWrapper;
-};
-
-export type GetQuotaStatusApiV1CardsQuotaStatusGetResponse =
-  GetQuotaStatusApiV1CardsQuotaStatusGetResponses[keyof GetQuotaStatusApiV1CardsQuotaStatusGetResponses];
-
-export type ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostData = {
-  body?: never;
-  path: {
-    /**
-     * Card Id
-     */
-    card_id: string;
-  };
-  query?: never;
-  url: '/api/v1/cards/{card_id}/confirm-upload';
-};
-
-export type ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostErrors = {
-  /**
-   * Invalid request (already confirmed, no image, etc.)
-   */
-  400: unknown;
-  /**
-   * Unauthorized
-   */
-  401: unknown;
-  /**
-   * Not the card owner
-   */
-  403: unknown;
-  /**
-   * Card not found or image not found in storage
-   */
-  404: unknown;
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostError =
-  ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostErrors[keyof ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostErrors];
-
-export type ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostResponses = {
-  /**
-   * Upload confirmed successfully
-   */
-  200: DeleteSuccessResponseWrapper;
-};
-
-export type ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostResponse =
-  ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostResponses[keyof ConfirmCardUploadApiV1CardsCardIdConfirmUploadPostResponses];
-
 export type GetChatRoomsApiV1ChatsGetData = {
   body?: never;
   path?: never;
@@ -2689,10 +2336,17 @@ export type GetChatRoomsApiV1ChatsGetErrors = {
    */
   401: unknown;
   /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+  /**
    * Internal server error
    */
   500: unknown;
 };
+
+export type GetChatRoomsApiV1ChatsGetError =
+  GetChatRoomsApiV1ChatsGetErrors[keyof GetChatRoomsApiV1ChatsGetErrors];
 
 export type GetChatRoomsApiV1ChatsGetResponses = {
   /**
@@ -2966,6 +2620,50 @@ export type CreatePostApiV1PostsPostResponses = {
 export type CreatePostApiV1PostsPostResponse =
   CreatePostApiV1PostsPostResponses[keyof CreatePostApiV1PostsPostResponses];
 
+export type GetPostApiV1PostsPostIdGetData = {
+  body?: never;
+  path: {
+    /**
+     * Post Id
+     */
+    post_id: string;
+  };
+  query?: never;
+  url: '/api/v1/posts/{post_id}';
+};
+
+export type GetPostApiV1PostsPostIdGetErrors = {
+  /**
+   * Unauthorized (not logged in)
+   */
+  401: unknown;
+  /**
+   * Post not found
+   */
+  404: unknown;
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+  /**
+   * Internal server error
+   */
+  500: unknown;
+};
+
+export type GetPostApiV1PostsPostIdGetError =
+  GetPostApiV1PostsPostIdGetErrors[keyof GetPostApiV1PostsPostIdGetErrors];
+
+export type GetPostApiV1PostsPostIdGetResponses = {
+  /**
+   * Post retrieved successfully
+   */
+  200: PostResponseWrapper;
+};
+
+export type GetPostApiV1PostsPostIdGetResponse =
+  GetPostApiV1PostsPostIdGetResponses[keyof GetPostApiV1PostsPostIdGetResponses];
+
 export type ClosePostApiV1PostsPostIdClosePostData = {
   body?: never;
   path: {
@@ -3110,6 +2808,16 @@ export type GetMyGalleryCardsApiV1GalleryCardsMeGetData = {
   query?: never;
   url: '/api/v1/gallery/cards/me';
 };
+
+export type GetMyGalleryCardsApiV1GalleryCardsMeGetErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type GetMyGalleryCardsApiV1GalleryCardsMeGetError =
+  GetMyGalleryCardsApiV1GalleryCardsMeGetErrors[keyof GetMyGalleryCardsApiV1GalleryCardsMeGetErrors];
 
 export type GetMyGalleryCardsApiV1GalleryCardsMeGetResponses = {
   /**
@@ -3329,6 +3037,33 @@ export type AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostRespon
 
 export type AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostResponse =
   AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostResponses[keyof AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostResponses];
+
+export type GetMediaReadUrlsApiV1MediaReadUrlsPostData = {
+  body: ReadMediaUrlsRequest;
+  path?: never;
+  query?: never;
+  url: '/api/v1/media/read-urls';
+};
+
+export type GetMediaReadUrlsApiV1MediaReadUrlsPostErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type GetMediaReadUrlsApiV1MediaReadUrlsPostError =
+  GetMediaReadUrlsApiV1MediaReadUrlsPostErrors[keyof GetMediaReadUrlsApiV1MediaReadUrlsPostErrors];
+
+export type GetMediaReadUrlsApiV1MediaReadUrlsPostResponses = {
+  /**
+   * Successful Response
+   */
+  200: ReadMediaUrlsResponseWrapper;
+};
+
+export type GetMediaReadUrlsApiV1MediaReadUrlsPostResponse =
+  GetMediaReadUrlsApiV1MediaReadUrlsPostResponses[keyof GetMediaReadUrlsApiV1MediaReadUrlsPostResponses];
 
 export type CreateMessageRequestApiV1MessageRequestsPostData = {
   body: CreateMessageRequestRequest;

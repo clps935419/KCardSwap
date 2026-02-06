@@ -1,6 +1,6 @@
 """Media repository interface."""
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import List, Optional
 from uuid import UUID
 
 from app.modules.media.domain.entities.media_asset import MediaAsset
@@ -56,5 +56,30 @@ class IMediaRepository(ABC):
 
         Returns:
             Total bytes used in the month
+        """
+        pass
+
+    @abstractmethod
+    async def get_by_ids(self, media_ids: List[UUID]) -> List[MediaAsset]:
+        """Get multiple media assets by IDs.
+
+        Args:
+            media_ids: List of media IDs
+
+        Returns:
+            List of MediaAsset entities (only found ones)
+        """
+        pass
+
+    @abstractmethod
+    async def get_by_target(self, target_type: str, target_id: UUID) -> List[MediaAsset]:
+        """Get media assets attached to a specific target.
+
+        Args:
+            target_type: Type of target entity ("post" or "gallery_card")
+            target_id: ID of the target entity
+
+        Returns:
+            List of MediaAsset entities attached to the target
         """
         pass

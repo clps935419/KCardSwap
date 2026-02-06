@@ -18,6 +18,10 @@ from app.modules.media.application.use_cases.create_upload_url import (
     CreateUploadUrlRequest,
     CreateUploadUrlUseCase,
 )
+from app.modules.media.application.use_cases.get_read_urls import (
+    GetReadUrlsRequest,
+    GetReadUrlsUseCase,
+)
 from app.modules.media.infrastructure.repositories.media_repository_impl import (
     MediaRepositoryImpl,
 )
@@ -28,6 +32,11 @@ from app.modules.media.presentation.schemas.media_schemas import (
     ConfirmUploadResponseSchema,
     CreateUploadUrlRequestSchema,
     CreateUploadUrlResponseSchema,
+)
+from app.modules.media.presentation.schemas.media_read_url_schemas import (
+    ReadMediaUrlsRequest,
+    ReadMediaUrlsResponse,
+    ReadMediaUrlsResponseWrapper,
 )
 from app.shared.domain.contracts.i_subscription_query_service import (
     ISubscriptionQueryService,
@@ -236,3 +245,56 @@ async def attach_media_to_gallery_card(
         attached_to=result.attached_to,
         target_id=result.target_id,
     )
+
+
+@router.post(
+    "/read-urls",
+    response_model=ReadMediaUrlsResponseWrapper,
+    status_code=status.HTTP_200_OK,
+    summary="Get signed read URLs for media assets (Phase 9)",
+    description="Batch retrieve signed download URLs for media. Login required. T083-T085.",
+)
+async def get_media_read_urls(
+    request: ReadMediaUrlsRequest,
+    session: Annotated[AsyncSession, Depends(get_db_session)],
+    user_id: UUID = Depends(get_current_user_id),
+):
+    """Get signed read URLs for multiple media assets.
+
+    Phase 9: Login-only access to images with long-lived TTL.
+    
+    Flow: User requests URLs → Backend generates signed URLs → Frontend displays images
+
+    Args:
+        request: ReadMediaUrlsRequest with list of media_asset_ids
+        user_id: Current authenticated user ID
+
+    Returns:
+        Dictionary mapping media_id to signed read URL
+        
+    Access Control:
+        - Requires login (enforced by get_current_user_id)
+        - Only confirmed/attached media are accessible
+        - Pending media are filtered out
+    """
+    media_repository = MediaRepositoryImpl(session)
+    storage_service = get_storage_service()
+    use_case = GetReadUrlsUseCase(
+        media_repository=media_repository,
+        storage_service=storage_service,
+        read_url_ttl_minutes=10,  # 10 minutes TTL as per Phase 9 spec
+    )
+
+    result = await use_case.execute(
+        GetReadUrlsRequest(
+            user_id=user_id,
+            media_asset_ids=request.media_asset_ids,
+        )
+    )
+
+    response_data = ReadMediaUrlsResponse(
+        urls=result.urls,
+        expires_in_minutes=result.expires_in_minutes,
+    )
+
+    return ReadMediaUrlsResponseWrapper(data=response_data)

@@ -8,6 +8,7 @@ import { Card } from '@/components/ui/card'
 import { Spinner } from '@/components/ui/spinner'
 import { useToast } from '@/components/ui/use-toast'
 import { useCreateMessageRequest } from '@/features/inbox/hooks/useCreateMessageRequest'
+import { PostImages } from '@/features/media/components/PostImages'
 import { usePostsList } from '@/features/posts/hooks/usePostsList'
 import { useToggleLike } from '@/features/posts/hooks/useToggleLike'
 import type { PostCategory, PostResponse } from '@/shared/api/generated'
@@ -173,8 +174,17 @@ export function PostsList() {
               <p className="text-sm text-foreground/90 font-bold leading-relaxed group-hover:underline">
                 {post.title}
               </p>
-              <div className="mt-2 flex items-center justify-between text-[11px] text-muted-foreground">
-                <span>無附圖</span>
+              
+              {/* Phase 9: Display post images using signed read URLs */}
+              {post.media_asset_ids && post.media_asset_ids.length > 0 ? (
+                <PostImages mediaAssetIds={post.media_asset_ids} maxDisplay={1} />
+              ) : (
+                <div className="mt-2 text-[11px] text-muted-foreground">
+                  無附圖
+                </div>
+              )}
+              
+              <div className="mt-2 flex items-center justify-end text-[11px]">
                 <span className="font-black text-primary-500">查看貼文 ›</span>
               </div>
             </button>
