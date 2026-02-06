@@ -1,0 +1,11 @@
+leonardtechsolutions.com {
+  handle_path /projects/kcardswap/api/* {
+    reverse_proxy backend:8000
+  }
+
+  handle /projects/kcardswap* {
+    reverse_proxy web:3000
+  }
+
+  respond "Not Found" 404
+}

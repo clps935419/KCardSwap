@@ -1,0 +1,36 @@
+services:
+  backend:
+    env_file:
+      - .env.prod
+
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+        NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${NEXT_PUBLIC_GOOGLE_CLIENT_ID}
+    env_file:
+      - .env.prod
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - backend
+
+  caddy:
+    image: caddy:2.8
+    container_name: kcardswap-caddy
+    depends_on:
+      - backend
+      - web
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  caddy_data:
+  caddy_config:

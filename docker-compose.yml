@@ -39,31 +39,5 @@ services:
       retries: 3
       start_period: 40s
 
-  kong:
-    image: kong:3.7
-    container_name: kcardswap-kong
-    environment:
-      KONG_DATABASE: "off"
-      KONG_DECLARATIVE_CONFIG: "/kong/declarative/kong.yaml"
-      KONG_LOG_LEVEL: info
-      KONG_PROXY_ACCESS_LOG: /dev/stdout
-      KONG_ADMIN_ACCESS_LOG: /dev/stdout
-      KONG_PROXY_ERROR_LOG: /dev/stderr
-      KONG_ADMIN_ERROR_LOG: /dev/stderr
-      KONG_PLUGINS: bundled
-    volumes:
-      - ./gateway/kong:/kong/declarative
-    ports:
-      - "8001:8001"  # Admin API
-      - "8080:8000"  # Proxy (external 8080 -> kong 8000)
-    depends_on:
-      backend:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD-SHELL", "kong health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
 volumes:
   db_data:

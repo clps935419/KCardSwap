@@ -1,6 +1,8 @@
+
 .PHONY: help dev dev-build up down logs logs-backend logs-kong logs-db \
 	test-unit-docker test-integration-docker test-docker ruff-docker clean build restart ps \
-	shell-backend shell-db init-db health seed init-admin-docker setup generate-openapi-docker
+	shell-backend shell-db init-db health seed init-admin-docker setup generate-openapi-docker \
+	prod-up prod-down
 
 help: ## 顯示可用指令
 	@echo '用法: make [target]'
@@ -28,6 +30,12 @@ up: dev ## dev 的別名
 
 down: ## 停止所有服務
 	docker compose down
+
+prod-up: ## 啟動正式環境（使用 docker-compose.prod.yml）
+	docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+
+prod-down: ## 停止正式環境
+	docker compose -f docker-compose.yml -f docker-compose.prod.yml down
 
 logs: ## 查看所有服務日誌
 	docker compose logs -f
@@ -77,8 +85,6 @@ init-db: ## 初始化資料庫 schema
 health: ## 檢查服務健康狀態
 	@echo "檢查健康端點..."
 	@curl -s http://localhost:8000/health || echo "Backend: DOWN"
-	@echo ""
-	@curl -s http://localhost:8080/api/v1/health || echo "Kong Proxy: DOWN"
 	@echo ""
 	@docker compose ps
 
