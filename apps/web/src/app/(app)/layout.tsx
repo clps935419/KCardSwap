@@ -52,9 +52,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <header className="px-6 py-4 flex justify-between items-center bg-card shadow-sm z-10 sticky top-0">
         <div className="flex flex-col">
           <p className="text-sm font-black text-foreground">{pageTitle}</p>
-          <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">
-            V2 貼文優先
-          </p>
         </div>
 
         <div className="flex items-center gap-2">

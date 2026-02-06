@@ -1,6 +1,7 @@
 'use client'
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -57,11 +58,11 @@ export function CreatePostForm() {
   const [errorMessage, setErrorMessage] = useState<string>('')
   const [uploadProgress, setUploadProgress] = useState<number>(0)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [imageName, setImageName] = useState<string | null>(null)
 
   const {
     register,
     handleSubmit,
-    watch,
     setValue,
     formState: { errors },
   } = useForm<FormData>({
@@ -112,6 +113,8 @@ export function CreatePostForm() {
         return
       }
 
+      setImageName(file.name)
+
       // Create preview
       const reader = new FileReader()
       reader.onloadend = () => {
@@ -123,6 +126,7 @@ export function CreatePostForm() {
 
   const removeImage = () => {
     setImagePreview(null)
+    setImageName(null)
     setValue('image', undefined)
   }
 
@@ -286,23 +290,38 @@ export function CreatePostForm() {
           </div>
         </div>
 
-        <Input
+        <input
           id="image"
           type="file"
           accept="image/*"
           {...register('image', {
             onChange: handleImageChange,
           })}
-          className="bg-card border-border rounded-xl"
+          className="hidden"
         />
+
+        <div className="space-y-2">
+          <Button
+            type="button"
+            variant="outline"
+            className="h-12 w-full rounded-xl font-black"
+            asChild
+          >
+            <label htmlFor="image">{imageName ? '更換圖片' : '選擇圖片'}</label>
+          </Button>
+
+          {imageName && (
+            <p className="text-xs text-muted-foreground truncate" title={imageName}>
+              {imageName}
+            </p>
+          )}
+        </div>
 
         {imagePreview && (
           <div className="relative mt-3">
-            <img
-              src={imagePreview}
-              alt="預覽"
-              className="max-h-48 rounded-2xl border border-border object-contain w-full"
-            />
+            <div className="relative h-48 w-full overflow-hidden rounded-2xl border border-border bg-muted">
+              <Image src={imagePreview} alt="預覽" fill className="object-contain" unoptimized />
+            </div>
             <Button
               type="button"
               variant="destructive"
@@ -326,13 +345,6 @@ export function CreatePostForm() {
             <p className="mt-1 text-[11px] text-muted-foreground">上傳中... {uploadProgress}%</p>
           </div>
         )}
-
-        <div className="mt-3 bg-card border border-border rounded-xl p-3">
-          <p className="text-[11px] font-black text-foreground">上傳流程（示意）</p>
-          <p className="text-[11px] text-muted-foreground">
-            授權 → PUT 上傳 → 確認（confirm）→ 附加（attach）
-          </p>
-        </div>
       </div>
 
       {/* 錯誤訊息 */}
