@@ -33,6 +33,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     retry: false,
   })
 
+  const avatarUrl = profileQuery.data?.data?.avatar_url || ''
   const userDisplay =
     profileQuery.data?.data?.nickname ||
     profileQuery.data?.data?.user_id?.substring(0, 1) ||
@@ -60,11 +61,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <Link href="/me/gallery">
             <button
               type="button"
-              className="w-9 h-9 bg-primary-500 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-white text-xs font-black transition-transform active:scale-95 hover:scale-105"
+              className="w-9 h-9 bg-primary-500 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-white text-xs font-black transition-transform active:scale-95 hover:scale-105 overflow-hidden"
               aria-label="前往我的檔案"
               title={userDisplay || '使用者'}
             >
-              {userDisplay?.[0]?.toUpperCase() || 'U'}
+              {avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt={userDisplay || '使用者'}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                userDisplay?.[0]?.toUpperCase() || 'U'
+              )}
             </button>
           </Link>
         </div>

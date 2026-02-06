@@ -69,6 +69,8 @@ class GoogleLoginUseCase:
 
         google_id = user_info.get("google_id")
         email = user_info.get("email")
+        name = user_info.get("name")
+        picture = user_info.get("picture")
 
         if not email or not google_id:
             self._logger.warning(
@@ -87,8 +89,23 @@ class GoogleLoginUseCase:
             user = await self._user_repo.save(user)
 
             # Create default profile for new user
-            profile = Profile(user_id=user.id, avatar_url=user_info.get("picture"))
+            profile = Profile(
+                user_id=user.id,
+                nickname=name,
+                avatar_url=picture,
+            )
             await self._profile_repo.save(profile)
+        else:
+            profile = await self._profile_repo.get_by_user_id(user.id)
+            if profile:
+                nickname_to_set = name if not profile.nickname and name else None
+                avatar_to_set = picture if not profile.avatar_url and picture else None
+                if nickname_to_set or avatar_to_set:
+                    profile.update_profile(
+                        nickname=nickname_to_set,
+                        avatar_url=avatar_to_set,
+                    )
+                    await self._profile_repo.save(profile)
 
         # Step 3: Generate JWT tokens
         access_token = self._jwt_service.create_access_token(
