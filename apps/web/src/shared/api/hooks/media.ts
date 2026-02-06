@@ -19,7 +19,7 @@ import {
 /**
  * Get presigned upload URL for media
  */
-async function createUploadUrl(
+export async function createUploadUrl(
   data: CreateUploadUrlRequestSchema
 ) {
   const response = await createUploadUrlApiV1MediaUploadUrlPost({
@@ -32,7 +32,7 @@ async function createUploadUrl(
 /**
  * Confirm media upload (applies quota)
  */
-async function confirmUpload(mediaId: string) {
+export async function confirmUpload(mediaId: string) {
   const response = await confirmUploadApiV1MediaMediaIdConfirmPost({
     path: {
       media_id: mediaId,
@@ -101,16 +101,7 @@ export function useUploadFlowMutation() {
 export function useAttachMediaToPostMutation() {
   return useMutation({
     mutationFn: async ({ postId, mediaId }: AttachMediaToPostInput) => {
-      const response = await attachMediaToPostApiV1MediaPostsPostIdAttachPost({
-        path: {
-          post_id: postId,
-        },
-        body: {
-          media_id: mediaId,
-        },
-        throwOnError: true,
-      })
-      return response.data
+      return attachMediaToPost(postId, mediaId)
     },
   })
 }
@@ -121,18 +112,35 @@ export function useAttachMediaToPostMutation() {
 export function useAttachMediaToGalleryCardMutation() {
   return useMutation({
     mutationFn: async ({ cardId, mediaId }: AttachMediaToGalleryCardInput) => {
-      const response = await attachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPost({
-        path: {
-          card_id: cardId,
-        },
-        body: {
-          media_id: mediaId,
-        },
-        throwOnError: true,
-      })
-      return response.data
+      return attachMediaToGalleryCard(cardId, mediaId)
     },
   })
+}
+
+export async function attachMediaToPost(postId: string, mediaId: string) {
+  const response = await attachMediaToPostApiV1MediaPostsPostIdAttachPost({
+    path: {
+      post_id: postId,
+    },
+    body: {
+      media_id: mediaId,
+    },
+    throwOnError: true,
+  })
+  return response.data
+}
+
+export async function attachMediaToGalleryCard(cardId: string, mediaId: string) {
+  const response = await attachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPost({
+    path: {
+      card_id: cardId,
+    },
+    body: {
+      media_id: mediaId,
+    },
+    throwOnError: true,
+  })
+  return response.data
 }
 
 async function uploadToGcs(

@@ -119,8 +119,8 @@ export default function MyGalleryPage() {
 
       {/* Gallery Cards */}
       {data &&
-        (data.items && data.items.length > 0 ? (
-          <GalleryGrid cards={data.items || []} isOwner={true} onDelete={handleDelete} />
+        (data.items.length > 0 ? (
+          <GalleryGrid cards={data.items} isOwner={true} onDelete={handleDelete} />
         ) : (
           <div className="text-center text-muted-foreground text-sm py-12">相簿目前沒有內容</div>
         ))}

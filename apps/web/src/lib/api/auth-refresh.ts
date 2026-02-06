@@ -1,4 +1,4 @@
-import { AuthenticationService } from '@/shared/api/generated'
+import { logoutApiV1AuthLogoutPost, refreshTokenApiV1AuthRefreshPost } from '@/shared/api/generated'
 
 /**
  * Auth Refresh Module
@@ -21,7 +21,7 @@ export async function refreshAccessToken(): Promise<void> {
     // Call refresh endpoint using SDK
     // Backend will read refresh_token from httpOnly cookie
     // and set new access_token in httpOnly cookie
-    await AuthenticationService.refreshTokenApiV1AuthRefreshPost()
+    await refreshTokenApiV1AuthRefreshPost()
 
     // Success - new access token is now in cookie
     return
@@ -37,7 +37,7 @@ export async function refreshAccessToken(): Promise<void> {
 export async function logout(): Promise<void> {
   try {
     // Call logout endpoint to clear cookies on server side using SDK
-    await AuthenticationService.logoutApiV1AuthLogoutPost()
+    await logoutApiV1AuthLogoutPost()
   } catch (error) {
     console.error('[Auth] Logout error:', error)
   } finally {

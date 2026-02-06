@@ -125,6 +125,9 @@ export default function PostDetailPage() {
   const isClosed = post.status === 'closed'
   const liked = post.liked_by_me ?? false
   const likeCount = post.like_count ?? 0
+  const category = post.category as PostCategory
+  const categoryLabel = CATEGORY_LABELS[category] ?? post.category
+  const categoryColor = CATEGORY_COLORS[category] ?? 'bg-muted text-muted-foreground'
 
   return (
     <div className="max-w-2xl mx-auto space-y-4">
@@ -153,10 +156,8 @@ export default function PostDetailPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <span
-              className={`${CATEGORY_COLORS[post.category]} text-[10px] px-3 py-1 rounded-full font-black`}
-            >
-              {CATEGORY_LABELS[post.category]}
+            <span className={`${categoryColor} text-[10px] px-3 py-1 rounded-full font-black`}>
+              {categoryLabel}
             </span>
             {post.scope === 'global' ? (
               <span className="bg-slate-900 text-white text-[10px] px-3 py-1 rounded-full font-black">

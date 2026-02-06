@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { checkAuth, initGoogleOAuth, loginWithGoogle, logout } from '@/lib/google-oauth'
-import { getMyProfileApiV1ProfileMeGet } from '@/shared/api/generated'
+import { getMyProfileApiV1ProfileMeGet, type ProfileResponse } from '@/shared/api/generated'
 
 /**
  * Auth Test Page
@@ -19,7 +19,7 @@ import { getMyProfileApiV1ProfileMeGet } from '@/shared/api/generated'
 export default function AuthTestPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [userInfo, setUserInfo] = useState<{ id?: string; email?: string } | null>(null)
+  const [userInfo, setUserInfo] = useState<ProfileResponse | null>(null)
   const [error, setError] = useState('')
 
   // Check auth status and fetch user info on mount
@@ -29,7 +29,7 @@ export default function AuthTestPage() {
     const fetchUserInfo = async () => {
       try {
         const response = await getMyProfileApiV1ProfileMeGet()
-        setUserInfo(response.data)
+        setUserInfo(response.data?.data ?? null)
       } catch (err) {
         console.error('Failed to fetch user info:', err)
       }
@@ -53,7 +53,7 @@ export default function AuthTestPage() {
   const fetchUserInfo = async () => {
     try {
       const response = await getMyProfileApiV1ProfileMeGet()
-      setUserInfo(response.data)
+      setUserInfo(response.data?.data ?? null)
     } catch (err) {
       console.error('Failed to fetch user info:', err)
     }
@@ -126,11 +126,11 @@ export default function AuthTestPage() {
             <div className="space-y-2">
               <div className="flex gap-2">
                 <span className="font-medium">User ID:</span>
-                <span className="font-mono text-sm">{userInfo.id || 'N/A'}</span>
+                <span className="font-mono text-sm">{userInfo.user_id || 'N/A'}</span>
               </div>
               <div className="flex gap-2">
-                <span className="font-medium">Email:</span>
-                <span className="font-mono text-sm">{userInfo.email || 'N/A'}</span>
+                <span className="font-medium">Nickname:</span>
+                <span className="font-mono text-sm">{userInfo.nickname || 'N/A'}</span>
               </div>
             </div>
 
