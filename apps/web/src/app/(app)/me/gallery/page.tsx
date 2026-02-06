@@ -1,6 +1,7 @@
 'use client'
 
 import { useQueryClient } from '@tanstack/react-query'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -13,6 +14,7 @@ import { logout } from '@/lib/google-oauth'
 import { useDeleteGalleryCard, useMyGalleryCards } from '@/shared/api/hooks/gallery'
 
 export default function MyGalleryPage() {
+  const router = useRouter()
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [allowStrangerDM, setAllowStrangerDM] = useState(true)
   const queryClient = useQueryClient()
@@ -57,6 +59,11 @@ export default function MyGalleryPage() {
       title: '隱私設定',
       description: `陌生人私訊：${!allowStrangerDM ? '開啟' : '關閉'}`,
     })
+  }
+
+  const handleLogout = async () => {
+    await logout()
+    router.push('/login')
   }
 
   return (
@@ -133,7 +140,7 @@ export default function MyGalleryPage() {
             <p className="text-[11px] text-muted-foreground">登出後需重新登入才能使用</p>
           </div>
           <Button
-            onClick={() => logout()}
+            onClick={handleLogout}
             variant="outline"
             className="w-full h-12 rounded-2xl border-border bg-card font-black hover:bg-muted hover:text-destructive"
           >

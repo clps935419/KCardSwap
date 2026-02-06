@@ -1,5 +1,6 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { checkAuth, initGoogleOAuth, loginWithGoogle, logout } from '@/lib/google-oauth'
@@ -17,6 +18,7 @@ import { getMyProfileApiV1ProfileMeGet, type ProfileResponse } from '@/shared/ap
  * - 提供登入/登出按鈕
  */
 export default function AuthTestPage() {
+  const router = useRouter()
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [userInfo, setUserInfo] = useState<ProfileResponse | null>(null)
@@ -91,6 +93,7 @@ export default function AuthTestPage() {
 
   const handleLogout = async () => {
     await logout()
+    router.push('/login')
   }
 
   return (

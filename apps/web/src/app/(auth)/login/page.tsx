@@ -1,9 +1,11 @@
 'use client'
 
 import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 export default function LoginPage() {
+  const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -13,6 +15,8 @@ export default function LoginPage() {
   // Check if running in development mode
   const isDev = process.env.NODE_ENV === 'development'
   const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ''
+
+  const redirectToPosts = () => router.push('/posts')
 
   const handleAdminLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -35,7 +39,7 @@ export default function LoginPage() {
       // No need to manually store them in localStorage
       if (response.data) {
         // Redirect to posts feed after login
-        window.location.href = '/posts'
+        redirectToPosts()
       }
     } catch (err: unknown) {
       // More robust error parsing
@@ -80,6 +84,7 @@ export default function LoginPage() {
         setGoogleError={setGoogleError}
         isDev={isDev}
         handleAdminLogin={handleAdminLogin}
+        onLoginSuccess={redirectToPosts}
       />
     </GoogleOAuthProvider>
   )
@@ -96,6 +101,7 @@ interface LoginPageContentProps {
   setGoogleError: (error: string) => void
   isDev: boolean
   handleAdminLogin: (e: React.FormEvent) => void
+  onLoginSuccess: () => void
 }
 
 function LoginPageContent({
@@ -109,6 +115,7 @@ function LoginPageContent({
   setGoogleError,
   isDev,
   handleAdminLogin,
+  onLoginSuccess,
 }: LoginPageContentProps) {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
 
@@ -138,7 +145,7 @@ function LoginPageContent({
 
         if (response.data) {
           // Redirect to posts feed after login
-          window.location.href = '/posts'
+          onLoginSuccess()
         }
       } catch (err: unknown) {
         // More robust error parsing
