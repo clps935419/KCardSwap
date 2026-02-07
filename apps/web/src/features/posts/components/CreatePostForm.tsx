@@ -151,8 +151,8 @@ export function CreatePostForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      {/* Category and Scope in 2-column grid */}
-      <div className="grid grid-cols-2 gap-3">
+      {/* Category and Scope in stacked rows */}
+      <div className="space-y-3">
         {/* 分類 */}
         <div className="bg-muted/50 border border-border/30 rounded-2xl p-4">
           <p className="text-[10px] font-bold text-muted-foreground uppercase mb-2">分類</p>

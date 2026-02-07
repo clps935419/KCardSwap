@@ -1,7 +1,6 @@
 'use client'
 
 import { useQueryClient } from '@tanstack/react-query'
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -10,13 +9,10 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/use-toast'
 import { GalleryCreateCardForm } from '@/features/gallery/components/GalleryCreateCardForm'
 import { GalleryGrid } from '@/features/gallery/components/GalleryGrid'
-import { logout } from '@/lib/google-oauth'
 import { useDeleteGalleryCard, useMyGalleryCards } from '@/shared/api/hooks/gallery'
 
 export default function MyGalleryPage() {
-  const router = useRouter()
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
-  const [allowStrangerDM, setAllowStrangerDM] = useState(true)
   const queryClient = useQueryClient()
   const { toast } = useToast()
 
@@ -53,47 +49,20 @@ export default function MyGalleryPage() {
     })
   }
 
-  const toggleStrangerDM = () => {
-    setAllowStrangerDM(!allowStrangerDM)
-    toast({
-      title: '隱私設定',
-      description: `陌生人私訊：${!allowStrangerDM ? '開啟' : '關閉'}`,
-    })
-  }
-
-  const handleLogout = async () => {
-    await logout()
-    router.push('/login')
-  }
-
   return (
     <div className="mx-auto max-w-2xl space-y-4">
-      {/* Header Card */}
+      {/* Gallery Header */}
       <Card className="p-5 rounded-2xl border border-border/30 bg-card shadow-sm">
         <div className="flex items-start justify-between">
           <div>
             <p className="text-sm font-black text-foreground">相簿小卡</p>
-            <p className="text-[11px] text-muted-foreground">可新增 / 刪除 / 排序；不含交換狀態</p>
           </div>
-          <span className="bg-primary-50 text-primary-700 text-[10px] px-2 py-1 rounded-full font-black">
-            V2
-          </span>
         </div>
 
-        <div className="mt-4 grid grid-cols-2 gap-3">
-          <Button
-            onClick={toggleStrangerDM}
-            variant="outline"
-            className="h-12 rounded-2xl border-border bg-card font-black hover:bg-muted"
-          >
-            陌生人私訊：
-            <span className={allowStrangerDM ? 'text-emerald-600' : 'text-rose-600'}>
-              {allowStrangerDM ? '開' : '關'}
-            </span>
-          </Button>
+        <div className="mt-4">
           <Button
             onClick={() => setIsCreateDialogOpen(true)}
-            className="h-12 rounded-2xl bg-slate-900 text-white font-black shadow-xl hover:bg-slate-800"
+            className="w-full h-12 rounded-2xl bg-slate-900 text-white font-black shadow-xl hover:bg-slate-800"
           >
             新增小卡
           </Button>
@@ -131,23 +100,6 @@ export default function MyGalleryPage() {
         ) : (
           <div className="text-center text-muted-foreground text-sm py-12">相簿目前沒有內容</div>
         ))}
-
-      {/* Logout Section */}
-      <Card className="p-5 rounded-2xl border border-border/30 bg-card shadow-sm">
-        <div className="space-y-3">
-          <div>
-            <p className="text-sm font-black text-foreground">帳號管理</p>
-            <p className="text-[11px] text-muted-foreground">登出後需重新登入才能使用</p>
-          </div>
-          <Button
-            onClick={handleLogout}
-            variant="outline"
-            className="w-full h-12 rounded-2xl border-border bg-card font-black hover:bg-muted hover:text-destructive"
-          >
-            登出
-          </Button>
-        </div>
-      </Card>
 
       {/* Create Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>

@@ -33,12 +33,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     retry: false,
   })
 
-  const avatarUrl = profileQuery.data?.data?.avatar_url || ''
-  const userDisplay =
-    profileQuery.data?.data?.nickname ||
-    profileQuery.data?.data?.user_id?.substring(0, 1) ||
-    ''
-
+  const profileWrapper = profileQuery.data
+  const profile = profileWrapper?.data
+  const avatarUrl = profile?.avatar_url || ''
+  const userDisplay = profile?.nickname || profile?.user_id?.substring(0, 1) || ''
   return (
     <div className="min-h-screen bg-background flex flex-col relative">
       {/* Header */}
@@ -58,7 +56,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </Button>
 
           {/* User Avatar */}
-          <Link href="/me/gallery">
+          <Link href="/me">
             <button
               type="button"
               className="w-9 h-9 bg-primary-500 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-white text-xs font-black transition-transform active:scale-95 hover:scale-105 overflow-hidden"
@@ -100,30 +98,33 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </button>
           </Link>
 
-          {/* Create Post */}
-          <Link href="/posts/new" className="justify-self-center">
-            <button
-              type="button"
-              className="w-14 h-14 bg-slate-900 rounded-2xl flex flex-col items-center justify-center gap-0.5 text-white shadow-xl transition-transform active:scale-95 hover:scale-105"
-              aria-label="發文"
-            >
-              <div className="text-2xl leading-none">+</div>
-              <div className="text-[9px] font-black tracking-wide text-white/90">發文</div>
-            </button>
-          </Link>
-
           {/* Inbox */}
           <Link href="/inbox" className="w-full">
             <button
               type="button"
               className={`w-full h-14 rounded-2xl flex flex-col items-center justify-center gap-1 transition-all active:scale-95 ${
-                pathname === '/inbox'
+                pathname === '/inbox' || pathname.startsWith('/inbox/')
                   ? 'text-primary-500 bg-accent shadow-sm'
                   : 'text-muted-foreground hover:text-foreground hover:bg-muted'
               }`}
             >
-              <div className="text-xl leading-none">💬</div>
+              <div className="text-xl leading-none">✉️</div>
               <div className="text-[10px] font-black tracking-wide">信箱</div>
+            </button>
+          </Link>
+
+          {/* Me */}
+          <Link href="/me" className="w-full">
+            <button
+              type="button"
+              className={`w-full h-14 rounded-2xl flex flex-col items-center justify-center gap-1 transition-all active:scale-95 ${
+                pathname === '/me' || pathname.startsWith('/me/')
+                  ? 'text-primary-500 bg-accent shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+              }`}
+            >
+              <div className="text-xl leading-none">👤</div>
+              <div className="text-[10px] font-black tracking-wide">我的</div>
             </button>
           </Link>
         </div>
