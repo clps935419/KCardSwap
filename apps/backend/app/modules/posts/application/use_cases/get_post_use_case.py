@@ -3,12 +3,16 @@ Get Post Use Case
 
 Retrieves a single post by ID with like count and current user's like status.
 Phase 9: Includes media_asset_ids for image display.
+Includes owner_nickname and owner_avatar_url from profile.
 """
 
 import logging
 from typing import Optional
 from uuid import UUID
 
+from sqlalchemy import select
+
+from app.modules.identity.infrastructure.database.models.profile_model import ProfileModel
 from app.modules.posts.domain.entities.post import Post
 from app.modules.posts.domain.repositories.i_post_repository import IPostRepository
 from app.modules.posts.infrastructure.repositories.post_like_repository_impl import (
@@ -63,9 +67,22 @@ class GetPostUseCase:
         post._like_count = like_count
         post._liked_by_me = liked_by_me
 
+        # Fetch owner profile information
+        result = await self.session.execute(
+            select(ProfileModel.nickname, ProfileModel.avatar_url)
+            .where(ProfileModel.user_id == UUID(post.owner_id))
+        )
+        profile_data = result.first()
+        if profile_data:
+            post._owner_nickname = profile_data[0]
+            post._owner_avatar_url = profile_data[1]
+        else:
+            post._owner_nickname = None
+            post._owner_avatar_url = None
+
         logger.info(
             f"Retrieved post {post_id} with {like_count} likes, "
-            f"liked_by_me={liked_by_me}"
+            f"liked_by_me={liked_by_me}, owner_nickname={post._owner_nickname}"
         )
 
         return post

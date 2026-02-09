@@ -1235,6 +1235,28 @@
         }
       }
     },
+    "/api/v1/posts/categories": {
+      "get": {
+        "tags": [
+          "Posts"
+        ],
+        "summary": "Get available post categories",
+        "description": "Returns list of all available post categories with their labels",
+        "operationId": "get_categories_api_v1_posts_categories_get",
+        "responses": {
+          "200": {
+            "description": "Categories retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostCategoryListResponseWrapper"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/posts": {
       "post": {
         "tags": [
@@ -2802,7 +2824,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SendMessageRequest"
+                "$ref": "#/components/schemas/app__modules__social__presentation__schemas__message_schemas__SendMessageRequest"
               }
             }
           }
@@ -4071,6 +4093,82 @@
         "title": "PostCategory",
         "description": "Post category enumeration (FR-002)"
       },
+      "PostCategoryListResponse": {
+        "properties": {
+          "categories": {
+            "items": {
+              "$ref": "#/components/schemas/PostCategoryOption"
+            },
+            "type": "array",
+            "title": "Categories",
+            "description": "List of available categories"
+          }
+        },
+        "type": "object",
+        "required": [
+          "categories"
+        ],
+        "title": "PostCategoryListResponse",
+        "description": "Response schema for category list",
+        "example": {
+          "categories": [
+            {
+              "label": "求換",
+              "value": "trade"
+            },
+            {
+              "label": "送出",
+              "value": "giveaway"
+            }
+          ]
+        }
+      },
+      "PostCategoryListResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/PostCategoryListResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "PostCategoryListResponseWrapper",
+        "description": "Response wrapper for category list (standardized envelope)"
+      },
+      "PostCategoryOption": {
+        "properties": {
+          "value": {
+            "type": "string",
+            "title": "Value",
+            "description": "Category value (enum)"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label",
+            "description": "Category display label (Chinese)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "value",
+          "label"
+        ],
+        "title": "PostCategoryOption",
+        "description": "Schema for a single category option",
+        "example": {
+          "label": "求換",
+          "value": "trade"
+        }
+      },
       "PostListResponse": {
         "properties": {
           "posts": {
@@ -4149,6 +4247,30 @@
             "format": "uuid",
             "title": "Owner Id",
             "description": "Owner user ID"
+          },
+          "owner_nickname": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Owner Nickname",
+            "description": "Owner's nickname from profile"
+          },
+          "owner_avatar_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Owner Avatar Url",
+            "description": "Owner's avatar URL from profile"
           },
           "scope": {
             "type": "string",
@@ -4795,35 +4917,6 @@
         "title": "ReportResponseWrapper",
         "description": "Response wrapper for single report (standardized envelope)"
       },
-      "SendMessageRequest": {
-        "properties": {
-          "content": {
-            "type": "string",
-            "maxLength": 5000,
-            "minLength": 1,
-            "title": "Content",
-            "description": "Message content"
-          },
-          "post_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Post Id",
-            "description": "Optional post ID to reference"
-          }
-        },
-        "type": "object",
-        "required": [
-          "content"
-        ],
-        "title": "SendMessageRequest",
-        "description": "Request to send a message in a thread"
-      },
       "SubscriptionStatusData": {
         "properties": {
           "plan": {
@@ -5360,6 +5453,35 @@
         "example": {
           "content": "Hello! I'm interested in trading cards."
         }
+      },
+      "app__modules__social__presentation__schemas__message_schemas__SendMessageRequest": {
+        "properties": {
+          "content": {
+            "type": "string",
+            "maxLength": 5000,
+            "minLength": 1,
+            "title": "Content",
+            "description": "Message content"
+          },
+          "post_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Post Id",
+            "description": "Optional post ID to reference"
+          }
+        },
+        "type": "object",
+        "required": [
+          "content"
+        ],
+        "title": "SendMessageRequest",
+        "description": "Request to send a message in a thread"
       }
     },
     "securitySchemes": {

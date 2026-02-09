@@ -32,6 +32,9 @@ from app.modules.posts.presentation.dependencies.use_case_deps import (
 )
 from app.modules.posts.presentation.schemas.post_schemas import (
     CreatePostRequest,
+    PostCategoryListResponse,
+    PostCategoryListResponseWrapper,
+    PostCategoryOption,
     PostListResponse,
     PostListResponseWrapper,
     PostResponse,
@@ -48,16 +51,47 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/posts", tags=["Posts"])
 
 
+@router.get(
+    "/categories",
+    response_model=PostCategoryListResponseWrapper,
+    responses={
+        200: {"description": "Categories retrieved successfully"},
+    },
+    summary="Get available post categories",
+    description="Returns list of all available post categories with their labels",
+)
+async def get_categories() -> PostCategoryListResponseWrapper:
+    """
+    Get available post categories.
+    
+    Returns all available categories with their Chinese labels for display.
+    """
+    categories = [
+        PostCategoryOption(value="trade", label="求換"),
+        PostCategoryOption(value="giveaway", label="送出"),
+        PostCategoryOption(value="group", label="揪團"),
+        PostCategoryOption(value="showcase", label="展示"),
+        PostCategoryOption(value="help", label="求助"),
+        PostCategoryOption(value="announcement", label="公告"),
+    ]
+    
+    data = PostCategoryListResponse(categories=categories)
+    return PostCategoryListResponseWrapper(data=data, meta=None, error=None)
+
+
 async def _post_to_response(
     post,
     session: AsyncSession,
     like_count: int = 0,
     liked_by_me: bool = False,
     media_asset_ids: Optional[List[UUID]] = None,
+    owner_nickname: Optional[str] = None,
+    owner_avatar_url: Optional[str] = None,
 ) -> PostResponse:
-    """Helper to convert Post entity to PostResponse with media_asset_ids.
+    """Helper to convert Post entity to PostResponse with media_asset_ids and owner info.
     
     Phase 9: Includes media_asset_ids for image display.
+    Includes owner_nickname and owner_avatar_url from profile.
     """
     # If media_asset_ids not provided, fetch from database
     if media_asset_ids is None:
@@ -65,9 +99,25 @@ async def _post_to_response(
         media_list = await media_repo.get_by_target("post", UUID(post.id))
         media_asset_ids = [media.id for media in media_list]
     
+    # If owner info not provided, fetch from profile
+    if owner_nickname is None or owner_avatar_url is None:
+        from sqlalchemy import select
+        from app.modules.identity.infrastructure.database.models.profile_model import ProfileModel
+        
+        result = await session.execute(
+            select(ProfileModel.nickname, ProfileModel.avatar_url)
+            .where(ProfileModel.user_id == UUID(post.owner_id))
+        )
+        profile_data = result.first()
+        if profile_data:
+            owner_nickname = profile_data[0]
+            owner_avatar_url = profile_data[1]
+    
     return PostResponse(
         id=UUID(post.id),
         owner_id=UUID(post.owner_id),
+        owner_nickname=owner_nickname,
+        owner_avatar_url=owner_avatar_url,
         scope=post.scope.value,
         city_code=post.city_code,
         category=post.category.value,
@@ -192,6 +242,8 @@ async def list_posts(
                 session,
                 like_count=pwl.like_count,
                 liked_by_me=pwl.liked_by_me,
+                owner_nickname=pwl.owner_nickname,
+                owner_avatar_url=pwl.owner_avatar_url,
             )
             for pwl in posts_with_likes
         ]
@@ -249,12 +301,16 @@ async def get_post(
         # Get like count and liked_by_me from post attributes
         like_count = getattr(post, '_like_count', 0)
         liked_by_me = getattr(post, '_liked_by_me', False)
+        owner_nickname = getattr(post, '_owner_nickname', None)
+        owner_avatar_url = getattr(post, '_owner_avatar_url', None)
         
         data = await _post_to_response(
             post,
             session,
             like_count=like_count,
             liked_by_me=liked_by_me,
+            owner_nickname=owner_nickname,
+            owner_avatar_url=owner_avatar_url,
         )
         return PostResponseWrapper(data=data, meta=None, error=None)
         

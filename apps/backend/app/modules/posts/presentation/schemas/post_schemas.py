@@ -89,6 +89,8 @@ class PostResponse(BaseModel):
 
     id: UUID = Field(..., description="Post ID")
     owner_id: UUID = Field(..., description="Owner user ID")
+    owner_nickname: Optional[str] = Field(None, description="Owner's nickname from profile")
+    owner_avatar_url: Optional[str] = Field(None, description="Owner's avatar URL from profile")
     scope: str = Field(..., description="Post scope (global/city)")
     city_code: Optional[str] = Field(None, description="City code (if scope=city)")
     category: str = Field(..., description="Post category")
@@ -296,5 +298,44 @@ class ToggleLikeResponseWrapper(BaseModel):
     """Response wrapper for toggle like response (standardized envelope)"""
 
     data: ToggleLikeResponse
+    meta: None = None
+    error: None = None
+
+
+class PostCategoryOption(BaseModel):
+    """Schema for a single category option"""
+
+    value: str = Field(..., description="Category value (enum)")
+    label: str = Field(..., description="Category display label (Chinese)")
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "value": "trade",
+                "label": "求換",
+            }
+        }
+
+
+class PostCategoryListResponse(BaseModel):
+    """Response schema for category list"""
+
+    categories: List[PostCategoryOption] = Field(..., description="List of available categories")
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "categories": [
+                    {"value": "trade", "label": "求換"},
+                    {"value": "giveaway", "label": "送出"},
+                ]
+            }
+        }
+
+
+class PostCategoryListResponseWrapper(BaseModel):
+    """Response wrapper for category list (standardized envelope)"""
+
+    data: PostCategoryListResponse
     meta: None = None
     error: None = None

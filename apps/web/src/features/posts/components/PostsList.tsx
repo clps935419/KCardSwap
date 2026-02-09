@@ -135,12 +135,20 @@ export function PostsList() {
             {/* Post Header */}
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-primary-50 rounded-full flex items-center justify-center">
-                  👤
+                <div className="w-8 h-8 bg-primary-50 rounded-full flex items-center justify-center overflow-hidden">
+                  {post.owner_avatar_url ? (
+                    <img 
+                      src={post.owner_avatar_url} 
+                      alt={post.owner_nickname || 'User avatar'}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span>👤</span>
+                  )}
                 </div>
                 <div>
                   <p className="text-sm font-black text-foreground">
-                    User {post.owner_id.slice(0, 8)}
+                    {post.owner_nickname || `User ${post.owner_id.slice(0, 8)}`}
                   </p>
                   <p className="text-[10px] text-muted-foreground font-bold uppercase">
                     {formatTimeAgo(post.created_at)} • {post.id.slice(0, 8)}

@@ -137,7 +137,7 @@ class PostsModule(Module):
         post_repo = PostRepositoryImpl(session)
         like_repo = PostLikeRepositoryImpl(session)
         return ListPostsV2UseCase(
-            post_repository=post_repo, like_repository=like_repo
+            post_repository=post_repo, like_repository=like_repo, session=session
         )
 
     @provider
