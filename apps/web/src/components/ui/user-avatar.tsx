@@ -4,6 +4,7 @@
  * Displays user avatar with fallback to initial
  */
 
+import Image from 'next/image'
 import { cn } from '@/lib/utils'
 
 interface UserAvatarProps {
@@ -27,13 +28,19 @@ export function UserAvatar({ nickname, avatarUrl, userId, size = 'md', className
   return (
     <div
       className={cn(
-        'rounded-full bg-primary-50 text-primary-500 flex items-center justify-center font-black overflow-hidden',
+        'rounded-full bg-primary-50 text-primary-500 flex items-center justify-center font-black overflow-hidden relative',
         sizeClasses[size],
         className
       )}
     >
       {avatarUrl ? (
-        <img src={avatarUrl} alt={nickname || 'User'} className="w-full h-full object-cover" />
+        <Image
+          src={avatarUrl}
+          alt={nickname || 'User'}
+          fill
+          className="object-cover"
+          sizes="40px"
+        />
       ) : (
         <span>{fallbackChar}</span>
       )}
