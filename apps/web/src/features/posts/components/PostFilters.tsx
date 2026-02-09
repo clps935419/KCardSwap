@@ -1,7 +1,16 @@
 'use client'
 
 import { useRouter, useSearchParams } from 'next/navigation'
+import { useQuery } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { getCitiesApiV1LocationsCitiesGetOptions } from '@/shared/api/generated/@tanstack/react-query.gen'
 import type { PostCategory } from '@/shared/api/generated'
 
 const CATEGORIES: { value: PostCategory | 'all'; label: string }[] = [
@@ -14,18 +23,14 @@ const CATEGORIES: { value: PostCategory | 'all'; label: string }[] = [
   { value: 'announcement', label: '公告' },
 ]
 
-const CITIES = [
-  { value: 'ALL', label: '全部城市' },
-  { value: 'TPE', label: '台北 TPE' },
-  { value: 'TPH', label: '新北 TPH' },
-  { value: 'TXG', label: '台中 TXG' },
-  { value: 'TNN', label: '台南 TNN' },
-  { value: 'KHH', label: '高雄 KHH' },
-]
-
 export function PostFilters() {
   const router = useRouter()
   const searchParams = useSearchParams()
+
+  const citiesQuery = useQuery({
+    ...getCitiesApiV1LocationsCitiesGetOptions(),
+    staleTime: 24 * 60 * 60 * 1000,
+  })
 
   const currentCity = searchParams.get('city') || 'ALL'
   const currentCategory = searchParams.get('category') || 'all'
@@ -39,6 +44,14 @@ export function PostFilters() {
     }
     router.push(`/posts?${params.toString()}`)
   }
+
+  const cityOptions = [
+    { value: 'ALL', label: '全部城市' },
+    ...(citiesQuery.data?.data.cities ?? []).map(city => ({
+      value: city.code,
+      label: `${city.name_zh}`,
+    })),
+  ]
 
   return (
     <div className="space-y-4">
@@ -56,23 +69,34 @@ export function PostFilters() {
         </Button>
       </div>
 
-      {/* City Filters */}
-      <div className="flex flex-wrap gap-2">
-        {CITIES.map(city => (
-          <Button
-            key={city.value}
-            variant="outline"
-            size="sm"
-            onClick={() => updateFilter('city', city.value)}
-            className={`px-3 py-2 rounded-full text-[11px] font-black border transition-all ${
-              currentCity === city.value
-                ? 'border-slate-900 bg-slate-900 text-white hover:bg-slate-900/90 hover:text-white'
-                : 'border-border bg-card text-muted-foreground hover:bg-muted hover:text-foreground'
-            }`}
-          >
-            {city.label}
-          </Button>
-        ))}
+      {/* City Filter */}
+      <div className="space-y-2">
+        <p className="text-[10px] font-bold text-muted-foreground uppercase">城市</p>
+        <Select
+          value={currentCity}
+          onValueChange={value => updateFilter('city', value)}
+        >
+          <SelectTrigger className="bg-card border-border rounded-xl font-black">
+            <SelectValue placeholder={citiesQuery.isLoading ? '城市載入中...' : '選擇城市'} />
+          </SelectTrigger>
+          <SelectContent>
+            {citiesQuery.isError && (
+              <SelectItem value="__error__" disabled>
+                城市載入失敗
+              </SelectItem>
+            )}
+            {!citiesQuery.isError && cityOptions.length === 0 && (
+              <SelectItem value="__empty__" disabled>
+                沒有可用城市
+              </SelectItem>
+            )}
+            {cityOptions.map(city => (
+              <SelectItem key={city.value} value={city.value}>
+                {city.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Category Filters */}
