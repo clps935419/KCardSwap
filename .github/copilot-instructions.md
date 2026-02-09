@@ -65,6 +65,21 @@ Speckit 在 implement 階段產生的報告，請直接寫入 `reports/` 目錄�
        - JavaScript Performance（`js-*`）
        - Advanced Patterns（`advanced-*`）
 
+3. **SSR 預取 + CSR HydrationBoundary**:
+   - 需要可預取的資料（如 location、category），必須在 Server Component 以 TanStack Query `prefetchQuery` 預取。
+   - 預取完成後以 `dehydrate` 產出 state，並用 `HydrationBoundary` 包住對應的 Client Component。
+   - Server 與 Client 必須使用一致的 `queryKey` 與 query options，避免 hydration miss 導致 loading。
+    - 適用情境判斷準則：
+       - 首屏立即可用的篩選或選項（避免進頁即 loading）。
+       - SEO 或分享卡片關鍵內容需要 SSR 即可讀取。
+       - 高流量或高轉換入口頁（降低感知等待）。
+       - 避免瀑布式查詢（Client 端後續 UI 依賴首個 query）。
+       - 低變動、可長時間快取的資料（字典表、分類、城市）。
+    - 不適用或可延後的情境：
+       - 強個人化或高頻變動的資料。
+       - 需要使用者互動後才需要的次要資料。
+       - 伺服器端無法安全取得的 cookie/session 依賴資料。
+
 ## 後端開發規範
 
 ### OpenAPI 規格生成
