@@ -58,15 +58,23 @@ export function CommentsList({ postId, comments, isLoading }: CommentsListProps)
 					>
 						<div className="flex items-start gap-3">
 							{/* Avatar */}
-							<div className="w-8 h-8 bg-primary-50 rounded-full flex items-center justify-center flex-shrink-0">
-								👤
+							<div className="w-8 h-8 bg-primary-50 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden">
+								{comment.user_avatar_url ? (
+									<img 
+										src={comment.user_avatar_url} 
+										alt={comment.user_nickname || '使用者'} 
+										className="w-full h-full object-cover"
+									/>
+								) : (
+									<span className="text-lg">👤</span>
+								)}
 							</div>
 
 							{/* Comment content */}
 							<div className="flex-1 min-w-0">
 								<div className="flex items-center gap-2 mb-1">
 									<span className="text-xs font-bold text-foreground">
-										使用者 {comment.user_id.toString().slice(0, 8)}
+										{comment.user_nickname || `使用者 ${comment.user_id.toString().slice(0, 8)}`}
 									</span>
 									<span className="text-[10px] text-muted-foreground">
 										{formatTimeAgo(comment.created_at)}

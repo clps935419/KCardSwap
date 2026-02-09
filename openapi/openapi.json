@@ -3493,7 +3493,9 @@
               "id": "123e4567-e89b-12d3-a456-426614174000",
               "post_id": "987e6543-e21b-12d3-a456-426614174000",
               "updated_at": "2024-01-01T00:00:00Z",
-              "user_id": "456e7890-e12b-34d5-a678-901234567000"
+              "user_avatar_url": "https://example.com/avatar.jpg",
+              "user_id": "456e7890-e12b-34d5-a678-901234567000",
+              "user_nickname": "KpopFan123"
             }
           ],
           "total": 1
@@ -3540,6 +3542,30 @@
             "title": "User Id",
             "description": "User ID who created the comment"
           },
+          "user_nickname": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Nickname",
+            "description": "Commenter's nickname from profile"
+          },
+          "user_avatar_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Avatar Url",
+            "description": "Commenter's avatar URL from profile"
+          },
           "content": {
             "type": "string",
             "title": "Content",
@@ -3575,7 +3601,9 @@
           "id": "123e4567-e89b-12d3-a456-426614174000",
           "post_id": "987e6543-e21b-12d3-a456-426614174000",
           "updated_at": "2024-01-01T00:00:00Z",
-          "user_id": "456e7890-e12b-34d5-a678-901234567000"
+          "user_avatar_url": "https://example.com/avatar.jpg",
+          "user_id": "456e7890-e12b-34d5-a678-901234567000",
+          "user_nickname": "KpopFan123"
         }
       },
       "CommentResponseWrapper": {

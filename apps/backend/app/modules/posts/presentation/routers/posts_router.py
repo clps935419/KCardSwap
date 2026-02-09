@@ -462,6 +462,7 @@ async def toggle_like(
 async def list_post_comments(
     post_id: UUID,
     use_case: Annotated[ListPostCommentsUseCase, Depends(get_list_post_comments_use_case)],
+    session: Annotated[AsyncSession, Depends(get_db_session)],
     limit: int = Query(50, ge=1, le=100, description="Maximum number of comments to return"),
     offset: int = Query(0, ge=0, description="Number of comments to skip"),
 ) -> CommentListResponseWrapper:
@@ -478,11 +479,27 @@ async def list_post_comments(
             offset=offset,
         )
         
+        # Fetch user profiles for all commenters
+        from sqlalchemy import select
+        from app.modules.identity.infrastructure.database.models.profile_model import ProfileModel
+        
+        user_ids = [UUID(comment.user_id) for comment in comments]
+        if user_ids:
+            result = await session.execute(
+                select(ProfileModel.user_id, ProfileModel.nickname, ProfileModel.avatar_url)
+                .where(ProfileModel.user_id.in_(user_ids))
+            )
+            profiles = {row[0]: (row[1], row[2]) for row in result.all()}
+        else:
+            profiles = {}
+        
         comment_responses = [
             CommentResponse(
                 id=UUID(comment.id),
                 post_id=UUID(comment.post_id),
                 user_id=UUID(comment.user_id),
+                user_nickname=profiles.get(UUID(comment.user_id), (None, None))[0],
+                user_avatar_url=profiles.get(UUID(comment.user_id), (None, None))[1],
                 content=comment.content,
                 created_at=comment.created_at,
                 updated_at=comment.updated_at,
@@ -518,6 +535,7 @@ async def create_post_comment(
     request: CreateCommentRequest,
     current_user_id: Annotated[UUID, Depends(require_user)],
     use_case: Annotated[CreatePostCommentUseCase, Depends(get_create_post_comment_use_case)],
+    session: Annotated[AsyncSession, Depends(get_db_session)],
 ) -> CommentResponseWrapper:
     """
     Create a comment on a post.
@@ -531,10 +549,24 @@ async def create_post_comment(
             content=request.content,
         )
         
+        # Fetch user profile for the commenter
+        from sqlalchemy import select
+        from app.modules.identity.infrastructure.database.models.profile_model import ProfileModel
+        
+        result = await session.execute(
+            select(ProfileModel.nickname, ProfileModel.avatar_url)
+            .where(ProfileModel.user_id == current_user_id)
+        )
+        profile_data = result.first()
+        user_nickname = profile_data[0] if profile_data else None
+        user_avatar_url = profile_data[1] if profile_data else None
+        
         data = CommentResponse(
             id=UUID(comment.id),
             post_id=UUID(comment.post_id),
             user_id=UUID(comment.user_id),
+            user_nickname=user_nickname,
+            user_avatar_url=user_avatar_url,
             content=comment.content,
             created_at=comment.created_at,
             updated_at=comment.updated_at,

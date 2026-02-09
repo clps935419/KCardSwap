@@ -66,6 +66,8 @@ export function useCreateComment(postId: string) {
 						id: `temp-${Date.now()}` as any,
 						post_id: postId as any,
 						user_id: 'current-user' as any, // Will be replaced with actual user ID from server
+						user_nickname: null, // Will be filled by server
+						user_avatar_url: null, // Will be filled by server
 						content,
 						created_at: new Date().toISOString(),
 						updated_at: new Date().toISOString(),

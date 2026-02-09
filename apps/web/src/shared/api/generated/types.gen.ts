@@ -331,6 +331,18 @@ export type CommentResponse = {
      */
     user_id: string;
     /**
+     * User Nickname
+     *
+     * Commenter's nickname from profile
+     */
+    user_nickname?: string | null;
+    /**
+     * User Avatar Url
+     *
+     * Commenter's avatar URL from profile
+     */
+    user_avatar_url?: string | null;
+    /**
      * Content
      *
      * Comment content

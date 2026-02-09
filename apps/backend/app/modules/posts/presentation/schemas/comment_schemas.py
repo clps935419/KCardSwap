@@ -4,7 +4,7 @@ Presentation layer - Request/Response schemas for comments
 """
 
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel, Field
@@ -35,6 +35,8 @@ class CommentResponse(BaseModel):
     id: UUID = Field(..., description="Comment ID")
     post_id: UUID = Field(..., description="Post ID")
     user_id: UUID = Field(..., description="User ID who created the comment")
+    user_nickname: Optional[str] = Field(None, description="Commenter's nickname from profile")
+    user_avatar_url: Optional[str] = Field(None, description="Commenter's avatar URL from profile")
     content: str = Field(..., description="Comment content")
     created_at: datetime = Field(..., description="Creation timestamp")
     updated_at: datetime = Field(..., description="Last update timestamp")
@@ -46,6 +48,8 @@ class CommentResponse(BaseModel):
                 "id": "123e4567-e89b-12d3-a456-426614174000",
                 "post_id": "987e6543-e21b-12d3-a456-426614174000",
                 "user_id": "456e7890-e12b-34d5-a678-901234567000",
+                "user_nickname": "KpopFan123",
+                "user_avatar_url": "https://example.com/avatar.jpg",
                 "content": "Great post! I'm interested!",
                 "created_at": "2024-01-01T00:00:00Z",
                 "updated_at": "2024-01-01T00:00:00Z",
@@ -67,6 +71,8 @@ class CommentListResponse(BaseModel):
                         "id": "123e4567-e89b-12d3-a456-426614174000",
                         "post_id": "987e6543-e21b-12d3-a456-426614174000",
                         "user_id": "456e7890-e12b-34d5-a678-901234567000",
+                        "user_nickname": "KpopFan123",
+                        "user_avatar_url": "https://example.com/avatar.jpg",
                         "content": "Great post! I'm interested!",
                         "created_at": "2024-01-01T00:00:00Z",
                         "updated_at": "2024-01-01T00:00:00Z",
