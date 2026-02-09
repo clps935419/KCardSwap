@@ -11,6 +11,9 @@ import { useCreateMessageRequest } from '@/features/inbox/hooks/useCreateMessage
 import { PostImages } from '@/features/media/components/PostImages'
 import { usePost } from '@/features/posts/hooks/usePost'
 import { useToggleLike } from '@/features/posts/hooks/useToggleLike'
+import { usePostComments, useCreateComment } from '@/features/posts/hooks/useComments'
+import { CommentsList } from '@/features/posts/components/CommentsList'
+import { CommentForm } from '@/features/posts/components/CommentForm'
 import type { PostCategory } from '@/shared/api/generated'
 
 const CATEGORY_LABELS: Record<PostCategory, string> = {
@@ -58,6 +61,23 @@ export function PostDetailPageClient({ postId }: PostDetailPageClientProps) {
 
   const { createRequest } = useCreateMessageRequest()
   const toggleLikeMutation = useToggleLike()
+
+  // Comments functionality
+  const { data: commentsData, isLoading: commentsLoading } = usePostComments(postId, {
+    enabled: !!post, // Only fetch comments if post is loaded
+  })
+  const commentsResponse = commentsData?.data
+  const comments = commentsResponse?.comments || []
+  const createCommentMutation = useCreateComment(postId)
+
+  const handleCreateComment = async (content: string) => {
+    try {
+      await createCommentMutation.mutateAsync(content)
+    } catch (err) {
+      // Error handling is done in the mutation's onError callback
+      console.error('Error creating comment:', err)
+    }
+  }
 
   const handleMessageAuthor = async () => {
     if (!post) return
@@ -148,12 +168,20 @@ export function PostDetailPageClient({ postId }: PostDetailPageClientProps) {
         {/* Post Header */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary-50 rounded-full flex items-center justify-center">
-              👤
+            <div className="w-10 h-10 bg-primary-50 rounded-full flex items-center justify-center overflow-hidden">
+              {post.owner_avatar_url ? (
+                <img 
+                  src={post.owner_avatar_url} 
+                  alt={post.owner_nickname || '使用者'} 
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span className="text-xl">👤</span>
+              )}
             </div>
             <div>
               <p className="text-sm font-black text-foreground">
-                使用者 {post.owner_id.slice(0, 8)}
+                {post.owner_nickname || `使用者 ${post.owner_id.slice(0, 8)}`}
               </p>
               <p className="text-[10px] text-muted-foreground font-bold uppercase">
                 {formatTimeAgo(post.created_at)} • {post.id.slice(0, 8)}
@@ -254,6 +282,29 @@ export function PostDetailPageClient({ postId }: PostDetailPageClientProps) {
             私信作者
           </Button>
         </div>
+      </Card>
+
+      {/* Comments Section */}
+      <Card className="p-6 rounded-2xl shadow-sm border border-border/30 bg-card">
+        <h2 className="text-lg font-black text-foreground mb-4">
+          留言 ({commentsData?.data?.total || 0})
+        </h2>
+
+        {/* Comment Form - Only show if user is authenticated */}
+        <div className="mb-6">
+          <CommentForm
+            onSubmit={handleCreateComment}
+            isSubmitting={createCommentMutation.isPending}
+            disabled={false} // User must be logged in to see this page
+          />
+        </div>
+
+        {/* Comments List */}
+        <CommentsList
+          postId={postId}
+          comments={comments}
+          isLoading={commentsLoading}
+        />
       </Card>
     </div>
   )

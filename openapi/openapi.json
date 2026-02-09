@@ -1660,6 +1660,159 @@
         }
       }
     },
+    "/api/v1/posts/{post_id}/comments": {
+      "get": {
+        "tags": [
+          "Posts"
+        ],
+        "summary": "List comments on a post",
+        "description": "Returns list of comments for a post (latest first)",
+        "operationId": "list_post_comments_api_v1_posts__post_id__comments_get",
+        "parameters": [
+          {
+            "name": "post_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Post Id"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Maximum number of comments to return",
+              "default": 50,
+              "title": "Limit"
+            },
+            "description": "Maximum number of comments to return"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Number of comments to skip",
+              "default": 0,
+              "title": "Offset"
+            },
+            "description": "Number of comments to skip"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Comments retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommentListResponseWrapper"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Post not found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Posts"
+        ],
+        "summary": "Create a comment on a post",
+        "description": "Create a new comment on the specified post (requires authentication)",
+        "operationId": "create_post_comment_api_v1_posts__post_id__comments_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "post_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Post Id"
+            }
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCommentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Comment created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommentResponseWrapper"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "404": {
+            "description": "Post not found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/locations/cities": {
       "get": {
         "tags": [
@@ -3309,6 +3462,171 @@
         "title": "CityResponse",
         "description": "Response schema for a single city."
       },
+      "CommentListResponse": {
+        "properties": {
+          "comments": {
+            "items": {
+              "$ref": "#/components/schemas/CommentResponse"
+            },
+            "type": "array",
+            "title": "Comments",
+            "description": "List of comments"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total",
+            "description": "Total number of comments"
+          }
+        },
+        "type": "object",
+        "required": [
+          "comments",
+          "total"
+        ],
+        "title": "CommentListResponse",
+        "description": "Response schema for comment list",
+        "example": {
+          "comments": [
+            {
+              "content": "Great post! I'm interested!",
+              "created_at": "2024-01-01T00:00:00Z",
+              "id": "123e4567-e89b-12d3-a456-426614174000",
+              "post_id": "987e6543-e21b-12d3-a456-426614174000",
+              "updated_at": "2024-01-01T00:00:00Z",
+              "user_avatar_url": "https://example.com/avatar.jpg",
+              "user_id": "456e7890-e12b-34d5-a678-901234567000",
+              "user_nickname": "KpopFan123"
+            }
+          ],
+          "total": 1
+        }
+      },
+      "CommentListResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/CommentListResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "CommentListResponseWrapper",
+        "description": "Response wrapper for comment list (standardized envelope)"
+      },
+      "CommentResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id",
+            "description": "Comment ID"
+          },
+          "post_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Post Id",
+            "description": "Post ID"
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "User Id",
+            "description": "User ID who created the comment"
+          },
+          "user_nickname": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Nickname",
+            "description": "Commenter's nickname from profile"
+          },
+          "user_avatar_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Avatar Url",
+            "description": "Commenter's avatar URL from profile"
+          },
+          "content": {
+            "type": "string",
+            "title": "Content",
+            "description": "Comment content"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At",
+            "description": "Creation timestamp"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At",
+            "description": "Last update timestamp"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "post_id",
+          "user_id",
+          "content",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "CommentResponse",
+        "description": "Response schema for comment details",
+        "example": {
+          "content": "Great post! I'm interested!",
+          "created_at": "2024-01-01T00:00:00Z",
+          "id": "123e4567-e89b-12d3-a456-426614174000",
+          "post_id": "987e6543-e21b-12d3-a456-426614174000",
+          "updated_at": "2024-01-01T00:00:00Z",
+          "user_avatar_url": "https://example.com/avatar.jpg",
+          "user_id": "456e7890-e12b-34d5-a678-901234567000",
+          "user_nickname": "KpopFan123"
+        }
+      },
+      "CommentResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/CommentResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "CommentResponseWrapper",
+        "description": "Response wrapper for single comment (standardized envelope)"
+      },
       "ConfirmUploadResponseSchema": {
         "properties": {
           "media_id": {
@@ -3335,6 +3653,29 @@
         ],
         "title": "ConfirmUploadResponseSchema",
         "description": "Response schema after confirming upload."
+      },
+      "CreateCommentRequest": {
+        "properties": {
+          "content": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 1,
+            "title": "Content",
+            "description": "Comment content",
+            "examples": [
+              "Great post! I'm interested!"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "content"
+        ],
+        "title": "CreateCommentRequest",
+        "description": "Request schema for creating a comment",
+        "example": {
+          "content": "Great post! I'm interested!"
+        }
       },
       "CreateGalleryCardRequest": {
         "properties": {
@@ -5451,6 +5792,13 @@
           "type": {
             "type": "string",
             "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
           }
         },
         "type": "object",

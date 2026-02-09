@@ -270,6 +270,116 @@ export type CityResponse = {
 };
 
 /**
+ * CommentListResponse
+ *
+ * Response schema for comment list
+ */
+export type CommentListResponse = {
+    /**
+     * Comments
+     *
+     * List of comments
+     */
+    comments: Array<CommentResponse>;
+    /**
+     * Total
+     *
+     * Total number of comments
+     */
+    total: number;
+};
+
+/**
+ * CommentListResponseWrapper
+ *
+ * Response wrapper for comment list (standardized envelope)
+ */
+export type CommentListResponseWrapper = {
+    data: CommentListResponse;
+    /**
+     * Meta
+     */
+    meta?: null;
+    /**
+     * Error
+     */
+    error?: null;
+};
+
+/**
+ * CommentResponse
+ *
+ * Response schema for comment details
+ */
+export type CommentResponse = {
+    /**
+     * Id
+     *
+     * Comment ID
+     */
+    id: string;
+    /**
+     * Post Id
+     *
+     * Post ID
+     */
+    post_id: string;
+    /**
+     * User Id
+     *
+     * User ID who created the comment
+     */
+    user_id: string;
+    /**
+     * User Nickname
+     *
+     * Commenter's nickname from profile
+     */
+    user_nickname?: string | null;
+    /**
+     * User Avatar Url
+     *
+     * Commenter's avatar URL from profile
+     */
+    user_avatar_url?: string | null;
+    /**
+     * Content
+     *
+     * Comment content
+     */
+    content: string;
+    /**
+     * Created At
+     *
+     * Creation timestamp
+     */
+    created_at: string;
+    /**
+     * Updated At
+     *
+     * Last update timestamp
+     */
+    updated_at: string;
+};
+
+/**
+ * CommentResponseWrapper
+ *
+ * Response wrapper for single comment (standardized envelope)
+ */
+export type CommentResponseWrapper = {
+    data: CommentResponse;
+    /**
+     * Meta
+     */
+    meta?: null;
+    /**
+     * Error
+     */
+    error?: null;
+};
+
+/**
  * ConfirmUploadResponseSchema
  *
  * Response schema after confirming upload.
@@ -289,6 +399,20 @@ export type ConfirmUploadResponseSchema = {
      * File Size Bytes
      */
     file_size_bytes: number;
+};
+
+/**
+ * CreateCommentRequest
+ *
+ * Request schema for creating a comment
+ */
+export type CreateCommentRequest = {
+    /**
+     * Content
+     *
+     * Comment content
+     */
+    content: string;
 };
 
 /**
@@ -1710,6 +1834,16 @@ export type ValidationError = {
      * Error Type
      */
     type: string;
+    /**
+     * Input
+     */
+    input?: unknown;
+    /**
+     * Context
+     */
+    ctx?: {
+        [key: string]: unknown;
+    };
 };
 
 /**
@@ -2715,6 +2849,91 @@ export type ToggleLikeApiV1PostsPostIdLikePostResponses = {
 };
 
 export type ToggleLikeApiV1PostsPostIdLikePostResponse = ToggleLikeApiV1PostsPostIdLikePostResponses[keyof ToggleLikeApiV1PostsPostIdLikePostResponses];
+
+export type ListPostCommentsApiV1PostsPostIdCommentsGetData = {
+    body?: never;
+    path: {
+        /**
+         * Post Id
+         */
+        post_id: string;
+    };
+    query?: {
+        /**
+         * Limit
+         *
+         * Maximum number of comments to return
+         */
+        limit?: number;
+        /**
+         * Offset
+         *
+         * Number of comments to skip
+         */
+        offset?: number;
+    };
+    url: '/api/v1/posts/{post_id}/comments';
+};
+
+export type ListPostCommentsApiV1PostsPostIdCommentsGetErrors = {
+    /**
+     * Post not found
+     */
+    404: unknown;
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ListPostCommentsApiV1PostsPostIdCommentsGetError = ListPostCommentsApiV1PostsPostIdCommentsGetErrors[keyof ListPostCommentsApiV1PostsPostIdCommentsGetErrors];
+
+export type ListPostCommentsApiV1PostsPostIdCommentsGetResponses = {
+    /**
+     * Comments retrieved successfully
+     */
+    200: CommentListResponseWrapper;
+};
+
+export type ListPostCommentsApiV1PostsPostIdCommentsGetResponse = ListPostCommentsApiV1PostsPostIdCommentsGetResponses[keyof ListPostCommentsApiV1PostsPostIdCommentsGetResponses];
+
+export type CreatePostCommentApiV1PostsPostIdCommentsPostData = {
+    body: CreateCommentRequest;
+    path: {
+        /**
+         * Post Id
+         */
+        post_id: string;
+    };
+    query?: never;
+    url: '/api/v1/posts/{post_id}/comments';
+};
+
+export type CreatePostCommentApiV1PostsPostIdCommentsPostErrors = {
+    /**
+     * Invalid request
+     */
+    400: unknown;
+    /**
+     * Post not found
+     */
+    404: unknown;
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type CreatePostCommentApiV1PostsPostIdCommentsPostError = CreatePostCommentApiV1PostsPostIdCommentsPostErrors[keyof CreatePostCommentApiV1PostsPostIdCommentsPostErrors];
+
+export type CreatePostCommentApiV1PostsPostIdCommentsPostResponses = {
+    /**
+     * Comment created successfully
+     */
+    201: CommentResponseWrapper;
+};
+
+export type CreatePostCommentApiV1PostsPostIdCommentsPostResponse = CreatePostCommentApiV1PostsPostIdCommentsPostResponses[keyof CreatePostCommentApiV1PostsPostIdCommentsPostResponses];
 
 export type GetCitiesApiV1LocationsCitiesGetData = {
     body?: never;

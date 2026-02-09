@@ -13,6 +13,9 @@ from app.modules.posts.application.use_cases.accept_interest_use_case import (
 from app.modules.posts.application.use_cases.close_post_use_case import (
     ClosePostUseCase,
 )
+from app.modules.posts.application.use_cases.create_post_comment_use_case import (
+    CreatePostCommentUseCase,
+)
 from app.modules.posts.application.use_cases.create_post_use_case import (
     CreatePostUseCase,
 )
@@ -21,6 +24,9 @@ from app.modules.posts.application.use_cases.express_interest_use_case import (
 )
 from app.modules.posts.application.use_cases.list_board_posts_use_case import (
     ListBoardPostsUseCase,
+)
+from app.modules.posts.application.use_cases.list_post_comments_use_case import (
+    ListPostCommentsUseCase,
 )
 from app.modules.posts.application.use_cases.list_post_interests_use_case import (
     ListPostInterestsUseCase,
@@ -149,3 +155,25 @@ async def get_get_post_use_case(
     child = injector.create_child_injector()
     child.binder.bind(AsyncSession, to=session)
     return child.get(GetPostUseCase)
+
+
+async def get_create_post_comment_use_case(
+    session: Annotated[AsyncSession, Depends(get_db_session)],
+    request: Request = None,
+) -> CreatePostCommentUseCase:
+    """Get CreatePostCommentUseCase from injector with request-scoped session."""
+    injector = _get_injector(request)
+    child = injector.create_child_injector()
+    child.binder.bind(AsyncSession, to=session)
+    return child.get(CreatePostCommentUseCase)
+
+
+async def get_list_post_comments_use_case(
+    session: Annotated[AsyncSession, Depends(get_db_session)],
+    request: Request = None,
+) -> ListPostCommentsUseCase:
+    """Get ListPostCommentsUseCase from injector with request-scoped session."""
+    injector = _get_injector(request)
+    child = injector.create_child_injector()
+    child.binder.bind(AsyncSession, to=session)
+    return child.get(ListPostCommentsUseCase)
