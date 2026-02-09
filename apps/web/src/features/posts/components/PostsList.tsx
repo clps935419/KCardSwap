@@ -163,7 +163,7 @@ export function PostsList() {
                 </span>
                 {post.scope === 'global' ? (
                   <span className="bg-slate-900 text-white text-[10px] px-2 py-1 rounded-full font-black">
-                    全域
+                    全部
                   </span>
                 ) : (
                   <span className="bg-accent text-primary-500 text-[10px] px-2 py-1 rounded-full font-black">
