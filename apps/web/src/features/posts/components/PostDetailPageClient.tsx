@@ -168,12 +168,20 @@ export function PostDetailPageClient({ postId }: PostDetailPageClientProps) {
         {/* Post Header */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary-50 rounded-full flex items-center justify-center">
-              👤
+            <div className="w-10 h-10 bg-primary-50 rounded-full flex items-center justify-center overflow-hidden">
+              {post.owner_avatar_url ? (
+                <img 
+                  src={post.owner_avatar_url} 
+                  alt={post.owner_nickname || '使用者'} 
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span className="text-xl">👤</span>
+              )}
             </div>
             <div>
               <p className="text-sm font-black text-foreground">
-                使用者 {post.owner_id.slice(0, 8)}
+                {post.owner_nickname || `使用者 ${post.owner_id.slice(0, 8)}`}
               </p>
               <p className="text-[10px] text-muted-foreground font-bold uppercase">
                 {formatTimeAgo(post.created_at)} • {post.id.slice(0, 8)}
