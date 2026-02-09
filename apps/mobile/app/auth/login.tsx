@@ -23,6 +23,12 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const { login } = useAuthStore();
 
+  const containerClass = isDevLoginEnabled
+    ? 'flex-1 items-center justify-center bg-white p-6'
+    : 'flex-1 items-center bg-white px-6 pt-10 pb-6';
+
+  const logoSpacingClass = isDevLoginEnabled ? 'mb-8' : 'mb-4';
+
   const handleGoogleLogin = async () => {
     try {
       setIsLoading(true);
@@ -142,17 +148,17 @@ export default function LoginScreen() {
   };
 
   return (
-    <Box className="flex-1 items-center justify-center bg-white p-6">
+    <Box className={containerClass}>
       {/* Logo/Title Section - 小卡Show! Branding */}
-      <Box className="items-center mb-12">
+      <Box className={`items-center ${logoSpacingClass}`}>
         {/* Logo Image */}
         <Image
           source={require('@/assets/CardShow_Logo.png')}
-          style={{ width: 80, height: 80, marginBottom: 16 }}
+          style={{ width: 64, height: 64, marginBottom: 12 }}
           resizeMode="contain"
         />
         
-        <Heading size="2xl" className="font-black text-pink-500 tracking-tight">
+        <Heading size="xl" className="font-black text-pink-500 tracking-tight">
           小卡Show!
         </Heading>
         <Text size="xs" className="text-slate-500 mt-1 tracking-wide font-medium">
@@ -212,18 +218,18 @@ export default function LoginScreen() {
         <Button
           onPress={handleGoogleLogin}
           isDisabled={isLoading}
-          className={`w-full h-16 bg-gradient-to-r from-pink-50 to-rose-50 border-2 border-pink-200 rounded-2xl ${brandShadows.googleButton}`}
+          className={`w-full h-12 bg-gradient-to-r from-pink-50 to-rose-50 border-2 border-pink-200 rounded-2xl ${brandShadows.googleButton}`}
         >
           {isLoading ? (
             <Spinner color="#EC4899" />
           ) : (
             <Box className="flex-row items-center justify-center">
-              <Box className={`w-10 h-10 bg-white rounded-full items-center justify-center mr-3 ${brandShadows.googleIcon}`}>
-                <Text size="xl" className="font-black text-pink-500">
+              <Box className={`w-8 h-8 bg-white rounded-full items-center justify-center mr-3 ${brandShadows.googleIcon}`}>
+                <Text size="lg" className="font-black text-pink-500">
                   G
                 </Text>
               </Box>
-              <ButtonText className="font-bold text-pink-600 text-base">
+              <ButtonText className="font-bold text-pink-600 text-sm">
                 使用 Google 帳號登入
               </ButtonText>
             </Box>
