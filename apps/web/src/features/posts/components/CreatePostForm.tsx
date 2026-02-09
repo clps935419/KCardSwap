@@ -23,16 +23,7 @@ import type {
   PostCategory,
   PostScope,
 } from '@/shared/api/generated'
-import { getCitiesApiV1LocationsCitiesGetOptions } from '@/shared/api/generated/@tanstack/react-query.gen'
-
-const CATEGORIES: { value: PostCategory; label: string }[] = [
-  { value: 'trade', label: '交換' },
-  { value: 'giveaway', label: '贈送' },
-  { value: 'group', label: '揪團' },
-  { value: 'showcase', label: '展示' },
-  { value: 'help', label: '求助' },
-  { value: 'announcement', label: '公告' },
-]
+import { getCategoriesApiV1PostsCategoriesGetOptions, getCitiesApiV1LocationsCitiesGetOptions } from '@/shared/api/generated/@tanstack/react-query.gen'
 
 
 interface FormData {
@@ -72,8 +63,13 @@ export function CreatePostForm() {
     staleTime: 1000 * 60 * 60 * 24,
     gcTime: 1000 * 60 * 60 * 24 * 7,
   })
+  const categoriesQuery = useQuery({
+    ...getCategoriesApiV1PostsCategoriesGetOptions(),
+    staleTime: 1000 * 60 * 60 * 24,
+  })
 
   const cities = (citiesQuery.data?.data?.cities ?? []) as CityResponse[]
+  const categories = categoriesQuery.data?.data?.categories ?? []
 
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -164,7 +160,22 @@ export function CreatePostForm() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {CATEGORIES.map(category => (
+              {categoriesQuery.isLoading && (
+                <SelectItem value="__loading__" disabled>
+                  分類載入中...
+                </SelectItem>
+              )}
+              {categoriesQuery.isError && (
+                <SelectItem value="__error__" disabled>
+                  分類載入失敗
+                </SelectItem>
+              )}
+              {!categoriesQuery.isError && categories.length === 0 && (
+                <SelectItem value="__empty__" disabled>
+                  沒有可用分類
+                </SelectItem>
+              )}
+              {categories.map(category => (
                 <SelectItem key={category.value} value={category.value}>
                   {category.label}
                 </SelectItem>
@@ -190,7 +201,7 @@ export function CreatePostForm() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="global">全域（不限）</SelectItem>
+              <SelectItem value="global">全部（不限）</SelectItem>
               <SelectItem value="city">城市（指定城市）</SelectItem>
             </SelectContent>
           </Select>

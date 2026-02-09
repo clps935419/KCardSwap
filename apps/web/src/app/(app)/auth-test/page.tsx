@@ -99,14 +99,14 @@ export default function AuthTestPage() {
   return (
     <div className="min-h-screen bg-background p-8">
       <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Cookie-based 認證測試頁面</h1>
+        <h1 className="text-3xl font-bold mb-8">登入狀態檢查</h1>
 
         {/* Status */}
         <div className="bg-card border rounded-lg p-6 mb-4">
-          <h2 className="text-xl font-semibold mb-4">認證狀態</h2>
+          <h2 className="text-xl font-semibold mb-4">登入狀態</h2>
           <div className="space-y-2">
             <div className="flex gap-2">
-              <span className="font-medium">Status:</span>
+              <span className="font-medium">狀態：</span>
               <span
                 className={`font-mono ${
                   isAuthenticated
@@ -116,7 +116,7 @@ export default function AuthTestPage() {
                       : 'text-red-600'
                 }`}
               >
-                {isLoading ? 'loading' : isAuthenticated ? 'authenticated' : 'unauthenticated'}
+                {isLoading ? '載入中' : isAuthenticated ? '已登入' : '未登入'}
               </span>
             </div>
           </div>
@@ -128,11 +128,11 @@ export default function AuthTestPage() {
             <h2 className="text-xl font-semibold mb-4">使用者資訊</h2>
             <div className="space-y-2">
               <div className="flex gap-2">
-                <span className="font-medium">User ID:</span>
+                <span className="font-medium">使用者代碼：</span>
                 <span className="font-mono text-sm">{userInfo.user_id || 'N/A'}</span>
               </div>
               <div className="flex gap-2">
-                <span className="font-medium">Nickname:</span>
+                <span className="font-medium">暱稱：</span>
                 <span className="font-mono text-sm">{userInfo.nickname || 'N/A'}</span>
               </div>
             </div>
@@ -186,11 +186,8 @@ export default function AuthTestPage() {
         <div className="mt-8 bg-muted/50 border rounded-lg p-6">
           <h2 className="text-xl font-semibold mb-4">說明</h2>
           <div className="space-y-2 text-sm text-muted-foreground">
-            <p>✅ 此頁面用於測試 Cookie-based 認證整合是否正常運作</p>
-            <p>✅ 確保已設定正確的環境變數（NEXT_PUBLIC_GOOGLE_CLIENT_ID）</p>
-            <p>✅ 後端使用 httpOnly cookies 儲存 access_token 和 refresh_token</p>
-            <p>✅ 前端直接呼叫後端 /api/v1/auth/google-login 取得 cookies</p>
-            <p>✅ 成功登入後，使用者資料會從後端 /api/v1/profile/me 取得</p>
+            <p>這是登入狀態的檢查頁，用於確認帳號是否可正常使用。</p>
+            <p>若登入異常，請重新登入或稍後再試。</p>
           </div>
         </div>
       </div>

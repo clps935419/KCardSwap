@@ -58,15 +58,8 @@ export function PostFilters() {
       {/* Info Header */}
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-sm font-black text-foreground">全域列表（顯示全部貼文）</p>
+          <p className="text-sm font-black text-foreground">探索貼文</p>
         </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-[11px] font-black text-primary-500 hover:text-primary-500/80 h-auto p-0"
-        >
-          規則
-        </Button>
       </div>
 
       {/* City Filter */}

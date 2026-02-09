@@ -148,7 +148,7 @@ export function PostsList() {
                 </div>
                 <div>
                   <p className="text-sm font-black text-foreground">
-                    {post.owner_nickname || `User ${post.owner_id.slice(0, 8)}`}
+                    {post.owner_nickname || `使用者 ${post.owner_id.slice(0, 8)}`}
                   </p>
                   <p className="text-[10px] text-muted-foreground font-bold uppercase">
                     {formatTimeAgo(post.created_at)} • {post.id.slice(0, 8)}

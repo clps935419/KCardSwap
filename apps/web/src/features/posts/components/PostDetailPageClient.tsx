@@ -149,7 +149,7 @@ export function PostDetailPageClient({ postId }: PostDetailPageClientProps) {
             </div>
             <div>
               <p className="text-sm font-black text-foreground">
-                User {post.owner_id.slice(0, 8)}
+                使用者 {post.owner_id.slice(0, 8)}
               </p>
               <p className="text-[10px] text-muted-foreground font-bold uppercase">
                 {formatTimeAgo(post.created_at)} • {post.id.slice(0, 8)}
@@ -162,7 +162,7 @@ export function PostDetailPageClient({ postId }: PostDetailPageClientProps) {
             </span>
             {post.scope === 'global' ? (
               <span className="bg-slate-900 text-white text-[10px] px-3 py-1 rounded-full font-black">
-                全域
+                全部
               </span>
             ) : (
               <span className="bg-accent text-primary-500 text-[10px] px-3 py-1 rounded-full font-black">

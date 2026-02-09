@@ -23,7 +23,7 @@ export default function ThreadPage() {
         >
           ← 返回信箱
         </button>
-        <p className="text-[11px] text-muted-foreground font-black">唯一對話規則（per pair）</p>
+        <p className="text-[11px] text-muted-foreground font-black">這是你和對方的專屬對話</p>
       </div>
 
       {/* Messages */}
@@ -35,7 +35,7 @@ export default function ThreadPage() {
       <div className="px-6 py-4 bg-card border-t border-border/30">
         <SendMessageForm threadId={threadId} />
         <p className="text-[10px] text-muted-foreground mt-2">
-          示意：訊息可選帶 post_id 引用（此頁不再額外演示）
+          需要的話可附上貼文連結，對方更好理解你的需求
         </p>
       </div>
     </div>

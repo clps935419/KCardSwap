@@ -203,12 +203,12 @@ function LoginPageContent({
               <div className="w-8 h-8 bg-amber-400 rounded-lg flex items-center justify-center text-white font-black text-sm">
                 🔐
               </div>
-              <p className="text-xs font-black text-amber-900">開發模式：管理員登入</p>
+              <p className="text-xs font-black text-amber-900">測試登入（僅開發環境顯示）</p>
             </div>
             <form onSubmit={handleAdminLogin} className="space-y-2">
               <input
                 type="email"
-                placeholder="管理員 Email"
+                placeholder="Email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 className="w-full px-3 py-2 text-sm border border-amber-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400"
@@ -228,7 +228,7 @@ function LoginPageContent({
                 disabled={isLoading}
                 className="w-full py-2 bg-amber-500 text-white text-sm font-bold rounded-lg hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? '登入中...' : '管理員登入'}
+                {isLoading ? '登入中...' : '登入'}
               </button>
             </form>
           </div>

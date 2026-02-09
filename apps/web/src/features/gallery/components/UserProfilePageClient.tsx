@@ -16,16 +16,16 @@ export function UserProfilePageClient({ userId }: UserProfilePageClientProps) {
     <div className="container mx-auto px-4 py-8 max-w-7xl">
       <Card className="mb-8">
         <CardHeader>
-          <CardTitle className="text-2xl">User Profile</CardTitle>
+          <CardTitle className="text-2xl">使用者檔案</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground">User ID: {userId}</p>
+          <p className="text-muted-foreground">使用者代碼：{userId}</p>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-xl">Gallery Cards</CardTitle>
+          <CardTitle className="text-xl">相簿小卡</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading && (
@@ -42,7 +42,7 @@ export function UserProfilePageClient({ userId }: UserProfilePageClientProps) {
 
           {error && (
             <div className="text-center py-8 text-destructive">
-              <p>Failed to load gallery cards. Please try again later.</p>
+              <p>載入相簿小卡時發生錯誤，請稍後再試。</p>
             </div>
           )}
 
