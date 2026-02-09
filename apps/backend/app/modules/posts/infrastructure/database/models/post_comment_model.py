@@ -5,7 +5,7 @@ Post Comment ORM model for Posts module
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import Column, DateTime, ForeignKey, Index, Text
+from sqlalchemy import Column, DateTime, ForeignKey, Text
 from sqlalchemy.dialects.postgresql import UUID
 
 from app.shared.infrastructure.database.connection import Base
@@ -21,13 +21,11 @@ class PostCommentModel(Base):
         UUID(as_uuid=True),
         ForeignKey("posts.id", ondelete="CASCADE"),
         nullable=False,
-        index=True,
     )
     user_id = Column(
         UUID(as_uuid=True),
         ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False,
-        index=True,
     )
     content = Column(Text, nullable=False)
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
@@ -35,9 +33,4 @@ class PostCommentModel(Base):
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
         onupdate=lambda: datetime.now(timezone.utc),
-    )
-
-    # Index for efficient queries (latest first)
-    __table_args__ = (
-        Index("idx_post_comments_post_id_created_at", "post_id", "created_at"),
     )
