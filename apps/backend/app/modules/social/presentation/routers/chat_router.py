@@ -40,6 +40,11 @@ from app.shared.infrastructure.database.connection import get_db_session
 from app.shared.infrastructure.external.fcm_service import get_fcm_service
 from app.shared.presentation.dependencies.auth import get_current_user_id
 
+# Import ProfileRepositoryImpl for fetching user profiles
+from app.modules.identity.infrastructure.repositories.profile_repository_impl import (
+    ProfileRepositoryImpl,
+)
+
 logger = logging.getLogger(__name__)
 
 # Create router
@@ -72,8 +77,9 @@ async def get_chat_rooms(
     - Unread count (placeholder)
     """
     try:
-        # Initialize repository
+        # Initialize repositories
         chat_room_repo = ChatRoomRepositoryImpl(session)
+        profile_repo = ProfileRepositoryImpl(session)
 
         # Get chat rooms for user
         chat_rooms = await chat_room_repo.get_rooms_by_user_id(str(current_user_id))
@@ -89,14 +95,27 @@ async def get_chat_rooms(
 
         room_responses = []
         for room in chat_rooms:
-            participants = [
-                ChatRoomParticipantResponse(
-                    user_id=UUID(uid),
-                    nickname=None,  # TODO: Fetch from profile
-                    avatar_url=None,  # TODO: Fetch from profile
-                )
-                for uid in room.participant_ids
-            ]
+            participants = []
+            for uid in room.participant_ids:
+                # Fetch profile data for each participant
+                try:
+                    profile = await profile_repo.get_by_user_id(UUID(uid))
+                    participants.append(
+                        ChatRoomParticipantResponse(
+                            user_id=UUID(uid),
+                            nickname=profile.nickname if profile else None,
+                            avatar_url=profile.avatar_url if profile else None,
+                        )
+                    )
+                except Exception:
+                    # If profile fetch fails, still include user_id with None values
+                    participants.append(
+                        ChatRoomParticipantResponse(
+                            user_id=UUID(uid),
+                            nickname=None,
+                            avatar_url=None,
+                        )
+                    )
 
             room_responses.append(
                 ChatRoomResponse(
