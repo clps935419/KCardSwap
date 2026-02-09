@@ -54,6 +54,22 @@ class IMessageRequestRepository(ABC):
         pass
 
     @abstractmethod
+    async def get_requests_for_sender(
+        self, sender_id: str, status: Optional[RequestStatus] = None
+    ) -> List[MessageRequest]:
+        """
+        Get all message requests for a sender
+
+        Args:
+            sender_id: ID of the sender user
+            status: Optional status filter (PENDING, ACCEPTED, DECLINED)
+
+        Returns:
+            List of message requests ordered by created_at descending
+        """
+        pass
+
+    @abstractmethod
     async def update(self, message_request: MessageRequest) -> MessageRequest:
         """Update an existing message request"""
         pass

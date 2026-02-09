@@ -2488,6 +2488,75 @@
         }
       }
     },
+    "/api/v1/message-requests/sent": {
+      "get": {
+        "tags": [
+          "message-requests"
+        ],
+        "summary": "Get My Sent Message Requests",
+        "description": "Get message requests sent by the current user.\n\nSender typically only needs pending status.\n\nQuery params:\n- status_filter: \"pending\", \"accepted\", \"declined\", or \"all\" (default: \"pending\")",
+        "operationId": "get_my_sent_message_requests_api_v1_message_requests_sent_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "status_filter",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "pending",
+              "title": "Status Filter"
+            }
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MessageRequestResponse"
+                  },
+                  "title": "Response Get My Sent Message Requests Api V1 Message Requests Sent Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/message-requests/{request_id}/accept": {
       "post": {
         "tags": [

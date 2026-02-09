@@ -23,6 +23,9 @@ from app.modules.social.application.use_cases.message_requests.decline_request i
 from app.modules.social.application.use_cases.message_requests.get_requests import (
     GetMessageRequestsUseCase,
 )
+from app.modules.social.application.use_cases.message_requests.get_sent_requests import (
+    GetSentMessageRequestsUseCase,
+)
 from app.modules.social.infrastructure.repositories.friendship_repository_impl import (
     FriendshipRepositoryImpl,
 )
@@ -44,7 +47,9 @@ from app.shared.presentation.deps.require_user import require_user
 router = APIRouter(prefix="/message-requests", tags=["message-requests"])
 
 
-@router.post("", response_model=MessageRequestResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "", response_model=MessageRequestResponse, status_code=status.HTTP_201_CREATED
+)
 async def create_message_request(
     request: CreateMessageRequestRequest,
     user_id: UUID = Depends(require_user),
@@ -124,6 +129,46 @@ async def get_my_message_requests(
     try:
         requests = await use_case.execute(
             recipient_id=str(user_id), status_filter=status_filter
+        )
+
+        return [
+            MessageRequestResponse(
+                id=req.id,
+                sender_id=req.sender_id,
+                recipient_id=req.recipient_id,
+                initial_message=req.initial_message,
+                post_id=req.post_id,
+                status=req.status.value,
+                thread_id=req.thread_id,
+                created_at=req.created_at,
+                updated_at=req.updated_at,
+            )
+            for req in requests
+        ]
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+
+@router.get("/sent", response_model=list[MessageRequestResponse])
+async def get_my_sent_message_requests(
+    status_filter: str = "pending",
+    user_id: UUID = Depends(require_user),
+    session: AsyncSession = Depends(get_db_session),
+):
+    """
+    Get message requests sent by the current user.
+
+    Sender typically only needs pending status.
+
+    Query params:
+    - status_filter: "pending", "accepted", "declined", or "all" (default: "pending")
+    """
+    message_request_repo = MessageRequestRepository(session)
+    use_case = GetSentMessageRequestsUseCase(message_request_repo)
+
+    try:
+        requests = await use_case.execute(
+            sender_id=str(user_id), status_filter=status_filter
         )
 
         return [

@@ -8,7 +8,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { MessageRequestResponse } from '@/shared/api/generated'
 import { createMessageRequestApiV1MessageRequestsPost } from '@/shared/api/generated'
-import { getMyMessageRequestsApiV1MessageRequestsInboxGetQueryKey } from '@/shared/api/generated/@tanstack/react-query.gen'
+import {
+  getMyMessageRequestsApiV1MessageRequestsInboxGetQueryKey,
+  getMySentMessageRequestsApiV1MessageRequestsSentGetQueryKey,
+} from '@/shared/api/generated/@tanstack/react-query.gen'
 
 interface CreateMessageRequestParams {
   recipientId: string
@@ -34,6 +37,13 @@ export function useCreateMessageRequest() {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: getMyMessageRequestsApiV1MessageRequestsInboxGetQueryKey({
+          query: {
+            status_filter: 'pending',
+          },
+        }),
+      })
+      queryClient.invalidateQueries({
+        queryKey: getMySentMessageRequestsApiV1MessageRequestsSentGetQueryKey({
           query: {
             status_filter: 'pending',
           },

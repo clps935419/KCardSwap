@@ -3064,6 +3064,38 @@ export type GetMyMessageRequestsApiV1MessageRequestsInboxGetResponses = {
 
 export type GetMyMessageRequestsApiV1MessageRequestsInboxGetResponse = GetMyMessageRequestsApiV1MessageRequestsInboxGetResponses[keyof GetMyMessageRequestsApiV1MessageRequestsInboxGetResponses];
 
+export type GetMySentMessageRequestsApiV1MessageRequestsSentGetData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Status Filter
+         */
+        status_filter?: string;
+    };
+    url: '/api/v1/message-requests/sent';
+};
+
+export type GetMySentMessageRequestsApiV1MessageRequestsSentGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GetMySentMessageRequestsApiV1MessageRequestsSentGetError = GetMySentMessageRequestsApiV1MessageRequestsSentGetErrors[keyof GetMySentMessageRequestsApiV1MessageRequestsSentGetErrors];
+
+export type GetMySentMessageRequestsApiV1MessageRequestsSentGetResponses = {
+    /**
+     * Response Get My Sent Message Requests Api V1 Message Requests Sent Get
+     *
+     * Successful Response
+     */
+    200: Array<MessageRequestResponse>;
+};
+
+export type GetMySentMessageRequestsApiV1MessageRequestsSentGetResponse = GetMySentMessageRequestsApiV1MessageRequestsSentGetResponses[keyof GetMySentMessageRequestsApiV1MessageRequestsSentGetResponses];
+
 export type AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostData = {
     body?: never;
     path: {

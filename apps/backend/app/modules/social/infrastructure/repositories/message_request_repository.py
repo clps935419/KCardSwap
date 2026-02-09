@@ -109,6 +109,23 @@ class MessageRequestRepository(IMessageRequestRepository):
         models = result.scalars().all()
         return [self._to_entity(model) for model in models]
 
+    async def get_requests_for_sender(
+        self, sender_id: str, status: Optional[RequestStatus] = None
+    ) -> List[MessageRequest]:
+        """Get all message requests for a sender"""
+        stmt = select(MessageRequestModel).where(
+            MessageRequestModel.sender_id == UUID(sender_id)
+        )
+
+        if status:
+            stmt = stmt.where(MessageRequestModel.status == status.value)
+
+        stmt = stmt.order_by(MessageRequestModel.created_at.desc())
+
+        result = await self.session.execute(stmt)
+        models = result.scalars().all()
+        return [self._to_entity(model) for model in models]
+
     async def update(self, message_request: MessageRequest) -> MessageRequest:
         """Update an existing message request"""
         stmt = select(MessageRequestModel).where(

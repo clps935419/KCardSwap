@@ -4,18 +4,20 @@ import { createServerQueryClient } from '@/lib/query-client'
 import { getUserGalleryCardsApiV1UsersUserIdGalleryCardsGetOptions } from '@/shared/api/generated/@tanstack/react-query.gen'
 
 interface UserProfilePageProps {
-  params: {
+  params: Promise<{
     userId: string
-  }
+  }>
 }
 
 export default async function UserProfilePage({ params }: UserProfilePageProps) {
+  const resolvedParams = await params
+  const userId = resolvedParams.userId
   const queryClient = createServerQueryClient()
 
   await queryClient.prefetchQuery({
     ...getUserGalleryCardsApiV1UsersUserIdGalleryCardsGetOptions({
       path: {
-        user_id: params.userId,
+        user_id: userId,
       },
     }),
   })
@@ -24,7 +26,7 @@ export default async function UserProfilePage({ params }: UserProfilePageProps) 
 
   return (
     <HydrationBoundary state={dehydratedState}>
-      <UserProfilePageClient userId={params.userId} />
+      <UserProfilePageClient userId={userId} />
     </HydrationBoundary>
   )
 }
