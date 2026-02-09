@@ -5,7 +5,10 @@
  */
 'use client'
 
-import { useState } from 'react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import type { MessageRequestResponse } from '@/shared/api/generated'
+import { createMessageRequestApiV1MessageRequestsPost } from '@/shared/api/generated'
+import { getMyMessageRequestsApiV1MessageRequestsInboxGetQueryKey } from '@/shared/api/generated/@tanstack/react-query.gen'
 
 interface CreateMessageRequestParams {
   recipientId: string
@@ -14,46 +17,34 @@ interface CreateMessageRequestParams {
 }
 
 export function useCreateMessageRequest() {
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<Error | null>(null)
+  const queryClient = useQueryClient()
 
-  const createRequest = async (params: CreateMessageRequestParams) => {
-    setLoading(true)
-    setError(null)
-
-    try {
-      // TODO: Replace with generated SDK call
-      // const response = await client.POST('/api/v1/message-requests', {
-      //   body: {
-      //     recipient_id: params.recipientId,
-      //     initial_message: params.initialMessage,
-      //     post_id: params.postId,
-      //   },
-      // });
-
-      // For now, return mock response
-      return {
-        id: 'mock-request-id',
-        sender_id: 'current-user',
-        recipient_id: params.recipientId,
-        initial_message: params.initialMessage,
-        post_id: params.postId,
-        status: 'pending',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      }
-    } catch (err) {
-      const error = err as Error
-      setError(error)
-      throw error
-    } finally {
-      setLoading(false)
-    }
-  }
+  const mutation = useMutation<MessageRequestResponse, Error, CreateMessageRequestParams>({
+    mutationFn: async params => {
+      const response = await createMessageRequestApiV1MessageRequestsPost({
+        body: {
+          recipient_id: params.recipientId,
+          initial_message: params.initialMessage,
+          post_id: params.postId ?? null,
+        },
+        throwOnError: true,
+      })
+      return response.data as MessageRequestResponse
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: getMyMessageRequestsApiV1MessageRequestsInboxGetQueryKey({
+          query: {
+            status_filter: 'pending',
+          },
+        }),
+      })
+    },
+  })
 
   return {
-    createRequest,
-    loading,
-    error,
+    createRequest: mutation.mutateAsync,
+    loading: mutation.isPending,
+    error: mutation.error,
   }
 }

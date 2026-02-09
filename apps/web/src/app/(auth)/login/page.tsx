@@ -1,11 +1,14 @@
 'use client'
 
+import { useQueryClient } from '@tanstack/react-query'
 import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { getMyProfileApiV1ProfileMeGetQueryKey } from '@/shared/api/generated/@tanstack/react-query.gen'
 
 export default function LoginPage() {
   const router = useRouter()
+  const queryClient = useQueryClient()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -38,6 +41,7 @@ export default function LoginPage() {
       // Tokens are now stored in httpOnly cookies automatically
       // No need to manually store them in localStorage
       if (response.data) {
+        queryClient.removeQueries({ queryKey: getMyProfileApiV1ProfileMeGetQueryKey() })
         // Redirect to posts feed after login
         redirectToPosts()
       }
@@ -118,6 +122,7 @@ function LoginPageContent({
   onLoginSuccess,
 }: LoginPageContentProps) {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
+  const queryClient = useQueryClient()
 
   const googleLogin = useGoogleLogin({
     flow: 'auth-code',
@@ -146,6 +151,7 @@ function LoginPageContent({
         })
 
         if (response.data) {
+          queryClient.removeQueries({ queryKey: getMyProfileApiV1ProfileMeGetQueryKey() })
           // Redirect to posts feed after login
           onLoginSuccess()
         }

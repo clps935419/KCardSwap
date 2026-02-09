@@ -1,5 +1,6 @@
 'use client'
 
+import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
@@ -9,6 +10,7 @@ import { logout } from '@/lib/google-oauth'
 
 export default function MeSettingsPage() {
   const router = useRouter()
+  const queryClient = useQueryClient()
   const { toast } = useToast()
   const [allowStrangerDM, setAllowStrangerDM] = useState(true)
 
@@ -23,6 +25,7 @@ export default function MeSettingsPage() {
 
   const handleLogout = async () => {
     await logout()
+    queryClient.clear()
     router.push('/login')
   }
 

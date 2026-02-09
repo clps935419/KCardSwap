@@ -14,17 +14,18 @@ import {
 } from '@/shared/api/generated/@tanstack/react-query.gen'
 
 interface PostsPageProps {
-  searchParams?: {
+  searchParams?: Promise<{
     city?: string
     category?: string
-  }
+  }>
 }
 
 export default async function PostsPage({ searchParams }: PostsPageProps) {
+  const resolvedSearchParams = (await searchParams) ?? {}
   const queryClient = createServerQueryClient()
   const filtersStaleTime = 24 * 60 * 60 * 1000
-  const cityParam = searchParams?.city
-  const categoryParam = searchParams?.category
+  const cityParam = resolvedSearchParams.city
+  const categoryParam = resolvedSearchParams.category
   const cityCode = cityParam && cityParam !== 'ALL' ? cityParam : undefined
   const category =
     categoryParam && categoryParam !== 'all' ? (categoryParam as PostCategory) : undefined

@@ -3,46 +3,89 @@
  *
  * Displays pending message requests for the current user
  */
+
 'use client'
 
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
+import Link from 'next/link'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { useToast } from '@/components/ui/use-toast'
+import type { MessageRequestResponse } from '@/shared/api/generated'
+import {
+  acceptMessageRequestApiV1MessageRequestsRequestIdAcceptPost,
+  declineMessageRequestApiV1MessageRequestsRequestIdDeclinePost,
+} from '@/shared/api/generated'
+import {
+  getMyMessageRequestsApiV1MessageRequestsInboxGetOptions,
+  getMyThreadsApiV1ThreadsGetQueryKey,
+} from '@/shared/api/generated/@tanstack/react-query.gen'
 
-// TODO: Replace with generated SDK hooks after OpenAPI generation
-interface MessageRequest {
-  id: string
-  sender_id: string
-  recipient_id: string
-  initial_message: string
-  post_id?: string
-  status: string
-  created_at: string
+interface MessageRequestsListProps {
+  limit?: number
+  showHeader?: boolean
+  hideEmpty?: boolean
 }
 
-export function MessageRequestsList() {
+export function MessageRequestsList({ limit, showHeader, hideEmpty }: MessageRequestsListProps) {
   const { toast } = useToast()
-  const [requests, _setRequests] = useState<MessageRequest[]>([])
-  const [loading, setLoading] = useState(false)
+  const queryClient = useQueryClient()
+  const [processingId, setProcessingId] = useState<string | null>(null)
+  const [processingAction, setProcessingAction] = useState<'accept' | 'decline' | null>(null)
+  const [showAll, setShowAll] = useState(false)
 
-  // TODO: Replace with generated SDK hook
-  // const { data, isLoading } = useGetMyMessageRequests({ status_filter: "pending" });
+  const requestsQueryOptions = getMyMessageRequestsApiV1MessageRequestsInboxGetOptions({
+    query: {
+      status_filter: 'pending',
+    },
+  })
+  const requestsQuery = useQuery({
+    ...requestsQueryOptions,
+  })
+  const requests = (requestsQuery.data ?? []) as MessageRequestResponse[]
 
-  const handleAccept = async (_requestId: string) => {
-    setLoading(true)
+  const acceptMutation = useMutation({
+    mutationFn: async (requestId: string) => {
+      const response = await acceptMessageRequestApiV1MessageRequestsRequestIdAcceptPost({
+        path: {
+          request_id: requestId,
+        },
+        throwOnError: true,
+      })
+      return response.data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: requestsQueryOptions.queryKey })
+      queryClient.invalidateQueries({ queryKey: getMyThreadsApiV1ThreadsGetQueryKey() })
+    },
+  })
+
+  const declineMutation = useMutation({
+    mutationFn: async (requestId: string) => {
+      const response = await declineMessageRequestApiV1MessageRequestsRequestIdDeclinePost({
+        path: {
+          request_id: requestId,
+        },
+        throwOnError: true,
+      })
+      return response.data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: requestsQueryOptions.queryKey })
+    },
+  })
+
+  const handleAccept = async (requestId: string) => {
+    setProcessingId(requestId)
+    setProcessingAction('accept')
     try {
-      // TODO: Call accept endpoint using generated SDK
-      // await acceptMessageRequest({ request_id: requestId });
-
+      await acceptMutation.mutateAsync(requestId)
       toast({
         title: '已接受',
         description: '已建立對話，已移到「聊天」',
       })
-
-      // Refresh list
-      // queryClient.invalidateQueries(['message-requests']);
     } catch (_error) {
       toast({
         title: '錯誤',
@@ -50,23 +93,20 @@ export function MessageRequestsList() {
         variant: 'destructive',
       })
     } finally {
-      setLoading(false)
+      setProcessingId(null)
+      setProcessingAction(null)
     }
   }
 
-  const handleDecline = async (_requestId: string) => {
-    setLoading(true)
+  const handleDecline = async (requestId: string) => {
+    setProcessingId(requestId)
+    setProcessingAction('decline')
     try {
-      // TODO: Call decline endpoint using generated SDK
-      // await declineMessageRequest({ request_id: requestId });
-
+      await declineMutation.mutateAsync(requestId)
       toast({
         title: '已拒絕',
         description: '此請求已標記為「拒絕」',
       })
-
-      // Refresh list
-      // queryClient.invalidateQueries(['message-requests']);
     } catch (_error) {
       toast({
         title: '錯誤',
@@ -74,30 +114,79 @@ export function MessageRequestsList() {
         variant: 'destructive',
       })
     } finally {
-      setLoading(false)
+      setProcessingId(null)
+      setProcessingAction(null)
     }
   }
 
-  if (requests.length === 0) {
-    return <div className="text-center text-muted-foreground text-sm py-12">目前沒有請求</div>
+  if (requestsQuery.isLoading) {
+    return (
+      <div className="flex justify-center py-12">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </div>
+    )
   }
+
+  if (requestsQuery.error) {
+    return (
+      <div className="text-center text-muted-foreground text-sm py-12">
+        載入請求時發生錯誤
+      </div>
+    )
+  }
+
+  if (requests.length === 0) {
+    if (hideEmpty) {
+      return null
+    }
+    return (
+      <div className="text-center text-muted-foreground text-sm py-12 space-y-3">
+        <p>目前沒有請求</p>
+        <Button asChild variant="outline" className="h-10 rounded-2xl font-black">
+          <Link href="/posts">去貼文看看</Link>
+        </Button>
+      </div>
+    )
+  }
+
+  const totalCount = requests.length
+  const displayLimit = limit ?? totalCount
+  const shouldShowAll = showAll || totalCount <= displayLimit
+  const displayRequests = shouldShowAll ? requests : requests.slice(0, displayLimit)
+  const canViewAll = !shouldShowAll && totalCount > displayLimit
 
   return (
     <div className="space-y-4">
-      {requests.map(request => (
+      {showHeader && (
+        <div className="flex items-center justify-between">
+          <p className="text-sm font-black text-foreground">請求 ({totalCount})</p>
+          {canViewAll && (
+            <Button
+              type="button"
+              variant="ghost"
+              className="h-8 px-2 text-[11px] font-black text-primary-500 hover:text-primary-500/80"
+              onClick={() => setShowAll(true)}
+            >
+              查看全部請求
+            </Button>
+          )}
+        </div>
+      )}
+      {displayRequests.map(request => (
         <Card
           key={request.id}
           className="p-4 rounded-2xl shadow-sm border border-border/30 bg-card"
         >
           <div className="flex items-start justify-between">
-            <div>
-              <p className="text-sm font-black text-foreground">
-                來自 User {request.sender_id.slice(0, 8)}
-              </p>
-              <p className="text-[11px] text-muted-foreground">
-                引用貼文：{request.post_id || '—'}
-              </p>
-              <p className="text-[11px] text-foreground/80 mt-2">{request.initial_message}</p>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-primary-50 text-primary-500 flex items-center justify-center text-xs font-black">
+                {request.sender_id.slice(0, 1).toUpperCase()}
+              </div>
+              <div>
+                <p className="text-sm font-black text-foreground">
+                  使用者 {request.sender_id.slice(0, 8)}
+                </p>
+              </div>
             </div>
             <span className="bg-amber-50 text-amber-700 text-[10px] px-2 py-1 rounded-full font-black">
               待處理
@@ -106,18 +195,26 @@ export function MessageRequestsList() {
           <div className="mt-3 grid grid-cols-2 gap-3">
             <Button
               onClick={() => handleAccept(request.id)}
-              disabled={loading}
+              disabled={processingId !== null}
               className="h-11 rounded-2xl bg-slate-900 text-white font-black hover:bg-slate-800"
             >
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : '接受'}
+              {processingId === request.id && processingAction === 'accept' ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                '接受'
+              )}
             </Button>
             <Button
               variant="outline"
               onClick={() => handleDecline(request.id)}
-              disabled={loading}
+              disabled={processingId !== null}
               className="h-11 rounded-2xl border border-border bg-card font-black hover:bg-muted"
             >
-              拒絕
+              {processingId === request.id && processingAction === 'decline' ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                '拒絕'
+              )}
             </Button>
           </div>
         </Card>

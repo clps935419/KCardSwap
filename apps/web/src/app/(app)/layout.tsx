@@ -33,6 +33,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     staleTime: 5 * 60 * 1000,
     retry: false,
   })
+  console.log('Profile Query:', profileQuery) // Debug log for profile query state
 
   const profileWrapper = profileQuery.data
   const profile = profileWrapper?.data

@@ -8,6 +8,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/components/ui/use-toast'
+import { useSendMessage } from '@/features/inbox/hooks/useSendMessage'
 
 interface SendMessageFormProps {
   threadId: string
@@ -15,9 +16,8 @@ interface SendMessageFormProps {
 
 export function SendMessageForm({ threadId }: SendMessageFormProps) {
   const [content, setContent] = useState('')
-  const [loading, setLoading] = useState(false)
   const { toast } = useToast()
-  void threadId
+  const { sendMessage, loading } = useSendMessage()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -26,18 +26,13 @@ export function SendMessageForm({ threadId }: SendMessageFormProps) {
       return
     }
 
-    setLoading(true)
     try {
-      // TODO: Call send message endpoint using generated SDK
-      // await sendMessage({
-      //   thread_id: threadId,
-      //   content: content.trim(),
-      // });
+      await sendMessage({
+        threadId,
+        content: content.trim(),
+      })
 
       setContent('')
-
-      // Refresh messages
-      // queryClient.invalidateQueries(['thread-messages', threadId]);
 
       toast({
         title: '訊息已送出',
@@ -48,8 +43,6 @@ export function SendMessageForm({ threadId }: SendMessageFormProps) {
         description: '無法送出訊息',
         variant: 'destructive',
       })
-    } finally {
-      setLoading(false)
     }
   }
 

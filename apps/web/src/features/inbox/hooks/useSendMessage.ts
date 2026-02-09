@@ -5,7 +5,13 @@
  */
 'use client'
 
-import { useState } from 'react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import type { ThreadMessageResponse } from '@/shared/api/generated'
+import { sendMessageApiV1ThreadsThreadIdMessagesPost } from '@/shared/api/generated'
+import {
+  getMyThreadsApiV1ThreadsGetQueryKey,
+  getThreadMessagesApiV1ThreadsThreadIdMessagesGetQueryKey,
+} from '@/shared/api/generated/@tanstack/react-query.gen'
 
 interface SendMessageParams {
   threadId: string
@@ -14,44 +20,41 @@ interface SendMessageParams {
 }
 
 export function useSendMessage() {
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<Error | null>(null)
+  const queryClient = useQueryClient()
 
-  const sendMessage = async (params: SendMessageParams) => {
-    setLoading(true)
-    setError(null)
-
-    try {
-      // TODO: Replace with generated SDK call
-      // const response = await client.POST('/api/v1/threads/{thread_id}/messages', {
-      //   params: { path: { thread_id: params.threadId } },
-      //   body: {
-      //     content: params.content,
-      //     post_id: params.postId,
-      //   },
-      // });
-
-      // For now, return mock response
-      return {
-        id: 'mock-id',
-        thread_id: params.threadId,
-        sender_id: 'current-user',
-        content: params.content,
-        post_id: params.postId,
-        created_at: new Date().toISOString(),
-      }
-    } catch (err) {
-      const error = err as Error
-      setError(error)
-      throw error
-    } finally {
-      setLoading(false)
-    }
-  }
+  const mutation = useMutation<ThreadMessageResponse, Error, SendMessageParams>({
+    mutationFn: async params => {
+      const response = await sendMessageApiV1ThreadsThreadIdMessagesPost({
+        path: {
+          thread_id: params.threadId,
+        },
+        body: {
+          content: params.content,
+          post_id: params.postId ?? null,
+        },
+        throwOnError: true,
+      })
+      return response.data as ThreadMessageResponse
+    },
+    onSuccess: (_data, params) => {
+      queryClient.invalidateQueries({
+        queryKey: getThreadMessagesApiV1ThreadsThreadIdMessagesGetQueryKey({
+          path: {
+            thread_id: params.threadId,
+          },
+          query: {
+            limit: 50,
+            offset: 0,
+          },
+        }),
+      })
+      queryClient.invalidateQueries({ queryKey: getMyThreadsApiV1ThreadsGetQueryKey() })
+    },
+  })
 
   return {
-    sendMessage,
-    loading,
-    error,
+    sendMessage: mutation.mutateAsync,
+    loading: mutation.isPending,
+    error: mutation.error,
   }
 }

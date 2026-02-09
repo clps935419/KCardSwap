@@ -5,45 +5,63 @@
  */
 'use client'
 
+import { useQuery } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { cn } from '@/lib/utils'
-
-// TODO: Replace with generated SDK types after OpenAPI generation
-interface ThreadMessage {
-  id: string
-  thread_id: string
-  sender_id: string
-  content: string
-  post_id?: string
-  created_at: string
-}
+import type { ThreadMessageResponse } from '@/shared/api/generated'
+import {
+  getMyProfileApiV1ProfileMeGetOptions,
+  getThreadMessagesApiV1ThreadsThreadIdMessagesGetOptions,
+} from '@/shared/api/generated/@tanstack/react-query.gen'
 
 interface MessageListProps {
   threadId: string
 }
 
 export function MessageList({ threadId }: MessageListProps) {
-  const [messages, _setMessages] = useState<ThreadMessage[]>([])
-  const [loading, _setLoading] = useState(true)
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  void threadId
+  const profileQuery = useQuery({
+    ...getMyProfileApiV1ProfileMeGetOptions(),
+    staleTime: 5 * 60 * 1000,
+    retry: false,
+  })
+  const messagesQuery = useQuery({
+    ...getThreadMessagesApiV1ThreadsThreadIdMessagesGetOptions({
+      path: {
+        thread_id: threadId,
+      },
+      query: {
+        limit: 50,
+        offset: 0,
+      },
+    }),
+    enabled: !!threadId,
+  })
 
-  // TODO: Get current user ID from auth context
-  const currentUserId = 'current-user-id'
-
-  // TODO: Replace with generated SDK hook
-  // const { data, isLoading } = useGetThreadMessages({ thread_id: threadId });
+  const currentUserId = profileQuery.data?.data?.user_id
+  const messages = (messagesQuery.data?.messages ?? []) as ThreadMessageResponse[]
 
   useEffect(() => {
     // Scroll to bottom when messages change
+    if (messages.length === 0) {
+      return
+    }
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [])
+  }, [messages.length])
 
-  if (loading) {
+  if (messagesQuery.isLoading) {
     return (
       <div className="flex justify-center items-center h-full">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    )
+  }
+
+  if (messagesQuery.error) {
+    return (
+      <div className="text-center py-12 text-muted-foreground text-sm">
+        載入訊息時發生錯誤
       </div>
     )
   }
@@ -60,7 +78,7 @@ export function MessageList({ threadId }: MessageListProps) {
   return (
     <div className="space-y-3">
       {messages.map(message => {
-        const isOwnMessage = message.sender_id === currentUserId
+        const isOwnMessage = !!currentUserId && message.sender_id === currentUserId
 
         return (
           <div
