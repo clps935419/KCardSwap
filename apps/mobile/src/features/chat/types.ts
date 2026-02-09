@@ -14,15 +14,21 @@ export type MessageStatus = 'sent' | 'delivered' | 'read';
  */
 export interface ChatRoom {
   id: string;
-  participant_ids: string[];
+  participant_ids?: string[];
+  participants: ChatRoomParticipant[];
   created_at: string;
   last_message?: Message;
   unread_count?: number;
-  other_participant?: {
-    id: string;
-    nickname?: string;
-    avatar_url?: string;
-  };
+  other_participant?: ChatRoomParticipant;
+}
+
+/**
+ * Chat room participant
+ */
+export interface ChatRoomParticipant {
+  user_id: string;
+  nickname?: string;
+  avatar_url?: string;
 }
 
 /**

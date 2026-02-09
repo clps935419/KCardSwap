@@ -10,19 +10,35 @@ import {
   getMessagesApiV1ChatsRoomIdMessagesGetOptions,
   sendMessageApiV1ChatsRoomIdMessagesPostMutation,
 } from '@/src/shared/api/generated/@tanstack/react-query.gen';
+import { useAuthStore } from '@/src/shared/state/authStore';
+import type { ChatRoom } from '../types';
 
 /**
  * Hook to fetch all chat rooms
  */
 export const useChatRooms = () => {
+  const { user } = useAuthStore();
   const result = useQuery({
     ...getChatRoomsApiV1ChatsGetOptions(),
   });
 
   // Transform the response to extract rooms array from envelope
+  const rooms = (result.data?.data?.rooms || []) as ChatRoom[];
+  const currentUserId = user?.id;
+  const roomsWithOtherParticipant = rooms.map(room => {
+    const otherParticipant = room.participants?.find(
+      participant => participant.user_id !== currentUserId
+    ) || room.participants?.[0];
+
+    return {
+      ...room,
+      other_participant: otherParticipant,
+    };
+  });
+
   return {
     ...result,
-    data: result.data?.data?.rooms || [],
+    data: roomsWithOtherParticipant,
   };
 };
 

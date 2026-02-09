@@ -8,7 +8,7 @@
  */
 
 import React from 'react';
-import { FlatList, RefreshControl, ActivityIndicator } from 'react-native';
+import { FlatList, RefreshControl, Image } from 'react-native';
 import { Box } from '@/src/shared/ui/components/box';
 import { Text } from '@/src/shared/ui/components/text';
 import { Pressable } from '@/src/shared/ui/components/pressable';
@@ -16,7 +16,9 @@ import { HStack } from '@/src/shared/ui/components/hstack';
 import { VStack } from '@/src/shared/ui/components/vstack';
 import { Heading } from '@/src/shared/ui/components/heading';
 import { Badge, BadgeText } from '@/src/shared/ui/components/badge';
+import { Spinner } from '@/src/shared/ui/components/spinner';
 import { useChatRooms } from '../hooks/useChat';
+import type { ChatRoom } from '../types';
 import { useRouter } from 'expo-router';
 
 export default function ChatRoomsScreen() {
@@ -45,26 +47,38 @@ export default function ChatRoomsScreen() {
     }
   };
 
-  const renderChatRoom = ({ item }: { item: any }) => {
+  const renderChatRoom = ({ item }: { item: ChatRoom }) => {
     const lastMessage = item.last_message;
     const hasUnread = (item.unread_count || 0) > 0;
+    const avatarUrl = item.other_participant?.avatar_url;
+    const displayName = item.other_participant?.nickname || `Room ${item.id.slice(0, 8)}`;
+    const fallbackInitial = displayName[0]?.toUpperCase() || 'U';
 
     return (
       <Pressable onPress={() => handleRoomPress(item.id)}>
         <Box className="bg-white px-4 py-3 border-b border-gray-200">
           <HStack className="items-center space-x-3">
             {/* Avatar */}
-            <Box className="w-12 h-12 bg-gray-300 rounded-full items-center justify-center">
-              <Text className="text-white font-bold text-lg">
-                {item.other_participant?.nickname?.[0]?.toUpperCase() || 'U'}
-              </Text>
+            <Box className="w-12 h-12 bg-gray-300 rounded-full items-center justify-center overflow-hidden">
+              {avatarUrl ? (
+                <Image
+                  source={{ uri: avatarUrl }}
+                  style={{ width: '100%', height: '100%' }}
+                  resizeMode="cover"
+                  accessibilityLabel={displayName}
+                />
+              ) : (
+                <Text className="text-white font-bold text-lg">
+                  {fallbackInitial}
+                </Text>
+              )}
             </Box>
 
             {/* Room info */}
             <VStack className="flex-1">
               <HStack className="items-center justify-between mb-1">
                 <Text className={`font-semibold ${hasUnread ? 'text-gray-900' : 'text-gray-700'}`}>
-                  {item.other_participant?.nickname || `Room ${item.id.slice(0, 8)}`}
+                  {displayName}
                 </Text>
                 {lastMessage && (
                   <Text className="text-xs text-gray-500">
@@ -118,7 +132,7 @@ export default function ChatRoomsScreen() {
       {/* Chat rooms list */}
       {isLoading ? (
         <Box className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#6366f1" />
+          <Spinner color="#6366f1" />
         </Box>
       ) : (
         <FlatList
