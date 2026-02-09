@@ -60,7 +60,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <Link href="/me">
             <button
               type="button"
-              className="w-9 h-9 bg-primary-500 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-white text-xs font-black transition-transform active:scale-95 hover:scale-105 overflow-hidden"
+              className="relative w-9 h-9 bg-primary-500 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-white text-xs font-black transition-transform active:scale-95 hover:scale-105 overflow-hidden"
               aria-label="前往我的檔案"
               title={userDisplay || '使用者'}
             >

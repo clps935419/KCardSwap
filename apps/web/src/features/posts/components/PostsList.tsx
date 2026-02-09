@@ -136,7 +136,7 @@ export function PostsList() {
             {/* Post Header */}
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-primary-50 rounded-full flex items-center justify-center overflow-hidden">
+                <div className="relative w-8 h-8 bg-primary-50 rounded-full flex items-center justify-center overflow-hidden">
                   {post.owner_avatar_url ? (
                     <Image
                       src={post.owner_avatar_url}
