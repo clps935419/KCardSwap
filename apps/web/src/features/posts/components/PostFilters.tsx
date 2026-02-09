@@ -10,18 +10,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { getCitiesApiV1LocationsCitiesGetOptions } from '@/shared/api/generated/@tanstack/react-query.gen'
+import { getCitiesApiV1LocationsCitiesGetOptions, getCategoriesApiV1PostsCategoriesGetOptions } from '@/shared/api/generated/@tanstack/react-query.gen'
 import type { PostCategory } from '@/shared/api/generated'
-
-const CATEGORIES: { value: PostCategory | 'all'; label: string }[] = [
-  { value: 'all', label: '全部' },
-  { value: 'trade', label: '求換' },
-  { value: 'giveaway', label: '送出' },
-  { value: 'group', label: '揪團' },
-  { value: 'showcase', label: '展示' },
-  { value: 'help', label: '求助' },
-  { value: 'announcement', label: '公告' },
-]
 
 export function PostFilters() {
   const router = useRouter()
@@ -29,6 +19,11 @@ export function PostFilters() {
 
   const citiesQuery = useQuery({
     ...getCitiesApiV1LocationsCitiesGetOptions(),
+    staleTime: 24 * 60 * 60 * 1000,
+  })
+
+  const categoriesQuery = useQuery({
+    ...getCategoriesApiV1PostsCategoriesGetOptions(),
     staleTime: 24 * 60 * 60 * 1000,
   })
 
@@ -51,6 +46,11 @@ export function PostFilters() {
       value: city.code,
       label: `${city.name_zh}`,
     })),
+  ]
+
+  const categories = [
+    { value: 'all', label: '全部' },
+    ...(categoriesQuery.data?.data.categories ?? []),
   ]
 
   return (
@@ -101,7 +101,13 @@ export function PostFilters() {
 
       {/* Category Filters */}
       <div className="flex flex-wrap gap-2">
-        {CATEGORIES.map(category => (
+        {categoriesQuery.isLoading && (
+          <div className="text-[11px] text-muted-foreground">載入分類中...</div>
+        )}
+        {categoriesQuery.isError && (
+          <div className="text-[11px] text-destructive">分類載入失敗</div>
+        )}
+        {categories.map(category => (
           <Button
             key={category.value}
             variant="outline"

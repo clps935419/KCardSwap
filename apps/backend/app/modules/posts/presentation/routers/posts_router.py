@@ -301,12 +301,16 @@ async def get_post(
         # Get like count and liked_by_me from post attributes
         like_count = getattr(post, '_like_count', 0)
         liked_by_me = getattr(post, '_liked_by_me', False)
+        owner_nickname = getattr(post, '_owner_nickname', None)
+        owner_avatar_url = getattr(post, '_owner_avatar_url', None)
         
         data = await _post_to_response(
             post,
             session,
             like_count=like_count,
             liked_by_me=liked_by_me,
+            owner_nickname=owner_nickname,
+            owner_avatar_url=owner_avatar_url,
         )
         return PostResponseWrapper(data=data, meta=None, error=None)
         

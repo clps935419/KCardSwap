@@ -844,6 +844,57 @@ export type MessagesListResponseWrapper = {
 export type PostCategory = 'trade' | 'giveaway' | 'group' | 'showcase' | 'help' | 'announcement';
 
 /**
+ * PostCategoryListResponse
+ *
+ * Response schema for category list
+ */
+export type PostCategoryListResponse = {
+    /**
+     * Categories
+     *
+     * List of available categories
+     */
+    categories: Array<PostCategoryOption>;
+};
+
+/**
+ * PostCategoryListResponseWrapper
+ *
+ * Response wrapper for category list (standardized envelope)
+ */
+export type PostCategoryListResponseWrapper = {
+    data: PostCategoryListResponse;
+    /**
+     * Meta
+     */
+    meta?: null;
+    /**
+     * Error
+     */
+    error?: null;
+};
+
+/**
+ * PostCategoryOption
+ *
+ * Schema for a single category option
+ */
+export type PostCategoryOption = {
+    /**
+     * Value
+     *
+     * Category value (enum)
+     */
+    value: string;
+    /**
+     * Label
+     *
+     * Category display label (Chinese)
+     */
+    label: string;
+};
+
+/**
  * PostListResponse
  *
  * Response schema for post list
@@ -898,6 +949,18 @@ export type PostResponse = {
      * Owner user ID
      */
     owner_id: string;
+    /**
+     * Owner Nickname
+     *
+     * Owner's nickname from profile
+     */
+    owner_nickname?: string | null;
+    /**
+     * Owner Avatar Url
+     *
+     * Owner's avatar URL from profile
+     */
+    owner_avatar_url?: string | null;
     /**
      * Scope
      *
@@ -1332,26 +1395,6 @@ export type ReportResponseWrapper = {
 };
 
 /**
- * SendMessageRequest
- *
- * Request to send a message in a thread
- */
-export type SendMessageRequest = {
-    /**
-     * Content
-     *
-     * Message content
-     */
-    content: string;
-    /**
-     * Post Id
-     *
-     * Optional post ID to reference
-     */
-    post_id?: string | null;
-};
-
-/**
  * SubscriptionStatusData
  *
  * Data schema for subscription status
@@ -1717,6 +1760,26 @@ export type AppModulesSocialPresentationSchemasChatSchemasSendMessageRequest = {
      * Message content
      */
     content: string;
+};
+
+/**
+ * SendMessageRequest
+ *
+ * Request to send a message in a thread
+ */
+export type AppModulesSocialPresentationSchemasMessageSchemasSendMessageRequest = {
+    /**
+     * Content
+     *
+     * Message content
+     */
+    content: string;
+    /**
+     * Post Id
+     *
+     * Optional post ID to reference
+     */
+    post_id?: string | null;
 };
 
 export type HealthCheckHealthGetData = {
@@ -2421,6 +2484,22 @@ export type MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostResponses = 
 };
 
 export type MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostResponse = MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostResponses[keyof MarkMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostResponses];
+
+export type GetCategoriesApiV1PostsCategoriesGetData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/posts/categories';
+};
+
+export type GetCategoriesApiV1PostsCategoriesGetResponses = {
+    /**
+     * Categories retrieved successfully
+     */
+    200: PostCategoryListResponseWrapper;
+};
+
+export type GetCategoriesApiV1PostsCategoriesGetResponse = GetCategoriesApiV1PostsCategoriesGetResponses[keyof GetCategoriesApiV1PostsCategoriesGetResponses];
 
 export type ListPostsApiV1PostsGetData = {
     body?: never;
@@ -3129,7 +3208,7 @@ export type GetThreadMessagesApiV1ThreadsThreadIdMessagesGetResponses = {
 export type GetThreadMessagesApiV1ThreadsThreadIdMessagesGetResponse = GetThreadMessagesApiV1ThreadsThreadIdMessagesGetResponses[keyof GetThreadMessagesApiV1ThreadsThreadIdMessagesGetResponses];
 
 export type SendMessageApiV1ThreadsThreadIdMessagesPostData = {
-    body: SendMessageRequest;
+    body: AppModulesSocialPresentationSchemasMessageSchemasSendMessageRequest;
     path: {
         /**
          * Thread Id
