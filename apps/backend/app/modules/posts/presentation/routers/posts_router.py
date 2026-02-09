@@ -461,9 +461,9 @@ async def toggle_like(
 )
 async def list_post_comments(
     post_id: UUID,
+    use_case: Annotated[ListPostCommentsUseCase, Depends(get_list_post_comments_use_case)],
     limit: int = Query(50, ge=1, le=100, description="Maximum number of comments to return"),
     offset: int = Query(0, ge=0, description="Number of comments to skip"),
-    use_case: Annotated[ListPostCommentsUseCase, Depends(get_list_post_comments_use_case)],
 ) -> CommentListResponseWrapper:
     """
     List comments on a post (latest first).
