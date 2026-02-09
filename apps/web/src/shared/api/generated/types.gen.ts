@@ -827,9 +827,25 @@ export type MessageRequestResponse = {
      */
     sender_id: string;
     /**
+     * Sender Nickname
+     */
+    sender_nickname?: string | null;
+    /**
+     * Sender Avatar Url
+     */
+    sender_avatar_url?: string | null;
+    /**
      * Recipient Id
      */
     recipient_id: string;
+    /**
+     * Recipient Nickname
+     */
+    recipient_nickname?: string | null;
+    /**
+     * Recipient Avatar Url
+     */
+    recipient_avatar_url?: string | null;
     /**
      * Initial Message
      */
@@ -1608,6 +1624,14 @@ export type ThreadMessageResponse = {
      */
     sender_id: string;
     /**
+     * Sender Nickname
+     */
+    sender_nickname?: string | null;
+    /**
+     * Sender Avatar Url
+     */
+    sender_avatar_url?: string | null;
+    /**
      * Content
      */
     content: string;
@@ -1652,9 +1676,25 @@ export type ThreadResponse = {
      */
     user_a_id: string;
     /**
+     * User A Nickname
+     */
+    user_a_nickname?: string | null;
+    /**
+     * User A Avatar Url
+     */
+    user_a_avatar_url?: string | null;
+    /**
      * User B Id
      */
     user_b_id: string;
+    /**
+     * User B Nickname
+     */
+    user_b_nickname?: string | null;
+    /**
+     * User B Avatar Url
+     */
+    user_b_avatar_url?: string | null;
     /**
      * Created At
      */
