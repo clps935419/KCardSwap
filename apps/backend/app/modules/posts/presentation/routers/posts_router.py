@@ -14,10 +14,16 @@ from app.modules.media.infrastructure.repositories.media_repository_impl import 
     MediaRepositoryImpl,
 )
 from app.modules.posts.application.use_cases.close_post_use_case import ClosePostUseCase
+from app.modules.posts.application.use_cases.create_post_comment_use_case import (
+    CreatePostCommentUseCase,
+)
 from app.modules.posts.application.use_cases.create_post_use_case import (
     CreatePostUseCase,
 )
 from app.modules.posts.application.use_cases.get_post_use_case import GetPostUseCase
+from app.modules.posts.application.use_cases.list_post_comments_use_case import (
+    ListPostCommentsUseCase,
+)
 from app.modules.posts.application.use_cases.list_posts_v2_use_case import (
     ListPostsV2UseCase,
 )
@@ -25,10 +31,19 @@ from app.modules.posts.application.use_cases.toggle_like import ToggleLikeUseCas
 from app.modules.posts.domain.entities.post_enums import PostCategory
 from app.modules.posts.presentation.dependencies.use_case_deps import (
     get_close_post_use_case,
+    get_create_post_comment_use_case,
     get_create_post_use_case,
     get_get_post_use_case,
+    get_list_post_comments_use_case,
     get_list_posts_v2_use_case,
     get_toggle_like_use_case,
+)
+from app.modules.posts.presentation.schemas.comment_schemas import (
+    CommentListResponse,
+    CommentListResponseWrapper,
+    CommentResponse,
+    CommentResponseWrapper,
+    CreateCommentRequest,
 )
 from app.modules.posts.presentation.schemas.post_schemas import (
     CreatePostRequest,
@@ -431,4 +446,112 @@ async def toggle_like(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to toggle like",
+        )
+
+
+@router.get(
+    "/{post_id}/comments",
+    response_model=CommentListResponseWrapper,
+    responses={
+        200: {"description": "Comments retrieved successfully"},
+        404: {"description": "Post not found"},
+    },
+    summary="List comments on a post",
+    description="Returns list of comments for a post (latest first)",
+)
+async def list_post_comments(
+    post_id: UUID,
+    limit: int = Query(50, ge=1, le=100, description="Maximum number of comments to return"),
+    offset: int = Query(0, ge=0, description="Number of comments to skip"),
+    use_case: Annotated[ListPostCommentsUseCase, Depends(get_list_post_comments_use_case)],
+) -> CommentListResponseWrapper:
+    """
+    List comments on a post (latest first).
+    
+    Returns comments sorted by creation time in descending order (newest first).
+    Supports pagination with limit and offset parameters.
+    """
+    try:
+        comments, total = await use_case.execute(
+            post_id=str(post_id),
+            limit=limit,
+            offset=offset,
+        )
+        
+        comment_responses = [
+            CommentResponse(
+                id=UUID(comment.id),
+                post_id=UUID(comment.post_id),
+                user_id=UUID(comment.user_id),
+                content=comment.content,
+                created_at=comment.created_at,
+                updated_at=comment.updated_at,
+            )
+            for comment in comments
+        ]
+        
+        data = CommentListResponse(comments=comment_responses, total=total)
+        return CommentListResponseWrapper(data=data, meta=None, error=None)
+        
+    except Exception as e:
+        logger.error(f"Error listing comments for post {post_id}: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to list comments",
+        )
+
+
+@router.post(
+    "/{post_id}/comments",
+    response_model=CommentResponseWrapper,
+    status_code=status.HTTP_201_CREATED,
+    responses={
+        201: {"description": "Comment created successfully"},
+        400: {"description": "Invalid request"},
+        404: {"description": "Post not found"},
+    },
+    summary="Create a comment on a post",
+    description="Create a new comment on the specified post (requires authentication)",
+)
+async def create_post_comment(
+    post_id: UUID,
+    request: CreateCommentRequest,
+    current_user_id: Annotated[UUID, Depends(require_user)],
+    use_case: Annotated[CreatePostCommentUseCase, Depends(get_create_post_comment_use_case)],
+) -> CommentResponseWrapper:
+    """
+    Create a comment on a post.
+    
+    Requires authentication. The user must be logged in to create a comment.
+    """
+    try:
+        comment = await use_case.execute(
+            post_id=str(post_id),
+            user_id=str(current_user_id),
+            content=request.content,
+        )
+        
+        data = CommentResponse(
+            id=UUID(comment.id),
+            post_id=UUID(comment.post_id),
+            user_id=UUID(comment.user_id),
+            content=comment.content,
+            created_at=comment.created_at,
+            updated_at=comment.updated_at,
+        )
+        return CommentResponseWrapper(data=data, meta=None, error=None)
+        
+    except ValueError as e:
+        error_msg = str(e).lower()
+        if "not found" in error_msg:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
+    except Exception as e:
+        logger.error(f"Error creating comment on post {post_id}: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to create comment",
         )

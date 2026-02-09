@@ -12,14 +12,21 @@ from app.modules.posts.application.use_cases.accept_interest_use_case import (
 from app.modules.posts.application.use_cases.close_post_use_case import (
     ClosePostUseCase,
 )
+from app.modules.posts.application.use_cases.create_post_comment_use_case import (
+    CreatePostCommentUseCase,
+)
 from app.modules.posts.application.use_cases.create_post_use_case import (
     CreatePostUseCase,
 )
 from app.modules.posts.application.use_cases.express_interest_use_case import (
     ExpressInterestUseCase,
 )
+from app.modules.posts.application.use_cases.get_post_use_case import GetPostUseCase
 from app.modules.posts.application.use_cases.list_board_posts_use_case import (
     ListBoardPostsUseCase,
+)
+from app.modules.posts.application.use_cases.list_post_comments_use_case import (
+    ListPostCommentsUseCase,
 )
 from app.modules.posts.application.use_cases.list_post_interests_use_case import (
     ListPostInterestsUseCase,
@@ -32,6 +39,9 @@ from app.modules.posts.application.use_cases.reject_interest_use_case import (
 )
 from app.modules.posts.application.use_cases.toggle_like import ToggleLikeUseCase
 from app.modules.posts.application.use_cases.get_post_use_case import GetPostUseCase
+from app.modules.posts.infrastructure.repositories.comment_repository_impl import (
+    CommentRepositoryImpl,
+)
 from app.modules.posts.infrastructure.repositories.post_interest_repository_impl import (
     PostInterestRepositoryImpl,
 )
@@ -158,3 +168,22 @@ class PostsModule(Module):
         """Provide GetPostUseCase with dependencies."""
         post_repo = PostRepositoryImpl(session)
         return GetPostUseCase(post_repository=post_repo, session=session)
+
+    @provider
+    def provide_create_post_comment_use_case(
+        self, session: AsyncSession
+    ) -> CreatePostCommentUseCase:
+        """Provide CreatePostCommentUseCase with dependencies."""
+        comment_repo = CommentRepositoryImpl(session)
+        post_repo = PostRepositoryImpl(session)
+        return CreatePostCommentUseCase(
+            comment_repository=comment_repo, post_repository=post_repo
+        )
+
+    @provider
+    def provide_list_post_comments_use_case(
+        self, session: AsyncSession
+    ) -> ListPostCommentsUseCase:
+        """Provide ListPostCommentsUseCase with dependencies."""
+        comment_repo = CommentRepositoryImpl(session)
+        return ListPostCommentsUseCase(comment_repository=comment_repo)
