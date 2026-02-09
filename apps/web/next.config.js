@@ -2,16 +2,16 @@
 const nextConfig = {
   reactStrictMode: true,
   transpilePackages: [],
-  basePath: '/projects/kcardswap',
-  assetPrefix: '/projects/kcardswap',
+  basePath: "/projects/kcardswap",
+  assetPrefix: "/projects/kcardswap",
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'storage.googleapis.com',
+        protocol: "https",
+        hostname: "storage.googleapis.com",
       },
     ],
   },
-}
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
