@@ -1,8 +1,13 @@
 """List Posts V2 Use Case - List posts with global/city filtering and category"""
 
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import Dict, List, Optional
+from uuid import UUID
 
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.modules.identity.infrastructure.database.models.profile_model import ProfileModel
 from app.modules.posts.domain.entities.post import Post, PostStatus
 from app.modules.posts.domain.entities.post_enums import PostCategory
 from app.modules.posts.domain.repositories.i_post_like_repository import (
@@ -18,6 +23,8 @@ class PostWithLikes:
     post: Post
     like_count: int
     liked_by_me: bool
+    owner_nickname: Optional[str] = None
+    owner_avatar_url: Optional[str] = None
 
 
 class ListPostsV2UseCase:
@@ -37,9 +44,46 @@ class ListPostsV2UseCase:
         self,
         post_repository: IPostRepository,
         like_repository: IPostLikeRepository,
+        session: AsyncSession,
     ):
         self.post_repository = post_repository
         self.like_repository = like_repository
+        self.session = session
+
+    async def _fetch_owner_profiles(
+        self, owner_ids: List[str]
+    ) -> Dict[str, Dict[str, Optional[str]]]:
+        """
+        Fetch profile information for multiple owners in a single query.
+        
+        Returns:
+            Dict mapping owner_id to {nickname, avatar_url}
+        """
+        if not owner_ids:
+            return {}
+        
+        # Convert to UUIDs
+        uuid_ids = [UUID(owner_id) for owner_id in owner_ids]
+        
+        # Query profiles
+        result = await self.session.execute(
+            select(
+                ProfileModel.user_id,
+                ProfileModel.nickname,
+                ProfileModel.avatar_url,
+            ).where(ProfileModel.user_id.in_(uuid_ids))
+        )
+        
+        # Build mapping
+        profiles = {}
+        for row in result:
+            user_id_str = str(row[0])
+            profiles[user_id_str] = {
+                "nickname": row[1],
+                "avatar_url": row[2],
+            }
+        
+        return profiles
 
     async def execute(
         self,
@@ -74,7 +118,11 @@ class ListPostsV2UseCase:
         # Filter out expired posts (runtime safety check)
         valid_posts = [post for post in posts if not post.is_expired()]
 
-        # Enrich with like information
+        # Fetch all owner profiles in a single query
+        owner_ids = list(set(post.owner_id for post in valid_posts))
+        owner_profiles = await self._fetch_owner_profiles(owner_ids)
+
+        # Enrich with like information and owner profiles
         posts_with_likes = []
         for post in valid_posts:
             like_count = await self.like_repository.count_by_post(post.id)
@@ -85,11 +133,18 @@ class ListPostsV2UseCase:
                 )
                 liked_by_me = existing_like is not None
 
+            # Get owner profile info
+            profile = owner_profiles.get(post.owner_id, {})
+            owner_nickname = profile.get("nickname")
+            owner_avatar_url = profile.get("avatar_url")
+
             posts_with_likes.append(
                 PostWithLikes(
                     post=post,
                     like_count=like_count,
                     liked_by_me=liked_by_me,
+                    owner_nickname=owner_nickname,
+                    owner_avatar_url=owner_avatar_url,
                 )
             )
 
