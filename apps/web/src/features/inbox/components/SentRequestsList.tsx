@@ -11,6 +11,7 @@ import { Loader2 } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import { UserAvatar } from '@/components/ui/user-avatar'
 import type { MessageRequestResponse } from '@/shared/api/generated'
 import { getMySentMessageRequestsApiV1MessageRequestsSentGetOptions } from '@/shared/api/generated/@tanstack/react-query.gen'
 
@@ -86,12 +87,14 @@ export function SentRequestsList({ limit, showHeader, hideEmpty }: SentRequestsL
         >
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-primary-50 text-primary-500 flex items-center justify-center text-xs font-black">
-                {request.recipient_id.slice(0, 1).toUpperCase()}
-              </div>
+              <UserAvatar
+                nickname={request.recipient_nickname}
+                avatarUrl={request.recipient_avatar_url}
+                userId={request.recipient_id}
+              />
               <div>
                 <p className="text-sm font-black text-foreground">
-                  對象 {request.recipient_id.slice(0, 8)}
+                  {request.recipient_nickname || `使用者 ${request.recipient_id.slice(0, 8)}`}
                 </p>
                 <p className="text-[11px] text-muted-foreground">等待對方回覆</p>
               </div>

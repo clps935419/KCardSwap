@@ -12,6 +12,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import { UserAvatar } from '@/components/ui/user-avatar'
 import { useToast } from '@/components/ui/use-toast'
 import type { MessageRequestResponse } from '@/shared/api/generated'
 import {
@@ -175,12 +176,14 @@ export function MessageRequestsList({ limit, showHeader, hideEmpty }: MessageReq
         >
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-primary-50 text-primary-500 flex items-center justify-center text-xs font-black">
-                {request.sender_id.slice(0, 1).toUpperCase()}
-              </div>
+              <UserAvatar
+                nickname={request.sender_nickname}
+                avatarUrl={request.sender_avatar_url}
+                userId={request.sender_id}
+              />
               <div>
                 <p className="text-sm font-black text-foreground">
-                  使用者 {request.sender_id.slice(0, 8)}
+                  {request.sender_nickname || `使用者 ${request.sender_id.slice(0, 8)}`}
                 </p>
               </div>
             </div>
