@@ -7,11 +7,11 @@ import { getMediaReadUrlsApiV1MediaReadUrlsPost } from '@/shared/api/generated'
 
 /**
  * Hook to batch fetch signed read URLs for media assets
- * 
+ *
  * @param mediaAssetIds - Array of media asset IDs to fetch URLs for
  * @param options - Additional query options
  * @returns Query result with urls mapping and expires_in_minutes
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useReadMediaUrls(['uuid-1', 'uuid-2']);

@@ -1,8 +1,9 @@
 'use client'
 
+import { useQuery } from '@tanstack/react-query'
+import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useQuery } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { getMyProfileApiV1ProfileMeGetOptions } from '@/shared/api/generated/@tanstack/react-query.gen'
 
@@ -64,10 +65,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               title={userDisplay || '使用者'}
             >
               {avatarUrl ? (
-                <img
+                <Image
                   src={avatarUrl}
                   alt={userDisplay || '使用者'}
-                  className="w-full h-full object-cover"
+                  fill
+                  sizes="36px"
+                  className="object-cover"
+                  unoptimized
                 />
               ) : (
                 userDisplay?.[0]?.toUpperCase() || 'U'

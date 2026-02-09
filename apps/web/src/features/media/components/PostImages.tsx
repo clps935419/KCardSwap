@@ -4,8 +4,8 @@
  */
 'use client'
 
-import Image from 'next/image'
 import { Loader2 } from 'lucide-react'
+import Image from 'next/image'
 import { useReadMediaUrls } from '@/features/media/hooks/useReadMediaUrls'
 
 interface PostImagesProps {
@@ -15,10 +15,10 @@ interface PostImagesProps {
 
 /**
  * Component to display images from a post using signed URLs
- * 
+ *
  * @param mediaAssetIds - Array of media asset IDs to display
  * @param maxDisplay - Maximum number of images to display (default: 4)
- * 
+ *
  * @example
  * ```tsx
  * <PostImages mediaAssetIds={post.media_asset_ids} maxDisplay={4} />

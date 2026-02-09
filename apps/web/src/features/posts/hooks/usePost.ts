@@ -7,11 +7,11 @@ import { getPostApiV1PostsPostIdGetOptions } from '@/shared/api/generated/@tanst
 
 /**
  * Hook to fetch a single post by ID
- * 
+ *
  * @param postId - The post ID to fetch
  * @param options - Additional query options
  * @returns Query result with post data
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading, error } = usePost('post-id-123');

@@ -4,14 +4,7 @@ import Image from 'next/image'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
 import { Textarea } from '@/components/ui/textarea'
@@ -103,7 +96,11 @@ export function GalleryCreateCardForm({ onSuccess }: GalleryCreateCardFormProps)
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <Input placeholder="卡片標題" className="bg-card border-border rounded-xl" {...field} />
+                  <Input
+                    placeholder="卡片標題"
+                    className="bg-card border-border rounded-xl"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -123,7 +120,11 @@ export function GalleryCreateCardForm({ onSuccess }: GalleryCreateCardFormProps)
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <Input placeholder="例如：IU" className="bg-card border-border rounded-xl" {...field} />
+                  <Input
+                    placeholder="例如：IU"
+                    className="bg-card border-border rounded-xl"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -140,7 +141,11 @@ export function GalleryCreateCardForm({ onSuccess }: GalleryCreateCardFormProps)
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <Input placeholder="例如：Love Poem" className="bg-card border-border rounded-xl" {...field} />
+                  <Input
+                    placeholder="例如：Love Poem"
+                    className="bg-card border-border rounded-xl"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -189,7 +194,12 @@ export function GalleryCreateCardForm({ onSuccess }: GalleryCreateCardFormProps)
           />
 
           <div className="space-y-2">
-            <Button type="button" variant="outline" className="h-12 w-full rounded-xl font-black" asChild>
+            <Button
+              type="button"
+              variant="outline"
+              className="h-12 w-full rounded-xl font-black"
+              asChild
+            >
               <label htmlFor="image">{imagePreview ? '更換圖片' : '選擇圖片'}</label>
             </Button>
           </div>

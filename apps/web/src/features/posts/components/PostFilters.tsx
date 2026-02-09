@@ -1,7 +1,7 @@
 'use client'
 
-import { useRouter, useSearchParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import {
   Select,
@@ -10,8 +10,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { getCitiesApiV1LocationsCitiesGetOptions, getCategoriesApiV1PostsCategoriesGetOptions } from '@/shared/api/generated/@tanstack/react-query.gen'
-import type { PostCategory } from '@/shared/api/generated'
+import {
+  getCategoriesApiV1PostsCategoriesGetOptions,
+  getCitiesApiV1LocationsCitiesGetOptions,
+} from '@/shared/api/generated/@tanstack/react-query.gen'
 
 export function PostFilters() {
   const router = useRouter()
@@ -65,10 +67,7 @@ export function PostFilters() {
       {/* City Filter */}
       <div className="space-y-2">
         <p className="text-[10px] font-bold text-muted-foreground uppercase">城市</p>
-        <Select
-          value={currentCity}
-          onValueChange={value => updateFilter('city', value)}
-        >
+        <Select value={currentCity} onValueChange={value => updateFilter('city', value)}>
           <SelectTrigger className="bg-card border-border rounded-xl font-black">
             <SelectValue placeholder={citiesQuery.isLoading ? '城市載入中...' : '選擇城市'} />
           </SelectTrigger>

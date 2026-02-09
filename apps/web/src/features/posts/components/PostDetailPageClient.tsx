@@ -1,16 +1,16 @@
 'use client'
 
+import { Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { Loader2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Spinner } from '@/components/ui/spinner'
-import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/use-toast'
-import { PostImages } from '@/features/media/components/PostImages'
-import { useToggleLike } from '@/features/posts/hooks/useToggleLike'
 import { useCreateMessageRequest } from '@/features/inbox/hooks/useCreateMessageRequest'
+import { PostImages } from '@/features/media/components/PostImages'
 import { usePost } from '@/features/posts/hooks/usePost'
+import { useToggleLike } from '@/features/posts/hooks/useToggleLike'
 import type { PostCategory } from '@/shared/api/generated'
 
 const CATEGORY_LABELS: Record<PostCategory, string> = {
@@ -134,7 +134,11 @@ export function PostDetailPageClient({ postId }: PostDetailPageClientProps) {
     <div className="max-w-2xl mx-auto space-y-4">
       {/* Back button */}
       <div className="flex items-center justify-between">
-        <Button variant="ghost" onClick={() => router.back()} className="text-primary-500 font-black">
+        <Button
+          variant="ghost"
+          onClick={() => router.back()}
+          className="text-primary-500 font-black"
+        >
           ← 返回
         </Button>
       </div>
@@ -182,9 +186,7 @@ export function PostDetailPageClient({ postId }: PostDetailPageClientProps) {
         )}
 
         {/* Post Title */}
-        <h1 className="text-xl font-black text-foreground mb-4 leading-relaxed">
-          {post.title}
-        </h1>
+        <h1 className="text-xl font-black text-foreground mb-4 leading-relaxed">{post.title}</h1>
 
         {/* Idol Tags */}
         {(post.idol || post.idol_group) && (

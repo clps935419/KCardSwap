@@ -19,9 +19,7 @@ import {
 /**
  * Get presigned upload URL for media
  */
-export async function createUploadUrl(
-  data: CreateUploadUrlRequestSchema
-) {
+export async function createUploadUrl(data: CreateUploadUrlRequestSchema) {
   const response = await createUploadUrlApiV1MediaUploadUrlPost({
     body: data,
     throwOnError: true,

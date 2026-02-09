@@ -2,11 +2,7 @@
  * Flow mutations for multi-step operations.
  */
 
-import {
-  type UseMutationOptions,
-  useMutation,
-  useQueryClient,
-} from '@tanstack/react-query'
+import { type UseMutationOptions, useMutation, useQueryClient } from '@tanstack/react-query'
 import type {
   CityCode,
   CreateGalleryCardApiV1GalleryCardsPostResponse,
@@ -45,26 +41,14 @@ export interface CreateGalleryCardFlowInput {
 }
 
 export function useCreatePostFlowMutation(
-  options?: UseMutationOptions<
-    CreatePostApiV1PostsPostResponse,
-    Error,
-    CreatePostFlowInput
-  >
+  options?: UseMutationOptions<CreatePostApiV1PostsPostResponse, Error, CreatePostFlowInput>
 ) {
   const queryClient = useQueryClient()
   const createPostMutationOptions = createPostApiV1PostsPostMutation()
 
   return useMutation({
     mutationFn: async input => {
-      const {
-        title,
-        content,
-        scope,
-        city_code,
-        category,
-        imageFile,
-        onUploadProgress,
-      } = input
+      const { title, content, scope, city_code, category, imageFile, onUploadProgress } = input
 
       let mediaId: string | undefined
 
@@ -126,14 +110,7 @@ export function useCreateGalleryCardFlowMutation(
 
   return useMutation({
     mutationFn: async input => {
-      const {
-        title,
-        idol_name,
-        era,
-        description,
-        imageFile,
-        onUploadProgress,
-      } = input
+      const { title, idol_name, era, description, imageFile, onUploadProgress } = input
 
       let mediaId: string | undefined
 

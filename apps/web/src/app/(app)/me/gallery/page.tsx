@@ -1,4 +1,4 @@
-import { HydrationBoundary, dehydrate } from '@tanstack/react-query'
+import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 import { MyGalleryPageClient } from '@/features/gallery/components/MyGalleryPageClient'
 import { createServerQueryClient } from '@/lib/query-client'
 import { getMyGalleryCardsApiV1GalleryCardsMeGetOptions } from '@/shared/api/generated/@tanstack/react-query.gen'

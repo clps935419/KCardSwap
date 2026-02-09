@@ -1,4 +1,4 @@
-import { HydrationBoundary, dehydrate } from '@tanstack/react-query'
+import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 import { PostDetailPageClient } from '@/features/posts/components/PostDetailPageClient'
 import { createServerQueryClient } from '@/lib/query-client'
 import { getPostApiV1PostsPostIdGetOptions } from '@/shared/api/generated/@tanstack/react-query.gen'

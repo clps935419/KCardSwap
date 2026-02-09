@@ -16,15 +16,12 @@ import {
 } from '@/components/ui/select'
 import { Spinner } from '@/components/ui/spinner'
 import { Textarea } from '@/components/ui/textarea'
+import type { CityCode, CityResponse, PostCategory, PostScope } from '@/shared/api/generated'
+import {
+  getCategoriesApiV1PostsCategoriesGetOptions,
+  getCitiesApiV1LocationsCitiesGetOptions,
+} from '@/shared/api/generated/@tanstack/react-query.gen'
 import { useCreatePostFlowMutation } from '@/shared/api/hooks/flows'
-import type {
-  CityCode,
-  CityResponse,
-  PostCategory,
-  PostScope,
-} from '@/shared/api/generated'
-import { getCategoriesApiV1PostsCategoriesGetOptions, getCitiesApiV1LocationsCitiesGetOptions } from '@/shared/api/generated/@tanstack/react-query.gen'
-
 
 interface FormData {
   title: string
@@ -70,7 +67,6 @@ export function CreatePostForm() {
 
   const cities = (citiesQuery.data?.data?.cities ?? []) as CityResponse[]
   const categories = categoriesQuery.data?.data?.categories ?? []
-
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]

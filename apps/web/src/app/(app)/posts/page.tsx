@@ -1,13 +1,17 @@
-import { Suspense } from 'react'
+import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 import Link from 'next/link'
-import { HydrationBoundary, dehydrate } from '@tanstack/react-query'
+import { Suspense } from 'react'
 import { Card } from '@/components/ui/card'
 import { Spinner } from '@/components/ui/spinner'
 import { PostFilters } from '@/features/posts/components/PostFilters'
 import { PostsList } from '@/features/posts/components/PostsList'
 import { createServerQueryClient } from '@/lib/query-client'
-import { getCategoriesApiV1PostsCategoriesGetOptions, getCitiesApiV1LocationsCitiesGetOptions, listPostsApiV1PostsGetOptions } from '@/shared/api/generated/@tanstack/react-query.gen'
 import type { PostCategory } from '@/shared/api/generated'
+import {
+  getCategoriesApiV1PostsCategoriesGetOptions,
+  getCitiesApiV1LocationsCitiesGetOptions,
+  listPostsApiV1PostsGetOptions,
+} from '@/shared/api/generated/@tanstack/react-query.gen'
 
 interface PostsPageProps {
   searchParams?: {
@@ -22,7 +26,8 @@ export default async function PostsPage({ searchParams }: PostsPageProps) {
   const cityParam = searchParams?.city
   const categoryParam = searchParams?.category
   const cityCode = cityParam && cityParam !== 'ALL' ? cityParam : undefined
-  const category = categoryParam && categoryParam !== 'all' ? (categoryParam as PostCategory) : undefined
+  const category =
+    categoryParam && categoryParam !== 'all' ? (categoryParam as PostCategory) : undefined
 
   await Promise.all([
     queryClient.prefetchQuery({

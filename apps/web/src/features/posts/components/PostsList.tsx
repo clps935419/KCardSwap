@@ -1,6 +1,7 @@
 'use client'
 
 import { Loader2 } from 'lucide-react'
+import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
@@ -137,10 +138,13 @@ export function PostsList() {
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 bg-primary-50 rounded-full flex items-center justify-center overflow-hidden">
                   {post.owner_avatar_url ? (
-                    <img 
-                      src={post.owner_avatar_url} 
+                    <Image
+                      src={post.owner_avatar_url}
                       alt={post.owner_nickname || 'User avatar'}
-                      className="w-full h-full object-cover"
+                      fill
+                      sizes="32px"
+                      className="object-cover"
+                      unoptimized
                     />
                   ) : (
                     <span>👤</span>
@@ -182,16 +186,14 @@ export function PostsList() {
               <p className="text-sm text-foreground/90 font-bold leading-relaxed group-hover:underline">
                 {post.title}
               </p>
-              
+
               {/* Phase 9: Display post images using signed read URLs */}
               {post.media_asset_ids && post.media_asset_ids.length > 0 ? (
                 <PostImages mediaAssetIds={post.media_asset_ids} maxDisplay={1} />
               ) : (
-                <div className="mt-2 text-[11px] text-muted-foreground">
-                  無附圖
-                </div>
+                <div className="mt-2 text-[11px] text-muted-foreground">無附圖</div>
               )}
-              
+
               <div className="mt-2 flex items-center justify-end text-[11px]">
                 <span className="font-black text-primary-500">查看貼文 ›</span>
               </div>

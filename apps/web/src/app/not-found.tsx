@@ -12,7 +12,10 @@ export default function NotFound() {
         <p className="mt-2 text-sm text-slate-600">請確認網址是否正確</p>
 
         <div className="mt-6 flex justify-center">
-          <Button asChild className="h-11 rounded-2xl bg-primary-500 font-black text-white hover:bg-primary-500/90">
+          <Button
+            asChild
+            className="h-11 rounded-2xl bg-primary-500 font-black text-white hover:bg-primary-500/90"
+          >
             <Link href="/">返回首頁</Link>
           </Button>
         </div>

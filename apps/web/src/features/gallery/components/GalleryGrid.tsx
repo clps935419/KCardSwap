@@ -20,13 +20,9 @@ export function GalleryGrid({
   cards,
   isOwner = false,
   onDelete,
-  onMoveUp,
-  onMoveDown,
+  onMoveUp: _onMoveUp,
+  onMoveDown: _onMoveDown,
 }: GalleryGridProps) {
-  if (cards.length === 0) {
-    return <div className="text-center text-muted-foreground text-sm py-12">相簿目前沒有內容</div>
-  }
-
   const mediaAssetIds = cards
     .map(card => card.media_asset_id)
     .filter((mediaId): mediaId is string => Boolean(mediaId))
@@ -41,10 +37,14 @@ export function GalleryGrid({
     ? mediaUrls[selectedCard.media_asset_id]
     : null
 
+  if (cards.length === 0) {
+    return <div className="text-center text-muted-foreground text-sm py-12">相簿目前沒有內容</div>
+  }
+
   return (
     <>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-        {cards.map((card, idx) => {
+        {cards.map((card, _idx) => {
           const thumbnailUrl = card.media_asset_id ? mediaUrls[card.media_asset_id] : null
           return (
             <button
@@ -131,7 +131,9 @@ export function GalleryGrid({
                   </span>
                 </div>
                 {selectedCard.description ? (
-                  <p className="text-sm text-foreground/80 leading-relaxed">{selectedCard.description}</p>
+                  <p className="text-sm text-foreground/80 leading-relaxed">
+                    {selectedCard.description}
+                  </p>
                 ) : (
                   <p className="text-sm text-muted-foreground">尚未填寫描述</p>
                 )}

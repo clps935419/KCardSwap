@@ -18,9 +18,8 @@ const PROTECTED_PATHS = ['/posts', '/inbox', '/me']
 
 export function proxy(request: NextRequest) {
   const { pathname, basePath } = request.nextUrl
-  const normalizedPath = basePath && pathname.startsWith(basePath)
-    ? pathname.slice(basePath.length) || '/'
-    : pathname
+  const normalizedPath =
+    basePath && pathname.startsWith(basePath) ? pathname.slice(basePath.length) || '/' : pathname
   const withBasePath = (path: string) => (basePath ? `${basePath}${path}` : path)
 
   // Check if path is public
