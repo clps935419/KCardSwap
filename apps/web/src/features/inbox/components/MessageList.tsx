@@ -59,11 +59,7 @@ export function MessageList({ threadId }: MessageListProps) {
   }
 
   if (messagesQuery.error) {
-    return (
-      <div className="text-center py-12 text-muted-foreground text-sm">
-        載入訊息時發生錯誤
-      </div>
-    )
+    return <div className="text-center py-12 text-muted-foreground text-sm">載入訊息時發生錯誤</div>
   }
 
   if (messages.length === 0) {

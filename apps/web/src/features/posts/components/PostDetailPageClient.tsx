@@ -1,6 +1,7 @@
 'use client'
 
 import { Loader2 } from 'lucide-react'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
@@ -9,11 +10,11 @@ import { Spinner } from '@/components/ui/spinner'
 import { useToast } from '@/components/ui/use-toast'
 import { useCreateMessageRequest } from '@/features/inbox/hooks/useCreateMessageRequest'
 import { PostImages } from '@/features/media/components/PostImages'
+import { CommentForm } from '@/features/posts/components/CommentForm'
+import { CommentsList } from '@/features/posts/components/CommentsList'
+import { useCreateComment, usePostComments } from '@/features/posts/hooks/useComments'
 import { usePost } from '@/features/posts/hooks/usePost'
 import { useToggleLike } from '@/features/posts/hooks/useToggleLike'
-import { usePostComments, useCreateComment } from '@/features/posts/hooks/useComments'
-import { CommentsList } from '@/features/posts/components/CommentsList'
-import { CommentForm } from '@/features/posts/components/CommentForm'
 import type { PostCategory } from '@/shared/api/generated'
 
 const CATEGORY_LABELS: Record<PostCategory, string> = {
@@ -170,9 +171,13 @@ export function PostDetailPageClient({ postId }: PostDetailPageClientProps) {
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-primary-50 rounded-full flex items-center justify-center overflow-hidden">
               {post.owner_avatar_url ? (
-                <img 
-                  src={post.owner_avatar_url} 
-                  alt={post.owner_nickname || '使用者'} 
+                <Image
+                  src={post.owner_avatar_url}
+                  alt={post.owner_nickname || '使用者'}
+                  width={40}
+                  height={40}
+                  sizes="40px"
+                  unoptimized
                   className="w-full h-full object-cover"
                 />
               ) : (
@@ -300,11 +305,7 @@ export function PostDetailPageClient({ postId }: PostDetailPageClientProps) {
         </div>
 
         {/* Comments List */}
-        <CommentsList
-          postId={postId}
-          comments={comments}
-          isLoading={commentsLoading}
-        />
+        <CommentsList comments={comments} isLoading={commentsLoading} />
       </Card>
     </div>
   )

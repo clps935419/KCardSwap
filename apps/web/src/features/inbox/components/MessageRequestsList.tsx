@@ -128,11 +128,7 @@ export function MessageRequestsList({ limit, showHeader, hideEmpty }: MessageReq
   }
 
   if (requestsQuery.error) {
-    return (
-      <div className="text-center text-muted-foreground text-sm py-12">
-        載入請求時發生錯誤
-      </div>
-    )
+    return <div className="text-center text-muted-foreground text-sm py-12">載入請求時發生錯誤</div>
   }
 
   if (requests.length === 0) {

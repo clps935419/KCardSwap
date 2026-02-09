@@ -63,11 +63,7 @@ export function ThreadsList() {
   }
 
   if (threadsQuery.error) {
-    return (
-      <div className="text-center text-muted-foreground text-sm py-12">
-        載入聊天時發生錯誤
-      </div>
-    )
+    return <div className="text-center text-muted-foreground text-sm py-12">載入聊天時發生錯誤</div>
   }
 
   if (threads.length === 0) {
@@ -81,24 +77,20 @@ export function ThreadsList() {
         const lastMessageText = resolveLastMessageText(thread)
 
         return (
-        <Link key={thread.id} href={`/inbox/threads/${thread.id}`}>
-          <Card className="p-4 rounded-2xl shadow-sm border border-border/30 flex items-center justify-between hover:bg-muted cursor-pointer transition-colors bg-card">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-primary-50 rounded-2xl flex items-center justify-center">
-                💬
+          <Link key={thread.id} href={`/inbox/threads/${thread.id}`}>
+            <Card className="p-4 rounded-2xl shadow-sm border border-border/30 flex items-center justify-between hover:bg-muted cursor-pointer transition-colors bg-card">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-primary-50 rounded-2xl flex items-center justify-center">
+                  💬
+                </div>
+                <div>
+                  <p className="text-sm font-black text-foreground">使用者 {peerId.slice(0, 8)}</p>
+                  <p className="text-[11px] text-muted-foreground">{lastMessageText}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-black text-foreground">
-                  使用者 {peerId.slice(0, 8)}
-                </p>
-                <p className="text-[11px] text-muted-foreground">
-                  {lastMessageText}
-                </p>
-              </div>
-            </div>
-            <span className="text-muted-foreground/30 font-black">›</span>
-          </Card>
-        </Link>
+              <span className="text-muted-foreground/30 font-black">›</span>
+            </Card>
+          </Link>
         )
       })}
     </div>

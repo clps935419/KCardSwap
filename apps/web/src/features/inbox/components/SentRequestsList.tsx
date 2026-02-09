@@ -43,9 +43,7 @@ export function SentRequestsList({ limit, showHeader, hideEmpty }: SentRequestsL
 
   if (requestsQuery.error) {
     return (
-      <div className="text-center text-muted-foreground text-sm py-8">
-        載入已送出請求時發生錯誤
-      </div>
+      <div className="text-center text-muted-foreground text-sm py-8">載入已送出請求時發生錯誤</div>
     )
   }
 

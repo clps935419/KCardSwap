@@ -1,7 +1,7 @@
 'use client'
 
-import { useQueryClient } from '@tanstack/react-query'
 import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google'
+import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { getMyProfileApiV1ProfileMeGetQueryKey } from '@/shared/api/generated/@tanstack/react-query.gen'
