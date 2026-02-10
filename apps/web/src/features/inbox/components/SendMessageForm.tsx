@@ -4,7 +4,7 @@
 'use client'
 
 import { Loader2 } from 'lucide-react'
-import { useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/components/ui/use-toast'
@@ -14,25 +14,32 @@ interface SendMessageFormProps {
   threadId: string
 }
 
+interface SendMessageFormValues {
+  content: string
+}
+
 export function SendMessageForm({ threadId }: SendMessageFormProps) {
-  const [content, setContent] = useState('')
   const { toast } = useToast()
   const { sendMessage, loading } = useSendMessage()
+  const form = useForm<SendMessageFormValues>({
+    defaultValues: {
+      content: '',
+    },
+  })
+  const content = form.watch('content')
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (!content.trim()) {
+  const handleSubmit = async (values: SendMessageFormValues) => {
+    const trimmedContent = values.content.trim()
+    if (!trimmedContent) {
       return
     }
 
     try {
       await sendMessage({
         threadId,
-        content: content.trim(),
+        content: trimmedContent,
       })
-
-      setContent('')
+      form.reset({ content: '' })
 
       toast({
         title: '訊息已送出',
@@ -46,18 +53,19 @@ export function SendMessageForm({ threadId }: SendMessageFormProps) {
     }
   }
 
+  const onSubmit = form.handleSubmit(handleSubmit)
+
   return (
-    <form onSubmit={handleSubmit} className="flex gap-2">
+    <form onSubmit={onSubmit} className="flex gap-2">
       <Input
         placeholder="輸入訊息..."
-        value={content}
-        onChange={e => setContent(e.target.value)}
         disabled={loading}
         className="flex-1 bg-muted/50 border-border rounded-2xl px-4 py-3"
+        {...form.register('content')}
         onKeyDown={e => {
           if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault()
-            handleSubmit(e)
+            onSubmit()
           }
         }}
       />

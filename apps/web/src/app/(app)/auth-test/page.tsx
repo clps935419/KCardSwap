@@ -1,10 +1,11 @@
 'use client'
 
+import { useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { checkAuth, initGoogleOAuth, loginWithGoogle, logout } from '@/lib/google-oauth'
-import { getMyProfileApiV1ProfileMeGet, type ProfileResponse } from '@/shared/api/generated'
+import { getMyProfileApiV1ProfileMeGetOptions } from '@/shared/api/generated/@tanstack/react-query.gen'
 
 /**
  * Auth Test Page
@@ -21,45 +22,27 @@ export default function AuthTestPage() {
   const router = useRouter()
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [userInfo, setUserInfo] = useState<ProfileResponse | null>(null)
   const [error, setError] = useState('')
+
+  const profileQuery = useQuery({
+    ...getMyProfileApiV1ProfileMeGetOptions(),
+    enabled: isAuthenticated,
+  })
+  const userInfo = profileQuery.data?.data ?? null
 
   // Check auth status and fetch user info on mount
   useEffect(() => {
     initGoogleOAuth()
 
-    const fetchUserInfo = async () => {
-      try {
-        const response = await getMyProfileApiV1ProfileMeGet()
-        setUserInfo(response.data?.data ?? null)
-      } catch (err) {
-        console.error('Failed to fetch user info:', err)
-      }
-    }
-
     const initAuth = async () => {
       setIsLoading(true)
       const authenticated = await checkAuth()
       setIsAuthenticated(authenticated)
-
-      if (authenticated) {
-        await fetchUserInfo()
-      }
-
       setIsLoading(false)
     }
 
     initAuth()
   }, [])
-
-  const fetchUserInfo = async () => {
-    try {
-      const response = await getMyProfileApiV1ProfileMeGet()
-      setUserInfo(response.data?.data ?? null)
-    } catch (err) {
-      console.error('Failed to fetch user info:', err)
-    }
-  }
 
   const handleLogin = async () => {
     setError('')
@@ -71,7 +54,7 @@ export default function AuthTestPage() {
       const authenticated = await checkAuth()
       setIsAuthenticated(authenticated)
       if (authenticated) {
-        await fetchUserInfo()
+        await profileQuery.refetch()
       }
       setIsLoading(false)
     } catch (err: unknown) {
@@ -86,7 +69,7 @@ export default function AuthTestPage() {
     const authenticated = await checkAuth()
     setIsAuthenticated(authenticated)
     if (authenticated) {
-      await fetchUserInfo()
+      await profileQuery.refetch()
     }
     setIsLoading(false)
   }

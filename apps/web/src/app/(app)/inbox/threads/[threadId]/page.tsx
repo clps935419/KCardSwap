@@ -4,6 +4,7 @@
 'use client'
 
 import { useParams, useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/button'
 import { MessageList } from '@/features/inbox/components/MessageList'
 import { SendMessageForm } from '@/features/inbox/components/SendMessageForm'
 
@@ -16,13 +17,15 @@ export default function ThreadPage() {
     <div className="h-[calc(100vh-120px)] flex flex-col max-w-2xl mx-auto">
       {/* Header */}
       <div className="px-6 py-3 bg-card border-b border-border/30 flex items-center justify-between">
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="sm"
           onClick={() => router.push('/inbox')}
           className="text-[11px] font-black text-primary-500 hover:text-primary-500/80"
         >
           ← 返回信箱
-        </button>
+        </Button>
         <p className="text-[11px] text-muted-foreground font-black">這是你和對方的專屬對話</p>
       </div>
 

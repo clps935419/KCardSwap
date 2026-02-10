@@ -171,10 +171,11 @@ export function PostsList() {
             </div>
 
             {/* Post Content */}
-            <button
+            <Button
               type="button"
+              variant="ghost"
               onClick={() => router.push(`/posts/${post.id}`)}
-              className="w-full text-left mt-1 group"
+              className="w-full h-auto p-0 text-left mt-1 flex flex-col items-start group"
             >
               <p className="text-sm text-foreground/90 font-bold leading-relaxed group-hover:underline">
                 {post.title}
@@ -190,7 +191,7 @@ export function PostsList() {
               <div className="mt-2 flex items-center justify-end text-[11px]">
                 <span className="font-black text-primary-500">查看貼文 ›</span>
               </div>
-            </button>
+            </Button>
 
             {/* Post Actions */}
             <div className="mt-3 flex items-center justify-between">

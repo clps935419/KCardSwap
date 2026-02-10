@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
+import { FileInput } from '@/components/ui/file-input'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
@@ -183,25 +184,25 @@ export function GalleryCreateCardForm({ onSuccess }: GalleryCreateCardFormProps)
             </div>
           </div>
 
-          <input
-            id="image"
-            type="file"
-            accept="image/*"
-            {...form.register('image', {
-              onChange: handleImageChange,
-            })}
-            className="hidden"
-          />
-
           <div className="space-y-2">
-            <Button
-              type="button"
-              variant="outline"
-              className="h-12 w-full rounded-xl font-black"
-              asChild
-            >
-              <label htmlFor="image">{imagePreview ? '更換圖片' : '選擇圖片'}</label>
-            </Button>
+            {(() => {
+              const imageField = form.register('image', {
+                onChange: handleImageChange,
+              })
+
+              return (
+                <FileInput
+                  id="image"
+                  label={imagePreview ? '更換圖片' : '選擇圖片'}
+                  accept="image/*"
+                  name={imageField.name}
+                  onBlur={imageField.onBlur}
+                  onChange={imageField.onChange}
+                  ref={imageField.ref}
+                  buttonClassName="h-12 w-full rounded-xl font-black"
+                />
+              )
+            })()}
           </div>
 
           {imagePreview && (

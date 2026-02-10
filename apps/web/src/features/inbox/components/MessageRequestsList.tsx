@@ -16,10 +16,8 @@ import { useToast } from '@/components/ui/use-toast'
 import { UserAvatar } from '@/components/ui/user-avatar'
 import type { MessageRequestResponse } from '@/shared/api/generated'
 import {
-  acceptMessageRequestApiV1MessageRequestsRequestIdAcceptPost,
-  declineMessageRequestApiV1MessageRequestsRequestIdDeclinePost,
-} from '@/shared/api/generated'
-import {
+  acceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostMutation,
+  declineMessageRequestApiV1MessageRequestsRequestIdDeclinePostMutation,
   getMyMessageRequestsApiV1MessageRequestsInboxGetOptions,
   getMyThreadsApiV1ThreadsGetQueryKey,
 } from '@/shared/api/generated/@tanstack/react-query.gen'
@@ -48,15 +46,7 @@ export function MessageRequestsList({ limit, showHeader, hideEmpty }: MessageReq
   const requests = (requestsQuery.data ?? []) as MessageRequestResponse[]
 
   const acceptMutation = useMutation({
-    mutationFn: async (requestId: string) => {
-      const response = await acceptMessageRequestApiV1MessageRequestsRequestIdAcceptPost({
-        path: {
-          request_id: requestId,
-        },
-        throwOnError: true,
-      })
-      return response.data
-    },
+    ...acceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostMutation(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: requestsQueryOptions.queryKey })
       queryClient.invalidateQueries({ queryKey: getMyThreadsApiV1ThreadsGetQueryKey() })
@@ -64,15 +54,7 @@ export function MessageRequestsList({ limit, showHeader, hideEmpty }: MessageReq
   })
 
   const declineMutation = useMutation({
-    mutationFn: async (requestId: string) => {
-      const response = await declineMessageRequestApiV1MessageRequestsRequestIdDeclinePost({
-        path: {
-          request_id: requestId,
-        },
-        throwOnError: true,
-      })
-      return response.data
-    },
+    ...declineMessageRequestApiV1MessageRequestsRequestIdDeclinePostMutation(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: requestsQueryOptions.queryKey })
     },
@@ -82,7 +64,11 @@ export function MessageRequestsList({ limit, showHeader, hideEmpty }: MessageReq
     setProcessingId(requestId)
     setProcessingAction('accept')
     try {
-      await acceptMutation.mutateAsync(requestId)
+      await acceptMutation.mutateAsync({
+        path: {
+          request_id: requestId,
+        },
+      })
       toast({
         title: '已接受',
         description: '已建立對話，已移到「聊天」',
@@ -103,7 +89,11 @@ export function MessageRequestsList({ limit, showHeader, hideEmpty }: MessageReq
     setProcessingId(requestId)
     setProcessingAction('decline')
     try {
-      await declineMutation.mutateAsync(requestId)
+      await declineMutation.mutateAsync({
+        path: {
+          request_id: requestId,
+        },
+      })
       toast({
         title: '已拒絕',
         description: '此請求已標記為「拒絕」',
