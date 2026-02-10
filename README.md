@@ -97,7 +97,6 @@ KCardSwap/
 ├── docker-compose.yml    # Container orchestration
 ├── docker-compose.override.yml  # Development overrides
 ├── Makefile             # Development commands
-└── SECRETS.md           # Secrets management guide
 ```
 
 ## 🛠️ Development
@@ -117,6 +116,7 @@ make logs-db              # View database logs
 make test-docker          # Run all tests in Docker
 make ruff-docker          # Run Ruff checks in Docker (with fix)
 make clean                # Stop services and remove volumes
+make reset-db             # Clear all volumes (including DB data)
 make build                # Rebuild all containers
 make restart              # Restart all services
 make ps                   # Show container status
@@ -211,8 +211,8 @@ curl http://localhost:8000/api/v1/health
 - **Database**: PostgreSQL 15
 - **Web**: Next.js (App Router)
 - **Container**: Docker & Docker Compose
- - **CI/CD**: GitHub Actions
- - **Testing**: pytest, httpx
+- **CI/CD**: GitHub Actions
+- **Testing**: pytest, httpx
 
 ## 🐛 Troubleshooting
 

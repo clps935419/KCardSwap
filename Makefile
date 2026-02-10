@@ -1,7 +1,7 @@
 
-.PHONY: help dev dev-build up down logs logs-backend logs-kong logs-db \
+.PHONY: help dev dev-build down logs logs-backend logs-db \
 	test-unit-docker test-integration-docker test-docker ruff-docker clean build restart ps \
-	shell-backend shell-db init-db health seed init-admin-docker setup generate-openapi-docker \
+	shell-backend shell-db init-db health seed init-admin-docker setup generate-openapi-docker reset-db \
 	prod-up prod-down prod-web-build
 
 help: ## 顯示可用指令
@@ -26,8 +26,6 @@ dev-build: ## 重新建置並啟動開發環境
 	fi
 	docker compose up -d --build
 
-up: dev ## dev 的別名
-
 down: ## 停止所有服務
 	docker compose down
 
@@ -45,9 +43,6 @@ logs: ## 查看所有服務日誌
 
 logs-backend: ## 查看後端日誌
 	docker compose logs -f backend
-
-logs-kong: ## 查看 Kong 日誌
-	docker compose logs -f kong
 
 logs-db: ## 查看資料庫日誌
 	docker compose logs -f db
@@ -84,6 +79,10 @@ shell-db: ## 進入資料庫 psql
 
 init-db: ## 初始化資料庫 schema
 	docker compose exec db psql -U kcardswap -d kcardswap -f /docker-entrypoint-initdb.d/init.sql
+
+reset-db: ## 清空所有 volumes（包含資料庫資料）
+	docker compose down -v
+	docker compose up -d
 
 health: ## 檢查服務健康狀態
 	@echo "檢查健康端點..."
