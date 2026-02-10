@@ -36,8 +36,8 @@ prod-up: ## 啟動正式環境（使用 docker-compose.prod.yml）
 prod-down: ## 停止正式環境
 	docker compose --env-file .env.prod -f docker-compose.prod.yml down
 
-prod-web-build: ## 只建置正式環境前端映像
-	docker compose --env-file .env.prod -f docker-compose.prod.yml build web
+prod-web-build: ## 刪除並重建正式環境前端容器
+	docker compose --env-file .env.prod -f docker-compose.prod.yml up -d --build --force-recreate --no-deps web
 
 logs: ## 查看所有服務日誌
 	docker compose logs -f
