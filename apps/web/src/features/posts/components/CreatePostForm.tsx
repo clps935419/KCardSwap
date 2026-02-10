@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/select'
 import { Spinner } from '@/components/ui/spinner'
 import { Textarea } from '@/components/ui/textarea'
+import { mapApiError } from '@/shared/api/errorMapper'
 import type { CityCode, CityResponse, PostCategory, PostScope } from '@/shared/api/generated'
 import {
   getCategoriesApiV1PostsCategoriesGetOptions,
@@ -117,28 +118,8 @@ export function CreatePostForm() {
 
       router.push('/posts')
     } catch (error: unknown) {
-      const err = error as { response?: { status?: number; data?: unknown }; message?: string }
-      if (err?.response?.status === 422) {
-        const errorData = err.response.data as {
-          detail?: {
-            error_code?: string
-            limit_key?: string
-            limit_value?: number
-            current_value?: number
-            reset_at?: string
-          }
-        }
-        if (errorData?.detail?.error_code === 'LIMIT_EXCEEDED') {
-          const limitInfo = errorData.detail
-          setErrorMessage(
-            `已達配額上限：${limitInfo.limit_key}（上限：${limitInfo.limit_value}，目前：${limitInfo.current_value}）。重置時間：${new Date(limitInfo.reset_at || '').toLocaleString('zh-TW')}`
-          )
-        } else {
-          setErrorMessage('資料驗證失敗，請檢查欄位是否正確')
-        }
-      } else {
-        setErrorMessage(err.message || '發文失敗，請稍後再試')
-      }
+      const apiError = mapApiError(error)
+      setErrorMessage(apiError.message)
     }
   }
 

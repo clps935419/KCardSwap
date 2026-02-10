@@ -59,3 +59,5 @@ htmlcov/
 # Build artifacts
 dist/
 build/
+
+gcp-sa.json

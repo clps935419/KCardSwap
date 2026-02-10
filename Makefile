@@ -1,8 +1,9 @@
 
+
 .PHONY: help dev dev-build down logs logs-backend logs-db \
 	test-unit-docker test-integration-docker test-docker ruff-docker clean build restart ps \
 	shell-backend shell-db init-db health seed init-admin-docker setup generate-openapi-docker reset-db \
-	prod-up prod-down prod-web-build
+	prod-up prod-down prod-web-build prune-images
 
 help: ## 顯示可用指令
 	@echo '用法: make [target]'
@@ -46,6 +47,9 @@ logs-backend: ## 查看後端日誌
 
 logs-db: ## 查看資料庫日誌
 	docker compose logs -f db
+
+prune-images: ## 移除未使用的 Docker image
+	docker image prune -f
 
 test-unit-docker: ## 在 Docker 中執行單元測試
 	docker compose exec backend python -m pytest -v tests/unit

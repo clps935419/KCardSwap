@@ -20,8 +20,35 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from ..errors.limit_exceeded import LimitExceededError
 from ..exceptions.api_exceptions import APIError
 from ..response import error_response
+
+
+async def limit_exceeded_handler(
+    request: Request, exc: LimitExceededError
+) -> JSONResponse:
+    """Handle quota/limit exceeded errors.
+
+    Args:
+        request: FastAPI request
+        exc: LimitExceededError
+
+    Returns:
+        JSON error response in envelope format
+    """
+    payload = exc.to_dict()
+    code = payload.pop("code", "422_LIMIT_EXCEEDED")
+    message = payload.pop("message", "Limit exceeded")
+
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content=error_response(
+            code=code,
+            message=message,
+            details=payload,
+        ),
+    )
 
 
 async def api_exception_handler(request: Request, exc: APIError) -> JSONResponse:
@@ -126,6 +153,7 @@ def register_exception_handlers(app: Any) -> None:
         app: FastAPI application instance
     """
     app.add_exception_handler(APIError, api_exception_handler)
+    app.add_exception_handler(LimitExceededError, limit_exceeded_handler)
     app.add_exception_handler(StarletteHTTPException, http_exception_handler)
     app.add_exception_handler(RequestValidationError, validation_exception_handler)
     app.add_exception_handler(Exception, general_exception_handler)

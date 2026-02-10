@@ -28,6 +28,8 @@ services:
     environment:
       - POETRY_INSTALL_ON_START=false
       - TEST_DATABASE_URL=postgresql+asyncpg://kcardswap:kcardswap@db:5432/kcardswap_test
+    volumes:
+      - ./gcp-sa.json:/secrets/gcp-sa.json:ro
     depends_on:
       db:
         condition: service_healthy

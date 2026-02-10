@@ -13,6 +13,7 @@ import { PostImages } from '@/features/media/components/PostImages'
 import { usePostsList } from '@/features/posts/hooks/usePostsList'
 import { useToggleLike } from '@/features/posts/hooks/useToggleLike'
 import type { PostCategory, PostResponse } from '@/shared/api/generated'
+import { useMyProfile } from '@/shared/api/hooks/profile'
 
 function formatTimeAgo(dateString: string) {
   const date = new Date(dateString)
@@ -57,6 +58,8 @@ export function PostsList() {
     cityCode: city === 'ALL' ? undefined : city,
     category,
   })
+  const { data: myProfileData } = useMyProfile()
+  const myUserId = myProfileData?.data?.user_id
 
   const { createRequest } = useCreateMessageRequest()
   const toggleLikeMutation = useToggleLike()
@@ -130,6 +133,7 @@ export function PostsList() {
       {posts.map((post: PostResponse) => {
         const liked = post.liked_by_me ?? false
         const likeCount = post.like_count ?? 0
+        const isMyPost = myUserId && post.owner_id === myUserId
 
         return (
           <Card key={post.id} className="p-4 rounded-2xl shadow-sm border border-border/30 bg-card">
@@ -212,18 +216,20 @@ export function PostsList() {
                 </span>
               </Button>
 
-              <Button
-                variant="default"
-                size="sm"
-                onClick={() => handleMessageAuthor(post)}
-                disabled={messagingPostId === post.id}
-                className="px-4 py-2 rounded-xl bg-slate-900 text-white text-[11px] font-black shadow hover:bg-slate-800"
-              >
-                {messagingPostId === post.id ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : null}
-                私信作者
-              </Button>
+              {!isMyPost && (
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={() => handleMessageAuthor(post)}
+                  disabled={messagingPostId === post.id}
+                  className="px-4 py-2 rounded-xl bg-slate-900 text-white text-[11px] font-black shadow hover:bg-slate-800"
+                >
+                  {messagingPostId === post.id ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : null}
+                  私信作者
+                </Button>
+              )}
             </div>
           </Card>
         )

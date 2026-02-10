@@ -58,6 +58,10 @@ from app.modules.posts.presentation.schemas.post_schemas import (
     ToggleLikeResponseWrapper,
 )
 from app.shared.infrastructure.database.connection import get_db_session
+from app.shared.presentation.errors.limit_exceeded import LimitExceededError
+from app.shared.presentation.exceptions.api_exceptions import (
+    UnprocessableEntityException,
+)
 from app.shared.presentation.deps.require_user import require_user
 
 logger = logging.getLogger(__name__)
@@ -78,7 +82,7 @@ router = APIRouter(prefix="/posts", tags=["Posts"])
 async def get_categories() -> PostCategoryListResponseWrapper:
     """
     Get available post categories.
-    
+
     Returns all available categories with their Chinese labels for display.
     """
     categories = [
@@ -89,7 +93,7 @@ async def get_categories() -> PostCategoryListResponseWrapper:
         PostCategoryOption(value="help", label="求助"),
         PostCategoryOption(value="announcement", label="公告"),
     ]
-    
+
     data = PostCategoryListResponse(categories=categories)
     return PostCategoryListResponseWrapper(data=data, meta=None, error=None)
 
@@ -104,7 +108,7 @@ async def _post_to_response(
     owner_avatar_url: Optional[str] = None,
 ) -> PostResponse:
     """Helper to convert Post entity to PostResponse with media_asset_ids and owner info.
-    
+
     Phase 9: Includes media_asset_ids for image display.
     Includes owner_nickname and owner_avatar_url from profile.
     """
@@ -113,21 +117,24 @@ async def _post_to_response(
         media_repo = MediaRepositoryImpl(session)
         media_list = await media_repo.get_by_target("post", UUID(post.id))
         media_asset_ids = [media.id for media in media_list]
-    
+
     # If owner info not provided, fetch from profile
     if owner_nickname is None or owner_avatar_url is None:
         from sqlalchemy import select
-        from app.modules.identity.infrastructure.database.models.profile_model import ProfileModel
-        
+        from app.modules.identity.infrastructure.database.models.profile_model import (
+            ProfileModel,
+        )
+
         result = await session.execute(
-            select(ProfileModel.nickname, ProfileModel.avatar_url)
-            .where(ProfileModel.user_id == UUID(post.owner_id))
+            select(ProfileModel.nickname, ProfileModel.avatar_url).where(
+                ProfileModel.user_id == UUID(post.owner_id)
+            )
         )
         profile_data = result.first()
         if profile_data:
             owner_nickname = profile_data[0]
             owner_avatar_url = profile_data[1]
-    
+
     return PostResponse(
         id=UUID(post.id),
         owner_id=UUID(post.owner_id),
@@ -203,6 +210,18 @@ async def create_post(
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e)
         )
+    except LimitExceededError as e:
+        logger.info("Post creation quota exceeded: %s", e)
+        payload = e.to_dict()
+        raise UnprocessableEntityException(
+            message=payload.get("message", str(e)),
+            error_code=payload.get("code", "422_LIMIT_EXCEEDED"),
+            details={
+                key: value
+                for key, value in payload.items()
+                if key not in ("code", "message")
+            },
+        )
     except Exception as e:
         logger.error(f"Error creating post: {e}", exc_info=True)
         raise HTTPException(
@@ -227,8 +246,12 @@ async def list_posts(
     current_user_id: Annotated[UUID, Depends(require_user)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
     use_case: Annotated[ListPostsV2UseCase, Depends(get_list_posts_v2_use_case)],
-    city_code: Annotated[Optional[str], Query(description="Optional city filter (omit for global view)")] = None,
-    category: Annotated[Optional[PostCategory], Query(description="Optional category filter")] = None,
+    city_code: Annotated[
+        Optional[str], Query(description="Optional city filter (omit for global view)")
+    ] = None,
+    category: Annotated[
+        Optional[PostCategory], Query(description="Optional category filter")
+    ] = None,
     limit: Annotated[int, Query(ge=1, le=100, description="Maximum results")] = 50,
     offset: Annotated[int, Query(ge=0, description="Pagination offset")] = 0,
 ) -> PostListResponseWrapper:
@@ -297,7 +320,7 @@ async def get_post(
 ) -> PostResponseWrapper:
     """
     Get a single post by ID.
-    
+
     Phase 9: Returns post with media_asset_ids for image display.
     Includes like count and current user's like status.
     """
@@ -306,19 +329,19 @@ async def get_post(
             post_id=str(post_id),
             current_user_id=str(current_user_id),
         )
-        
+
         if not post:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Post not found",
             )
-        
+
         # Get like count and liked_by_me from post attributes
-        like_count = getattr(post, '_like_count', 0)
-        liked_by_me = getattr(post, '_liked_by_me', False)
-        owner_nickname = getattr(post, '_owner_nickname', None)
-        owner_avatar_url = getattr(post, '_owner_avatar_url', None)
-        
+        like_count = getattr(post, "_like_count", 0)
+        liked_by_me = getattr(post, "_liked_by_me", False)
+        owner_nickname = getattr(post, "_owner_nickname", None)
+        owner_avatar_url = getattr(post, "_owner_avatar_url", None)
+
         data = await _post_to_response(
             post,
             session,
@@ -328,7 +351,7 @@ async def get_post(
             owner_avatar_url=owner_avatar_url,
         )
         return PostResponseWrapper(data=data, meta=None, error=None)
-        
+
     except HTTPException:
         raise
     except Exception as e:
@@ -342,6 +365,7 @@ async def get_post(
 # REMOVED: Post interest endpoints - not required for POC
 # The following 5 endpoints have been commented out:
 # - express_interest, accept_interest, reject_interest, list_post_interests, get_post_interest
+
 
 @router.post(
     "/{post_id}/close",
@@ -461,14 +485,18 @@ async def toggle_like(
 )
 async def list_post_comments(
     post_id: UUID,
-    use_case: Annotated[ListPostCommentsUseCase, Depends(get_list_post_comments_use_case)],
+    use_case: Annotated[
+        ListPostCommentsUseCase, Depends(get_list_post_comments_use_case)
+    ],
     session: Annotated[AsyncSession, Depends(get_db_session)],
-    limit: int = Query(50, ge=1, le=100, description="Maximum number of comments to return"),
+    limit: int = Query(
+        50, ge=1, le=100, description="Maximum number of comments to return"
+    ),
     offset: int = Query(0, ge=0, description="Number of comments to skip"),
 ) -> CommentListResponseWrapper:
     """
     List comments on a post (latest first).
-    
+
     Returns comments sorted by creation time in descending order (newest first).
     Supports pagination with limit and offset parameters.
     """
@@ -478,21 +506,24 @@ async def list_post_comments(
             limit=limit,
             offset=offset,
         )
-        
+
         # Fetch user profiles for all commenters
         from sqlalchemy import select
-        from app.modules.identity.infrastructure.database.models.profile_model import ProfileModel
-        
+        from app.modules.identity.infrastructure.database.models.profile_model import (
+            ProfileModel,
+        )
+
         user_ids = [UUID(comment.user_id) for comment in comments]
         if user_ids:
             result = await session.execute(
-                select(ProfileModel.user_id, ProfileModel.nickname, ProfileModel.avatar_url)
-                .where(ProfileModel.user_id.in_(user_ids))
+                select(
+                    ProfileModel.user_id, ProfileModel.nickname, ProfileModel.avatar_url
+                ).where(ProfileModel.user_id.in_(user_ids))
             )
             profiles = {row[0]: (row[1], row[2]) for row in result.all()}
         else:
             profiles = {}
-        
+
         comment_responses = [
             CommentResponse(
                 id=UUID(comment.id),
@@ -506,10 +537,10 @@ async def list_post_comments(
             )
             for comment in comments
         ]
-        
+
         data = CommentListResponse(comments=comment_responses, total=total)
         return CommentListResponseWrapper(data=data, meta=None, error=None)
-        
+
     except Exception as e:
         logger.error(f"Error listing comments for post {post_id}: {e}", exc_info=True)
         raise HTTPException(
@@ -534,12 +565,14 @@ async def create_post_comment(
     post_id: UUID,
     request: CreateCommentRequest,
     current_user_id: Annotated[UUID, Depends(require_user)],
-    use_case: Annotated[CreatePostCommentUseCase, Depends(get_create_post_comment_use_case)],
+    use_case: Annotated[
+        CreatePostCommentUseCase, Depends(get_create_post_comment_use_case)
+    ],
     session: Annotated[AsyncSession, Depends(get_db_session)],
 ) -> CommentResponseWrapper:
     """
     Create a comment on a post.
-    
+
     Requires authentication. The user must be logged in to create a comment.
     """
     try:
@@ -548,19 +581,22 @@ async def create_post_comment(
             user_id=str(current_user_id),
             content=request.content,
         )
-        
+
         # Fetch user profile for the commenter
         from sqlalchemy import select
-        from app.modules.identity.infrastructure.database.models.profile_model import ProfileModel
-        
+        from app.modules.identity.infrastructure.database.models.profile_model import (
+            ProfileModel,
+        )
+
         result = await session.execute(
-            select(ProfileModel.nickname, ProfileModel.avatar_url)
-            .where(ProfileModel.user_id == current_user_id)
+            select(ProfileModel.nickname, ProfileModel.avatar_url).where(
+                ProfileModel.user_id == current_user_id
+            )
         )
         profile_data = result.first()
         user_nickname = profile_data[0] if profile_data else None
         user_avatar_url = profile_data[1] if profile_data else None
-        
+
         data = CommentResponse(
             id=UUID(comment.id),
             post_id=UUID(comment.post_id),
@@ -572,7 +608,7 @@ async def create_post_comment(
             updated_at=comment.updated_at,
         )
         return CommentResponseWrapper(data=data, meta=None, error=None)
-        
+
     except ValueError as e:
         error_msg = str(e).lower()
         if "not found" in error_msg:

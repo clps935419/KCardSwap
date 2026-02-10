@@ -18,6 +18,7 @@ import {
   createGalleryCardApiV1GalleryCardsPostMutation,
   createPostApiV1PostsPostMutation,
   getMyGalleryCardsApiV1GalleryCardsMeGetQueryKey,
+  listPostsApiV1PostsGetQueryKey,
 } from '@/shared/api/generated/@tanstack/react-query.gen'
 import { runUploadFlow } from '@/shared/api/hooks/media'
 
@@ -91,7 +92,7 @@ export function useCreatePostFlowMutation(
       return postResponse as CreatePostApiV1PostsPostResponse
     },
     onSuccess: (...args) => {
-      queryClient.invalidateQueries({ queryKey: ['posts'] })
+      queryClient.invalidateQueries({ queryKey: listPostsApiV1PostsGetQueryKey() })
       options?.onSuccess?.(...args)
     },
     ...options,

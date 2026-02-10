@@ -16,6 +16,7 @@ import { useCreateComment, usePostComments } from '@/features/posts/hooks/useCom
 import { usePost } from '@/features/posts/hooks/usePost'
 import { useToggleLike } from '@/features/posts/hooks/useToggleLike'
 import type { PostCategory } from '@/shared/api/generated'
+import { useMyProfile } from '@/shared/api/hooks/profile'
 
 const CATEGORY_LABELS: Record<PostCategory, string> = {
   trade: '求換',
@@ -59,6 +60,8 @@ export function PostDetailPageClient({ postId }: PostDetailPageClientProps) {
 
   const { data, isLoading, error } = usePost(postId)
   const post = data?.data
+  const { data: myProfileData } = useMyProfile()
+  const myUserId = myProfileData?.data?.user_id
 
   const { createRequest } = useCreateMessageRequest()
   const toggleLikeMutation = useToggleLike()
@@ -147,6 +150,7 @@ export function PostDetailPageClient({ postId }: PostDetailPageClientProps) {
   const isClosed = post.status === 'closed'
   const liked = post.liked_by_me ?? false
   const likeCount = post.like_count ?? 0
+  const isMyPost = myUserId && post.owner_id === myUserId
   const category = post.category as PostCategory
   const categoryLabel = CATEGORY_LABELS[category] ?? post.category
   const categoryColor = CATEGORY_COLORS[category] ?? 'bg-muted text-muted-foreground'
@@ -276,16 +280,18 @@ export function PostDetailPageClient({ postId }: PostDetailPageClientProps) {
             </span>
           </Button>
 
-          <Button
-            variant="default"
-            size="sm"
-            onClick={handleMessageAuthor}
-            disabled={messagingPost}
-            className="px-5 py-2 rounded-xl bg-slate-900 text-white text-[12px] font-black shadow hover:bg-slate-800"
-          >
-            {messagingPost ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-            私信作者
-          </Button>
+          {!isMyPost && (
+            <Button
+              variant="default"
+              size="sm"
+              onClick={handleMessageAuthor}
+              disabled={messagingPost}
+              className="px-5 py-2 rounded-xl bg-slate-900 text-white text-[12px] font-black shadow hover:bg-slate-800"
+            >
+              {messagingPost ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              私信作者
+            </Button>
+          )}
         </div>
       </Card>
 
