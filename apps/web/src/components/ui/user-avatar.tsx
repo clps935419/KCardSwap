@@ -5,6 +5,7 @@
  */
 
 import Image from 'next/image'
+import type { ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 
 interface UserAvatarProps {
@@ -13,6 +14,7 @@ interface UserAvatarProps {
   userId?: string
   size?: 'sm' | 'md' | 'lg'
   className?: string
+  fallback?: ReactNode
 }
 
 const sizeClasses = {
@@ -21,10 +23,18 @@ const sizeClasses = {
   lg: 'w-12 h-12 text-base',
 }
 
-export function UserAvatar({ nickname, avatarUrl, userId, size = 'md', className }: UserAvatarProps) {
+export function UserAvatar({
+  nickname,
+  avatarUrl,
+  userId,
+  size = 'md',
+  className,
+  fallback,
+}: UserAvatarProps) {
   // Get first character for fallback
   const fallbackChar = nickname?.charAt(0).toUpperCase() || userId?.charAt(0).toUpperCase() || '?'
-
+  const fallbackContent = fallback ?? <span>{fallbackChar}</span>
+  
   return (
     <div
       className={cn(
@@ -40,9 +50,10 @@ export function UserAvatar({ nickname, avatarUrl, userId, size = 'md', className
           fill
           className="object-cover"
           sizes="40px"
+          unoptimized
         />
       ) : (
-        <span>{fallbackChar}</span>
+        fallbackContent
       )}
     </div>
   )

@@ -1,10 +1,10 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
+import { UserAvatar } from '@/components/ui/user-avatar'
 import { getMyProfileApiV1ProfileMeGetOptions } from '@/shared/api/generated/@tanstack/react-query.gen'
 
 // Constants for page titles
@@ -33,12 +33,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     staleTime: 5 * 60 * 1000,
     retry: false,
   })
-  console.log('Profile Query:', profileQuery) // Debug log for profile query state
 
   const profileWrapper = profileQuery.data
   const profile = profileWrapper?.data
   const avatarUrl = profile?.avatar_url || ''
   const userDisplay = profile?.nickname || profile?.user_id?.substring(0, 1) || ''
+
   return (
     <div className="min-h-screen bg-background flex flex-col relative">
       {/* Header */}
@@ -61,22 +61,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <Link href="/me">
             <button
               type="button"
-              className="relative w-9 h-9 bg-primary-500 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-white text-xs font-black transition-transform active:scale-95 hover:scale-105 overflow-hidden"
+              className="rounded-full overflow-hidden transition-transform active:scale-95 hover:scale-105"
               aria-label="前往我的檔案"
               title={userDisplay || '使用者'}
             >
-              {avatarUrl ? (
-                <Image
-                  src={avatarUrl}
-                  alt={userDisplay || '使用者'}
-                  fill
-                  sizes="36px"
-                  className="object-cover"
-                  unoptimized
-                />
-              ) : (
-                userDisplay?.[0]?.toUpperCase() || 'U'
-              )}
+              <UserAvatar
+                nickname={profile?.nickname}
+                avatarUrl={avatarUrl}
+                userId={profile?.user_id}
+                size="md"
+                className="w-9 h-9 bg-primary-500 text-white border-2 border-white shadow-lg"
+              />
             </button>
           </Link>
         </div>
