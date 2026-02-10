@@ -1,6 +1,6 @@
 # KCardSwap - Card Exchange Platform
 
-A card trading platform built with FastAPI, Kong API Gateway, and PostgreSQL.
+A social platform for discussing idol photocards, built with FastAPI, PostgreSQL, and Next.js.
 
 ## 🚀 Quick Start
 
@@ -32,6 +32,8 @@ This will automatically create the `.env` file and start all services.
    # Edit .env with your configuration
    ```
 
+   **Note**: The backend uses Google Cloud Storage (GCS) for image uploads. Provide a service account key file and set the related env vars (for example `GCS_CREDENTIALS_PATH` and `GCS_BUCKET_NAME`).
+
 3. Start all services:
    ```bash
    # Build and start all services (first time or after Dockerfile changes)
@@ -60,8 +62,7 @@ Access points:
 - Backend API: http://localhost:8000
 - API Documentation: http://localhost:8000/api/v1/docs
 - OpenAPI JSON: http://localhost:8000/api/v1/openapi.json
-- Kong Gateway: http://localhost:8080
-- Kong Admin: http://localhost:8001
+- Web App (dev): http://localhost:3000
 - PostgreSQL: localhost:5432
 
 For deterministic client generation (cloud agent / CI), keep an OpenAPI snapshot in the repository:
@@ -73,22 +74,19 @@ For deterministic client generation (cloud agent / CI), keep an OpenAPI snapshot
 ```
 KCardSwap/
 ├── apps/
-│   └── backend/          # FastAPI backend application
-│       ├── app/
-│       │   ├── main.py   # Application entry point
-│       │   ├── config.py # Settings / env config
-│       │   ├── injector.py # IoC container setup
-│       │   ├── modules/  # Feature modules (e.g. identity, social, posts)
-│       │   └── shared/   # Shared infrastructure / cross-cutting concerns
-│       ├── alembic/      # Database migrations
-│       ├── tests/        # Test files
-│       ├── pyproject.toml # Poetry dependencies
-│       ├── poetry.lock   # Locked dependencies
-│       └── Dockerfile    # Multi-stage build
-│   └── mobile/           # Expo (React Native) mobile app
-├── gateway/
-│   └── kong/             # Kong API Gateway configuration
-│       └── kong.yaml     # Declarative config
+│   ├── backend/          # FastAPI backend application
+│   │   ├── app/
+│   │   │   ├── main.py   # Application entry point
+│   │   │   ├── config.py # Settings / env config
+│   │   │   ├── injector.py # IoC container setup
+│   │   │   ├── modules/  # Feature modules (e.g. identity, social, posts)
+│   │   │   └── shared/   # Shared infrastructure / cross-cutting concerns
+│   │   ├── alembic/      # Database migrations
+│   │   ├── tests/        # Test files
+│   │   ├── pyproject.toml # Poetry dependencies
+│   │   ├── poetry.lock   # Locked dependencies
+│   │   └── Dockerfile    # Multi-stage build
+│   └── web/              # Next.js web app (App Router)
 ├── infra/
 │   └── db/               # Database scripts
 │       └── init.sql      # Database-level setup only
@@ -109,14 +107,29 @@ Backend routes are registered in `apps/backend/app/main.py`; individual routers 
 ### Available Commands
 
 ```bash
-make help           # Show all available commands
-make dev            # Start development environment
-make down           # Stop all services
-make logs           # View logs from all services
-make test           # Run tests
-make lint           # Run linter
-make clean          # Stop services and remove volumes
-make health         # Check service health
+make help                 # Show all available commands
+make dev                  # Start development environment
+make dev-build            # Rebuild and start development environment
+make down                 # Stop all services
+make logs                 # View logs from all services
+make logs-backend         # View backend logs
+make logs-db              # View database logs
+make test-docker          # Run all tests in Docker
+make ruff-docker          # Run Ruff checks in Docker (with fix)
+make clean                # Stop services and remove volumes
+make build                # Rebuild all containers
+make restart              # Restart all services
+make ps                   # Show container status
+make shell-backend        # Enter backend container shell
+make shell-db             # Enter database psql
+make init-db              # Initialize database schema
+make init-admin-docker    # Initialize default admin in Docker
+make health               # Check service health
+make setup                # Initial setup (copy env and start)
+make generate-openapi-docker # Generate OpenAPI spec in Docker
+make prod-up              # Start production environment
+make prod-down            # Stop production environment
+make prod-web-build       # Build production web image
 ```
 
 ### Backend Development
@@ -137,12 +150,12 @@ poetry run ruff check .
 make shell-backend
 ```
 
-### Mobile Development
+### Web Development
 
 ```bash
-cd apps/mobile
+cd apps/web
 npm install --legacy-peer-deps
-npm start
+npm run dev
 ```
 
 ### Database
@@ -178,81 +191,28 @@ Once the services are running, access the interactive API documentation:
 
 ### API Routes
 
-All API endpoints are prefixed with `/api/v1/` and routed through Kong Gateway:
+All API endpoints are prefixed with `/api/v1/`:
 
 ```
 GET  /health              # Health check (direct)
-GET  /api/v1/health       # Health check (via Kong)
+GET  /api/v1/health       # Health check
 GET  /api/v1/docs         # API documentation
 ```
 
-### Example Request via Kong
+### Example Request
 
 ```bash
-# Direct to backend
 curl http://localhost:8000/api/v1/health
-
-# Via Kong Gateway (with rate limiting, CORS, etc.)
-curl http://localhost:8080/api/v1/health
 ```
-
-## 🔐 Security & Secrets
-
-See [SECRETS.md](SECRETS.md) for detailed secrets management strategy.
-
-**Important:**
-- Never commit `.env` file
-- Rotate secrets regularly
-- Use different secrets for each environment
-
-## 🚢 Deployment
-
-### Phase 0 Status (Current)
-
-- [x] Mono-repo structure
-- [x] Docker Compose setup
-- [x] Kong API Gateway configuration
-- [x] Backend basic structure
-- [x] Database initialization
-- [x] CI/CD workflows
-- [x] Secrets management documentation
-
-### Next Phases
-
-See [specs/001-kcardswap-complete-spec/tasks.md](specs/001-kcardswap-complete-spec/tasks.md) for complete roadmap.
 
 ## 📊 Tech Stack
 
 - **Backend**: Python 3.11, FastAPI, Uvicorn
 - **Database**: PostgreSQL 15
-- **API Gateway**: Kong 3.7
+- **Web**: Next.js (App Router)
 - **Container**: Docker & Docker Compose
-- **CI/CD**: GitHub Actions
-- **Testing**: pytest, httpx
-
-## 🤝 Contributing
-
-1. Create a feature branch
-2. Make your changes
-3. Run tests and linter
-4. Submit a pull request
-
-CI will automatically run:
-- Python linting (ruff)
-- Unit tests (pytest)
-- Build verification
-- PR validation checks
-
-## 📚 Documentation
-
-- [Specification](specs/001-kcardswap-complete-spec/spec.md) - Complete feature specification
-- [Technical Plan](specs/001-kcardswap-complete-spec/plan.md) - Architecture and technical design
-- [Tasks](specs/001-kcardswap-complete-spec/tasks.md) - Implementation roadmap
-- [Secrets Management](SECRETS.md) - Security and secrets guide
-- [Backend README](apps/backend/README.md) - Backend-specific documentation
-- [Mobile README](apps/mobile/README.md) - Mobile app documentation
-- [OpenAPI Snapshot Guide](openapi/README.md) - How to generate/update OpenAPI snapshot
-- [PR Merge Reports Index](reports/README.md) - Consolidated completion reports and verification notes
+ - **CI/CD**: GitHub Actions
+ - **Testing**: pytest, httpx
 
 ## 🐛 Troubleshooting
 
@@ -282,15 +242,6 @@ make logs-db
 docker compose exec db pg_isready -U kcardswap
 ```
 
-### Kong routing issues
-
-```bash
-# Verify Kong configuration
-docker compose exec kong kong config parse /kong/declarative/kong.yaml
-
-# Check Kong logs
-make logs-kong
-```
 
 ## 📄 License
 
