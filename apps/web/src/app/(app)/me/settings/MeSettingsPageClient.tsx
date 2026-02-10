@@ -57,7 +57,7 @@ export function MeSettingsPageClient() {
         title: '隱私設定',
         description: `陌生人私訊：${nextValue ? '開啟' : '關閉'}`,
       })
-    } catch (error) {
+    } catch (_error) {
       setAllowStrangerDM(!nextValue)
       toast({
         title: '隱私設定',
