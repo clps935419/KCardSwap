@@ -34,7 +34,7 @@ export function UserAvatar({
   // Get first character for fallback
   const fallbackChar = nickname?.charAt(0).toUpperCase() || userId?.charAt(0).toUpperCase() || '?'
   const fallbackContent = fallback ?? <span>{fallbackChar}</span>
-  
+
   return (
     <div
       className={cn(

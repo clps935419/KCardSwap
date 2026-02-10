@@ -12,8 +12,8 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { UserAvatar } from '@/components/ui/user-avatar'
 import { useToast } from '@/components/ui/use-toast'
+import { UserAvatar } from '@/components/ui/user-avatar'
 import type { MessageRequestResponse } from '@/shared/api/generated'
 import {
   acceptMessageRequestApiV1MessageRequestsRequestIdAcceptPost,
