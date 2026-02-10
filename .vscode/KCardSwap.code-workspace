@@ -9,20 +9,12 @@
       "path": "../apps/backend"
     },
     {
-      "name": "example",
-      "path": "../../job-execution"
-    },
-    {
       "name": "mobile",
       "path": "../apps/mobile"
     },
     {
       "name": "openapi",
       "path": "../openapi"
-    },
-    {
-      "name": "gateway",
-      "path": "../gateway"
     },
     {
       "name": "infra",

@@ -1,1 +1,0 @@
-bash: poetry: command not found
