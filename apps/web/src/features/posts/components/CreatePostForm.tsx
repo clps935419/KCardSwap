@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
+import { FileInput } from '@/components/ui/file-input'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -279,25 +280,25 @@ export function CreatePostForm() {
           </div>
         </div>
 
-        <input
-          id="image"
-          type="file"
-          accept="image/*"
-          {...register('image', {
-            onChange: handleImageChange,
-          })}
-          className="hidden"
-        />
-
         <div className="space-y-2">
-          <Button
-            type="button"
-            variant="outline"
-            className="h-12 w-full rounded-xl font-black"
-            asChild
-          >
-            <label htmlFor="image">{imageName ? '更換圖片' : '選擇圖片'}</label>
-          </Button>
+          {(() => {
+            const imageField = register('image', {
+              onChange: handleImageChange,
+            })
+
+            return (
+              <FileInput
+                id="image"
+                label={imageName ? '更換圖片' : '選擇圖片'}
+                accept="image/*"
+                name={imageField.name}
+                onBlur={imageField.onBlur}
+                onChange={imageField.onChange}
+                ref={imageField.ref}
+                buttonClassName="h-12 w-full rounded-xl font-black"
+              />
+            )
+          })()}
 
           {imageName && (
             <p className="text-xs text-muted-foreground truncate" title={imageName}>

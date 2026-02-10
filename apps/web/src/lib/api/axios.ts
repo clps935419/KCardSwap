@@ -40,6 +40,16 @@ apiClient.interceptors.response.use(
   },
   error => {
     if (process.env.NODE_ENV === 'development') {
+      if (axios.isCancel(error) || error.code === 'ERR_CANCELED') {
+        console.warn('[API Cancelled]', error.message)
+        return Promise.reject(error)
+      }
+
+      if (error.code === 'ECONNABORTED') {
+        console.warn('[API Timeout]', error.message)
+        return Promise.reject(error)
+      }
+
       console.error('[API Error]', error.response?.status, error.response?.data)
     }
     return Promise.reject(error)

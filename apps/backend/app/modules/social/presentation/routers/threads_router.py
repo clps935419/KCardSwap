@@ -5,6 +5,9 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.modules.identity.infrastructure.repositories.profile_repository_impl import (
+    ProfileRepositoryImpl,
+)
 from app.modules.social.application.use_cases.messages.get_messages import (
     GetThreadMessagesUseCase,
 )
@@ -33,6 +36,17 @@ from app.shared.presentation.deps.require_user import require_user
 router = APIRouter(prefix="/threads", tags=["threads"])
 
 
+async def _get_user_profile_data(user_id: str, profile_repo: ProfileRepositoryImpl):
+    """Helper to fetch nickname and avatar_url for a user"""
+    try:
+        profile = await profile_repo.get_by_user_id(UUID(user_id))
+        if profile:
+            return profile.nickname, profile.avatar_url
+    except Exception:
+        pass
+    return None, None
+
+
 @router.get("", response_model=ThreadListResponse)
 async def get_my_threads(
     limit: int = Query(50, ge=1, le=100),
@@ -47,25 +61,40 @@ async def get_my_threads(
     Returns threads ordered by last_message_at descending.
     """
     thread_repo = ThreadRepository(session)
+    profile_repo = ProfileRepositoryImpl(session)
     use_case = GetThreadsUseCase(thread_repo)
 
     threads = await use_case.execute(
         user_id=str(user_id), limit=limit, offset=offset
     )
 
-    return ThreadListResponse(
-        threads=[
+    # Build response list with profile data
+    thread_responses = []
+    for thread in threads:
+        user_a_nickname, user_a_avatar_url = await _get_user_profile_data(
+            thread.user_a_id, profile_repo
+        )
+        user_b_nickname, user_b_avatar_url = await _get_user_profile_data(
+            thread.user_b_id, profile_repo
+        )
+        thread_responses.append(
             ThreadResponse(
                 id=thread.id,
                 user_a_id=thread.user_a_id,
+                user_a_nickname=user_a_nickname,
+                user_a_avatar_url=user_a_avatar_url,
                 user_b_id=thread.user_b_id,
+                user_b_nickname=user_b_nickname,
+                user_b_avatar_url=user_b_avatar_url,
                 created_at=thread.created_at,
                 updated_at=thread.updated_at,
                 last_message_at=thread.last_message_at,
             )
-            for thread in threads
-        ],
-        total=len(threads),
+        )
+
+    return ThreadListResponse(
+        threads=thread_responses,
+        total=len(thread_responses),
     )
 
 
@@ -85,6 +114,7 @@ async def get_thread_messages(
     """
     thread_repo = ThreadRepository(session)
     thread_message_repo = ThreadMessageRepository(session)
+    profile_repo = ProfileRepositoryImpl(session)
 
     use_case = GetThreadMessagesUseCase(thread_repo, thread_message_repo)
 
@@ -96,19 +126,28 @@ async def get_thread_messages(
             offset=offset,
         )
 
-        return ThreadMessagesResponse(
-            messages=[
+        # Build response list with profile data
+        message_responses = []
+        for msg in messages:
+            sender_nickname, sender_avatar_url = await _get_user_profile_data(
+                msg.sender_id, profile_repo
+            )
+            message_responses.append(
                 ThreadMessageResponse(
                     id=msg.id,
                     thread_id=msg.thread_id,
                     sender_id=msg.sender_id,
+                    sender_nickname=sender_nickname,
+                    sender_avatar_url=sender_avatar_url,
                     content=msg.content,
                     post_id=msg.post_id,
                     created_at=msg.created_at,
                 )
-                for msg in messages
-            ],
-            total=len(messages),
+            )
+
+        return ThreadMessagesResponse(
+            messages=message_responses,
+            total=len(message_responses),
         )
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
@@ -129,6 +168,7 @@ async def send_message(
     """
     thread_repo = ThreadRepository(session)
     thread_message_repo = ThreadMessageRepository(session)
+    profile_repo = ProfileRepositoryImpl(session)
 
     use_case = SendMessageUseCase(thread_repo, thread_message_repo)
 
@@ -140,10 +180,17 @@ async def send_message(
             post_id=request.post_id,
         )
 
+        # Fetch profile data for sender
+        sender_nickname, sender_avatar_url = await _get_user_profile_data(
+            message.sender_id, profile_repo
+        )
+
         return ThreadMessageResponse(
             id=message.id,
             thread_id=message.thread_id,
             sender_id=message.sender_id,
+            sender_nickname=sender_nickname,
+            sender_avatar_url=sender_avatar_url,
             content=message.content,
             post_id=message.post_id,
             created_at=message.created_at,

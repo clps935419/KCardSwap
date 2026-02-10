@@ -1,13 +1,13 @@
 'use client'
 
 import { Loader2 } from 'lucide-react'
-import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Spinner } from '@/components/ui/spinner'
 import { useToast } from '@/components/ui/use-toast'
+import { UserAvatar } from '@/components/ui/user-avatar'
 import { useCreateMessageRequest } from '@/features/inbox/hooks/useCreateMessageRequest'
 import { PostImages } from '@/features/media/components/PostImages'
 import { usePostsList } from '@/features/posts/hooks/usePostsList'
@@ -136,20 +136,13 @@ export function PostsList() {
             {/* Post Header */}
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <div className="relative w-8 h-8 bg-primary-50 rounded-full flex items-center justify-center overflow-hidden">
-                  {post.owner_avatar_url ? (
-                    <Image
-                      src={post.owner_avatar_url}
-                      alt={post.owner_nickname || 'User avatar'}
-                      fill
-                      sizes="32px"
-                      className="object-cover"
-                      unoptimized
-                    />
-                  ) : (
-                    <span>👤</span>
-                  )}
-                </div>
+                <UserAvatar
+                  nickname={post.owner_nickname}
+                  avatarUrl={post.owner_avatar_url}
+                  userId={post.owner_id}
+                  size="sm"
+                  fallback={<span>👤</span>}
+                />
                 <div>
                   <p className="text-sm font-black text-foreground">
                     {post.owner_nickname || `使用者 ${post.owner_id.slice(0, 8)}`}
@@ -178,10 +171,11 @@ export function PostsList() {
             </div>
 
             {/* Post Content */}
-            <button
+            <Button
               type="button"
+              variant="ghost"
               onClick={() => router.push(`/posts/${post.id}`)}
-              className="w-full text-left mt-1 group"
+              className="w-full h-auto p-0 text-left mt-1 flex flex-col items-start group"
             >
               <p className="text-sm text-foreground/90 font-bold leading-relaxed group-hover:underline">
                 {post.title}
@@ -197,7 +191,7 @@ export function PostsList() {
               <div className="mt-2 flex items-center justify-end text-[11px]">
                 <span className="font-black text-primary-500">查看貼文 ›</span>
               </div>
-            </button>
+            </Button>
 
             {/* Post Actions */}
             <div className="mt-3 flex items-center justify-between">

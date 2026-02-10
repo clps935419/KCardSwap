@@ -22,7 +22,11 @@ class MessageRequestResponse(BaseModel):
 
     id: str
     sender_id: str
+    sender_nickname: Optional[str] = None
+    sender_avatar_url: Optional[str] = None
     recipient_id: str
+    recipient_nickname: Optional[str] = None
+    recipient_avatar_url: Optional[str] = None
     initial_message: str
     post_id: Optional[str]
     status: str  # pending, accepted, declined
@@ -53,7 +57,11 @@ class ThreadResponse(BaseModel):
 
     id: str
     user_a_id: str
+    user_a_nickname: Optional[str] = None
+    user_a_avatar_url: Optional[str] = None
     user_b_id: str
+    user_b_nickname: Optional[str] = None
+    user_b_avatar_url: Optional[str] = None
     created_at: datetime
     updated_at: datetime
     last_message_at: Optional[datetime]
@@ -85,6 +93,8 @@ class ThreadMessageResponse(BaseModel):
     id: str
     thread_id: str
     sender_id: str
+    sender_nickname: Optional[str] = None
+    sender_avatar_url: Optional[str] = None
     content: str
     post_id: Optional[str]
     created_at: datetime

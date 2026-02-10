@@ -9,6 +9,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { Card } from '@/components/ui/card'
+import { UserAvatar } from '@/components/ui/user-avatar'
 import type { ThreadResponse } from '@/shared/api/generated'
 import {
   getMyProfileApiV1ProfileMeGetOptions,
@@ -41,11 +42,26 @@ export function ThreadsList() {
   const currentUserId = profileQuery.data?.data?.user_id
   const threads = threadsQuery.data?.threads ?? []
 
-  const resolvePeerId = (thread: ThreadResponse) => {
+  const resolvePeerData = (thread: ThreadResponse) => {
     if (!currentUserId) {
-      return thread.user_b_id
+      return {
+        peerId: thread.user_b_id,
+        peerNickname: thread.user_b_nickname,
+        peerAvatarUrl: thread.user_b_avatar_url,
+      }
     }
-    return thread.user_a_id === currentUserId ? thread.user_b_id : thread.user_a_id
+    if (thread.user_a_id === currentUserId) {
+      return {
+        peerId: thread.user_b_id,
+        peerNickname: thread.user_b_nickname,
+        peerAvatarUrl: thread.user_b_avatar_url,
+      }
+    }
+    return {
+      peerId: thread.user_a_id,
+      peerNickname: thread.user_a_nickname,
+      peerAvatarUrl: thread.user_a_avatar_url,
+    }
   }
 
   const resolveLastMessageText = (thread: ThreadResponse) => {
@@ -73,18 +89,18 @@ export function ThreadsList() {
   return (
     <div className="space-y-2">
       {threads.map(thread => {
-        const peerId = resolvePeerId(thread)
+        const { peerId, peerNickname, peerAvatarUrl } = resolvePeerData(thread)
         const lastMessageText = resolveLastMessageText(thread)
 
         return (
           <Link key={thread.id} href={`/inbox/threads/${thread.id}`}>
             <Card className="p-4 rounded-2xl shadow-sm border border-border/30 flex items-center justify-between hover:bg-muted cursor-pointer transition-colors bg-card">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-primary-50 rounded-2xl flex items-center justify-center">
-                  💬
-                </div>
+                <UserAvatar nickname={peerNickname} avatarUrl={peerAvatarUrl} userId={peerId} />
                 <div>
-                  <p className="text-sm font-black text-foreground">使用者 {peerId.slice(0, 8)}</p>
+                  <p className="text-sm font-black text-foreground">
+                    {peerNickname || `使用者 ${peerId.slice(0, 8)}`}
+                  </p>
                   <p className="text-[11px] text-muted-foreground">{lastMessageText}</p>
                 </div>
               </div>

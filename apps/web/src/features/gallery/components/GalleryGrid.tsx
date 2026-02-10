@@ -12,17 +12,9 @@ interface GalleryGridProps {
   cards: GalleryCardResponse[]
   isOwner?: boolean
   onDelete?: (cardId: string) => void
-  onMoveUp?: (index: number) => void
-  onMoveDown?: (index: number) => void
 }
 
-export function GalleryGrid({
-  cards,
-  isOwner = false,
-  onDelete,
-  onMoveUp: _onMoveUp,
-  onMoveDown: _onMoveDown,
-}: GalleryGridProps) {
+export function GalleryGrid({ cards, isOwner = false, onDelete }: GalleryGridProps) {
   const mediaAssetIds = cards
     .map(card => card.media_asset_id)
     .filter((mediaId): mediaId is string => Boolean(mediaId))
@@ -47,11 +39,12 @@ export function GalleryGrid({
         {cards.map((card, _idx) => {
           const thumbnailUrl = card.media_asset_id ? mediaUrls[card.media_asset_id] : null
           return (
-            <button
+            <Button
               key={card.id}
               type="button"
+              variant="ghost"
               onClick={() => setSelectedCardId(card.id)}
-              className="group text-left"
+              className="group h-auto w-full p-0 text-left"
             >
               <Card className="rounded-2xl border border-border/30 bg-card shadow-sm overflow-hidden transition-transform duration-200 group-hover:-translate-y-0.5">
                 <div className="relative aspect-square bg-muted/60">
@@ -92,7 +85,7 @@ export function GalleryGrid({
                   )}
                 </div>
               </Card>
-            </button>
+            </Button>
           )
         })}
       </div>

@@ -1,10 +1,16 @@
 'use client'
 
 import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google'
-import { useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { getMyProfileApiV1ProfileMeGetQueryKey } from '@/shared/api/generated/@tanstack/react-query.gen'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  adminLoginApiV1AuthAdminLoginPostMutation,
+  getMyProfileApiV1ProfileMeGetQueryKey,
+  googleLoginCodeApiV1AuthGoogleLoginCodePostMutation,
+} from '@/shared/api/generated/@tanstack/react-query.gen'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -21,30 +27,28 @@ export default function LoginPage() {
 
   const redirectToPosts = () => router.push('/posts')
 
+  const adminLoginMutation = useMutation({
+    ...adminLoginApiV1AuthAdminLoginPostMutation(),
+    onSuccess: data => {
+      if (data) {
+        queryClient.removeQueries({ queryKey: getMyProfileApiV1ProfileMeGetQueryKey() })
+        redirectToPosts()
+      }
+    },
+  })
+
   const handleAdminLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     setIsLoading(true)
 
     try {
-      // Import SDK dynamically to avoid build issues
-      const { adminLoginApiV1AuthAdminLoginPost } = await import('@/shared/api/generated')
-
-      const response = await adminLoginApiV1AuthAdminLoginPost({
+      await adminLoginMutation.mutateAsync({
         body: {
           email,
           password,
         },
-        throwOnError: true,
       })
-
-      // Tokens are now stored in httpOnly cookies automatically
-      // No need to manually store them in localStorage
-      if (response.data) {
-        queryClient.removeQueries({ queryKey: getMyProfileApiV1ProfileMeGetQueryKey() })
-        // Redirect to posts feed after login
-        redirectToPosts()
-      }
     } catch (err: unknown) {
       // More robust error parsing
       let errorMessage = '登入失敗，請檢查帳號密碼'
@@ -124,6 +128,16 @@ function LoginPageContent({
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
   const queryClient = useQueryClient()
 
+  const googleLoginMutation = useMutation({
+    ...googleLoginCodeApiV1AuthGoogleLoginCodePostMutation(),
+    onSuccess: data => {
+      if (data) {
+        queryClient.removeQueries({ queryKey: getMyProfileApiV1ProfileMeGetQueryKey() })
+        onLoginSuccess()
+      }
+    },
+  })
+
   const googleLogin = useGoogleLogin({
     flow: 'auth-code',
     onSuccess: async codeResponse => {
@@ -132,29 +146,17 @@ function LoginPageContent({
       setGoogleError('')
 
       try {
-        // Import SDK dynamically to avoid build issues
-        const { googleLoginCodeApiV1AuthGoogleLoginCodePost } = await import(
-          '@/shared/api/generated'
-        )
-
         // Get the redirect_uri that was used in the authorization request
         // @react-oauth/google uses window.location.origin by default
         const redirectUri = window.location.origin
 
         // Send authorization code to backend with redirect_uri for OAuth 2.0 validation
-        const response = await googleLoginCodeApiV1AuthGoogleLoginCodePost({
+        await googleLoginMutation.mutateAsync({
           body: {
             code: codeResponse.code,
             redirect_uri: redirectUri,
           },
-          throwOnError: true,
         })
-
-        if (response.data) {
-          queryClient.removeQueries({ queryKey: getMyProfileApiV1ProfileMeGetQueryKey() })
-          // Redirect to posts feed after login
-          onLoginSuccess()
-        }
       } catch (err: unknown) {
         // More robust error parsing
         let errorMessage = 'Google 登入失敗，請稍後再試'
@@ -214,38 +216,39 @@ function LoginPageContent({
               <p className="text-xs font-black text-amber-900">測試登入（僅開發環境顯示）</p>
             </div>
             <form onSubmit={handleAdminLogin} className="space-y-2">
-              <input
+              <Input
                 type="email"
                 placeholder="Email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-amber-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400"
+                className="w-full border-amber-300 bg-white text-sm focus-visible:ring-amber-400"
                 required
               />
-              <input
+              <Input
                 type="password"
                 placeholder="密碼"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-amber-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400"
+                className="w-full border-amber-300 bg-white text-sm focus-visible:ring-amber-400"
                 required
               />
               {error && <p className="text-xs text-red-600 font-medium">{error}</p>}
-              <button
+              <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-2 bg-amber-500 text-white text-sm font-bold rounded-lg hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-amber-500 text-white text-sm font-bold rounded-lg hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? '登入中...' : '登入'}
-              </button>
+              </Button>
             </form>
           </div>
         )}
 
         {/* Custom Google Login Button */}
         <div className="space-y-2">
-          <button
+          <Button
             type="button"
+            variant="outline"
             onClick={() => googleLogin()}
             disabled={isGoogleLoading}
             className="w-full h-14 bg-gradient-to-r from-pink-50 to-rose-50 border-2 border-pink-200 rounded-2xl hover:from-pink-100 hover:to-rose-100 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 px-6"
@@ -305,7 +308,7 @@ function LoginPageContent({
                 <p className="text-sm font-black text-slate-900">使用 Google 登入</p>
               </>
             )}
-          </button>
+          </Button>
           {googleError && (
             <div className="bg-red-50 border-2 border-red-300 rounded-2xl p-4">
               <div className="flex items-start gap-2">

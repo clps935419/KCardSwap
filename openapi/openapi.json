@@ -4282,9 +4282,53 @@
             "type": "string",
             "title": "Sender Id"
           },
+          "sender_nickname": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sender Nickname"
+          },
+          "sender_avatar_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sender Avatar Url"
+          },
           "recipient_id": {
             "type": "string",
             "title": "Recipient Id"
+          },
+          "recipient_nickname": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recipient Nickname"
+          },
+          "recipient_avatar_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recipient Avatar Url"
           },
           "initial_message": {
             "type": "string",
@@ -5436,6 +5480,28 @@
             "type": "string",
             "title": "Sender Id"
           },
+          "sender_nickname": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sender Nickname"
+          },
+          "sender_avatar_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sender Avatar Url"
+          },
           "content": {
             "type": "string",
             "title": "Content"
@@ -5501,9 +5567,53 @@
             "type": "string",
             "title": "User A Id"
           },
+          "user_a_nickname": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User A Nickname"
+          },
+          "user_a_avatar_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User A Avatar Url"
+          },
           "user_b_id": {
             "type": "string",
             "title": "User B Id"
+          },
+          "user_b_nickname": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User B Nickname"
+          },
+          "user_b_avatar_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User B Avatar Url"
           },
           "created_at": {
             "type": "string",
