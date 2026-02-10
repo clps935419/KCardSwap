@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Spinner } from '@/components/ui/spinner'
+import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/use-toast'
 import { useCreateMessageRequest } from '@/features/inbox/hooks/useCreateMessageRequest'
 import { PostImages } from '@/features/media/components/PostImages'
@@ -17,6 +17,9 @@ import { usePost } from '@/features/posts/hooks/usePost'
 import { useToggleLike } from '@/features/posts/hooks/useToggleLike'
 import type { PostCategory } from '@/shared/api/generated'
 import { useMyProfile } from '@/shared/api/hooks/profile'
+
+const BLUR_DATA_URL =
+  'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMSIgaGVpZ2h0PSIxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiNlZWVlZWUiLz48L3N2Zz4='
 
 const CATEGORY_LABELS: Record<PostCategory, string> = {
   trade: '求換',
@@ -126,8 +129,68 @@ export function PostDetailPageClient({ postId }: PostDetailPageClientProps) {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center py-12">
-        <Spinner className="h-8 w-8" />
+      <div className="max-w-2xl mx-auto space-y-4">
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-8 w-20 rounded-xl" />
+        </div>
+        <Card className="p-6 rounded-2xl shadow-sm border border-border/30 bg-card">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-10 w-10 rounded-full" />
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-3 w-24" />
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-5 w-14 rounded-full" />
+              <Skeleton className="h-5 w-16 rounded-full" />
+            </div>
+          </div>
+
+          <div className="mb-3 flex items-center gap-2">
+            <Skeleton className="h-6 w-20 rounded-full" />
+            <Skeleton className="h-6 w-16 rounded-full" />
+          </div>
+          <Skeleton className="h-6 w-4/5 mb-3" />
+          <Skeleton className="h-6 w-2/3 mb-4" />
+          <div className="mb-6 space-y-2">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-5/6" />
+          </div>
+          <Skeleton className="h-[180px] w-full rounded-2xl mb-6" />
+
+          <div className="mb-6 space-y-2">
+            <Skeleton className="h-3 w-2/3" />
+            <Skeleton className="h-3 w-1/2" />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <Skeleton className="h-8 w-24 rounded-xl" />
+            <Skeleton className="h-8 w-24 rounded-xl" />
+          </div>
+        </Card>
+
+        <Card className="p-6 rounded-2xl shadow-sm border border-border/30 bg-card">
+          <Skeleton className="h-5 w-28 mb-4" />
+          <div className="mb-6 space-y-2">
+            <Skeleton className="h-10 w-full rounded-xl" />
+            <Skeleton className="h-10 w-24 rounded-xl" />
+          </div>
+          <div className="space-y-3">
+            {[...Array(4)].map((_, i) => (
+              <div key={`comment-skeleton-${i}`} className="flex items-start gap-3">
+                <Skeleton className="h-8 w-8 rounded-full" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-3 w-24" />
+                  <Skeleton className="h-3 w-full" />
+                  <Skeleton className="h-3 w-4/5" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
       </div>
     )
   }
@@ -182,6 +245,8 @@ export function PostDetailPageClient({ postId }: PostDetailPageClientProps) {
                   height={40}
                   sizes="40px"
                   unoptimized
+                  placeholder="blur"
+                  blurDataURL={BLUR_DATA_URL}
                   className="w-full h-full object-cover"
                 />
               ) : (

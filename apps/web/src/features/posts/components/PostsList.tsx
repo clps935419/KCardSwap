@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Spinner } from '@/components/ui/spinner'
+import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/use-toast'
 import { UserAvatar } from '@/components/ui/user-avatar'
 import { useCreateMessageRequest } from '@/features/inbox/hooks/useCreateMessageRequest'
@@ -105,8 +105,35 @@ export function PostsList() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center py-12">
-        <Spinner className="h-8 w-8" />
+      <div className="space-y-4">
+        {[...Array(6)].map((_, i) => (
+          <Card
+            key={`post-skeleton-${i}`}
+            className="p-4 rounded-2xl shadow-sm border border-border/30 bg-card"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-9 w-9 rounded-full" />
+                <div className="space-y-2">
+                  <Skeleton className="h-3 w-28" />
+                  <Skeleton className="h-3 w-20" />
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-4 w-12 rounded-full" />
+                <Skeleton className="h-4 w-16 rounded-full" />
+              </div>
+            </div>
+
+            <Skeleton className="h-4 w-4/5" />
+            <Skeleton className="mt-2 h-24 w-full rounded-lg" />
+
+            <div className="mt-3 flex items-center justify-between">
+              <Skeleton className="h-8 w-22 rounded-xl" />
+              <Skeleton className="h-8 w-22 rounded-xl" />
+            </div>
+          </Card>
+        ))}
       </div>
     )
   }

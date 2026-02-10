@@ -3,8 +3,11 @@
 import { Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import { Card } from '@/components/ui/card'
-import { Spinner } from '@/components/ui/spinner'
+import { Skeleton } from '@/components/ui/skeleton'
 import type { CommentResponse } from '@/shared/api/generated'
+
+const BLUR_DATA_URL =
+  'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMSIgaGVpZ2h0PSIxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiNlZWVlZWUiLz48L3N2Zz4='
 
 interface CommentsListProps {
   comments: (CommentResponse & { pending?: boolean })[]
@@ -28,8 +31,19 @@ function formatTimeAgo(dateString: string) {
 export function CommentsList({ comments, isLoading }: CommentsListProps) {
   if (isLoading) {
     return (
-      <div className="flex justify-center py-8">
-        <Spinner className="h-6 w-6" />
+      <div className="space-y-3">
+        {[...Array(4)].map((_, i) => (
+          <Card key={`comment-skeleton-${i}`} className="p-4 bg-card border-border/30">
+            <div className="flex items-start gap-3">
+              <Skeleton className="h-8 w-8 rounded-full" />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-3 w-28" />
+                <Skeleton className="h-3 w-full" />
+                <Skeleton className="h-3 w-4/5" />
+              </div>
+            </div>
+          </Card>
+        ))}
       </div>
     )
   }
@@ -65,6 +79,8 @@ export function CommentsList({ comments, isLoading }: CommentsListProps) {
                     height={32}
                     sizes="32px"
                     unoptimized
+                    placeholder="blur"
+                    blurDataURL={BLUR_DATA_URL}
                     className="w-full h-full object-cover"
                   />
                 ) : (

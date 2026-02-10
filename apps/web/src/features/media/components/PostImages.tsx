@@ -8,6 +8,9 @@ import { Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import { useReadMediaUrls } from '@/features/media/hooks/useReadMediaUrls'
 
+const BLUR_DATA_URL =
+  'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMSIgaGVpZ2h0PSIxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiNlZWVlZWUiLz48L3N2Zz4='
+
 interface PostImagesProps {
   mediaAssetIds: string[]
   maxDisplay?: number
@@ -81,6 +84,8 @@ export function PostImages({ mediaAssetIds, maxDisplay = 4 }: PostImagesProps) {
               sizes={isSingle ? '320px' : '156px'}
               className="rounded-lg object-cover"
               unoptimized
+              placeholder="blur"
+              blurDataURL={BLUR_DATA_URL}
             />
             {showOverlay && (
               <div className="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center">

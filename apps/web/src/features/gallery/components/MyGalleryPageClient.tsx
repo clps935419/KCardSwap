@@ -71,15 +71,21 @@ export function MyGalleryPageClient() {
 
       {/* Loading State */}
       {isLoading && (
-        <div className="space-y-4">
-          {[...Array(3)].map((_, i) => (
-            <Card key={`skeleton-${i}`} className="p-4 rounded-2xl">
-              <div className="flex items-start gap-3">
-                <Skeleton className="w-11 h-11 rounded-2xl" />
-                <div className="flex-1 space-y-2">
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-3 w-1/2" />
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {[...Array(6)].map((_, i) => (
+            <Card
+              key={`skeleton-${i}`}
+              className="rounded-2xl border border-border/30 bg-card shadow-sm overflow-hidden"
+            >
+              <div className="relative aspect-[4/5] bg-muted/60">
+                <Skeleton className="absolute inset-0 h-full w-full rounded-none" />
+              </div>
+              <div className="px-3 py-2 flex items-center justify-between">
+                <div className="space-y-2">
+                  <Skeleton className="h-3 w-20" />
+                  <Skeleton className="h-3 w-12" />
                 </div>
+                <Skeleton className="h-8 w-14 rounded-full" />
               </div>
             </Card>
           ))}
