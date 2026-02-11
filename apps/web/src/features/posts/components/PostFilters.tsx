@@ -42,18 +42,17 @@ export function PostFilters() {
     router.push(`/posts?${params.toString()}`)
   }
 
+  const cities = citiesQuery.data?.data.cities ?? []
+  const rawCategories = categoriesQuery.data?.data.categories ?? []
   const cityOptions = [
     { value: 'ALL', label: '全部城市' },
-    ...(citiesQuery.data?.data.cities ?? []).map(city => ({
+    ...cities.map(city => ({
       value: city.code,
       label: `${city.name_zh}`,
     })),
   ]
 
-  const categories = [
-    { value: 'all', label: '全部' },
-    ...(categoriesQuery.data?.data.categories ?? []),
-  ]
+  const categories = [{ value: 'all', label: '全部' }, ...rawCategories]
 
   return (
     <div className="space-y-4">
@@ -93,8 +92,16 @@ export function PostFilters() {
 
       {/* Category Filters */}
       <div className="flex flex-wrap gap-2">
-        {categoriesQuery.isLoading && (
-          <div className="text-[11px] text-muted-foreground">載入分類中...</div>
+        {categoriesQuery.isLoading && rawCategories.length === 0 && (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled
+            className="px-3 py-2 rounded-full text-[11px] font-black border-border bg-muted/40 text-muted-foreground"
+          >
+            載入分類中
+          </Button>
         )}
         {categoriesQuery.isError && (
           <div className="text-[11px] text-destructive">分類載入失敗</div>
