@@ -161,6 +161,7 @@ export function PostsList() {
         const liked = post.liked_by_me ?? false
         const likeCount = post.like_count ?? 0
         const isMyPost = myUserId && post.owner_id === myUserId
+        const canMessage = post.can_message ?? false
 
         return (
           <Card key={post.id} className="p-4 rounded-2xl shadow-sm border border-border/30 bg-card">
@@ -245,7 +246,7 @@ export function PostsList() {
                 </span>
               </Button>
 
-              {!isMyPost && (
+              {canMessage && (
                 <Button
                   variant="default"
                   size="sm"

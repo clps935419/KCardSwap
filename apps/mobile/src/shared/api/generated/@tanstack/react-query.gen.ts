@@ -21,10 +21,12 @@ import {
   createGalleryCardApiV1GalleryCardsPost,
   createMessageRequestApiV1MessageRequestsPost,
   createPostApiV1PostsPost,
+  createPostCommentApiV1PostsPostIdCommentsPost,
   createUploadUrlApiV1MediaUploadUrlPost,
   declineMessageRequestApiV1MessageRequestsRequestIdDeclinePost,
   deleteGalleryCardApiV1GalleryCardsCardIdDelete,
   expireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPost,
+  getCategoriesApiV1PostsCategoriesGet,
   getChatRoomsApiV1ChatsGet,
   getCitiesApiV1LocationsCitiesGet,
   getIdolGroupsApiV1IdolsGroupsGet,
@@ -34,6 +36,7 @@ import {
   getMyMessageRequestsApiV1MessageRequestsInboxGet,
   getMyProfileApiV1ProfileMeGet,
   getMyReportsApiV1ReportsGet,
+  getMySentMessageRequestsApiV1MessageRequestsSentGet,
   getMyThreadsApiV1ThreadsGet,
   getPostApiV1PostsPostIdGet,
   getSubscriptionStatusApiV1SubscriptionsStatusGet,
@@ -43,6 +46,7 @@ import {
   googleLoginApiV1AuthGoogleLoginPost,
   googleLoginCodeApiV1AuthGoogleLoginCodePost,
   healthCheckHealthGet,
+  listPostCommentsApiV1PostsPostIdCommentsGet,
   listPostsApiV1PostsGet,
   logoutApiV1AuthLogoutPost,
   markMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPost,
@@ -88,6 +92,9 @@ import type {
   CreateMessageRequestApiV1MessageRequestsPostResponse,
   CreatePostApiV1PostsPostData,
   CreatePostApiV1PostsPostResponse,
+  CreatePostCommentApiV1PostsPostIdCommentsPostData,
+  CreatePostCommentApiV1PostsPostIdCommentsPostError,
+  CreatePostCommentApiV1PostsPostIdCommentsPostResponse,
   CreateUploadUrlApiV1MediaUploadUrlPostData,
   CreateUploadUrlApiV1MediaUploadUrlPostError,
   CreateUploadUrlApiV1MediaUploadUrlPostResponse,
@@ -99,6 +106,8 @@ import type {
   DeleteGalleryCardApiV1GalleryCardsCardIdDeleteResponse,
   ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostData,
   ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostResponse,
+  GetCategoriesApiV1PostsCategoriesGetData,
+  GetCategoriesApiV1PostsCategoriesGetResponse,
   GetChatRoomsApiV1ChatsGetData,
   GetChatRoomsApiV1ChatsGetError,
   GetChatRoomsApiV1ChatsGetResponse,
@@ -124,6 +133,9 @@ import type {
   GetMyReportsApiV1ReportsGetData,
   GetMyReportsApiV1ReportsGetError,
   GetMyReportsApiV1ReportsGetResponse,
+  GetMySentMessageRequestsApiV1MessageRequestsSentGetData,
+  GetMySentMessageRequestsApiV1MessageRequestsSentGetError,
+  GetMySentMessageRequestsApiV1MessageRequestsSentGetResponse,
   GetMyThreadsApiV1ThreadsGetData,
   GetMyThreadsApiV1ThreadsGetError,
   GetMyThreadsApiV1ThreadsGetResponse,
@@ -147,6 +159,9 @@ import type {
   GoogleLoginCodeApiV1AuthGoogleLoginCodePostData,
   GoogleLoginCodeApiV1AuthGoogleLoginCodePostResponse,
   HealthCheckHealthGetData,
+  ListPostCommentsApiV1PostsPostIdCommentsGetData,
+  ListPostCommentsApiV1PostsPostIdCommentsGetError,
+  ListPostCommentsApiV1PostsPostIdCommentsGetResponse,
   ListPostsApiV1PostsGetData,
   ListPostsApiV1PostsGetError,
   ListPostsApiV1PostsGetResponse,
@@ -921,6 +936,36 @@ export const markMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPostMutation = 
   return mutationOptions;
 };
 
+export const getCategoriesApiV1PostsCategoriesGetQueryKey = (
+  options?: Options<GetCategoriesApiV1PostsCategoriesGetData>
+) => createQueryKey('getCategoriesApiV1PostsCategoriesGet', options);
+
+/**
+ * Get available post categories
+ *
+ * Returns list of all available post categories with their labels
+ */
+export const getCategoriesApiV1PostsCategoriesGetOptions = (
+  options?: Options<GetCategoriesApiV1PostsCategoriesGetData>
+) =>
+  queryOptions<
+    GetCategoriesApiV1PostsCategoriesGetResponse,
+    DefaultError,
+    GetCategoriesApiV1PostsCategoriesGetResponse,
+    ReturnType<typeof getCategoriesApiV1PostsCategoriesGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getCategoriesApiV1PostsCategoriesGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getCategoriesApiV1PostsCategoriesGetQueryKey(options),
+  });
+
 export const listPostsApiV1PostsGetQueryKey = (options?: Options<ListPostsApiV1PostsGetData>) =>
   createQueryKey('listPostsApiV1PostsGet', options);
 
@@ -1138,6 +1183,117 @@ export const toggleLikeApiV1PostsPostIdLikePostMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await toggleLikeApiV1PostsPostIdLikePost({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const listPostCommentsApiV1PostsPostIdCommentsGetQueryKey = (
+  options: Options<ListPostCommentsApiV1PostsPostIdCommentsGetData>
+) => createQueryKey('listPostCommentsApiV1PostsPostIdCommentsGet', options);
+
+/**
+ * List comments on a post
+ *
+ * Returns list of comments for a post (latest first)
+ */
+export const listPostCommentsApiV1PostsPostIdCommentsGetOptions = (
+  options: Options<ListPostCommentsApiV1PostsPostIdCommentsGetData>
+) =>
+  queryOptions<
+    ListPostCommentsApiV1PostsPostIdCommentsGetResponse,
+    ListPostCommentsApiV1PostsPostIdCommentsGetError,
+    ListPostCommentsApiV1PostsPostIdCommentsGetResponse,
+    ReturnType<typeof listPostCommentsApiV1PostsPostIdCommentsGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await listPostCommentsApiV1PostsPostIdCommentsGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: listPostCommentsApiV1PostsPostIdCommentsGetQueryKey(options),
+  });
+
+export const listPostCommentsApiV1PostsPostIdCommentsGetInfiniteQueryKey = (
+  options: Options<ListPostCommentsApiV1PostsPostIdCommentsGetData>
+): QueryKey<Options<ListPostCommentsApiV1PostsPostIdCommentsGetData>> =>
+  createQueryKey('listPostCommentsApiV1PostsPostIdCommentsGet', options, true);
+
+/**
+ * List comments on a post
+ *
+ * Returns list of comments for a post (latest first)
+ */
+export const listPostCommentsApiV1PostsPostIdCommentsGetInfiniteOptions = (
+  options: Options<ListPostCommentsApiV1PostsPostIdCommentsGetData>
+) =>
+  infiniteQueryOptions<
+    ListPostCommentsApiV1PostsPostIdCommentsGetResponse,
+    ListPostCommentsApiV1PostsPostIdCommentsGetError,
+    InfiniteData<ListPostCommentsApiV1PostsPostIdCommentsGetResponse>,
+    QueryKey<Options<ListPostCommentsApiV1PostsPostIdCommentsGetData>>,
+    | number
+    | Pick<
+        QueryKey<Options<ListPostCommentsApiV1PostsPostIdCommentsGetData>>[0],
+        'body' | 'headers' | 'path' | 'query'
+      >
+  >(
+    // @ts-ignore
+    {
+      queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<
+          QueryKey<Options<ListPostCommentsApiV1PostsPostIdCommentsGetData>>[0],
+          'body' | 'headers' | 'path' | 'query'
+        > =
+          typeof pageParam === 'object'
+            ? pageParam
+            : {
+                query: {
+                  offset: pageParam,
+                },
+              };
+        const params = createInfiniteParams(queryKey, page);
+        const { data } = await listPostCommentsApiV1PostsPostIdCommentsGet({
+          ...options,
+          ...params,
+          signal,
+          throwOnError: true,
+        });
+        return data;
+      },
+      queryKey: listPostCommentsApiV1PostsPostIdCommentsGetInfiniteQueryKey(options),
+    }
+  );
+
+/**
+ * Create a comment on a post
+ *
+ * Create a new comment on the specified post (requires authentication)
+ */
+export const createPostCommentApiV1PostsPostIdCommentsPostMutation = (
+  options?: Partial<Options<CreatePostCommentApiV1PostsPostIdCommentsPostData>>
+): UseMutationOptions<
+  CreatePostCommentApiV1PostsPostIdCommentsPostResponse,
+  CreatePostCommentApiV1PostsPostIdCommentsPostError,
+  Options<CreatePostCommentApiV1PostsPostIdCommentsPostData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CreatePostCommentApiV1PostsPostIdCommentsPostResponse,
+    CreatePostCommentApiV1PostsPostIdCommentsPostError,
+    Options<CreatePostCommentApiV1PostsPostIdCommentsPostData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await createPostCommentApiV1PostsPostIdCommentsPost({
         ...options,
         ...fnOptions,
         throwOnError: true,
@@ -1549,6 +1705,41 @@ export const getMyMessageRequestsApiV1MessageRequestsInboxGetOptions = (
       return data;
     },
     queryKey: getMyMessageRequestsApiV1MessageRequestsInboxGetQueryKey(options),
+  });
+
+export const getMySentMessageRequestsApiV1MessageRequestsSentGetQueryKey = (
+  options?: Options<GetMySentMessageRequestsApiV1MessageRequestsSentGetData>
+) => createQueryKey('getMySentMessageRequestsApiV1MessageRequestsSentGet', options);
+
+/**
+ * Get My Sent Message Requests
+ *
+ * Get message requests sent by the current user.
+ *
+ * Sender typically only needs pending status.
+ *
+ * Query params:
+ * - status_filter: "pending", "accepted", "declined", or "all" (default: "pending")
+ */
+export const getMySentMessageRequestsApiV1MessageRequestsSentGetOptions = (
+  options?: Options<GetMySentMessageRequestsApiV1MessageRequestsSentGetData>
+) =>
+  queryOptions<
+    GetMySentMessageRequestsApiV1MessageRequestsSentGetResponse,
+    GetMySentMessageRequestsApiV1MessageRequestsSentGetError,
+    GetMySentMessageRequestsApiV1MessageRequestsSentGetResponse,
+    ReturnType<typeof getMySentMessageRequestsApiV1MessageRequestsSentGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getMySentMessageRequestsApiV1MessageRequestsSentGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getMySentMessageRequestsApiV1MessageRequestsSentGetQueryKey(options),
   });
 
 /**

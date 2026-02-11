@@ -4805,6 +4805,12 @@
             "description": "Whether the current user has liked this post",
             "default": false
           },
+          "can_message": {
+            "type": "boolean",
+            "title": "Can Message",
+            "description": "Whether the current user can send a message to the post author",
+            "default": false
+          },
           "media_asset_ids": {
             "items": {
               "type": "string",
@@ -4849,6 +4855,7 @@
         "title": "PostResponse",
         "description": "Response schema for post details (V2: with scope/category + like fields)",
         "example": {
+          "can_message": true,
           "category": "trade",
           "city_code": "TPE",
           "content": "I have Jungkook cards and looking for V cards",
