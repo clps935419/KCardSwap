@@ -102,15 +102,9 @@ export default function InboxPage() {
         <div className={hasRequests ? 'border-t border-border/60 pt-4' : ''}>
           <div className="mb-3 flex items-center justify-between">
             <p className="text-sm font-black text-foreground">聊天</p>
-            <span className="text-xs font-black text-muted-foreground">
-              共 {threads.length} 間
-            </span>
+            <span className="text-xs font-black text-muted-foreground">共 {threads.length} 間</span>
           </div>
-          <ThreadsList
-            currentUserId={currentUserId}
-            threads={threads}
-            error={threadsQuery.error}
-          />
+          <ThreadsList currentUserId={currentUserId} threads={threads} error={threadsQuery.error} />
         </div>
       </div>
     </div>

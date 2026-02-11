@@ -19,7 +19,10 @@ const replaceFileExtension = (filename: string, extension: string) => {
 const ensureFile = (blob: Blob, filename: string) =>
   blob instanceof File ? blob : new File([blob], filename, { type: blob.type || 'image/jpeg' })
 
-export async function prepareUploadFile(file: File, maxBytes = MAX_UPLOAD_BYTES_FREE): Promise<File> {
+export async function prepareUploadFile(
+  file: File,
+  maxBytes = MAX_UPLOAD_BYTES_FREE
+): Promise<File> {
   if (file.size <= maxBytes) {
     return file
   }

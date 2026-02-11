@@ -6,8 +6,8 @@
  * @module lib/media/uploadFlow
  */
 
-import { confirmUpload, createUploadUrl } from '@/shared/api/hooks/media'
 import { prepareUploadFile } from '@/lib/media/prepareUploadFile'
+import { confirmUpload, createUploadUrl } from '@/shared/api/hooks/media'
 
 export interface UploadFlowOptions {
   file: File

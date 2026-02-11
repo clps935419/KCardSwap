@@ -302,9 +302,7 @@ export function CreatePostForm() {
               {imageName}
             </p>
           )}
-          <p className="text-[11px] text-muted-foreground">
-            免費方案單張上限 2MB，超過會自動壓縮
-          </p>
+          <p className="text-[11px] text-muted-foreground">免費方案單張上限 2MB，超過會自動壓縮</p>
         </div>
 
         {imagePreview && (

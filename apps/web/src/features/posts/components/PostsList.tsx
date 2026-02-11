@@ -160,7 +160,6 @@ export function PostsList() {
       {posts.map((post: PostResponse) => {
         const liked = post.liked_by_me ?? false
         const likeCount = post.like_count ?? 0
-        const isMyPost = myUserId && post.owner_id === myUserId
         const canMessage = post.can_message ?? false
 
         return (
