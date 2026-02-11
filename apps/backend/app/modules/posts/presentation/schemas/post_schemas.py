@@ -105,6 +105,10 @@ class PostResponse(BaseModel):
     )
     like_count: int = Field(0, description="Total number of likes on this post")
     liked_by_me: bool = Field(False, description="Whether the current user has liked this post")
+    can_message: bool = Field(
+        False,
+        description="Whether the current user can send a message to the post author",
+    )
     media_asset_ids: List[UUID] = Field(
         default_factory=list,
         description="List of media asset IDs attached to this post (Phase 9)",
@@ -129,6 +133,7 @@ class PostResponse(BaseModel):
                 "status": "open",
                 "like_count": 5,
                 "liked_by_me": True,
+                "can_message": True,
                 "expires_at": "2024-02-01T00:00:00Z",
                 "created_at": "2024-01-01T00:00:00Z",
                 "updated_at": "2024-01-01T00:00:00Z",

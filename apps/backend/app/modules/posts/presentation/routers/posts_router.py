@@ -70,6 +70,81 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/posts", tags=["Posts"])
 
 
+async def _calculate_can_message(
+    current_user_id: str,
+    post_owner_id: str,
+    session: AsyncSession,
+) -> bool:
+    """
+    Calculate whether the current user can send a message to the post author.
+
+    Rules:
+    - Not own post: current_user_id != post_owner_id
+    - No existing thread between users
+    - No pending message request between users
+    - Not blocked by either user
+    - Owner allows stranger messages OR users are already friends
+    """
+    # Rule 1: Cannot message own posts
+    if current_user_id == post_owner_id:
+        return False
+
+    # Import repositories here to avoid circular dependencies
+    from app.modules.social.infrastructure.repositories.friendship_repository_impl import (
+        FriendshipRepositoryImpl,
+    )
+    from app.modules.social.infrastructure.repositories.message_request_repository import (
+        MessageRequestRepository,
+    )
+    from app.modules.social.infrastructure.repositories.thread_repository import (
+        ThreadRepository,
+    )
+    from app.modules.identity.infrastructure.repositories.profile_repository_impl import (
+        ProfileRepositoryImpl,
+    )
+
+    friendship_repo = FriendshipRepositoryImpl(session)
+    message_request_repo = MessageRequestRepository(session)
+    thread_repo = ThreadRepository(session)
+    profile_repo = ProfileRepositoryImpl(session)
+
+    # Rule 2: Check if thread already exists
+    existing_thread = await thread_repo.find_by_users(current_user_id, post_owner_id)
+    if existing_thread:
+        return False
+
+    # Rule 3: Check if pending message request exists
+    pending_request = await message_request_repo.find_pending_between_users(
+        current_user_id, post_owner_id
+    )
+    if pending_request:
+        return False
+
+    # Rule 4: Check if blocked (either direction)
+    is_blocked_by_owner = await friendship_repo.is_blocked(
+        current_user_id, post_owner_id
+    )
+    is_blocking_owner = await friendship_repo.is_blocked(post_owner_id, current_user_id)
+    if is_blocked_by_owner or is_blocking_owner:
+        return False
+
+    # Rule 5: Check privacy settings and friendship status
+    # Get owner's profile to check allow_stranger_chat
+    owner_profile = await profile_repo.get_by_user_id(UUID(post_owner_id))
+    if not owner_profile:
+        # If no profile found, default to not allowing messages
+        return False
+
+    # Check if users are already friends
+    are_friends = await friendship_repo.are_friends(current_user_id, post_owner_id)
+
+    # Allow if owner allows stranger chat OR users are already friends
+    allow_stranger_chat = owner_profile.privacy_flags.get("allow_stranger_chat", True)
+    can_message = are_friends or allow_stranger_chat
+
+    return can_message
+
+
 @router.get(
     "/categories",
     response_model=PostCategoryListResponseWrapper,
@@ -103,6 +178,7 @@ async def _post_to_response(
     session: AsyncSession,
     like_count: int = 0,
     liked_by_me: bool = False,
+    can_message: bool = False,
     media_asset_ids: Optional[List[UUID]] = None,
     owner_nickname: Optional[str] = None,
     owner_avatar_url: Optional[str] = None,
@@ -111,6 +187,7 @@ async def _post_to_response(
 
     Phase 9: Includes media_asset_ids for image display.
     Includes owner_nickname and owner_avatar_url from profile.
+    Includes can_message flag to control "Message Author" button visibility.
     """
     # If media_asset_ids not provided, fetch from database
     if media_asset_ids is None:
@@ -150,6 +227,7 @@ async def _post_to_response(
         status=post.status.value,
         like_count=like_count,
         liked_by_me=liked_by_me,
+        can_message=can_message,
         media_asset_ids=media_asset_ids,
         expires_at=post.expires_at,
         created_at=post.created_at,
@@ -274,17 +352,23 @@ async def list_posts(
             offset=offset,
         )
 
-        post_responses = [
-            await _post_to_response(
+        post_responses = []
+        for pwl in posts_with_likes:
+            can_message = await _calculate_can_message(
+                str(current_user_id),
+                pwl.post.owner_id,
+                session,
+            )
+            post_response = await _post_to_response(
                 pwl.post,
                 session,
                 like_count=pwl.like_count,
                 liked_by_me=pwl.liked_by_me,
+                can_message=can_message,
                 owner_nickname=pwl.owner_nickname,
                 owner_avatar_url=pwl.owner_avatar_url,
             )
-            for pwl in posts_with_likes
-        ]
+            post_responses.append(post_response)
 
         data = PostListResponse(posts=post_responses, total=len(post_responses))
         return PostListResponseWrapper(data=data, meta=None, error=None)
@@ -342,11 +426,19 @@ async def get_post(
         owner_nickname = getattr(post, "_owner_nickname", None)
         owner_avatar_url = getattr(post, "_owner_avatar_url", None)
 
+        # Calculate can_message
+        can_message = await _calculate_can_message(
+            str(current_user_id),
+            post.owner_id,
+            session,
+        )
+
         data = await _post_to_response(
             post,
             session,
             like_count=like_count,
             liked_by_me=liked_by_me,
+            can_message=can_message,
             owner_nickname=owner_nickname,
             owner_avatar_url=owner_avatar_url,
         )
