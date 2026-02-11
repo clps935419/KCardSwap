@@ -74,10 +74,10 @@ export default function InboxPage() {
             </div>
 
             {messageRequests.length > 0 && (
-              <div className="rounded-3xl border border-border/50 bg-card p-5 shadow-sm">
+              <div className="space-y-3">
                 <MessageRequestsList
                   limit={3}
-                  showHeader
+                  showHeader={false}
                   hideEmpty
                   requests={messageRequests}
                   error={messageRequestsQuery.error}
@@ -86,10 +86,10 @@ export default function InboxPage() {
             )}
 
             {sentRequests.length > 0 && (
-              <div className="rounded-3xl border border-border/50 bg-card p-5 shadow-sm">
+              <div className="space-y-3">
                 <SentRequestsList
                   limit={3}
-                  showHeader
+                  showHeader={false}
                   hideEmpty
                   requests={sentRequests}
                   error={sentRequestsQuery.error}
