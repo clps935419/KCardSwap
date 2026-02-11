@@ -315,7 +315,7 @@ export function PostDetailPageClient({ postId }: PostDetailPageClientProps) {
 
         {/* Phase 9: Display post images using signed read URLs */}
         {post.media_asset_ids && post.media_asset_ids.length > 0 && (
-          <div className="mb-6">
+          <div className="mb-6 flex justify-center">
             <PostImages mediaAssetIds={post.media_asset_ids} maxDisplay={4} />
           </div>
         )}

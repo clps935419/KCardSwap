@@ -214,7 +214,9 @@ export function PostsList() {
 
               {/* Phase 9: Display post images using signed read URLs */}
               {post.media_asset_ids && post.media_asset_ids.length > 0 ? (
-                <PostImages mediaAssetIds={post.media_asset_ids} maxDisplay={1} />
+                <div className="mt-2 w-full flex justify-center">
+                  <PostImages mediaAssetIds={post.media_asset_ids} maxDisplay={1} />
+                </div>
               ) : (
                 <div className="mt-2 text-[11px] text-muted-foreground">無附圖</div>
               )}
