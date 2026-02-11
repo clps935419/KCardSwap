@@ -1162,6 +1162,12 @@ export type PostResponse = {
      */
     liked_by_me?: boolean;
     /**
+     * Can Message
+     *
+     * Whether the current user can send a message to the post author
+     */
+    can_message?: boolean;
+    /**
      * Media Asset Ids
      *
      * List of media asset IDs attached to this post (Phase 9)
