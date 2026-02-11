@@ -9,6 +9,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 
 from app.modules.media.infrastructure.repositories.media_repository_impl import (
     MediaRepositoryImpl,
@@ -74,6 +75,9 @@ from app.modules.social.infrastructure.repositories.thread_repository import (
 )
 from app.modules.identity.infrastructure.repositories.profile_repository_impl import (
     ProfileRepositoryImpl,
+)
+from app.modules.identity.infrastructure.database.models.profile_model import (
+    ProfileModel,
 )
 
 logger = logging.getLogger(__name__)
@@ -173,8 +177,8 @@ async def _calculate_can_message_batch(
     thread_repo = ThreadRepository(session)
     profile_repo = ProfileRepositoryImpl(session)
     
-    # Batch fetch threads for current user
-    threads = await thread_repo.get_threads_for_user(current_user_id, limit=1000)
+    # Batch fetch threads for current user (no limit to ensure all are checked)
+    threads = await thread_repo.get_threads_for_user(current_user_id, limit=10000)
     thread_user_ids = set()
     for thread in threads:
         if thread.user_a_id == current_user_id:
@@ -212,12 +216,16 @@ async def _calculate_can_message_batch(
         elif friendship.status.value == "accepted":
             friend_user_ids.add(other_id)
     
-    # Batch fetch profiles for privacy settings
+    # Batch fetch profiles for privacy settings using a single query
     profiles = {}
-    for owner_id in owner_ids:
-        profile = await profile_repo.get_by_user_id(UUID(owner_id))
-        if profile:
-            profiles[owner_id] = profile
+    if owner_ids:
+        owner_uuids = [UUID(oid) for oid in owner_ids]
+        result = await session.execute(
+            select(ProfileModel).where(ProfileModel.user_id.in_(owner_uuids))
+        )
+        profile_models = result.scalars().all()
+        for model in profile_models:
+            profiles[str(model.user_id)] = ProfileRepositoryImpl._to_entity(model)
     
     # Second pass: Calculate can_message for non-own posts
     for post_id, owner_id in posts_with_owner_ids:
