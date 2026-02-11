@@ -7,7 +7,7 @@
 - **安全上傳**：後端產生具時效性的 Signed URL
 - **直傳儲存**：檔案直接上傳到 GCS，降低後端負載
 - **配額管理**：限制每日上傳張數與總儲存容量
-- **型別驗證**：僅允許 JPEG/PNG
+- **型別驗證**：僅允許 JPEG/PNG/WEBP/HEIC/HEIF
 
 **重要（目前實作）**：
 - 後端在 `POST /api/v1/cards/upload-url` 這一步就會建立小卡資料庫紀錄。
@@ -49,7 +49,7 @@
 ```
 
 **後端驗證項目**：
-- Content-Type（必須是 `image/jpeg` 或 `image/png`）
+- Content-Type（必須是 `image/jpeg`、`image/png`、`image/webp`、`image/heic` 或 `image/heif`）
 - 檔案大小（預設 ≤ 10MB）
 - 每日上傳配額（目前預設：2 張/天）
 - 總容量配額（目前預設：1GB）
@@ -190,7 +190,7 @@ Invalid request data:
 ```
 
 Common validation errors:
-- Invalid `content_type` (must be `image/jpeg` or `image/png`)
+- Invalid `content_type` (must be `image/jpeg`, `image/png`, `image/webp`, `image/heic`, or `image/heif`)
 - Invalid `file_size_bytes` (must be > 0 and ≤ MAX_FILE_SIZE)
 - Invalid `rarity` (must be one of: common, rare, epic, legendary)
 
@@ -340,7 +340,7 @@ cards/550e8400-e29b-41d4-a716-446655440000/a1b2c3d4-5678-90ab-cdef-1234567890ab.
 
 - `user_id`: UUID of the card owner
 - `card_id`: UUID of the card record
-- `ext`: File extension (`.jpg` or `.png`)
+- `ext`: File extension (`.jpg`, `.png`, `.webp`, `.heic`, `.heif`)
 
 ### Public Access
 

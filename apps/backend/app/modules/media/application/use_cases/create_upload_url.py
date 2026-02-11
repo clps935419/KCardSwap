@@ -1,4 +1,5 @@
 """Create upload URL use case - Presign step of media upload flow."""
+
 import uuid
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -13,6 +14,7 @@ from app.shared.infrastructure.external.gcs_storage_service import GCSStorageSer
 @dataclass
 class CreateUploadUrlRequest:
     """Request for creating upload URL."""
+
     user_id: UUID
     content_type: str
     file_size_bytes: int
@@ -22,6 +24,7 @@ class CreateUploadUrlRequest:
 @dataclass
 class CreateUploadUrlResponse:
     """Response containing presigned upload URL and media ID."""
+
     media_id: UUID
     upload_url: str
     gcs_blob_name: str
@@ -100,5 +103,7 @@ class CreateUploadUrlUseCase:
             "image/png": ".png",
             "image/gif": ".gif",
             "image/webp": ".webp",
+            "image/heic": ".heic",
+            "image/heif": ".heif",
         }
         return mapping.get(content_type.lower(), ".jpg")
