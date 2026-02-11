@@ -63,6 +63,18 @@ from app.shared.presentation.exceptions.api_exceptions import (
     UnprocessableEntityException,
 )
 from app.shared.presentation.deps.require_user import require_user
+from app.modules.social.infrastructure.repositories.friendship_repository_impl import (
+    FriendshipRepositoryImpl,
+)
+from app.modules.social.infrastructure.repositories.message_request_repository import (
+    MessageRequestRepository,
+)
+from app.modules.social.infrastructure.repositories.thread_repository import (
+    ThreadRepository,
+)
+from app.modules.identity.infrastructure.repositories.profile_repository_impl import (
+    ProfileRepositoryImpl,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -88,20 +100,6 @@ async def _calculate_can_message(
     # Rule 1: Cannot message own posts
     if current_user_id == post_owner_id:
         return False
-
-    # Import repositories here to avoid circular dependencies
-    from app.modules.social.infrastructure.repositories.friendship_repository_impl import (
-        FriendshipRepositoryImpl,
-    )
-    from app.modules.social.infrastructure.repositories.message_request_repository import (
-        MessageRequestRepository,
-    )
-    from app.modules.social.infrastructure.repositories.thread_repository import (
-        ThreadRepository,
-    )
-    from app.modules.identity.infrastructure.repositories.profile_repository_impl import (
-        ProfileRepositoryImpl,
-    )
 
     friendship_repo = FriendshipRepositoryImpl(session)
     message_request_repo = MessageRequestRepository(session)
@@ -143,6 +141,115 @@ async def _calculate_can_message(
     can_message = are_friends or allow_stranger_chat
 
     return can_message
+
+
+async def _calculate_can_message_batch(
+    current_user_id: str,
+    posts_with_owner_ids: list[tuple[str, str]],  # List of (post_id, owner_id) tuples
+    session: AsyncSession,
+) -> dict[str, bool]:
+    """
+    Batch calculate can_message for multiple posts to avoid N+1 queries.
+    
+    Returns a dict mapping post_id to can_message boolean.
+    """
+    result = {}
+    owner_ids = set()
+    
+    # First pass: Check own posts
+    for post_id, owner_id in posts_with_owner_ids:
+        if current_user_id == owner_id:
+            result[post_id] = False
+        else:
+            owner_ids.add(owner_id)
+    
+    # If all posts are own posts, return early
+    if not owner_ids:
+        return result
+    
+    # Initialize repositories
+    friendship_repo = FriendshipRepositoryImpl(session)
+    message_request_repo = MessageRequestRepository(session)
+    thread_repo = ThreadRepository(session)
+    profile_repo = ProfileRepositoryImpl(session)
+    
+    # Batch fetch threads for current user
+    threads = await thread_repo.get_threads_for_user(current_user_id, limit=1000)
+    thread_user_ids = set()
+    for thread in threads:
+        if thread.user_a_id == current_user_id:
+            thread_user_ids.add(thread.user_b_id)
+        else:
+            thread_user_ids.add(thread.user_a_id)
+    
+    # Batch fetch pending requests (both sent and received)
+    sent_requests = await message_request_repo.get_requests_for_sender(
+        current_user_id
+    )
+    received_requests = await message_request_repo.get_requests_for_recipient(
+        current_user_id
+    )
+    pending_user_ids = set()
+    for req in sent_requests + received_requests:
+        if req.status.value == "pending":
+            other_id = (
+                req.recipient_id if req.sender_id == current_user_id else req.sender_id
+            )
+            pending_user_ids.add(other_id)
+    
+    # Batch fetch friendships to check blocks and friend status
+    friendships = await friendship_repo.get_friends_by_user_id(current_user_id)
+    blocked_user_ids = set()
+    friend_user_ids = set()
+    for friendship in friendships:
+        other_id = (
+            friendship.friend_id
+            if friendship.user_id == current_user_id
+            else friendship.user_id
+        )
+        if friendship.status.value == "blocked":
+            blocked_user_ids.add(other_id)
+        elif friendship.status.value == "accepted":
+            friend_user_ids.add(other_id)
+    
+    # Batch fetch profiles for privacy settings
+    profiles = {}
+    for owner_id in owner_ids:
+        profile = await profile_repo.get_by_user_id(UUID(owner_id))
+        if profile:
+            profiles[owner_id] = profile
+    
+    # Second pass: Calculate can_message for non-own posts
+    for post_id, owner_id in posts_with_owner_ids:
+        if post_id in result:  # Already determined (own post)
+            continue
+        
+        # Rule 2: No existing thread
+        if owner_id in thread_user_ids:
+            result[post_id] = False
+            continue
+        
+        # Rule 3: No pending request
+        if owner_id in pending_user_ids:
+            result[post_id] = False
+            continue
+        
+        # Rule 4: Not blocked
+        if owner_id in blocked_user_ids:
+            result[post_id] = False
+            continue
+        
+        # Rule 5: Check privacy and friendship
+        profile = profiles.get(owner_id)
+        if not profile:
+            result[post_id] = False
+            continue
+        
+        is_friend = owner_id in friend_user_ids
+        allow_stranger_chat = profile.privacy_flags.get("allow_stranger_chat", True)
+        result[post_id] = is_friend or allow_stranger_chat
+    
+    return result
 
 
 @router.get(
@@ -352,13 +459,18 @@ async def list_posts(
             offset=offset,
         )
 
+        # Batch calculate can_message for all posts
+        posts_with_owner_ids = [(pwl.post.id, pwl.post.owner_id) for pwl in posts_with_likes]
+        can_message_map = await _calculate_can_message_batch(
+            str(current_user_id),
+            posts_with_owner_ids,
+            session,
+        )
+
+        # Build responses with calculated can_message values
         post_responses = []
         for pwl in posts_with_likes:
-            can_message = await _calculate_can_message(
-                str(current_user_id),
-                pwl.post.owner_id,
-                session,
-            )
+            can_message = can_message_map.get(pwl.post.id, False)
             post_response = await _post_to_response(
                 pwl.post,
                 session,
