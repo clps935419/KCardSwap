@@ -193,7 +193,7 @@ function LoginPageContent({
   })
 
   return (
-    <div className="flex min-h-screen items-center justify-between flex-col bg-gradient-to-b from-slate-50 to-white p-8 py-20">
+    <div className="flex min-h-[100svh] items-center justify-between flex-col bg-gradient-to-b from-slate-50 to-white p-8 py-20">
       {/* Logo Section */}
       <div className="text-center">
         <div className="w-20 h-20 bg-secondary-50 rounded-3xl mx-auto flex items-center justify-center shadow-2xl shadow-secondary-300/30 mb-4 ring-4 ring-secondary-50">
