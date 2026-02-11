@@ -177,7 +177,10 @@ async def _calculate_can_message_batch(
     thread_repo = ThreadRepository(session)
     profile_repo = ProfileRepositoryImpl(session)
     
-    # Batch fetch threads for current user (no limit to ensure all are checked)
+    # Batch fetch threads for current user
+    # Note: Using a high limit (10000) as a pragmatic approach. In practice, most users
+    # will have far fewer threads. If this becomes an issue, we can add a targeted query
+    # to check specific thread existence or implement streaming/pagination.
     threads = await thread_repo.get_threads_for_user(current_user_id, limit=10000)
     thread_user_ids = set()
     for thread in threads:
@@ -220,10 +223,10 @@ async def _calculate_can_message_batch(
     profiles = {}
     if owner_ids:
         owner_uuids = [UUID(oid) for oid in owner_ids]
-        result = await session.execute(
+        profiles_query_result = await session.execute(
             select(ProfileModel).where(ProfileModel.user_id.in_(owner_uuids))
         )
-        profile_models = result.scalars().all()
+        profile_models = profiles_query_result.scalars().all()
         for model in profile_models:
             profiles[str(model.user_id)] = ProfileRepositoryImpl._to_entity(model)
     
