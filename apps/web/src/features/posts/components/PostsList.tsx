@@ -1,11 +1,18 @@
 'use client'
 
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Loader2, Trash2 } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/use-toast'
 import { UserAvatar } from '@/components/ui/user-avatar'
@@ -14,13 +21,12 @@ import { PostImages } from '@/features/media/components/PostImages'
 import { usePostsList } from '@/features/posts/hooks/usePostsList'
 import { useToggleLike } from '@/features/posts/hooks/useToggleLike'
 import type { PostCategory, PostResponse } from '@/shared/api/generated'
-import { useMyProfile } from '@/shared/api/hooks/profile'
 import {
   closePostApiV1PostsPostIdClosePostMutation,
   getPostApiV1PostsPostIdGetQueryKey,
   listPostsApiV1PostsGetQueryKey,
 } from '@/shared/api/generated/@tanstack/react-query.gen'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMyProfile } from '@/shared/api/hooks/profile'
 
 function formatTimeAgo(dateString: string) {
   const date = new Date(dateString)
@@ -95,9 +101,7 @@ export function PostsList() {
         data => {
           if (!data || typeof data !== 'object') return data
           const typed = data as { data?: { posts?: PostResponse[] } }
-          const nextPosts = typed.data?.posts?.filter(
-            post => post.id !== variables.path.post_id
-          )
+          const nextPosts = typed.data?.posts?.filter(post => post.id !== variables.path.post_id)
           return {
             ...typed,
             data: {

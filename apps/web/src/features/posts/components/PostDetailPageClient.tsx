@@ -1,12 +1,19 @@
 'use client'
 
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Loader2, Trash2 } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/use-toast'
 import { useCreateMessageRequest } from '@/features/inbox/hooks/useCreateMessageRequest'
@@ -17,13 +24,12 @@ import { useCreateComment, usePostComments } from '@/features/posts/hooks/useCom
 import { usePost } from '@/features/posts/hooks/usePost'
 import { useToggleLike } from '@/features/posts/hooks/useToggleLike'
 import type { PostCategory } from '@/shared/api/generated'
-import { useMyProfile } from '@/shared/api/hooks/profile'
 import {
   closePostApiV1PostsPostIdClosePostMutation,
   getPostApiV1PostsPostIdGetQueryKey,
   listPostsApiV1PostsGetQueryKey,
 } from '@/shared/api/generated/@tanstack/react-query.gen'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMyProfile } from '@/shared/api/hooks/profile'
 
 const BLUR_DATA_URL =
   'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMSIgaGVpZ2h0PSIxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiNlZWVlZWUiLz48L3N2Zz4='
