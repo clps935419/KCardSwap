@@ -5,16 +5,10 @@
  */
 'use client'
 
-import { useQuery } from '@tanstack/react-query'
-import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { Card } from '@/components/ui/card'
 import { UserAvatar } from '@/components/ui/user-avatar'
 import type { ThreadResponse } from '@/shared/api/generated'
-import {
-  getMyProfileApiV1ProfileMeGetOptions,
-  getMyThreadsApiV1ThreadsGetOptions,
-} from '@/shared/api/generated/@tanstack/react-query.gen'
 
 function formatTimeAgo(dateString: string) {
   const date = new Date(dateString)
@@ -29,18 +23,14 @@ function formatTimeAgo(dateString: string) {
   return `${days} 天前`
 }
 
-export function ThreadsList() {
-  const profileQuery = useQuery({
-    ...getMyProfileApiV1ProfileMeGetOptions(),
-    staleTime: 5 * 60 * 1000,
-    retry: false,
-  })
-  const threadsQuery = useQuery({
-    ...getMyThreadsApiV1ThreadsGetOptions(),
-  })
+interface ThreadsListProps {
+  currentUserId?: string
+  threads?: ThreadResponse[]
+  error?: unknown
+}
 
-  const currentUserId = profileQuery.data?.data?.user_id
-  const threads = threadsQuery.data?.threads ?? []
+export function ThreadsList({ currentUserId, threads: threadsProp, error }: ThreadsListProps) {
+  const threads = threadsProp ?? []
 
   const resolvePeerData = (thread: ThreadResponse) => {
     if (!currentUserId) {
@@ -70,15 +60,7 @@ export function ThreadsList() {
     return `更新於 ${formatTimeAgo(timestamp)}`
   }
 
-  if (threadsQuery.isLoading) {
-    return (
-      <div className="flex justify-center py-12">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-      </div>
-    )
-  }
-
-  if (threadsQuery.error) {
+  if (error) {
     return <div className="text-center text-muted-foreground text-sm py-12">載入聊天時發生錯誤</div>
   }
 

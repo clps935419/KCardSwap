@@ -6,43 +6,32 @@
 
 'use client'
 
-import { useQuery } from '@tanstack/react-query'
-import { Loader2 } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { UserAvatar } from '@/components/ui/user-avatar'
 import type { MessageRequestResponse } from '@/shared/api/generated'
-import { getMySentMessageRequestsApiV1MessageRequestsSentGetOptions } from '@/shared/api/generated/@tanstack/react-query.gen'
 
 interface SentRequestsListProps {
+  requests?: MessageRequestResponse[]
+  error?: unknown
   limit?: number
   showHeader?: boolean
   hideEmpty?: boolean
 }
 
-export function SentRequestsList({ limit, showHeader, hideEmpty }: SentRequestsListProps) {
+export function SentRequestsList({
+  requests: requestsProp,
+  error,
+  limit,
+  showHeader,
+  hideEmpty,
+}: SentRequestsListProps) {
   const [showAll, setShowAll] = useState(false)
 
-  const requestsQueryOptions = getMySentMessageRequestsApiV1MessageRequestsSentGetOptions({
-    query: {
-      status_filter: 'pending',
-    },
-  })
-  const requestsQuery = useQuery({
-    ...requestsQueryOptions,
-  })
-  const requests = (requestsQuery.data ?? []) as MessageRequestResponse[]
+  const requests = requestsProp ?? []
 
-  if (requestsQuery.isLoading) {
-    return (
-      <div className="flex justify-center py-8">
-        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-      </div>
-    )
-  }
-
-  if (requestsQuery.error) {
+  if (error) {
     return (
       <div className="text-center text-muted-foreground text-sm py-8">載入已送出請求時發生錯誤</div>
     )

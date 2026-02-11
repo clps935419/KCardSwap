@@ -6,7 +6,7 @@
 
 'use client'
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -23,12 +23,20 @@ import {
 } from '@/shared/api/generated/@tanstack/react-query.gen'
 
 interface MessageRequestsListProps {
+  requests?: MessageRequestResponse[]
+  error?: unknown
   limit?: number
   showHeader?: boolean
   hideEmpty?: boolean
 }
 
-export function MessageRequestsList({ limit, showHeader, hideEmpty }: MessageRequestsListProps) {
+export function MessageRequestsList({
+  requests: requestsProp,
+  error,
+  limit,
+  showHeader,
+  hideEmpty,
+}: MessageRequestsListProps) {
   const { toast } = useToast()
   const queryClient = useQueryClient()
   const [processingId, setProcessingId] = useState<string | null>(null)
@@ -40,10 +48,7 @@ export function MessageRequestsList({ limit, showHeader, hideEmpty }: MessageReq
       status_filter: 'pending',
     },
   })
-  const requestsQuery = useQuery({
-    ...requestsQueryOptions,
-  })
-  const requests = (requestsQuery.data ?? []) as MessageRequestResponse[]
+  const requests = requestsProp ?? []
 
   const acceptMutation = useMutation({
     ...acceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostMutation(),
@@ -110,15 +115,7 @@ export function MessageRequestsList({ limit, showHeader, hideEmpty }: MessageReq
     }
   }
 
-  if (requestsQuery.isLoading) {
-    return (
-      <div className="flex justify-center py-12">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-      </div>
-    )
-  }
-
-  if (requestsQuery.error) {
+  if (error) {
     return <div className="text-center text-muted-foreground text-sm py-12">載入請求時發生錯誤</div>
   }
 
