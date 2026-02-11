@@ -13,7 +13,6 @@ import { PostImages } from '@/features/media/components/PostImages'
 import { usePostsList } from '@/features/posts/hooks/usePostsList'
 import { useToggleLike } from '@/features/posts/hooks/useToggleLike'
 import type { PostCategory, PostResponse } from '@/shared/api/generated'
-import { useMyProfile } from '@/shared/api/hooks/profile'
 
 function formatTimeAgo(dateString: string) {
   const date = new Date(dateString)
@@ -58,8 +57,6 @@ export function PostsList() {
     cityCode: city === 'ALL' ? undefined : city,
     category,
   })
-  const { data: myProfileData } = useMyProfile()
-  const myUserId = myProfileData?.data?.user_id
 
   const { createRequest } = useCreateMessageRequest()
   const toggleLikeMutation = useToggleLike()

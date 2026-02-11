@@ -16,7 +16,6 @@ import { useCreateComment, usePostComments } from '@/features/posts/hooks/useCom
 import { usePost } from '@/features/posts/hooks/usePost'
 import { useToggleLike } from '@/features/posts/hooks/useToggleLike'
 import type { PostCategory } from '@/shared/api/generated'
-import { useMyProfile } from '@/shared/api/hooks/profile'
 
 const BLUR_DATA_URL =
   'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMSIgaGVpZ2h0PSIxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiNlZWVlZWUiLz48L3N2Zz4='
@@ -63,8 +62,6 @@ export function PostDetailPageClient({ postId }: PostDetailPageClientProps) {
 
   const { data, isLoading, error } = usePost(postId)
   const post = data?.data
-  const { data: myProfileData } = useMyProfile()
-  const myUserId = myProfileData?.data?.user_id
 
   const { createRequest } = useCreateMessageRequest()
   const toggleLikeMutation = useToggleLike()
