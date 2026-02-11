@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/select'
 import { Spinner } from '@/components/ui/spinner'
 import { Textarea } from '@/components/ui/textarea'
+import { MAX_UPLOAD_BYTES_FREE_LIMIT, prepareUploadFile } from '@/lib/media/prepareUploadFile'
 import { mapApiError } from '@/shared/api/errorMapper'
 import type { CityCode, CityResponse, PostCategory, PostScope } from '@/shared/api/generated'
 import {
@@ -41,6 +42,7 @@ export function CreatePostForm() {
   const [uploadProgress, setUploadProgress] = useState<number>(0)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [imageName, setImageName] = useState<string | null>(null)
+  const [preparedImageFile, setPreparedImageFile] = useState<File | null>(null)
   const createPostFlowMutation = useCreatePostFlowMutation()
 
   const {
@@ -70,29 +72,42 @@ export function CreatePostForm() {
   const cities = (citiesQuery.data?.data?.cities ?? []) as CityResponse[]
   const categories = categoriesQuery.data?.data?.categories ?? []
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
+      setErrorMessage('')
+      setPreparedImageFile(null)
+
       // Validate file type
       if (!file.type.startsWith('image/')) {
         setErrorMessage('請選擇圖片檔案')
         return
       }
+      try {
+        const preparedFile = await prepareUploadFile(file, MAX_UPLOAD_BYTES_FREE_LIMIT)
+        setPreparedImageFile(preparedFile)
+        setImageName(preparedFile.name)
 
-      setImageName(file.name)
-
-      // Create preview
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string)
+        // Create preview
+        const reader = new FileReader()
+        reader.onloadend = () => {
+          setImagePreview(reader.result as string)
+        }
+        reader.readAsDataURL(preparedFile)
+      } catch (error) {
+        setErrorMessage(error instanceof Error ? error.message : '圖片處理失敗，請稍後再試')
+        setImagePreview(null)
+        setImageName(null)
+        setValue('image', undefined)
       }
-      reader.readAsDataURL(file)
     }
   }
 
   const removeImage = () => {
     setImagePreview(null)
     setImageName(null)
+    setPreparedImageFile(null)
+    setErrorMessage('')
     setValue('image', undefined)
   }
 
@@ -106,13 +121,14 @@ export function CreatePostForm() {
     }
 
     try {
+      const imageFile = preparedImageFile ?? data.image?.[0]
       await createPostFlowMutation.mutateAsync({
         title: data.title,
         content: data.content,
         scope: data.scope,
         city_code: data.scope === 'city' ? data.city_code || null : null,
         category: data.category,
-        imageFile: data.image?.[0],
+        imageFile,
         onUploadProgress: setUploadProgress,
       })
 
@@ -286,6 +302,9 @@ export function CreatePostForm() {
               {imageName}
             </p>
           )}
+          <p className="text-[11px] text-muted-foreground">
+            免費方案單張上限 2MB，超過會自動壓縮
+          </p>
         </div>
 
         {imagePreview && (

@@ -2,6 +2,7 @@
 
 Tests User Story 3 - Media Upload & Attach (T045).
 """
+
 from uuid import uuid4
 
 import pytest
@@ -115,37 +116,21 @@ class TestMediaUploadConfirmAttach:
     async def test_confirm_upload_exceeds_file_size_quota(
         self,
         create_upload_url_use_case: CreateUploadUrlUseCase,
-        confirm_upload_use_case: ConfirmUploadUseCase,
-        mock_gcs_storage: GCSStorageService,
         test_user_id,
     ):
-        """Test confirmation fails if file size exceeds quota (1MB for free users)."""
-        # Create presign URL for file larger than quota
-        large_file_size = 2 * 1024 * 1024  # 2MB (exceeds 1MB free tier limit)
+        """Test presign fails if file size exceeds quota (2MB for free users)."""
+        large_file_size = 3 * 1024 * 1024  # 3MB (exceeds 2MB free tier limit)
         presign_request = CreateUploadUrlRequest(
             user_id=test_user_id,
             content_type="image/jpeg",
             file_size_bytes=large_file_size,
         )
-        presign_result = await create_upload_url_use_case.execute(presign_request)
-
-        # Simulate upload
-        mock_gcs_storage._mock_storage[presign_result.gcs_blob_name] = {
-            "size": large_file_size,
-            "content_type": "image/jpeg",
-        }
-
-        # Try to confirm - should fail with quota exceeded
-        confirm_request = ConfirmUploadRequest(
-            user_id=test_user_id,
-            media_id=presign_result.media_id,
-        )
 
         with pytest.raises(LimitExceededError) as exc_info:
-            await confirm_upload_use_case.execute(confirm_request)
+            await create_upload_url_use_case.execute(presign_request)
 
         assert exc_info.value.limit_key == "media_file_bytes_max"
-        assert exc_info.value.limit_value == 1 * 1024 * 1024  # 1MB for free users
+        assert exc_info.value.limit_value == 2 * 1024 * 1024  # 2MB for free users
 
     async def test_attach_media_to_post_success(
         self,
@@ -284,7 +269,10 @@ class TestMediaUploadConfirmAttach:
                 file_size_bytes=512000,
             )
         )
-        mock_gcs_storage._mock_storage[presign1.gcs_blob_name] = {"size": 512000, "content_type": "image/jpeg"}
+        mock_gcs_storage._mock_storage[presign1.gcs_blob_name] = {
+            "size": 512000,
+            "content_type": "image/jpeg",
+        }
         await confirm_upload_use_case.execute(
             ConfirmUploadRequest(user_id=test_user_id, media_id=presign1.media_id)
         )
@@ -297,7 +285,10 @@ class TestMediaUploadConfirmAttach:
                 file_size_bytes=409600,
             )
         )
-        mock_gcs_storage._mock_storage[presign2.gcs_blob_name] = {"size": 409600, "content_type": "image/png"}
+        mock_gcs_storage._mock_storage[presign2.gcs_blob_name] = {
+            "size": 409600,
+            "content_type": "image/png",
+        }
         await confirm_upload_use_case.execute(
             ConfirmUploadRequest(user_id=test_user_id, media_id=presign2.media_id)
         )

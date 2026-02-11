@@ -14,10 +14,12 @@ class Settings:
 
     # Database
     DATABASE_URL: str = os.getenv(
-        "DATABASE_URL", "postgresql+asyncpg://postgres:postgres@localhost:5432/kcardswap"
+        "DATABASE_URL",
+        "postgresql+asyncpg://postgres:postgres@localhost:5432/kcardswap",
     )
     TEST_DATABASE_URL: str = os.getenv(
-        "TEST_DATABASE_URL", "postgresql+asyncpg://kcardswap:kcardswap@localhost:5432/kcardswap_test"
+        "TEST_DATABASE_URL",
+        "postgresql+asyncpg://kcardswap:kcardswap@localhost:5432/kcardswap_test",
     )
 
     # JWT
@@ -36,7 +38,9 @@ class Settings:
     REFRESH_COOKIE_NAME: str = os.getenv("REFRESH_COOKIE_NAME", "refresh_token")
     # Cookie security settings
     COOKIE_SAMESITE: str = os.getenv("COOKIE_SAMESITE", "lax")  # lax, strict, none
-    COOKIE_SECURE: bool = os.getenv("COOKIE_SECURE", "false").lower() == "true"  # true for HTTPS
+    COOKIE_SECURE: bool = (
+        os.getenv("COOKIE_SECURE", "false").lower() == "true"
+    )  # true for HTTPS
     COOKIE_HTTPONLY: bool = True  # Always httpOnly for security
     COOKIE_DOMAIN: str | None = os.getenv("COOKIE_DOMAIN")  # None for same-origin
     COOKIE_PATH: str = "/"  # Root path for all cookies
@@ -58,7 +62,7 @@ class Settings:
     FCM_CREDENTIALS_PATH: str | None = os.getenv("FCM_CREDENTIALS_PATH")
 
     # File Upload Limits
-    MAX_FILE_SIZE_MB: int = int(os.getenv("MAX_FILE_SIZE_MB", "10"))
+    MAX_FILE_SIZE_MB: int = int(os.getenv("MAX_FILE_SIZE_MB", "2"))
     DAILY_UPLOAD_LIMIT_FREE: int = int(os.getenv("DAILY_UPLOAD_LIMIT_FREE", "2"))
     TOTAL_STORAGE_GB_FREE: int = int(os.getenv("TOTAL_STORAGE_GB_FREE", "1"))
 

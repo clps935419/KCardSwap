@@ -8,6 +8,7 @@ from uuid import UUID
 
 from app.modules.media.domain.entities.media_asset import MediaAsset, MediaStatus
 from app.modules.media.domain.repositories.i_media_repository import IMediaRepository
+from app.shared.domain.quota.media_quota_service import MediaQuotaService
 from app.shared.infrastructure.external.gcs_storage_service import GCSStorageService
 
 
@@ -37,16 +38,18 @@ class CreateUploadUrlUseCase:
     This is step 1 of the media upload flow: presign → upload → confirm → attach.
 
     FR-006: System must support media upload through presigned URL flow.
-    FR-022: Quota is NOT applied at this stage (only on confirm).
+    FR-022: Usage quota is applied on confirm (file size is checked at presign).
     """
 
     def __init__(
         self,
         media_repository: IMediaRepository,
         storage_service: GCSStorageService,
+        media_quota_service: MediaQuotaService,
     ):
         self.media_repository = media_repository
         self.storage_service = storage_service
+        self.media_quota_service = media_quota_service
 
     async def execute(self, request: CreateUploadUrlRequest) -> CreateUploadUrlResponse:
         """Generate presigned upload URL for user.
@@ -57,6 +60,11 @@ class CreateUploadUrlUseCase:
         Returns:
             Presigned URL and media ID for subsequent confirmation
         """
+        await self.media_quota_service.check_file_size(
+            user_id=request.user_id,
+            file_size_bytes=request.file_size_bytes,
+        )
+
         # Generate unique media ID and blob name
         media_id = uuid.uuid4()
 

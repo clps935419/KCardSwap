@@ -8,6 +8,8 @@
 
 import { useMutation } from '@tanstack/react-query'
 
+import { prepareUploadFile } from '@/lib/media/prepareUploadFile'
+
 import type { CreateUploadUrlRequestSchema } from '../generated'
 import {
   attachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPost,
@@ -57,20 +59,21 @@ export interface UploadFlowOptions {
 
 export async function runUploadFlow(options: UploadFlowOptions): Promise<string> {
   const { file, onProgress } = options
+  const preparedFile = await prepareUploadFile(file)
 
   onProgress?.(10)
 
   const presignResponse = await createUploadUrl({
-    content_type: file.type,
-    file_size_bytes: file.size,
-    filename: file.name,
+    content_type: preparedFile.type,
+    file_size_bytes: preparedFile.size,
+    filename: preparedFile.name,
   })
 
   const { media_id, upload_url } = presignResponse
 
   onProgress?.(30)
 
-  await uploadToGcs(upload_url, file, progress => {
+  await uploadToGcs(upload_url, preparedFile, progress => {
     const overallProgress = 30 + Math.floor(progress * 0.5)
     onProgress?.(overallProgress)
   })

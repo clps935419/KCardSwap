@@ -66,6 +66,9 @@ router = APIRouter(prefix="/media", tags=["media"])
 async def create_upload_url(
     request: CreateUploadUrlRequestSchema,
     session: Annotated[AsyncSession, Depends(get_db_session)],
+    subscription_service: Annotated[
+        ISubscriptionQueryService, Depends(get_subscription_service)
+    ],
     user_id: UUID = Depends(get_current_user_id),
 ):
     """Generate presigned upload URL for media.
@@ -77,19 +80,26 @@ async def create_upload_url(
     """
     media_repository = MediaRepositoryImpl(session)
     storage_service = get_storage_service()
+    media_quota_service = MediaQuotaService(subscription_service)
     use_case = CreateUploadUrlUseCase(
         media_repository=media_repository,
         storage_service=storage_service,
+        media_quota_service=media_quota_service,
     )
 
-    result = await use_case.execute(
-        CreateUploadUrlRequest(
-            user_id=user_id,
-            content_type=request.content_type,
-            file_size_bytes=request.file_size_bytes,
-            filename=request.filename,
+    try:
+        result = await use_case.execute(
+            CreateUploadUrlRequest(
+                user_id=user_id,
+                content_type=request.content_type,
+                file_size_bytes=request.file_size_bytes,
+                filename=request.filename,
+            )
         )
-    )
+    except LimitExceededError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=exc.message
+        )
 
     return CreateUploadUrlResponseSchema(
         media_id=result.media_id,
@@ -238,7 +248,9 @@ async def attach_media_to_gallery_card(
 
         card = await gallery_repository.find_by_id(card_id)
         if not card:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Gallery card not found")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Gallery card not found"
+            )
         if card.user_id != user_id:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -277,7 +289,7 @@ async def get_media_read_urls(
     """Get signed read URLs for multiple media assets.
 
     Phase 9: Login-only access to images with long-lived TTL.
-    
+
     Flow: User requests URLs → Backend generates signed URLs → Frontend displays images
 
     Args:
@@ -286,7 +298,7 @@ async def get_media_read_urls(
 
     Returns:
         Dictionary mapping media_id to signed read URL
-        
+
     Access Control:
         - Requires login (enforced by get_current_user_id)
         - Only confirmed/attached media are accessible

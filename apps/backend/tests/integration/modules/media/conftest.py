@@ -1,6 +1,5 @@
 """Pytest fixtures for media module integration tests."""
 
-
 import pytest
 import pytest_asyncio
 
@@ -59,11 +58,12 @@ def subscription_query_service(db_session):
 
 
 @pytest.fixture
-def create_upload_url_use_case(media_repository, mock_gcs_storage):
+def create_upload_url_use_case(media_repository, mock_gcs_storage, media_quota_service):
     """Create upload URL use case fixture."""
     return CreateUploadUrlUseCase(
         media_repository=media_repository,
         storage_service=mock_gcs_storage,
+        media_quota_service=media_quota_service,
     )
 
 

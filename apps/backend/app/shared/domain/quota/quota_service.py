@@ -46,7 +46,7 @@ QUOTA_LIMITS = {
         SubscriptionTier.PREMIUM: 500,
     },
     QuotaKey.MEDIA_FILE_BYTES_MAX: {
-        SubscriptionTier.FREE: 1 * 1024 * 1024,  # 1MB
+        SubscriptionTier.FREE: 2 * 1024 * 1024,  # 2MB
         SubscriptionTier.PREMIUM: 5 * 1024 * 1024,  # 5MB
     },
     QuotaKey.MEDIA_BYTES_PER_MONTH: {

@@ -39,7 +39,7 @@
 ```json
 {
   "content_type": "image/jpeg",
-  "file_size_bytes": 5242880,
+  "file_size_bytes": 2097152,
   "idol": "IU",
   "idol_group": "Solo",
   "album": "LILAC",
@@ -50,7 +50,7 @@
 
 **後端驗證項目**：
 - Content-Type（必須是 `image/jpeg`、`image/png`、`image/webp`、`image/heic` 或 `image/heif`）
-- 檔案大小（預設 ≤ 10MB）
+- 檔案大小（預設 ≤ 2MB）
 - 每日上傳配額（目前預設：2 張/天）
 - 總容量配額（目前預設：1GB）
 
@@ -121,7 +121,7 @@ GET /api/v1/cards/me
 | Limit | Default Value | Config Variable |
 |-------|---------------|-----------------|
 | Daily uploads | 2 per day | `DAILY_UPLOAD_LIMIT_FREE` |
-| Max file size | 10 MB | `MAX_FILE_SIZE_MB` |
+| Max file size | 2 MB | `MAX_FILE_SIZE_MB` |
 | Total storage | 1 GB | `TOTAL_STORAGE_GB_FREE` |
 
 ### 配額檢查時機

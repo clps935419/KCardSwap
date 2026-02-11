@@ -155,6 +155,14 @@ export const mapApiError = (error: unknown): ApiError => {
     }
   }
 
+  if (error instanceof Error) {
+    return {
+      code: 'CLIENT_ERROR',
+      message: error.message || ERROR_MESSAGES.UNKNOWN_ERROR,
+      statusCode: 0,
+    }
+  }
+
   return {
     code: 'UNKNOWN_ERROR',
     message: ERROR_MESSAGES.UNKNOWN_ERROR,

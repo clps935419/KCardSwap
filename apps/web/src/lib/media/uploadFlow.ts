@@ -7,6 +7,7 @@
  */
 
 import { confirmUpload, createUploadUrl } from '@/shared/api/hooks/media'
+import { prepareUploadFile } from '@/lib/media/prepareUploadFile'
 
 export interface UploadFlowOptions {
   file: File
@@ -29,14 +30,15 @@ export interface UploadFlowResult {
  */
 export async function executeUploadFlow(options: UploadFlowOptions): Promise<string> {
   const { file, onProgress } = options
+  const preparedFile = await prepareUploadFile(file)
 
   // Step 1: Get presigned upload URL using SDK
   onProgress?.(10)
 
   const presignResponse = await createUploadUrl({
-    content_type: file.type,
-    file_size_bytes: file.size,
-    filename: file.name,
+    content_type: preparedFile.type,
+    file_size_bytes: preparedFile.size,
+    filename: preparedFile.name,
   })
 
   const { media_id, upload_url } = presignResponse
@@ -44,7 +46,7 @@ export async function executeUploadFlow(options: UploadFlowOptions): Promise<str
   // Step 2: Upload file to GCS using presigned URL
   onProgress?.(30)
 
-  await uploadToGCS(upload_url, file, progress => {
+  await uploadToGCS(upload_url, preparedFile, progress => {
     // Map GCS upload progress (30-80%) to overall progress
     const overallProgress = 30 + Math.floor(progress * 0.5)
     onProgress?.(overallProgress)

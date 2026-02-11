@@ -9,6 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from '@/component
 import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
 import { Textarea } from '@/components/ui/textarea'
+import { MAX_UPLOAD_BYTES_FREE_LIMIT, prepareUploadFile } from '@/lib/media/prepareUploadFile'
 import { useCreateGalleryCardFlowMutation } from '@/shared/api/hooks/flows'
 
 interface GalleryCreateCardFormProps {
@@ -35,38 +36,55 @@ export function GalleryCreateCardForm({ onSuccess }: GalleryCreateCardFormProps)
 
   const [uploadProgress, setUploadProgress] = useState<number>(0)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [preparedImageFile, setPreparedImageFile] = useState<File | null>(null)
   const createCardFlowMutation = useCreateGalleryCardFlowMutation()
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
+      form.clearErrors('root')
+      setPreparedImageFile(null)
+
       if (!file.type.startsWith('image/')) {
         form.setError('root', { message: 'Please select an image file' })
         return
       }
+      try {
+        const preparedFile = await prepareUploadFile(file, MAX_UPLOAD_BYTES_FREE_LIMIT)
+        setPreparedImageFile(preparedFile)
 
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string)
+        const reader = new FileReader()
+        reader.onloadend = () => {
+          setImagePreview(reader.result as string)
+        }
+        reader.readAsDataURL(preparedFile)
+      } catch (error) {
+        form.setError('root', {
+          message: error instanceof Error ? error.message : '圖片處理失敗，請稍後再試',
+        })
+        setImagePreview(null)
+        form.setValue('image', undefined)
       }
-      reader.readAsDataURL(file)
     }
   }
 
   const removeImage = () => {
     setImagePreview(null)
+    setPreparedImageFile(null)
+    form.clearErrors('root')
     form.setValue('image', undefined)
   }
 
   const onSubmit = async (data: CreateCardFormData) => {
     try {
+      const imageFile = preparedImageFile ?? data.image?.[0]
       setUploadProgress(0)
       await createCardFlowMutation.mutateAsync({
         title: data.title,
         idol_name: data.idol_name,
         era: data.era || undefined,
         description: data.description || undefined,
-        imageFile: data.image?.[0],
+        imageFile,
         onUploadProgress: setUploadProgress,
       })
 
@@ -203,6 +221,9 @@ export function GalleryCreateCardForm({ onSuccess }: GalleryCreateCardFormProps)
                 />
               )
             })()}
+            <p className="text-[11px] text-muted-foreground">
+              免費方案單張上限 2MB，超過會自動壓縮
+            </p>
           </div>
 
           {imagePreview && (
