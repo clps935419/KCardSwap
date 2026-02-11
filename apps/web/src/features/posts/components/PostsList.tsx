@@ -1,10 +1,11 @@
 'use client'
 
-import { Loader2 } from 'lucide-react'
+import { Loader2, Trash2 } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/use-toast'
 import { UserAvatar } from '@/components/ui/user-avatar'
@@ -13,6 +14,13 @@ import { PostImages } from '@/features/media/components/PostImages'
 import { usePostsList } from '@/features/posts/hooks/usePostsList'
 import { useToggleLike } from '@/features/posts/hooks/useToggleLike'
 import type { PostCategory, PostResponse } from '@/shared/api/generated'
+import { useMyProfile } from '@/shared/api/hooks/profile'
+import {
+  closePostApiV1PostsPostIdClosePostMutation,
+  getPostApiV1PostsPostIdGetQueryKey,
+  listPostsApiV1PostsGetQueryKey,
+} from '@/shared/api/generated/@tanstack/react-query.gen'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 function formatTimeAgo(dateString: string) {
   const date = new Date(dateString)
@@ -45,6 +53,11 @@ const CATEGORY_COLORS: Record<PostCategory, string> = {
   announcement: 'bg-purple-50 text-purple-700',
 }
 
+const clampText = (value: string, maxLength: number) => {
+  if (value.length <= maxLength) return value
+  return `${value.slice(0, Math.max(0, maxLength - 1))}…`
+}
+
 export function PostsList() {
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -52,14 +65,82 @@ export function PostsList() {
   const city = searchParams.get('city') || undefined
   const category = searchParams.get('category') as PostCategory | undefined
   const [messagingPostId, setMessagingPostId] = useState<string | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<PostResponse | null>(null)
+  const queryClient = useQueryClient()
 
   const { data, isLoading, error } = usePostsList({
     cityCode: city === 'ALL' ? undefined : city,
     category,
   })
+  const { data: myProfileData } = useMyProfile()
+  const myUserId = myProfileData?.data?.user_id
 
   const { createRequest } = useCreateMessageRequest()
   const toggleLikeMutation = useToggleLike()
+  const closePostMutation = useMutation({
+    ...closePostApiV1PostsPostIdClosePostMutation(),
+    onMutate: async variables => {
+      await queryClient.cancelQueries({
+        queryKey: listPostsApiV1PostsGetQueryKey(),
+        exact: false,
+      })
+
+      const previous = queryClient.getQueriesData({
+        queryKey: listPostsApiV1PostsGetQueryKey(),
+        exact: false,
+      })
+
+      queryClient.setQueriesData(
+        { queryKey: listPostsApiV1PostsGetQueryKey(), exact: false },
+        data => {
+          if (!data || typeof data !== 'object') return data
+          const typed = data as { data?: { posts?: PostResponse[] } }
+          const nextPosts = typed.data?.posts?.filter(
+            post => post.id !== variables.path.post_id
+          )
+          return {
+            ...typed,
+            data: {
+              ...typed.data,
+              posts: nextPosts,
+            },
+          }
+        }
+      )
+
+      setDeleteTarget(null)
+
+      return { previous }
+    },
+    onError: (_error, _variables, context) => {
+      context?.previous?.forEach(([queryKey, data]) => {
+        queryClient.setQueryData(queryKey, data)
+      })
+      toast({
+        title: '刪除失敗',
+        description: '無法刪除貼文，請稍後再試',
+        variant: 'destructive',
+      })
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: listPostsApiV1PostsGetQueryKey(),
+        exact: false,
+      })
+      queryClient.invalidateQueries({
+        queryKey: getPostApiV1PostsPostIdGetQueryKey({
+          path: {
+            post_id: variables.path.post_id,
+          },
+        }),
+      })
+      toast({
+        title: '已刪除',
+        description: '貼文已關閉並從列表移除',
+      })
+      setDeleteTarget(null)
+    },
+  })
 
   const handleMessageAuthor = async (post: PostResponse) => {
     setMessagingPostId(post.id)
@@ -95,6 +176,23 @@ export function PostsList() {
       toast({
         title: '錯誤',
         description: '無法更新按讚狀態，請稍後再試',
+        variant: 'destructive',
+      })
+    }
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return
+    try {
+      await closePostMutation.mutateAsync({
+        path: {
+          post_id: deleteTarget.id,
+        },
+      })
+    } catch (_err) {
+      toast({
+        title: '刪除失敗',
+        description: '無法刪除貼文，請稍後再試',
         variant: 'destructive',
       })
     }
@@ -157,7 +255,9 @@ export function PostsList() {
       {posts.map((post: PostResponse) => {
         const liked = post.liked_by_me ?? false
         const likeCount = post.like_count ?? 0
-        const canMessage = post.can_message ?? false
+        const isOwner = !!myUserId && post.owner_id === myUserId
+        const canMessage = !isOwner && (post.can_message ?? false)
+        const canDelete = isOwner && post.status !== 'closed'
 
         return (
           <Card key={post.id} className="p-4 rounded-2xl shadow-sm border border-border/30 bg-card">
@@ -230,14 +330,14 @@ export function PostsList() {
                 size="sm"
                 onClick={() => handleToggleLike(post.id)}
                 disabled={toggleLikeMutation.isPending}
-                className={`flex items-center gap-2 px-3 py-2 rounded-xl border transition-all ${
+                className={`flex h-9 items-center gap-2 px-4 rounded-xl text-[11px] font-black leading-none border transition-all ${
                   liked
                     ? 'border-secondary-300 bg-secondary-50 text-secondary-900 hover:bg-secondary-50/80'
                     : 'border-border bg-card text-muted-foreground hover:bg-muted'
                 }`}
               >
-                <span className="text-base">{liked ? '💗' : '🤍'}</span>
-                <span className="text-[11px] font-black">
+                <span className="text-base leading-none">{liked ? '💗' : '🤍'}</span>
+                <span className="leading-none">
                   {liked ? '已讚' : '讚'} • {likeCount}
                 </span>
               </Button>
@@ -248,7 +348,7 @@ export function PostsList() {
                   size="sm"
                   onClick={() => handleMessageAuthor(post)}
                   disabled={messagingPostId === post.id}
-                  className="px-4 py-2 rounded-xl bg-slate-900 text-white text-[11px] font-black shadow hover:bg-slate-800"
+                  className="h-9 px-4 rounded-xl bg-slate-900 text-white text-[11px] font-black shadow hover:bg-slate-800"
                 >
                   {messagingPostId === post.id ? (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -256,10 +356,52 @@ export function PostsList() {
                   私信作者
                 </Button>
               )}
+              {canDelete && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setDeleteTarget(post)}
+                  className="h-9 px-4 rounded-xl text-[11px] font-black text-destructive border-destructive/40 hover:bg-destructive/10"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  刪除
+                </Button>
+              )}
             </div>
           </Card>
         )
       })}
+
+      <Dialog open={!!deleteTarget} onOpenChange={open => !open && setDeleteTarget(null)}>
+        <DialogContent className="max-w-sm rounded-3xl border border-border/60 bg-card/95 p-6">
+          <DialogHeader className="text-center">
+            <DialogTitle className="text-lg font-black leading-snug">
+              刪除「
+              {clampText(deleteTarget?.title || '這則貼文', 22)}」？
+            </DialogTitle>
+          </DialogHeader>
+          <DialogFooter className="flex-col gap-2 sm:flex-col sm:space-x-0">
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={handleConfirmDelete}
+              disabled={closePostMutation.isPending}
+              className="h-11 w-full rounded-2xl text-sm font-black"
+            >
+              {closePostMutation.isPending ? '刪除中...' : '確認刪除'}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setDeleteTarget(null)}
+              className="h-11 w-full rounded-2xl text-sm font-black"
+            >
+              取消
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

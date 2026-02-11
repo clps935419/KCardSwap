@@ -1,11 +1,12 @@
 'use client'
 
-import { Loader2 } from 'lucide-react'
+import { Loader2, Trash2 } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/use-toast'
 import { useCreateMessageRequest } from '@/features/inbox/hooks/useCreateMessageRequest'
@@ -16,6 +17,13 @@ import { useCreateComment, usePostComments } from '@/features/posts/hooks/useCom
 import { usePost } from '@/features/posts/hooks/usePost'
 import { useToggleLike } from '@/features/posts/hooks/useToggleLike'
 import type { PostCategory } from '@/shared/api/generated'
+import { useMyProfile } from '@/shared/api/hooks/profile'
+import {
+  closePostApiV1PostsPostIdClosePostMutation,
+  getPostApiV1PostsPostIdGetQueryKey,
+  listPostsApiV1PostsGetQueryKey,
+} from '@/shared/api/generated/@tanstack/react-query.gen'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 const BLUR_DATA_URL =
   'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMSIgaGVpZ2h0PSIxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiNlZWVlZWUiLz48L3N2Zz4='
@@ -36,6 +44,11 @@ const CATEGORY_COLORS: Record<PostCategory, string> = {
   showcase: 'bg-primary-50 text-primary-500',
   help: 'bg-slate-100 text-slate-700',
   announcement: 'bg-purple-50 text-purple-700',
+}
+
+const clampText = (value: string, maxLength: number) => {
+  if (value.length <= maxLength) return value
+  return `${value.slice(0, Math.max(0, maxLength - 1))}…`
 }
 
 function formatTimeAgo(dateString: string) {
@@ -59,12 +72,38 @@ export function PostDetailPageClient({ postId }: PostDetailPageClientProps) {
   const router = useRouter()
   const { toast } = useToast()
   const [messagingPost, setMessagingPost] = useState(false)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const queryClient = useQueryClient()
 
   const { data, isLoading, error } = usePost(postId)
   const post = data?.data
+  const { data: myProfileData } = useMyProfile()
+  const myUserId = myProfileData?.data?.user_id
 
   const { createRequest } = useCreateMessageRequest()
   const toggleLikeMutation = useToggleLike()
+  const closePostMutation = useMutation({
+    ...closePostApiV1PostsPostIdClosePostMutation(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: listPostsApiV1PostsGetQueryKey(),
+        exact: false,
+      })
+      queryClient.invalidateQueries({
+        queryKey: getPostApiV1PostsPostIdGetQueryKey({
+          path: {
+            post_id: postId,
+          },
+        }),
+      })
+      toast({
+        title: '已刪除',
+        description: '貼文已關閉並從列表移除',
+      })
+      setDeleteDialogOpen(false)
+      router.back()
+    },
+  })
 
   // Comments functionality
   const { data: commentsData, isLoading: commentsLoading } = usePostComments(postId, {
@@ -119,6 +158,22 @@ export function PostDetailPageClient({ postId }: PostDetailPageClientProps) {
       toast({
         title: '錯誤',
         description: '無法更新按讚狀態，請稍後再試',
+        variant: 'destructive',
+      })
+    }
+  }
+
+  const handleConfirmDelete = async () => {
+    try {
+      await closePostMutation.mutateAsync({
+        path: {
+          post_id: postId,
+        },
+      })
+    } catch (_err) {
+      toast({
+        title: '刪除失敗',
+        description: '無法刪除貼文，請稍後再試',
         variant: 'destructive',
       })
     }
@@ -210,7 +265,9 @@ export function PostDetailPageClient({ postId }: PostDetailPageClientProps) {
   const isClosed = post.status === 'closed'
   const liked = post.liked_by_me ?? false
   const likeCount = post.like_count ?? 0
-  const canMessage = post.can_message ?? false
+  const isOwner = !!myUserId && post.owner_id === myUserId
+  const canMessage = !isOwner && (post.can_message ?? false)
+  const canDelete = isOwner && !isClosed
   const category = post.category as PostCategory
   const categoryLabel = CATEGORY_LABELS[category] ?? post.category
   const categoryColor = CATEGORY_COLORS[category] ?? 'bg-muted text-muted-foreground'
@@ -324,38 +381,80 @@ export function PostDetailPageClient({ postId }: PostDetailPageClientProps) {
         </div>
 
         {/* Post Actions */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-3">
           <Button
             variant="outline"
             size="sm"
             onClick={handleToggleLike}
             disabled={toggleLikeMutation.isPending}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all ${
+            className={`flex h-9 items-center gap-2 px-4 rounded-xl text-[11px] font-black leading-none border transition-all ${
               liked
                 ? 'border-secondary-300 bg-secondary-50 text-secondary-900 hover:bg-secondary-50/80'
                 : 'border-border bg-card text-muted-foreground hover:bg-muted'
             }`}
           >
-            <span className="text-lg">{liked ? '💗' : '🤍'}</span>
-            <span className="text-[12px] font-black">
+            <span className="text-base leading-none">{liked ? '💗' : '🤍'}</span>
+            <span className="leading-none">
               {liked ? '已讚' : '讚'} • {likeCount}
             </span>
           </Button>
-
-          {canMessage && (
-            <Button
-              variant="default"
-              size="sm"
-              onClick={handleMessageAuthor}
-              disabled={messagingPost}
-              className="px-5 py-2 rounded-xl bg-slate-900 text-white text-[12px] font-black shadow hover:bg-slate-800"
-            >
-              {messagingPost ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-              私信作者
-            </Button>
-          )}
+          <div className="flex items-center gap-2">
+            {canMessage && (
+              <Button
+                variant="default"
+                size="sm"
+                onClick={handleMessageAuthor}
+                disabled={messagingPost}
+                className="h-9 px-4 rounded-xl bg-slate-900 text-white text-[11px] font-black shadow hover:bg-slate-800"
+              >
+                {messagingPost ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                私信作者
+              </Button>
+            )}
+            {canDelete && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setDeleteDialogOpen(true)}
+                className="h-9 px-4 rounded-xl text-[11px] font-black text-destructive border-destructive/40 hover:bg-destructive/10"
+              >
+                <Trash2 className="h-4 w-4" />
+                刪除
+              </Button>
+            )}
+          </div>
         </div>
       </Card>
+
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent className="max-w-sm rounded-3xl border border-border/60 bg-card/95 p-6">
+          <DialogHeader className="text-center">
+            <DialogTitle className="text-lg font-black leading-snug">
+              刪除「{clampText(post.title, 22)}」？
+            </DialogTitle>
+          </DialogHeader>
+          <DialogFooter className="flex-col gap-2 sm:flex-col sm:space-x-0">
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={handleConfirmDelete}
+              disabled={closePostMutation.isPending}
+              className="h-11 w-full rounded-2xl text-sm font-black"
+            >
+              {closePostMutation.isPending ? '刪除中...' : '確認刪除'}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setDeleteDialogOpen(false)}
+              className="h-11 w-full rounded-2xl text-sm font-black"
+            >
+              取消
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Comments Section */}
       <Card className="p-6 rounded-2xl shadow-sm border border-border/30 bg-card">
