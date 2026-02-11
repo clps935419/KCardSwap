@@ -214,6 +214,7 @@ export function PostDetailPageClient({ postId }: PostDetailPageClientProps) {
   const liked = post.liked_by_me ?? false
   const likeCount = post.like_count ?? 0
   const isMyPost = myUserId && post.owner_id === myUserId
+  const canMessage = post.can_message ?? false
   const category = post.category as PostCategory
   const categoryLabel = CATEGORY_LABELS[category] ?? post.category
   const categoryColor = CATEGORY_COLORS[category] ?? 'bg-muted text-muted-foreground'
@@ -345,7 +346,7 @@ export function PostDetailPageClient({ postId }: PostDetailPageClientProps) {
             </span>
           </Button>
 
-          {!isMyPost && (
+          {canMessage && (
             <Button
               variant="default"
               size="sm"

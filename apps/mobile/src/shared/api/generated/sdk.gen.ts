@@ -35,6 +35,9 @@ import type {
   CreatePostApiV1PostsPostData,
   CreatePostApiV1PostsPostErrors,
   CreatePostApiV1PostsPostResponses,
+  CreatePostCommentApiV1PostsPostIdCommentsPostData,
+  CreatePostCommentApiV1PostsPostIdCommentsPostErrors,
+  CreatePostCommentApiV1PostsPostIdCommentsPostResponses,
   CreateUploadUrlApiV1MediaUploadUrlPostData,
   CreateUploadUrlApiV1MediaUploadUrlPostErrors,
   CreateUploadUrlApiV1MediaUploadUrlPostResponses,
@@ -46,6 +49,8 @@ import type {
   DeleteGalleryCardApiV1GalleryCardsCardIdDeleteResponses,
   ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostData,
   ExpireSubscriptionsApiV1SubscriptionsExpireSubscriptionsPostResponses,
+  GetCategoriesApiV1PostsCategoriesGetData,
+  GetCategoriesApiV1PostsCategoriesGetResponses,
   GetChatRoomsApiV1ChatsGetData,
   GetChatRoomsApiV1ChatsGetErrors,
   GetChatRoomsApiV1ChatsGetResponses,
@@ -71,6 +76,9 @@ import type {
   GetMyReportsApiV1ReportsGetData,
   GetMyReportsApiV1ReportsGetErrors,
   GetMyReportsApiV1ReportsGetResponses,
+  GetMySentMessageRequestsApiV1MessageRequestsSentGetData,
+  GetMySentMessageRequestsApiV1MessageRequestsSentGetErrors,
+  GetMySentMessageRequestsApiV1MessageRequestsSentGetResponses,
   GetMyThreadsApiV1ThreadsGetData,
   GetMyThreadsApiV1ThreadsGetErrors,
   GetMyThreadsApiV1ThreadsGetResponses,
@@ -97,6 +105,9 @@ import type {
   GoogleLoginCodeApiV1AuthGoogleLoginCodePostResponses,
   HealthCheckHealthGetData,
   HealthCheckHealthGetResponses,
+  ListPostCommentsApiV1PostsPostIdCommentsGetData,
+  ListPostCommentsApiV1PostsPostIdCommentsGetErrors,
+  ListPostCommentsApiV1PostsPostIdCommentsGetResponses,
   ListPostsApiV1PostsGetData,
   ListPostsApiV1PostsGetErrors,
   ListPostsApiV1PostsGetResponses,
@@ -617,6 +628,20 @@ export const markMessageReadApiV1ChatsRoomIdMessagesMessageIdReadPost = <
   });
 
 /**
+ * Get available post categories
+ *
+ * Returns list of all available post categories with their labels
+ */
+export const getCategoriesApiV1PostsCategoriesGet = <ThrowOnError extends boolean = false>(
+  options?: Options<GetCategoriesApiV1PostsCategoriesGetData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    GetCategoriesApiV1PostsCategoriesGetResponses,
+    unknown,
+    ThrowOnError
+  >({ url: '/api/v1/posts/categories', ...options });
+
+/**
  * List posts (V2: global/city filtering with category)
  *
  * List posts. FR-005: Global view (no city_code) shows all posts; City view (with city_code) shows city-specific posts.
@@ -708,6 +733,42 @@ export const toggleLikeApiV1PostsPostIdLikePost = <ThrowOnError extends boolean 
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/api/v1/posts/{post_id}/like',
     ...options,
+  });
+
+/**
+ * List comments on a post
+ *
+ * Returns list of comments for a post (latest first)
+ */
+export const listPostCommentsApiV1PostsPostIdCommentsGet = <ThrowOnError extends boolean = false>(
+  options: Options<ListPostCommentsApiV1PostsPostIdCommentsGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    ListPostCommentsApiV1PostsPostIdCommentsGetResponses,
+    ListPostCommentsApiV1PostsPostIdCommentsGetErrors,
+    ThrowOnError
+  >({ url: '/api/v1/posts/{post_id}/comments', ...options });
+
+/**
+ * Create a comment on a post
+ *
+ * Create a new comment on the specified post (requires authentication)
+ */
+export const createPostCommentApiV1PostsPostIdCommentsPost = <ThrowOnError extends boolean = false>(
+  options: Options<CreatePostCommentApiV1PostsPostIdCommentsPostData, ThrowOnError>
+) =>
+  (options.client ?? client).post<
+    CreatePostCommentApiV1PostsPostIdCommentsPostResponses,
+    CreatePostCommentApiV1PostsPostIdCommentsPostErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/posts/{post_id}/comments',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**
@@ -997,6 +1058,31 @@ export const getMyMessageRequestsApiV1MessageRequestsInboxGet = <
   >({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/api/v1/message-requests/inbox',
+    ...options,
+  });
+
+/**
+ * Get My Sent Message Requests
+ *
+ * Get message requests sent by the current user.
+ *
+ * Sender typically only needs pending status.
+ *
+ * Query params:
+ * - status_filter: "pending", "accepted", "declined", or "all" (default: "pending")
+ */
+export const getMySentMessageRequestsApiV1MessageRequestsSentGet = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<GetMySentMessageRequestsApiV1MessageRequestsSentGetData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    GetMySentMessageRequestsApiV1MessageRequestsSentGetResponses,
+    GetMySentMessageRequestsApiV1MessageRequestsSentGetErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/message-requests/sent',
     ...options,
   });
 
