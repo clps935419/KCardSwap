@@ -208,7 +208,7 @@ description: "Task list for implementing Posts-first POC (V2)"
 - [ ] T076 [P] 後端：避免 N+1（更新 apps/backend/app/modules/posts/infrastructure/repositories/post_repository.py 加入 eager loading/最佳化）
 - [ ] T077 Web：為「所有頁面需登入」加上 route guard（更新 apps/web/src/middleware.ts 與 apps/web/src/app/(app)/layout.tsx）
 - [ ] T078 Web：確認不出現 NEARBY/TRADE/評分相關 UI/字樣（掃描並更新 apps/web/src/）
-- [ ] T079 後端：更新 OpenAPI 說明與重新生成（更新 openapi/openapi.json）
+- [ ] T079 後端：更新 OpenAPI 說明與重新生成（更新 openapi/openapi.json；需包含新增的公開 profile endpoint：GET /api/v1/profile/{user_id}）
 - [ ] T080 依 specs/001-posts-first-poc/spec.md 的 Success Criteria 撰寫 Demo Checklist（新增 specs/001-posts-first-poc/checklists/demo.md）
 - [ ] T081 [P] 後端：確認/移除 NEARBY/TRADE/評分相關 endpoints 或模組註冊（掃描 apps/backend/app/modules/ 與 openapi/openapi.json；如存在則移除 router 註冊、相關 schemas/use cases、並更新/移除對應測試後重新生成 openapi/openapi.json）
 
@@ -234,6 +234,70 @@ description: "Task list for implementing Posts-first POC (V2)"
 
 - [x] T088 [P] [US3] 建立批次 read URL hook（新增 apps/web/src/features/media/hooks/useReadMediaUrls.ts；輸入 media_asset_ids，回傳 media_id -> url 對照）
 - [x] T089 [US3] 帖文/相簿列表改用 read URL 顯示圖片（更新 apps/web/src/features/posts/components/PostsList.tsx 與 apps/web/src/features/gallery/components/GalleryGrid.tsx；從 PostResponse.media_asset_ids 蒐集並呼叫 read-urls）
+
+---
+
+## Phase 10: User Story 6 - 查看他人個人詳細頁（IG-style：上方個人資訊、下方相簿小卡）(Priority: P2)
+
+**Goal**: 在貼文列表/詳情點擊作者頭像或暱稱 → 進入他人個人詳細頁，顯示公開個人資訊（頭貼/暱稱/自介/地區）與相簿小卡。
+
+**Context / API Gap**:
+- 目前 OpenAPI 有 `/api/v1/profile/me`（僅自己），缺少「查看他人公開 profile」的 endpoint。
+- 「查別人相簿小卡」API 已存在：`GET /api/v1/users/{user_id}/gallery/cards`。
+
+**Independent Test**: A/B 兩帳號；A 設定暱稱/頭貼/自介；B 在貼文列表點 A 的頭像進入個人頁，可見 A 的公開資訊與相簿小卡。
+
+**Recommended Execution Order**:
+1) Backend：先完成公開 profile endpoint（T090→T091→T092）
+2) 更新合約：重新生成並提交 OpenAPI（使用 Phase 8 的 T079）
+3) Web：重新生成 SDK（T097）
+4) Web：補 hook / SSR 預取 / UI / 貼文入口導頁（T093→T094→T095→T096）
+
+### Backend（identity module：Profile）
+
+- [ ] T090 [P] [US6] 新增公開 Profile schema（更新 apps/backend/app/modules/identity/presentation/schemas/profile_schemas.py：PublicProfileResponse/Wrapper，不含 preferences/privacy_flags）
+- [ ] T091 [US6] 新增查看他人公開 Profile endpoint（更新 apps/backend/app/modules/identity/presentation/routers/profile_router.py：GET /api/v1/profile/{user_id}，需登入）
+- [ ] T092 [P] [US6] 後端整合測試：查看他人公開 Profile（新增 apps/backend/tests/integration/modules/identity/test_profile_public_get.py）
+
+### Web（apps/web）
+
+- [ ] T093 [P] [US6] Web：新增/擴充他人 Profile 查詢 hook（更新 apps/web/src/shared/api/hooks/profile.ts：useUserProfile(userId)；使用生成的 TanStack Query options）
+- [ ] T094 [US6] Web：他人個人頁 SSR 預取（更新 apps/web/src/app/(app)/users/[userId]/page.tsx：prefetch 公開 profile + gallery，並用 HydrationBoundary）
+- [ ] T095 [US6] Web：他人個人頁 UI 做成 IG-style（更新 apps/web/src/features/gallery/components/UserProfilePageClient.tsx：上方頭貼+個人資訊，下方沿用 GalleryGrid；缺資料時 skeleton/空值處理）
+- [ ] T096 [US6] Web：貼文作者入口可導到他人頁（更新 apps/web/src/features/posts/components/PostsList.tsx 與 apps/web/src/features/posts/components/PostDetailPageClient.tsx：作者頭像/暱稱可點擊導到 /users/{owner_id}）
+- [ ] T097 [P] [US6] Web：更新 SDK 產物以取得新 endpoint（更新 apps/web/src/shared/api/generated/；執行 apps/web/package.json 的 sdk:generate）
+
+---
+
+## Phase 11: API Response Envelope 統一（前後端對齊）
+
+**Goal**: 統一「有回傳 JSON body 的 2xx responses」格式為 `{ data, meta, error }` envelope，以降低前端特判與 SDK 型別分歧。
+
+**Non-Goals / Exceptions**:
+- `204 No Content`、或本來就沒有 response body / 沒有 `application/json` 的 endpoints：維持現狀，不強制包 envelope。
+
+**Recommended Execution Order**:
+1) 建立共用 DTO（T098）
+2) 後端逐步套用到目標 endpoints（T099）
+3) 同步更新/補齊測試（T100）
+4) 重新生成並提交 OpenAPI（T101）
+5) Web 重新生成 SDK（T102）
+6) Web 更新 hooks/features 取值路徑（T103）
+
+### Backend（shared DTO + 逐步套用）
+
+- [ ] T098 [P] 新增共用 Response Envelope DTO（新增 apps/backend/app/shared/presentation/schemas/response_envelope.py：ResponseEnvelope[TData] 或等價泛型/具體類別；提供 meta/error 介面）
+- [ ] T099 後端：套用到 POC 核心 endpoints（更新各 module 的 presentation schemas + routers，將目前 bare/inline 的 2xx JSON 改為 envelope 回應；不改 204）
+- [ ] T100 [P] 後端：更新/補齊對應整合測試（調整既有 tests assertions 以匹配 envelope；必要時新增缺漏測試）
+
+### OpenAPI / SDK
+
+- [ ] T101 重新生成並提交 OpenAPI（更新 openapi/openapi.json；反映 envelope 結構變更與 Phase 10 新增 GET /api/v1/profile/{user_id}）
+- [ ] T102 [P] Web：重新生成 SDK（更新 apps/web/src/shared/api/generated/；執行 apps/web 的 sdk:generate）
+
+### Web（hooks / UI 對齊 envelope）
+
+- [ ] T103 Web：更新使用到 bare/inline response 的 hooks（更新 apps/web/src/shared/api/hooks/ 與 apps/web/src/features/* 取值路徑，統一改用 `.data` envelope）
 
 ---
 

@@ -7,6 +7,8 @@
 
 本 POC 以 Web 端完成「貼文為核心入口」的最小可用產品：需登入才能瀏覽與互動；貼文支援 global/city 發布與篩選；貼文可附圖（授權→上傳→確認→綁定）；互動包含 Like 與私信作者（IG 式 Message Requests + Inbox）；並提供可管理的個人小卡相簿（新增/刪除/排序）。所有貼文圖片與相簿圖片合併計入統一媒體配額，且只在 confirm 成功時計入。
 
+補強互動閉環：在貼文列表/詳情點擊作者頭像或暱稱，可進入「他人個人詳細頁」（UI 風格類 IG：上方頭貼+個人資訊、下方相簿小卡）。
+
 ## Technical Context
 
 **Language/Version**: TypeScript（Web）；Python 3.11+（Backend）  
@@ -105,6 +107,7 @@ gateway/
 - Like：按讚/取消
 - Inbox：Requests/Threads 列表、Thread 訊息列表、發送訊息（可帶 post_id）
 - Profile：個人頁、相簿小卡列表、相簿管理（新增/刪除/排序）
+- 他人個人頁：從貼文作者入口進入，顯示公開個人資訊 + 相簿小卡（IG 樣式）
 
 ### Phase 3 — Verification & Demo (1–2 days)
 
