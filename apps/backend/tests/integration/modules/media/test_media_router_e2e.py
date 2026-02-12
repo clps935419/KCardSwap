@@ -88,7 +88,14 @@ class TestMediaRouterE2E:
 
         assert response.status_code == 201
 
-        data = response.json()
+        # Check envelope structure
+        json_response = response.json()
+        assert "data" in json_response
+        assert "meta" in json_response
+        assert "error" in json_response
+        assert json_response["error"] is None
+
+        data = json_response["data"]
         assert "media_id" in data
         assert "upload_url" in data
         assert "expires_in_minutes" in data

@@ -137,7 +137,14 @@ class TestMessageRequestsRouterE2E:
         assert response.status_code in [201, 400]
 
         if response.status_code == 201:
-            data = response.json()
+            # Check envelope structure
+            json_response = response.json()
+            assert "data" in json_response
+            assert "meta" in json_response
+            assert "error" in json_response
+            assert json_response["error"] is None
+
+            data = json_response["data"]
             # Note: sender_id should match test_user1, not the client object
             assert "sender_id" in data
             assert data["recipient_id"] == str(test_user2)
@@ -248,7 +255,15 @@ class TestMessageRequestsRouterE2E:
         response = authenticated_client_user1.get("/api/v1/message-requests/inbox")
 
         assert response.status_code == 200
-        data = response.json()
+        
+        # Check envelope structure
+        json_response = response.json()
+        assert "data" in json_response
+        assert "meta" in json_response
+        assert "error" in json_response
+        assert json_response["error"] is None
+
+        data = json_response["data"]
         assert isinstance(data, list)
 
     def test_get_inbox_with_status_filter(self, authenticated_client_user1):
@@ -258,7 +273,14 @@ class TestMessageRequestsRouterE2E:
         )
 
         assert response.status_code == 200
-        data = response.json()
+        
+        # Check envelope structure
+        json_response = response.json()
+        assert "data" in json_response
+        assert "meta" in json_response
+        assert "error" in json_response
+
+        data = json_response["data"]
         assert isinstance(data, list)
 
     def test_get_inbox_unauthorized(self, unauthenticated_client):

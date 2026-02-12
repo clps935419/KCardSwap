@@ -106,7 +106,15 @@ class TestThreadsRouterE2E:
         response = authenticated_client_user1.get("/api/v1/threads")
 
         assert response.status_code == 200
-        data = response.json()
+        
+        # Check envelope structure
+        json_response = response.json()
+        assert "data" in json_response
+        assert "meta" in json_response
+        assert "error" in json_response
+        assert json_response["error"] is None
+
+        data = json_response["data"]
         assert "threads" in data
         assert isinstance(data["threads"], list)
 
@@ -121,7 +129,14 @@ class TestThreadsRouterE2E:
         response = authenticated_client_user1.get("/api/v1/threads?limit=10&offset=0")
 
         assert response.status_code == 200
-        data = response.json()
+        
+        # Check envelope structure
+        json_response = response.json()
+        assert "data" in json_response
+        assert "meta" in json_response
+        assert "error" in json_response
+
+        data = json_response["data"]
         assert "threads" in data
         assert "total" in data
 
@@ -150,7 +165,14 @@ class TestThreadsRouterE2E:
         response = authenticated_client_user1.get("/api/v1/threads")
 
         assert response.status_code == 200
-        data = response.json()
+        
+        # Check envelope structure
+        json_response = response.json()
+        assert "data" in json_response
+        assert "meta" in json_response
+        assert "error" in json_response
+
+        data = json_response["data"]
         assert "threads" in data
         assert len(data["threads"]) > 0
 
@@ -178,7 +200,15 @@ class TestThreadsRouterE2E:
         )
 
         assert response.status_code == 200
-        data = response.json()
+        
+        # Check envelope structure
+        json_response = response.json()
+        assert "data" in json_response
+        assert "meta" in json_response
+        assert "error" in json_response
+        assert json_response["error"] is None
+
+        data = json_response["data"]
         assert "messages" in data
         assert isinstance(data["messages"], list)
 
@@ -191,7 +221,14 @@ class TestThreadsRouterE2E:
         )
 
         assert response.status_code == 200
-        data = response.json()
+        
+        # Check envelope structure
+        json_response = response.json()
+        assert "data" in json_response
+        assert "meta" in json_response
+        assert "error" in json_response
+
+        data = json_response["data"]
         assert "messages" in data
         assert "total" in data
 
@@ -222,7 +259,15 @@ class TestThreadsRouterE2E:
         )
 
         assert response.status_code == 201
-        data = response.json()
+        
+        # Check envelope structure
+        json_response = response.json()
+        assert "data" in json_response
+        assert "meta" in json_response
+        assert "error" in json_response
+        assert json_response["error"] is None
+
+        data = json_response["data"]
         assert data["content"] == payload["content"]
         assert "id" in data
         assert "sender_id" in data
@@ -242,7 +287,14 @@ class TestThreadsRouterE2E:
         )
 
         assert response.status_code == 201
-        data = response.json()
+        
+        # Check envelope structure
+        json_response = response.json()
+        assert "data" in json_response
+        assert "meta" in json_response
+        assert "error" in json_response
+
+        data = json_response["data"]
         assert data["content"] == payload["content"]
         assert "post_id" in data
 
@@ -334,7 +386,14 @@ class TestThreadsRouterE2E:
         )
 
         assert response.status_code == 200
-        data = response.json()
+        
+        # Check envelope structure
+        json_response = response.json()
+        assert "data" in json_response
+        assert "meta" in json_response
+        assert "error" in json_response
+
+        data = json_response["data"]
         assert "messages" in data
         assert len(data["messages"]) >= 3
 

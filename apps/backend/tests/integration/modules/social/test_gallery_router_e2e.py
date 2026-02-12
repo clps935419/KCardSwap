@@ -108,7 +108,15 @@ class TestGalleryRouterE2E:
         response = authenticated_client.get("/api/v1/gallery/cards/me")
 
         assert response.status_code == 200
-        data = response.json()
+        
+        # Check envelope structure
+        json_response = response.json()
+        assert "data" in json_response
+        assert "meta" in json_response
+        assert "error" in json_response
+        assert json_response["error"] is None
+
+        data = json_response["data"]
         assert "items" in data
         assert "total" in data
         assert isinstance(data["items"], list)
@@ -134,7 +142,15 @@ class TestGalleryRouterE2E:
         response = authenticated_client.post("/api/v1/gallery/cards", json=payload)
 
         assert response.status_code == 201
-        data = response.json()
+        
+        # Check envelope structure
+        json_response = response.json()
+        assert "data" in json_response
+        assert "meta" in json_response
+        assert "error" in json_response
+        assert json_response["error"] is None
+
+        data = json_response["data"]
         assert data["title"] == payload["title"]
         assert data["idol_name"] == payload["idol_name"]
         assert data["era"] == payload["era"]
@@ -168,7 +184,14 @@ class TestGalleryRouterE2E:
         response = authenticated_client.get(f"/api/v1/users/{test_user}/gallery/cards")
 
         assert response.status_code == 200
-        data = response.json()
+        
+        # Check envelope structure
+        json_response = response.json()
+        assert "data" in json_response
+        assert "meta" in json_response
+        assert "error" in json_response
+
+        data = json_response["data"]
         assert "items" in data
         assert "total" in data
 
