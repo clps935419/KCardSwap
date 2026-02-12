@@ -42,6 +42,7 @@ import {
   getSubscriptionStatusApiV1SubscriptionsStatusGet,
   getThreadMessagesApiV1ThreadsThreadIdMessagesGet,
   getUserGalleryCardsApiV1UsersUserIdGalleryCardsGet,
+  getUserProfileApiV1ProfileUserIdGet,
   googleCallbackApiV1AuthGoogleCallbackPost,
   googleLoginApiV1AuthGoogleLoginPost,
   googleLoginCodeApiV1AuthGoogleLoginCodePost,
@@ -151,6 +152,9 @@ import type {
   GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetData,
   GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetError,
   GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetResponse,
+  GetUserProfileApiV1ProfileUserIdGetData,
+  GetUserProfileApiV1ProfileUserIdGetError,
+  GetUserProfileApiV1ProfileUserIdGetResponse,
   GoogleCallbackApiV1AuthGoogleCallbackPostData,
   GoogleCallbackApiV1AuthGoogleCallbackPostResponse,
   GoogleLoginApiV1AuthGoogleLoginPostData,
@@ -543,6 +547,36 @@ export const updateMyProfileApiV1ProfileMePutMutation = (
   };
   return mutationOptions;
 };
+
+export const getUserProfileApiV1ProfileUserIdGetQueryKey = (
+  options: Options<GetUserProfileApiV1ProfileUserIdGetData>
+) => createQueryKey('getUserProfileApiV1ProfileUserIdGet', options);
+
+/**
+ * Get user profile
+ *
+ * Retrieve another user's profile information
+ */
+export const getUserProfileApiV1ProfileUserIdGetOptions = (
+  options: Options<GetUserProfileApiV1ProfileUserIdGetData>
+) =>
+  queryOptions<
+    GetUserProfileApiV1ProfileUserIdGetResponse,
+    GetUserProfileApiV1ProfileUserIdGetError,
+    GetUserProfileApiV1ProfileUserIdGetResponse,
+    ReturnType<typeof getUserProfileApiV1ProfileUserIdGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getUserProfileApiV1ProfileUserIdGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getUserProfileApiV1ProfileUserIdGetQueryKey(options),
+  });
 
 export const getIdolGroupsApiV1IdolsGroupsGetQueryKey = (
   options?: Options<GetIdolGroupsApiV1IdolsGroupsGetData>

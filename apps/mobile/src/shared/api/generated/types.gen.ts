@@ -2311,6 +2311,46 @@ export type UpdateMyProfileApiV1ProfileMePutResponses = {
 export type UpdateMyProfileApiV1ProfileMePutResponse =
   UpdateMyProfileApiV1ProfileMePutResponses[keyof UpdateMyProfileApiV1ProfileMePutResponses];
 
+export type GetUserProfileApiV1ProfileUserIdGetData = {
+  body?: never;
+  path: {
+    /**
+     * User Id
+     */
+    user_id: string;
+  };
+  query?: never;
+  url: '/api/v1/profile/{user_id}';
+};
+
+export type GetUserProfileApiV1ProfileUserIdGetErrors = {
+  /**
+   * Unauthorized
+   */
+  401: unknown;
+  /**
+   * Profile not found
+   */
+  404: unknown;
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type GetUserProfileApiV1ProfileUserIdGetError =
+  GetUserProfileApiV1ProfileUserIdGetErrors[keyof GetUserProfileApiV1ProfileUserIdGetErrors];
+
+export type GetUserProfileApiV1ProfileUserIdGetResponses = {
+  /**
+   * Successfully retrieved user profile
+   */
+  200: ProfileResponseWrapper;
+};
+
+export type GetUserProfileApiV1ProfileUserIdGetResponse =
+  GetUserProfileApiV1ProfileUserIdGetResponses[keyof GetUserProfileApiV1ProfileUserIdGetResponses];
+
 export type GetIdolGroupsApiV1IdolsGroupsGetData = {
   body?: never;
   path?: never;
