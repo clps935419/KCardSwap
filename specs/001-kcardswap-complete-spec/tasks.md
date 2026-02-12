@@ -1202,12 +1202,70 @@ Group M5: US5 Mobile (Expo) - Trade
 
 ---
 
+## Phase 10: User Story 6 Extended - 查看他人個人詳細頁 (Priority: P2)
+
+**目的**: 實作 Instagram 風格的使用者個人檔案頁面，可查看其他使用者的個人資訊與相簿小卡（Web 端）
+
+### Backend 實作
+
+- [x] T206 [P] [US6-EXT] 新增 GET /api/v1/profile/{user_id} endpoint：允許查看其他使用者的公開個人檔案
+  - 路徑：apps/backend/app/modules/identity/presentation/routers/profile_router.py
+  - 重用現有的 GetProfileUseCase
+  - 使用標準 ProfileResponse schema
+  - 需要認證但不限制查看權限
+
+- [x] T207 [P] [US6-EXT] 更新 OpenAPI 規格：執行 generate_openapi.py 產生新的 API 文件
+  - 路徑：openapi/openapi.json
+
+- [x] T208 [P] [US6-EXT] 新增 Profile Router 整合測試：測試查看他人 profile 功能
+  - 路徑：apps/backend/tests/integration/modules/identity/test_profile_router_e2e.py
+  - 測試案例：成功查看、不存在的使用者、未認證訪問
+
+### Web 前端實作
+
+- [x] W101 [P] [US6-EXT] 重新生成 Web SDK：整合新的 profile endpoint
+  - 執行：cd apps/web && npm run sdk:generate
+  - 路徑：apps/web/src/shared/api/generated/
+
+- [x] W102 [P] [US6-EXT] 新增 useUserProfile hook：封裝 getUserProfile API 呼叫
+  - 路徑：apps/web/src/shared/api/hooks/profile.ts
+  - 使用 TanStack Query 管理資料狀態
+  - 設定 5 分鐘 staleTime
+
+- [x] W103 [P] [US6-EXT] 建立 ProfileHeader 元件：IG 風格的個人資訊卡片
+  - 路徑：apps/web/src/features/profile/components/ProfileHeader.tsx
+  - 使用 shadcn/ui Card 元件
+  - 顯示：頭像（UserAvatar）、暱稱、ID、簡介、地區
+  - 統計資訊區域（預留：小卡數、交易數、朋友數）
+
+- [x] W104 [US6-EXT] 更新 UserProfilePageClient：整合 profile 資料顯示
+  - 路徑：apps/web/src/features/gallery/components/UserProfilePageClient.tsx
+  - 使用 useUserProfile 和 useUserGalleryCards hooks
+  - 並行載入 profile 和 gallery 資料
+  - 完整的 loading 和 error 狀態處理
+  - 整合 ProfileHeader 元件
+
+- [x] W105 [US6-EXT] 新增 SSR 預取：優化使用者個人檔案頁面載入速度
+  - 路徑：apps/web/src/app/(app)/users/[userId]/page.tsx
+  - Server Component 預取 profile 和 gallery 資料
+  - 使用 HydrationBoundary 實現 SSR + CSR hydration
+
+- [x] W106 [US6-EXT] 貼文頭像可點擊導向個人檔案：增強使用者互動
+  - 路徑：apps/web/src/features/posts/components/PostsList.tsx
+  - 路徑：apps/web/src/features/posts/components/PostDetailPageClient.tsx
+  - 路徑：apps/web/src/features/posts/components/CommentsList.tsx
+  - 使用 Next.js Link 包裹頭像和暱稱
+  - 點擊導向 `/users/{userId}` 查看完整個人檔案
+  - 新增 hover 效果提示可點擊
+
+---
+
 ## Summary（摘要）
 
 ### Statistics（統計）
 
-- **Total Tasks**: 228 (Backend) + 13 (Mobile Phase 1M) + 6 (Mobile Tooling: Phase 1M.1) + Mobile US tasks = 247+
-- **Completed**: 96 (Backend: Phase 1: 8/8, Phase 2: 20/20, Phase 3: 35/37, Phase 6: 33/33) + 13 (Mobile: Phase 1M: 13/13) + 3 (Mobile: Phase 3: 3/4) = 112
+- **Total Tasks**: 231 (Backend: includes Phase 10 T206-T208) + 13 (Mobile Phase 1M) + 6 (Mobile Tooling: Phase 1M.1) + Mobile US tasks + 6 (Phase 10 Web: W101-W106) = 256+
+- **Completed**: 96 (Backend: Phase 1: 8/8, Phase 2: 20/20, Phase 3: 35/37, Phase 6: 33/33) + 13 (Mobile: Phase 1M: 13/13) + 3 (Mobile: Phase 3: 3/4) + 3 (Phase 10 Backend: T206-T208) + 6 (Phase 10 Web: W101-W106) = 121
 - **Remaining**: 132 (Backend) + Mobile US tasks (M104, M201-M704)
 - **Estimated Duration**: 8 weeks (remaining sprints)
 
@@ -1233,6 +1291,8 @@ Group M5: US5 Mobile (Expo) - Trade
 | 8 | US6 - Subscription | 17 | P2 | ⏸️ Not Started |
 | 8.5 | US7 - Board Posts | 23 | P2 | ⏸️ Not Started |
 | 9 | Polish | 14 | - | ⏸️ Not Started |
+| 10 | US6-EXT - User Profile View (Backend) | 3 | P2 | ✅ 100% Complete (T206-T208) |
+| 10 | US6-EXT - User Profile View (Web) | 6 | P2 | ✅ 100% Complete (W101-W106) |
 
 ### MVP Scope（MVP 範圍）
 

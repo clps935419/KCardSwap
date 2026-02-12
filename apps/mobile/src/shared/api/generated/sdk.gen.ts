@@ -94,6 +94,9 @@ import type {
   GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetData,
   GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetErrors,
   GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetResponses,
+  GetUserProfileApiV1ProfileUserIdGetData,
+  GetUserProfileApiV1ProfileUserIdGetErrors,
+  GetUserProfileApiV1ProfileUserIdGetResponses,
   GoogleCallbackApiV1AuthGoogleCallbackPostData,
   GoogleCallbackApiV1AuthGoogleCallbackPostErrors,
   GoogleCallbackApiV1AuthGoogleCallbackPostResponses,
@@ -352,6 +355,24 @@ export const updateMyProfileApiV1ProfileMePut = <ThrowOnError extends boolean = 
       'Content-Type': 'application/json',
       ...options.headers,
     },
+  });
+
+/**
+ * Get user profile
+ *
+ * Retrieve another user's profile information
+ */
+export const getUserProfileApiV1ProfileUserIdGet = <ThrowOnError extends boolean = false>(
+  options: Options<GetUserProfileApiV1ProfileUserIdGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    GetUserProfileApiV1ProfileUserIdGetResponses,
+    GetUserProfileApiV1ProfileUserIdGetErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/profile/{user_id}',
+    ...options,
   });
 
 /**

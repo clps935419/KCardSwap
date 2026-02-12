@@ -2,6 +2,7 @@
 
 import { Loader2 } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { Card } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { CommentResponse } from '@/shared/api/generated'
@@ -69,31 +70,39 @@ export function CommentsList({ comments, isLoading }: CommentsListProps) {
             }`}
           >
             <div className="flex items-start gap-3">
-              {/* Avatar */}
-              <div className="w-8 h-8 bg-primary-50 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden">
-                {comment.user_avatar_url ? (
-                  <Image
-                    src={comment.user_avatar_url}
-                    alt={comment.user_nickname || '使用者'}
-                    width={32}
-                    height={32}
-                    sizes="32px"
-                    unoptimized
-                    placeholder="blur"
-                    blurDataURL={BLUR_DATA_URL}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <span className="text-lg">👤</span>
-                )}
-              </div>
+              {/* Avatar - clickable */}
+              <Link 
+                href={`/users/${comment.user_id}`}
+                className="hover:opacity-80 transition-opacity"
+              >
+                <div className="w-8 h-8 bg-primary-50 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden">
+                  {comment.user_avatar_url ? (
+                    <Image
+                      src={comment.user_avatar_url}
+                      alt={comment.user_nickname || '使用者'}
+                      width={32}
+                      height={32}
+                      sizes="32px"
+                      unoptimized
+                      placeholder="blur"
+                      blurDataURL={BLUR_DATA_URL}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-lg">👤</span>
+                  )}
+                </div>
+              </Link>
 
               {/* Comment content */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-xs font-bold text-foreground">
+                  <Link 
+                    href={`/users/${comment.user_id}`}
+                    className="text-xs font-bold text-foreground hover:underline"
+                  >
                     {comment.user_nickname || `使用者 ${comment.user_id.toString().slice(0, 8)}`}
-                  </span>
+                  </Link>
                   <span className="text-[10px] text-muted-foreground">
                     {formatTimeAgo(comment.created_at)}
                   </span>

@@ -77,6 +77,56 @@ async def get_my_profile(
     return ProfileResponseWrapper(data=profile_response, meta=None, error=None)
 
 
+@router.get(
+    "/{user_id}",
+    response_model=ProfileResponseWrapper,
+    status_code=status.HTTP_200_OK,
+    responses={
+        200: {"description": "Successfully retrieved user profile"},
+        401: {"description": "Unauthorized"},
+        404: {"description": "Profile not found"},
+    },
+    summary="Get user profile",
+    description="Retrieve another user's profile information",
+)
+async def get_user_profile(
+    user_id: UUID,
+    current_user_id: Annotated[UUID, Depends(get_current_user)],
+    use_case: Annotated[GetProfileUseCase, Depends(get_get_profile_use_case)],
+) -> ProfileResponseWrapper:
+    """
+    Get another user's profile by user ID.
+
+    Requires authentication (Bearer token).
+    Returns public profile information.
+    """
+    # Execute use case
+    profile = await use_case.execute(user_id)
+
+    if profile is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"code": "NOT_FOUND", "message": "Profile not found"},
+        )
+
+    # Build response (same as get_my_profile)
+    profile_response = ProfileResponse(
+        id=profile.id,
+        user_id=profile.user_id,
+        nickname=profile.nickname,
+        avatar_url=profile.avatar_url,
+        bio=profile.bio,
+        region=profile.region,
+        preferences=profile.preferences or {},
+        privacy_flags=profile.privacy_flags
+        or {"show_online": True, "allow_stranger_chat": True},
+        created_at=profile.created_at,
+        updated_at=profile.updated_at,
+    )
+
+    return ProfileResponseWrapper(data=profile_response, meta=None, error=None)
+
+
 @router.put(
     "/me",
     response_model=ProfileResponseWrapper,

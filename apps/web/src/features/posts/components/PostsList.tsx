@@ -2,6 +2,7 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Loader2, Trash2 } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
@@ -267,7 +268,10 @@ export function PostsList() {
           <Card key={post.id} className="p-4 rounded-2xl shadow-sm border border-border/30 bg-card">
             {/* Post Header */}
             <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
+              <Link 
+                href={`/users/${post.owner_id}`}
+                className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+              >
                 <UserAvatar
                   nickname={post.owner_nickname}
                   avatarUrl={post.owner_avatar_url}
@@ -283,7 +287,7 @@ export function PostsList() {
                     {formatTimeAgo(post.created_at)} • {post.id.slice(0, 8)}
                   </p>
                 </div>
-              </div>
+              </Link>
               <div className="flex items-center gap-2">
                 <span
                   className={`${CATEGORY_COLORS[post.category as PostCategory]} text-[10px] px-2 py-1 rounded-full font-black`}

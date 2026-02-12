@@ -3,6 +3,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Loader2, Trash2 } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
@@ -295,7 +296,10 @@ export function PostDetailPageClient({ postId }: PostDetailPageClientProps) {
       <Card className="p-6 rounded-2xl shadow-sm border border-border/30 bg-card">
         {/* Post Header */}
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
+          <Link 
+            href={`/users/${post.owner_id}`}
+            className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+          >
             <div className="w-10 h-10 bg-primary-50 rounded-full flex items-center justify-center overflow-hidden">
               {post.owner_avatar_url ? (
                 <Image
@@ -321,7 +325,7 @@ export function PostDetailPageClient({ postId }: PostDetailPageClientProps) {
                 {formatTimeAgo(post.created_at)} • {post.id.slice(0, 8)}
               </p>
             </div>
-          </div>
+          </Link>
           <div className="flex items-center gap-2">
             <span className={`${categoryColor} text-[10px] px-3 py-1 rounded-full font-black`}>
               {categoryLabel}
