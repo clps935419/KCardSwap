@@ -26,7 +26,7 @@ export async function createUploadUrl(data: CreateUploadUrlRequestSchema) {
     body: data,
     throwOnError: true,
   })
-  return response.data
+  return response.data.data
 }
 
 /**
@@ -39,7 +39,7 @@ export async function confirmUpload(mediaId: string) {
     },
     throwOnError: true,
   })
-  return response.data
+  return response.data.data
 }
 
 export interface AttachMediaToPostInput {
@@ -128,7 +128,7 @@ export async function attachMediaToPost(postId: string, mediaId: string) {
     },
     throwOnError: true,
   })
-  return response.data
+  return response.data.data
 }
 
 export async function attachMediaToGalleryCard(cardId: string, mediaId: string) {
@@ -141,7 +141,7 @@ export async function attachMediaToGalleryCard(cardId: string, mediaId: string) 
     },
     throwOnError: true,
   })
-  return response.data
+  return response.data.data
 }
 
 async function uploadToGcs(

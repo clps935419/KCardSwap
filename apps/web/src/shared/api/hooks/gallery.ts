@@ -15,13 +15,14 @@ import {
 import type { AxiosError } from 'axios'
 import type {
   CreateGalleryCardApiV1GalleryCardsPostError,
-  CreateGalleryCardApiV1GalleryCardsPostResponse,
   CreateGalleryCardRequest,
+  GalleryCardListResponse,
+  GalleryCardResponse,
   GetMyGalleryCardsApiV1GalleryCardsMeGetError,
   GetMyGalleryCardsApiV1GalleryCardsMeGetResponse,
   GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetError,
   GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetResponse,
-  ReorderGalleryCardsApiV1GalleryCardsReorderPutResponse,
+  ReorderGalleryCardsResponse,
 } from '../generated'
 import {
   createGalleryCardApiV1GalleryCardsPost,
@@ -36,6 +37,7 @@ import {
 
 /**
  * Hook to fetch current user's gallery cards
+ * @returns Query result with envelope format. Access data via `data?.data`
  */
 export function useMyGalleryCards(
   options?: Omit<
@@ -65,6 +67,7 @@ export function useMyGalleryCards(
 
 /**
  * Hook to fetch another user's gallery cards
+ * @returns Query result with envelope format. Access data via `data?.data`
  */
 export function useUserGalleryCards(
   userId: string,
@@ -103,7 +106,7 @@ export function useUserGalleryCards(
  */
 export function useCreateGalleryCard(
   options?: UseMutationOptions<
-    CreateGalleryCardApiV1GalleryCardsPostResponse,
+    GalleryCardResponse,
     AxiosError<CreateGalleryCardApiV1GalleryCardsPostError>,
     CreateGalleryCardRequest
   >
@@ -111,7 +114,7 @@ export function useCreateGalleryCard(
   const queryClient = useQueryClient()
 
   return useMutation<
-    CreateGalleryCardApiV1GalleryCardsPostResponse,
+    GalleryCardResponse,
     AxiosError<CreateGalleryCardApiV1GalleryCardsPostError>,
     CreateGalleryCardRequest
   >({
@@ -120,7 +123,7 @@ export function useCreateGalleryCard(
         body: data,
         throwOnError: true,
       })
-      return response.data as CreateGalleryCardApiV1GalleryCardsPostResponse
+      return response.data.data as GalleryCardResponse
     },
     onSuccess: (...args) => {
       queryClient.invalidateQueries({
@@ -170,7 +173,10 @@ export function useDeleteGalleryCard(options?: UseMutationOptions<void, Error, s
       if (previousData) {
         queryClient.setQueryData<GetMyGalleryCardsApiV1GalleryCardsMeGetResponse>(queryKey, {
           ...previousData,
-          items: previousData.items.filter(card => card.id !== cardId),
+          data: {
+            ...previousData.data,
+            items: previousData.data.items.filter(card => card.id !== cardId),
+          },
         })
       }
 
@@ -197,11 +203,7 @@ export function useDeleteGalleryCard(options?: UseMutationOptions<void, Error, s
  * Hook to reorder gallery cards
  */
 export function useReorderGalleryCards(
-  options?: UseMutationOptions<
-    ReorderGalleryCardsApiV1GalleryCardsReorderPutResponse,
-    Error,
-    string[]
-  >
+  options?: UseMutationOptions<ReorderGalleryCardsResponse, Error, string[]>
 ) {
   const queryClient = useQueryClient()
 
@@ -213,7 +215,7 @@ export function useReorderGalleryCards(
         },
         throwOnError: true,
       })
-      return response.data as ReorderGalleryCardsApiV1GalleryCardsReorderPutResponse
+      return response.data.data as ReorderGalleryCardsResponse
     },
     onSuccess: (...args) => {
       queryClient.invalidateQueries({
