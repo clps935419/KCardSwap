@@ -1204,7 +1204,7 @@ Group M5: US5 Mobile (Expo) - Trade
 
 ## Phase 10: User Story 6 Extended - 查看他人個人詳細頁 (Priority: P2)
 
-**目的**: 實作 Instagram 風格的使用者個人檔案頁面，可查看其他使用者的個人資訊與相簿小卡
+**目的**: 實作 Instagram 風格的使用者個人檔案頁面，可查看其他使用者的個人資訊與相簿小卡（Web 端）
 
 ### Backend 實作
 
@@ -1221,28 +1221,34 @@ Group M5: US5 Mobile (Expo) - Trade
   - 路徑：apps/backend/tests/integration/modules/identity/test_profile_router_e2e.py
   - 測試案例：成功查看、不存在的使用者、未認證訪問
 
-### Mobile 前端實作
+### Web 前端實作
 
-- [x] M106 [P] [US6-EXT] 重新生成 Mobile SDK：整合新的 profile endpoint
-  - 執行：npm run sdk:clean && npm run sdk:generate
+- [x] W101 [P] [US6-EXT] 重新生成 Web SDK：整合新的 profile endpoint
+  - 執行：cd apps/web && npm run sdk:generate
+  - 路徑：apps/web/src/shared/api/generated/
 
-- [x] M107 [P] [US6-EXT] 建立 ProfileHeader 元件：IG 風格的個人資訊卡片
-  - 路徑：apps/mobile/src/features/profile/components/ProfileHeader.tsx
-  - 顯示：頭像、暱稱、簡介、地區、統計資訊
+- [x] W102 [P] [US6-EXT] 新增 useUserProfile hook：封裝 getUserProfile API 呼叫
+  - 路徑：apps/web/src/shared/api/hooks/profile.ts
+  - 使用 TanStack Query 管理資料狀態
+  - 設定 5 分鐘 staleTime
 
-- [x] M108 [P] [US6-EXT] 建立 CardGrid 元件：相簿網格顯示（3列）
-  - 路徑：apps/mobile/src/features/profile/components/CardGrid.tsx
-  - 整合 gallery cards API
-  - IG 風格的網格佈局
+- [x] W103 [P] [US6-EXT] 建立 ProfileHeader 元件：IG 風格的個人資訊卡片
+  - 路徑：apps/web/src/features/profile/components/ProfileHeader.tsx
+  - 使用 shadcn/ui Card 元件
+  - 顯示：頭像（UserAvatar）、暱稱、ID、簡介、地區
+  - 統計資訊區域（預留：小卡數、交易數、朋友數）
 
-- [x] M109 [US6-EXT] 建立 UserProfileScreen：組合 ProfileHeader + CardGrid
-  - 路徑：apps/mobile/src/features/profile/screens/UserProfileScreen.tsx
-  - 整合 getUserProfile 和 getUserGalleryCards APIs
-  - 包含發送訊息、封鎖使用者等操作
+- [x] W104 [US6-EXT] 更新 UserProfilePageClient：整合 profile 資料顯示
+  - 路徑：apps/web/src/features/gallery/components/UserProfilePageClient.tsx
+  - 使用 useUserProfile 和 useUserGalleryCards hooks
+  - 並行載入 profile 和 gallery 資料
+  - 完整的 loading 和 error 狀態處理
+  - 整合 ProfileHeader 元件
 
-- [x] M110 [US6-EXT] 更新 FriendProfileScreen：使用新的 UserProfileScreen
-  - 路徑：apps/mobile/app/friends/[userId].tsx
-  - 簡化為重導至 UserProfileScreen
+- [x] W105 [US6-EXT] 新增 SSR 預取：優化使用者個人檔案頁面載入速度
+  - 路徑：apps/web/src/app/(app)/users/[userId]/page.tsx
+  - Server Component 預取 profile 和 gallery 資料
+  - 使用 HydrationBoundary 實現 SSR + CSR hydration
 
 ---
 
@@ -1250,8 +1256,8 @@ Group M5: US5 Mobile (Expo) - Trade
 
 ### Statistics（統計）
 
-- **Total Tasks**: 231 (Backend: includes Phase 10 T206-T208) + 13 (Mobile Phase 1M) + 6 (Mobile Tooling: Phase 1M.1) + Mobile US tasks + 5 (Phase 10 Mobile: M106-M110) = 255+
-- **Completed**: 96 (Backend: Phase 1: 8/8, Phase 2: 20/20, Phase 3: 35/37, Phase 6: 33/33) + 13 (Mobile: Phase 1M: 13/13) + 3 (Mobile: Phase 3: 3/4) + 3 (Phase 10 Backend: T206-T208) + 5 (Phase 10 Mobile: M106-M110) = 120
+- **Total Tasks**: 231 (Backend: includes Phase 10 T206-T208) + 13 (Mobile Phase 1M) + 6 (Mobile Tooling: Phase 1M.1) + Mobile US tasks + 5 (Phase 10 Web: W101-W105) = 255+
+- **Completed**: 96 (Backend: Phase 1: 8/8, Phase 2: 20/20, Phase 3: 35/37, Phase 6: 33/33) + 13 (Mobile: Phase 1M: 13/13) + 3 (Mobile: Phase 3: 3/4) + 3 (Phase 10 Backend: T206-T208) + 5 (Phase 10 Web: W101-W105) = 120
 - **Remaining**: 132 (Backend) + Mobile US tasks (M104, M201-M704)
 - **Estimated Duration**: 8 weeks (remaining sprints)
 
@@ -1278,7 +1284,7 @@ Group M5: US5 Mobile (Expo) - Trade
 | 8.5 | US7 - Board Posts | 23 | P2 | ⏸️ Not Started |
 | 9 | Polish | 14 | - | ⏸️ Not Started |
 | 10 | US6-EXT - User Profile View (Backend) | 3 | P2 | ✅ 100% Complete (T206-T208) |
-| 10 | US6-EXT - User Profile View (Mobile) | 5 | P2 | ✅ 100% Complete (M106-M110) |
+| 10 | US6-EXT - User Profile View (Web) | 5 | P2 | ✅ 100% Complete (W101-W105) |
 
 ### MVP Scope（MVP 範圍）
 
