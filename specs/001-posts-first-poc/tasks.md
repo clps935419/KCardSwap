@@ -286,18 +286,18 @@ description: "Task list for implementing Posts-first POC (V2)"
 
 ### Backend（shared DTO + 逐步套用）
 
-- [ ] T098 [P] 新增共用 Response Envelope DTO（新增 apps/backend/app/shared/presentation/schemas/response_envelope.py：ResponseEnvelope[TData] 或等價泛型/具體類別；提供 meta/error 介面）
-- [ ] T099 後端：套用到 POC 核心 endpoints（更新各 module 的 presentation schemas + routers，將目前 bare/inline 的 2xx JSON 改為 envelope 回應；不改 204）
-- [ ] T100 [P] 後端：更新/補齊對應整合測試（調整既有 tests assertions 以匹配 envelope；必要時新增缺漏測試）
+- [x] T098 [P] 新增共用 Response Envelope DTO（新增 apps/backend/app/shared/presentation/schemas/response_envelope.py：ResponseEnvelope[TData] 或等價泛型/具體類別；提供 meta/error 介面）
+- [x] T099 後端：套用到 POC 核心 endpoints（更新各 module 的 presentation schemas + routers，將目前 bare/inline 的 2xx JSON 改為 envelope 回應；不改 204）
+- [x] T100 [P] 後端：更新/補齊對應整合測試（調整既有 tests assertions 以匹配 envelope；必要時新增缺漏測試）
 
 ### OpenAPI / SDK
 
-- [ ] T101 重新生成並提交 OpenAPI（更新 openapi/openapi.json；反映 envelope 結構變更與 Phase 10 新增 GET /api/v1/profile/{user_id}）
-- [ ] T102 [P] Web：重新生成 SDK（更新 apps/web/src/shared/api/generated/；執行 apps/web 的 sdk:generate）
+- [x] T101 重新生成並提交 OpenAPI（更新 openapi/openapi.json；反映 envelope 結構變更與 Phase 10 新增 GET /api/v1/profile/{user_id}）
+- [x] T102 [P] Web：重新生成 SDK（更新 apps/web/src/shared/api/generated/；執行 apps/web 的 sdk:generate）
 
 ### Web（hooks / UI 對齊 envelope）
 
-- [ ] T103 Web：更新使用到 bare/inline response 的 hooks（更新 apps/web/src/shared/api/hooks/ 與 apps/web/src/features/* 取值路徑，統一改用 `.data` envelope）
+- [x] T103 Web：更新使用到 bare/inline response 的 hooks（更新 apps/web/src/shared/api/hooks/ 與 apps/web/src/features/* 取值路徑，統一改用 `.data` envelope）
 
 ---
 

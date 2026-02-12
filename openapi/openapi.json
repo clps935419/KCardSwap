@@ -267,7 +267,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RefreshSuccessResponse"
+                  "$ref": "#/components/schemas/RefreshSuccessResponseWrapper"
                 }
               }
             }
@@ -302,7 +302,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RefreshSuccessResponse"
+                  "$ref": "#/components/schemas/RefreshSuccessResponseWrapper"
                 }
               }
             }
@@ -1972,7 +1972,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GalleryCardListResponse"
+                  "$ref": "#/components/schemas/GalleryCardListResponseWrapper"
                 }
               }
             }
@@ -2027,7 +2027,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GalleryCardListResponse"
+                  "$ref": "#/components/schemas/GalleryCardListResponseWrapper"
                 }
               }
             }
@@ -2092,7 +2092,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GalleryCardResponse"
+                  "$ref": "#/components/schemas/GalleryCardResponseWrapper"
                 }
               }
             }
@@ -2215,7 +2215,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ReorderGalleryCardsResponse"
+                  "$ref": "#/components/schemas/ReorderGalleryCardsResponseWrapper"
                 }
               }
             }
@@ -2280,7 +2280,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreateUploadUrlResponseSchema"
+                  "$ref": "#/components/schemas/CreateUploadUrlResponseWrapper"
                 }
               }
             }
@@ -2345,7 +2345,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ConfirmUploadResponseSchema"
+                  "$ref": "#/components/schemas/ConfirmUploadResponseWrapper"
                 }
               }
             }
@@ -2420,7 +2420,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AttachMediaResponseSchema"
+                  "$ref": "#/components/schemas/AttachMediaResponseWrapper"
                 }
               }
             }
@@ -2495,7 +2495,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AttachMediaResponseSchema"
+                  "$ref": "#/components/schemas/AttachMediaResponseWrapper"
                 }
               }
             }
@@ -2625,7 +2625,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/MessageRequestResponse"
+                  "$ref": "#/components/schemas/MessageRequestResponseWrapper"
                 }
               }
             }
@@ -2690,11 +2690,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MessageRequestResponse"
-                  },
-                  "title": "Response Get My Message Requests Api V1 Message Requests Inbox Get"
+                  "$ref": "#/components/schemas/MessageRequestListResponseWrapper"
                 }
               }
             }
@@ -2759,11 +2755,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MessageRequestResponse"
-                  },
-                  "title": "Response Get My Sent Message Requests Api V1 Message Requests Sent Get"
+                  "$ref": "#/components/schemas/MessageRequestListResponseWrapper"
                 }
               }
             }
@@ -2827,7 +2819,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AcceptRequestResponse"
+                  "$ref": "#/components/schemas/AcceptRequestResponseWrapper"
                 }
               }
             }
@@ -2891,7 +2883,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/MessageRequestResponse"
+                  "$ref": "#/components/schemas/MessageRequestResponseWrapper"
                 }
               }
             }
@@ -2969,7 +2961,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ThreadListResponse"
+                  "$ref": "#/components/schemas/ThreadListResponseWrapper"
                 }
               }
             }
@@ -3056,7 +3048,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ThreadMessagesResponse"
+                  "$ref": "#/components/schemas/ThreadMessagesResponseWrapper"
                 }
               }
             }
@@ -3128,7 +3120,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ThreadMessageResponse"
+                  "$ref": "#/components/schemas/ThreadMessageResponseWrapper"
                 }
               }
             }
@@ -3165,6 +3157,27 @@
         ],
         "title": "AcceptRequestResponse",
         "description": "Response for accepting a request"
+      },
+      "AcceptRequestResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/AcceptRequestResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "AcceptRequestResponseWrapper",
+        "description": "Response wrapper for accept request (standardized envelope)"
       },
       "AdminLoginRequest": {
         "properties": {
@@ -3224,6 +3237,27 @@
         ],
         "title": "AttachMediaResponseSchema",
         "description": "Response schema after attaching media."
+      },
+      "AttachMediaResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/AttachMediaResponseSchema"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "AttachMediaResponseWrapper",
+        "description": "Response wrapper for attach media (standardized envelope)"
       },
       "AttachMediaToGalleryCardRequestSchema": {
         "properties": {
@@ -3725,6 +3759,27 @@
         "title": "ConfirmUploadResponseSchema",
         "description": "Response schema after confirming upload."
       },
+      "ConfirmUploadResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ConfirmUploadResponseSchema"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "ConfirmUploadResponseWrapper",
+        "description": "Response wrapper for confirm upload (standardized envelope)"
+      },
       "CreateCommentRequest": {
         "properties": {
           "content": {
@@ -4013,6 +4068,27 @@
         "title": "CreateUploadUrlResponseSchema",
         "description": "Response schema for upload URL."
       },
+      "CreateUploadUrlResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/CreateUploadUrlResponseSchema"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "CreateUploadUrlResponseWrapper",
+        "description": "Response wrapper for upload URL (standardized envelope)"
+      },
       "ExpireSubscriptionsData": {
         "properties": {
           "expired_count": {
@@ -4080,6 +4156,27 @@
         ],
         "title": "GalleryCardListResponse",
         "description": "Response for a list of gallery cards."
+      },
+      "GalleryCardListResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/GalleryCardListResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "GalleryCardListResponseWrapper",
+        "description": "Response wrapper for gallery card list (standardized envelope)"
       },
       "GalleryCardResponse": {
         "properties": {
@@ -4162,6 +4259,27 @@
         ],
         "title": "GalleryCardResponse",
         "description": "Response for a single gallery card."
+      },
+      "GalleryCardResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/GalleryCardResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "GalleryCardResponseWrapper",
+        "description": "Response wrapper for single gallery card (standardized envelope)"
       },
       "GoogleCallbackRequest": {
         "properties": {
@@ -4343,6 +4461,31 @@
         "title": "LoginResponse",
         "description": "Response wrapper for successful login (standardized envelope)"
       },
+      "MessageRequestListResponseWrapper": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/MessageRequestResponse"
+            },
+            "type": "array",
+            "title": "Data"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "MessageRequestListResponseWrapper",
+        "description": "Response wrapper for message request list (standardized envelope)"
+      },
       "MessageRequestResponse": {
         "properties": {
           "id": {
@@ -4456,6 +4599,27 @@
         ],
         "title": "MessageRequestResponse",
         "description": "Response for a message request"
+      },
+      "MessageRequestResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/MessageRequestResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "MessageRequestResponseWrapper",
+        "description": "Response wrapper for message request (standardized envelope)"
       },
       "MessageResponse": {
         "properties": {
@@ -5224,6 +5388,27 @@
         "title": "RefreshSuccessResponse",
         "description": "Response for successful token refresh (cookie-based)"
       },
+      "RefreshSuccessResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/RefreshSuccessResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "RefreshSuccessResponseWrapper",
+        "description": "Response wrapper for successful token refresh (standardized envelope)"
+      },
       "ReorderGalleryCardsRequest": {
         "properties": {
           "card_ids": {
@@ -5261,6 +5446,27 @@
         ],
         "title": "ReorderGalleryCardsResponse",
         "description": "Response after reordering gallery cards."
+      },
+      "ReorderGalleryCardsResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ReorderGalleryCardsResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "ReorderGalleryCardsResponseWrapper",
+        "description": "Response wrapper for reorder response (standardized envelope)"
       },
       "ReportListResponse": {
         "properties": {
@@ -5544,6 +5750,27 @@
         "title": "ThreadListResponse",
         "description": "Response for list of threads"
       },
+      "ThreadListResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ThreadListResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "ThreadListResponseWrapper",
+        "description": "Response wrapper for thread list (standardized envelope)"
+      },
       "ThreadMessageResponse": {
         "properties": {
           "id": {
@@ -5613,6 +5840,27 @@
         "title": "ThreadMessageResponse",
         "description": "Response for a thread message"
       },
+      "ThreadMessageResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ThreadMessageResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "ThreadMessageResponseWrapper",
+        "description": "Response wrapper for thread message (standardized envelope)"
+      },
       "ThreadMessagesResponse": {
         "properties": {
           "messages": {
@@ -5634,6 +5882,27 @@
         ],
         "title": "ThreadMessagesResponse",
         "description": "Response for list of messages in a thread"
+      },
+      "ThreadMessagesResponseWrapper": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ThreadMessagesResponse"
+          },
+          "meta": {
+            "type": "null",
+            "title": "Meta"
+          },
+          "error": {
+            "type": "null",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "ThreadMessagesResponseWrapper",
+        "description": "Response wrapper for thread messages list (standardized envelope)"
       },
       "ThreadResponse": {
         "properties": {

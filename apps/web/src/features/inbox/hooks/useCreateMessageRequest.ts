@@ -32,7 +32,7 @@ export function useCreateMessageRequest() {
         },
         throwOnError: true,
       })
-      return response.data as MessageRequestResponse
+      return response.data.data as MessageRequestResponse
     },
     onSuccess: () => {
       queryClient.invalidateQueries({

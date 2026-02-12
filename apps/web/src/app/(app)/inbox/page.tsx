@@ -44,10 +44,10 @@ export default function InboxPage() {
     profileQuery.isLoading ||
     threadsQuery.isLoading
 
-  const messageRequests = (messageRequestsQuery.data ?? []) as MessageRequestResponse[]
-  const sentRequests = (sentRequestsQuery.data ?? []) as MessageRequestResponse[]
+  const messageRequests = (messageRequestsQuery.data?.data ?? []) as MessageRequestResponse[]
+  const sentRequests = (sentRequestsQuery.data?.data ?? []) as MessageRequestResponse[]
   const currentUserId = profileQuery.data?.data?.user_id
-  const threads = threadsQuery.data?.threads ?? []
+  const threads = threadsQuery.data?.data?.threads ?? []
   const hasRequests = messageRequests.length > 0 || sentRequests.length > 0
 
   if (isPageLoading) {

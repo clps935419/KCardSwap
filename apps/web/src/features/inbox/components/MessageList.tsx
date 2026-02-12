@@ -41,7 +41,7 @@ export function MessageList({ threadId }: MessageListProps) {
   })
 
   const currentUserId = profileQuery.data?.data?.user_id
-  const messages = (messagesQuery.data?.messages ?? []) as ThreadMessageResponse[]
+  const messages = (messagesQuery.data?.data?.messages ?? []) as ThreadMessageResponse[]
 
   useEffect(() => {
     // Scroll to bottom when messages change

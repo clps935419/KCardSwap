@@ -34,7 +34,7 @@ export function useSendMessage() {
         },
         throwOnError: true,
       })
-      return response.data as ThreadMessageResponse
+      return response.data.data as ThreadMessageResponse
     },
     onSuccess: (_data, params) => {
       queryClient.invalidateQueries({

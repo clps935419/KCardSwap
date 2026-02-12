@@ -22,9 +22,12 @@ from app.modules.social.infrastructure.repositories.gallery_card_repository impo
 from app.modules.social.presentation.schemas.gallery_schemas import (
     CreateGalleryCardRequest,
     GalleryCardListResponse,
+    GalleryCardListResponseWrapper,
     GalleryCardResponse,
+    GalleryCardResponseWrapper,
     ReorderGalleryCardsRequest,
     ReorderGalleryCardsResponse,
+    ReorderGalleryCardsResponseWrapper,
 )
 from app.shared.infrastructure.database.connection import get_db_session
 from app.shared.presentation.deps.require_user import require_user
@@ -44,7 +47,7 @@ def get_gallery_card_repository(
 
 @router.get(
     "/users/{user_id}/gallery/cards",
-    response_model=GalleryCardListResponse,
+    response_model=GalleryCardListResponseWrapper,
     status_code=status.HTTP_200_OK,
     summary="Get user's gallery cards",
     description="View another user's public gallery cards (requires authentication).",
@@ -53,30 +56,34 @@ async def get_user_gallery_cards(
     user_id: UUID,
     current_user_id: Annotated[UUID, Depends(require_user)],
     repository: Annotated[IGalleryCardRepository, Depends(get_gallery_card_repository)],
-) -> GalleryCardListResponse:
+):
     """Get a user's gallery cards."""
     try:
         cards = await repository.find_by_user_id(user_id)
         total = await repository.count_by_user_id(user_id)
 
-        return GalleryCardListResponse(
-            items=[
-                GalleryCardResponse(
-                    id=card.id,
-                    user_id=card.user_id,
-                    title=card.title,
-                    idol_name=card.idol_name,
-                    era=card.era,
-                    description=card.description,
-                    media_asset_id=card.media_asset_id,
-                    display_order=card.display_order,
-                    created_at=card.created_at,
-                    updated_at=card.updated_at,
-                )
-                for card in cards
-            ],
-            total=total,
-        )
+        return {
+            "data": GalleryCardListResponse(
+                items=[
+                    GalleryCardResponse(
+                        id=card.id,
+                        user_id=card.user_id,
+                        title=card.title,
+                        idol_name=card.idol_name,
+                        era=card.era,
+                        description=card.description,
+                        media_asset_id=card.media_asset_id,
+                        display_order=card.display_order,
+                        created_at=card.created_at,
+                        updated_at=card.updated_at,
+                    )
+                    for card in cards
+                ],
+                total=total,
+            ),
+            "meta": None,
+            "error": None,
+        }
     except Exception as e:
         logger.error(f"Error getting user gallery cards: {e}")
         raise HTTPException(
@@ -87,7 +94,7 @@ async def get_user_gallery_cards(
 
 @router.get(
     "/gallery/cards/me",
-    response_model=GalleryCardListResponse,
+    response_model=GalleryCardListResponseWrapper,
     status_code=status.HTTP_200_OK,
     summary="Get my gallery cards",
     description="Get the authenticated user's own gallery cards.",
@@ -95,7 +102,7 @@ async def get_user_gallery_cards(
 async def get_my_gallery_cards(
     current_user_id: Annotated[UUID, Depends(require_user)],
     repository: Annotated[IGalleryCardRepository, Depends(get_gallery_card_repository)],
-) -> GalleryCardListResponse:
+):
     """Get the current user's gallery cards."""
     user_id = current_user_id
 
@@ -103,24 +110,28 @@ async def get_my_gallery_cards(
         cards = await repository.find_by_user_id(user_id)
         total = await repository.count_by_user_id(user_id)
 
-        return GalleryCardListResponse(
-            items=[
-                GalleryCardResponse(
-                    id=card.id,
-                    user_id=card.user_id,
-                    title=card.title,
-                    idol_name=card.idol_name,
-                    era=card.era,
-                    description=card.description,
-                    media_asset_id=card.media_asset_id,
-                    display_order=card.display_order,
-                    created_at=card.created_at,
-                    updated_at=card.updated_at,
-                )
-                for card in cards
-            ],
-            total=total,
-        )
+        return {
+            "data": GalleryCardListResponse(
+                items=[
+                    GalleryCardResponse(
+                        id=card.id,
+                        user_id=card.user_id,
+                        title=card.title,
+                        idol_name=card.idol_name,
+                        era=card.era,
+                        description=card.description,
+                        media_asset_id=card.media_asset_id,
+                        display_order=card.display_order,
+                        created_at=card.created_at,
+                        updated_at=card.updated_at,
+                    )
+                    for card in cards
+                ],
+                total=total,
+            ),
+            "meta": None,
+            "error": None,
+        }
     except Exception as e:
         logger.error(f"Error getting my gallery cards: {e}")
         raise HTTPException(
@@ -131,7 +142,7 @@ async def get_my_gallery_cards(
 
 @router.post(
     "/gallery/cards",
-    response_model=GalleryCardResponse,
+    response_model=GalleryCardResponseWrapper,
     status_code=status.HTTP_201_CREATED,
     summary="Create gallery card",
     description="Create a new gallery card in the user's personal album.",
@@ -140,7 +151,7 @@ async def create_gallery_card(
     request: CreateGalleryCardRequest,
     current_user_id: Annotated[UUID, Depends(require_user)],
     repository: Annotated[IGalleryCardRepository, Depends(get_gallery_card_repository)],
-) -> GalleryCardResponse:
+):
     """Create a new gallery card."""
     user_id = current_user_id
 
@@ -162,18 +173,22 @@ async def create_gallery_card(
 
         created_card = await repository.create(new_card)
 
-        return GalleryCardResponse(
-            id=created_card.id,
-            user_id=created_card.user_id,
-            title=created_card.title,
-            idol_name=created_card.idol_name,
-            era=created_card.era,
-            description=created_card.description,
-            media_asset_id=created_card.media_asset_id,
-            display_order=created_card.display_order,
-            created_at=created_card.created_at,
-            updated_at=created_card.updated_at,
-        )
+        return {
+            "data": GalleryCardResponse(
+                id=created_card.id,
+                user_id=created_card.user_id,
+                title=created_card.title,
+                idol_name=created_card.idol_name,
+                era=created_card.era,
+                description=created_card.description,
+                media_asset_id=created_card.media_asset_id,
+                display_order=created_card.display_order,
+                created_at=created_card.created_at,
+                updated_at=created_card.updated_at,
+            ),
+            "meta": None,
+            "error": None,
+        }
     except Exception as e:
         logger.error(f"Error creating gallery card: {e}")
         raise HTTPException(
@@ -233,7 +248,7 @@ async def delete_gallery_card(
 
 @router.put(
     "/gallery/cards/reorder",
-    response_model=ReorderGalleryCardsResponse,
+    response_model=ReorderGalleryCardsResponseWrapper,
     status_code=status.HTTP_200_OK,
     summary="Reorder gallery cards",
     description="Update the display order of gallery cards.",
@@ -242,7 +257,7 @@ async def reorder_gallery_cards(
     request: ReorderGalleryCardsRequest,
     current_user_id: Annotated[UUID, Depends(require_user)],
     repository: Annotated[IGalleryCardRepository, Depends(get_gallery_card_repository)],
-) -> ReorderGalleryCardsResponse:
+):
     """Reorder gallery cards."""
     user_id = current_user_id
 
@@ -250,10 +265,14 @@ async def reorder_gallery_cards(
         use_case = ReorderGalleryCardsUseCase(repository)
         updated_cards = await use_case.execute(user_id, request.card_ids)
 
-        return ReorderGalleryCardsResponse(
-            message="Gallery cards reordered successfully",
-            updated_count=len(updated_cards),
-        )
+        return {
+            "data": ReorderGalleryCardsResponse(
+                message="Gallery cards reordered successfully",
+                updated_count=len(updated_cards),
+            ),
+            "meta": None,
+            "error": None,
+        }
     except ValueError as e:
         logger.warning(f"Invalid reorder request: {e}")
         raise HTTPException(

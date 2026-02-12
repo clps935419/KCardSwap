@@ -94,7 +94,7 @@ export function UserProfilePageClient({ userId }: UserProfilePageClientProps) {
         )}
 
         {galleryData && (
-          <GalleryGrid cards={galleryData.items || []} isOwner={false} variant="wall" />
+          <GalleryGrid cards={galleryData.data.items || []} isOwner={false} variant="wall" />
         )}
       </div>
     </div>

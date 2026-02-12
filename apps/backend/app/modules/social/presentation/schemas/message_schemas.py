@@ -116,3 +116,60 @@ class InboxResponse(BaseModel):
 
     requests: list[MessageRequestResponse]
     threads: list[ThreadResponse]
+
+
+# Envelope wrappers for standardized responses
+class MessageRequestResponseWrapper(BaseModel):
+    """Response wrapper for message request (standardized envelope)"""
+
+    data: MessageRequestResponse
+    meta: None = None
+    error: None = None
+
+
+class AcceptRequestResponseWrapper(BaseModel):
+    """Response wrapper for accept request (standardized envelope)"""
+
+    data: AcceptRequestResponse
+    meta: None = None
+    error: None = None
+
+
+class ThreadResponseWrapper(BaseModel):
+    """Response wrapper for thread (standardized envelope)"""
+
+    data: ThreadResponse
+    meta: None = None
+    error: None = None
+
+
+class ThreadListResponseWrapper(BaseModel):
+    """Response wrapper for thread list (standardized envelope)"""
+
+    data: ThreadListResponse
+    meta: None = None
+    error: None = None
+
+
+class ThreadMessageResponseWrapper(BaseModel):
+    """Response wrapper for thread message (standardized envelope)"""
+
+    data: ThreadMessageResponse
+    meta: None = None
+    error: None = None
+
+
+class ThreadMessagesResponseWrapper(BaseModel):
+    """Response wrapper for thread messages list (standardized envelope)"""
+
+    data: ThreadMessagesResponse
+    meta: None = None
+    error: None = None
+
+
+class MessageRequestListResponseWrapper(BaseModel):
+    """Response wrapper for message request list (standardized envelope)"""
+
+    data: list[MessageRequestResponse]
+    meta: None = None
+    error: None = None

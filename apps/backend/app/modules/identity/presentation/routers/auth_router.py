@@ -37,6 +37,7 @@ from app.modules.identity.presentation.schemas.auth_schemas import (
     GoogleLoginRequest,
     LoginResponse,
     RefreshSuccessResponse,
+    RefreshSuccessResponseWrapper,
     TokenResponse,
 )
 from app.shared.infrastructure.security.jwt_service import JWTService
@@ -362,7 +363,7 @@ async def google_login_code(
 
 @router.post(
     "/refresh",
-    response_model=RefreshSuccessResponse,
+    response_model=RefreshSuccessResponseWrapper,
     status_code=status.HTTP_200_OK,
     responses={
         200: {"description": "Successfully refreshed tokens"},
@@ -376,7 +377,7 @@ async def refresh_token(
     use_case: Annotated[RefreshTokenUseCase, Depends(get_refresh_token_use_case)],
     jwt_service: JWTService = Depends(lambda: JWTService()),
     refresh_token_cookie: Optional[str] = Cookie(None, alias=settings.REFRESH_COOKIE_NAME),
-) -> RefreshSuccessResponse:
+):
     """
     Refresh access token using refresh token from httpOnly cookie.
 
@@ -435,15 +436,19 @@ async def refresh_token(
         path=settings.COOKIE_PATH,
     )
 
-    return RefreshSuccessResponse(
-        success=True,
-        message="Tokens refreshed successfully",
-    )
+    return {
+        "data": RefreshSuccessResponse(
+            success=True,
+            message="Tokens refreshed successfully",
+        ),
+        "meta": None,
+        "error": None,
+    }
 
 
 @router.post(
     "/logout",
-    response_model=RefreshSuccessResponse,
+    response_model=RefreshSuccessResponseWrapper,
     status_code=status.HTTP_200_OK,
     responses={
         200: {"description": "Successfully logged out"},
@@ -453,7 +458,7 @@ async def refresh_token(
 )
 async def logout(
     response: Response,
-) -> RefreshSuccessResponse:
+):
     """
     Logout user by clearing httpOnly cookies.
 
@@ -485,7 +490,11 @@ async def logout(
         path=settings.COOKIE_PATH,
     )
 
-    return RefreshSuccessResponse(
-        success=True,
-        message="Logged out successfully",
-    )
+    return {
+        "data": RefreshSuccessResponse(
+            success=True,
+            message="Logged out successfully",
+        ),
+        "meta": None,
+        "error": None,
+    }

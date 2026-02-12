@@ -5,9 +5,9 @@
 import { type UseMutationOptions, useMutation, useQueryClient } from '@tanstack/react-query'
 import type {
   CityCode,
-  CreateGalleryCardApiV1GalleryCardsPostResponse,
-  CreatePostApiV1PostsPostResponse,
+  GalleryCardResponse,
   PostCategory,
+  PostResponse,
   PostScope,
 } from '@/shared/api/generated'
 import {
@@ -42,7 +42,7 @@ export interface CreateGalleryCardFlowInput {
 }
 
 export function useCreatePostFlowMutation(
-  options?: UseMutationOptions<CreatePostApiV1PostsPostResponse, Error, CreatePostFlowInput>
+  options?: UseMutationOptions<PostResponse, Error, CreatePostFlowInput>
 ) {
   const queryClient = useQueryClient()
   const createPostMutationOptions = createPostApiV1PostsPostMutation()
@@ -89,7 +89,7 @@ export function useCreatePostFlowMutation(
         })
       }
 
-      return postResponse as CreatePostApiV1PostsPostResponse
+      return postResponse.data as PostResponse
     },
     onSuccess: (...args) => {
       queryClient.invalidateQueries({ queryKey: listPostsApiV1PostsGetQueryKey() })
@@ -100,11 +100,7 @@ export function useCreatePostFlowMutation(
 }
 
 export function useCreateGalleryCardFlowMutation(
-  options?: UseMutationOptions<
-    CreateGalleryCardApiV1GalleryCardsPostResponse,
-    Error,
-    CreateGalleryCardFlowInput
-  >
+  options?: UseMutationOptions<GalleryCardResponse, Error, CreateGalleryCardFlowInput>
 ) {
   const queryClient = useQueryClient()
   const createGalleryCardMutationOptions = createGalleryCardApiV1GalleryCardsPostMutation()
@@ -138,10 +134,10 @@ export function useCreateGalleryCardFlowMutation(
         undefined as unknown as Parameters<typeof createGalleryCardMutationOptions.mutationFn>[1]
       )
 
-      if (mediaId && response?.id) {
+      if (mediaId && response?.data?.id) {
         await attachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPost({
           path: {
-            card_id: response.id,
+            card_id: response.data.id,
           },
           body: {
             media_id: mediaId,
@@ -150,7 +146,7 @@ export function useCreateGalleryCardFlowMutation(
         })
       }
 
-      return response as CreateGalleryCardApiV1GalleryCardsPostResponse
+      return response.data as GalleryCardResponse
     },
     onSuccess: (...args) => {
       queryClient.invalidateQueries({

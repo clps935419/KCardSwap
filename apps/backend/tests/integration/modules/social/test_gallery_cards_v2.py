@@ -38,7 +38,15 @@ class TestGalleryCardsCRUD:
 
         # Assert
         assert response.status_code == 201
-        data = response.json()
+        
+        # Check envelope structure
+        json_response = response.json()
+        assert "data" in json_response
+        assert "meta" in json_response
+        assert "error" in json_response
+        assert json_response["error"] is None
+
+        data = json_response["data"]
         assert data["title"] == card_data["title"]
         assert data["description"] == card_data["description"]
         assert data["idol_name"] == card_data["idol_name"]
@@ -76,7 +84,15 @@ class TestGalleryCardsCRUD:
 
         # Assert
         assert response.status_code == 200
-        data = response.json()
+        
+        # Check envelope structure
+        json_response = response.json()
+        assert "data" in json_response
+        assert "meta" in json_response
+        assert "error" in json_response
+        assert json_response["error"] is None
+
+        data = json_response["data"]
         assert len(data["items"]) == 3
         assert all(
             card["title"] in ["Card 1", "Card 2", "Card 3"] for card in data["items"]
@@ -98,7 +114,7 @@ class TestGalleryCardsCRUD:
             headers=auth_headers_user1,
         )
         assert create_response.status_code == 201
-        user1_id = create_response.json()["user_id"]
+        user1_id = create_response.json()["data"]["user_id"]
 
         # Act - User2 views User1's gallery
         response = await async_client.get(
@@ -108,7 +124,14 @@ class TestGalleryCardsCRUD:
 
         # Assert
         assert response.status_code == 200
-        data = response.json()
+        
+        # Check envelope structure
+        json_response = response.json()
+        assert "data" in json_response
+        assert "meta" in json_response
+        assert "error" in json_response
+
+        data = json_response["data"]
         assert len(data["items"]) >= 1
         assert any(card["title"] == "User1 Card" for card in data["items"])
 
@@ -127,7 +150,7 @@ class TestGalleryCardsCRUD:
             headers=auth_headers_user1,
         )
         assert create_response.status_code == 201
-        card_id = create_response.json()["id"]
+        card_id = create_response.json()["data"]["id"]
 
         # Act
         delete_response = await async_client.delete(
@@ -144,7 +167,7 @@ class TestGalleryCardsCRUD:
             headers=auth_headers_user1,
         )
         assert get_response.status_code == 200
-        cards = get_response.json()["items"]
+        cards = get_response.json()["data"]["items"]
         assert not any(card["id"] == card_id for card in cards)
 
     async def test_delete_gallery_card_not_owner(
@@ -163,7 +186,7 @@ class TestGalleryCardsCRUD:
             headers=auth_headers_user1,
         )
         assert create_response.status_code == 201
-        card_id = create_response.json()["id"]
+        card_id = create_response.json()["data"]["id"]
 
         # Act - User2 tries to delete User1's card
         delete_response = await async_client.delete(
@@ -196,7 +219,7 @@ class TestGalleryCardsReorder:
                 headers=auth_headers_user1,
             )
             assert response.status_code == 201
-            card_ids.append(response.json()["id"])
+            card_ids.append(response.json()["data"]["id"])
 
         # Act - Reorder cards (reverse order)
         reorder_data = {"card_ids": list(reversed(card_ids))}
@@ -208,6 +231,12 @@ class TestGalleryCardsReorder:
 
         # Assert
         assert reorder_response.status_code == 200
+        
+        # Check envelope structure
+        json_response = reorder_response.json()
+        assert "data" in json_response
+        assert "meta" in json_response
+        assert "error" in json_response
 
         # Verify new order
         get_response = await async_client.get(
@@ -215,7 +244,7 @@ class TestGalleryCardsReorder:
             headers=auth_headers_user1,
         )
         assert get_response.status_code == 200
-        cards = get_response.json()["items"]
+        cards = get_response.json()["data"]["items"]
 
         # Cards should be in the new order (reversed)
         returned_ids = [card["id"] for card in cards]
@@ -238,7 +267,7 @@ class TestGalleryCardsReorder:
                 headers=auth_headers_user1,
             )
             assert response.status_code == 201
-            card_ids.append(response.json()["id"])
+            card_ids.append(response.json()["data"]["id"])
 
         # Act - Reorder only first 2 cards
         reorder_data = {"card_ids": [card_ids[1], card_ids[0]]}
@@ -257,7 +286,7 @@ class TestGalleryCardsReorder:
             headers=auth_headers_user1,
         )
         assert get_response.status_code == 200
-        cards = get_response.json()["items"]
+        cards = get_response.json()["data"]["items"]
         returned_ids = [card["id"] for card in cards]
 
         # First two should be swapped
@@ -282,7 +311,7 @@ class TestGalleryCardsReorder:
                 headers=auth_headers_user1,
             )
             assert response.status_code == 201
-            card_ids.append(response.json()["id"])
+            card_ids.append(response.json()["data"]["id"])
 
         # Act - User2 tries to reorder User1's cards
         reorder_data = {"card_ids": list(reversed(card_ids))}

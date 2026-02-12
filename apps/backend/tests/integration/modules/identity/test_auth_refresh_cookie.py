@@ -51,7 +51,15 @@ class TestRefreshTokenCookie:
 
             # Verify response status
             assert response.status_code == 200
-            data = response.json()
+            
+            # Check envelope structure
+            json_response = response.json()
+            assert "data" in json_response
+            assert "meta" in json_response
+            assert "error" in json_response
+            assert json_response["error"] is None
+            
+            data = json_response["data"]
             assert data["success"] is True
             assert data["message"] == "Tokens refreshed successfully"
 
@@ -88,8 +96,10 @@ class TestRefreshTokenCookie:
         # Verify error response
         assert response.status_code == 401
         error = response.json()
-        # Check if using standardized error envelope
+        
+        # Check envelope structure for error responses
         if "error" in error:
+            assert "code" in error["error"]
             assert error["error"]["code"] in ["401_HTTP_ERROR", "UNAUTHORIZED"]
         elif "detail" in error:
             detail = error["detail"]
@@ -123,8 +133,10 @@ class TestRefreshTokenCookie:
             # Verify error response
             assert response.status_code == 401
             error = response.json()
-            # Check if using standardized error envelope
+            
+            # Check envelope structure for error responses
             if "error" in error:
+                assert "code" in error["error"]
                 assert error["error"]["code"] in ["401_HTTP_ERROR", "UNAUTHORIZED"]
             elif "detail" in error:
                 detail = error["detail"]
