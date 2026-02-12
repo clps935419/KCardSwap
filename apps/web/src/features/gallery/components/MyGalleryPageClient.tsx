@@ -35,9 +35,7 @@ export function MyGalleryPageClient() {
   })
 
   const handleDelete = (cardId: string) => {
-    if (confirm('確定要刪除這張小卡嗎？')) {
-      deleteMutation.mutate(cardId)
-    }
+    deleteMutation.mutate(cardId)
   }
 
   const handleCreateSuccess = () => {

@@ -137,8 +137,22 @@ export function useCreateGalleryCard(
  */
 export function useDeleteGalleryCard(options?: UseMutationOptions<void, Error, string>) {
   const queryClient = useQueryClient()
+  const queryKey = getMyGalleryCardsApiV1GalleryCardsMeGetQueryKey()
+  const {
+    onMutate: onMutateOption,
+    onError: onErrorOption,
+    onSuccess: onSuccessOption,
+    onSettled: onSettledOption,
+    ...mutationOptions
+  } = options ?? {}
 
-  return useMutation({
+  return useMutation<
+    void,
+    Error,
+    string,
+    { previousData: GetMyGalleryCardsApiV1GalleryCardsMeGetResponse | undefined }
+  >({
+    ...mutationOptions,
     mutationFn: async (cardId: string) => {
       await deleteGalleryCardApiV1GalleryCardsCardIdDelete({
         path: {
@@ -147,13 +161,35 @@ export function useDeleteGalleryCard(options?: UseMutationOptions<void, Error, s
         throwOnError: true,
       })
     },
-    onSuccess: (...args) => {
-      queryClient.invalidateQueries({
-        queryKey: getMyGalleryCardsApiV1GalleryCardsMeGetQueryKey(),
-      })
-      options?.onSuccess?.(...args)
+    onMutate: async (cardId, context) => {
+      await queryClient.cancelQueries({ queryKey })
+
+      const previousData =
+        queryClient.getQueryData<GetMyGalleryCardsApiV1GalleryCardsMeGetResponse>(queryKey)
+
+      if (previousData) {
+        queryClient.setQueryData<GetMyGalleryCardsApiV1GalleryCardsMeGetResponse>(queryKey, {
+          ...previousData,
+          items: previousData.items.filter(card => card.id !== cardId),
+        })
+      }
+
+      await onMutateOption?.(cardId, context)
+      return { previousData }
     },
-    ...options,
+    onError: (error, variables, onMutateResult, context) => {
+      if (onMutateResult?.previousData) {
+        queryClient.setQueryData(queryKey, onMutateResult.previousData)
+      }
+      onErrorOption?.(error, variables, onMutateResult, context)
+    },
+    onSuccess: (data, variables, onMutateResult, context) => {
+      onSuccessOption?.(data, variables, onMutateResult, context)
+    },
+    onSettled: (data, error, variables, onMutateResult, context) => {
+      queryClient.invalidateQueries({ queryKey })
+      onSettledOption?.(data, error, variables, onMutateResult, context)
+    },
   })
 }
 

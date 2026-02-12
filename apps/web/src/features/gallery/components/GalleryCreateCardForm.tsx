@@ -104,7 +104,9 @@ export function GalleryCreateCardForm({ onSuccess }: GalleryCreateCardFormProps)
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <div className="bg-muted/50 border border-border/30 rounded-2xl p-4 space-y-2">
-          <p className="text-[10px] font-bold text-muted-foreground uppercase">標題</p>
+          <p className="text-[10px] font-bold text-muted-foreground uppercase">
+            標題 <span className="text-destructive">*</span>
+          </p>
           <FormField
             control={form.control}
             name="title"
@@ -128,7 +130,9 @@ export function GalleryCreateCardForm({ onSuccess }: GalleryCreateCardFormProps)
         </div>
 
         <div className="bg-muted/50 border border-border/30 rounded-2xl p-4 space-y-2">
-          <p className="text-[10px] font-bold text-muted-foreground uppercase">偶像名稱</p>
+          <p className="text-[10px] font-bold text-muted-foreground uppercase">
+            偶像名稱 <span className="text-destructive">*</span>
+          </p>
           <FormField
             control={form.control}
             name="idol_name"

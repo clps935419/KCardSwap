@@ -237,7 +237,9 @@ export function CreatePostForm() {
 
       {/* 標題與內容 */}
       <div className="bg-muted/50 border border-border/30 rounded-2xl p-4 space-y-2">
-        <p className="text-[10px] font-bold text-muted-foreground uppercase">標題</p>
+        <p className="text-[10px] font-bold text-muted-foreground uppercase">
+          標題 <span className="text-destructive">*</span>
+        </p>
         <Input
           id="title"
           placeholder="想分享什麼？"
@@ -252,7 +254,9 @@ export function CreatePostForm() {
       </div>
 
       <div className="bg-muted/50 border border-border/30 rounded-2xl p-4 space-y-2">
-        <p className="text-[10px] font-bold text-muted-foreground uppercase">內容</p>
+        <p className="text-[10px] font-bold text-muted-foreground uppercase">
+          內容 <span className="text-destructive">*</span>
+        </p>
         <Textarea
           id="content"
           placeholder="分享更多細節..."
