@@ -37,8 +37,11 @@ from app.modules.social.infrastructure.repositories.thread_repository import (
 )
 from app.modules.social.presentation.schemas.message_schemas import (
     AcceptRequestResponse,
+    AcceptRequestResponseWrapper,
     CreateMessageRequestRequest,
+    MessageRequestListResponseWrapper,
     MessageRequestResponse,
+    MessageRequestResponseWrapper,
     ThreadResponse,
 )
 from app.shared.infrastructure.database.connection import get_db_session
@@ -59,7 +62,7 @@ async def _get_user_profile_data(user_id: str, profile_repo: ProfileRepositoryIm
 
 
 @router.post(
-    "", response_model=MessageRequestResponse, status_code=status.HTTP_201_CREATED
+    "", response_model=MessageRequestResponseWrapper, status_code=status.HTTP_201_CREATED
 )
 async def create_message_request(
     request: CreateMessageRequestRequest,
@@ -113,26 +116,30 @@ async def create_message_request(
             message_request.recipient_id, profile_repo
         )
 
-        return MessageRequestResponse(
-            id=message_request.id,
-            sender_id=message_request.sender_id,
-            sender_nickname=sender_nickname,
-            sender_avatar_url=sender_avatar_url,
-            recipient_id=message_request.recipient_id,
-            recipient_nickname=recipient_nickname,
-            recipient_avatar_url=recipient_avatar_url,
-            initial_message=message_request.initial_message,
-            post_id=message_request.post_id,
-            status=message_request.status.value,
-            thread_id=message_request.thread_id,
-            created_at=message_request.created_at,
-            updated_at=message_request.updated_at,
-        )
+        return {
+            "data": MessageRequestResponse(
+                id=message_request.id,
+                sender_id=message_request.sender_id,
+                sender_nickname=sender_nickname,
+                sender_avatar_url=sender_avatar_url,
+                recipient_id=message_request.recipient_id,
+                recipient_nickname=recipient_nickname,
+                recipient_avatar_url=recipient_avatar_url,
+                initial_message=message_request.initial_message,
+                post_id=message_request.post_id,
+                status=message_request.status.value,
+                thread_id=message_request.thread_id,
+                created_at=message_request.created_at,
+                updated_at=message_request.updated_at,
+            ),
+            "meta": None,
+            "error": None,
+        }
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-@router.get("/inbox", response_model=list[MessageRequestResponse])
+@router.get("/inbox", response_model=MessageRequestListResponseWrapper)
 async def get_my_message_requests(
     status_filter: str = "pending",
     user_id: UUID = Depends(require_user),
@@ -182,12 +189,12 @@ async def get_my_message_requests(
                 )
             )
 
-        return response_list
+        return {"data": response_list, "meta": None, "error": None}
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-@router.get("/sent", response_model=list[MessageRequestResponse])
+@router.get("/sent", response_model=MessageRequestListResponseWrapper)
 async def get_my_sent_message_requests(
     status_filter: str = "pending",
     user_id: UUID = Depends(require_user),
@@ -237,12 +244,12 @@ async def get_my_sent_message_requests(
                 )
             )
 
-        return response_list
+        return {"data": response_list, "meta": None, "error": None}
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-@router.post("/{request_id}/accept", response_model=AcceptRequestResponse)
+@router.post("/{request_id}/accept", response_model=AcceptRequestResponseWrapper)
 async def accept_message_request(
     request_id: str,
     user_id: UUID = Depends(require_user),
@@ -281,40 +288,44 @@ async def accept_message_request(
             thread.user_b_id, profile_repo
         )
 
-        return AcceptRequestResponse(
-            message_request=MessageRequestResponse(
-                id=updated_request.id,
-                sender_id=updated_request.sender_id,
-                sender_nickname=sender_nickname,
-                sender_avatar_url=sender_avatar_url,
-                recipient_id=updated_request.recipient_id,
-                recipient_nickname=recipient_nickname,
-                recipient_avatar_url=recipient_avatar_url,
-                initial_message=updated_request.initial_message,
-                post_id=updated_request.post_id,
-                status=updated_request.status.value,
-                thread_id=updated_request.thread_id,
-                created_at=updated_request.created_at,
-                updated_at=updated_request.updated_at,
+        return {
+            "data": AcceptRequestResponse(
+                message_request=MessageRequestResponse(
+                    id=updated_request.id,
+                    sender_id=updated_request.sender_id,
+                    sender_nickname=sender_nickname,
+                    sender_avatar_url=sender_avatar_url,
+                    recipient_id=updated_request.recipient_id,
+                    recipient_nickname=recipient_nickname,
+                    recipient_avatar_url=recipient_avatar_url,
+                    initial_message=updated_request.initial_message,
+                    post_id=updated_request.post_id,
+                    status=updated_request.status.value,
+                    thread_id=updated_request.thread_id,
+                    created_at=updated_request.created_at,
+                    updated_at=updated_request.updated_at,
+                ),
+                thread=ThreadResponse(
+                    id=thread.id,
+                    user_a_id=thread.user_a_id,
+                    user_a_nickname=user_a_nickname,
+                    user_a_avatar_url=user_a_avatar_url,
+                    user_b_id=thread.user_b_id,
+                    user_b_nickname=user_b_nickname,
+                    user_b_avatar_url=user_b_avatar_url,
+                    created_at=thread.created_at,
+                    updated_at=thread.updated_at,
+                    last_message_at=thread.last_message_at,
+                ),
             ),
-            thread=ThreadResponse(
-                id=thread.id,
-                user_a_id=thread.user_a_id,
-                user_a_nickname=user_a_nickname,
-                user_a_avatar_url=user_a_avatar_url,
-                user_b_id=thread.user_b_id,
-                user_b_nickname=user_b_nickname,
-                user_b_avatar_url=user_b_avatar_url,
-                created_at=thread.created_at,
-                updated_at=thread.updated_at,
-                last_message_at=thread.last_message_at,
-            ),
-        )
+            "meta": None,
+            "error": None,
+        }
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-@router.post("/{request_id}/decline", response_model=MessageRequestResponse)
+@router.post("/{request_id}/decline", response_model=MessageRequestResponseWrapper)
 async def decline_message_request(
     request_id: str,
     user_id: UUID = Depends(require_user),
@@ -342,20 +353,24 @@ async def decline_message_request(
             updated_request.recipient_id, profile_repo
         )
 
-        return MessageRequestResponse(
-            id=updated_request.id,
-            sender_id=updated_request.sender_id,
-            sender_nickname=sender_nickname,
-            sender_avatar_url=sender_avatar_url,
-            recipient_id=updated_request.recipient_id,
-            recipient_nickname=recipient_nickname,
-            recipient_avatar_url=recipient_avatar_url,
-            initial_message=updated_request.initial_message,
-            post_id=updated_request.post_id,
-            status=updated_request.status.value,
-            thread_id=updated_request.thread_id,
-            created_at=updated_request.created_at,
-            updated_at=updated_request.updated_at,
-        )
+        return {
+            "data": MessageRequestResponse(
+                id=updated_request.id,
+                sender_id=updated_request.sender_id,
+                sender_nickname=sender_nickname,
+                sender_avatar_url=sender_avatar_url,
+                recipient_id=updated_request.recipient_id,
+                recipient_nickname=recipient_nickname,
+                recipient_avatar_url=recipient_avatar_url,
+                initial_message=updated_request.initial_message,
+                post_id=updated_request.post_id,
+                status=updated_request.status.value,
+                thread_id=updated_request.thread_id,
+                created_at=updated_request.created_at,
+                updated_at=updated_request.updated_at,
+            ),
+            "meta": None,
+            "error": None,
+        }
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

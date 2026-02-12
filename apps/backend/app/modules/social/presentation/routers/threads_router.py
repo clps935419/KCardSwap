@@ -26,8 +26,11 @@ from app.modules.social.infrastructure.repositories.thread_repository import (
 from app.modules.social.presentation.schemas.message_schemas import (
     SendMessageRequest,
     ThreadListResponse,
+    ThreadListResponseWrapper,
     ThreadMessageResponse,
+    ThreadMessageResponseWrapper,
     ThreadMessagesResponse,
+    ThreadMessagesResponseWrapper,
     ThreadResponse,
 )
 from app.shared.infrastructure.database.connection import get_db_session
@@ -47,7 +50,7 @@ async def _get_user_profile_data(user_id: str, profile_repo: ProfileRepositoryIm
     return None, None
 
 
-@router.get("", response_model=ThreadListResponse)
+@router.get("", response_model=ThreadListResponseWrapper)
 async def get_my_threads(
     limit: int = Query(50, ge=1, le=100),
     offset: int = Query(0, ge=0),
@@ -92,13 +95,17 @@ async def get_my_threads(
             )
         )
 
-    return ThreadListResponse(
-        threads=thread_responses,
-        total=len(thread_responses),
-    )
+    return {
+        "data": ThreadListResponse(
+            threads=thread_responses,
+            total=len(thread_responses),
+        ),
+        "meta": None,
+        "error": None,
+    }
 
 
-@router.get("/{thread_id}/messages", response_model=ThreadMessagesResponse)
+@router.get("/{thread_id}/messages", response_model=ThreadMessagesResponseWrapper)
 async def get_thread_messages(
     thread_id: str,
     limit: int = Query(50, ge=1, le=100),
@@ -145,15 +152,19 @@ async def get_thread_messages(
                 )
             )
 
-        return ThreadMessagesResponse(
-            messages=message_responses,
-            total=len(message_responses),
-        )
+        return {
+            "data": ThreadMessagesResponse(
+                messages=message_responses,
+                total=len(message_responses),
+            ),
+            "meta": None,
+            "error": None,
+        }
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
 
 
-@router.post("/{thread_id}/messages", response_model=ThreadMessageResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/{thread_id}/messages", response_model=ThreadMessageResponseWrapper, status_code=status.HTTP_201_CREATED)
 async def send_message(
     thread_id: str,
     request: SendMessageRequest,
@@ -185,15 +196,19 @@ async def send_message(
             message.sender_id, profile_repo
         )
 
-        return ThreadMessageResponse(
-            id=message.id,
-            thread_id=message.thread_id,
-            sender_id=message.sender_id,
-            sender_nickname=sender_nickname,
-            sender_avatar_url=sender_avatar_url,
-            content=message.content,
-            post_id=message.post_id,
-            created_at=message.created_at,
-        )
+        return {
+            "data": ThreadMessageResponse(
+                id=message.id,
+                thread_id=message.thread_id,
+                sender_id=message.sender_id,
+                sender_nickname=sender_nickname,
+                sender_avatar_url=sender_avatar_url,
+                content=message.content,
+                post_id=message.post_id,
+                created_at=message.created_at,
+            ),
+            "meta": None,
+            "error": None,
+        }
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
