@@ -1,5 +1,6 @@
 import { Card, CardContent } from '@/components/ui/card'
 import { UserAvatar } from '@/components/ui/user-avatar'
+import { truncateUserId } from '@/lib/utils'
 import type { ProfileResponse } from '@/shared/api/generated/types.gen'
 
 interface ProfileHeaderProps {
@@ -21,9 +22,7 @@ export function ProfileHeader({ profile }: ProfileHeaderProps) {
           {/* Nickname */}
           <div className="text-center space-y-1">
             <h2 className="text-2xl font-bold">{profile.nickname || 'Anonymous'}</h2>
-            <p className="text-sm text-muted-foreground">
-              ID: {profile.user_id.substring(0, 8)}...
-            </p>
+            <p className="text-sm text-muted-foreground">ID: {truncateUserId(profile.user_id)}</p>
           </div>
 
           {/* Bio */}

@@ -43,7 +43,10 @@ export function UserProfilePageClient({ userId }: UserProfilePageClientProps) {
         <Card className="mb-8">
           <CardContent className="pt-6">
             <div className="text-center text-destructive">
-              <p>載入使用者資料時發生錯誤，請稍後再試。</p>
+              <p className="font-semibold mb-2">載入使用者資料時發生錯誤</p>
+              <p className="text-sm">
+                {profileError instanceof Error ? profileError.message : '請稍後再試或聯繫技術支援'}
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -75,7 +78,10 @@ export function UserProfilePageClient({ userId }: UserProfilePageClientProps) {
 
           {galleryError && (
             <div className="text-center py-8 text-destructive">
-              <p>載入相簿小卡時發生錯誤，請稍後再試。</p>
+              <p className="font-semibold mb-2">載入相簿小卡時發生錯誤</p>
+              <p className="text-sm">
+                {galleryError instanceof Error ? galleryError.message : '請稍後再試或聯繫技術支援'}
+              </p>
             </div>
           )}
 
