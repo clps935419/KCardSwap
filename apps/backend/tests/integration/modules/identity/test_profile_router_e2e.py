@@ -188,3 +188,40 @@ class TestProfileRouterE2E:
         data = response.json()["data"]
         # Original values should be preserved
         assert data["nickname"] == "Test User"
+
+    def test_get_user_profile_success(
+        self, authenticated_client, test_user_with_profile
+    ):
+        """Test getting another user's profile successfully"""
+        response = authenticated_client.get(
+            f"/api/v1/profile/{test_user_with_profile}"
+        )
+
+        assert response.status_code == 200
+        data = response.json()["data"]
+        assert data["nickname"] == "Test User"
+        assert data["avatar_url"] == "https://example.com/avatar.jpg"
+        assert data["bio"] == "Test bio"
+        assert data["region"] == "TW"
+        assert "id" in data
+        assert "user_id" in data
+        assert str(data["user_id"]) == str(test_user_with_profile)
+
+    def test_get_user_profile_not_found(self, authenticated_client):
+        """Test getting a non-existent user's profile returns 404"""
+        fake_user_id = "00000000-0000-0000-0000-000000000000"
+        response = authenticated_client.get(f"/api/v1/profile/{fake_user_id}")
+
+        assert response.status_code == 404
+        data = response.json()
+        assert "detail" in data
+
+    def test_get_user_profile_unauthorized(
+        self, unauthenticated_client, test_user_with_profile
+    ):
+        """Test getting user profile without authentication returns 401"""
+        response = unauthenticated_client.get(
+            f"/api/v1/profile/{test_user_with_profile}"
+        )
+
+        assert response.status_code == 401

@@ -118,14 +118,17 @@ export default function UserProfileScreen() {
   }
 
   if (profileError || !profileData?.data) {
+    const errorMessage =
+      profileError && typeof profileError === 'object' && 'message' in profileError
+        ? String((profileError as any).message)
+        : '找不到使用者';
+
     return (
       <Box className="flex-1 bg-white items-center justify-center p-4">
         <Text className="text-red-500 text-center mb-4">
           載入個人資料失敗
         </Text>
-        <Text className="text-gray-600 text-center">
-          {profileError?.message || '找不到使用者'}
-        </Text>
+        <Text className="text-gray-600 text-center">{errorMessage}</Text>
       </Box>
     );
   }
