@@ -1,9 +1,8 @@
 'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
+import { UserAvatar } from '@/components/ui/user-avatar'
 import { GalleryGrid } from '@/features/gallery/components/GalleryGrid'
-import { ProfileHeader } from '@/features/profile/components'
 import { useUserGalleryCards } from '@/shared/api/hooks/gallery'
 import { useUserProfile } from '@/shared/api/hooks/profile'
 
@@ -24,70 +23,79 @@ export function UserProfilePageClient({ userId }: UserProfilePageClientProps) {
   } = useUserGalleryCards(userId)
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
-      {/* Profile Header Section */}
+    <div className="mx-auto w-full max-w-2xl min-h-screen bg-card py-6">
+      {/* IG-style Profile Header */}
       {isLoadingProfile && (
-        <Card className="mb-8">
-          <CardContent className="pt-6">
-            <div className="flex flex-col items-center space-y-4">
-              <Skeleton className="h-24 w-24 rounded-full" />
-              <Skeleton className="h-8 w-48" />
-              <Skeleton className="h-4 w-32" />
-              <Skeleton className="h-16 w-full max-w-md" />
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {profileError && (
-        <Card className="mb-8">
-          <CardContent className="pt-6">
-            <div className="text-center text-destructive">
-              <p className="font-semibold mb-2">載入使用者資料時發生錯誤</p>
-              <p className="text-sm">
-                {profileError instanceof Error ? profileError.message : '請稍後再試或聯繫技術支援'}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {profileData?.data && (
-        <div className="mb-8">
-          <ProfileHeader profile={profileData.data} />
+        <div className="flex items-start gap-4 px-4 pb-4 border-b border-border/30">
+          <Skeleton className="h-20 w-20 rounded-full" />
+          <div className="flex-1 space-y-2 pt-1">
+            <Skeleton className="h-6 w-40" />
+            <Skeleton className="h-4 w-full max-w-md" />
+            <Skeleton className="h-4 w-2/3 max-w-sm" />
+          </div>
         </div>
       )}
 
-      {/* Gallery Cards Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-xl">相簿小卡 📸</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {isLoadingGallery && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {[...Array(8)].map((_, i) => (
-                <div key={`skeleton-${i}`} className="space-y-2">
-                  <Skeleton className="aspect-[3/4] w-full" />
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-3 w-1/2" />
-                </div>
-              ))}
-            </div>
-          )}
+      {profileError && (
+        <div className="px-4">
+          <div className="rounded-2xl border border-destructive/20 bg-destructive/5 px-4 py-3 text-destructive">
+            <p className="text-sm font-semibold">載入使用者資料時發生錯誤</p>
+            <p className="text-xs mt-1">
+              {profileError instanceof Error ? profileError.message : '請稍後再試或聯繫技術支援'}
+            </p>
+          </div>
+        </div>
+      )}
 
-          {galleryError && (
+      {profileData?.data && (
+        <header className="flex flex-col gap-3 px-4 pb-4 border-b border-border/30">
+          <div className="flex items-start gap-4">
+            <UserAvatar
+              avatarUrl={profileData.data.avatar_url || undefined}
+              nickname={profileData.data.nickname || undefined}
+              userId={profileData.data.user_id}
+              size="lg"
+              className="h-20 w-20 text-xl"
+            />
+
+            <div className="min-w-0 flex-1 pt-1">
+              <h1 className="text-xl font-bold leading-tight truncate">
+                {profileData.data.nickname || 'Anonymous'}
+              </h1>
+              {profileData.data.bio && (
+                <p className="mt-2 text-sm text-muted-foreground whitespace-pre-line">
+                  {profileData.data.bio}
+                </p>
+              )}
+            </div>
+          </div>
+        </header>
+      )}
+
+      <div>
+        {isLoadingGallery && (
+          <div className="grid grid-cols-3 gap-0">
+            {Array.from({ length: 12 }).map((_, i) => (
+              <Skeleton key={`skeleton-${i}`} className="aspect-square w-full rounded-none" />
+            ))}
+          </div>
+        )}
+
+        {galleryError && (
+          <div className="px-4">
             <div className="text-center py-8 text-destructive">
               <p className="font-semibold mb-2">載入相簿小卡時發生錯誤</p>
               <p className="text-sm">
                 {galleryError instanceof Error ? galleryError.message : '請稍後再試或聯繫技術支援'}
               </p>
             </div>
-          )}
+          </div>
+        )}
 
-          {galleryData && <GalleryGrid cards={galleryData.items || []} isOwner={false} />}
-        </CardContent>
-      </Card>
+        {galleryData && (
+          <GalleryGrid cards={galleryData.items || []} isOwner={false} variant="wall" />
+        )}
+      </div>
     </div>
   )
 }

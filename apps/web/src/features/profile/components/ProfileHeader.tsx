@@ -14,9 +14,11 @@ export function ProfileHeader({ profile }: ProfileHeaderProps) {
         <div className="flex flex-col items-center space-y-4">
           {/* Avatar */}
           <UserAvatar
-            src={profile.avatar_url || undefined}
-            alt={profile.nickname || 'User'}
-            className="h-24 w-24"
+            avatarUrl={profile.avatar_url || undefined}
+            nickname={profile.nickname || undefined}
+            userId={profile.user_id}
+            size="lg"
+            className="h-24 w-24 text-2xl"
           />
 
           {/* Nickname */}

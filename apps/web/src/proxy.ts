@@ -14,7 +14,7 @@ import { NextResponse } from 'next/server'
 const PUBLIC_PATHS = ['/login', '/api/auth']
 
 // Paths that require authentication
-const PROTECTED_PATHS = ['/posts', '/inbox', '/me']
+const PROTECTED_PATHS = ['/posts', '/inbox', '/me', '/users']
 
 export function proxy(request: NextRequest) {
   const { pathname, basePath } = request.nextUrl

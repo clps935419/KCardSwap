@@ -71,7 +71,7 @@ export function CommentsList({ comments, isLoading }: CommentsListProps) {
           >
             <div className="flex items-start gap-3">
               {/* Avatar - clickable */}
-              <Link 
+              <Link
                 href={`/users/${comment.user_id}`}
                 className="hover:opacity-80 transition-opacity"
               >
@@ -97,7 +97,7 @@ export function CommentsList({ comments, isLoading }: CommentsListProps) {
               {/* Comment content */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <Link 
+                  <Link
                     href={`/users/${comment.user_id}`}
                     className="text-xs font-bold text-foreground hover:underline"
                   >

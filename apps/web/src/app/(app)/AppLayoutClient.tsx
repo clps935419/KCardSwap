@@ -11,6 +11,7 @@ const PAGE_TITLES = {
   POSTS: '貼文',
   INBOX: '信箱',
   PROFILE: '我的檔案',
+  USER: '個人檔案',
   DEFAULT: '貼文',
 } as const
 
@@ -18,6 +19,7 @@ function getPageTitle(pathname: string): string {
   if (pathname === '/posts' || pathname.startsWith('/posts/')) return PAGE_TITLES.POSTS
   if (pathname === '/inbox' || pathname.startsWith('/inbox/')) return PAGE_TITLES.INBOX
   if (pathname === '/me' || pathname.startsWith('/me/')) return PAGE_TITLES.PROFILE
+  if (pathname.startsWith('/users/')) return PAGE_TITLES.USER
   return PAGE_TITLES.DEFAULT
 }
 
@@ -25,6 +27,15 @@ export function AppLayoutClient({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
   const pageTitle = getPageTitle(pathname)
+  const showBackButton = pathname.startsWith('/users/')
+
+  const handleBack = () => {
+    if (typeof window !== 'undefined' && window.history.length > 1) {
+      router.back()
+      return
+    }
+    router.push('/posts')
+  }
 
   const prefetchPosts = () => {
     if (pathname === '/posts' || pathname.startsWith('/posts/')) return
@@ -48,8 +59,22 @@ export function AppLayoutClient({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-background flex flex-col relative">
       <header className="px-6 py-4 flex justify-between items-center bg-card shadow-sm z-10 sticky top-0">
-        <div className="flex flex-col">
-          <p className="text-sm font-black text-foreground">{pageTitle}</p>
+        <div className="flex items-center gap-2">
+          {showBackButton && (
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={handleBack}
+              className="h-9 w-9 p-0 rounded-xl text-foreground hover:bg-muted"
+              aria-label="返回"
+              title="返回"
+            >
+              ←
+            </Button>
+          )}
+          <div className="flex flex-col">
+            <p className="text-sm font-black text-foreground">{pageTitle}</p>
+          </div>
         </div>
 
         <div className="flex items-center gap-2">

@@ -268,7 +268,7 @@ export function PostsList() {
           <Card key={post.id} className="p-4 rounded-2xl shadow-sm border border-border/30 bg-card">
             {/* Post Header */}
             <div className="flex items-center justify-between mb-2">
-              <Link 
+              <Link
                 href={`/users/${post.owner_id}`}
                 className="flex items-center gap-2 hover:opacity-80 transition-opacity"
               >

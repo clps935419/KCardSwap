@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useReadMediaUrls } from '@/features/media/hooks/useReadMediaUrls'
+import { cn } from '@/lib/utils'
 import type { GalleryCardResponse } from '@/shared/api/generated'
 
 const BLUR_DATA_URL =
@@ -25,6 +26,7 @@ interface GalleryGridProps {
   cards: GalleryCardResponse[]
   isOwner?: boolean
   onDelete?: (cardId: string) => void
+  variant?: 'cards' | 'wall'
 }
 
 function getDisplayText(value?: string | null, fallback = '未填寫') {
@@ -52,7 +54,12 @@ function clampText(value: string, maxLength: number) {
   return `${value.slice(0, Math.max(0, maxLength - 1))}…`
 }
 
-export function GalleryGrid({ cards, isOwner = false, onDelete }: GalleryGridProps) {
+export function GalleryGrid({
+  cards,
+  isOwner = false,
+  onDelete,
+  variant = 'cards',
+}: GalleryGridProps) {
   const mediaAssetIds = cards
     .map(card => card.media_asset_id)
     .filter((mediaId): mediaId is string => Boolean(mediaId))
@@ -142,7 +149,14 @@ export function GalleryGrid({ cards, isOwner = false, onDelete }: GalleryGridPro
 
   return (
     <>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <div
+        className={cn(
+          'grid',
+          variant === 'wall'
+            ? 'grid-cols-3 gap-0'
+            : 'grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3'
+        )}
+      >
         {cards.map((card, _idx) => {
           const thumbnailUrl = card.media_asset_id ? mediaUrls[card.media_asset_id] : null
           const isThumbnailLoaded = thumbnailLoadedMap[card.id]
@@ -156,10 +170,26 @@ export function GalleryGrid({ cards, isOwner = false, onDelete }: GalleryGridPro
                 setDialogImageNaturalSize(null)
                 setSelectedCardId(card.id)
               }}
-              className="group h-auto w-full text-left"
+              className={cn(
+                'group h-auto w-full text-left',
+                variant === 'wall' &&
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card'
+              )}
             >
-              <Card className="rounded-2xl border border-border/30 bg-card shadow-sm overflow-hidden transition-transform duration-200 group-hover:-translate-y-0.5">
-                <div className="relative aspect-[4/5] bg-muted/60">
+              <Card
+                className={cn(
+                  'overflow-hidden',
+                  variant === 'wall'
+                    ? 'rounded-none border-0 bg-card shadow-none'
+                    : 'rounded-2xl border border-border/30 bg-card shadow-sm transition-transform duration-200 group-hover:-translate-y-0.5'
+                )}
+              >
+                <div
+                  className={cn(
+                    'relative bg-muted/60',
+                    variant === 'wall' ? 'aspect-square' : 'aspect-[4/5]'
+                  )}
+                >
                   {thumbnailUrl ? (
                     <>
                       {!isThumbnailLoaded && (
@@ -184,29 +214,37 @@ export function GalleryGrid({ cards, isOwner = false, onDelete }: GalleryGridPro
                       {card.media_asset_id ? '🖼️' : '🃏'}
                     </div>
                   )}
-                  <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/60 to-transparent" />
-                  <div className="absolute bottom-3 left-3 right-3">
-                    <p className="text-[11px] font-black text-white truncate">{card.title}</p>
-                    <p className="text-[10px] text-white/70 truncate">{card.idol_name || '—'}</p>
-                  </div>
-                </div>
-                <div className="px-3 py-2 flex items-center justify-between">
-                  <span className="text-[10px] font-bold text-muted-foreground">&nbsp;</span>
-                  {isOwner && onDelete && (
-                    <Button
-                      onClick={event => {
-                        event.stopPropagation()
-                        setDeleteTarget(card)
-                      }}
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 w-8  p-0 text-rose-700 hover:bg-rose-100"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                      <span className="sr-only">刪除</span>
-                    </Button>
+                  {variant === 'cards' && (
+                    <>
+                      <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/60 to-transparent" />
+                      <div className="absolute bottom-3 left-3 right-3">
+                        <p className="text-[11px] font-black text-white truncate">{card.title}</p>
+                        <p className="text-[10px] text-white/70 truncate">
+                          {card.idol_name || '—'}
+                        </p>
+                      </div>
+                    </>
                   )}
                 </div>
+                {variant === 'cards' && (
+                  <div className="px-3 py-2 flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-muted-foreground">&nbsp;</span>
+                    {isOwner && onDelete && (
+                      <Button
+                        onClick={event => {
+                          event.stopPropagation()
+                          setDeleteTarget(card)
+                        }}
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8  p-0 text-rose-700 hover:bg-rose-100"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        <span className="sr-only">刪除</span>
+                      </Button>
+                    )}
+                  </div>
+                )}
               </Card>
             </button>
           )
