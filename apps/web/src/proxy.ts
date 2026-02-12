@@ -36,16 +36,6 @@ export function proxy(request: NextRequest) {
   const accessToken = request.cookies.get('access_token')
   const hasAuth = !!accessToken
 
-  if (process.env.NODE_ENV !== 'production') {
-    console.log('[proxy]', {
-      pathname,
-      basePath,
-      normalizedPath,
-      url: request.nextUrl.href,
-      hasAuth,
-    })
-  }
-
   // If accessing protected path without auth, redirect to login
   if (isProtectedPath && !hasAuth) {
     const loginUrl = request.nextUrl.clone()
