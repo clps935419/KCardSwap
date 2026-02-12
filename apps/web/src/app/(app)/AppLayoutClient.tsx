@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { UserAvatar } from '@/components/ui/user-avatar'
 import { getMyProfileApiV1ProfileMeGetOptions } from '@/shared/api/generated/@tanstack/react-query.gen'
@@ -23,7 +23,13 @@ function getPageTitle(pathname: string): string {
 
 export function AppLayoutClient({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+  const router = useRouter()
   const pageTitle = getPageTitle(pathname)
+
+  const prefetchPosts = () => {
+    if (pathname === '/posts' || pathname.startsWith('/posts/')) return
+    router.prefetch('/posts')
+  }
 
   const profileQuery = useQuery({
     ...getMyProfileApiV1ProfileMeGetOptions(),
@@ -85,6 +91,9 @@ export function AppLayoutClient({ children }: { children: React.ReactNode }) {
                 ? 'text-primary-500 bg-accent shadow-sm'
                 : 'text-muted-foreground hover:text-foreground hover:bg-muted'
             }`}
+            onPointerEnter={prefetchPosts}
+            onTouchStart={prefetchPosts}
+            onFocus={prefetchPosts}
           >
             <Link href="/posts">
               <div className="text-xl leading-none">🏠</div>
