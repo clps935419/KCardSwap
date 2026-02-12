@@ -15,6 +15,23 @@ export type AcceptRequestResponse = {
 };
 
 /**
+ * AcceptRequestResponseWrapper
+ *
+ * Response wrapper for accept request (standardized envelope)
+ */
+export type AcceptRequestResponseWrapper = {
+    data: AcceptRequestResponse;
+    /**
+     * Meta
+     */
+    meta?: null;
+    /**
+     * Error
+     */
+    error?: null;
+};
+
+/**
  * AdminLoginRequest
  *
  * Request schema for admin login with email/password
@@ -62,6 +79,23 @@ export type AttachMediaResponseSchema = {
      * ID of the entity media was attached to
      */
     target_id: string;
+};
+
+/**
+ * AttachMediaResponseWrapper
+ *
+ * Response wrapper for attach media (standardized envelope)
+ */
+export type AttachMediaResponseWrapper = {
+    data: AttachMediaResponseSchema;
+    /**
+     * Meta
+     */
+    meta?: null;
+    /**
+     * Error
+     */
+    error?: null;
 };
 
 /**
@@ -402,6 +436,23 @@ export type ConfirmUploadResponseSchema = {
 };
 
 /**
+ * ConfirmUploadResponseWrapper
+ *
+ * Response wrapper for confirm upload (standardized envelope)
+ */
+export type ConfirmUploadResponseWrapper = {
+    data: ConfirmUploadResponseSchema;
+    /**
+     * Meta
+     */
+    meta?: null;
+    /**
+     * Error
+     */
+    error?: null;
+};
+
+/**
  * CreateCommentRequest
  *
  * Request schema for creating a comment
@@ -568,6 +619,23 @@ export type CreateUploadUrlResponseSchema = {
 };
 
 /**
+ * CreateUploadUrlResponseWrapper
+ *
+ * Response wrapper for upload URL (standardized envelope)
+ */
+export type CreateUploadUrlResponseWrapper = {
+    data: CreateUploadUrlResponseSchema;
+    /**
+     * Meta
+     */
+    meta?: null;
+    /**
+     * Error
+     */
+    error?: null;
+};
+
+/**
  * ExpireSubscriptionsData
  *
  * Data schema for expire subscriptions job
@@ -621,6 +689,23 @@ export type GalleryCardListResponse = {
 };
 
 /**
+ * GalleryCardListResponseWrapper
+ *
+ * Response wrapper for gallery card list (standardized envelope)
+ */
+export type GalleryCardListResponseWrapper = {
+    data: GalleryCardListResponse;
+    /**
+     * Meta
+     */
+    meta?: null;
+    /**
+     * Error
+     */
+    error?: null;
+};
+
+/**
  * GalleryCardResponse
  *
  * Response for a single gallery card.
@@ -666,6 +751,23 @@ export type GalleryCardResponse = {
      * Updated At
      */
     updated_at: string;
+};
+
+/**
+ * GalleryCardResponseWrapper
+ *
+ * Response wrapper for single gallery card (standardized envelope)
+ */
+export type GalleryCardResponseWrapper = {
+    data: GalleryCardResponse;
+    /**
+     * Meta
+     */
+    meta?: null;
+    /**
+     * Error
+     */
+    error?: null;
 };
 
 /**
@@ -813,6 +915,26 @@ export type LoginResponse = {
 };
 
 /**
+ * MessageRequestListResponseWrapper
+ *
+ * Response wrapper for message request list (standardized envelope)
+ */
+export type MessageRequestListResponseWrapper = {
+    /**
+     * Data
+     */
+    data: Array<MessageRequestResponse>;
+    /**
+     * Meta
+     */
+    meta?: null;
+    /**
+     * Error
+     */
+    error?: null;
+};
+
+/**
  * MessageRequestResponse
  *
  * Response for a message request
@@ -870,6 +992,23 @@ export type MessageRequestResponse = {
      * Updated At
      */
     updated_at: string;
+};
+
+/**
+ * MessageRequestResponseWrapper
+ *
+ * Response wrapper for message request (standardized envelope)
+ */
+export type MessageRequestResponseWrapper = {
+    data: MessageRequestResponse;
+    /**
+     * Meta
+     */
+    meta?: null;
+    /**
+     * Error
+     */
+    error?: null;
 };
 
 /**
@@ -1380,6 +1519,23 @@ export type RefreshSuccessResponse = {
 };
 
 /**
+ * RefreshSuccessResponseWrapper
+ *
+ * Response wrapper for successful token refresh (standardized envelope)
+ */
+export type RefreshSuccessResponseWrapper = {
+    data: RefreshSuccessResponse;
+    /**
+     * Meta
+     */
+    meta?: null;
+    /**
+     * Error
+     */
+    error?: null;
+};
+
+/**
  * ReorderGalleryCardsRequest
  *
  * Request to reorder gallery cards.
@@ -1405,6 +1561,23 @@ export type ReorderGalleryCardsResponse = {
      * Updated Count
      */
     updated_count: number;
+};
+
+/**
+ * ReorderGalleryCardsResponseWrapper
+ *
+ * Response wrapper for reorder response (standardized envelope)
+ */
+export type ReorderGalleryCardsResponseWrapper = {
+    data: ReorderGalleryCardsResponse;
+    /**
+     * Meta
+     */
+    meta?: null;
+    /**
+     * Error
+     */
+    error?: null;
 };
 
 /**
@@ -1612,6 +1785,23 @@ export type ThreadListResponse = {
 };
 
 /**
+ * ThreadListResponseWrapper
+ *
+ * Response wrapper for thread list (standardized envelope)
+ */
+export type ThreadListResponseWrapper = {
+    data: ThreadListResponse;
+    /**
+     * Meta
+     */
+    meta?: null;
+    /**
+     * Error
+     */
+    error?: null;
+};
+
+/**
  * ThreadMessageResponse
  *
  * Response for a thread message
@@ -1652,6 +1842,23 @@ export type ThreadMessageResponse = {
 };
 
 /**
+ * ThreadMessageResponseWrapper
+ *
+ * Response wrapper for thread message (standardized envelope)
+ */
+export type ThreadMessageResponseWrapper = {
+    data: ThreadMessageResponse;
+    /**
+     * Meta
+     */
+    meta?: null;
+    /**
+     * Error
+     */
+    error?: null;
+};
+
+/**
  * ThreadMessagesResponse
  *
  * Response for list of messages in a thread
@@ -1665,6 +1872,23 @@ export type ThreadMessagesResponse = {
      * Total
      */
     total: number;
+};
+
+/**
+ * ThreadMessagesResponseWrapper
+ *
+ * Response wrapper for thread messages list (standardized envelope)
+ */
+export type ThreadMessagesResponseWrapper = {
+    data: ThreadMessagesResponse;
+    /**
+     * Meta
+     */
+    meta?: null;
+    /**
+     * Error
+     */
+    error?: null;
 };
 
 /**
@@ -2146,7 +2370,7 @@ export type RefreshTokenApiV1AuthRefreshPostResponses = {
     /**
      * Successfully refreshed tokens
      */
-    200: RefreshSuccessResponse;
+    200: RefreshSuccessResponseWrapper;
 };
 
 export type RefreshTokenApiV1AuthRefreshPostResponse = RefreshTokenApiV1AuthRefreshPostResponses[keyof RefreshTokenApiV1AuthRefreshPostResponses];
@@ -2162,7 +2386,7 @@ export type LogoutApiV1AuthLogoutPostResponses = {
     /**
      * Successfully logged out
      */
-    200: RefreshSuccessResponse;
+    200: RefreshSuccessResponseWrapper;
 };
 
 export type LogoutApiV1AuthLogoutPostResponse = LogoutApiV1AuthLogoutPostResponses[keyof LogoutApiV1AuthLogoutPostResponses];
@@ -3060,7 +3284,7 @@ export type GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetResponses = {
     /**
      * Successful Response
      */
-    200: GalleryCardListResponse;
+    200: GalleryCardListResponseWrapper;
 };
 
 export type GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetResponse = GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetResponses[keyof GetUserGalleryCardsApiV1UsersUserIdGalleryCardsGetResponses];
@@ -3085,7 +3309,7 @@ export type GetMyGalleryCardsApiV1GalleryCardsMeGetResponses = {
     /**
      * Successful Response
      */
-    200: GalleryCardListResponse;
+    200: GalleryCardListResponseWrapper;
 };
 
 export type GetMyGalleryCardsApiV1GalleryCardsMeGetResponse = GetMyGalleryCardsApiV1GalleryCardsMeGetResponses[keyof GetMyGalleryCardsApiV1GalleryCardsMeGetResponses];
@@ -3110,7 +3334,7 @@ export type CreateGalleryCardApiV1GalleryCardsPostResponses = {
     /**
      * Successful Response
      */
-    201: GalleryCardResponse;
+    201: GalleryCardResponseWrapper;
 };
 
 export type CreateGalleryCardApiV1GalleryCardsPostResponse = CreateGalleryCardApiV1GalleryCardsPostResponses[keyof CreateGalleryCardApiV1GalleryCardsPostResponses];
@@ -3165,7 +3389,7 @@ export type ReorderGalleryCardsApiV1GalleryCardsReorderPutResponses = {
     /**
      * Successful Response
      */
-    200: ReorderGalleryCardsResponse;
+    200: ReorderGalleryCardsResponseWrapper;
 };
 
 export type ReorderGalleryCardsApiV1GalleryCardsReorderPutResponse = ReorderGalleryCardsApiV1GalleryCardsReorderPutResponses[keyof ReorderGalleryCardsApiV1GalleryCardsReorderPutResponses];
@@ -3190,7 +3414,7 @@ export type CreateUploadUrlApiV1MediaUploadUrlPostResponses = {
     /**
      * Successful Response
      */
-    201: CreateUploadUrlResponseSchema;
+    201: CreateUploadUrlResponseWrapper;
 };
 
 export type CreateUploadUrlApiV1MediaUploadUrlPostResponse = CreateUploadUrlApiV1MediaUploadUrlPostResponses[keyof CreateUploadUrlApiV1MediaUploadUrlPostResponses];
@@ -3220,7 +3444,7 @@ export type ConfirmUploadApiV1MediaMediaIdConfirmPostResponses = {
     /**
      * Successful Response
      */
-    200: ConfirmUploadResponseSchema;
+    200: ConfirmUploadResponseWrapper;
 };
 
 export type ConfirmUploadApiV1MediaMediaIdConfirmPostResponse = ConfirmUploadApiV1MediaMediaIdConfirmPostResponses[keyof ConfirmUploadApiV1MediaMediaIdConfirmPostResponses];
@@ -3250,7 +3474,7 @@ export type AttachMediaToPostApiV1MediaPostsPostIdAttachPostResponses = {
     /**
      * Successful Response
      */
-    200: AttachMediaResponseSchema;
+    200: AttachMediaResponseWrapper;
 };
 
 export type AttachMediaToPostApiV1MediaPostsPostIdAttachPostResponse = AttachMediaToPostApiV1MediaPostsPostIdAttachPostResponses[keyof AttachMediaToPostApiV1MediaPostsPostIdAttachPostResponses];
@@ -3280,7 +3504,7 @@ export type AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostRespon
     /**
      * Successful Response
      */
-    200: AttachMediaResponseSchema;
+    200: AttachMediaResponseWrapper;
 };
 
 export type AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostResponse = AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostResponses[keyof AttachMediaToGalleryCardApiV1MediaGalleryCardsCardIdAttachPostResponses];
@@ -3330,7 +3554,7 @@ export type CreateMessageRequestApiV1MessageRequestsPostResponses = {
     /**
      * Successful Response
      */
-    201: MessageRequestResponse;
+    201: MessageRequestResponseWrapper;
 };
 
 export type CreateMessageRequestApiV1MessageRequestsPostResponse = CreateMessageRequestApiV1MessageRequestsPostResponses[keyof CreateMessageRequestApiV1MessageRequestsPostResponses];
@@ -3358,11 +3582,9 @@ export type GetMyMessageRequestsApiV1MessageRequestsInboxGetError = GetMyMessage
 
 export type GetMyMessageRequestsApiV1MessageRequestsInboxGetResponses = {
     /**
-     * Response Get My Message Requests Api V1 Message Requests Inbox Get
-     *
      * Successful Response
      */
-    200: Array<MessageRequestResponse>;
+    200: MessageRequestListResponseWrapper;
 };
 
 export type GetMyMessageRequestsApiV1MessageRequestsInboxGetResponse = GetMyMessageRequestsApiV1MessageRequestsInboxGetResponses[keyof GetMyMessageRequestsApiV1MessageRequestsInboxGetResponses];
@@ -3390,11 +3612,9 @@ export type GetMySentMessageRequestsApiV1MessageRequestsSentGetError = GetMySent
 
 export type GetMySentMessageRequestsApiV1MessageRequestsSentGetResponses = {
     /**
-     * Response Get My Sent Message Requests Api V1 Message Requests Sent Get
-     *
      * Successful Response
      */
-    200: Array<MessageRequestResponse>;
+    200: MessageRequestListResponseWrapper;
 };
 
 export type GetMySentMessageRequestsApiV1MessageRequestsSentGetResponse = GetMySentMessageRequestsApiV1MessageRequestsSentGetResponses[keyof GetMySentMessageRequestsApiV1MessageRequestsSentGetResponses];
@@ -3424,7 +3644,7 @@ export type AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostResponses
     /**
      * Successful Response
      */
-    200: AcceptRequestResponse;
+    200: AcceptRequestResponseWrapper;
 };
 
 export type AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostResponse = AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostResponses[keyof AcceptMessageRequestApiV1MessageRequestsRequestIdAcceptPostResponses];
@@ -3454,7 +3674,7 @@ export type DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostRespons
     /**
      * Successful Response
      */
-    200: MessageRequestResponse;
+    200: MessageRequestResponseWrapper;
 };
 
 export type DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostResponse = DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostResponses[keyof DeclineMessageRequestApiV1MessageRequestsRequestIdDeclinePostResponses];
@@ -3488,7 +3708,7 @@ export type GetMyThreadsApiV1ThreadsGetResponses = {
     /**
      * Successful Response
      */
-    200: ThreadListResponse;
+    200: ThreadListResponseWrapper;
 };
 
 export type GetMyThreadsApiV1ThreadsGetResponse = GetMyThreadsApiV1ThreadsGetResponses[keyof GetMyThreadsApiV1ThreadsGetResponses];
@@ -3527,7 +3747,7 @@ export type GetThreadMessagesApiV1ThreadsThreadIdMessagesGetResponses = {
     /**
      * Successful Response
      */
-    200: ThreadMessagesResponse;
+    200: ThreadMessagesResponseWrapper;
 };
 
 export type GetThreadMessagesApiV1ThreadsThreadIdMessagesGetResponse = GetThreadMessagesApiV1ThreadsThreadIdMessagesGetResponses[keyof GetThreadMessagesApiV1ThreadsThreadIdMessagesGetResponses];
@@ -3557,7 +3777,7 @@ export type SendMessageApiV1ThreadsThreadIdMessagesPostResponses = {
     /**
      * Successful Response
      */
-    201: ThreadMessageResponse;
+    201: ThreadMessageResponseWrapper;
 };
 
 export type SendMessageApiV1ThreadsThreadIdMessagesPostResponse = SendMessageApiV1ThreadsThreadIdMessagesPostResponses[keyof SendMessageApiV1ThreadsThreadIdMessagesPostResponses];
