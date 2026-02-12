@@ -3,7 +3,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { PostResponse } from '@/shared/api/generated'
 import { toggleLikeApiV1PostsPostIdLikePost } from '@/shared/api/generated'
-import { listPostsApiV1PostsGetQueryKey } from '@/shared/api/generated/@tanstack/react-query.gen'
+import {
+  getPostApiV1PostsPostIdGetQueryKey,
+  listPostsApiV1PostsGetQueryKey,
+} from '@/shared/api/generated/@tanstack/react-query.gen'
 
 interface ToggleLikeResponse {
   data: {
@@ -27,11 +30,19 @@ export function useToggleLike() {
       return response.data as ToggleLikeResponse
     },
     onMutate: async postId => {
+      const postDetailQueryKey = getPostApiV1PostsPostIdGetQueryKey({
+        path: {
+          post_id: postId,
+        },
+      })
+
       // Cancel any outgoing refetches
       await queryClient.cancelQueries({ queryKey: postsQueryKey })
+      await queryClient.cancelQueries({ queryKey: postDetailQueryKey })
 
       // Snapshot the previous value
       const previousPosts = queryClient.getQueriesData({ queryKey: postsQueryKey })
+      const previousPostDetail = queryClient.getQueryData(postDetailQueryKey)
 
       // Optimistically update to the new value
       queryClient.setQueriesData<{ data: { posts: PostResponse[]; total: number } }>(
@@ -50,7 +61,7 @@ export function useToggleLike() {
                     ...post,
                     liked_by_me: !currentlyLiked,
                     like_count: currentlyLiked
-                      ? (post.like_count ?? 0) - 1
+                      ? Math.max(0, (post.like_count ?? 0) - 1)
                       : (post.like_count ?? 0) + 1,
                   }
                 }
@@ -61,7 +72,27 @@ export function useToggleLike() {
         }
       )
 
-      return { previousPosts }
+      queryClient.setQueryData(postDetailQueryKey, old => {
+        if (!old || typeof old !== 'object') return old
+        const typed = old as { data?: PostResponse }
+        const currentPost = typed.data
+        if (!currentPost || currentPost.id !== postId) return old
+
+        const currentlyLiked = currentPost.liked_by_me ?? false
+
+        return {
+          ...typed,
+          data: {
+            ...currentPost,
+            liked_by_me: !currentlyLiked,
+            like_count: currentlyLiked
+              ? Math.max(0, (currentPost.like_count ?? 0) - 1)
+              : (currentPost.like_count ?? 0) + 1,
+          },
+        }
+      })
+
+      return { previousPosts, previousPostDetail, postDetailQueryKey }
     },
     onError: (_err, _postId, context) => {
       // Rollback on error
@@ -70,10 +101,22 @@ export function useToggleLike() {
           queryClient.setQueryData(queryKey, data)
         })
       }
+
+      if (context?.postDetailQueryKey) {
+        queryClient.setQueryData(context.postDetailQueryKey, context.previousPostDetail)
+      }
     },
-    onSettled: () => {
+    onSettled: (_data, _error, postId) => {
       // Refetch to ensure we have the latest data
       queryClient.invalidateQueries({ queryKey: postsQueryKey })
+
+      queryClient.invalidateQueries({
+        queryKey: getPostApiV1PostsPostIdGetQueryKey({
+          path: {
+            post_id: postId,
+          },
+        }),
+      })
     },
   })
 

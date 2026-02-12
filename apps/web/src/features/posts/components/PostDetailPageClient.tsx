@@ -367,7 +367,7 @@ export function PostDetailPageClient({ postId }: PostDetailPageClientProps) {
         )}
 
         {/* Post Content */}
-        <div className="mb-6 p-4 bg-muted/30 rounded-lg">
+        <div className="mb-4 bg-muted/30 rounded-lg">
           <p className="text-base text-foreground leading-relaxed whitespace-pre-wrap">
             {post.content}
           </p>
@@ -375,13 +375,13 @@ export function PostDetailPageClient({ postId }: PostDetailPageClientProps) {
 
         {/* Phase 9: Display post images using signed read URLs */}
         {post.media_asset_ids && post.media_asset_ids.length > 0 && (
-          <div className="mb-6 flex justify-center">
+          <div className="mb-4 flex justify-center">
             <PostImages mediaAssetIds={post.media_asset_ids} maxDisplay={4} />
           </div>
         )}
 
         {/* Post Meta */}
-        <div className="mb-6 p-4 bg-muted/20 rounded-lg text-xs text-muted-foreground space-y-1">
+        <div className="mb-4 bg-muted/20 rounded-lg text-xs text-muted-foreground space-y-1">
           <p>📅 發布時間: {new Date(post.created_at).toLocaleString('zh-TW')}</p>
           <p>⏰ 到期時間: {new Date(post.expires_at).toLocaleString('zh-TW')}</p>
         </div>
