@@ -1250,14 +1250,22 @@ Group M5: US5 Mobile (Expo) - Trade
   - Server Component 預取 profile 和 gallery 資料
   - 使用 HydrationBoundary 實現 SSR + CSR hydration
 
+- [x] W106 [US6-EXT] 貼文頭像可點擊導向個人檔案：增強使用者互動
+  - 路徑：apps/web/src/features/posts/components/PostsList.tsx
+  - 路徑：apps/web/src/features/posts/components/PostDetailPageClient.tsx
+  - 路徑：apps/web/src/features/posts/components/CommentsList.tsx
+  - 使用 Next.js Link 包裹頭像和暱稱
+  - 點擊導向 `/users/{userId}` 查看完整個人檔案
+  - 新增 hover 效果提示可點擊
+
 ---
 
 ## Summary（摘要）
 
 ### Statistics（統計）
 
-- **Total Tasks**: 231 (Backend: includes Phase 10 T206-T208) + 13 (Mobile Phase 1M) + 6 (Mobile Tooling: Phase 1M.1) + Mobile US tasks + 5 (Phase 10 Web: W101-W105) = 255+
-- **Completed**: 96 (Backend: Phase 1: 8/8, Phase 2: 20/20, Phase 3: 35/37, Phase 6: 33/33) + 13 (Mobile: Phase 1M: 13/13) + 3 (Mobile: Phase 3: 3/4) + 3 (Phase 10 Backend: T206-T208) + 5 (Phase 10 Web: W101-W105) = 120
+- **Total Tasks**: 231 (Backend: includes Phase 10 T206-T208) + 13 (Mobile Phase 1M) + 6 (Mobile Tooling: Phase 1M.1) + Mobile US tasks + 6 (Phase 10 Web: W101-W106) = 256+
+- **Completed**: 96 (Backend: Phase 1: 8/8, Phase 2: 20/20, Phase 3: 35/37, Phase 6: 33/33) + 13 (Mobile: Phase 1M: 13/13) + 3 (Mobile: Phase 3: 3/4) + 3 (Phase 10 Backend: T206-T208) + 6 (Phase 10 Web: W101-W106) = 121
 - **Remaining**: 132 (Backend) + Mobile US tasks (M104, M201-M704)
 - **Estimated Duration**: 8 weeks (remaining sprints)
 
@@ -1284,7 +1292,7 @@ Group M5: US5 Mobile (Expo) - Trade
 | 8.5 | US7 - Board Posts | 23 | P2 | ⏸️ Not Started |
 | 9 | Polish | 14 | - | ⏸️ Not Started |
 | 10 | US6-EXT - User Profile View (Backend) | 3 | P2 | ✅ 100% Complete (T206-T208) |
-| 10 | US6-EXT - User Profile View (Web) | 5 | P2 | ✅ 100% Complete (W101-W105) |
+| 10 | US6-EXT - User Profile View (Web) | 6 | P2 | ✅ 100% Complete (W101-W106) |
 
 ### MVP Scope（MVP 範圍）
 
