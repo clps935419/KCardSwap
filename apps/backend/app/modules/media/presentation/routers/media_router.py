@@ -27,11 +27,14 @@ from app.modules.media.infrastructure.repositories.media_repository_impl import 
 )
 from app.modules.media.presentation.schemas.media_schemas import (
     AttachMediaResponseSchema,
+    AttachMediaResponseWrapper,
     AttachMediaToGalleryCardRequestSchema,
     AttachMediaToPostRequestSchema,
     ConfirmUploadResponseSchema,
+    ConfirmUploadResponseWrapper,
     CreateUploadUrlRequestSchema,
     CreateUploadUrlResponseSchema,
+    CreateUploadUrlResponseWrapper,
 )
 from app.modules.media.presentation.schemas.media_read_url_schemas import (
     ReadMediaUrlsRequest,
@@ -58,7 +61,7 @@ router = APIRouter(prefix="/media", tags=["media"])
 
 @router.post(
     "/upload-url",
-    response_model=CreateUploadUrlResponseSchema,
+    response_model=CreateUploadUrlResponseWrapper,
     status_code=status.HTTP_201_CREATED,
     summary="Generate presigned upload URL",
     description="Step 1: Generate a presigned URL for uploading media to GCS. FR-006.",
@@ -101,16 +104,20 @@ async def create_upload_url(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=exc.message
         )
 
-    return CreateUploadUrlResponseSchema(
-        media_id=result.media_id,
-        upload_url=result.upload_url,
-        expires_in_minutes=result.expires_in_minutes,
-    )
+    return {
+        "data": CreateUploadUrlResponseSchema(
+            media_id=result.media_id,
+            upload_url=result.upload_url,
+            expires_in_minutes=result.expires_in_minutes,
+        ),
+        "meta": None,
+        "error": None,
+    }
 
 
 @router.post(
     "/{media_id}/confirm",
-    response_model=ConfirmUploadResponseSchema,
+    response_model=ConfirmUploadResponseWrapper,
     status_code=status.HTTP_200_OK,
     summary="Confirm media upload",
     description="Step 2: Confirm that media was uploaded to GCS. Applies quota. FR-022, T052.",
@@ -159,16 +166,20 @@ async def confirm_upload(
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(exc))
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
 
-    return ConfirmUploadResponseSchema(
-        media_id=result.media_id,
-        status=result.status,
-        file_size_bytes=result.file_size_bytes,
-    )
+    return {
+        "data": ConfirmUploadResponseSchema(
+            media_id=result.media_id,
+            status=result.status,
+            file_size_bytes=result.file_size_bytes,
+        ),
+        "meta": None,
+        "error": None,
+    }
 
 
 @router.post(
     "/posts/{post_id}/attach",
-    response_model=AttachMediaResponseSchema,
+    response_model=AttachMediaResponseWrapper,
     status_code=status.HTTP_200_OK,
     summary="Attach media to post",
     description="Step 3: Attach confirmed media to a post. FR-007.",
@@ -205,17 +216,21 @@ async def attach_media_to_post(
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(exc))
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
 
-    return AttachMediaResponseSchema(
-        media_id=result.media_id,
-        status=result.status,
-        attached_to=result.attached_to,
-        target_id=result.target_id,
-    )
+    return {
+        "data": AttachMediaResponseSchema(
+            media_id=result.media_id,
+            status=result.status,
+            attached_to=result.attached_to,
+            target_id=result.target_id,
+        ),
+        "meta": None,
+        "error": None,
+    }
 
 
 @router.post(
     "/gallery/cards/{card_id}/attach",
-    response_model=AttachMediaResponseSchema,
+    response_model=AttachMediaResponseWrapper,
     status_code=status.HTTP_200_OK,
     summary="Attach media to gallery card",
     description="Step 3: Attach confirmed media to a gallery card. FR-007, FR-020.",
@@ -266,12 +281,16 @@ async def attach_media_to_gallery_card(
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(exc))
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
 
-    return AttachMediaResponseSchema(
-        media_id=result.media_id,
-        status=result.status,
-        attached_to=result.attached_to,
-        target_id=result.target_id,
-    )
+    return {
+        "data": AttachMediaResponseSchema(
+            media_id=result.media_id,
+            status=result.status,
+            attached_to=result.attached_to,
+            target_id=result.target_id,
+        ),
+        "meta": None,
+        "error": None,
+    }
 
 
 @router.post(

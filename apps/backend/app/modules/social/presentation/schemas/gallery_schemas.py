@@ -53,3 +53,28 @@ class ReorderGalleryCardsResponse(BaseModel):
 
     message: str = "Gallery cards reordered successfully"
     updated_count: int
+
+
+# Envelope wrappers for standardized responses
+class GalleryCardResponseWrapper(BaseModel):
+    """Response wrapper for single gallery card (standardized envelope)"""
+
+    data: GalleryCardResponse
+    meta: None = None
+    error: None = None
+
+
+class GalleryCardListResponseWrapper(BaseModel):
+    """Response wrapper for gallery card list (standardized envelope)"""
+
+    data: GalleryCardListResponse
+    meta: None = None
+    error: None = None
+
+
+class ReorderGalleryCardsResponseWrapper(BaseModel):
+    """Response wrapper for reorder response (standardized envelope)"""
+
+    data: ReorderGalleryCardsResponse
+    meta: None = None
+    error: None = None

@@ -50,3 +50,28 @@ class AttachMediaResponseSchema(BaseModel):
     status: str = Field(..., description="Media status after attachment", example="attached")
     attached_to: str = Field(..., description="Type of entity attached to", example="post")
     target_id: UUID = Field(..., description="ID of the entity media was attached to")
+
+
+# Envelope wrappers for standardized responses
+class CreateUploadUrlResponseWrapper(BaseModel):
+    """Response wrapper for upload URL (standardized envelope)"""
+
+    data: CreateUploadUrlResponseSchema
+    meta: None = None
+    error: None = None
+
+
+class ConfirmUploadResponseWrapper(BaseModel):
+    """Response wrapper for confirm upload (standardized envelope)"""
+
+    data: ConfirmUploadResponseSchema
+    meta: None = None
+    error: None = None
+
+
+class AttachMediaResponseWrapper(BaseModel):
+    """Response wrapper for attach media (standardized envelope)"""
+
+    data: AttachMediaResponseSchema
+    meta: None = None
+    error: None = None
