@@ -63,6 +63,13 @@ export function ProfileHeader({ profile, isOwnProfile = false }: ProfileHeaderPr
           <Text size="sm" className="text-gray-600">朋友</Text>
         </Box>
       </Box>
+      {/* 
+        TODO: Replace hardcoded values with actual data:
+        - 小卡 count: Get from cardsData.total (requires passing cardsCount prop)
+        - 交易 count: Implement trade count API endpoint
+        - 朋友 count: Implement friends count API endpoint
+        See PHASE10_IMPLEMENTATION_REPORT.md for details
+      */}
     </Box>
   );
 }

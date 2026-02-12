@@ -60,8 +60,12 @@ export function CardGrid({ cards, onCardPress, isLoading }: CardGridProps) {
             className="w-full h-full bg-gray-200 rounded-sm overflow-hidden"
             style={{ borderRadius: 2 }}
           >
-            {/* Placeholder - will be replaced with actual media asset */}
-            <Box className="w-full h-full items-center justify-center bg-gradient-to-br from-purple-400 to-pink-400">
+            {/* 
+              TODO: Replace placeholder with actual media asset image
+              Currently using solid background color as gradient is not supported in React Native
+              Future: Integrate with media asset service to display card images
+            */}
+            <Box className="w-full h-full items-center justify-center bg-purple-400">
               <Text className="text-white text-xs font-bold text-center px-1">
                 {item.idol_name}
               </Text>
