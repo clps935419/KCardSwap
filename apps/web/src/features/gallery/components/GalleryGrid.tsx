@@ -153,7 +153,7 @@ export function GalleryGrid({
         className={cn(
           'grid',
           variant === 'wall'
-            ? 'grid-cols-3 gap-0'
+            ? 'grid-cols-3 gap-px'
             : 'grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3'
         )}
       >
@@ -180,7 +180,7 @@ export function GalleryGrid({
                 className={cn(
                   'overflow-hidden',
                   variant === 'wall'
-                    ? 'rounded-none border-0 bg-card shadow-none'
+                    ? 'rounded-none border border-border/20 bg-card shadow-none'
                     : 'rounded-2xl border border-border/30 bg-card shadow-sm transition-transform duration-200 group-hover:-translate-y-0.5'
                 )}
               >

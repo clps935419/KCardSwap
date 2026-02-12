@@ -23,10 +23,10 @@ export function UserProfilePageClient({ userId }: UserProfilePageClientProps) {
   } = useUserGalleryCards(userId)
 
   return (
-    <div className="mx-auto w-full max-w-2xl min-h-screen bg-card py-6">
+    <div className="mx-auto w-full max-w-3xl min-h-screen bg-background">
       {/* IG-style Profile Header */}
       {isLoadingProfile && (
-        <div className="flex items-start gap-4 px-4 pb-4 border-b border-border/30">
+        <div className="flex items-start gap-4 border-b border-border/30 px-5 py-5 sm:px-6">
           <Skeleton className="h-20 w-20 rounded-full" />
           <div className="flex-1 space-y-2 pt-1">
             <Skeleton className="h-6 w-40" />
@@ -37,7 +37,7 @@ export function UserProfilePageClient({ userId }: UserProfilePageClientProps) {
       )}
 
       {profileError && (
-        <div className="px-4">
+        <div className="px-5 py-4 sm:px-6">
           <div className="rounded-2xl border border-destructive/20 bg-destructive/5 px-4 py-3 text-destructive">
             <p className="text-sm font-semibold">載入使用者資料時發生錯誤</p>
             <p className="text-xs mt-1">
@@ -48,7 +48,7 @@ export function UserProfilePageClient({ userId }: UserProfilePageClientProps) {
       )}
 
       {profileData?.data && (
-        <header className="flex flex-col gap-3 px-4 pb-4 border-b border-border/30">
+        <header className="border-b border-border/30 px-5 py-5 sm:px-6">
           <div className="flex items-start gap-4">
             <UserAvatar
               avatarUrl={profileData.data.avatar_url || undefined}
@@ -59,14 +59,12 @@ export function UserProfilePageClient({ userId }: UserProfilePageClientProps) {
             />
 
             <div className="min-w-0 flex-1 pt-1">
-              <h1 className="text-xl font-bold leading-tight truncate">
+              <h1 className="text-2xl font-bold leading-tight truncate">
                 {profileData.data.nickname || 'Anonymous'}
               </h1>
-              {profileData.data.bio && (
-                <p className="mt-2 text-sm text-muted-foreground whitespace-pre-line">
-                  {profileData.data.bio}
-                </p>
-              )}
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground whitespace-pre-line">
+                {profileData.data.bio?.trim() || '尚未填寫個人簡介'}
+              </p>
             </div>
           </div>
         </header>
@@ -74,15 +72,18 @@ export function UserProfilePageClient({ userId }: UserProfilePageClientProps) {
 
       <div>
         {isLoadingGallery && (
-          <div className="grid grid-cols-3 gap-0">
+          <div className="grid grid-cols-3 gap-px bg-border/20">
             {Array.from({ length: 12 }).map((_, i) => (
-              <Skeleton key={`skeleton-${i}`} className="aspect-square w-full rounded-none" />
+              <Skeleton
+                key={`skeleton-${i}`}
+                className="aspect-square w-full rounded-none bg-muted/40"
+              />
             ))}
           </div>
         )}
 
         {galleryError && (
-          <div className="px-4">
+          <div className="px-5 py-4 sm:px-6">
             <div className="text-center py-8 text-destructive">
               <p className="font-semibold mb-2">載入相簿小卡時發生錯誤</p>
               <p className="text-sm">
