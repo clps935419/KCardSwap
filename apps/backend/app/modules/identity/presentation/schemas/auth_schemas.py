@@ -106,3 +106,12 @@ class RefreshSuccessResponse(BaseModel):
 
     success: bool = Field(default=True, description="Indicates successful refresh")
     message: str = Field(default="Tokens refreshed successfully", description="Success message")
+
+
+# Envelope wrapper for refresh response
+class RefreshSuccessResponseWrapper(BaseModel):
+    """Response wrapper for successful token refresh (standardized envelope)"""
+
+    data: RefreshSuccessResponse
+    meta: None = None
+    error: None = None
