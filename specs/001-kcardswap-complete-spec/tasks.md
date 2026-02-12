@@ -1202,12 +1202,56 @@ Group M5: US5 Mobile (Expo) - Trade
 
 ---
 
+## Phase 10: User Story 6 Extended - 查看他人個人詳細頁 (Priority: P2)
+
+**目的**: 實作 Instagram 風格的使用者個人檔案頁面，可查看其他使用者的個人資訊與相簿小卡
+
+### Backend 實作
+
+- [x] T206 [P] [US6-EXT] 新增 GET /api/v1/profile/{user_id} endpoint：允許查看其他使用者的公開個人檔案
+  - 路徑：apps/backend/app/modules/identity/presentation/routers/profile_router.py
+  - 重用現有的 GetProfileUseCase
+  - 使用標準 ProfileResponse schema
+  - 需要認證但不限制查看權限
+
+- [x] T207 [P] [US6-EXT] 更新 OpenAPI 規格：執行 generate_openapi.py 產生新的 API 文件
+  - 路徑：openapi/openapi.json
+
+- [x] T208 [P] [US6-EXT] 新增 Profile Router 整合測試：測試查看他人 profile 功能
+  - 路徑：apps/backend/tests/integration/modules/identity/test_profile_router_e2e.py
+  - 測試案例：成功查看、不存在的使用者、未認證訪問
+
+### Mobile 前端實作
+
+- [x] M106 [P] [US6-EXT] 重新生成 Mobile SDK：整合新的 profile endpoint
+  - 執行：npm run sdk:clean && npm run sdk:generate
+
+- [x] M107 [P] [US6-EXT] 建立 ProfileHeader 元件：IG 風格的個人資訊卡片
+  - 路徑：apps/mobile/src/features/profile/components/ProfileHeader.tsx
+  - 顯示：頭像、暱稱、簡介、地區、統計資訊
+
+- [x] M108 [P] [US6-EXT] 建立 CardGrid 元件：相簿網格顯示（3列）
+  - 路徑：apps/mobile/src/features/profile/components/CardGrid.tsx
+  - 整合 gallery cards API
+  - IG 風格的網格佈局
+
+- [x] M109 [US6-EXT] 建立 UserProfileScreen：組合 ProfileHeader + CardGrid
+  - 路徑：apps/mobile/src/features/profile/screens/UserProfileScreen.tsx
+  - 整合 getUserProfile 和 getUserGalleryCards APIs
+  - 包含發送訊息、封鎖使用者等操作
+
+- [x] M110 [US6-EXT] 更新 FriendProfileScreen：使用新的 UserProfileScreen
+  - 路徑：apps/mobile/app/friends/[userId].tsx
+  - 簡化為重導至 UserProfileScreen
+
+---
+
 ## Summary（摘要）
 
 ### Statistics（統計）
 
-- **Total Tasks**: 228 (Backend) + 13 (Mobile Phase 1M) + 6 (Mobile Tooling: Phase 1M.1) + Mobile US tasks = 247+
-- **Completed**: 96 (Backend: Phase 1: 8/8, Phase 2: 20/20, Phase 3: 35/37, Phase 6: 33/33) + 13 (Mobile: Phase 1M: 13/13) + 3 (Mobile: Phase 3: 3/4) = 112
+- **Total Tasks**: 231 (Backend: includes Phase 10 T206-T208) + 13 (Mobile Phase 1M) + 6 (Mobile Tooling: Phase 1M.1) + Mobile US tasks + 5 (Phase 10 Mobile: M106-M110) = 255+
+- **Completed**: 96 (Backend: Phase 1: 8/8, Phase 2: 20/20, Phase 3: 35/37, Phase 6: 33/33) + 13 (Mobile: Phase 1M: 13/13) + 3 (Mobile: Phase 3: 3/4) + 3 (Phase 10 Backend: T206-T208) + 5 (Phase 10 Mobile: M106-M110) = 120
 - **Remaining**: 132 (Backend) + Mobile US tasks (M104, M201-M704)
 - **Estimated Duration**: 8 weeks (remaining sprints)
 
@@ -1233,6 +1277,8 @@ Group M5: US5 Mobile (Expo) - Trade
 | 8 | US6 - Subscription | 17 | P2 | ⏸️ Not Started |
 | 8.5 | US7 - Board Posts | 23 | P2 | ⏸️ Not Started |
 | 9 | Polish | 14 | - | ⏸️ Not Started |
+| 10 | US6-EXT - User Profile View (Backend) | 3 | P2 | ✅ 100% Complete (T206-T208) |
+| 10 | US6-EXT - User Profile View (Mobile) | 5 | P2 | ✅ 100% Complete (M106-M110) |
 
 ### MVP Scope（MVP 範圍）
 
