@@ -12,11 +12,8 @@ export function useToast() {
       description?: string
       variant?: 'default' | 'destructive'
     }) => {
-      // For now, just console.log
       if (variant === 'destructive') {
         console.error(title, description)
-      } else {
-        console.log(title, description)
       }
     },
   }

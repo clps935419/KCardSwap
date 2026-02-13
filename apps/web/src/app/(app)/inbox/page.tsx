@@ -36,6 +36,7 @@ export default function InboxPage() {
   const threadsQuery = useQuery({
     ...getMyThreadsApiV1ThreadsGetOptions(),
     refetchInterval: 30000, // 每 30 秒自動更新 inbox 列表
+    refetchIntervalInBackground: false,
   })
 
   const isPageLoading =

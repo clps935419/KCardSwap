@@ -145,7 +145,6 @@ function LoginPageContent({
   const googleLogin = useGoogleLogin({
     flow: 'auth-code',
     onSuccess: async codeResponse => {
-      console.log('[Google OAuth] Authorization code received')
       setAuthStatus('loading')
       setGoogleError('')
 

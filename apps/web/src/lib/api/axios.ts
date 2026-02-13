@@ -20,40 +20,14 @@ export const apiClient: AxiosInstance = axios.create({
   timeout: 30000, // 30 seconds
 })
 
-// Request interceptor (for logging, etc.)
 apiClient.interceptors.request.use(
-  config => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`)
-    }
-    return config
-  },
-  error => {
-    return Promise.reject(error)
-  }
+  config => config,
+  error => Promise.reject(error)
 )
 
-// Response interceptor (for global error handling)
 apiClient.interceptors.response.use(
-  response => {
-    return response
-  },
-  error => {
-    if (process.env.NODE_ENV === 'development') {
-      if (axios.isCancel(error) || error.code === 'ERR_CANCELED') {
-        console.warn('[API Cancelled]', error.message)
-        return Promise.reject(error)
-      }
-
-      if (error.code === 'ECONNABORTED') {
-        console.warn('[API Timeout]', error.message)
-        return Promise.reject(error)
-      }
-
-      console.error('[API Error]', error.response?.status, error.response?.data)
-    }
-    return Promise.reject(error)
-  }
+  response => response,
+  error => Promise.reject(error)
 )
 
 export default apiClient

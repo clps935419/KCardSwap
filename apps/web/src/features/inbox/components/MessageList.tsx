@@ -38,6 +38,7 @@ export function MessageList({ threadId }: MessageListProps) {
     }),
     enabled: !!threadId,
     refetchInterval: 5000, // 每 5 秒自動更新聊天訊息，提供即時通訊體驗
+    refetchIntervalInBackground: false,
   })
 
   const currentUserId = profileQuery.data?.data?.user_id
