@@ -24,8 +24,10 @@ export function useReadMediaUrls(
     enabled?: boolean
   }
 ) {
+  const sortedMediaAssetIds = [...mediaAssetIds].sort()
+
   return useQuery({
-    queryKey: ['media', 'read-urls', ...mediaAssetIds.sort()],
+    queryKey: ['media', 'read-urls', ...sortedMediaAssetIds],
     queryFn: async () => {
       if (mediaAssetIds.length === 0) {
         return {

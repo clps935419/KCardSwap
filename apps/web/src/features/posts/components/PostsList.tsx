@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Loader2, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import {
@@ -19,6 +19,7 @@ import { useToast } from '@/components/ui/use-toast'
 import { UserAvatar } from '@/components/ui/user-avatar'
 import { useCreateMessageRequest } from '@/features/inbox/hooks/useCreateMessageRequest'
 import { PostImages } from '@/features/media/components/PostImages'
+import { useReadMediaUrls } from '@/features/media/hooks/useReadMediaUrls'
 import { usePostsList } from '@/features/posts/hooks/usePostsList'
 import { useToggleLike } from '@/features/posts/hooks/useToggleLike'
 import type { PostCategory, PostResponse } from '@/shared/api/generated'
@@ -81,6 +82,22 @@ export function PostsList() {
   })
   const { data: myProfileData } = useMyProfile()
   const myUserId = myProfileData?.data?.user_id
+  const posts = data?.data?.posts ?? []
+
+  const postListMediaAssetIds = useMemo(() => {
+    return Array.from(
+      new Set(
+        posts
+          .map(post => post.media_asset_ids?.[0])
+          .filter((mediaId): mediaId is string => Boolean(mediaId))
+      )
+    )
+  }, [posts])
+
+  const readMediaUrlsQuery = useReadMediaUrls(postListMediaAssetIds, {
+    enabled: posts.length > 0,
+  })
+  const preloadedMediaUrls = readMediaUrlsQuery.data?.data?.urls ?? {}
 
   const { createRequest } = useCreateMessageRequest()
   const toggleLikeMutation = useToggleLike()
@@ -249,8 +266,6 @@ export function PostsList() {
     )
   }
 
-  const posts = data?.data?.posts || []
-
   if (posts.length === 0) {
     return <div className="text-center text-muted-foreground text-sm py-12">沒有符合篩選的貼文</div>
   }
@@ -320,7 +335,13 @@ export function PostsList() {
               {/* Phase 9: Display post images using signed read URLs */}
               {post.media_asset_ids && post.media_asset_ids.length > 0 ? (
                 <div className="mt-2 w-full flex justify-center">
-                  <PostImages mediaAssetIds={post.media_asset_ids} maxDisplay={1} />
+                  <PostImages
+                    mediaAssetIds={post.media_asset_ids}
+                    maxDisplay={1}
+                    preloadedUrls={preloadedMediaUrls}
+                    isPreloadedUrlsLoading={readMediaUrlsQuery.isLoading}
+                    hasPreloadedUrlsError={!!readMediaUrlsQuery.error}
+                  />
                 </div>
               ) : (
                 <div className="mt-2 text-[11px] text-muted-foreground">無附圖</div>

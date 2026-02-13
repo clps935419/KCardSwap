@@ -14,6 +14,9 @@ const BLUR_DATA_URL =
 interface PostImagesProps {
   mediaAssetIds: string[]
   maxDisplay?: number
+  preloadedUrls?: Record<string, string>
+  isPreloadedUrlsLoading?: boolean
+  hasPreloadedUrlsError?: boolean
 }
 
 /**
@@ -27,16 +30,28 @@ interface PostImagesProps {
  * <PostImages mediaAssetIds={post.media_asset_ids} maxDisplay={4} />
  * ```
  */
-export function PostImages({ mediaAssetIds, maxDisplay = 4 }: PostImagesProps) {
-  const { data, isLoading, error } = useReadMediaUrls(mediaAssetIds)
+export function PostImages({
+  mediaAssetIds,
+  maxDisplay = 4,
+  preloadedUrls,
+  isPreloadedUrlsLoading = false,
+  hasPreloadedUrlsError = false,
+}: PostImagesProps) {
+  const usingPreloadedUrls = typeof preloadedUrls !== 'undefined'
+  const { data, isLoading, error } = useReadMediaUrls(mediaAssetIds, {
+    enabled: !usingPreloadedUrls,
+  })
 
   // Don't render if no media
   if (!mediaAssetIds || mediaAssetIds.length === 0) {
     return null
   }
 
+  const loading = usingPreloadedUrls ? isPreloadedUrlsLoading : isLoading
+  const hasError = usingPreloadedUrls ? hasPreloadedUrlsError : !!error
+
   // Show loading state
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="h-48 flex items-center justify-center bg-muted/30 rounded-lg">
         <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -46,7 +61,7 @@ export function PostImages({ mediaAssetIds, maxDisplay = 4 }: PostImagesProps) {
   }
 
   // Show error state
-  if (error) {
+  if (hasError) {
     return (
       <div className="h-48 flex items-center justify-center bg-destructive/10 rounded-lg">
         <span className="text-sm text-destructive">無法載入圖片</span>
@@ -54,7 +69,7 @@ export function PostImages({ mediaAssetIds, maxDisplay = 4 }: PostImagesProps) {
     )
   }
 
-  const urls = data?.data?.urls || {}
+  const urls = preloadedUrls ?? data?.data?.urls ?? {}
   const imagesToShow = mediaAssetIds.slice(0, maxDisplay)
   const remainingCount = mediaAssetIds.length - maxDisplay
   const isSingle = imagesToShow.length === 1
